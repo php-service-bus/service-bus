@@ -48,7 +48,8 @@ class LoggerRegistry
      */
     public static function getLogger(string $channelName = null): Logger
     {
-        $channelName = $channelName ?:
+        $channelName = $channelName
+            ?:
             ('' !== (string) \getenv('ENTRY_POINT_NAME')
                 ? \getenv('ENTRY_POINT_NAME')
                 : 'default'

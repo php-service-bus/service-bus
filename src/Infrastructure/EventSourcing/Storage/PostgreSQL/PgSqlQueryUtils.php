@@ -58,7 +58,7 @@ class PgSqlQueryUtils
         }
 
         return [
-            'query' => \rtrim($sql, ','),
+            'query'      => \rtrim($sql, ','),
             'parameters' => $variables
         ];
     }

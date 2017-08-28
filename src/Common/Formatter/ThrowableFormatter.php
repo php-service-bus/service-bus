@@ -39,7 +39,8 @@ class ThrowableFormatter
                     $previous->getCode(), $previous->getMessage(),
                     $previous->getFile(), $previous->getLine()
                 );
-            } while($previous = $previous->getPrevious());
+            }
+            while($previous = $previous->getPrevious());
         }
 
         $result = \sprintf(

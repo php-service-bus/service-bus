@@ -52,8 +52,8 @@ class DaemonBackendFactory
     private $channels;
 
     /**
-     * @param string                      $entryPointName
-     * @param array                       $channels
+     * @param string                     $entryPointName
+     * @param array                      $channels
      * @param MessageSerializerInterface $serializer
      */
     public function __construct(

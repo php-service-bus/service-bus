@@ -84,7 +84,7 @@ class ContextStorage
 
         throw new Exceptions\StorageManagerWasNotConfiguredException(
             \sprintf(
-                'The manager for the "%s" (type "%s") was not configured in parameters.yaml file',
+                'The manager for the "%s" (type "%s") was not configured in "parameters.yaml" file',
                 $entry, $type
             )
         );

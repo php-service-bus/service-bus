@@ -27,7 +27,7 @@ class StorageFactory
     public const AMPHP_POSTGRE_SQL_STORAGE = 'amphpPgSql';
 
     private const SUPPORTED_DRIVERS = [
-        self::IN_MEMORY_STORAGE => InMemoryEventStorage::class,
+        self::IN_MEMORY_STORAGE         => InMemoryEventStorage::class,
         self::AMPHP_POSTGRE_SQL_STORAGE => AmPhpPostgreSQLStorage::class
     ];
 

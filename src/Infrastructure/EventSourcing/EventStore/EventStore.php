@@ -40,7 +40,7 @@ class EventStore implements EventStoreInterface
     private $eventStreamTransformer;
 
     /**
-     * @param EventStorageInterface       $storage
+     * @param EventStorageInterface      $storage
      * @param MessageSerializerInterface $messageSerializer
      */
     public function __construct(EventStorageInterface $storage, MessageSerializerInterface $messageSerializer)

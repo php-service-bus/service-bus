@@ -68,10 +68,10 @@ class StoredEventStream
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
-            'class' => $this->class,
+            'id'       => $this->id,
+            'class'    => $this->class,
             'isClosed' => $this->isClosed,
-            'events' => \array_map(
+            'events'   => \array_map(
                 function(StoredDomainEvent $storedDomainEvent)
                 {
                     return $storedDomainEvent->toArray();

@@ -65,7 +65,7 @@ class InMemoryEventStorage implements EventStorageInterface
 
             return [
                 'isClosed' => $this->storage[$streamId]['isClosed'],
-                'events' => $events
+                'events'   => $events
             ];
         }
 
