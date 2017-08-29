@@ -24,7 +24,7 @@ class ErrorHandlerAnnotation extends AbstractAnnotation
     /**
      * Logger channel
      *
-     * @var string|null
+     * @var string
      */
-    public $loggerChannel;
+    public $loggerChannel = '';
 }

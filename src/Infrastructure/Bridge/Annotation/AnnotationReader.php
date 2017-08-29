@@ -41,12 +41,14 @@ class AnnotationReader
     /**
      * Load class annotations
      *
-     * @param string $className
+     * @param object|string $class
      *
      * @return array
      */
-    public function loadClassAnnotations(string $className): array
+    public function loadClassAnnotations($class): array
     {
+        $className = true === \is_object($class) ? \get_class($class) : $class;
+
         return $this->reader->getClassAnnotations(new \ReflectionClass($className));
     }
 
@@ -55,18 +57,20 @@ class AnnotationReader
      *
      * [
      *    0 => [
-     *        'annotation'       => AbstractAnnotation instance,
-     *        'reflectionMethod' => ReflectionMethod instance
+     *        'annotation' => AbstractAnnotation instance,
+     *        'method'     => methodName
      *    ],
      *    ...
      * ]
      *
-     * @param string $className
+     * @param object|string $class
      *
      * @return array
      */
-    public function loadClassMethodsAnnotation(string $className): array
+    public function loadClassMethodsAnnotation($class): array
     {
+        $className = true === \is_object($class) ? \get_class($class) : $class;
+
         $reflectionClass = new \ReflectionClass($className);
         $annotations = [];
 
@@ -83,8 +87,8 @@ class AnnotationReader
                             function(AbstractAnnotation $each) use ($method)
                             {
                                 return [
-                                    'annotation'       => $each,
-                                    'reflectionMethod' => $method
+                                    'annotation' => $each,
+                                    'method'     => $method->getName()
                                 ];
                             },
                             $list

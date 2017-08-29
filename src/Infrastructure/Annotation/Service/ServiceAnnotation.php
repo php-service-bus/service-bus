@@ -17,24 +17,10 @@ use Desperado\ConcurrencyFramework\Infrastructure\Annotation\AbstractAnnotation;
 
 /**
  * @Annotation
- * @Target("METHOD")
+ * @Target("CLASS")
  */
-class CommandHandlerAnnotation extends AbstractAnnotation
+class ServiceAnnotation extends AbstractAnnotation
 {
-    /**
-     * Retry delay
-     *
-     * @var float
-     */
-    public $retryDelay = 0.2;
-
-    /**
-     * Retry count
-     *
-     * @var int
-     */
-    public $retryCount = 5;
-
     /**
      * Logger channel
      *

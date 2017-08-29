@@ -13,20 +13,20 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Application\Context;
 
-use Desperado\ConcurrencyFramework\Application\Context\Exceptions\StorageManagerWasNotConfiguredException;
-use Desperado\ConcurrencyFramework\Application\Context\Variables;
+use Desperado\ConcurrencyFramework\Application\Context;
 use Desperado\ConcurrencyFramework\Domain\Environment\Environment;
 use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryOptions;
+use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\AbstractStorageManager;
 use Psr\Log\LoggerInterface;
 
 /**
  * Kernel context
  */
-class KernelContext implements DeliveryContextInterface
+class KernelContext implements DeliveryContextInterface, Options\OptionsInterface
 {
     /**
      * Context messages data
@@ -57,6 +57,27 @@ class KernelContext implements DeliveryContextInterface
     private $contextEntryPoint;
 
     /**
+     * Command execution options
+     *
+     * @var Options\CommandOptions
+     */
+    private $commandExecutionOptions;
+
+    /**
+     * Event execution options
+     *
+     * @var Options\EventOptions
+     */
+    private $eventExecutionOptions;
+
+    /**
+     * Error handler execution options
+     *
+     * @var Options\ErrorOptions
+     */
+    private $errorHandlerExecutionOptions;
+
+    /**
      * @param Variables\ContextEntryPoint $contextEntryPoint
      * @param Variables\ContextMessages   $contextMessages
      * @param Variables\ContextStorage    $contextStorage
@@ -73,6 +94,42 @@ class KernelContext implements DeliveryContextInterface
         $this->contextMessages = $contextMessages;
         $this->contextStorage = $contextStorage;
         $this->contextLogger = $contextLogger;
+    }
+
+    /**
+     * Append command handler execution options
+     *
+     * @param Options\CommandOptions $options
+     *
+     * @return void
+     */
+    public function appendCommandExecutionOptions(Options\CommandOptions $options): void
+    {
+        $this->commandExecutionOptions = $options;
+    }
+
+    /**
+     * Append event handler execution options
+     *
+     * @param Options\EventOptions $options
+     *
+     * @return void
+     */
+    public function appendEventExecutionOptions(Options\EventOptions $options): void
+    {
+        $this->eventExecutionOptions = $options;
+    }
+
+    /**
+     * Append error handler execution options
+     *
+     * @param Options\ErrorOptions $options
+     *
+     * @return void
+     */
+    public function appendErrorHandlerExecutionOptions(Options\ErrorOptions $options): void
+    {
+        $this->errorHandlerExecutionOptions = $options;
     }
 
     /**
@@ -94,7 +151,7 @@ class KernelContext implements DeliveryContextInterface
      *
      * @return AbstractStorageManager
      *
-     * @throws StorageManagerWasNotConfiguredException
+     * @throws Context\Exceptions\StorageManagerWasNotConfiguredException
      */
     public function getStorage(string $entry): AbstractStorageManager
     {

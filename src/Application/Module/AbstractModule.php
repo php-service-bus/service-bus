@@ -13,15 +13,34 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Application\Module;
 
+use Desperado\ConcurrencyFramework\Application\Service\ServiceConfigurator;
+use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
 use Desperado\ConcurrencyFramework\Domain\Service\ServiceInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation\AnnotationReader;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
+use Desperado\ConcurrencyFramework\Infrastructure\Annotation;
+use Psr\Log\LoggerInterface;
 
 /**
  * Load modules
  */
 abstract class AbstractModule
 {
+    /**
+     * Logger instance
+     *
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param LoggerInterface|null $logger
+     */
+    public function __construct(LoggerInterface $logger = null)
+    {
+        $this->logger = $logger ?? LoggerRegistry::getLogger('modules');
+    }
+
     /**
      * Boot module
      *
@@ -32,9 +51,13 @@ abstract class AbstractModule
      */
     public function boot(MessageBusBuilder $messageBusBuilder, AnnotationReader $annotationsReader): void
     {
+        $serviceConfigurator = new ServiceConfigurator(
+            $messageBusBuilder, $annotationsReader, $this->logger
+        );
+
         foreach($this->getServices() as $service)
         {
-            $this->configureService($service, $messageBusBuilder, $annotationsReader);
+            $serviceConfigurator->extract($service);
         }
     }
 
@@ -46,23 +69,5 @@ abstract class AbstractModule
     protected function getServices(): array
     {
         return [];
-    }
-
-    /**
-     * Configure service handlers
-     *
-     * @param ServiceInterface  $service
-     * @param MessageBusBuilder $messageBusBuilder
-     * @param AnnotationReader  $annotationsReader
-     *
-     * @return void
-     */
-    private function configureService(
-        ServiceInterface $service,
-        MessageBusBuilder $messageBusBuilder,
-        AnnotationReader $annotationsReader
-    ): void
-    {
-
     }
 }

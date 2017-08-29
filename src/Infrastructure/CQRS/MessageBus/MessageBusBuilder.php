@@ -14,10 +14,8 @@ declare(strict_types = 1);
 namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus;
 
 use Desperado\ConcurrencyFramework\Domain\MessageBus\MessageBusInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
 use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineCollection;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus\Exceptions\MessageBusCreateFailException;
+use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Pipeline\Pipeline;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task\ProcessMessageTask;
 
@@ -27,75 +25,70 @@ use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task\ProcessMessageTask;
 class MessageBusBuilder
 {
     /**
-     * Handlers
-     *
-     * [
-     *    'commands' => [
-     *         'someCommandNamespace' => \Closure[]
-     *     ],
-     *    'events' => [
-     *         'someEventNamespace' => \Closure[]
-     *     ],
-     *    'errors' => [
-     *         'someErrorNamespace' => \Closure
-     *    ]
-     * ]
+     * Message handlers
      *
      * @var array
      */
     private $messageHandlers = [];
 
     /**
-     * Add command handler
+     * Error handlers
      *
-     * @param string   $commandType
-     * @param \Closure $handler
-     *
-     * @return $this
+     * @var array
      */
-    public function addCommandHandler(string $commandType, \Closure $handler): self
+    private $errorHandlers = [];
+
+    /**
+     * Add command execution handler
+     *
+     * @param \Closure               $handler
+     * @param Options\CommandOptions $options
+     *
+     * @return void
+     */
+    public function addCommandHandler(\Closure $handler, Options\CommandOptions $options): void
     {
-        self::guardCommandType($commandType);
-
-        $this->messageHandlers['commands'][$commandType] = $handler;
-
-        return $this;
+        $this->messageHandlers['command'][] = [
+            'handler' => $handler,
+            'options' => $options
+        ];
     }
 
     /**
-     * Add event listener
+     * Add event execution handler
      *
-     * @param string   $eventType
-     * @param \Closure $listener
+     * @param \Closure             $handler
+     * @param Options\EventOptions $options
      *
-     * @return $this
+     * @return void
      */
-    public function addEventListener(string $eventType, \Closure $listener): self
+    public function addEventHandler(\Closure $handler, Options\EventOptions $options): void
     {
-        self::guardEventType($eventType);
-
-        $this->messageHandlers['events'][$eventType] = $listener;
-
-        return $this;
+        $this->messageHandlers['event'][] = [
+            'handler' => $handler,
+            'options' => $options
+        ];
     }
 
     /**
      * Add error handler
      *
-     * @param string   $errorType
-     * @param string   $commandType
-     * @param \Closure $handler
+     * @param string               $forCommandNamespace
+     * @param \Closure             $handler
+     * @param Options\ErrorOptions $options
      *
-     * @return $this
+     * @return void
      */
-    public function addErrorHandler(string $errorType, string $commandType, \Closure $handler): self
+    public function addErrorHandler(
+        string $forCommandNamespace,
+        \Closure $handler,
+        Options\ErrorOptions $options
+    ): void
     {
-        self::guardErrorType($errorType);
-        self::guardCommandType($commandType);
-
-        $this->messageHandlers['errors'][$commandType][$errorType] = $handler;
-
-        return $this;
+        $this->errorHandlers[$forCommandNamespace] = [
+            'handler' => $handler,
+            'options' => $options
+        ];
     }
 
     /**
@@ -111,102 +104,19 @@ class MessageBusBuilder
         {
             $pipeline = new Pipeline($type);
 
-            foreach($handlers as $key => $handler)
+            foreach($handlers as $handlerData)
             {
-                if(true === \is_object($handler))
-                {
-                    $pipeline->push(new ProcessMessageTask($handler));
-                }
+                $pipeline->push(
+                    new ProcessMessageTask(
+                        $handlerData['handler'],
+                        $handlerData['options']
+                    )
+                );
             }
 
             $collection->add($pipeline);
         }
 
         return new MessageBus($collection);
-    }
-
-    /**
-     * Assert event listener is valid
-     *
-     * @param string $eventType
-     *
-     * @throws MessageBusCreateFailException
-     */
-    private static function guardEventType(string $eventType): void
-    {
-        self::guardHandlerClassNamespace($eventType, 'Event');
-
-        if(false === \is_a($eventType, EventInterface::class, true))
-        {
-            throw new MessageBusCreateFailException(
-                \sprintf('Event must be instanceof "%s"', EventInterface::class)
-            );
-        }
-    }
-
-    /**
-     * Assert command handler is valid
-     *
-     * @param string $commandType
-     *
-     * @throws MessageBusCreateFailException
-     */
-    private static function guardCommandType(string $commandType): void
-    {
-        self::guardHandlerClassNamespace($commandType, 'Command');
-
-        if(false === \is_a($commandType, CommandInterface::class, true))
-        {
-            throw new MessageBusCreateFailException(
-                \sprintf('Command must be instanceof "%s"', CommandInterface::class)
-            );
-        }
-    }
-
-    /**
-     * Assert error handler is valid
-     *
-     * @param string $errorType
-     *
-     * @throws MessageBusCreateFailException
-     */
-    private static function guardErrorType(string $errorType): void
-    {
-        self::guardHandlerClassNamespace($errorType, 'Error');
-
-        if(false === \is_a($errorType, \Throwable::class, true))
-        {
-            throw new MessageBusCreateFailException(
-                \sprintf('Error must be instanceof "%s"', \Throwable::class)
-            );
-        }
-    }
-
-    /**
-     * Assert handler class namespace is valid
-     *
-     * @param string $classNamespace
-     * @param string $type
-     *
-     * @throws MessageBusCreateFailException
-     */
-    private static function guardHandlerClassNamespace(string $classNamespace, string $type): void
-    {
-        if('' === $classNamespace)
-        {
-            throw new MessageBusCreateFailException(
-                \sprintf('%s class must be specified', $type)
-            );
-        }
-
-        if(false === \class_exists($classNamespace))
-        {
-            throw new MessageBusCreateFailException(
-                \sprintf(
-                    '%s class not found (specified namespace: "%s")',
-                    $type, $classNamespace
-                )
-            );
-        }
     }
 }

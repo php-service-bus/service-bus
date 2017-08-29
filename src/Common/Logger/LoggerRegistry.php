@@ -134,7 +134,6 @@ class LoggerRegistry
     {
         return [
             new Processor\PsrLogMessageProcessor(),
-            new Processor\IntrospectionProcessor(),
             new Processor\ProcessIdProcessor()
         ];
     }
