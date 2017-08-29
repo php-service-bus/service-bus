@@ -22,6 +22,20 @@ use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 interface KernelInterface
 {
     /**
+     * Run application
+     *
+     * @return void
+     */
+    public function run(): void;
+
+    /**
+     * Terminate application
+     *
+     * @return void
+     */
+    public function terminate(): void;
+
+    /**
      * Handle message
      *
      * @param MessageInterface $message
