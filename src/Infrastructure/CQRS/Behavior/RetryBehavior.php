@@ -11,21 +11,23 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Behavior;
+namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Behavior;
 
+use Desperado\ConcurrencyFramework\Domain\Behavior\BehaviorInterface;
 use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
 
 /**
- * Behavior
+ * Retry failed commands
  */
-interface BehaviorInterface
+class RetryBehavior implements BehaviorInterface
 {
     /**
-     * Execute
-     *
-     * @param TaskInterface     $task
+     * @param TaskInterface $task
      *
      * @return void
      */
-    public function __invoke(TaskInterface $task): void;
+    public function __invoke(TaskInterface $task): void
+    {
+
+    }
 }

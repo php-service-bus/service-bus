@@ -13,12 +13,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus;
 
+use Desperado\ConcurrencyFramework\Domain\Behavior\BehaviorInterface;
 use Desperado\ConcurrencyFramework\Domain\MessageBus\MessageBusInterface;
 use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineCollection;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Pipeline\Pipeline;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task\ProcessMessageTask;
-use Psr\Log\LoggerInterface;
 
 /**
  * Message bus factory
@@ -38,6 +38,13 @@ class MessageBusBuilder
      * @var array
      */
     private $errorHandlers = [];
+
+    /**
+     * Behaviors collection
+     *
+     * @var BehaviorInterface[]
+     */
+    private $behaviors = [];
 
     /**
      * Add command execution handler
@@ -69,6 +76,18 @@ class MessageBusBuilder
             'handler' => $handler,
             'options' => $options
         ];
+    }
+
+    /**
+     * Add behavior
+     *
+     * @param BehaviorInterface $behavior
+     *
+     * @return void
+     */
+    public function addBehavior(BehaviorInterface $behavior): void
+    {
+        $this->behaviors[\get_class($behavior)] = $behavior;
     }
 
     /**

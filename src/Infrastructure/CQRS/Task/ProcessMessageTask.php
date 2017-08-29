@@ -77,26 +77,7 @@ class ProcessMessageTask implements TaskInterface
             $this->appendOptions($context);
         }
 
-        try
-        {
-            return \call_user_func_array($this->handlerClosure, [$message, $context]);
-        }
-        catch(\Exception $exception)
-        {
-            
-        }
-        catch(\Throwable $throwable)
-        {
-            $this->logger
-                ->critical(
-                    \sprintf(
-                        'An uncovered exception was caught in the task "%s" execution. Error: %s',
-                        \get_class($message), ThrowableFormatter::toString($throwable)
-                    )
-                );
-
-            throw $throwable;
-        }
+        return \call_user_func_array($this->handlerClosure, [$message, $context]);
     }
 
     /**
