@@ -433,7 +433,7 @@ class ServiceConfigurator
     {
         $this->logger->debug(
             \sprintf(
-                'Handler for "%s:%s" successful registered with options %s',
+                'Handler for "%s::%s" successful registered with options %s',
                 $serviceNamespace, $method, \urldecode(\http_build_query($options->toArray()))
             )
         );
