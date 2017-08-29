@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Context;
+namespace Desperado\ConcurrencyFramework\Application\Context\Variables;
 
 use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
 use Psr\Log\LoggerInterface;

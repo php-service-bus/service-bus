@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\Backend;
 
-use Desperado\ConcurrencyFramework\Infrastructure\Application\ApplicationInterface;
+use Desperado\ConcurrencyFramework\Infrastructure\Application\KernelInterface;
 
 /**
  * Entry point backend
@@ -23,11 +23,11 @@ interface BackendInterface
     /**
      * Run backend
      *
-     * @param ApplicationInterface $application
+     * @param KernelInterface $kernel
      *
      * @return void
      */
-    public function run(ApplicationInterface $application): void;
+    public function run(KernelInterface $kernel): void;
 
     /**
      * Stop backend

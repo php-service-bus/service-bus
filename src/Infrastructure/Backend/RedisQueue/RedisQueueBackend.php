@@ -18,7 +18,7 @@ use Amp\Loop;
 use Amp\Redis;
 use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
 use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Application\ApplicationInterface;
+use Desperado\ConcurrencyFramework\Infrastructure\Application\KernelInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Backend\BackendInterface;
 use Psr\Log\LoggerInterface;
 
@@ -95,12 +95,12 @@ class RedisQueueBackend implements BackendInterface
     /**
      * @inheritdoc
      */
-    public function run(ApplicationInterface $application): void
+    public function run(KernelInterface $kernel): void
     {
         $this->initSignals();
 
         Loop::run(
-            function() use ($application)
+            function() use ($kernel)
             {
                 /** Register listeners for each application exchange */
                 try
@@ -127,7 +127,7 @@ class RedisQueueBackend implements BackendInterface
 
                     while(yield $iterator->advance())
                     {
-                        $this->handleMessage((string) $iterator->getCurrent(), $application);
+                        $this->handleMessage((string) $iterator->getCurrent(), $kernel);
                     }
                 }
                 catch(\Throwable $throwable)
@@ -152,12 +152,12 @@ class RedisQueueBackend implements BackendInterface
     /**
      * Handle received task
      *
-     * @param string               $serializedMessage
-     * @param ApplicationInterface $application
+     * @param string          $serializedMessage
+     * @param KernelInterface $kernel
      *
      * @return void
      */
-    private function handleMessage(string $serializedMessage, ApplicationInterface $application)
+    private function handleMessage(string $serializedMessage, KernelInterface $kernel)
     {
         try
         {
@@ -184,7 +184,7 @@ class RedisQueueBackend implements BackendInterface
                     ]
                 );
 
-            $application->handleMessage($message, $context);
+            $kernel->handleMessage($message, $context);
         }
         catch(\Throwable $throwable)
         {

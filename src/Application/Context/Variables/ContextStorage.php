@@ -11,8 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Context;
+namespace Desperado\ConcurrencyFramework\Application\Context\Variables;
 
+use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
 use Desperado\ConcurrencyFramework\Application\Context\Exceptions;
 use Desperado\ConcurrencyFramework\Domain\EventSourced\AggregateRootInterface;
 use Desperado\ConcurrencyFramework\Domain\EventSourced\SagaInterface;
@@ -41,11 +42,11 @@ class ContextStorage
     /**
      * Flush changes
      *
-     * @param ApplicationContext $context
+     * @param KernelContext $context
      *
      * @return void
      */
-    public function flush(ApplicationContext $context): void
+    public function flush(KernelContext $context): void
     {
         foreach($this->storageManagers as $manager)
         {

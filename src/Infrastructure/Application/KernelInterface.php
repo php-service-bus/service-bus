@@ -17,9 +17,9 @@ use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 
 /**
- * Application interface
+ * Kernel
  */
-interface ApplicationInterface
+interface KernelInterface
 {
     /**
      * Handle message

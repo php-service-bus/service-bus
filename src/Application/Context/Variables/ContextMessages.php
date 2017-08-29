@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Context;
+namespace Desperado\ConcurrencyFramework\Application\Context\Variables;
 
 use Desperado\ConcurrencyFramework\Domain\MessageRouter\MessageRouterInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;

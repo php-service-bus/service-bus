@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ConcurrencyFramework\Application\Context;
 
 use Desperado\ConcurrencyFramework\Application\Context\Exceptions\StorageManagerWasNotConfiguredException;
+use Desperado\ConcurrencyFramework\Application\Context\Variables;
 use Desperado\ConcurrencyFramework\Domain\Environment\Environment;
 use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
@@ -23,49 +24,49 @@ use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\AbstractStorage
 use Psr\Log\LoggerInterface;
 
 /**
- * Application context
+ * Kernel context
  */
-class ApplicationContext implements DeliveryContextInterface
+class KernelContext implements DeliveryContextInterface
 {
     /**
      * Context messages data
      *
-     * @var ContextMessages
+     * @var Variables\ContextMessages
      */
     private $contextMessages;
 
     /**
      * Context storage data
      *
-     * @var ContextStorage
+     * @var Variables\ContextStorage
      */
     private $contextStorage;
 
     /**
      * Logger context
      *
-     * @var ContextLogger
+     * @var Variables\ContextLogger
      */
     private $contextLogger;
 
     /**
      * Context entry point
      *
-     * @var ContextEntryPoint
+     * @var Variables\ContextEntryPoint
      */
     private $contextEntryPoint;
 
     /**
-     * @param ContextEntryPoint $contextEntryPoint
-     * @param ContextMessages   $contextMessages
-     * @param ContextStorage    $contextStorage
-     * @param ContextLogger     $contextLogger
+     * @param Variables\ContextEntryPoint $contextEntryPoint
+     * @param Variables\ContextMessages   $contextMessages
+     * @param Variables\ContextStorage    $contextStorage
+     * @param Variables\ContextLogger     $contextLogger
      */
     public function __construct(
-        ContextEntryPoint $contextEntryPoint,
-        ContextMessages $contextMessages,
-        ContextStorage $contextStorage,
-        ContextLogger $contextLogger
+        Variables\ContextEntryPoint $contextEntryPoint,
+        Variables\ContextMessages $contextMessages,
+        Variables\ContextStorage $contextStorage,
+        Variables\ContextLogger $contextLogger
     )
     {
         $this->contextEntryPoint = $contextEntryPoint;
