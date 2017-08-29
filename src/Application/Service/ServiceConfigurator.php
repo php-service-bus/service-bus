@@ -79,64 +79,71 @@ class ServiceConfigurator
      */
     public function extract(ServiceInterface $service): void
     {
-        $globalLoggerChannel = $this->extractGlobalLoggerChannel($service);
-
-        $messageHandlers = $this->annotationsReader->loadClassMethodsAnnotation($service);
-
-        foreach($messageHandlers as $annotationData)
+        try
         {
-            /** @var AbstractAnnotation $annotation */
-            $annotation = $annotationData['annotation'];
-            $reflectionMethod = new \ReflectionMethod($service, $annotationData['method']);
+            $globalLoggerChannel = $this->extractGlobalLoggerChannel($service);
 
-            switch(\get_class($annotation))
+            $messageHandlers = $this->annotationsReader->loadClassMethodsAnnotation($service);
+
+            foreach($messageHandlers as $annotationData)
             {
-                case Annotation\Service\CommandHandlerAnnotation::class:
+                /** @var AbstractAnnotation $annotation */
+                $annotation = $annotationData['annotation'];
+                $reflectionMethod = new \ReflectionMethod($service, $annotationData['method']);
 
-                    /** @var Annotation\Service\CommandHandlerAnnotation $annotation */
+                switch(\get_class($annotation))
+                {
+                    case Annotation\CommandHandlerAnnotation::class:
 
-                    $this->configureCommandHandler(
-                        $service, $annotation, $reflectionMethod, $globalLoggerChannel
-                    );
+                        /** @var Annotation\CommandHandlerAnnotation $annotation */
 
-                    break;
+                        $this->configureCommandHandler(
+                            $service, $annotation, $reflectionMethod, $globalLoggerChannel
+                        );
 
-                case Annotation\Service\EventListenerAnnotation::class:
+                        break;
 
-                    /** @var Annotation\Service\EventListenerAnnotation $annotation */
+                    case Annotation\EventListenerAnnotation::class:
 
-                    $this->configureEventHandler(
-                        $service, $annotation, $reflectionMethod, $globalLoggerChannel
-                    );
+                        /** @var Annotation\EventListenerAnnotation $annotation */
 
-                    break;
+                        $this->configureEventHandler(
+                            $service, $annotation, $reflectionMethod, $globalLoggerChannel
+                        );
 
-                case Annotation\Service\ErrorHandlerAnnotation::class:
+                        break;
 
-                    /** @var Annotation\Service\ErrorHandlerAnnotation $annotation */
+                    case Annotation\ErrorHandlerAnnotation::class:
 
-                    $this->configureErrorHandler(
-                        $service, $annotation, $reflectionMethod, $globalLoggerChannel
-                    );
+                        /** @var Annotation\ErrorHandlerAnnotation $annotation */
 
-                    break;
+                        $this->configureErrorHandler(
+                            $service, $annotation, $reflectionMethod, $globalLoggerChannel
+                        );
+
+                        break;
+                }
             }
+        }
+        catch(\Throwable $throwable)
+        {
+            $this->logger->critical(ThrowableFormatter::toString($throwable));
         }
     }
 
     /**
      * Configure error handler
      *
-     * @param ServiceInterface                          $service
-     * @param Annotation\Service\ErrorHandlerAnnotation $annotation
-     * @param \ReflectionMethod                         $reflectionMethod
-     * @param string                                    $globalLoggerChannel
+     * @param ServiceInterface                  $service
+     * @param Annotation\ErrorHandlerAnnotation $annotation
+     * @param \ReflectionMethod                 $reflectionMethod
+     * @param string                            $globalLoggerChannel
      *
      * @return void
      */
     private function configureErrorHandler(
         ServiceInterface $service,
-        Annotation\Service\ErrorHandlerAnnotation $annotation,
+        Annotation\ErrorHandlerAnnotation $annotation,
         \ReflectionMethod $reflectionMethod,
         string $globalLoggerChannel
     )
@@ -193,16 +200,16 @@ class ServiceConfigurator
     /**
      * Register event handler
      *
-     * @param ServiceInterface                           $service
-     * @param Annotation\Service\EventListenerAnnotation $annotation
-     * @param \ReflectionMethod                          $reflectionMethod
-     * @param string                                     $globalLoggerChannel
+     * @param ServiceInterface                   $service
+     * @param Annotation\EventListenerAnnotation $annotation
+     * @param \ReflectionMethod                  $reflectionMethod
+     * @param string                             $globalLoggerChannel
      *
      * @return void
      */
     private function configureEventHandler(
         ServiceInterface $service,
-        Annotation\Service\EventListenerAnnotation $annotation,
+        Annotation\EventListenerAnnotation $annotation,
         \ReflectionMethod $reflectionMethod,
         string $globalLoggerChannel
     ): void
@@ -243,16 +250,16 @@ class ServiceConfigurator
     /**
      * Configure command handler
      *
-     * @param ServiceInterface                            $service
-     * @param Annotation\Service\CommandHandlerAnnotation $annotation
-     * @param \ReflectionMethod                           $reflectionMethod
-     * @param string                                      $globalLoggerChannel
+     * @param ServiceInterface                    $service
+     * @param Annotation\CommandHandlerAnnotation $annotation
+     * @param \ReflectionMethod                   $reflectionMethod
+     * @param string                              $globalLoggerChannel
      *
      * @return void
      */
     private function configureCommandHandler(
         ServiceInterface $service,
-        Annotation\Service\CommandHandlerAnnotation $annotation,
+        Annotation\CommandHandlerAnnotation $annotation,
         \ReflectionMethod $reflectionMethod,
         string $globalLoggerChannel
     ): void
@@ -308,7 +315,7 @@ class ServiceConfigurator
             function(AbstractAnnotation $annotation) use (&$globalServiceLoggerChannel)
             {
                 if(
-                    $annotation instanceof Annotation\Service\ServiceAnnotation &&
+                    $annotation instanceof Annotation\ServiceAnnotation &&
                     '' !== (string) $annotation->loggerChannel
                 )
                 {
