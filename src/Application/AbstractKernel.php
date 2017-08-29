@@ -331,4 +331,104 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     {
         return Common\Logger\LoggerRegistry::getLogger();
     }
+
+    /**
+     * Get root directory path
+     *
+     * @return string
+     */
+    protected function getRootDirectoryPath(): string
+    {
+        return $this->rootDirectoryPath;
+    }
+
+    /**
+     * Get environment
+     *
+     * @return string
+     */
+    protected function getEnvironmentFilePath(): string
+    {
+        return $this->environmentFilePath;
+    }
+
+    /**
+     * Get message serializer
+     *
+     * @return Domain\Serializer\MessageSerializerInterface
+     */
+    public function getMessageSerializer(): Domain\Serializer\MessageSerializerInterface
+    {
+        return $this->messageSerializer;
+    }
+
+    /**
+     * Get configuration parameters
+     *
+     * @return Domain\ParameterBag
+     */
+    protected function getConfiguration(): Domain\ParameterBag
+    {
+        return $this->configuration;
+    }
+
+    /**
+     * Get logger
+     *
+     * @return LoggerInterface
+     */
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    /**
+     * Get application environment
+     *
+     * @return Domain\Environment\Environment
+     */
+    protected function getEnvironment(): Domain\Environment\Environment
+    {
+        return $this->environment;
+    }
+
+    /**
+     * Get entry point name
+     *
+     * @return string
+     */
+    protected function getEntryPointName(): string
+    {
+        return $this->entryPointName;
+    }
+
+    /**
+     * Get message router
+     *
+     * @return Infrastructure\MessageRouter\MessageRouter
+     */
+    protected function getMessagesRouter(): Infrastructure\MessageRouter\MessageRouter
+    {
+        return $this->messagesRouter;
+    }
+
+    /**
+     * Get messages bus
+     *
+     * @return Domain\MessageBus\MessageBusInterface
+     */
+    protected function getMessageBus(): Domain\MessageBus\MessageBusInterface
+    {
+        return $this->messageBus;
+    }
+
+    /**
+     * Get storage managers
+     *
+     * @return Infrastructure\StorageManager\AbstractStorageManager[]
+     */
+    protected function getStorageManagers(): array
+    {
+        return $this->storageManagers;
+    }
 }
