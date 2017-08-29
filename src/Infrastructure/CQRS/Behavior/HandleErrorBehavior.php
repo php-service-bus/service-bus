@@ -14,7 +14,9 @@ declare(strict_types = 1);
 namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Behavior;
 
 use Desperado\ConcurrencyFramework\Domain\Behavior\BehaviorInterface;
+use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineInterface;
 use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
+use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task\ErrorHandlerWrappedTask;
 
 /**
  * Run error handler for failed command (if specified)
@@ -22,12 +24,29 @@ use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
 class HandleErrorBehavior implements BehaviorInterface
 {
     /**
-     * @param TaskInterface $task
+     * Error handlers
+     *
+     * @var array
+     */
+    private $handlers = [];
+
+    /**
+     * Append error handlers
+     *
+     * @param array $errorHandlers
      *
      * @return void
      */
-    public function __invoke(TaskInterface $task): void
+    public function appendHandlers(array $errorHandlers): void
     {
+        $this->handlers = \array_merge($this->handlers, $errorHandlers);
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function apply(PipelineInterface $pipeline, TaskInterface $task): TaskInterface
+    {
+        return new ErrorHandlerWrappedTask($task, $this->handlers);
     }
 }

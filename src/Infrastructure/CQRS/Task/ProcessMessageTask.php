@@ -13,58 +13,33 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task;
 
-use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
-use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
-use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
 use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\AbstractExecutionOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\CommandOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\ErrorOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\EventOptions;
-use Psr\Log\LoggerInterface;
 
 
 /**
  * Process message (event/command)
  */
-class ProcessMessageTask implements TaskInterface
+class ProcessMessageTask extends AbstractTask
 {
     /**
-     * Message handler
+     * Handler
      *
      * @var \Closure
      */
-    private $handlerClosure;
+    private $handler;
 
     /**
-     * Execution options
-     *
-     * @var AbstractExecutionOptions
-     */
-    private $options;
-
-    /**
-     * Logger
-     *
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param \Closure                 $handlerClosure
+     * @param \Closure                 $closure
      * @param AbstractExecutionOptions $options
      */
-    public function __construct(
-        \Closure $handlerClosure,
-        AbstractExecutionOptions $options
-    )
+    public function __construct(\Closure $closure, AbstractExecutionOptions $options)
     {
-        $this->handlerClosure = $handlerClosure;
-        $this->options = $options;
+        $this->handler = $closure;
 
-        $this->logger = LoggerRegistry::getLogger($options->getLoggerChannel());
+        parent::__construct($options);
     }
 
     /**
@@ -72,36 +47,9 @@ class ProcessMessageTask implements TaskInterface
      */
     public function __invoke(MessageInterface $message, ContextInterface $context): ?TaskInterface
     {
-        if($context instanceof KernelContext)
-        {
-            $this->appendOptions($context);
-        }
+        $this->appendOptions($context);
+        $this->logMessage($message, $context);
 
-        return \call_user_func_array($this->handlerClosure, [$message, $context]);
-    }
-
-    /**
-     * Append execution options
-     *
-     * @param KernelContext $context
-     *
-     * @return void
-     */
-    private function appendOptions(KernelContext $context)
-    {
-        switch(\get_class($this->options))
-        {
-            case CommandOptions::class:
-                $context->appendCommandExecutionOptions($this->options);
-                break;
-
-            case EventOptions::class:
-                $context->appendEventExecutionOptions($this->options);
-                break;
-
-            case ErrorOptions::class:
-                $context->appendErrorHandlerExecutionOptions($this->options);
-                break;
-        }
+        return \call_user_func_array($this->handler, [$message, $context]);
     }
 }

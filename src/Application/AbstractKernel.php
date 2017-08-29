@@ -165,6 +165,16 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     abstract protected function getModules(): array;
 
     /**
+     * @return Domain\Behavior\BehaviorInterface[]
+     */
+    protected function getBehaviors(): array
+    {
+        return [
+            new Infrastructure\CQRS\Behavior\HandleErrorBehavior()
+        ];
+    }
+
+    /**
      * Application init
      * Custom application initialization
      *
@@ -206,6 +216,11 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
                     \sprintf('Module must extends %s', Application\Module\AbstractModule::class)
                 );
             }
+        }
+
+        foreach($this->getBehaviors() as $behavior)
+        {
+            $messageBusBuilder->addBehavior($behavior);
         }
 
         return $messageBusBuilder->build();

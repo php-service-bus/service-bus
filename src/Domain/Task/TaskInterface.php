@@ -15,6 +15,7 @@ namespace Desperado\ConcurrencyFramework\Domain\Task;
 
 use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
+use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\AbstractExecutionOptions;
 
 /**
  * Task
@@ -30,4 +31,11 @@ interface TaskInterface
      * @return TaskInterface|null
      */
     public function __invoke(MessageInterface $message, ContextInterface $context): ?TaskInterface;
+
+    /**
+     * Get execute options
+     *
+     * @return AbstractExecutionOptions
+     */
+    public function getOptions(): AbstractExecutionOptions;
 }

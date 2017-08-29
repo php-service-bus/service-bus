@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Domain\Behavior;
 
+use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineInterface;
 use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
 
 /**
@@ -20,12 +21,5 @@ use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
  */
 interface BehaviorInterface
 {
-    /**
-     * Execute
-     *
-     * @param TaskInterface     $task
-     *
-     * @return void
-     */
-    public function __invoke(TaskInterface $task): void;
+    public function apply(PipelineInterface $pipeline, TaskInterface $task): TaskInterface;
 }

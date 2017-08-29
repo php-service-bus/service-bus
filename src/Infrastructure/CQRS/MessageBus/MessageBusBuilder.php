@@ -16,6 +16,7 @@ namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus;
 use Desperado\ConcurrencyFramework\Domain\Behavior\BehaviorInterface;
 use Desperado\ConcurrencyFramework\Domain\MessageBus\MessageBusInterface;
 use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineCollection;
+use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Behavior\HandleErrorBehavior;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Pipeline\Pipeline;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task\ProcessMessageTask;
@@ -93,6 +94,7 @@ class MessageBusBuilder
     /**
      * Add error handler
      *
+     * @param string               $forExceptionNamespace
      * @param string               $forCommandNamespace
      * @param \Closure             $handler
      * @param Options\ErrorOptions $options
@@ -100,12 +102,13 @@ class MessageBusBuilder
      * @return void
      */
     public function addErrorHandler(
+        string $forExceptionNamespace,
         string $forCommandNamespace,
         \Closure $handler,
         Options\ErrorOptions $options
     ): void
     {
-        $this->errorHandlers[$forCommandNamespace] = [
+        $this->errorHandlers[$forCommandNamespace][$forExceptionNamespace] = [
             'handler' => $handler,
             'options' => $options
         ];
@@ -118,6 +121,13 @@ class MessageBusBuilder
      */
     public function build(): MessageBusInterface
     {
+        if(true === \array_key_exists(HandleErrorBehavior::class, $this->behaviors))
+        {
+            /** @var HandleErrorBehavior $behavior */
+            $behavior = $this->behaviors[HandleErrorBehavior::class];
+            $behavior->appendHandlers($this->errorHandlers);
+        }
+
         $collection = new PipelineCollection();
 
         foreach($this->messageHandlers as $type => $handlers)
@@ -126,12 +136,17 @@ class MessageBusBuilder
 
             foreach($handlers as $handlerData)
             {
-                $pipeline->push(
-                    new ProcessMessageTask(
-                        $handlerData['handler'],
-                        $handlerData['options']
-                    )
+                $task = new ProcessMessageTask(
+                    $handlerData['handler'],
+                    $handlerData['options']
                 );
+
+                foreach($this->behaviors as $behavior)
+                {
+                    $task = $behavior->apply($pipeline, $task);
+                }
+
+                $pipeline->push($task);
             }
 
             $collection->add($pipeline);

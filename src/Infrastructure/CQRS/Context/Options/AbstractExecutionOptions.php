@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CQRS/Event Sourcing Non-blocking concurrency example
+ * CQRS/Event Sourcing Non-blocking concurrency
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @url     https://github.com/mmasiukevich
@@ -45,7 +45,7 @@ abstract class AbstractExecutionOptions implements OptionsInterface
      *
      * @return null|string
      */
-    public function getLoggerChannel()
+    public function getLoggerChannel(): ?string
     {
         return $this->loggerChannel;
     }

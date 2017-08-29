@@ -16,7 +16,7 @@ namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 /**
  * Command execution options
  */
-class CommandOptions extends AbstractExecutionOptions
+class CommandOptions extends AbstractExecutionOptions implements MessageOptionsInterface
 {
     /**
      * Retry delay

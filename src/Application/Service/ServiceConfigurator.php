@@ -182,6 +182,7 @@ class ServiceConfigurator
             );
 
             $this->messageBusBuilder->addErrorHandler(
+                $parameters[0]->getClass()->getName(),
                 $parameters[1]->getClass()->getName(),
                 $reflectionMethod->getClosure($service),
                 $options

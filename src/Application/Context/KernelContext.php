@@ -17,6 +17,7 @@ use Desperado\ConcurrencyFramework\Application\Context;
 use Desperado\ConcurrencyFramework\Domain\Environment\Environment;
 use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
+use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryOptions;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
@@ -130,6 +131,20 @@ class KernelContext implements DeliveryContextInterface, Options\OptionsInterfac
     public function appendErrorHandlerExecutionOptions(Options\ErrorOptions $options): void
     {
         $this->errorHandlerExecutionOptions = $options;
+    }
+
+    /**
+     * Get options for message
+     *
+     * @param MessageInterface $message
+     *
+     * @return Options\MessageOptionsInterface
+     */
+    public function getOptions(MessageInterface $message): Options\MessageOptionsInterface
+    {
+        return $message instanceof EventInterface
+            ? $this->eventExecutionOptions
+            : $this->commandExecutionOptions;
     }
 
     /**

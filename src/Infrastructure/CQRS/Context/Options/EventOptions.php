@@ -16,14 +16,13 @@ namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 /**
  * Event execution options
  */
-class EventOptions extends AbstractExecutionOptions
+class EventOptions extends AbstractExecutionOptions implements MessageOptionsInterface
 {
     /**
      * Log payload data
      *
      * @var bool
      */
-
     private $logPayload;
 
     /**
@@ -60,6 +59,5 @@ class EventOptions extends AbstractExecutionOptions
     {
         return $this->logPayload;
     }
-
 }
 
