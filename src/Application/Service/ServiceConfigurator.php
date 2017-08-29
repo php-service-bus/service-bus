@@ -121,8 +121,6 @@ class ServiceConfigurator
                     break;
             }
         }
-
-        die('111');
     }
 
     /**
