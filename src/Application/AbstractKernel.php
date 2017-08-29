@@ -106,13 +106,13 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
         $this->rootDirectoryPath = \rtrim($rootDirectoryPath, '/');
         $this->environmentFilePath = $environmentFilePath;
 
-        $this->initLogger();
-        $this->initConfiguration();
-        $this->initEnvironment();
-        $this->initEntryPointName();
-        $this->initMessagesRouter();
-        $this->initMessageBus();
-        $this->initEventSourcedStorage();
+        $this->logger = $this->initLogger();
+        $this->configuration = $this->initConfiguration();
+        $this->environment = $this->initEnvironment();
+        $this->entryPointName = $this->initEntryPointName();
+        $this->messagesRouter = $this->initMessagesRouter();
+        $this->messageBus = $this->initMessageBus();
+        $this->storageManagers = $this->initEventSourcedStorage();
     }
 
     /**
@@ -169,9 +169,9 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     /**
      * Init message bus
      *
-     * @return void
+     * @return Domain\MessageBus\MessageBusInterface
      */
-    protected function initMessageBus(): void
+    protected function initMessageBus(): Domain\MessageBus\MessageBusInterface
     {
         $messageBusBuilder = new Infrastructure\CQRS\MessageBus\MessageBusBuilder();
 
@@ -189,16 +189,17 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
             }
         }
 
-        $this->messageBus = $messageBusBuilder->build();
+        return $messageBusBuilder->build();
     }
 
     /**
      * Init event sourced entries storage
      *
-     * @return void
+     * @return Infrastructure\StorageManager\AbstractStorageManager[]
      */
-    protected function initEventSourcedStorage()
+    protected function initEventSourcedStorage(): array
     {
+        $managers = [];
         $parameters = new Domain\ParameterBag($this->configuration->get('eventSourced', []));
 
         /** Init saga storages */
@@ -217,7 +218,7 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
 
             foreach($sagaConfig->get('list', []) as $saga)
             {
-                $this->storageManagers[$saga] = new Infrastructure\StorageManager\SagaStorageManager(
+                $managers[$saga] = new Infrastructure\StorageManager\SagaStorageManager(
                     $saga, $sagaRepository
                 );
             }
@@ -239,24 +240,26 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
 
             foreach($aggregateConfig->get('list', []) as $aggregate)
             {
-                $this->storageManagers[$aggregate] = new Infrastructure\StorageManager\AggregateStorageManager(
+                $managers[$aggregate] = new Infrastructure\StorageManager\AggregateStorageManager(
                     $aggregate, $aggregateRepository
                 );
             }
         }
+
+        return $managers;
     }
 
     /**
      * Init messages router
      *
-     * @return void
+     * @return Domain\MessageRouter\MessageRouterInterface
      */
-    protected function initMessagesRouter(): void
+    protected function initMessagesRouter(): Domain\MessageRouter\MessageRouterInterface
     {
         $appExchanges = new Domain\ParameterBag($this->configuration->get('applicationExchanges', []));
         $responseRoutes = $this->configuration->get('responseMessageRoutes', []);
 
-        $this->messagesRouter = new Infrastructure\MessageRouter\MessageRouter(
+        return new Infrastructure\MessageRouter\MessageRouter(
             $appExchanges->getAsString('commands', $this->entryPointName),
             $appExchanges->getAsString(
                 'events', \sprintf('%s.events', $this->entryPointName)
@@ -268,30 +271,32 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     /**
      * Init entry point
      *
-     * @return void
+     * @return string
      *
      * @throws Application\Exceptions\EmptyEntryPointNameException
      */
-    protected function initEntryPointName(): void
+    protected function initEntryPointName(): string
     {
-        $this->entryPointName = $this->configuration->getAsString('entryPoint');
+        $entryPointName = $this->configuration->getAsString('entryPoint');
 
-        if('' === $this->entryPointName)
+        if('' !== $entryPointName)
         {
-            throw new Application\Exceptions\EmptyEntryPointNameException(
-                'Entry point name must be specified ("APP_ENTRY_POINT_NAME" variable)'
-            );
+            return $entryPointName;
         }
+
+        throw new Application\Exceptions\EmptyEntryPointNameException(
+            'Entry point name must be specified ("APP_ENTRY_POINT_NAME" variable)'
+        );
     }
 
     /**
      * Init environment
      *
-     * @return void
+     * @return Domain\Environment\Environment
      */
-    protected function initEnvironment()
+    protected function initEnvironment(): Domain\Environment\Environment
     {
-        $this->environment = new Domain\Environment\Environment(
+        return new Domain\Environment\Environment(
             $this->configuration->getAsString(
                 'environment',
                 Domain\Environment\Environment::ENVIRONMENT_SANDBOX
@@ -300,11 +305,11 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     }
 
     /**
-     * Parse configuration
+     * Load application configuration
      *
-     * @return void
+     * @return Domain\ParameterBag
      */
-    protected function initConfiguration(): void
+    protected function initConfiguration(): Domain\ParameterBag
     {
         $configurationFilePath = $this->rootDirectoryPath . '/app/configs/parameters.yaml';
 
@@ -312,18 +317,18 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
             $this->environmentFilePath, $configurationFilePath
         );
 
-        $this->configuration = $configurationLoader->loadParameters();
+        return $configurationLoader->loadParameters();
     }
 
     /**
-     * Init loggers
+     * Init logger
      *
      * @todo: configuration support
      *
-     * @return void
+     * @return LoggerInterface
      */
-    protected function initLogger(): void
+    protected function initLogger(): LoggerInterface
     {
-        $this->logger = Common\Logger\LoggerRegistry::getLogger();
+        return Common\Logger\LoggerRegistry::getLogger();
     }
 }
