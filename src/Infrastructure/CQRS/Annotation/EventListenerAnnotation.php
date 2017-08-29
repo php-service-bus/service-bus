@@ -11,15 +11,15 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Annotation\Service;
+namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Annotation\Service;
 
-use Desperado\ConcurrencyFramework\Infrastructure\Annotation\AbstractAnnotation;
+use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
 
 /**
  * @Annotation
- * @Target("CLASS")
+ * @Target("METHOD")
  */
-class ServiceAnnotation extends AbstractAnnotation
+class EventListenerAnnotation extends AbstractAnnotation
 {
     /**
      * Logger channel
@@ -27,4 +27,11 @@ class ServiceAnnotation extends AbstractAnnotation
      * @var string
      */
     public $loggerChannel = '';
+
+    /**
+     * Log payload data
+     *
+     * @var bool
+     */
+    public $logPayload = false;
 }

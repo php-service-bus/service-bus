@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Annotation;
+namespace Desperado\ConcurrencyFramework\Domain\Annotation;
 
 /**
  * Base annotations class

@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Annotation\Service;
+namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Annotation\Service;
 
-use Desperado\ConcurrencyFramework\Infrastructure\Annotation\AbstractAnnotation;
+use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
 
 /**
  * @Annotation

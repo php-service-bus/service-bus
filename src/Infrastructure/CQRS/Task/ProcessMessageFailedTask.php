@@ -11,15 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Annotation\Marker;
+namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task;
 
-use Desperado\ConcurrencyFramework\Infrastructure\Annotation\AbstractAnnotation;
 
-/**
- * @Annotation
- * @Target("CLASS")
- */
-class SagaAnnotation extends AbstractAnnotation
+class ProcessMessageFailedTask
 {
 
 }

@@ -15,6 +15,7 @@ namespace Desperado\ConcurrencyFramework\Application\Service;
 
 use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
 use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
+use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
 use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
 use Desperado\ConcurrencyFramework\Domain\Service\ServiceInterface;
@@ -24,7 +25,7 @@ use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\CommandOp
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\ErrorOptions;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\EventOptions;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
-use Desperado\ConcurrencyFramework\Infrastructure\Annotation;
+use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Annotation;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -84,7 +85,7 @@ class ServiceConfigurator
 
         foreach($messageHandlers as $annotationData)
         {
-            /** @var Annotation\AbstractAnnotation $annotation */
+            /** @var AbstractAnnotation $annotation */
             $annotation = $annotationData['annotation'];
             $reflectionMethod = new \ReflectionMethod($service, $annotationData['method']);
 
@@ -170,9 +171,7 @@ class ServiceConfigurator
             $this->assertContextValidArgument($service, $reflectionMethod, $parameters[2]);
 
             $options = new ErrorOptions(
-                '' !== (string) $annotation->loggerChannel
-                    ? $annotation->loggerChannel
-                    : $globalLoggerChannel
+                self::extractHandlerLoggerChannel($annotation, $globalLoggerChannel)
             );
 
             $this->messageBusBuilder->addErrorHandler(
@@ -222,9 +221,8 @@ class ServiceConfigurator
             $this->assertContextValidArgument($service, $reflectionMethod, $parameters[1]);
 
             $options = new EventOptions(
-                '' !== (string) $annotation->loggerChannel
-                    ? $annotation->loggerChannel
-                    : $globalLoggerChannel
+                $annotation->logPayload,
+                self::extractHandlerLoggerChannel($annotation, $globalLoggerChannel)
             );
 
             $this->messageBusBuilder->addEventHandler(
@@ -273,10 +271,10 @@ class ServiceConfigurator
             $this->assertContextValidArgument($service, $reflectionMethod, $parameters[1]);
 
             $options = new CommandOptions(
-                (float) $annotation->retryDelay, (int) $annotation->retryCount,
-                '' !== (string) $annotation->loggerChannel
-                    ? $annotation->loggerChannel
-                    : $globalLoggerChannel
+                (float) $annotation->retryDelay,
+                (int) $annotation->retryCount,
+                (bool) $annotation->logPayload,
+                self::extractHandlerLoggerChannel($annotation, $globalLoggerChannel)
             );
 
             $this->messageBusBuilder->addCommandHandler(
@@ -307,7 +305,7 @@ class ServiceConfigurator
         $serviceAnnotations = $this->annotationsReader->loadClassAnnotations($service);
 
         \array_map(
-            function(Annotation\AbstractAnnotation $annotation) use (&$globalServiceLoggerChannel)
+            function(AbstractAnnotation $annotation) use (&$globalServiceLoggerChannel)
             {
                 if(
                     $annotation instanceof Annotation\Service\ServiceAnnotation &&
@@ -319,6 +317,29 @@ class ServiceConfigurator
             },
             $serviceAnnotations
         );
+
+        return $globalServiceLoggerChannel;
+    }
+
+    /**
+     * Extract logger channel from annotation
+     *
+     * @param AbstractAnnotation $annotation
+     * @param string             $globalServiceLoggerChannel
+     *
+     * @return string
+     */
+    private static function extractHandlerLoggerChannel(
+        AbstractAnnotation $annotation,
+        string $globalServiceLoggerChannel
+    ): string
+    {
+        if(true === \property_exists($annotation, 'loggerChannel'))
+        {
+            return '' !== (string) $annotation->loggerChannel
+                ? (string) $annotation->loggerChannel
+                : $globalServiceLoggerChannel;
+        }
 
         return $globalServiceLoggerChannel;
     }

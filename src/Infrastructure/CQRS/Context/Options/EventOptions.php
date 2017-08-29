@@ -19,13 +19,47 @@ namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 class EventOptions extends AbstractExecutionOptions
 {
     /**
+     * Log payload data
+     *
+     * @var bool
+     */
+
+    private $logPayload;
+
+    /**
+     * @param bool        $logPayload
+     * @param string|null $loggerChannel
+     */
+    public function __construct(
+        bool $logPayload = false,
+        string $loggerChannel = null
+    )
+    {
+        parent::__construct($loggerChannel);
+
+        $this->logPayload = $logPayload;
+    }
+
+    /**
      * @inheritdoc
      */
     public function toArray(): array
     {
         return [
-            'loggerChannel' => $this->getLoggerChannel()
+            'loggerChannel' => $this->getLoggerChannel(),
+            'logPayload'    => $this->getLogPayloadFlag()
         ];
     }
+
+    /**
+     * Get payload logging flag
+     *
+     * @return bool
+     */
+    public function getLogPayloadFlag(): bool
+    {
+        return $this->logPayload;
+    }
+
 }
 

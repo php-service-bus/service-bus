@@ -33,16 +33,30 @@ class CommandOptions extends AbstractExecutionOptions
     private $retryCount;
 
     /**
+     * Log payload data
+     *
+     * @var bool
+     */
+    private $logPayload;
+
+    /**
      * @param float       $retryDelay
      * @param int         $retryCount
-     * @param null|string $loggerChannel
+     * @param bool        $logPayload
+     * @param string|null $loggerChannel
      */
-    public function __construct(float $retryDelay = 0.2, int $retryCount = 5, string $loggerChannel = null)
+    public function __construct(
+        float $retryDelay = 0.2,
+        int $retryCount = 5,
+        bool $logPayload = false,
+        string $loggerChannel = null
+    )
     {
         parent::__construct($loggerChannel);
 
         $this->retryDelay = $retryDelay;
         $this->retryCount = $retryCount;
+        $this->logPayload = $logPayload;
     }
 
     /**
@@ -53,8 +67,19 @@ class CommandOptions extends AbstractExecutionOptions
         return [
             'retryDelay'    => $this->getRetryDelay(),
             'retryCount'    => $this->getRetryCount(),
-            'loggerChannel' => $this->getLoggerChannel()
+            'loggerChannel' => $this->getLoggerChannel(),
+            'logPayload'    => $this->getLogPayloadFlag()
         ];
+    }
+
+    /**
+     * Get payload logging flag
+     *
+     * @return bool
+     */
+    public function getLogPayloadFlag(): bool
+    {
+        return $this->logPayload;
     }
 
     /**

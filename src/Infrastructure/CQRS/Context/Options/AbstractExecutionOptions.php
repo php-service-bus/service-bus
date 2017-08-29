@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CQRS/Event Sourcing Non-blocking concurrency framework
+ * CQRS/Event Sourcing Non-blocking concurrency example
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @url     https://github.com/mmasiukevich

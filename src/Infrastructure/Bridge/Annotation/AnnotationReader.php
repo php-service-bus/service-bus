@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation;
 
-use Desperado\ConcurrencyFramework\Infrastructure\Annotation\AbstractAnnotation;
+use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
 use Doctrine\Common\Annotations as DoctrineAnnotations;
 
 /**

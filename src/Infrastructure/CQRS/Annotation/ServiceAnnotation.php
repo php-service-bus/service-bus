@@ -11,15 +11,20 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Annotation\Marker;
+namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Annotation\Service;
 
-use Desperado\ConcurrencyFramework\Infrastructure\Annotation\AbstractAnnotation;
+use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
 
 /**
  * @Annotation
  * @Target("CLASS")
  */
-class AggregateRootAnnotation extends AbstractAnnotation
+class ServiceAnnotation extends AbstractAnnotation
 {
-
+    /**
+     * Logger channel
+     *
+     * @var string
+     */
+    public $loggerChannel = '';
 }
