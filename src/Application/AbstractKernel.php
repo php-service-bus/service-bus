@@ -99,7 +99,7 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
      *
      * @var Infrastructure\Bridge\Annotation\AnnotationReader
      */
-    private $annotationsReaer;
+    private $annotationsReader;
 
     /**
      * @param string $rootDirectoryPath
@@ -112,12 +112,13 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     {
         $this->rootDirectoryPath = \rtrim($rootDirectoryPath, '/');
         $this->environmentFilePath = $environmentFilePath;
-        $this->annotationsReaer = new Infrastructure\Bridge\Annotation\AnnotationReader();
+        $this->annotationsReader = new Infrastructure\Bridge\Annotation\AnnotationReader();
 
         $this->logger = $this->initLogger();
         $this->configuration = $this->initConfiguration();
         $this->environment = $this->initEnvironment();
         $this->entryPointName = $this->initEntryPointName();
+        $this->messageSerializer = $this->initMessageSerializer();
         $this->messagesRouter = $this->initMessagesRouter();
         $this->messageBus = $this->initMessageBus();
         $this->storageManagers = $this->initEventSourcedStorage();
@@ -175,6 +176,16 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     }
 
     /**
+     * Init messages serializer
+     *
+     * @return Domain\Serializer\MessageSerializerInterface
+     */
+    protected function initMessageSerializer(): Domain\Serializer\MessageSerializerInterface
+    {
+        return new Infrastructure\Serializer\SymfonyMessageSerializer();
+    }
+
+    /**
      * Init message bus
      *
      * @return Domain\MessageBus\MessageBusInterface
@@ -187,7 +198,7 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
         {
             if($module instanceof Application\Module\AbstractModule)
             {
-                $module->boot($messageBusBuilder, $this->annotationsReaer);
+                $module->boot($messageBusBuilder, $this->annotationsReader);
             }
             else
             {
