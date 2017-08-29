@@ -235,11 +235,16 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
                 )
             );
 
-            foreach($sagaConfig->get('list', []) as $saga)
+            $sagas = $sagaConfig->get('list', []);
+
+            if(true === \is_array($sagas) && 0 !== \count($sagas))
             {
-                $managers[$saga] = new Infrastructure\StorageManager\SagaStorageManager(
-                    $saga, $sagaRepository
-                );
+                foreach($sagas as $saga)
+                {
+                    $managers[$saga] = new Infrastructure\StorageManager\SagaStorageManager(
+                        $saga, $sagaRepository
+                    );
+                }
             }
         }
 
@@ -257,11 +262,16 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
                 )
             );
 
-            foreach($aggregateConfig->get('list', []) as $aggregate)
+            $aggregates = $aggregateConfig->get('list', []);
+
+            if(true === \is_array($aggregates) && 0 !== \count($aggregates))
             {
-                $managers[$aggregate] = new Infrastructure\StorageManager\AggregateStorageManager(
-                    $aggregate, $aggregateRepository
-                );
+                foreach($aggregates as $aggregate)
+                {
+                    $managers[$aggregate] = new Infrastructure\StorageManager\AggregateStorageManager(
+                        $aggregate, $aggregateRepository
+                    );
+                }
             }
         }
 
