@@ -95,6 +95,13 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     private $storageManagers = [];
 
     /**
+     * Annotations reader
+     *
+     * @var Infrastructure\Bridge\Annotation\AnnotationReader
+     */
+    private $annotationsReaer;
+
+    /**
      * @param string $rootDirectoryPath
      * @param string $environmentFilePath
      */
@@ -105,6 +112,7 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     {
         $this->rootDirectoryPath = \rtrim($rootDirectoryPath, '/');
         $this->environmentFilePath = $environmentFilePath;
+        $this->annotationsReaer = new Infrastructure\Bridge\Annotation\AnnotationReader();
 
         $this->logger = $this->initLogger();
         $this->configuration = $this->initConfiguration();
@@ -151,7 +159,7 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     /**
      * Get modules
      *
-     * @return Domain\Module\AbstractModule[]
+     * @return Application\Module\AbstractModule[]
      */
     abstract protected function getModules(): array;
 
@@ -177,14 +185,14 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
 
         foreach($this->getModules() as $module)
         {
-            if($module instanceof Domain\Module\AbstractModule)
+            if($module instanceof Application\Module\AbstractModule)
             {
-                $module->boot($messageBusBuilder);
+                $module->boot($messageBusBuilder, $this->annotationsReaer);
             }
             else
             {
                 $this->logger->critical(
-                    \sprintf('Module must extends %s', Domain\Module\AbstractModule::class)
+                    \sprintf('Module must extends %s', Application\Module\AbstractModule::class)
                 );
             }
         }
