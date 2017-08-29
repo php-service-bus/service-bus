@@ -18,6 +18,7 @@ use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineCollection;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Pipeline\Pipeline;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task\ProcessMessageTask;
+use Psr\Log\LoggerInterface;
 
 /**
  * Message bus factory

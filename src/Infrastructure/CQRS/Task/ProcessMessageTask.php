@@ -14,6 +14,8 @@ declare(strict_types = 1);
 namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task;
 
 use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
+use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
+use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
 use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
@@ -21,6 +23,7 @@ use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\AbstractE
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\CommandOptions;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\ErrorOptions;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\EventOptions;
+use Psr\Log\LoggerInterface;
 
 
 /**
@@ -43,12 +46,25 @@ class ProcessMessageTask implements TaskInterface
     private $options;
 
     /**
+     * Logger
+     *
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param \Closure                 $handlerClosure
      * @param AbstractExecutionOptions $options
      */
-    public function __construct(\Closure $handlerClosure, AbstractExecutionOptions $options)
+    public function __construct(
+        \Closure $handlerClosure,
+        AbstractExecutionOptions $options
+    )
     {
         $this->handlerClosure = $handlerClosure;
+        $this->options = $options;
+
+        $this->logger = LoggerRegistry::getLogger($options->getLoggerChannel());
     }
 
     /**
@@ -61,7 +77,26 @@ class ProcessMessageTask implements TaskInterface
             $this->appendOptions($context);
         }
 
-        return \call_user_func_array($this->handlerClosure, [$message, $context]);
+        try
+        {
+            return \call_user_func_array($this->handlerClosure, [$message, $context]);
+        }
+        catch(\Exception $exception)
+        {
+            
+        }
+        catch(\Throwable $throwable)
+        {
+            $this->logger
+                ->critical(
+                    \sprintf(
+                        'An uncovered exception was caught in the task "%s" execution. Error: %s',
+                        \get_class($message), ThrowableFormatter::toString($throwable)
+                    )
+                );
+
+            throw $throwable;
+        }
     }
 
     /**

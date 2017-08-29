@@ -47,8 +47,8 @@ class MessageBus implements MessageBusInterface
     public function handle(MessageInterface $message, ContextInterface $context): void
     {
         $pipelineName = $message instanceof CommandInterface
-            ? 'commands'
-            : 'events';
+            ? 'command'
+            : 'event';
 
         if(false === $this->pipelines->has($pipelineName))
         {

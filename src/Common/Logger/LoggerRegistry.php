@@ -133,7 +133,6 @@ class LoggerRegistry
     protected static function getDefaultProcessors(): array
     {
         return [
-            new Processor\PsrLogMessageProcessor(),
             new Processor\ProcessIdProcessor()
         ];
     }

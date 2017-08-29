@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Pipeline;
 
+use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
+use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineEntry;
 use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineInterface;
 use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
@@ -106,15 +108,21 @@ class Pipeline implements PipelineInterface
 
         while(false === $this->queue->isEmpty())
         {
+            /** @var PipelineEntry $entry */
+            $entry = yield;
+
+            /** @var MessageInterface $message */
+            $message = $entry->getMessage();
+
+            /** @var KernelContext $context */
+            $context = $entry->getContext();
+
+            /** @var TaskInterface $task */
+            $task = $this->queue->shift();
+
             try
             {
-                /** @var PipelineEntry $entry */
-                $entry = yield;
-
-                /** @var TaskInterface $task */
-                $task = $this->queue->shift();
-
-                $result = $task($entry->getMessage(), $entry->getContext());
+                $result = $task($message, $context);
 
                 if(null !== $result && $result instanceof TaskInterface)
                 {

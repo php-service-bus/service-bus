@@ -113,16 +113,17 @@ class RedisQueueBackend implements BackendInterface
 
                         $this->logger
                             ->debug(
-                                'Signed to channel "{channel}" (For "{entryPoint}" entry point)',
-                                ['channel' => $channel, 'entryPoint' => $this->entryPoint]
+                                \sprintf(
+                                    'Signed to channel "%s" (For "%s" entry point)',
+                                    $channel, $this->entryPoint
+                                )
                             );
                     }
 
                     $iterator = merge($listeners);
 
                     $this->logger->debug(
-                        'Redis queue daemon for entry point "{entryPoint}" started',
-                        ['entryPoint' => $this->entryPoint]
+                        \sprintf('Redis queue daemon for entry point "%s" started', $this->entryPoint)
                     );
 
                     while(yield $iterator->advance())
@@ -170,21 +171,10 @@ class RedisQueueBackend implements BackendInterface
 
             $receivedMessage = $this->messageSerializer->unserialize($serializedMessage);
 
-            $message = $receivedMessage->getMessage();
-            $metadata = $receivedMessage->getMetadata();
-
-            $context = new AmPhpRedisContext($this->publisher, $this->messageSerializer);
-
-            $this->logger
-                ->debug(
-                    'Received message "{messageType}" with metadata "{metadata}"',
-                    [
-                        'messageType' => \get_class($message),
-                        'metadata'    => \urldecode(\http_build_query($metadata->all()))
-                    ]
-                );
-
-            $kernel->handleMessage($message, $context);
+            $kernel->handleMessage(
+                $receivedMessage->getMessage(),
+                new AmPhpRedisContext($this->publisher, $this->messageSerializer)
+            );
         }
         catch(\Throwable $throwable)
         {
