@@ -145,13 +145,13 @@ class ServiceConfigurator
             /** @var EventOptions|CommandOptions $options */
             $options = true === $isEvent
                 ? new EventOptions(
-                    $annotation->logPayload,
-                    self::extractHandlerLoggerChannel($annotation, $globalLoggerChannel)
+                    (bool) $annotation->logPayload,
+                    (string) self::extractHandlerLoggerChannel($annotation, $globalLoggerChannel)
                 )
                 : new CommandOptions(
-                    $annotation->retryDelay,
-                    $annotation->retryCount,
-                    $annotation->logPayload,
+                    (float) $annotation->retryDelay,
+                    (int) $annotation->retryCount,
+                    (bool) $annotation->logPayload,
                     self::extractHandlerLoggerChannel($annotation, $globalLoggerChannel)
                 );
 
