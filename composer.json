@@ -39,7 +39,9 @@
     "amphp/redis": "0.3.0",
     "doctrine/annotations": "v1.5.0",
     "ramsey/uuid": "3.7.0",
-    "amphp/postgres": "^0.1"
+    "amphp/postgres": "^0.1",
+    "bunny/bunny": "^0.2.4",
+    "react/react": "v0.4.2"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.2"
