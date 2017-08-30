@@ -46,25 +46,15 @@ class DaemonBackendFactory
     private $logger;
 
     /**
-     * Channels to subscribe
-     *
-     * @var array
-     */
-    private $channels;
-
-    /**
      * @param string                     $entryPointName
-     * @param array                      $channels
      * @param MessageSerializerInterface $serializer
      */
     public function __construct(
         string $entryPointName,
-        array $channels,
         MessageSerializerInterface $serializer
     )
     {
         $this->entryPointName = $entryPointName;
-        $this->channels = $channels;
         $this->serializer = $serializer;
         $this->logger = LoggerRegistry::getLogger($entryPointName);
     }
@@ -94,7 +84,6 @@ class DaemonBackendFactory
                     return new RedisQueueBackend(
                         $dsnParts['path'],
                         $this->entryPointName,
-                        $this->channels,
                         $this->serializer,
                         $this->logger
                     );
@@ -105,8 +94,7 @@ class DaemonBackendFactory
                         $dsn,
                         $this->entryPointName,
                         $this->logger,
-                        $this->serializer,
-                        $this->channels
+                        $this->serializer
                     );
 
                 default:

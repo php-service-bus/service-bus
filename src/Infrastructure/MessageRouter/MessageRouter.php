@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ConcurrencyFramework\Infrastructure\MessageRouter;
 
 use Desperado\ConcurrencyFramework\Domain\MessageRouter\MessageRouterInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 
 /**
@@ -38,45 +37,14 @@ class MessageRouter implements MessageRouterInterface
     private $routes = [];
 
     /**
-     * Application command destination exchange
-     *
-     * @var string
+     * @param array $messageRoutes
      */
-    private $appCommandDestination;
-
-    /**
-     * Application event destination exchange
-     *
-     * @var string
-     */
-    private $appEventDestination;
-
-    /**
-     * @param string $appCommandDestination
-     * @param string $ppEventDestination
-     * @param array  $routes
-     */
-    public function __construct(
-        string $appCommandDestination,
-        string $ppEventDestination,
-        array $routes = []
-    )
+    public function __construct(array $messageRoutes)
     {
-        $this->appCommandDestination = $appCommandDestination;
-        $this->appEventDestination = $ppEventDestination;
-
-        if(0 !== \count($routes))
+        if(0 !== \count($messageRoutes))
         {
-            $this->addRoutes($routes);
+            $this->addRoutes($messageRoutes);
         }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getApplicationExchanges(): array
-    {
-        return \array_unique([$this->appCommandDestination, $this->appEventDestination]);
     }
 
     /**
@@ -117,8 +85,6 @@ class MessageRouter implements MessageRouterInterface
             return $this->routes[$messageClass];
         }
 
-        return $message instanceof EventInterface
-            ? [$this->appEventDestination]
-            : [$this->appCommandDestination];
+        return [];
     }
 }

@@ -37,16 +37,4 @@ interface MessageRouterInterface
      * @return array
      */
     public function routeMessage(MessageInterface $message): array;
-
-    /**
-     * Get application exchanges
-     *
-     * [
-     *    '0' => 'CommandDestinationExchange',
-     *    '1' => 'EventDestinationExchange'
-     * ]
-     *
-     * @return array
-     */
-    public function getApplicationExchanges(): array;
 }

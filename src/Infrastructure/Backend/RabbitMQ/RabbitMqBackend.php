@@ -73,40 +73,19 @@ class RabbitMqBackend implements BackendInterface
      */
     private $subscriber;
 
-    /**
-     * Commands exchange
-     *
-     * @var string
-     */
-    private $commandExchangeName;
-
-    /**
-     * Events exchange
-     *
-     * @var string
-     */
-    private $eventExchangeName;
-
-    /**
-     * Messages queue
-     *
-     * @var string
-     */
-    private $messagesQueue;
+    private $retry;
 
     /**
      * @param string                     $connectionDSN
      * @param string                     $entryPoint
      * @param LoggerInterface            $logger
      * @param MessageSerializerInterface $messageSerializer
-     * @param array                      $exchanges
      */
     public function __construct(
         string $connectionDSN,
         string $entryPoint,
         LoggerInterface $logger,
-        MessageSerializerInterface $messageSerializer,
-        array $exchanges
+        MessageSerializerInterface $messageSerializer
     )
     {
         $this->connectionDsnParts = \parse_url($connectionDSN);
@@ -114,11 +93,8 @@ class RabbitMqBackend implements BackendInterface
         $this->messageSerializer = $messageSerializer;
         $this->logger = $logger;
         $this->eventLoop = EventLoop::getLoop();
-
-        $this->setupExchangesName($exchanges);
-        $this->setupQueueName();
-
-        $this->subscriber = new Async\Client($this->eventLoop, $this->connectionDsnParts);
+        $this->subscriber = new Async\Client($this->eventLoop, $this->connectionDsnParts, $logger);
+        $this->initSignals();
     }
 
     /**
@@ -126,95 +102,65 @@ class RabbitMqBackend implements BackendInterface
      */
     public function run(KernelInterface $kernel): void
     {
-        $this->initSignals();
-
-
         $this->subscriber
             ->connect()
             ->then(
                 function(Async\Client $client)
                 {
-                    return $client->channel();
-                }
-            )
-            ->then(function(Channel $channel)
-            {
-                return $channel
-                    ->qos(0, 5)
-                    ->then(
-                        function() use ($channel)
-                        {
-                            return $channel;
-                        }
-                    );
-            }
-            )
-            ->then(
-                function(Channel $channel) use ($kernel)
-                {
-                    $this->logger->debug(
-                        \sprintf(
-                            'Connected to rabbit mq queue "%s:%s"',
-                            $this->connectionDsnParts['host'], $this->connectionDsnParts['port']
-                        )
-                    );
-
-                    return $channel
-                        ->exchangeDeclare($this->commandExchangeName)
+                    return $client
+                        ->channel()
                         ->then(
-                            function() use ($channel, $kernel)
+                            function(Channel $channel)
                             {
-                                return $channel->exchangeDeclare($this->eventExchangeName);
-                            },
-                            function()
-                            {
-                                $this->logger->error(
-                                    \sprintf('Execute declare "%s" exchange failed', $this->commandExchangeName)
-                                );
-                            }
-                        )
-                        ->then(
-                            function() use ($channel, $kernel)
-                            {
-                                return $channel->queueDeclare($this->messagesQueue, false, true);
-                            },
-                            function()
-                            {
-                                $this->logger->error(
-                                    \sprintf('Execute declare "%s" exchange failed', $this->commandExchangeName)
-                                );
-                            }
-                        )
-                        ->then(
-                            function(MethodQueueDeclareOkFrame $frame) use ($channel, $kernel)
-                            {
-                                $this->logger->debug('Exchanges configuration successful finished. Start subscribe');
-
                                 return $channel
-                                    ->consume(
-                                        function(Message $incoming, Channel $channel) use ($kernel)
+                                    ->qos(0, 1)
+                                    ->then(
+                                        function() use ($channel)
                                         {
-                                            $this->eventLoop
-                                                ->futureTick(
-                                                    function() use ($incoming, $channel, $kernel)
-                                                    {
-                                                        $this->handleMessage($kernel, $incoming, $channel);
-                                                    }
-                                                );
-                                        },
-                                        $frame->queue
+                                            return $channel;
+                                        }
                                     );
-                            },
-                            function()
+                            }
+                        )
+                        ->then(
+                            function(Channel $channel)
                             {
-                                $this->logger->error(
-                                    \sprintf('Execute declare "%s" queue failed', $this->messagesQueue)
-                                );
+                                return $channel
+                                    ->exchangeDeclare($this->entryPoint)
+                                    ->then(
+                                        function() use ($channel)
+                                        {
+                                            return $channel
+                                                ->queueDeclare($this->entryPoint);
+                                        }
+                                    )
+                                    ->then(
+                                        function(MethodQueueDeclareOkFrame $frame) use ($channel)
+                                        {
+
+                                            $channel
+                                                ->consume(
+                                                    function(Message $incoming, Channel $channel)
+                                                    {
+                                                        $this->eventLoop
+                                                            ->futureTick(
+                                                                function() use ($incoming, $channel)
+                                                                {
+                                                                    echo PHP_EOL . $incoming->content . PHP_EOL;
+
+                                                                    $channel->ack($incoming);
+                                                                }
+                                                            );
+                                                    },
+                                                    $frame->queue
+                                                );
+                                        }
+                                    );
                             }
                         );
-
                 }
             );
+
 
         $this->eventLoop->run();
     }
@@ -251,6 +197,7 @@ class RabbitMqBackend implements BackendInterface
      */
     private function handleMessage(KernelInterface $kernel, Message $incoming, Channel $channel): void
     {
+        die('3');
         try
         {
             $context = new RabbitMqContext(
@@ -273,39 +220,6 @@ class RabbitMqBackend implements BackendInterface
     }
 
     /**
-     * Setup exchanges name
-     *
-     * @param array $exchanges
-     *
-     * @return void
-     */
-    private function setupExchangesName(array $exchanges): void
-    {
-        if(1 === \count($exchanges))
-        {
-            $baseName = \end($exchanges);
-            \reset($exchanges);
-
-            $this->commandExchangeName = $baseName;
-            $this->eventExchangeName = \sprintf('%s.events', $baseName);
-        }
-        else
-        {
-            [$this->commandExchangeName, $this->eventExchangeName] = $exchanges;
-        }
-    }
-
-    /**
-     * Setup messages queue name
-     *
-     * @return void
-     */
-    private function setupQueueName(): void
-    {
-        $this->messagesQueue = \sprintf('%s.messages', $this->entryPoint);
-    }
-
-    /**
      * Init unix signals
      *
      * @return void
@@ -316,5 +230,30 @@ class RabbitMqBackend implements BackendInterface
         \pcntl_signal(\SIGTERM, [$this, 'stop']);
 
         \pcntl_async_signals(true);
+    }
+
+    /**
+     * @param string   $exchangeMain
+     * @param callable $consume
+     *
+     * @return callable
+     */
+    private function getRetryCallback(string $exchangeMain, callable $consume): callable
+    {
+        static $interval = 0.5;
+
+        return function(\Throwable $error) use (&$interval, $exchangeMain, $consume)
+        {
+            $this->logger->critical(ThrowableFormatter::toString($error));
+
+            $this->logger->info(\sprintf('Try to reconnect after %s seconds.', $interval));
+
+            $this->eventLoop->addTimer($interval, function() use ($exchangeMain, $consume)
+            {
+                $this->connectToBroker($exchangeMain, $consume);
+            });
+
+            $interval = 60 > $interval ? $interval * 2 : 0.5;
+        };
     }
 }

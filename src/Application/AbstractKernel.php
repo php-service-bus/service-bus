@@ -305,14 +305,9 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
      */
     protected function initMessagesRouter(): Domain\MessageRouter\MessageRouterInterface
     {
-        $appExchanges = new Domain\ParameterBag($this->configuration->get('applicationExchanges', []));
         $responseRoutes = $this->configuration->get('responseMessageRoutes', []);
 
         return new Infrastructure\MessageRouter\MessageRouter(
-            $appExchanges->getAsString('commands', $this->entryPointName),
-            $appExchanges->getAsString(
-                'events', \sprintf('%s.events', $this->entryPointName)
-            ),
             true === \is_array($responseRoutes) ? $responseRoutes : []
         );
     }

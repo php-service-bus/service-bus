@@ -56,13 +56,6 @@ class RedisQueueBackend implements BackendInterface
     private $messageSerializer;
 
     /**
-     * Channels to subscribe
-     *
-     * @var array
-     */
-    private $channels;
-
-    /**
      * Entry point name
      *
      * @var string
@@ -72,14 +65,12 @@ class RedisQueueBackend implements BackendInterface
     /**
      * @param string                     $connectionDSN
      * @param string                     $entryPoint
-     * @param array                      $channels
      * @param MessageSerializerInterface $messageSerializer
      * @param LoggerInterface            $logger
      */
     public function __construct(
         string $connectionDSN,
         string $entryPoint,
-        array $channels = [],
         MessageSerializerInterface $messageSerializer,
         LoggerInterface $logger
     )
@@ -87,7 +78,6 @@ class RedisQueueBackend implements BackendInterface
         $this->subscriber = new Redis\SubscribeClient($connectionDSN);
         $this->publisher = new Redis\Client($connectionDSN);
         $this->entryPoint = $entryPoint;
-        $this->channels = \array_unique($channels);
         $this->messageSerializer = $messageSerializer;
         $this->logger = $logger;
     }
@@ -99,15 +89,17 @@ class RedisQueueBackend implements BackendInterface
     {
         $this->initSignals();
 
+        $channels = [$this->entryPoint];
+
         Loop::run(
-            function() use ($kernel)
+            function() use ($kernel, $channels)
             {
                 /** Register listeners for each application exchange */
                 try
                 {
                     $listeners = [];
 
-                    foreach($this->channels as $channel)
+                    foreach($channels as $channel)
                     {
                         $listeners[] = yield  $this->subscriber->subscribe($channel);
 
