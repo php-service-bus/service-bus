@@ -20,6 +20,7 @@ use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryOptions;
+use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\AbstractStorageManager;
 use Psr\Log\LoggerInterface;
@@ -27,7 +28,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Kernel context
  */
-class KernelContext implements DeliveryContextInterface, Options\OptionsInterface
+class KernelContext implements DeliveryContextInterface, MessageExecutionOptionsContextInterface
 {
     /**
      * Context messages data
@@ -72,13 +73,6 @@ class KernelContext implements DeliveryContextInterface, Options\OptionsInterfac
     private $eventExecutionOptions;
 
     /**
-     * Error handler execution options
-     *
-     * @var Options\ErrorOptions
-     */
-    private $errorHandlerExecutionOptions;
-
-    /**
      * @param Variables\ContextEntryPoint $contextEntryPoint
      * @param Variables\ContextMessages   $contextMessages
      * @param Variables\ContextStorage    $contextStorage
@@ -98,11 +92,7 @@ class KernelContext implements DeliveryContextInterface, Options\OptionsInterfac
     }
 
     /**
-     * Append command handler execution options
-     *
-     * @param Options\CommandOptions $options
-     *
-     * @return void
+     * @inheritdoc
      */
     public function appendCommandExecutionOptions(Options\CommandOptions $options): void
     {
@@ -110,11 +100,7 @@ class KernelContext implements DeliveryContextInterface, Options\OptionsInterfac
     }
 
     /**
-     * Append event handler execution options
-     *
-     * @param Options\EventOptions $options
-     *
-     * @return void
+     * @inheritdoc
      */
     public function appendEventExecutionOptions(Options\EventOptions $options): void
     {
@@ -122,23 +108,7 @@ class KernelContext implements DeliveryContextInterface, Options\OptionsInterfac
     }
 
     /**
-     * Append error handler execution options
-     *
-     * @param Options\ErrorOptions $options
-     *
-     * @return void
-     */
-    public function appendErrorHandlerExecutionOptions(Options\ErrorOptions $options): void
-    {
-        $this->errorHandlerExecutionOptions = $options;
-    }
-
-    /**
-     * Get options for message
-     *
-     * @param MessageInterface $message
-     *
-     * @return Options\MessageOptionsInterface
+     * @inheritdoc
      */
     public function getOptions(MessageInterface $message): Options\MessageOptionsInterface
     {

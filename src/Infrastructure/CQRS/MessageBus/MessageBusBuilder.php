@@ -94,24 +94,19 @@ class MessageBusBuilder
     /**
      * Add error handler
      *
-     * @param string               $forExceptionNamespace
-     * @param string               $forCommandNamespace
-     * @param \Closure             $handler
-     * @param Options\ErrorOptions $options
+     * @param string   $forExceptionNamespace
+     * @param string   $forCommandNamespace
+     * @param \Closure $handler
      *
      * @return void
      */
     public function addErrorHandler(
         string $forExceptionNamespace,
         string $forCommandNamespace,
-        \Closure $handler,
-        Options\ErrorOptions $options
+        \Closure $handler
     ): void
     {
-        $this->errorHandlers[$forCommandNamespace][$forExceptionNamespace] = [
-            'handler' => $handler,
-            'options' => $options
-        ];
+        $this->errorHandlers[$forCommandNamespace][$forExceptionNamespace] = $handler;
     }
 
     /**

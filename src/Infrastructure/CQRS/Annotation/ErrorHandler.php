@@ -17,14 +17,9 @@ use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
 
 /**
  * @Annotation
- * @Target("CLASS")
+ * @Target("METHOD")
  */
-class ServiceAnnotation extends AbstractAnnotation
+class ErrorHandler extends AbstractAnnotation
 {
-    /**
-     * Logger channel
-     *
-     * @var string
-     */
-    public $loggerChannel = '';
+
 }

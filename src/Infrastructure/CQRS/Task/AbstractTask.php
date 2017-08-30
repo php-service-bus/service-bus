@@ -19,9 +19,9 @@ use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
 use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
+use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\AbstractExecutionOptions;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\CommandOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\ErrorOptions;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\EventOptions;
 use Psr\Log\LoggerInterface;
 
@@ -63,21 +63,19 @@ abstract class AbstractTask implements TaskInterface
      */
     protected function logMessage(MessageInterface $message, ContextInterface $context): void
     {
-        if($context instanceof KernelContext)
+        if($context instanceof MessageExecutionOptionsContextInterface)
         {
             $options = $context->getOptions($message);
+            $logger = $this->getLogger($message, $context);
 
-            if(null !== $options)
+            $logMessage = \sprintf('Start "%s" message execution', \get_class($message));
+
+            if(true === $options->getLogPayloadFlag())
             {
-                $logMessage = \sprintf('Start "%s" message execution', \get_class($message));
-
-                if(true === $options->getLogPayloadFlag())
-                {
-                    $logMessage .= \sprintf(' with payload "%s"', self::getMessagePayloadAsString($message));
-                }
-
-                $this->getLogger($message, $context)->debug($logMessage);
+                $logMessage .= \sprintf(' with payload "%s"', self::getMessagePayloadAsString($message));
             }
+
+            $logger->debug($logMessage);
         }
     }
 
@@ -105,7 +103,7 @@ abstract class AbstractTask implements TaskInterface
      */
     protected function appendOptions(ContextInterface $context)
     {
-        if(false === ($context instanceof KernelContext))
+        if(false === ($context instanceof MessageExecutionOptionsContextInterface))
         {
             return;
         }
@@ -115,15 +113,19 @@ abstract class AbstractTask implements TaskInterface
         switch(\get_class($this->options))
         {
             case CommandOptions::class:
-                $context->appendCommandExecutionOptions($this->options);
+
+                /** @var CommandOptions $options */
+                $options = $this->options;
+
+                $context->appendCommandExecutionOptions($options);
                 break;
 
             case EventOptions::class:
-                $context->appendEventExecutionOptions($this->options);
-                break;
 
-            case ErrorOptions::class:
-                $context->appendErrorHandlerExecutionOptions($this->options);
+                /** @var EventOptions $options */
+                $options = $this->options;
+
+                $context->appendEventExecutionOptions($options);
                 break;
         }
     }

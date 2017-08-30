@@ -16,7 +16,7 @@ namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
 /**
  * Base execution options class
  */
-abstract class AbstractExecutionOptions implements OptionsInterface
+abstract class AbstractExecutionOptions
 {
     /**
      * Logger channel

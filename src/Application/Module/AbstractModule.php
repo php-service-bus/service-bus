@@ -18,7 +18,6 @@ use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
 use Desperado\ConcurrencyFramework\Domain\Service\ServiceInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation\AnnotationReader;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
-use Desperado\ConcurrencyFramework\Infrastructure\Annotation;
 use Psr\Log\LoggerInterface;
 
 /**

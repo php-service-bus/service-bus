@@ -19,22 +19,8 @@ use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
  * @Annotation
  * @Target("METHOD")
  */
-class CommandHandlerAnnotation extends AbstractAnnotation
+class EventHandler extends AbstractAnnotation
 {
-    /**
-     * Retry delay
-     *
-     * @var float
-     */
-    public $retryDelay = 0.2;
-
-    /**
-     * Retry count
-     *
-     * @var int
-     */
-    public $retryCount = 5;
-
     /**
      * Logger channel
      *

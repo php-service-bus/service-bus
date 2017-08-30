@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task;
 
-use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
 use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
 use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
@@ -55,6 +54,8 @@ class ErrorHandlerWrappedTask extends AbstractTask
      */
     public function __invoke(MessageInterface $message, ContextInterface $context): ?TaskInterface
     {
+        $this->appendOptions($context);
+
         try
         {
             $task = $this->originalTask;
@@ -63,90 +64,113 @@ class ErrorHandlerWrappedTask extends AbstractTask
         }
         catch(\Exception $exception)
         {
-            $logger = $this->getLogger($message, $context);
-
-            /** @var KernelContext $context */
-            $options = $context->getOptions($message);
-
-            $logMessage = \sprintf(
-                'An exception "%s" was thrown during execution of the "%s" message',
-                \get_class($exception), \get_class($message)
-            );
-
-            if(true === $options->getLogPayloadFlag())
-            {
-                $logMessage .= \sprintf(' with payload "%s"', self::getMessagePayloadAsString($message));
-            }
-
-            $handlerData = $this->getErrorHandler($exception, $message);
-
-            if(null !== $handlerData)
-            {
-                $logMessage .= '. Error handler found';
-
-                $logger->debug($logMessage);
-
-                try
-                {
-                    /** @var \Closure $handler */
-                    $handler = $handlerData['handler'];
-
-                    $handler($exception, $message, $context);
-
-                    $logger->debug(
-                        \sprintf(
-                            'Exception "%s" for message "%s" successful intercepted',
-                            \get_class($exception), \get_class($message)
-                        )
-                    );
-                }
-                catch(\Throwable $throwable)
-                {
-                    $logger->critical(
-                        \sprintf(
-                            'The error handler can not throw an exception. Intercepted: %s',
-                            ThrowableFormatter::toString($throwable)
-                        )
-                    );
-                }
-            }
-            else
-            {
-                $logMessage .= '. No error handler found';
-
-                $logger->error($logMessage);
-            }
+            $this->handleException($exception, $message, $context);
         }
         catch(\Throwable $throwable)
         {
-            $this
-                ->getLogger($message, $context)
-                ->critical(
-                    \sprintf(
-                        'A fatal error (%s) was caught during the execution of the message "%s" with payload "%s"',
-                        ThrowableFormatter::toString($throwable),
-                        \get_class($message),
-                        self::getMessagePayloadAsString($message)
-                    )
-                );
+            $this->handleThrowable($throwable, $message, $context);
         }
 
         return null;
     }
 
     /**
-     * Get error handler for message
+     * Calling the error handler (if specified)
      *
      * @param \Exception       $exception
      * @param MessageInterface $message
+     * @param ContextInterface $context
      *
-     * @return array|null
+     * @return void
      */
-    private function getErrorHandler(\Exception $exception, MessageInterface $message): ?array
+    private function handleException(
+        \Exception $exception,
+        MessageInterface $message,
+        ContextInterface $context
+    ): void
     {
-        if(isset($this->handlers[\get_class($message)][\get_class($exception)]))
+        $logger = $this->getLogger($message, $context);
+        $exceptionClass = \get_class($exception);
+        $messageClass = \get_class($message);
+        $handler = $this->getErrorHandler($exceptionClass, $messageClass);
+
+        $logMessage = \sprintf(
+            'An exception "%s" was thrown during execution of the "%s" message%s',
+            $exceptionClass, $messageClass,
+            null !== $handler
+                ? '. Error handler found'
+                : '. The error handler was not found'
+        );
+
+        null !== $handler
+            ? $logger->debug($logMessage)
+            : $logger->error($logMessage);
+
+        if(null !== $handler)
         {
-            return $this->handlers[\get_class($message)][\get_class($exception)];
+            try
+            {
+                $handler($exception, $message, $context);
+
+                $logger->debug(
+                    \sprintf(
+                        'Exception "%s" for message "%s" successful intercepted',
+                        $exceptionClass, $messageClass
+                    )
+                );
+            }
+            catch(\Throwable $throwable)
+            {
+                $logger->critical(
+                    \sprintf(
+                        'The error handler can\'t throw an exception. Intercepted: %s',
+                        ThrowableFormatter::toString($throwable)
+                    )
+                );
+            }
+        }
+    }
+
+    /**
+     * Processing of an unrecovered exception
+     *
+     * @param \Throwable       $throwable
+     * @param MessageInterface $message
+     * @param ContextInterface $context
+     *
+     * @return void
+     */
+    private function handleThrowable(
+        \Throwable $throwable,
+        MessageInterface $message,
+        ContextInterface $context
+    ): void
+    {
+        $this
+            ->getLogger($message, $context)
+            ->critical(
+                \sprintf(
+                    'A fatal error (%s) was caught during the execution of the message "%s" with payload "%s"',
+                    ThrowableFormatter::toString($throwable),
+                    \get_class($message),
+                    self::getMessagePayloadAsString($message)
+                )
+            );
+    }
+
+    /**
+     * Get error handler for message
+     *
+     * @param string $exceptionNamespace
+     * @param string $messageNamespace
+     *
+     * @return \Closure|null
+     */
+    private function getErrorHandler(string $exceptionNamespace, string $messageNamespace): ?\Closure
+    {
+        if(isset($this->handlers[$exceptionNamespace][$messageNamespace]))
+        {
+            return $this->handlers[$exceptionNamespace][$messageNamespace];
         }
 
         return null;
