@@ -155,6 +155,11 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
         );
 
         $this->messageBus->handle($message, $kernelContext);
+
+        foreach($this->storageManagers as $storageManager)
+        {
+            $storageManager->commit($kernelContext);
+        }
     }
 
     /**
