@@ -378,8 +378,12 @@ class ServiceConfigurator
         {
             throw new \LogicException(
                 \sprintf(
-                    'The %d argument to the handler "%s:%s" must be instanceof the "%s"',
-                    $argumentPosition, \get_class($service), $reflectionMethod->getName(), MessageInterface::class
+                    'The %d argument to the handler "%s:%s" must be instanceof the "%s" (%s specified)',
+                    $argumentPosition,
+                    \get_class($service),
+                    $reflectionMethod->getName(),
+                    MessageInterface::class,
+                    $parameter->getClass()
                 )
             );
         }
