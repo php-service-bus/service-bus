@@ -168,9 +168,9 @@ class ErrorHandlerWrappedTask extends AbstractTask
      */
     private function getErrorHandler(string $exceptionNamespace, string $messageNamespace): ?\Closure
     {
-        if(isset($this->handlers[$exceptionNamespace][$messageNamespace]))
+        if(isset($this->handlers[$messageNamespace][$exceptionNamespace]))
         {
-            return $this->handlers[$exceptionNamespace][$messageNamespace];
+            return $this->handlers[$messageNamespace][$exceptionNamespace];
         }
 
         return null;
