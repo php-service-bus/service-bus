@@ -135,22 +135,25 @@ class ServiceConfigurator
             /** @var \ReflectionParameter[] $parameters */
             $parameters = $reflectionMethod->getParameters();
 
-            $this->assertValidMessageArgument($service, $reflectionMethod, $parameters[1], 0);
+            $this->assertValidMessageArgument($service, $reflectionMethod, $parameters[0], 0);
             $this->assertContextValidArgument($service, $reflectionMethod, $parameters[1]);
 
             $isEvent = $parameters[0]
                 ->getClass()
                 ->implementsInterface(EventInterface::class);
 
-            $optionsClass = true === $isEvent
-                ? EventOptions::class
-                : CommandOptions::class;
-
             /** @var EventOptions|CommandOptions $options */
-            $options = new $optionsClass(
-                $annotation->logPayload,
-                self::extractHandlerLoggerChannel($annotation, $globalLoggerChannel)
-            );
+            $options = true === $isEvent
+                ? new EventOptions(
+                    $annotation->logPayload,
+                    self::extractHandlerLoggerChannel($annotation, $globalLoggerChannel)
+                )
+                : new CommandOptions(
+                    $annotation->retryDelay,
+                    $annotation->retryCount,
+                    $annotation->logPayload,
+                    self::extractHandlerLoggerChannel($annotation, $globalLoggerChannel)
+                );
 
             $handler = $reflectionMethod->getClosure($service);
 
@@ -383,7 +386,9 @@ class ServiceConfigurator
                     \get_class($service),
                     $reflectionMethod->getName(),
                     MessageInterface::class,
-                    $parameter->getClass()
+                    null !== $parameter->getClass()
+                        ? $parameter->getClass()->getName()
+                        : 'n/a'
                 )
             );
         }
