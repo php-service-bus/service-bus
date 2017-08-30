@@ -14,25 +14,22 @@ declare(strict_types = 1);
 namespace Desperado\ConcurrencyFramework\Infrastructure\Backend\RabbitMQ;
 
 use Bunny\Async\Client;
+use Bunny\Channel;
+use Bunny\Message;
+use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
 use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
+use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryOptions;
-use React\EventLoop\LoopInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * ReactPHP RabbitMQ context
  */
 class RabbitMqContext implements DeliveryContextInterface
 {
-    /**
-     * Publisher client
-     *
-     * @var Client
-     */
-    private $publisher;
-
     /**
      * Message serializer
      *
@@ -41,18 +38,43 @@ class RabbitMqContext implements DeliveryContextInterface
     private $serializer;
 
     /**
-     * @param LoopInterface              $eventLoop
-     * @param array                      $configParts
+     * Exchange ID
+     *
+     * @var string
+     */
+    private $exchange;
+
+    /**
+     * AMQP channel
+     *
+     * @var Channel
+     */
+    private $channel;
+
+    /**
+     * Logger
+     *
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param Message                    $incoming
+     * @param Channel                    $channel
      * @param MessageSerializerInterface $serializer
+     * @param LoggerInterface            $logger
      */
     public function __construct(
-        LoopInterface $eventLoop,
-        array $configParts,
-        MessageSerializerInterface $serializer
+        Message $incoming,
+        Channel $channel,
+        MessageSerializerInterface $serializer,
+        LoggerInterface $logger
     )
     {
-        $this->publisher = new Client($eventLoop, $configParts);
+        $this->exchange = $incoming->exchange;
+        $this->channel = $channel;
         $this->serializer = $serializer;
+        $this->logger = $logger;
     }
 
     /**
@@ -60,7 +82,7 @@ class RabbitMqContext implements DeliveryContextInterface
      */
     public function send(CommandInterface $command, DeliveryOptions $deliveryOptions): void
     {
-        $this->publisher->publish($deliveryOptions->getDestination(), $this->serializer->serialize($command));
+        //$this->publishMessage($deliveryOptions->getDestination(), $command);
     }
 
     /**
@@ -68,6 +90,25 @@ class RabbitMqContext implements DeliveryContextInterface
      */
     public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
     {
-        $this->publisher->publish($deliveryOptions->getDestination(), $this->serializer->serialize($event));
+        $this->publishMessage($this->exchange, $event);
+        $this->publishMessage(\sprintf('%s.events', $this->exchange), $event);
+    }
+
+    private function publishMessage(string $destination, MessageInterface $message)
+    {
+        $serializedMessage = $this->serializer->serialize($message);
+
+        $this->channel
+            ->exchangeDeclare($destination, 'direct', true)
+            ->then(
+                function() use ($destination, $serializedMessage)
+                {
+                    $this->channel->publish($serializedMessage, [], $destination);
+                },
+                function(\Throwable $throwable)
+                {
+                    $this->logger->critical(ThrowableFormatter::toString($throwable));
+                }
+            );
     }
 }

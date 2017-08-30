@@ -46,43 +46,29 @@ class ContextMessages
     private $contextLogger;
 
     /**
+     * Entry point
+     *
+     * @var string
+     */
+    private $entryPointName;
+
+    /**
+     * @param string                   $entryPointName
      * @param DeliveryContextInterface $originContext
      * @param MessageRouterInterface   $messagesRouter
      * @param ContextLogger            $contextLogger
      */
     public function __construct(
+        string $entryPointName,
         DeliveryContextInterface $originContext,
         MessageRouterInterface $messagesRouter,
         ContextLogger $contextLogger
     )
     {
+        $this->entryPointName = $entryPointName;
         $this->originContext = $originContext;
         $this->messagesRouter = $messagesRouter;
         $this->contextLogger = $contextLogger;
-    }
-
-    /**
-     * Get default destination for message
-     *
-     * @param MessageInterface $message
-     *
-     * @return string
-     */
-    public function getDefaultDestinationForMessage(MessageInterface $message): string
-    {
-        $destinations = $this->messagesRouter->getApplicationExchanges();
-        $destinationsCount = \count($destinations);
-
-        if(1 === $destinationsCount)
-        {
-            return $destinations[0];
-        }
-        else if(2 === $destinationsCount)
-        {
-            return $message instanceof CommandInterface ? $destinations[0] : $destinations[1];
-        }
-
-        return '';
     }
 
     /**
@@ -93,7 +79,6 @@ class ContextMessages
      */
     public function deliveryMessage(MessageInterface $message, DeliveryOptions $deliveryOptions): void
     {
-        $messageClass = \get_class($message);
         $messageDeliveryMethod = $message instanceof CommandInterface ? 'send' : 'publish';
         $routes = $this->messagesRouter->routeMessage($message);
 
@@ -103,38 +88,13 @@ class ContextMessages
             {
                 $deliveryContext = $deliveryOptions->changeDestination($route);
 
-                $destination = (string) $deliveryContext->getDestination();
-
-                if('' !== $destination)
-                {
-                    $this->originContext->$messageDeliveryMethod($message, $deliveryContext);
-
-                    $this->contextLogger
-                        ->getLogger('messages')
-                        ->debug(
-                            'Message "{messageType}" was sent to the "{destination}" exchange',
-                            ['messageType' => $messageClass, 'destination' => $destination]
-                        );
-                }
-                else
-                {
-                    $this->contextLogger
-                        ->getLogger('messages')
-                        ->error(
-                            'Not found destination queue for message "{messageType}"',
-                            ['messageType' => $messageClass]
-                        );
-                }
+                $this->originContext->$messageDeliveryMethod($message, $deliveryContext);
             }
 
             return;
         }
 
-        $this->contextLogger
-            ->getLogger('messages')
-            ->error(
-                'Not found routes for message "{messageType}"',
-                ['messageType' => $messageClass]
-            );
+        $deliveryContext = $deliveryOptions->changeDestination($this->entryPointName);
+        $this->originContext->$messageDeliveryMethod($message, $deliveryContext);
     }
 }

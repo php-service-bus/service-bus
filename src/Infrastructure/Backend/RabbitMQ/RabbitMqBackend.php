@@ -13,9 +13,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\Backend\RabbitMQ;
 
+use function Amp\Promise\all;
 use Bunny\Channel;
 use Bunny\Message;
 use Bunny\Async;
+use Bunny\Protocol\MethodQueueBindFrame;
+use Bunny\Protocol\MethodQueueBindOkFrame;
 use Psr\Log\LoggerInterface;
 use EventLoop\EventLoop;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
@@ -24,12 +27,18 @@ use Desperado\ConcurrencyFramework\Domain\Messages\ReceivedMessage;
 use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Application\KernelInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Backend\BackendInterface;
+use React\Promise\PromiseInterface;
 
 /**
  * ReactPHP rabbit mq client
  */
 class RabbitMqBackend implements BackendInterface
 {
+    /** Exchange types */
+    private const EXCHANGE_TYPE_DIRECT = 'direct';
+    private const EXCHANGE_TYPE_FANOUT = 'fanout';
+    private const EXCHANGE_TYPE_TOPIC = 'topic';
+
 
     /**
      * Logger
@@ -71,9 +80,14 @@ class RabbitMqBackend implements BackendInterface
      *
      * @var Async\Client
      */
-    private $subscriber;
+    private $client;
 
-    private $retry;
+    /**
+     * Failed promice handler
+     *
+     * @var callable
+     */
+    private $failPromiseResultHandler;
 
     /**
      * @param string                     $connectionDSN
@@ -92,9 +106,12 @@ class RabbitMqBackend implements BackendInterface
         $this->entryPoint = $entryPoint;
         $this->messageSerializer = $messageSerializer;
         $this->logger = $logger;
+
         $this->eventLoop = EventLoop::getLoop();
-        $this->subscriber = new Async\Client($this->eventLoop, $this->connectionDsnParts, $logger);
+        $this->client = new Async\Client($this->eventLoop, $this->connectionDsnParts, $logger);
+
         $this->initSignals();
+        $this->initFailHandler();
     }
 
     /**
@@ -102,65 +119,18 @@ class RabbitMqBackend implements BackendInterface
      */
     public function run(KernelInterface $kernel): void
     {
-        $this->subscriber
-            ->connect()
-            ->then(
-                function(Async\Client $client)
-                {
-                    return $client
-                        ->channel()
-                        ->then(
-                            function(Channel $channel)
-                            {
-                                return $channel
-                                    ->qos(0, 1)
-                                    ->then(
-                                        function() use ($channel)
-                                        {
-                                            return $channel;
-                                        }
-                                    );
-                            }
-                        )
-                        ->then(
-                            function(Channel $channel)
-                            {
-                                return $channel
-                                    ->exchangeDeclare($this->entryPoint)
-                                    ->then(
-                                        function() use ($channel)
-                                        {
-                                            return $channel
-                                                ->queueDeclare($this->entryPoint);
-                                        }
-                                    )
-                                    ->then(
-                                        function(MethodQueueDeclareOkFrame $frame) use ($channel)
-                                        {
-
-                                            $channel
-                                                ->consume(
-                                                    function(Message $incoming, Channel $channel)
-                                                    {
-                                                        $this->eventLoop
-                                                            ->futureTick(
-                                                                function() use ($incoming, $channel)
-                                                                {
-                                                                    echo PHP_EOL . $incoming->content . PHP_EOL;
-
-                                                                    $channel->ack($incoming);
-                                                                }
-                                                            );
-                                                    },
-                                                    $frame->queue
-                                                );
-                                        }
-                                    );
-                            }
-                        );
-                }
-            );
-
+        $this->connect(
+            function(Message $incoming, Channel $channel) use ($kernel)
+            {
+                $this->eventLoop->futureTick(
+                    function() use ($incoming, $channel, $kernel)
+                    {
+                        $this->handleMessage($kernel, $incoming, $channel);
+                        $channel->ack($incoming);
+                    }
+                );
+            }
+        );
 
         $this->eventLoop->run();
     }
@@ -170,20 +140,141 @@ class RabbitMqBackend implements BackendInterface
      */
     public function stop(): void
     {
-        if(null !== $this->subscriber)
+        if(null !== $this->client)
         {
             $callable = function()
             {
-                $this->subscriber->stop();
+                $this->client->stop();
             };
 
-            $this->subscriber
+            $this->client
                 ->disconnect()
                 ->then($callable, $callable);
         }
 
         $this->logger->debug('RabbitMQ queue daemon stopped');
         exit(0);
+    }
+
+    private function connect(callable $consumeCallable)
+    {
+        $this->client
+            ->connect()
+            ->then(
+                function(Async\Client $client) use ($consumeCallable)
+                {
+                    return $client
+                        ->channel()
+                        ->then(
+                            function(Channel $channel) use ($consumeCallable)
+                            {
+                                return $this
+                                    ->configureChannel($channel)
+                                    ->then(
+                                        function() use ($channel)
+                                        {
+                                            return $channel->queueDeclare(
+                                                \sprintf('%s.messages', $this->entryPoint),
+                                                false, true
+                                            );
+                                        },
+                                        $this->failPromiseResultHandler
+                                    )
+                                    ->then(
+                                        function(MethodQueueDeclareOkFrame $frame) use ($channel, $consumeCallable)
+                                        {
+                                            return $channel->consume($consumeCallable, $frame->queue);
+                                        },
+                                        $this->failPromiseResultHandler
+                                    );
+                            },
+                            $this->failPromiseResultHandler
+                        );
+                },
+                $this->failPromiseResultHandler
+            );
+    }
+
+    /**
+     * @param Channel $channel
+     *
+     * @return PromiseInterface
+     */
+    private function configureChannel(Channel $channel): PromiseInterface
+    {
+        return $channel
+            /** Application main exchange */
+            ->exchangeDeclare($this->entryPoint, self::EXCHANGE_TYPE_DIRECT)
+            /** Events exchanges */
+            ->then(
+                function() use ($channel)
+                {
+                    return $channel
+                        ->exchangeDeclare(
+                            \sprintf('%s.events', $this->entryPoint),
+                            self::EXCHANGE_TYPE_DIRECT
+                        );
+                },
+                $this->failPromiseResultHandler
+            )
+            ->then(
+                function() use ($channel)
+                {
+                    return $channel->exchangeDeclare(
+                        \sprintf('%s.errors', $this->entryPoint),
+                        self::EXCHANGE_TYPE_DIRECT
+                    );
+                },
+                $this->failPromiseResultHandler
+            )
+            ->then(
+                function() use ($channel)
+                {
+                    return $channel
+                        ->exchangeDeclare(
+                            \sprintf('%s.expired', $this->entryPoint),
+                            self::EXCHANGE_TYPE_FANOUT
+                        );
+                },
+                $this->failPromiseResultHandler
+            )
+            ->then(
+                function() use ($channel)
+                {
+                    return $channel->queueDeclare(\sprintf('%s.expired', $this->entryPoint), false, true, false, false, false, [
+                        'x-dead-letter-exchange' => $this->entryPoint
+                    ]);
+                },
+                $this->failPromiseResultHandler
+            )
+            ->then(
+                function(MethodQueueDeclareOkFrame $frame) use ($channel)
+                {
+                    return $channel
+                        ->queueBind($frame->queue, \sprintf('%s.expired', $this->entryPoint))
+                        ->then(
+                            function() use ($channel)
+                            {
+                                return $channel;
+                            },
+                            $this->failPromiseResultHandler
+                        );
+                }
+            )
+            ->then(
+                function() use ($channel)
+                {
+                    return $channel->queueDeclare(\sprintf('%s.messages', $this->entryPoint), false, true);
+                },
+                $this->failPromiseResultHandler
+            )
+            ->then(
+                function(MethodQueueDeclareOkFrame $frame) use ($channel)
+                {
+                    return $channel->queueBind($frame->queue, $this->entryPoint);
+                },
+                $this->failPromiseResultHandler
+            );
     }
 
     /**
@@ -197,14 +288,9 @@ class RabbitMqBackend implements BackendInterface
      */
     private function handleMessage(KernelInterface $kernel, Message $incoming, Channel $channel): void
     {
-        die('3');
         try
         {
-            $context = new RabbitMqContext(
-                $this->eventLoop,
-                $this->connectionDsnParts,
-                $this->messageSerializer
-            );
+            $context = new RabbitMqContext($incoming, $channel, $this->messageSerializer, $this->logger);
 
             /** @var ReceivedMessage $message */
             $message = $this->messageSerializer->unserialize($incoming->content);
@@ -215,8 +301,14 @@ class RabbitMqBackend implements BackendInterface
         {
             $this->logger->error(ThrowableFormatter::toString($throwable));
         }
+    }
 
-        $channel->ack($incoming);
+    private function initFailHandler(): void
+    {
+        $this->failPromiseResultHandler = function(\Throwable $throwable)
+        {
+            $this->logger->error(ThrowableFormatter::toString($throwable));
+        };
     }
 
     /**
@@ -230,30 +322,5 @@ class RabbitMqBackend implements BackendInterface
         \pcntl_signal(\SIGTERM, [$this, 'stop']);
 
         \pcntl_async_signals(true);
-    }
-
-    /**
-     * @param string   $exchangeMain
-     * @param callable $consume
-     *
-     * @return callable
-     */
-    private function getRetryCallback(string $exchangeMain, callable $consume): callable
-    {
-        static $interval = 0.5;
-
-        return function(\Throwable $error) use (&$interval, $exchangeMain, $consume)
-        {
-            $this->logger->critical(ThrowableFormatter::toString($error));
-
-            $this->logger->info(\sprintf('Try to reconnect after %s seconds.', $interval));
-
-            $this->eventLoop->addTimer($interval, function() use ($exchangeMain, $consume)
-            {
-                $this->connectToBroker($exchangeMain, $consume);
-            });
-
-            $interval = 60 > $interval ? $interval * 2 : 0.5;
-        };
     }
 }

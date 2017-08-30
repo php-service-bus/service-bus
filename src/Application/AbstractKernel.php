@@ -140,7 +140,7 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
         );
 
         $contextMessages = new Application\Context\Variables\ContextMessages(
-            $context, $this->messagesRouter, $loggerContext
+           $this->entryPointName, $context, $this->messagesRouter, $loggerContext
         );
 
         $contextStorage = new Application\Context\Variables\ContextStorage(
