@@ -128,18 +128,16 @@ class RabbitMqBackend implements BackendInterface
     {
         $this->initSignals();
 
-        $logger = $this->logger;
-        $connectionConfig = $this->connectionDsnParts;
 
         $this->subscriber
             ->connect()
             ->then(
-                function(Async\Client $client) use ($logger, $connectionConfig)
+                function(Async\Client $client)
                 {
                     return $client->channel();
                 }
             )
-            ->then(function(Channel $channel) use ($logger, $connectionConfig)
+            ->then(function(Channel $channel)
             {
                 return $channel
                     ->qos(0, 5)
@@ -152,49 +150,49 @@ class RabbitMqBackend implements BackendInterface
             }
             )
             ->then(
-                function(Channel $channel) use ($logger, $connectionConfig, $kernel)
+                function(Channel $channel) use ($kernel)
                 {
-                    $logger->debug(
+                    $this->logger->debug(
                         \sprintf(
                             'Connected to rabbit mq queue "%s:%s"',
-                            $connectionConfig['host'], $connectionConfig['port']
+                            $this->connectionDsnParts['host'], $this->connectionDsnParts['port']
                         )
                     );
 
                     return $channel
                         ->exchangeDeclare($this->commandExchangeName)
                         ->then(
-                            function() use ($channel, $logger, $kernel)
+                            function() use ($channel, $kernel)
                             {
                                 return $channel->exchangeDeclare($this->eventExchangeName);
                             },
-                            function() use ($logger)
+                            function()
                             {
-                                $logger->error(
+                                $this->logger->error(
                                     \sprintf('Execute declare "%s" exchange failed', $this->commandExchangeName)
                                 );
                             }
                         )
                         ->then(
-                            function() use ($channel, $logger, $kernel)
+                            function() use ($channel, $kernel)
                             {
                                 return $channel->queueDeclare($this->messagesQueue, false, true);
                             },
-                            function() use ($logger)
+                            function()
                             {
-                                $logger->error(
+                                $this->logger->error(
                                     \sprintf('Execute declare "%s" exchange failed', $this->commandExchangeName)
                                 );
                             }
                         )
                         ->then(
-                            function(MethodQueueDeclareOkFrame $frame) use ($channel, $logger, $kernel)
+                            function(MethodQueueDeclareOkFrame $frame) use ($channel, $kernel)
                             {
-                                $logger->debug('Exchanges configuration successful finished. Start subscribe');
+                                $this->logger->debug('Exchanges configuration successful finished. Start subscribe');
 
                                 return $channel
                                     ->consume(
-                                        function(Message $incoming, Channel $channel) use ($logger, $kernel)
+                                        function(Message $incoming, Channel $channel) use ($kernel)
                                         {
                                             $this->eventLoop
                                                 ->futureTick(
@@ -207,9 +205,9 @@ class RabbitMqBackend implements BackendInterface
                                         $frame->queue
                                     );
                             },
-                            function() use ($logger)
+                            function()
                             {
-                                $logger->error(
+                                $this->logger->error(
                                     \sprintf('Execute declare "%s" queue failed', $this->messagesQueue)
                                 );
                             }
@@ -238,7 +236,6 @@ class RabbitMqBackend implements BackendInterface
                 ->then($callable, $callable);
         }
 
-
         $this->logger->debug('RabbitMQ queue daemon stopped');
         exit(0);
     }
@@ -264,7 +261,7 @@ class RabbitMqBackend implements BackendInterface
 
             /** @var ReceivedMessage $message */
             $message = $this->messageSerializer->unserialize($incoming->content);
-var_export($message->getMessage());
+
             $kernel->handleMessage($message->getMessage(), $context);
         }
         catch(\Throwable $throwable)
