@@ -41,6 +41,7 @@
     "ramsey/uuid": "3.7.0",
     "amphp/postgres": "^0.1",
     "bunny/bunny": "^0.2.4",
+    "voryx/event-loop": "^2.0",
     "react/react": "v0.4.2"
   },
   "require-dev": {
