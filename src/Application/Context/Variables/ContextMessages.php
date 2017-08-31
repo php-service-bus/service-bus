@@ -39,24 +39,14 @@ class ContextMessages
     private $messagesRouter;
 
     /**
-     * Entry point
-     *
-     * @var string
-     */
-    private $entryPointName;
-
-    /**
-     * @param string                   $entryPointName
      * @param DeliveryContextInterface $originContext
      * @param MessageRouterInterface   $messagesRouter
      */
     public function __construct(
-        string $entryPointName,
         DeliveryContextInterface $originContext,
         MessageRouterInterface $messagesRouter
     )
     {
-        $this->entryPointName = $entryPointName;
         $this->originContext = $originContext;
         $this->messagesRouter = $messagesRouter;
     }
