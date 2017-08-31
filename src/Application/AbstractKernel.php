@@ -120,8 +120,8 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
         $this->entryPointName = $this->initEntryPointName();
         $this->messageSerializer = $this->initMessageSerializer();
         $this->messagesRouter = $this->initMessagesRouter();
-        $this->messageBus = $this->initMessageBus();
         $this->storageManagers = $this->initEventSourcedStorage();
+        $this->messageBus = $this->initMessageBus();
     }
 
     /**
@@ -228,7 +228,45 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
             $messageBusBuilder->addBehavior($behavior);
         }
 
+        /** Init saga listeners */
+        $parameters = new Domain\ParameterBag($this->configuration->get('eventSourced', []));
+        $sagaConfig = new Domain\ParameterBag($parameters->get('saga', []));
+        $sagas = $sagaConfig->get('list', []);
+
+        if(true === \is_array($sagas) && 0 !== \count($sagas))
+        {
+            $sagaListenerConfigurator = new Application\Saga\SagaListenerConfiguration(
+                $messageBusBuilder, $this->annotationsReader,
+                $this->getSagasStorageManagers(), $this->logger
+            );
+
+            foreach($sagas as $saga)
+            {
+                $sagaListenerConfigurator->extract($saga);
+            }
+        }
+
         return $messageBusBuilder->build();
+    }
+
+    /**
+     * Get sagas storage managers
+     *
+     * @return Infrastructure\StorageManager\SagaStorageManager[]
+     */
+    protected function getSagasStorageManagers(): array
+    {
+        return \array_filter(
+            \array_map(
+                function(Infrastructure\StorageManager\AbstractStorageManager $storageManager)
+                {
+                    return $storageManager instanceof Infrastructure\StorageManager\SagaStorageManager
+                        ? $storageManager
+                        : null;
+                },
+                $this->storageManagers
+            )
+        );
     }
 
     /**

@@ -88,7 +88,8 @@ class AnnotationReader
                             {
                                 return [
                                     'annotation' => $each,
-                                    'method'     => $method->getName()
+                                    'method'     => $method->getName(),
+                                    'arguments'  => $method->getParameters()
                                 ];
                             },
                             $list

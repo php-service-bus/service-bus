@@ -59,8 +59,11 @@ class SagaStorageManager extends AbstractStorageManager
 
         if(null !== $saga)
         {
-            $saga->resetCommands();
-            $this->getPersistMap()->attach($saga);
+            if(false === $this->getPersistMap()->contains($saga))
+            {
+                $this->getPersistMap()->attach($saga, $identity);
+                $saga->resetCommands();
+            }
         }
 
         return $saga;

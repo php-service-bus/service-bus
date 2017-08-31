@@ -18,6 +18,7 @@ use Desperado\ConcurrencyFramework\Domain\EventSourced\SagaInterface;
 use Desperado\ConcurrencyFramework\Domain\EventSourced\SagaStateInterface;
 use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
+use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\AbstractEventSourced;
 use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Contract\EventSourcedEntryCreatedEvent;
 use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga\Contract\SagaCompletedEvent;
@@ -63,6 +64,18 @@ abstract class AbstractSaga extends AbstractEventSourced implements SagaInterfac
         $this->resetCommands();
 
         return $commands;
+    }
+
+    /**
+     * Execute event (for saga listeners only)
+     *
+     * @param EventInterface $event
+     *
+     * @return void
+     */
+    public function transition(EventInterface $event): void
+    {
+        $this->raiseEvent($event);
     }
 
     /**
