@@ -13,12 +13,9 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\Backend\RabbitMQ;
 
-use function Amp\Promise\all;
 use Bunny\Channel;
 use Bunny\Message;
 use Bunny\Async;
-use Bunny\Protocol\MethodQueueBindFrame;
-use Bunny\Protocol\MethodQueueBindOkFrame;
 use Psr\Log\LoggerInterface;
 use EventLoop\EventLoop;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
@@ -27,7 +24,6 @@ use Desperado\ConcurrencyFramework\Domain\Messages\ReceivedMessage;
 use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Application\KernelInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Backend\BackendInterface;
-use React\Promise\PromiseInterface;
 
 /**
  * ReactPHP rabbit mq client
@@ -35,9 +31,9 @@ use React\Promise\PromiseInterface;
 class RabbitMqBackend implements BackendInterface
 {
     /** Exchange types */
-    private const EXCHANGE_TYPE_DIRECT = 'direct';
-    private const EXCHANGE_TYPE_FANOUT = 'fanout';
-    private const EXCHANGE_TYPE_TOPIC = 'topic';
+    protected const EXCHANGE_TYPE_DIRECT = 'direct';
+    protected const EXCHANGE_TYPE_FANOUT = 'fanout';
+    protected const EXCHANGE_TYPE_TOPIC = 'topic';
 
 
     /**
@@ -83,7 +79,7 @@ class RabbitMqBackend implements BackendInterface
     private $client;
 
     /**
-     * Failed promice handler
+     * Failed promise handler
      *
      * @var callable
      */
@@ -117,7 +113,7 @@ class RabbitMqBackend implements BackendInterface
     /**
      * @inheritdoc
      */
-    public function run(KernelInterface $kernel): void
+    public function run(KernelInterface $kernel, array $clients): void
     {
         $this->connect(
             function(Message $incoming, Channel $channel) use ($kernel)
@@ -129,7 +125,8 @@ class RabbitMqBackend implements BackendInterface
                         $channel->ack($incoming);
                     }
                 );
-            }
+            },
+            $clients
         );
 
         $this->eventLoop->run();
@@ -156,20 +153,42 @@ class RabbitMqBackend implements BackendInterface
         exit(0);
     }
 
-    private function connect(callable $consumeCallable)
+    /**
+     * Connect to broker
+     *
+     * @param callable $consumeCallable
+     * @param array    $clients
+     *
+     * @return void
+     */
+    private function connect(callable $consumeCallable, array $clients)
     {
         $this->client
             ->connect()
             ->then(
-                function(Async\Client $client) use ($consumeCallable)
+                function(Async\Client $client) use ($consumeCallable, $clients)
                 {
                     return $client
                         ->channel()
                         ->then(
-                            function(Channel $channel) use ($consumeCallable)
+                            function(Channel $channel) use ($consumeCallable, $clients)
                             {
-                                return $this
-                                    ->configureChannel($channel)
+                                return $channel
+                                    /** Application main exchange */
+                                    ->exchangeDeclare($this->entryPoint, self::EXCHANGE_TYPE_DIRECT)
+                                    /** Events exchanges */
+                                    ->then(
+                                        function() use ($channel)
+                                        {
+                                            return $channel
+                                                ->exchangeDeclare(
+                                                    \sprintf('%s.events', $this->entryPoint),
+                                                    self::EXCHANGE_TYPE_DIRECT
+                                                );
+                                        },
+                                        $this->failPromiseResultHandler
+                                    )
+                                    /** Messages (internal usage) queue */
                                     ->then(
                                         function() use ($channel)
                                         {
@@ -180,98 +199,49 @@ class RabbitMqBackend implements BackendInterface
                                         },
                                         $this->failPromiseResultHandler
                                     )
+                                    /** Configure routing keys for clients */
+                                    ->then(
+                                        function(MethodQueueDeclareOkFrame $frame) use ($channel, $clients)
+                                        {
+                                            $promises = \array_map(
+                                                function($routingKey) use ($frame, $channel)
+                                                {
+                                                    return $channel->queueBind($frame->queue, $this->entryPoint, $routingKey);
+                                                },
+                                                $clients
+                                            );
+
+                                            return \React\Promise\all($promises)
+                                                ->then(
+                                                    function() use ($frame)
+                                                    {
+                                                        return $frame;
+                                                    }
+                                                );
+                                        },
+                                        $this->failPromiseResultHandler
+                                    )
                                     ->then(
                                         function(MethodQueueDeclareOkFrame $frame) use ($channel, $consumeCallable)
                                         {
-                                            return $channel->consume($consumeCallable, $frame->queue);
+                                            $this->logger
+                                                ->debug(
+                                                    \sprintf(
+                                                        'RabbitMQ daemon for the entry point "%s" started',
+                                                        $this->entryPoint
+                                                    )
+                                                );
+
+                                            return $channel->consume(
+                                                $consumeCallable,
+                                                $frame->queue
+                                            );
                                         },
                                         $this->failPromiseResultHandler
                                     );
                             },
                             $this->failPromiseResultHandler
                         );
-                },
-                $this->failPromiseResultHandler
-            );
-    }
-
-    /**
-     * @param Channel $channel
-     *
-     * @return PromiseInterface
-     */
-    private function configureChannel(Channel $channel): PromiseInterface
-    {
-        return $channel
-            /** Application main exchange */
-            ->exchangeDeclare($this->entryPoint, self::EXCHANGE_TYPE_DIRECT)
-            /** Events exchanges */
-            ->then(
-                function() use ($channel)
-                {
-                    return $channel
-                        ->exchangeDeclare(
-                            \sprintf('%s.events', $this->entryPoint),
-                            self::EXCHANGE_TYPE_DIRECT
-                        );
-                },
-                $this->failPromiseResultHandler
-            )
-            ->then(
-                function() use ($channel)
-                {
-                    return $channel->exchangeDeclare(
-                        \sprintf('%s.errors', $this->entryPoint),
-                        self::EXCHANGE_TYPE_DIRECT
-                    );
-                },
-                $this->failPromiseResultHandler
-            )
-            ->then(
-                function() use ($channel)
-                {
-                    return $channel
-                        ->exchangeDeclare(
-                            \sprintf('%s.expired', $this->entryPoint),
-                            self::EXCHANGE_TYPE_FANOUT
-                        );
-                },
-                $this->failPromiseResultHandler
-            )
-            ->then(
-                function() use ($channel)
-                {
-                    return $channel->queueDeclare(\sprintf('%s.expired', $this->entryPoint), false, true, false, false, false, [
-                        'x-dead-letter-exchange' => $this->entryPoint
-                    ]);
-                },
-                $this->failPromiseResultHandler
-            )
-            ->then(
-                function(MethodQueueDeclareOkFrame $frame) use ($channel)
-                {
-                    return $channel
-                        ->queueBind($frame->queue, \sprintf('%s.expired', $this->entryPoint))
-                        ->then(
-                            function() use ($channel)
-                            {
-                                return $channel;
-                            },
-                            $this->failPromiseResultHandler
-                        );
-                }
-            )
-            ->then(
-                function() use ($channel)
-                {
-                    return $channel->queueDeclare(\sprintf('%s.messages', $this->entryPoint), false, true);
-                },
-                $this->failPromiseResultHandler
-            )
-            ->then(
-                function(MethodQueueDeclareOkFrame $frame) use ($channel)
-                {
-                    return $channel->queueBind($frame->queue, $this->entryPoint);
                 },
                 $this->failPromiseResultHandler
             );
@@ -303,6 +273,11 @@ class RabbitMqBackend implements BackendInterface
         }
     }
 
+    /**
+     * Init connection fail handler
+     *
+     * @return void
+     */
     private function initFailHandler(): void
     {
         $this->failPromiseResultHandler = function(\Throwable $throwable)

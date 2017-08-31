@@ -48,8 +48,7 @@ interface PipelineInterface
     /**
      * Execute task
      *
-     * @return mixed
-     * @yield
+     * @return \Generator
      */
     public function run(): \Generator;
 }

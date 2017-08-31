@@ -15,7 +15,6 @@ namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus;
 
 use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
 use Desperado\ConcurrencyFramework\Domain\MessageBus\MessageBusInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineCollection;
 use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineEntry;
@@ -46,17 +45,15 @@ class MessageBus implements MessageBusInterface
      */
     public function handle(MessageInterface $message, ContextInterface $context): void
     {
-        $pipelineName = $message instanceof CommandInterface
-            ? 'command'
-            : 'event';
+        $messageNamespace = \get_class($message);
 
-        if(false === $this->pipelines->has($pipelineName))
+        if(false === $this->pipelines->has($messageNamespace))
         {
-            $this->pipelines->add(new Pipeline($pipelineName));
+            $this->pipelines->add(new Pipeline($messageNamespace));
         }
 
         $this->pipelines
-            ->get($pipelineName)
+            ->get($messageNamespace)
             ->run()
             ->send(new PipelineEntry($message, $context));
 

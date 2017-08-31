@@ -157,9 +157,13 @@ class ServiceConfigurator
 
             $handler = $reflectionMethod->getClosure($service);
 
-            true === $isEvent
-                ? $this->messageBusBuilder->addEventHandler($handler, $options)
-                : $this->messageBusBuilder->addCommandHandler($handler, $options);
+            $this->messageBusBuilder->addMessageHandler(
+                $parameters[0]
+                    ->getClass()
+                    ->getName(),
+                $handler,
+                $options
+            );
 
             $this->logSuccessfulHandlerRegister(
                 \get_class($service), $reflectionMethod->getName(), $options

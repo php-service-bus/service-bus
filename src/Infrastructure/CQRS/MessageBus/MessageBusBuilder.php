@@ -48,32 +48,21 @@ class MessageBusBuilder
     private $behaviors = [];
 
     /**
-     * Add command execution handler
+     * Add message handler
      *
-     * @param \Closure               $handler
-     * @param Options\CommandOptions $options
-     *
-     * @return void
-     */
-    public function addCommandHandler(\Closure $handler, Options\CommandOptions $options): void
-    {
-        $this->messageHandlers['command'][] = [
-            'handler' => $handler,
-            'options' => $options
-        ];
-    }
-
-    /**
-     * Add event execution handler
-     *
-     * @param \Closure             $handler
-     * @param Options\EventOptions $options
+     * @param                                  $messageNamespace
+     * @param \Closure                         $handler
+     * @param Options\AbstractExecutionOptions $options
      *
      * @return void
      */
-    public function addEventHandler(\Closure $handler, Options\EventOptions $options): void
+    public function addMessageHandler(
+        string $messageNamespace,
+        \Closure $handler,
+        Options\AbstractExecutionOptions $options
+    ): void
     {
-        $this->messageHandlers['event'][] = [
+        $this->messageHandlers[$messageNamespace][] = [
             'handler' => $handler,
             'options' => $options
         ];
@@ -125,9 +114,9 @@ class MessageBusBuilder
 
         $collection = new PipelineCollection();
 
-        foreach($this->messageHandlers as $type => $handlers)
+        foreach($this->messageHandlers as $messageNamespace => $handlers)
         {
-            $pipeline = new Pipeline($type);
+            $pipeline = new Pipeline($messageNamespace);
 
             foreach($handlers as $handlerData)
             {

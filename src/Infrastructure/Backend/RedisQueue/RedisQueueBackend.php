@@ -85,7 +85,7 @@ class RedisQueueBackend implements BackendInterface
     /**
      * @inheritdoc
      */
-    public function run(KernelInterface $kernel): void
+    public function run(KernelInterface $kernel, array $clients): void
     {
         $this->initSignals();
 

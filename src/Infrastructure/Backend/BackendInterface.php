@@ -24,10 +24,11 @@ interface BackendInterface
      * Run backend
      *
      * @param KernelInterface $kernel
+     * @param array           $clients
      *
      * @return void
      */
-    public function run(KernelInterface $kernel): void;
+    public function run(KernelInterface $kernel, array $clients): void;
 
     /**
      * Stop backend

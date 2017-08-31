@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\Backend\RabbitMQ;
 
-use Bunny\Async\Client;
 use Bunny\Channel;
 use Bunny\Message;
 use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
@@ -59,6 +58,13 @@ class RabbitMqContext implements DeliveryContextInterface
     private $logger;
 
     /**
+     * Routing key (client ID)
+     *
+     * @var string
+     */
+    private $routingKey;
+
+    /**
      * @param Message                    $incoming
      * @param Channel                    $channel
      * @param MessageSerializerInterface $serializer
@@ -72,6 +78,7 @@ class RabbitMqContext implements DeliveryContextInterface
     )
     {
         $this->exchange = $incoming->exchange;
+        $this->routingKey = $incoming->routingKey;
         $this->channel = $channel;
         $this->serializer = $serializer;
         $this->logger = $logger;
@@ -82,7 +89,7 @@ class RabbitMqContext implements DeliveryContextInterface
      */
     public function send(CommandInterface $command, DeliveryOptions $deliveryOptions): void
     {
-        //$this->publishMessage($deliveryOptions->getDestination(), $command);
+        $this->publishMessage($deliveryOptions->getDestination(), $command);
     }
 
     /**
@@ -90,20 +97,41 @@ class RabbitMqContext implements DeliveryContextInterface
      */
     public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
     {
-        $this->publishMessage($this->exchange, $event);
+        $this->publishMessage($deliveryOptions->getDestination(), $event);
         $this->publishMessage(\sprintf('%s.events', $this->exchange), $event);
     }
 
+    /**
+     * Send message to broker
+     *
+     * @param string           $destination
+     * @param MessageInterface $message
+     *
+     * @return void
+     */
     private function publishMessage(string $destination, MessageInterface $message)
     {
+        $destination = '' !== $destination ? $destination : $this->exchange;
         $serializedMessage = $this->serializer->serialize($message);
 
         $this->channel
             ->exchangeDeclare($destination, 'direct', true)
             ->then(
-                function() use ($destination, $serializedMessage)
+                function() use ($destination, $serializedMessage, $message)
                 {
-                    $this->channel->publish($serializedMessage, [], $destination);
+                    return $this->channel
+                        ->publish($serializedMessage, [], $destination, $this->routingKey)
+                        ->then(
+                            function() use ($destination, $message)
+                            {
+                                $this->logger->debug(
+                                    \sprintf(
+                                        '"%s" message published to exchange "%s" with routing key "%s"',
+                                        \get_class($message), $destination, $this->routingKey
+                                    )
+                                );
+                            }
+                        );
                 },
                 function(\Throwable $throwable)
                 {

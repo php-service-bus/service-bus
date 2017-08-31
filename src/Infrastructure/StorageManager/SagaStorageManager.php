@@ -31,7 +31,7 @@ class SagaStorageManager extends AbstractStorageManager
      *
      * @var SagaRepositoryInterface
      */
-    private $aggregateRepository;
+    private $sagaRepository;
 
     /**
      * @param string                  $sagaNamespace
@@ -40,12 +40,11 @@ class SagaStorageManager extends AbstractStorageManager
     public function __construct(
         string $sagaNamespace,
         SagaRepositoryInterface $sagaRepository
-
     )
     {
         parent::__construct($sagaNamespace);
 
-        $this->aggregateRepository = $sagaRepository;
+        $this->sagaRepository = $sagaRepository;
     }
 
     /**
@@ -56,10 +55,11 @@ class SagaStorageManager extends AbstractStorageManager
     public function load(IdentityInterface $identity)
     {
         /** @var AbstractSaga|null $saga */
-        $saga = $this->aggregateRepository->load($identity, $this->getEntityNamespace());
+        $saga = $this->sagaRepository->load($identity, $this->getEntityNamespace());
 
         if(null !== $saga)
         {
+            $saga->resetCommands();
             $this->getPersistMap()->attach($saga);
         }
 
@@ -80,7 +80,7 @@ class SagaStorageManager extends AbstractStorageManager
             $eventStream = clone $saga->getEventStream();
             $commands = $saga->getCommands();
 
-            $this->aggregateRepository->save($saga);
+            $this->sagaRepository->save($saga);
 
             foreach($eventStream as $domainEvent)
             {
@@ -98,6 +98,8 @@ class SagaStorageManager extends AbstractStorageManager
             $saga->resetUncommittedEvents();
 
             $this->getPersistMap()->detach($saga);
+
+            unset($saga);
         }
 
         $this->flushLocalStorage();

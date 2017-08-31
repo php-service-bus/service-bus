@@ -94,7 +94,6 @@ class ContextMessages
             return;
         }
 
-        $deliveryContext = $deliveryOptions->changeDestination($this->entryPointName);
-        $this->originContext->$messageDeliveryMethod($message, $deliveryContext);
+        $this->originContext->$messageDeliveryMethod($message, $deliveryOptions);
     }
 }

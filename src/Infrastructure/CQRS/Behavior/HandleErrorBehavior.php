@@ -47,6 +47,6 @@ class HandleErrorBehavior implements BehaviorInterface
      */
     public function apply(PipelineInterface $pipeline, TaskInterface $task): TaskInterface
     {
-        return $task;
+        return new ErrorHandlerWrappedTask($task, $this->handlers);
     }
 }

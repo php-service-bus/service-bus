@@ -24,9 +24,11 @@ interface KernelInterface
     /**
      * Run application
      *
+     * @param array $clients
+     *
      * @return void
      */
-    public function run(): void;
+    public function run(array $clients): void;
 
     /**
      * Terminate application

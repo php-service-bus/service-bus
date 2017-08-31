@@ -105,6 +105,8 @@ class AggregateStorageManager extends AbstractStorageManager
 
             $this->getPersistMap()->detach($aggregate);
             $aggregate->resetUncommittedEvents();
+
+            unset($aggregate);
         }
 
         $this->flushLocalStorage();
