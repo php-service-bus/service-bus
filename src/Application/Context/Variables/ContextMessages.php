@@ -39,13 +39,6 @@ class ContextMessages
     private $messagesRouter;
 
     /**
-     * Logger context
-     *
-     * @var ContextLogger
-     */
-    private $contextLogger;
-
-    /**
      * Entry point
      *
      * @var string
@@ -56,19 +49,16 @@ class ContextMessages
      * @param string                   $entryPointName
      * @param DeliveryContextInterface $originContext
      * @param MessageRouterInterface   $messagesRouter
-     * @param ContextLogger            $contextLogger
      */
     public function __construct(
         string $entryPointName,
         DeliveryContextInterface $originContext,
-        MessageRouterInterface $messagesRouter,
-        ContextLogger $contextLogger
+        MessageRouterInterface $messagesRouter
     )
     {
         $this->entryPointName = $entryPointName;
         $this->originContext = $originContext;
         $this->messagesRouter = $messagesRouter;
-        $this->contextLogger = $contextLogger;
     }
 
     /**
