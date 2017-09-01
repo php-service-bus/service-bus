@@ -67,7 +67,7 @@ abstract class AbstractSaga extends AbstractEventSourced implements SagaInterfac
     }
 
     /**
-     * Execute event (for saga listeners only)
+     * Execute event (for saga listeners only. Don't use this method)
      *
      * @param EventInterface $event
      *
@@ -75,7 +75,7 @@ abstract class AbstractSaga extends AbstractEventSourced implements SagaInterfac
      */
     public function transition(EventInterface $event): void
     {
-        $this->raiseEvent($event);
+        $this->raiseEvent($event, false);
     }
 
     /**

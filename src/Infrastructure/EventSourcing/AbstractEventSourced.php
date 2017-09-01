@@ -59,6 +59,13 @@ abstract class AbstractEventSourced implements EventSourcedInterface
     private $createdAt;
 
     /**
+     * List of events to be published while saving
+     *
+     * @var EventInterface[]
+     */
+    private $toPublishEvents = [];
+
+    /**
      * @inheritdoc
      */
     final public static function fromEventStream(IdentityInterface $identity, DomainEventStream $eventStream): self
@@ -86,6 +93,26 @@ abstract class AbstractEventSourced implements EventSourcedInterface
     /**
      * @inheritdoc
      */
+    final public function getToPublishEvents(): array
+    {
+        $events = $this->toPublishEvents;
+
+        $this->resetToPublishEvents();
+
+        return $events;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    final public function resetToPublishEvents(): void
+    {
+        $this->toPublishEvents = [];
+    }
+
+    /**
+     * @inheritdoc
+     */
     final public function resetUncommittedEvents(): void
     {
         $this->uncommittedEvents = [];
@@ -106,6 +133,8 @@ abstract class AbstractEventSourced implements EventSourcedInterface
     {
         $eventStream = DomainEventStream::create($this->uncommittedEvents);
 
+        $this->resetUncommittedEvents();
+
         return $eventStream;
     }
 
@@ -123,15 +152,21 @@ abstract class AbstractEventSourced implements EventSourcedInterface
      * Raise event
      *
      * @param EventInterface $event
+     * @param bool           $publishOnFlush
      *
      * @return void
      */
-    final protected function raiseEvent(EventInterface $event): void
+    final protected function raiseEvent(EventInterface $event, bool $publishOnFlush = true): void
     {
         $domainEvent = DomainEvent::new($event, $this->version);
         $this->applyEvent($domainEvent);
         $this->version++;
         $this->uncommittedEvents[] = $domainEvent;
+
+        if(true === $publishOnFlush)
+        {
+            $this->toPublishEvents[] = $event;
+        }
     }
 
     /**

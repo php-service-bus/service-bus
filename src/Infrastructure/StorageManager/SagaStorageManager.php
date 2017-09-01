@@ -61,9 +61,10 @@ class SagaStorageManager extends AbstractStorageManager
         {
             if(false === $this->getPersistMap()->contains($saga))
             {
-                $this->getPersistMap()->attach($saga, $identity);
-                $saga->resetCommands();
+                $this->getPersistMap()->attach($saga);
             }
+
+            $saga->resetCommands();
         }
 
         return $saga;
@@ -80,25 +81,19 @@ class SagaStorageManager extends AbstractStorageManager
         {
             /** @var AbstractSaga $saga */
 
-            $eventStream = clone $saga->getEventStream();
-            $commands = $saga->getCommands();
-
             $this->sagaRepository->save($saga);
 
-            foreach($eventStream as $domainEvent)
+            foreach($saga->getToPublishEvents() as $event)
             {
                 /** @var DomainEvent $domainEvent */
-                $context->publish($domainEvent->getReceivedEvent(), $deliveryOptions);
+                $context->publish($event, $deliveryOptions);
             }
 
-            foreach($commands as $command)
+            foreach($saga->getCommands() as $command)
             {
                 /** @var CommandInterface $command */
                 $context->send($command, $deliveryOptions);
             }
-
-            $saga->resetCommands();
-            $saga->resetUncommittedEvents();
 
             $this->getPersistMap()->detach($saga);
 
@@ -106,5 +101,15 @@ class SagaStorageManager extends AbstractStorageManager
         }
 
         $this->flushLocalStorage();
+    }
+
+    /**
+     * Get saga repository
+     *
+     * @return SagaRepositoryInterface
+     */
+    public function getSagaRepository(): SagaRepositoryInterface
+    {
+        return $this->sagaRepository;
     }
 }

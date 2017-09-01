@@ -39,13 +39,6 @@ class Pipeline implements PipelineInterface
     private $queue;
 
     /**
-     * Failed task list
-     *
-     * @var \SplObjectStorage
-     */
-    private $failed;
-
-    /**
      * @param string        $name
      * @param iterable|null $taskCollection
      */
@@ -62,8 +55,6 @@ class Pipeline implements PipelineInterface
         {
             $this->pushCollection($taskCollection);
         }
-
-        $this->failed = new \SplObjectStorage();
     }
 
     /**
@@ -120,18 +111,11 @@ class Pipeline implements PipelineInterface
             /** @var TaskInterface $task */
             $task = $this->queue->shift();
 
-            try
-            {
-                $result = $task($message, $context);
+            $result = $task($message, $context);
 
-                if(null !== $result && $result instanceof TaskInterface)
-                {
-                    $this->push($result);
-                }
-            }
-            catch(\Throwable $throwable)
+            if(null !== $result && $result instanceof TaskInterface)
             {
-                $this->failed->attach($task, $throwable);
+                $this->push($result);
             }
         }
 

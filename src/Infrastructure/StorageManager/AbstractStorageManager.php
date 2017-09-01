@@ -54,6 +54,16 @@ abstract class AbstractStorageManager
     }
 
     /**
+     * Get event sourced entry namespace
+     *
+     * @return string
+     */
+    public function getEntityNamespace(): string
+    {
+        return $this->entityNamespace;
+    }
+
+    /**
      * Load event entry
      *
      * @param IdentityInterface $identity
@@ -121,15 +131,6 @@ abstract class AbstractStorageManager
      */
     abstract public function commit(DeliveryContextInterface $context): void;
 
-    /**
-     * Get entity namespace
-     *
-     * @return string
-     */
-    protected function getEntityNamespace(): string
-    {
-        return $this->entityNamespace;
-    }
 
     /**
      * Flush persist/remove map

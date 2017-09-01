@@ -64,14 +64,10 @@ class SagaRepository implements SagaRepositoryInterface
     {
         /** @var AbstractSaga $saga */
 
-        $saga->resetCommands();
-
         $this->eventStore->append(
             $saga->getId(),
             $saga->getEventStream()
         );
-
-        $saga->resetUncommittedEvents();
     }
 
     /**

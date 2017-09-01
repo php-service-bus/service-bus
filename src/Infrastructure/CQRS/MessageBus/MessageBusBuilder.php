@@ -26,6 +26,7 @@ use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task\ProcessMessageTask;
  */
 class MessageBusBuilder
 {
+
     /**
      * Message handlers
      *

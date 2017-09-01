@@ -50,6 +50,9 @@ class ProcessMessageTask extends AbstractTask
         $this->appendOptions($context);
         $this->logMessage($message, $context);
 
-        return \call_user_func_array($this->handler, [$message, $context]);
+        $handler = $this->handler;
+
+        return $handler($message, $context);
+
     }
 }

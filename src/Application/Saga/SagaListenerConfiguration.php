@@ -15,14 +15,11 @@ namespace Desperado\ConcurrencyFramework\Application\Saga;
 
 use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
 use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
-use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation\AnnotationReader;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\LocalContext;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\EventOptions;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
 use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Annotation\SagaListener;
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\AbstractStorageManager;
 use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\SagaStorageManager;
 use Psr\Log\LoggerInterface;
 
@@ -87,8 +84,6 @@ class SagaListenerConfiguration
      */
     public function extract(string $saga): void
     {
-        $contextOptions = new EventOptions();
-
         foreach($this->extractSupportedAnnotations($saga) as $annotationData)
         {
             /** @var SagaStorageManager $storageManager */
@@ -99,8 +94,8 @@ class SagaListenerConfiguration
 
             $eventNamespace = $parameters[0]->getClass()->getName();
 
-            $handler = function(EventInterface $event, ContextInterface $context) use (
-                $contextOptions, $storageManager, $annotationData
+            $handler = function(EventInterface $event, KernelContext $context) use (
+                $storageManager, $annotationData
             )
             {
                 /** @var SagaListener $annotation */
@@ -125,6 +120,9 @@ class SagaListenerConfiguration
 
                         $storageManager->commit($context);
 
+                        $saga->resetUncommittedEvents();
+                        $saga->resetCommands();
+
                         unset($saga);
                     }
                 }
@@ -133,7 +131,7 @@ class SagaListenerConfiguration
             $this->messageBusBuilder->addMessageHandler(
                 $eventNamespace,
                 $handler,
-                $contextOptions
+                new EventOptions()
             );
 
             $this->logger->debug(

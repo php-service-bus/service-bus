@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\StorageManager;
 
-use Desperado\ConcurrencyFramework\Domain\Event\DomainEvent;
 use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
 use Desperado\ConcurrencyFramework\Domain\Repository\AggregateRepositoryInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
@@ -83,8 +82,6 @@ class AggregateStorageManager extends AbstractStorageManager
         {
             /** @var AbstractAggregateRoot $aggregate */
 
-            $eventStream = clone $aggregate->getEventStream();
-
             $this->aggregateRepository->save($aggregate);
 
             $savedAggregateEvent = new AggregateEventStreamStored();
@@ -97,14 +94,12 @@ class AggregateStorageManager extends AbstractStorageManager
 
             $aggregate->resetUncommittedEvents();
 
-            foreach($eventStream as $domainEvent)
+            foreach($aggregate->getToPublishEvents() as $event)
             {
-                /** @var DomainEvent $domainEvent */
-                $context->publish($domainEvent->getReceivedEvent(), $deliveryOptions);
+                $context->publish($event, $deliveryOptions);
             }
 
             $this->getPersistMap()->detach($aggregate);
-            $aggregate->resetUncommittedEvents();
 
             unset($aggregate);
         }

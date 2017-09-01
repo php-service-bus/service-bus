@@ -15,6 +15,7 @@ namespace Desperado\ConcurrencyFramework\Domain\EventSourced;
 
 use Desperado\ConcurrencyFramework\Domain\Event\DomainEventStream;
 use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
+use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
 
 /**
  * Event sourced entry
@@ -58,4 +59,18 @@ interface EventSourcedInterface
      * @return int
      */
     public function getVersion(): int;
+
+    /**
+     * Get list of events to be published while saving
+     *
+     * @return EventInterface[]
+     */
+    public function getToPublishEvents(): array;
+
+    /**
+     * Reset events to publish while saving
+     *
+     * @return void
+     */
+    public function resetToPublishEvents(): void;
 }
