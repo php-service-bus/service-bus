@@ -48,7 +48,10 @@ class ObjectUtils
         {
             if(true === \is_object($item))
             {
-                $result[$key] = self::getObjectVars($item);
+                if(\spl_object_hash($object) !== \spl_object_hash($item))
+                {
+                    $result[$key] = self::getObjectVars($item);
+                }
             }
             else
             {

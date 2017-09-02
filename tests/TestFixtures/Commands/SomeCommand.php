@@ -11,31 +11,26 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Messages;
+namespace Desperado\ConcurrencyFramework\Tests\TestFixtures\Commands;
+
+use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
 
 /**
- * Serialized message DTO
+ *
  */
-final class SerializedMessage
+class SomeCommand implements CommandInterface
 {
     /**
-     * Message payload
-     *
-     * @var array
-     */
-    public $message;
-
-    /**
-     * Message class namespace
+     * ID
      *
      * @var string
      */
-    public $namespace;
+    public $id;
 
     /**
-     * Metadata
+     * Payload
      *
-     * @var array
+     * @var string
      */
-    public $metadata;
+    public $payload;
 }

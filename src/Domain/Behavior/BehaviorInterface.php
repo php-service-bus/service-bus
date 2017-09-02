@@ -21,5 +21,13 @@ use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
  */
 interface BehaviorInterface
 {
+    /**
+     * Apply behavior
+     *
+     * @param PipelineInterface $pipeline
+     * @param TaskInterface     $task
+     *
+     * @return TaskInterface
+     */
     public function apply(PipelineInterface $pipeline, TaskInterface $task): TaskInterface;
 }

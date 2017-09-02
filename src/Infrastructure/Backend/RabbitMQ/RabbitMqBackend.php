@@ -16,14 +16,14 @@ namespace Desperado\ConcurrencyFramework\Infrastructure\Backend\RabbitMQ;
 use Bunny\Channel;
 use Bunny\Message;
 use Bunny\Async;
+use Desperado\ConcurrencyFramework\Domain\Application\BackendInterface;
+use Desperado\ConcurrencyFramework\Domain\Application\KernelInterface;
 use Psr\Log\LoggerInterface;
 use EventLoop\EventLoop;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
 use Desperado\ConcurrencyFramework\Domain\Messages\ReceivedMessage;
 use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Application\KernelInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Backend\BackendInterface;
 
 /**
  * ReactPHP rabbit mq client

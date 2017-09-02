@@ -18,11 +18,12 @@ use Desperado\ConcurrencyFramework\Common;
 use Desperado\ConcurrencyFramework\Domain;
 use Desperado\ConcurrencyFramework\Infrastructure;
 use Psr\Log\LoggerInterface;
+use React\Promise\Deferred;
 
 /**
  * Base application class
  */
-abstract class AbstractKernel implements Infrastructure\Application\KernelInterface
+abstract class AbstractKernel implements Domain\Application\KernelInterface
 {
     /**
      * Application root directory path
@@ -88,11 +89,11 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     private $messageBus;
 
     /**
-     * Aggregate/Saga storage manager
+     * Storage manager registry
      *
-     * @var Infrastructure\StorageManager\AbstractStorageManager[]
+     * @var Application\Storage\StorageManagerRegistry
      */
-    private $storageManagers = [];
+    private $storageManagersRegistry;
 
     /**
      * Annotations reader
@@ -120,7 +121,7 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
         $this->entryPointName = $this->initEntryPointName();
         $this->messageSerializer = $this->initMessageSerializer();
         $this->messagesRouter = $this->initMessagesRouter();
-        $this->storageManagers = $this->initEventSourcedStorage();
+        $this->storageManagersRegistry = $this->initEventSourcedStorage();
         $this->messageBus = $this->initMessageBus();
     }
 
@@ -132,34 +133,58 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
         Domain\Context\ContextInterface $context
     ): void
     {
-        /** @var Infrastructure\CQRS\Context\DeliveryContextInterface $context */
+        $environment = $this->environment;
+        $entryPoint = $this->entryPointName;
+        $router = $this->messagesRouter;
+        $logger = $this->logger;
+        $storageManagersRegistry = $this->storageManagersRegistry;
+        $messageBus = $this->messageBus;
 
-        $loggerContext = new Application\Context\Variables\ContextLogger();
-        $contextEntryPoint = new Application\Context\Variables\ContextEntryPoint(
-            $this->entryPointName, $this->environment
-        );
-
-        $contextMessages = new Application\Context\Variables\ContextMessages(
-            $context, $this->messagesRouter
-        );
-
-        $contextStorage = new Application\Context\Variables\ContextStorage(
-            $this->storageManagers
-        );
-
-        $kernelContext = new Application\Context\KernelContext(
-            $contextEntryPoint,
-            $contextMessages,
-            $contextStorage,
-            $loggerContext
-        );
-
-        $this->messageBus->handle($message, $kernelContext);
-
-        foreach($this->storageManagers as $storageManager)
+        $logFailCallable = function(\Throwable $throwable) use ($logger)
         {
-            $storageManager->commit($kernelContext);
-        }
+            $logger->error(Common\Formatter\ThrowableFormatter::toString($throwable));
+        };
+
+        $task = new \stdClass();
+        $task->message = $message;
+        $task->originalContext = $context;
+
+        $deferred = new Deferred();
+        $deferred
+            ->promise()
+            ->then(
+                function(\stdClass $task) use ($entryPoint, $environment, $router, $storageManagersRegistry, $messageBus)
+                {
+                    $loggerContext = new Application\Context\Variables\ContextLogger();
+                    $contextEntryPoint = new Application\Context\Variables\ContextEntryPoint($entryPoint, $environment);
+                    $contextMessages = new Application\Context\Variables\ContextMessages($task->originalContext, $router);
+                    $contextStorage = new Application\Context\Variables\ContextStorage($storageManagersRegistry);
+
+                    $kernelContext = new Application\Context\KernelContext(
+                        $contextEntryPoint,
+                        $contextMessages,
+                        $contextStorage,
+                        $loggerContext
+                    );
+
+                    $messageBus->handle($task->message, $kernelContext);
+
+                    return $kernelContext;
+                },
+                $logFailCallable
+            )
+            ->then(
+                function(Application\Context\KernelContext $context) use ($storageManagersRegistry)
+                {
+                    foreach($storageManagersRegistry as $storageManager)
+                    {
+                        $storageManager->commit($context);
+                    }
+                },
+                $logFailCallable
+            );
+
+        $deferred->resolve($task);
     }
 
     /**
@@ -197,7 +222,9 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
      */
     protected function initMessageSerializer(): Domain\Serializer\MessageSerializerInterface
     {
-        return new Infrastructure\Serializer\SymfonyMessageSerializer();
+        return new Application\Serializer\MessageSerializer(
+            new Infrastructure\Bridge\Serializer\SymfonySerializer()
+        );
     }
 
     /**
@@ -208,6 +235,15 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     protected function initMessageBus(): Domain\MessageBus\MessageBusInterface
     {
         $messageBusBuilder = new Infrastructure\CQRS\MessageBus\MessageBusBuilder();
+        $modules = $this->getModules();
+
+        $sagasConfig = $this->getSagasConfiguration();
+        $sagas = $sagasConfig->get('list', []);
+
+        if(true === \is_array($sagas) && 0 !== \count($sagas))
+        {
+            $modules[] = new Application\Module\SagasModule($sagas, $this->storageManagersRegistry, $this->logger);
+        }
 
         foreach($this->getModules() as $module)
         {
@@ -228,112 +264,28 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
             $messageBusBuilder->addBehavior($behavior);
         }
 
-        /** Init saga listeners */
-        $parameters = new Domain\ParameterBag($this->configuration->get('eventSourced', []));
-        $sagaConfig = new Domain\ParameterBag($parameters->get('saga', []));
-        $sagas = $sagaConfig->get('list', []);
-
-        if(true === \is_array($sagas) && 0 !== \count($sagas))
-        {
-            $sagaListenerConfigurator = new Application\Saga\SagaListenerConfiguration(
-                $messageBusBuilder, $this->annotationsReader,
-                $this->getSagasStorageManagers(), $this->logger
-            );
-
-            foreach($sagas as $saga)
-            {
-                $sagaListenerConfigurator->extract($saga);
-            }
-        }
-
         return $messageBusBuilder->build();
-    }
-
-    /**
-     * Get sagas storage managers
-     *
-     * @return Infrastructure\StorageManager\SagaStorageManager[]
-     */
-    protected function getSagasStorageManagers(): array
-    {
-        return \array_filter(
-            \array_map(
-                function(Infrastructure\StorageManager\AbstractStorageManager $storageManager)
-                {
-                    return $storageManager instanceof Infrastructure\StorageManager\SagaStorageManager
-                        ? $storageManager
-                        : null;
-                },
-                $this->storageManagers
-            )
-        );
     }
 
     /**
      * Init event sourced entries storage
      *
-     * @return Infrastructure\StorageManager\AbstractStorageManager[]
+     * @return Application\Storage\StorageManagerRegistry
      */
-    protected function initEventSourcedStorage(): array
+    protected function initEventSourcedStorage(): Application\Storage\StorageManagerRegistry
     {
-        $managers = [];
-        $parameters = new Domain\ParameterBag($this->configuration->get('eventSourced', []));
+        $registry = new Application\Storage\StorageManagerRegistry();
 
-        /** Init saga storages */
-        if(true === $parameters->has('saga'))
-        {
-            $sagaConfig = new Domain\ParameterBag($parameters->get('saga', []));
+        $sagasConfig = $this->getSagasConfiguration();
+        $aggregatesConfig = $this->getEventSourcedConfiguration();
 
-            $sagaStorage = Infrastructure\EventSourcing\Storage\StorageFactory::create(
-                $sagaConfig->getAsString('storageDSN')
-            );
-            $sagaRepository = new Infrastructure\EventSourcing\Repository\SagaRepository(
-                new Infrastructure\EventSourcing\EventStore\EventStore(
-                    $sagaStorage, $this->messageSerializer
-                )
-            );
+        Application\Storage\EventSourcedManagerFactory::sagas($sagasConfig, $this->messageSerializer)
+            ->append($registry);
 
-            $sagas = $sagaConfig->get('list', []);
+        Application\Storage\EventSourcedManagerFactory::aggregates($aggregatesConfig, $this->messageSerializer)
+            ->append($registry);
 
-            if(true === \is_array($sagas) && 0 !== \count($sagas))
-            {
-                foreach($sagas as $saga)
-                {
-                    $managers[$saga] = new Infrastructure\StorageManager\SagaStorageManager(
-                        $saga, $sagaRepository
-                    );
-                }
-            }
-        }
-
-        /** Init aggregate storage */
-        if(true === $parameters->has('aggregate'))
-        {
-            $aggregateConfig = new Domain\ParameterBag($parameters->get('aggregate', []));
-
-            $aggregateStorage = Infrastructure\EventSourcing\Storage\StorageFactory::create(
-                $aggregateConfig->getAsString('storageDSN')
-            );
-            $aggregateRepository = new Infrastructure\EventSourcing\Repository\AggregateRepository(
-                new Infrastructure\EventSourcing\EventStore\EventStore(
-                    $aggregateStorage, $this->messageSerializer
-                )
-            );
-
-            $aggregates = $aggregateConfig->get('list', []);
-
-            if(true === \is_array($aggregates) && 0 !== \count($aggregates))
-            {
-                foreach($aggregates as $aggregate)
-                {
-                    $managers[$aggregate] = new Infrastructure\StorageManager\AggregateStorageManager(
-                        $aggregate, $aggregateRepository
-                    );
-                }
-            }
-        }
-
-        return $managers;
+        return $registry;
     }
 
     /**
@@ -411,7 +363,7 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
      */
     protected function initLogger(): LoggerInterface
     {
-        return Common\Logger\LoggerRegistry::getLogger();
+        return Infrastructure\Bridge\Logger\LoggerRegistry::getLogger();
     }
 
     /**
@@ -505,12 +457,42 @@ abstract class AbstractKernel implements Infrastructure\Application\KernelInterf
     }
 
     /**
-     * Get storage managers
+     * Get storage manager registry
      *
-     * @return Infrastructure\StorageManager\AbstractStorageManager[]
+     * @return Storage\StorageManagerRegistry
      */
-    protected function getStorageManagers(): array
+    protected function getStorageManagersRegistry(): Storage\StorageManagerRegistry
     {
-        return $this->storageManagers;
+        return $this->storageManagersRegistry;
+    }
+
+    /**
+     * Get sagas config
+     *
+     * @return Domain\ParameterBag
+     */
+    private function getSagasConfiguration(): Domain\ParameterBag
+    {
+        return new Domain\ParameterBag((array) $this->getEventSourcedConfiguration()->get('saga', []));
+    }
+
+    /**
+     * Get aggregates config
+     *
+     * @return Domain\ParameterBag
+     */
+    private function getAggregatesConfiguration(): Domain\ParameterBag
+    {
+        return new Domain\ParameterBag((array) $this->getEventSourcedConfiguration()->get('aggregate', []));
+    }
+
+    /**
+     * Get event sourced entries config
+     *
+     * @return Domain\ParameterBag
+     */
+    private function getEventSourcedConfiguration(): Domain\ParameterBag
+    {
+        return new Domain\ParameterBag((array) $this->configuration->get('eventSourced', []));
     }
 }

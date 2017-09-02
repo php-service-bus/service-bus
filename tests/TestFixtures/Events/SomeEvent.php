@@ -11,31 +11,26 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Messages;
+namespace Desperado\ConcurrencyFramework\Tests\TestFixtures\Events;
+
+use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
 
 /**
- * Serialized message DTO
+ *
  */
-final class SerializedMessage
+class SomeEvent implements EventInterface
 {
     /**
-     * Message payload
-     *
-     * @var array
-     */
-    public $message;
-
-    /**
-     * Message class namespace
+     * ID
      *
      * @var string
      */
-    public $namespace;
+    public $someEventId;
 
     /**
-     * Metadata
+     * Some value
      *
-     * @var array
+     * @var string
      */
-    public $metadata;
+    public $someEventValue;
 }

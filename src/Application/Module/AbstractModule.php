@@ -13,10 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Application\Module;
 
-use Desperado\ConcurrencyFramework\Application\Service\ServiceConfigurator;
-use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
+use Desperado\ConcurrencyFramework\Application\Service\ServiceHandlersSetup;
 use Desperado\ConcurrencyFramework\Domain\Service\ServiceInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation\AnnotationReader;
+use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
 use Psr\Log\LoggerInterface;
 
@@ -50,13 +50,11 @@ abstract class AbstractModule
      */
     public function boot(MessageBusBuilder $messageBusBuilder, AnnotationReader $annotationsReader): void
     {
-        $serviceConfigurator = new ServiceConfigurator(
-            $messageBusBuilder, $annotationsReader, $this->logger
-        );
+        $serviceSetup = new ServiceHandlersSetup($messageBusBuilder, $annotationsReader, $this->logger);
 
         foreach($this->getServices() as $service)
         {
-            $serviceConfigurator->extract($service);
+            $serviceSetup->setup($service);
         }
     }
 
@@ -68,5 +66,15 @@ abstract class AbstractModule
     protected function getServices(): array
     {
         return [];
+    }
+
+    /**
+     * Get logger
+     *
+     * @return LoggerInterface
+     */
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }

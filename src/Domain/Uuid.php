@@ -46,8 +46,10 @@ final class Uuid
 
     /**
      * Close constructor
+     *
+     * @codeCoverageIgnore
      */
-    public function __construct()
+    private function __construct()
     {
 
     }

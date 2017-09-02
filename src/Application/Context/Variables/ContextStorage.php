@@ -15,8 +15,7 @@ namespace Desperado\ConcurrencyFramework\Application\Context\Variables;
 
 use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
 use Desperado\ConcurrencyFramework\Application\Context\Exceptions;
-use Desperado\ConcurrencyFramework\Domain\EventSourced\AggregateRootInterface;
-use Desperado\ConcurrencyFramework\Domain\EventSourced\SagaInterface;
+use Desperado\ConcurrencyFramework\Application\Storage\StorageManagerRegistry;
 use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\AbstractStorageManager;
 
 /**
@@ -27,16 +26,16 @@ class ContextStorage
     /**
      * Storage managers
      *
-     * @var AbstractStorageManager[]
+     * @var StorageManagerRegistry
      */
-    private $storageManagers;
+    private $storageManagerRegistry;
 
     /**
-     * @param AbstractStorageManager[] $storageManagers
+     * @param StorageManagerRegistry $storageManagerRegistry
      */
-    public function __construct(array $storageManagers)
+    public function __construct(StorageManagerRegistry $storageManagerRegistry)
     {
-        $this->storageManagers = $storageManagers;
+        $this->storageManagerRegistry = $storageManagerRegistry;
     }
 
     /**
@@ -48,7 +47,7 @@ class ContextStorage
      */
     public function flush(KernelContext $context): void
     {
-        foreach($this->storageManagers as $manager)
+        foreach($this->storageManagerRegistry as $manager)
         {
             $manager->commit($context);
         }
@@ -65,29 +64,13 @@ class ContextStorage
      */
     public function getStorage(string $entry): AbstractStorageManager
     {
-        if(true === \array_key_exists($entry, $this->storageManagers))
+        if(true === $this->storageManagerRegistry->has($entry))
         {
-            return $this->storageManagers[$entry];
-        }
-
-        if(\is_a($entry, SagaInterface::class, true))
-        {
-            $type = 'saga';
-        }
-        else if(\is_a($entry, AggregateRootInterface::class, true))
-        {
-            $type = 'aggregate';
-        }
-        else
-        {
-            $type = 'dbal';
+            return $this->storageManagerRegistry->get($entry);
         }
 
         throw new Exceptions\StorageManagerWasNotConfiguredException(
-            \sprintf(
-                'The manager for the "%s" (type "%s") was not configured in "parameters.yaml" file',
-                $entry, $type
-            )
+            \sprintf('The manager for the "%s" was not configured in "parameters.yaml" file', $entry)
         );
     }
 }

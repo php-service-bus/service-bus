@@ -29,7 +29,7 @@ class JsonSerializeHandler
      *
      * @throws JsonSerializationException
      */
-    public function serialize($content): string
+    public static function serialize($content): string
     {
         \json_last_error();
 
@@ -52,7 +52,7 @@ class JsonSerializeHandler
      *
      * @throws JsonSerializationException
      */
-    public function unserialize(string $content)
+    public static function unserialize(string $content)
     {
         \json_last_error();
 
@@ -64,5 +64,15 @@ class JsonSerializeHandler
         }
 
         throw new JsonSerializationException(\json_last_error_msg());
+    }
+
+    /**
+     * Close constructor
+     *
+     * @codeCoverageIgnore
+     */
+    private function __construct()
+    {
+
     }
 }

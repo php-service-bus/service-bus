@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Application\Context\Variables;
 
-use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
+use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Psr\Log\LoggerInterface;
 
 /**
