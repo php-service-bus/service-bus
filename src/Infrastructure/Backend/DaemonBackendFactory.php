@@ -13,10 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Infrastructure\Backend;
 
-use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
+use Desperado\ConcurrencyFramework\Domain\Application\BackendInterface;
+use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
 use Desperado\ConcurrencyFramework\Infrastructure\Backend\RabbitMQ\RabbitMqBackend;
-use Desperado\ConcurrencyFramework\Infrastructure\Backend\RedisQueue\RedisQueueBackend;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -74,20 +74,6 @@ class DaemonBackendFactory
         {
             switch($dsnParts['scheme'])
             {
-                case 'redis':
-
-                    if(false === isset($dsnParts['path']))
-                    {
-                        throw new \InvalidArgumentException('Invalid redis queue connection DSN');
-                    }
-
-                    return new RedisQueueBackend(
-                        $dsnParts['path'],
-                        $this->entryPointName,
-                        $this->serializer,
-                        $this->logger
-                    );
-
                 case 'amqp':
 
                     return new RabbitMqBackend(

@@ -117,7 +117,7 @@ class RabbitMqContext implements DeliveryContextInterface
         $this->channel
             ->exchangeDeclare($destination, 'direct', true)
             ->then(
-                function() use ($destination, $serializedMessage, $message)
+                function() use ($destination, $serializedMessage)
                 {
                     return $this->channel->publish($serializedMessage, [], $destination, $this->routingKey);
                 },

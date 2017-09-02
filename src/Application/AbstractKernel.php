@@ -245,7 +245,7 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
             $modules[] = new Application\Module\SagasModule($sagas, $this->storageManagersRegistry, $this->logger);
         }
 
-        foreach($this->getModules() as $module)
+        foreach($modules as $module)
         {
             if($module instanceof Application\Module\AbstractModule)
             {
