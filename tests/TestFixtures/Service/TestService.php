@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Tests\TestFixtures\Service;
+namespace Desperado\Framework\Tests\TestFixtures\Service;
 
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\LocalContext;
-use Desperado\ConcurrencyFramework\Tests\TestFixtures\Commands\SomeCommand;
-use Desperado\ConcurrencyFramework\Tests\TestFixtures\Events\SomeEvent;
+use Desperado\Framework\Infrastructure\CQRS\Context\LocalContext;
+use Desperado\Framework\Tests\TestFixtures\Commands\SomeCommand;
+use Desperado\Framework\Tests\TestFixtures\Events\SomeEvent;
 
 /**
  *

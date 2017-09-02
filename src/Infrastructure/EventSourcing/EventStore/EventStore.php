@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\EventStore;
+namespace Desperado\Framework\Infrastructure\EventSourcing\EventStore;
 
-use Desperado\ConcurrencyFramework\Domain\Event\DomainEventStream;
-use Desperado\ConcurrencyFramework\Domain\EventStore\EventStoreInterface;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\DataTransformer\EventStreamTransformer;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\EventStorageInterface;
+use Desperado\Framework\Domain\Event\DomainEventStream;
+use Desperado\Framework\Domain\EventStore\EventStoreInterface;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Framework\Infrastructure\EventSourcing\DataTransformer\EventStreamTransformer;
+use Desperado\Framework\Infrastructure\EventSourcing\Storage\EventStorageInterface;
 
 /**
  * Event store

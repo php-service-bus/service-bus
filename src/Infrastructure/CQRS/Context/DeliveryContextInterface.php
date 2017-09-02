@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context;
+namespace Desperado\Framework\Infrastructure\CQRS\Context;
 
-use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Context\ContextInterface;
+use Desperado\Framework\Domain\Messages\CommandInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
 
 /**
  * Delivery context

@@ -11,15 +11,15 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus;
+namespace Desperado\Framework\Infrastructure\CQRS\MessageBus;
 
-use Desperado\ConcurrencyFramework\Domain\Behavior\BehaviorInterface;
-use Desperado\ConcurrencyFramework\Domain\MessageBus\MessageBusInterface;
-use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineCollection;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Behavior\HandleErrorBehavior;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Pipeline\Pipeline;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task\ProcessMessageTask;
+use Desperado\Framework\Domain\Behavior\BehaviorInterface;
+use Desperado\Framework\Domain\MessageBus\MessageBusInterface;
+use Desperado\Framework\Domain\Pipeline\PipelineCollection;
+use Desperado\Framework\Infrastructure\CQRS\Behavior\HandleErrorBehavior;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options;
+use Desperado\Framework\Infrastructure\CQRS\Pipeline\Pipeline;
+use Desperado\Framework\Infrastructure\CQRS\Task\ProcessMessageTask;
 
 /**
  * Message bus factory

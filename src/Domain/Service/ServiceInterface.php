@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Service;
+namespace Desperado\Framework\Domain\Service;
 
 /**
  * Service

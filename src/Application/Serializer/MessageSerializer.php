@@ -11,15 +11,15 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Serializer;
+namespace Desperado\Framework\Application\Serializer;
 
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\ReceivedMessage;
-use Desperado\ConcurrencyFramework\Domain\Messages\SerializedMessage;
-use Desperado\ConcurrencyFramework\Domain\ParameterBag;
-use Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions\MessageSerializationFailException;
-use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
-use Desperado\ConcurrencyFramework\Domain\Serializer\SerializerInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\Messages\ReceivedMessage;
+use Desperado\Framework\Domain\Messages\SerializedMessage;
+use Desperado\Framework\Domain\ParameterBag;
+use Desperado\Framework\Domain\Serializer\Exceptions\MessageSerializationFailException;
+use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Framework\Domain\Serializer\SerializerInterface;
 
 /**
  * Message serializer

@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions;
+namespace Desperado\Framework\Domain\Serializer\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class DenormalizeException extends AbstractConcurrencyFrameworkException
+class DenormalizeException extends AbstractFrameworkException
 {
 
 }

@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
+namespace Desperado\Framework\Infrastructure\CQRS\Context\Options;
 
 /**
  * Base execution options class

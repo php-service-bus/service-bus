@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions;
+namespace Desperado\Framework\Domain\Serializer\Exceptions;
 
 /**
  *

@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Tests\Domain\Environment;
+namespace Desperado\Framework\Tests\Domain\Environment;
 
-use Desperado\ConcurrencyFramework\Domain\Environment\Environment;
+use Desperado\Framework\Domain\Environment\Environment;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,7 +23,7 @@ class EnvironmentTest extends TestCase
 {
     /**
      * @test
-     * @expectedException  \Desperado\ConcurrencyFramework\Domain\Environment\Exceptions\InvalidEnvironmentException
+     * @expectedException  \Desperado\Framework\Domain\Environment\Exceptions\InvalidEnvironmentException
      * @expectedExceptionMessage Wrong environment specified (""). Expected choices: prod, dev, test
      *
      * @return void
@@ -35,7 +35,7 @@ class EnvironmentTest extends TestCase
 
     /**
      * @test
-     * @expectedException  \Desperado\ConcurrencyFramework\Domain\Environment\Exceptions\InvalidEnvironmentException
+     * @expectedException  \Desperado\Framework\Domain\Environment\Exceptions\InvalidEnvironmentException
      * @expectedExceptionMessage Wrong environment specified ("qwerty"). Expected choices: prod, dev, test
      *
      * @return void

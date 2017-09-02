@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Environment;
+namespace Desperado\Framework\Domain\Environment;
 
-use Desperado\ConcurrencyFramework\Domain\Environment\Exceptions\InvalidEnvironmentException;
+use Desperado\Framework\Domain\Environment\Exceptions\InvalidEnvironmentException;
 
 /**
  * Environment

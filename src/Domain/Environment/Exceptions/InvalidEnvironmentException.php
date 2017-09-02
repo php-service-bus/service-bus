@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Environment\Exceptions;
+namespace Desperado\Framework\Domain\Environment\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class InvalidEnvironmentException extends AbstractConcurrencyFrameworkException
+class InvalidEnvironmentException extends AbstractFrameworkException
 {
 
 }

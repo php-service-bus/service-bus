@@ -11,17 +11,17 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Storage;
+namespace Desperado\Framework\Application\Storage;
 
-use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
-use Desperado\ConcurrencyFramework\Domain\ParameterBag;
-use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\EventStore\EventStore;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Repository\AggregateRepository;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Repository\SagaRepository;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\StorageFactory;
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\AggregateStorageManager;
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\SagaStorageManager;
+use Desperado\Framework\Common\Formatter\ThrowableFormatter;
+use Desperado\Framework\Domain\ParameterBag;
+use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Framework\Infrastructure\EventSourcing\EventStore\EventStore;
+use Desperado\Framework\Infrastructure\EventSourcing\Repository\AggregateRepository;
+use Desperado\Framework\Infrastructure\EventSourcing\Repository\SagaRepository;
+use Desperado\Framework\Infrastructure\EventSourcing\Storage\StorageFactory;
+use Desperado\Framework\Infrastructure\StorageManager\AggregateStorageManager;
+use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManager;
 use Psr\Log\LoggerInterface;
 
 /**

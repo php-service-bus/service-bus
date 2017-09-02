@@ -11,21 +11,21 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Saga;
 
-use Desperado\ConcurrencyFramework\Domain\DateTime;
-use Desperado\ConcurrencyFramework\Domain\EventSourced\SagaInterface;
-use Desperado\ConcurrencyFramework\Domain\EventSourced\SagaStateInterface;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\AbstractEventSourced;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Contract\EventSourcedEntryCreatedEvent;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga\Contract\SagaCompletedEvent;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga\Contract\SagaExpiredEvent;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga\Contract\SagaFailedEvent;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga\Contract\SagaInitializedEvent;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga\Exceptions\SagaIsClosedException;
+use Desperado\Framework\Domain\DateTime;
+use Desperado\Framework\Domain\EventSourced\SagaInterface;
+use Desperado\Framework\Domain\EventSourced\SagaStateInterface;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Messages\CommandInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Infrastructure\EventSourcing\AbstractEventSourced;
+use Desperado\Framework\Infrastructure\EventSourcing\Contract\EventSourcedEntryCreatedEvent;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\Contract\SagaCompletedEvent;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\Contract\SagaExpiredEvent;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\Contract\SagaFailedEvent;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\Contract\SagaInitializedEvent;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\Exceptions\SagaIsClosedException;
 
 /**
  * Base saga class

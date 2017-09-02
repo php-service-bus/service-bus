@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Context\Variables;
+namespace Desperado\Framework\Application\Context\Variables;
 
-use Desperado\ConcurrencyFramework\Domain\MessageRouter\MessageRouterInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryOptions;
+use Desperado\Framework\Domain\MessageRouter\MessageRouterInterface;
+use Desperado\Framework\Domain\Messages\CommandInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryContextInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
 
 /**
  * Context messages DTO

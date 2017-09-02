@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Repository;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Repository;
 
-use Desperado\ConcurrencyFramework\Domain\EventSourced\SagaInterface;
-use Desperado\ConcurrencyFramework\Domain\EventStore\EventStoreInterface;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Domain\Repository\SagaRepositoryInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga\AbstractSaga;
+use Desperado\Framework\Domain\EventSourced\SagaInterface;
+use Desperado\Framework\Domain\EventStore\EventStoreInterface;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Repository\SagaRepositoryInterface;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\AbstractSaga;
 
 /**
  * Saga repository

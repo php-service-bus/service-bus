@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation;
+namespace Desperado\Framework\Infrastructure\Bridge\Annotation;
 
-use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
+use Desperado\Framework\Domain\Annotation\AbstractAnnotation;
 use Doctrine\Common\Annotations as DoctrineAnnotations;
 
 /**

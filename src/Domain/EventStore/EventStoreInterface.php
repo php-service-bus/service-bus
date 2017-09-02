@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\EventStore;
+namespace Desperado\Framework\Domain\EventStore;
 
-use Desperado\ConcurrencyFramework\Domain\Event\DomainEventStream;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Event\DomainEventStream;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
 
 /**
  * Event store

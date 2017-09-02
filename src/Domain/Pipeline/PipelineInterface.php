@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Pipeline;
+namespace Desperado\Framework\Domain\Pipeline;
 
-use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
+use Desperado\Framework\Domain\Task\TaskInterface;
 
 /**
  * Pipeline

@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Tests\Common\Formatter;
+namespace Desperado\Framework\Tests\Common\Formatter;
 
-use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
+use Desperado\Framework\Common\Formatter\ThrowableFormatter;
 use PHPUnit\Framework\TestCase;
 
 /**

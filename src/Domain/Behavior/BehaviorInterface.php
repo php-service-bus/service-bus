@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Behavior;
+namespace Desperado\Framework\Domain\Behavior;
 
-use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineInterface;
-use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
+use Desperado\Framework\Domain\Pipeline\PipelineInterface;
+use Desperado\Framework\Domain\Task\TaskInterface;
 
 /**
  * Behavior

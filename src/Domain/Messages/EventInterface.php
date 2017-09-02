@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Messages;
+namespace Desperado\Framework\Domain\Messages;
 
 /**
  * Used to communicate that some action has taken place. An Event should be published. An event:

@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Tests\TestFixtures\Events;
+namespace Desperado\Framework\Tests\TestFixtures\Events;
 
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
 
 /**
  *

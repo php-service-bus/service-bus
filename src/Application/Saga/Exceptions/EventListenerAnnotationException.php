@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Saga\Exceptions;
+namespace Desperado\Framework\Application\Saga\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class EventListenerAnnotationException extends AbstractConcurrencyFrameworkException
+class EventListenerAnnotationException extends AbstractFrameworkException
 {
 
 }

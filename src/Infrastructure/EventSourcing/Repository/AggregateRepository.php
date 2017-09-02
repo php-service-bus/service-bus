@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Repository;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Repository;
 
-use Desperado\ConcurrencyFramework\Domain\EventSourced\AggregateRootInterface;
-use Desperado\ConcurrencyFramework\Domain\EventStore\EventStoreInterface;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Domain\Repository\AggregateRepositoryInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Aggregate\AbstractAggregateRoot;
+use Desperado\Framework\Domain\EventSourced\AggregateRootInterface;
+use Desperado\Framework\Domain\EventStore\EventStoreInterface;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Repository\AggregateRepositoryInterface;
+use Desperado\Framework\Infrastructure\EventSourcing\Aggregate\AbstractAggregateRoot;
 
 /**
  * Aggregate repository

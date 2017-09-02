@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Context;
+namespace Desperado\Framework\Domain\Context;
 
 /**
  * Execution context

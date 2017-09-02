@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Tests\Application\Serializer;
+namespace Desperado\Framework\Tests\Application\Serializer;
 
-use Desperado\ConcurrencyFramework\Application\Serializer\MessageSerializer;
-use Desperado\ConcurrencyFramework\Domain\Messages\ReceivedMessage;
-use Desperado\ConcurrencyFramework\Domain\Serializer\SerializerInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Serializer\SymfonySerializer;
-use Desperado\ConcurrencyFramework\Tests\TestFixtures\Events\SomeEvent;
+use Desperado\Framework\Application\Serializer\MessageSerializer;
+use Desperado\Framework\Domain\Messages\ReceivedMessage;
+use Desperado\Framework\Domain\Serializer\SerializerInterface;
+use Desperado\Framework\Infrastructure\Bridge\Serializer\SymfonySerializer;
+use Desperado\Framework\Tests\TestFixtures\Events\SomeEvent;
 use PHPUnit\Framework\TestCase;
 
 /**

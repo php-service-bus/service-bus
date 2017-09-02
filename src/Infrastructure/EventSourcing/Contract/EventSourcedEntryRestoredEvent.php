@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Contract;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Contract;
 
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
 
 /**
  * Event sourced entry restored

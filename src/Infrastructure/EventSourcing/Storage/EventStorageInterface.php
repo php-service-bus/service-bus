@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Storage;
 
-use Desperado\ConcurrencyFramework\Domain\Event\StoredRepresentation\StoredEventStream;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Event\StoredRepresentation\StoredEventStream;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
 
 /**
  * Event storage backend

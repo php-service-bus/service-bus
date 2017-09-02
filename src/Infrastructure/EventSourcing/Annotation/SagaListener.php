@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Annotation;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Annotation;
 
-use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
+use Desperado\Framework\Domain\Annotation\AbstractAnnotation;
 
 /**
  * Saga listener marker

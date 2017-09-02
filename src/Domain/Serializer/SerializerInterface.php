@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Serializer;
+namespace Desperado\Framework\Domain\Serializer;
 
 /**
  * Serializer
@@ -29,7 +29,7 @@ interface SerializerInterface
      *
      * @return string
      *
-     * @throws \Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions\SerializationException
+     * @throws \Desperado\Framework\Domain\Serializer\Exceptions\SerializationException
      */
     public function encode(array $normalizedObject, string $classNamespace, string $format): string;
 
@@ -42,7 +42,7 @@ interface SerializerInterface
      *
      * @return array
      *
-     * @throws \Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions\SerializationException
+     * @throws \Desperado\Framework\Domain\Serializer\Exceptions\SerializationException
      */
     public function decode(string $encodedObject, string $format, array $context = []): array;
 
@@ -53,7 +53,7 @@ interface SerializerInterface
      *
      * @return array
      *
-     * @throws \Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions\NormalizeException
+     * @throws \Desperado\Framework\Domain\Serializer\Exceptions\NormalizeException
      */
     public function normalize($object): array;
 
@@ -65,7 +65,7 @@ interface SerializerInterface
      *
      * @return object
      *
-     * @throws \Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions\DenormalizeException
+     * @throws \Desperado\Framework\Domain\Serializer\Exceptions\DenormalizeException
      */
     public function denormalize(array $objectData, string $namespace);
 }

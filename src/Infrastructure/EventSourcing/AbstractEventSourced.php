@@ -11,17 +11,17 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing;
+namespace Desperado\Framework\Infrastructure\EventSourcing;
 
-use Desperado\ConcurrencyFramework\Common\Utils\ObjectUtils;
-use Desperado\ConcurrencyFramework\Domain\DateTime;
-use Desperado\ConcurrencyFramework\Domain\Event\DomainEvent;
-use Desperado\ConcurrencyFramework\Domain\Event\DomainEventStream;
-use Desperado\ConcurrencyFramework\Domain\EventSourced\EventSourcedInterface;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Contract\EventSourcedEntryCreatedEvent;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Contract\EventSourcedEntryRestoredEvent;
+use Desperado\Framework\Common\Utils\ObjectUtils;
+use Desperado\Framework\Domain\DateTime;
+use Desperado\Framework\Domain\Event\DomainEvent;
+use Desperado\Framework\Domain\Event\DomainEventStream;
+use Desperado\Framework\Domain\EventSourced\EventSourcedInterface;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Infrastructure\EventSourcing\Contract\EventSourcedEntryCreatedEvent;
+use Desperado\Framework\Infrastructure\EventSourcing\Contract\EventSourcedEntryRestoredEvent;
 
 /**
  * Base event sourced entry

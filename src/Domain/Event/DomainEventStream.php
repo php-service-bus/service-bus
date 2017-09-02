@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Event;
+namespace Desperado\Framework\Domain\Event;
 
 /**
  * Event stream

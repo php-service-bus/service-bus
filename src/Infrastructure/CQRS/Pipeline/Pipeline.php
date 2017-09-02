@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Pipeline;
+namespace Desperado\Framework\Infrastructure\CQRS\Pipeline;
 
-use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineEntry;
-use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineInterface;
-use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
+use Desperado\Framework\Application\Context\KernelContext;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\Pipeline\PipelineEntry;
+use Desperado\Framework\Domain\Pipeline\PipelineInterface;
+use Desperado\Framework\Domain\Task\TaskInterface;
 
 /**
  * Pipeline

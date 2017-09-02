@@ -11,17 +11,17 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Backend\RabbitMQ;
+namespace Desperado\Framework\Infrastructure\Backend\RabbitMQ;
 
 use Bunny\Channel;
 use Bunny\Message;
-use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryOptions;
+use Desperado\Framework\Common\Formatter\ThrowableFormatter;
+use Desperado\Framework\Domain\Messages\CommandInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryContextInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
 use Psr\Log\LoggerInterface;
 
 /**

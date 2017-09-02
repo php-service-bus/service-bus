@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Messages;
+namespace Desperado\Framework\Domain\Messages;
 
-use Desperado\ConcurrencyFramework\Domain\ParameterBag;
+use Desperado\Framework\Domain\ParameterBag;
 
 /**
  * Received message DTO

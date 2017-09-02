@@ -11,20 +11,20 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Service;
+namespace Desperado\Framework\Application\Service;
 
-use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
-use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
-use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Domain\Service\ServiceInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation\AnnotationReader;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Annotation\CommandHandler;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Annotation\ErrorHandler;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Annotation\EventHandler;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\CommandOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\EventOptions;
+use Desperado\Framework\Application\Context\KernelContext;
+use Desperado\Framework\Common\Formatter\ThrowableFormatter;
+use Desperado\Framework\Domain\Annotation\AbstractAnnotation;
+use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\Service\ServiceInterface;
+use Desperado\Framework\Infrastructure\Bridge\Annotation\AnnotationReader;
+use Desperado\Framework\Infrastructure\CQRS\Annotation\CommandHandler;
+use Desperado\Framework\Infrastructure\CQRS\Annotation\ErrorHandler;
+use Desperado\Framework\Infrastructure\CQRS\Annotation\EventHandler;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options\CommandOptions;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options\EventOptions;
 use Psr\Log\LoggerInterface;
 
 /**

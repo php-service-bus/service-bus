@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Event;
+namespace Desperado\Framework\Domain\Event;
 
-use Desperado\ConcurrencyFramework\Domain\DateTime;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
-use Desperado\ConcurrencyFramework\Domain\Uuid;
+use Desperado\Framework\Domain\DateTime;
+use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Uuid;
 
 /**
  * Domain event

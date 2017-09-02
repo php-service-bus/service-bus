@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Configuration\Exceptions;
+namespace Desperado\Framework\Application\Configuration\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class InvalidConfigurationFileContentException extends AbstractConcurrencyFrameworkException
+class InvalidConfigurationFileContentException extends AbstractFrameworkException
 {
 
 }

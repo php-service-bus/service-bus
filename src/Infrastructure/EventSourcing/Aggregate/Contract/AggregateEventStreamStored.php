@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Aggregate\Contract;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Aggregate\Contract;
 
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
 
 /**
  * Aggregate event stream stored event

@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\EventSourced;
+namespace Desperado\Framework\Domain\EventSourced;
 
-use Desperado\ConcurrencyFramework\Domain\DateTime;
+use Desperado\Framework\Domain\DateTime;
 
 
 /**

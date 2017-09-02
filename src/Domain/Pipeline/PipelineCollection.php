@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Pipeline;
+namespace Desperado\Framework\Domain\Pipeline;
 
 /**
  * Pipelines collection

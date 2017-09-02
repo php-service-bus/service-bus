@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Serializer;
+namespace Desperado\Framework\Domain\Serializer;
 
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\ReceivedMessage;
-use Desperado\ConcurrencyFramework\Domain\ParameterBag;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\Messages\ReceivedMessage;
+use Desperado\Framework\Domain\ParameterBag;
 
 /**
  * Messages serializer
@@ -30,7 +30,7 @@ interface MessageSerializerInterface
      *
      * @return string
      *
-     * @throws \Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions\MessageSerializationFailException
+     * @throws \Desperado\Framework\Domain\Serializer\Exceptions\MessageSerializationFailException
      */
     public function serialize(MessageInterface $message, ParameterBag $metadata = null): string;
 
@@ -41,7 +41,7 @@ interface MessageSerializerInterface
      *
      * @return ReceivedMessage
      *
-     * @throws \Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions\MessageSerializationFailException
+     * @throws \Desperado\Framework\Domain\Serializer\Exceptions\MessageSerializationFailException
      */
     public function unserialize(string $content): ReceivedMessage;
 }

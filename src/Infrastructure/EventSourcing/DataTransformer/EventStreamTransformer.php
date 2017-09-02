@@ -11,16 +11,16 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\DataTransformer;
+namespace Desperado\Framework\Infrastructure\EventSourcing\DataTransformer;
 
-use Desperado\ConcurrencyFramework\Domain\DateTime;
-use Desperado\ConcurrencyFramework\Domain\Event\DomainEvent;
-use Desperado\ConcurrencyFramework\Domain\Event\DomainEventStream;
-use Desperado\ConcurrencyFramework\Domain\Event\StoredRepresentation\StoredDomainEvent;
-use Desperado\ConcurrencyFramework\Domain\Event\StoredRepresentation\StoredEventStream;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
-use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Framework\Domain\DateTime;
+use Desperado\Framework\Domain\Event\DomainEvent;
+use Desperado\Framework\Domain\Event\DomainEventStream;
+use Desperado\Framework\Domain\Event\StoredRepresentation\StoredDomainEvent;
+use Desperado\Framework\Domain\Event\StoredRepresentation\StoredEventStream;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
 
 /**
  * Event stream transformer

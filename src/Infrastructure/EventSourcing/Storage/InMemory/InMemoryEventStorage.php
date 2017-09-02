@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\InMemory;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Storage\InMemory;
 
-use Desperado\ConcurrencyFramework\Domain\Event\StoredRepresentation\StoredEventStream;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\DuplicatePlayheadException;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\EventStorageInterface;
+use Desperado\Framework\Domain\Event\StoredRepresentation\StoredEventStream;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Infrastructure\EventSourcing\Storage\DuplicatePlayheadException;
+use Desperado\Framework\Infrastructure\EventSourcing\Storage\EventStorageInterface;
 
 /**
  * InMemory storage backed

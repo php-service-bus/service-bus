@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Module;
+namespace Desperado\Framework\Application\Module;
 
-use Desperado\ConcurrencyFramework\Application\Saga\SagaListenerSetup;
-use Desperado\ConcurrencyFramework\Application\Storage\StorageManagerRegistry;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation\AnnotationReader;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
+use Desperado\Framework\Application\Saga\SagaListenerSetup;
+use Desperado\Framework\Application\Storage\StorageManagerRegistry;
+use Desperado\Framework\Infrastructure\Bridge\Annotation\AnnotationReader;
+use Desperado\Framework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
 use Psr\Log\LoggerInterface;
 
 /**

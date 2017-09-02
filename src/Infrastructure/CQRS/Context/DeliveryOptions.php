@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context;
+namespace Desperado\Framework\Infrastructure\CQRS\Context;
 
-use Desperado\ConcurrencyFramework\Domain\ParameterBag;
+use Desperado\Framework\Domain\ParameterBag;
 
 /**
  * Messages delivery options container

@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Bridge\Serializer\Exceptions;
+namespace Desperado\Framework\Infrastructure\Bridge\Serializer\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class UnexpectedSerializationFormatException extends AbstractConcurrencyFrameworkException
+class UnexpectedSerializationFormatException extends AbstractFrameworkException
 {
 
 }

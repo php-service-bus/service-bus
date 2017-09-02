@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\MessageBus;
+namespace Desperado\Framework\Domain\MessageBus;
 
-use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\Context\ContextInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
 
 /**
  * Message bus

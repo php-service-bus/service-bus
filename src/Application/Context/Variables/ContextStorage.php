@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Context\Variables;
+namespace Desperado\Framework\Application\Context\Variables;
 
-use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
-use Desperado\ConcurrencyFramework\Application\Context\Exceptions;
-use Desperado\ConcurrencyFramework\Application\Storage\StorageManagerRegistry;
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\AbstractStorageManager;
+use Desperado\Framework\Application\Context\KernelContext;
+use Desperado\Framework\Application\Context\Exceptions;
+use Desperado\Framework\Application\Storage\StorageManagerRegistry;
+use Desperado\Framework\Infrastructure\StorageManager\AbstractStorageManager;
 
 /**
  * Context storages

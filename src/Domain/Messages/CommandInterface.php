@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Messages;
+namespace Desperado\Framework\Domain\Messages;
 
 /**
  * Used to request that an action should be taken. A Command is intended to be sent to a receiver (all commands should

@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Repository;
+namespace Desperado\Framework\Domain\Repository;
 
-use Desperado\ConcurrencyFramework\Domain\EventSourced\AggregateRootInterface;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\EventSourced\AggregateRootInterface;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
 
 /**
  * Aggregate repository

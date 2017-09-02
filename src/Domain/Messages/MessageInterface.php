@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Messages;
+namespace Desperado\Framework\Domain\Messages;
 
 /**
  * Message (event/command) marker interface

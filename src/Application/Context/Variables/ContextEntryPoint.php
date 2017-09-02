@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Context\Variables;
+namespace Desperado\Framework\Application\Context\Variables;
 
-use Desperado\ConcurrencyFramework\Domain\Environment\Environment;
+use Desperado\Framework\Domain\Environment\Environment;
 
 /**
  * Entry point context DTO

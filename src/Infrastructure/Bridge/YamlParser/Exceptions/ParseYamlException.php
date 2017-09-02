@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Bridge\YamlParser\Exceptions;
+namespace Desperado\Framework\Infrastructure\Bridge\YamlParser\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class ParseYamlException extends AbstractConcurrencyFrameworkException
+class ParseYamlException extends AbstractFrameworkException
 {
 
 }

@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Tests\TestFixtures\Commands;
+namespace Desperado\Framework\Tests\TestFixtures\Commands;
 
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
+use Desperado\Framework\Domain\Messages\CommandInterface;
 
 /**
  *

@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application;
+namespace Desperado\Framework\Application;
 
-use Desperado\ConcurrencyFramework\Application;
-use Desperado\ConcurrencyFramework\Common;
-use Desperado\ConcurrencyFramework\Domain;
-use Desperado\ConcurrencyFramework\Infrastructure;
+use Desperado\Framework\Application;
+use Desperado\Framework\Common;
+use Desperado\Framework\Domain;
+use Desperado\Framework\Infrastructure;
 use Psr\Log\LoggerInterface;
 use React\Promise\Deferred;
 

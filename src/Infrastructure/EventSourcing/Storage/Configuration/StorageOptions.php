@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\Configuration;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Storage\Configuration;
 
 /**
  * Storage options

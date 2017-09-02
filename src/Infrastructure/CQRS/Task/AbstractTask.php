@@ -11,17 +11,17 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task;
+namespace Desperado\Framework\Infrastructure\CQRS\Task;
 
-use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Logger\LoggerRegistry;
-use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\AbstractExecutionOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\CommandOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\EventOptions;
+use Desperado\Framework\Application\Context\KernelContext;
+use Desperado\Framework\Infrastructure\Bridge\Logger\LoggerRegistry;
+use Desperado\Framework\Domain\Context\ContextInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\Task\TaskInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options\AbstractExecutionOptions;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options\CommandOptions;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options\EventOptions;
 use Psr\Log\LoggerInterface;
 
 /**

@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Storage;
 
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\Configuration\StorageConfigurationConfig;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\Configuration\UnSupportedStorageDriverException;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\InMemory\InMemoryEventStorage;
+use Desperado\Framework\Infrastructure\EventSourcing\Storage\Configuration\StorageConfigurationConfig;
+use Desperado\Framework\Infrastructure\EventSourcing\Storage\Configuration\UnSupportedStorageDriverException;
+use Desperado\Framework\Infrastructure\EventSourcing\Storage\InMemory\InMemoryEventStorage;
 
 /**
  * Storage factory

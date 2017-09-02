@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Backend;
+namespace Desperado\Framework\Infrastructure\Backend;
 
-use Desperado\ConcurrencyFramework\Domain\Application\BackendInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Logger\LoggerRegistry;
-use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Backend\RabbitMQ\RabbitMqBackend;
+use Desperado\Framework\Domain\Application\BackendInterface;
+use Desperado\Framework\Infrastructure\Bridge\Logger\LoggerRegistry;
+use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Framework\Infrastructure\Backend\RabbitMQ\RabbitMqBackend;
 use Psr\Log\LoggerInterface;
 
 /**

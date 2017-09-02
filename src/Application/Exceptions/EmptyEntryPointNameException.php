@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Exceptions;
+namespace Desperado\Framework\Application\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class EmptyEntryPointNameException extends AbstractConcurrencyFrameworkException
+class EmptyEntryPointNameException extends AbstractFrameworkException
 {
 
 }

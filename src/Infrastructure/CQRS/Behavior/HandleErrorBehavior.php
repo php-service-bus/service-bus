@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Behavior;
+namespace Desperado\Framework\Infrastructure\CQRS\Behavior;
 
-use Desperado\ConcurrencyFramework\Domain\Behavior\BehaviorInterface;
-use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineInterface;
-use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task\ErrorHandlerWrappedTask;
+use Desperado\Framework\Domain\Behavior\BehaviorInterface;
+use Desperado\Framework\Domain\Pipeline\PipelineInterface;
+use Desperado\Framework\Domain\Task\TaskInterface;
+use Desperado\Framework\Infrastructure\CQRS\Task\ErrorHandlerWrappedTask;
 
 /**
  * Run error handler for failed command (if specified)

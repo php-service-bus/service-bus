@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Configuration;
+namespace Desperado\Framework\Application\Configuration;
 
-use Desperado\ConcurrencyFramework\Application\Configuration\Exceptions;
-use Desperado\ConcurrencyFramework\Domain\ParameterBag;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\YamlParser\Exceptions\ParseYamlException;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\YamlParser\YamlParser;
+use Desperado\Framework\Application\Configuration\Exceptions;
+use Desperado\Framework\Domain\ParameterBag;
+use Desperado\Framework\Infrastructure\Bridge\YamlParser\Exceptions\ParseYamlException;
+use Desperado\Framework\Infrastructure\Bridge\YamlParser\YamlParser;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**

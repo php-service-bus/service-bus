@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Storage;
+namespace Desperado\Framework\Application\Storage;
 
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\AbstractStorageManager;
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\SagaStorageManager;
+use Desperado\Framework\Infrastructure\StorageManager\AbstractStorageManager;
+use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManager;
 
 /**
  * Storage managers registry

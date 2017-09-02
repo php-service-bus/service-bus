@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\MessageRouter;
+namespace Desperado\Framework\Infrastructure\MessageRouter;
 
-use Desperado\ConcurrencyFramework\Domain\MessageRouter\MessageRouterInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\MessageRouter\MessageRouterInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
 
 /**
  * Message router

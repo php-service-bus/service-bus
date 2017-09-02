@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Common\Serializer\Exceptions;
+namespace Desperado\Framework\Common\Serializer\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class JsonSerializationException extends AbstractConcurrencyFrameworkException
+class JsonSerializationException extends AbstractFrameworkException
 {
 
 }

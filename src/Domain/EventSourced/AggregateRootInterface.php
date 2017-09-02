@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\EventSourced;
+namespace Desperado\Framework\Domain\EventSourced;
 
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
+use Desperado\Framework\Domain\Messages\CommandInterface;
 
 /**
  * Aggregate root

@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Task;
+namespace Desperado\Framework\Domain\Task;
 
-use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\AbstractExecutionOptions;
+use Desperado\Framework\Domain\Context\ContextInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options\AbstractExecutionOptions;
 
 /**
  * Task

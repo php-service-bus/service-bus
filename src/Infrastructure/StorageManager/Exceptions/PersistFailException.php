@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\StorageManager\Exceptions;
+namespace Desperado\Framework\Infrastructure\StorageManager\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class PersistFailException extends AbstractConcurrencyFrameworkException
+class PersistFailException extends AbstractFrameworkException
 {
 
 }

@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain;
+namespace Desperado\Framework\Domain;
 
 use Ramsey\Uuid\Uuid as RamseyUuid;
 

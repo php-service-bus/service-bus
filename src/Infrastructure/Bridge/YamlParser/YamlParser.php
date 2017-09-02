@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Bridge\YamlParser;
+namespace Desperado\Framework\Infrastructure\Bridge\YamlParser;
 
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\YamlParser\Exceptions\ParseYamlException;
+use Desperado\Framework\Infrastructure\Bridge\YamlParser\Exceptions\ParseYamlException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 

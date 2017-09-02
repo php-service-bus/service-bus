@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Application;
+namespace Desperado\Framework\Domain\Application;
 
 /**
  * Entry point backend

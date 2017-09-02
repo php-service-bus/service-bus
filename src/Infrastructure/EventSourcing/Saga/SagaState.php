@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Saga;
 
-use Desperado\ConcurrencyFramework\Domain\DateTime;
-use Desperado\ConcurrencyFramework\Domain\EventSourced\SagaStateInterface;
+use Desperado\Framework\Domain\DateTime;
+use Desperado\Framework\Domain\EventSourced\SagaStateInterface;
 
 /**
  * Saga state

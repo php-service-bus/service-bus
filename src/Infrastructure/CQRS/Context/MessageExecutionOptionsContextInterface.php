@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context;
+namespace Desperado\Framework\Infrastructure\CQRS\Context;
 
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\MessageOptionsInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options\MessageOptionsInterface;
 
 /**
  * Execution options

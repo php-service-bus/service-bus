@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Saga;
+namespace Desperado\Framework\Application\Saga;
 
-use Desperado\ConcurrencyFramework\Application\Saga\Exceptions\EventListenerAnnotationException;
-use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
-use Desperado\ConcurrencyFramework\Domain\Annotation\AbstractAnnotation;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation\AnnotationReader;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Annotation\SagaListener;
+use Desperado\Framework\Application\Saga\Exceptions\EventListenerAnnotationException;
+use Desperado\Framework\Common\Formatter\ThrowableFormatter;
+use Desperado\Framework\Domain\Annotation\AbstractAnnotation;
+use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Infrastructure\Bridge\Annotation\AnnotationReader;
+use Desperado\Framework\Infrastructure\EventSourcing\Annotation\SagaListener;
 use Psr\Log\LoggerInterface;
 
 /**

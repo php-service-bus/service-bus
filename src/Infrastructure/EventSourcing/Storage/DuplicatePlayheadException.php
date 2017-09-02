@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Storage;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class DuplicatePlayheadException extends AbstractConcurrencyFrameworkException
+class DuplicatePlayheadException extends AbstractFrameworkException
 {
 
 }

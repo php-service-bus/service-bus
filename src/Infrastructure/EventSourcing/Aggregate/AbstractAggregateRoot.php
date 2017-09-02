@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Aggregate;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Aggregate;
 
-use Desperado\ConcurrencyFramework\Domain\DateTime;
-use Desperado\ConcurrencyFramework\Domain\EventSourced\AggregateRootInterface;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\AbstractEventSourced;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Contract\EventSourcedEntryCreatedEvent;
+use Desperado\Framework\Domain\DateTime;
+use Desperado\Framework\Domain\EventSourced\AggregateRootInterface;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Infrastructure\EventSourcing\AbstractEventSourced;
+use Desperado\Framework\Infrastructure\EventSourcing\Contract\EventSourcedEntryCreatedEvent;
 
 /**
  * Aggregate root

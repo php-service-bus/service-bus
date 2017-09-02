@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\EventSourced;
+namespace Desperado\Framework\Domain\EventSourced;
 
-use Desperado\ConcurrencyFramework\Domain\Event\DomainEventStream;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Event\DomainEventStream;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
 
 /**
  * Event sourced entry

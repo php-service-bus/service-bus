@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Tests\Domain;
+namespace Desperado\Framework\Tests\Domain;
 
-use Desperado\ConcurrencyFramework\Domain\Uuid;
+use Desperado\Framework\Domain\Uuid;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain;
+namespace Desperado\Framework\Domain;
 
 /**
  *
  */
-abstract class AbstractConcurrencyFrameworkException extends \Exception
+abstract class AbstractFrameworkException extends \Exception
 {
 
 }

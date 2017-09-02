@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Exceptions;
+namespace Desperado\Framework\Infrastructure\CQRS\Context\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class EmptyMessageDestinationException extends AbstractConcurrencyFrameworkException
+class EmptyMessageDestinationException extends AbstractFrameworkException
 {
 
 }

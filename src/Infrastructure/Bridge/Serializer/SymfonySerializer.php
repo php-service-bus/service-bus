@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Bridge\Serializer;
+namespace Desperado\Framework\Infrastructure\Bridge\Serializer;
 
-use Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions;
-use Desperado\ConcurrencyFramework\Domain\Serializer\SerializerInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Serializer\Exceptions\UnexpectedSerializationFormatException;
+use Desperado\Framework\Domain\Serializer\Exceptions;
+use Desperado\Framework\Domain\Serializer\SerializerInterface;
+use Desperado\Framework\Infrastructure\Bridge\Serializer\Exceptions\UnexpectedSerializationFormatException;
 use Symfony\Component\PropertyInfo;
 use Symfony\Component\Serializer;
 

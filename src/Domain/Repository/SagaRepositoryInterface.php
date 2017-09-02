@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\Repository;
+namespace Desperado\Framework\Domain\Repository;
 
-use Desperado\ConcurrencyFramework\Domain\EventSourced\SagaInterface;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\EventSourced\SagaInterface;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
 
 /**
  * Saga repository

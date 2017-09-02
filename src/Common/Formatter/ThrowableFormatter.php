@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Common\Formatter;
+namespace Desperado\Framework\Common\Formatter;
 
 /**
  * Format Throwable to string representation

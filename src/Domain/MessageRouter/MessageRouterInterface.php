@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Domain\MessageRouter;
+namespace Desperado\Framework\Domain\MessageRouter;
 
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
 
 /**
  * Messages (command/events) response router

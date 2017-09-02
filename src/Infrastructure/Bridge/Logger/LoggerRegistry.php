@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Bridge\Logger;
+namespace Desperado\Framework\Infrastructure\Bridge\Logger;
 
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Logger\Handlers\StdoutHandler;
+use Desperado\Framework\Infrastructure\Bridge\Logger\Handlers\StdoutHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Processor;
 use Monolog\Logger;

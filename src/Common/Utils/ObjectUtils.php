@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Common\Utils;
+namespace Desperado\Framework\Common\Utils;
 
 /**
  * Object helpers

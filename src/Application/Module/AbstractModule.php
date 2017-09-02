@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Module;
+namespace Desperado\Framework\Application\Module;
 
-use Desperado\ConcurrencyFramework\Application\Service\ServiceHandlersSetup;
-use Desperado\ConcurrencyFramework\Domain\Service\ServiceInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation\AnnotationReader;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Logger\LoggerRegistry;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
+use Desperado\Framework\Application\Service\ServiceHandlersSetup;
+use Desperado\Framework\Domain\Service\ServiceInterface;
+use Desperado\Framework\Infrastructure\Bridge\Annotation\AnnotationReader;
+use Desperado\Framework\Infrastructure\Bridge\Logger\LoggerRegistry;
+use Desperado\Framework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
 use Psr\Log\LoggerInterface;
 
 /**

@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus;
+namespace Desperado\Framework\Infrastructure\CQRS\MessageBus;
 
-use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
-use Desperado\ConcurrencyFramework\Domain\MessageBus\MessageBusInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineCollection;
-use Desperado\ConcurrencyFramework\Domain\Pipeline\PipelineEntry;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Pipeline\Pipeline;
+use Desperado\Framework\Domain\Context\ContextInterface;
+use Desperado\Framework\Domain\MessageBus\MessageBusInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Domain\Pipeline\PipelineCollection;
+use Desperado\Framework\Domain\Pipeline\PipelineEntry;
+use Desperado\Framework\Infrastructure\CQRS\Pipeline\Pipeline;
 
 /**
  * Message bus

@@ -11,15 +11,15 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\StorageManager;
+namespace Desperado\Framework\Infrastructure\StorageManager;
 
-use Desperado\ConcurrencyFramework\Domain\Event\DomainEvent;
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
-use Desperado\ConcurrencyFramework\Domain\Repository\SagaRepositoryInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga\AbstractSaga;
+use Desperado\Framework\Domain\Event\DomainEvent;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Domain\Messages\CommandInterface;
+use Desperado\Framework\Domain\Repository\SagaRepositoryInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryContextInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\AbstractSaga;
 
 /**
  * Saga manager

@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Common\Serializer;
+namespace Desperado\Framework\Common\Serializer;
 
-use Desperado\ConcurrencyFramework\Common\Serializer\Exceptions\JsonSerializationException;
+use Desperado\Framework\Common\Serializer\Exceptions\JsonSerializationException;
 
 /**
  * Json serializer

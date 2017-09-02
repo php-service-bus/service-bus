@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Context\Exceptions;
+namespace Desperado\Framework\Application\Context\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class StorageManagerWasNotConfiguredException extends AbstractConcurrencyFrameworkException
+class StorageManagerWasNotConfiguredException extends AbstractFrameworkException
 {
 
 }

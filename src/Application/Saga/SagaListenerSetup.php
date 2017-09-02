@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Saga;
+namespace Desperado\Framework\Application\Saga;
 
-use Desperado\ConcurrencyFramework\Application\Saga\Exceptions\EventListenerAnnotationException;
-use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Annotation\AnnotationReader;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options\EventOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\SagaStorageManager;
+use Desperado\Framework\Application\Saga\Exceptions\EventListenerAnnotationException;
+use Desperado\Framework\Infrastructure\Bridge\Annotation\AnnotationReader;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options\EventOptions;
+use Desperado\Framework\Infrastructure\CQRS\MessageBus\MessageBusBuilder;
+use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManager;
 use Psr\Log\LoggerInterface;
 
 /**

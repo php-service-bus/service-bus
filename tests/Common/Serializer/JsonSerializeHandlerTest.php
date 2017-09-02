@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Tests\Common\Serializer;
+namespace Desperado\Framework\Tests\Common\Serializer;
 
-use Desperado\ConcurrencyFramework\Common\Serializer\JsonSerializeHandler;
+use Desperado\Framework\Common\Serializer\JsonSerializeHandler;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -44,7 +44,7 @@ class JsonSerializeHandlerTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Desperado\ConcurrencyFramework\Common\Serializer\Exceptions\JsonSerializationException
+     * @expectedException \Desperado\Framework\Common\Serializer\Exceptions\JsonSerializationException
      * @expectedExceptionMessage Syntax error
      *
      * @return void
@@ -73,7 +73,7 @@ class JsonSerializeHandlerTest extends TestCase
      * @test
      *
      * @return void
-     * @expectedException \Desperado\ConcurrencyFramework\Common\Serializer\Exceptions\JsonSerializationException
+     * @expectedException \Desperado\Framework\Common\Serializer\Exceptions\JsonSerializationException
      * @expectedExceptionMessage Malformed UTF-8 characters, possibly incorrectly encoded
      */
     public function serializeWithBadCharset(): void

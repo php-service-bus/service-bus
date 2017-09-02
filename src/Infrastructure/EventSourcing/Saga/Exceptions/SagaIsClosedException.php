@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Saga\Exceptions;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Saga\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
+use Desperado\Framework\Domain\AbstractFrameworkException;
 
 /**
  *
  */
-class SagaIsClosedException extends AbstractConcurrencyFrameworkException
+class SagaIsClosedException extends AbstractFrameworkException
 {
 
 }

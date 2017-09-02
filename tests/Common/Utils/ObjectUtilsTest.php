@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Tests\Common\Utils;
+namespace Desperado\Framework\Tests\Common\Utils;
 
-use Desperado\ConcurrencyFramework\Common\Utils\ObjectUtils;
+use Desperado\Framework\Common\Utils\ObjectUtils;
 use PHPUnit\Framework\TestCase;
 
 /**

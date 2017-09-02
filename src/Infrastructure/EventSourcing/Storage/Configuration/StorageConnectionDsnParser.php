@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\Configuration;
+namespace Desperado\Framework\Infrastructure\EventSourcing\Storage\Configuration;
 
-use Desperado\ConcurrencyFramework\Domain\ParameterBag;
+use Desperado\Framework\Domain\ParameterBag;
 
 /**
  * Connection DSN parser

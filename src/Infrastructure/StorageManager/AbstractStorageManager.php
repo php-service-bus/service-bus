@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\StorageManager;
+namespace Desperado\Framework\Infrastructure\StorageManager;
 
-use Desperado\ConcurrencyFramework\Domain\Identity\IdentityInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\Exceptions\PersistFailException;
+use Desperado\Framework\Domain\Identity\IdentityInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryContextInterface;
+use Desperado\Framework\Infrastructure\StorageManager\Exceptions\PersistFailException;
 
 /**
  * Base storage manager

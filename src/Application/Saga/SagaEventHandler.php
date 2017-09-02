@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Saga;
+namespace Desperado\Framework\Application\Saga;
 
-use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Annotation\SagaListener;
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\SagaStorageManager;
+use Desperado\Framework\Application\Context\KernelContext;
+use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Infrastructure\EventSourcing\Annotation\SagaListener;
+use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManager;
 
 /**
  * Saga event handler

@@ -11,19 +11,19 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Infrastructure\Backend\RabbitMQ;
+namespace Desperado\Framework\Infrastructure\Backend\RabbitMQ;
 
 use Bunny\Channel;
 use Bunny\Message;
 use Bunny\Async;
-use Desperado\ConcurrencyFramework\Domain\Application\BackendInterface;
-use Desperado\ConcurrencyFramework\Domain\Application\KernelInterface;
+use Desperado\Framework\Domain\Application\BackendInterface;
+use Desperado\Framework\Domain\Application\KernelInterface;
 use Psr\Log\LoggerInterface;
 use EventLoop\EventLoop;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
-use Desperado\ConcurrencyFramework\Common\Formatter\ThrowableFormatter;
-use Desperado\ConcurrencyFramework\Domain\Messages\ReceivedMessage;
-use Desperado\ConcurrencyFramework\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Framework\Common\Formatter\ThrowableFormatter;
+use Desperado\Framework\Domain\Messages\ReceivedMessage;
+use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
 
 /**
  * ReactPHP rabbit mq client

@@ -11,18 +11,18 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ConcurrencyFramework\Application\Context;
+namespace Desperado\Framework\Application\Context;
 
-use Desperado\ConcurrencyFramework\Application\Context;
-use Desperado\ConcurrencyFramework\Domain\Environment\Environment;
-use Desperado\ConcurrencyFramework\Domain\Messages\CommandInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\EventInterface;
-use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryContextInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\DeliveryOptions;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
-use Desperado\ConcurrencyFramework\Infrastructure\CQRS\Context\Options;
-use Desperado\ConcurrencyFramework\Infrastructure\StorageManager\AbstractStorageManager;
+use Desperado\Framework\Application\Context;
+use Desperado\Framework\Domain\Environment\Environment;
+use Desperado\Framework\Domain\Messages\CommandInterface;
+use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryContextInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
+use Desperado\Framework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
+use Desperado\Framework\Infrastructure\CQRS\Context\Options;
+use Desperado\Framework\Infrastructure\StorageManager\AbstractStorageManager;
 use Psr\Log\LoggerInterface;
 
 /**
