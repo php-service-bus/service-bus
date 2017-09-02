@@ -15,7 +15,7 @@ declare(strict_types = 1);
 namespace Desperado\ConcurrencyFramework\Infrastructure\CQRS\Task;
 
 use Desperado\ConcurrencyFramework\Application\Context\KernelContext;
-use Desperado\ConcurrencyFramework\Common\Logger\LoggerRegistry;
+use Desperado\ConcurrencyFramework\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\ConcurrencyFramework\Domain\Context\ContextInterface;
 use Desperado\ConcurrencyFramework\Domain\Messages\MessageInterface;
 use Desperado\ConcurrencyFramework\Domain\Task\TaskInterface;

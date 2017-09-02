@@ -16,7 +16,6 @@ namespace Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage;
 use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\Configuration\StorageConfigurationConfig;
 use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\Configuration\UnSupportedStorageDriverException;
 use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\InMemory\InMemoryEventStorage;
-use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\PostgreSQL\AmPhpPostgreSQLStorage;
 
 /**
  * Storage factory
@@ -24,11 +23,9 @@ use Desperado\ConcurrencyFramework\Infrastructure\EventSourcing\Storage\PostgreS
 class StorageFactory
 {
     public const IN_MEMORY_STORAGE = 'inMemory';
-    public const AMPHP_POSTGRE_SQL_STORAGE = 'amphpPgSql';
 
     private const SUPPORTED_DRIVERS = [
         self::IN_MEMORY_STORAGE         => InMemoryEventStorage::class,
-        self::AMPHP_POSTGRE_SQL_STORAGE => AmPhpPostgreSQLStorage::class
     ];
 
     /**
@@ -56,9 +53,6 @@ class StorageFactory
 
             switch($config->getDriver())
             {
-                case 'amphpPgsql':
-                    $storage = new $storageDriverClass($config);
-                    break;
                 case 'inMemory':
                     $storage = new $storageDriverClass();
                     break;

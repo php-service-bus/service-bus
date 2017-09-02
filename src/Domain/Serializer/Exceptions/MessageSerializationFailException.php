@@ -13,8 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ConcurrencyFramework\Domain\Serializer\Exceptions;
 
-use Desperado\ConcurrencyFramework\Domain\AbstractConcurrencyFrameworkException;
-
 /**
  *
  */

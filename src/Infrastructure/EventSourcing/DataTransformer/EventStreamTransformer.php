@@ -97,7 +97,7 @@ class EventStreamTransformer
                         /** @var EventInterface $receivedEvent */
                         $receivedEvent = $this->messageSerializer
                             ->unserialize($eachEvent['receivedEvent'])
-                            ->getMessage();
+                            ->message;
 
                         return DomainEvent::restore(
                             $eachEvent['id'],

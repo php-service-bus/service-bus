@@ -265,7 +265,7 @@ class RabbitMqBackend implements BackendInterface
             /** @var ReceivedMessage $message */
             $message = $this->messageSerializer->unserialize($incoming->content);
 
-            $kernel->handleMessage($message->getMessage(), $context);
+            $kernel->handleMessage($message->message, $context);
         }
         catch(\Throwable $throwable)
         {
