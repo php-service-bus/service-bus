@@ -277,7 +277,7 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         $registry = new Application\Storage\StorageManagerRegistry();
 
         $sagasConfig = $this->getSagasConfiguration();
-        $aggregatesConfig = $this->getEventSourcedConfiguration();
+        $aggregatesConfig = $this->getAggregatesConfiguration();
 
         Application\Storage\EventSourcedManagerFactory::sagas($sagasConfig, $this->messageSerializer)
             ->append($registry);
