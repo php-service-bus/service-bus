@@ -16,7 +16,7 @@ namespace Desperado\Framework\Domain\Application;
 /**
  * Entry point backend
  */
-interface BackendInterface
+interface DaemonInterface
 {
     /**
      * Run backend

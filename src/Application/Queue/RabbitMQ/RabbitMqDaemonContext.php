@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\Framework\Infrastructure\Backend\RabbitMQ;
+namespace Desperado\Framework\Application\Queue\RabbitMQ;
 
 use Bunny\Channel;
 use Bunny\Message;
@@ -25,9 +25,9 @@ use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
 use Psr\Log\LoggerInterface;
 
 /**
- * ReactPHP RabbitMQ context
+ * Execution context RabbitMQ
  */
-class RabbitMqContext implements DeliveryContextInterface
+class RabbitMqDaemonContext implements DeliveryContextInterface
 {
     /**
      * Message serializer

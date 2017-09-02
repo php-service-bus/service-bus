@@ -11,30 +11,29 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\Framework\Infrastructure\Backend\RabbitMQ;
+namespace Desperado\Framework\Application\Queue\RabbitMQ;
 
+use Bunny\Async\Client;
 use Bunny\Channel;
 use Bunny\Message;
-use Bunny\Async;
-use Desperado\Framework\Domain\Application\BackendInterface;
-use Desperado\Framework\Domain\Application\KernelInterface;
-use Psr\Log\LoggerInterface;
-use EventLoop\EventLoop;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
+use EventLoop\EventLoop;
+use Psr\Log\LoggerInterface;
 use Desperado\Framework\Common\Formatter\ThrowableFormatter;
+use Desperado\Framework\Domain\Application\DaemonInterface;
+use Desperado\Framework\Domain\Application\KernelInterface;
 use Desperado\Framework\Domain\Messages\ReceivedMessage;
 use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
 
 /**
- * ReactPHP rabbit mq client
+ * RabbitMQ daemon implementation
  */
-class RabbitMqBackend implements BackendInterface
+class RabbitMqDaemon implements DaemonInterface
 {
     /** Exchange types */
     protected const EXCHANGE_TYPE_DIRECT = 'direct';
     protected const EXCHANGE_TYPE_FANOUT = 'fanout';
     protected const EXCHANGE_TYPE_TOPIC = 'topic';
-
 
     /**
      * Logger
@@ -74,7 +73,7 @@ class RabbitMqBackend implements BackendInterface
     /**
      * Subscriber client
      *
-     * @var Async\Client
+     * @var Client
      */
     private $client;
 
@@ -104,7 +103,7 @@ class RabbitMqBackend implements BackendInterface
         $this->logger = $logger;
 
         $this->eventLoop = EventLoop::getLoop();
-        $this->client = new Async\Client($this->eventLoop, $this->connectionDsnParts, $logger);
+        $this->client = new Client($this->eventLoop, $this->connectionDsnParts, $logger);
 
         $this->initSignals();
         $this->initFailHandler();
@@ -166,7 +165,7 @@ class RabbitMqBackend implements BackendInterface
         $this->client
             ->connect()
             ->then(
-                function(Async\Client $client) use ($consumeCallable, $clients)
+                function(Client $client) use ($consumeCallable, $clients)
                 {
                     return $client
                         ->channel()
@@ -260,7 +259,7 @@ class RabbitMqBackend implements BackendInterface
     {
         try
         {
-            $context = new RabbitMqContext($incoming, $channel, $this->messageSerializer, $this->logger);
+            $context = new RabbitMqDaemonContext($incoming, $channel, $this->messageSerializer, $this->logger);
 
             /** @var ReceivedMessage $message */
             $message = $this->messageSerializer->unserialize($incoming->content);

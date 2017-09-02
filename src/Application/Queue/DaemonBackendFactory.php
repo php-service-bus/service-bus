@@ -11,16 +11,16 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\Framework\Infrastructure\Backend;
+namespace Desperado\Framework\Application\Queue;
 
-use Desperado\Framework\Domain\Application\BackendInterface;
-use Desperado\Framework\Infrastructure\Bridge\Logger\LoggerRegistry;
+use Desperado\Framework\Application\Queue\RabbitMQ\RabbitMqDaemon;
+use Desperado\Framework\Domain\Application\DaemonInterface;
 use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
-use Desperado\Framework\Infrastructure\Backend\RabbitMQ\RabbitMqBackend;
+use Desperado\Framework\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Psr\Log\LoggerInterface;
 
 /**
- * Daemon backend factory
+ * Daemon backend creation
  */
 class DaemonBackendFactory
 {
@@ -64,9 +64,9 @@ class DaemonBackendFactory
      *
      * @param string $dsn
      *
-     * @return BackendInterface
+     * @return DaemonInterface
      */
-    public function create(string $dsn): BackendInterface
+    public function create(string $dsn): DaemonInterface
     {
         $dsnParts = \parse_url($dsn);
 
@@ -76,7 +76,7 @@ class DaemonBackendFactory
             {
                 case 'amqp':
 
-                    return new RabbitMqBackend(
+                    return new RabbitMqDaemon(
                         $dsn,
                         $this->entryPointName,
                         $this->logger,
