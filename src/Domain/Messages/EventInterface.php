@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CQRS/Event Sourcing Non-blocking concurrency framework
+ * Command Query Responsibility Segregation, Event Sourcing implementation
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @url     https://github.com/mmasiukevich

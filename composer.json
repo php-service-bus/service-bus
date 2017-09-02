@@ -1,13 +1,14 @@
 {
-  "name": "desperado/concurrency-framework",
-  "description": "CQRS/Event Sourcing Non-blocking concurrency framework",
+  "name": "desperado/php-es-cqrs",
+  "description": "Command Query Responsibility Segregation/Event Sourcing implementation",
   "type": "library",
   "keywords": [
     "CQRS",
     "Command Query Responsibility Segregation",
     "Event Sourcing",
     "Concurrency",
-    "Framework"
+    "Framework",
+    "Async PHP"
   ],
   "authors": [
     {
@@ -20,12 +21,12 @@
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Desperado\\ConcurrencyFramework\\": "src/"
+      "Desperado\\Framework\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Desperado\\ConcurrencyFramework\\Tests\\": "tests/"
+      "Desperado\\Framework\\Tests\\": "tests/"
     }
   },
   "require": {
