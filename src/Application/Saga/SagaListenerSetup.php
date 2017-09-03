@@ -96,7 +96,11 @@ class SagaListenerSetup
                 $this->storageManagers[$saga]
             );
 
-            $this->messageBusBuilder->addMessageHandler($eventNamespace, $handler, new EventOptions());
+            $this->messageBusBuilder->addMessageHandler(
+                $eventNamespace,
+                \Closure::fromCallable($handler),
+                new EventOptions()
+            );
 
             $this->logger->debug(
                 \sprintf(

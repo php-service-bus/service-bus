@@ -73,7 +73,7 @@ class SagaEventListenersAnnotationReader
 
                 /** @var SagaListener $annotation */
 
-                self::guardContainingExpectedProperties($annotationData, $sagaNamespace);
+                self::guardContainingExpectedProperties($annotation, $sagaNamespace);
                 self::guardFirstArgumentIsEvent($sagaNamespace, $annotationData['arguments']);
 
                 $list[] = $annotationData;
