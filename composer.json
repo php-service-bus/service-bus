@@ -41,7 +41,8 @@
     "ramsey/uuid": "3.7.0",
     "bunny/bunny": "^0.2.4",
     "voryx/event-loop": "^2.0",
-    "react/react": "v0.4.2"
+    "react/react": "v0.4.2",
+    "guzzlehttp/guzzle": "~6.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.2"

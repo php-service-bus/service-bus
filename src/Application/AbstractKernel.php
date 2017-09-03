@@ -17,6 +17,7 @@ use Desperado\Framework\Application;
 use Desperado\Framework\Common;
 use Desperado\Framework\Domain;
 use Desperado\Framework\Infrastructure;
+use EventLoop\EventLoop;
 use Psr\Log\LoggerInterface;
 use React\Promise\Deferred;
 
@@ -123,6 +124,8 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         $this->messagesRouter = $this->initMessagesRouter();
         $this->storageManagersRegistry = $this->initEventSourcedStorage();
         $this->messageBus = $this->initMessageBus();
+
+        $this->initGuzzleHttpQueue();
     }
 
     /**
@@ -216,6 +219,16 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     protected function init(): void
     {
 
+    }
+
+    /**
+     * Init guzzle http queue
+     *
+     * @return void
+     */
+    protected function initGuzzleHttpQueue(): void
+    {
+        EventLoop::getLoop()->nextTick([\GuzzleHttp\Promise\queue(), 'run']);
     }
 
     /**
