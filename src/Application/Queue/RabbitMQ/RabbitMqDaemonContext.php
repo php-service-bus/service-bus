@@ -121,7 +121,7 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
                 {
                     $this->logger->debug(
                         \sprintf(
-                            'Publish message "%s" to "%s" destination with routing key "%"',
+                            'Publish message "%s" to "%s" destination with routing key "%s"',
                             \get_class($message), $destination, $this->routingKey
                         )
                     );

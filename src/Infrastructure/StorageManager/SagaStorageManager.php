@@ -94,8 +94,7 @@ class SagaStorageManager extends AbstractStorageManager
             }
 
             $this->getPersistMap()->detach($saga);
-
-            unset($saga);
+            $this->getRemoveMap()->detach($saga);
         }
 
         $this->flushLocalStorage();

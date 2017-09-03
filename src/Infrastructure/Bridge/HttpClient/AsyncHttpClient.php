@@ -30,8 +30,8 @@ use WyriHaximus\React\GuzzlePsr7\HttpClientAdapter;
 class AsyncHttpClient implements HttpClientInterface
 {
     private const DEFAULT_REQUEST_OPTIONS = [
-        'connect_timeout' => 10,
-        'timeout'         => 10,
+        'connect_timeout' => 15,
+        'timeout'         => 15,
         'exceptions'      => false,
         'allow_redirects' => true
     ];
