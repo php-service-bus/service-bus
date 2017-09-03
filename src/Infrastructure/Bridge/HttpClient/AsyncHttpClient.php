@@ -134,6 +134,7 @@ class AsyncHttpClient implements HttpClientInterface
      */
     private static function processPromise(PromiseInterface $promise, callable $resultHandler): void
     {
+        $promise->wait();
         $promise->then(
             function(Response $response) use ($resultHandler)
             {
