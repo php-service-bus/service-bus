@@ -76,12 +76,17 @@ class EventSourcedManagerFactory
      *
      * @param ParameterBag               $configSection
      * @param MessageSerializerInterface $messageSerializer
+     * @param LoggerInterface            $logger
      *
      * @return EventSourcedManagerFactory
      */
-    public static function sagas(ParameterBag $configSection, MessageSerializerInterface $messageSerializer): self
+    public static function sagas(
+        ParameterBag $configSection,
+        MessageSerializerInterface $messageSerializer,
+        LoggerInterface $logger
+    ): self
     {
-        return new self(self::TYPE_SAGAS, $configSection, $messageSerializer);
+        return new self(self::TYPE_SAGAS, $configSection, $messageSerializer, $logger);
     }
 
     /**
@@ -89,12 +94,17 @@ class EventSourcedManagerFactory
      *
      * @param ParameterBag               $configSection
      * @param MessageSerializerInterface $messageSerializer
+     * @param LoggerInterface            $logger
      *
      * @return EventSourcedManagerFactory
      */
-    public static function aggregates(ParameterBag $configSection, MessageSerializerInterface $messageSerializer): self
+    public static function aggregates(
+        ParameterBag $configSection,
+        MessageSerializerInterface $messageSerializer,
+        LoggerInterface $logger
+    ): self
     {
-        return new self(self::TYPE_AGGREGATES, $configSection, $messageSerializer);
+        return new self(self::TYPE_AGGREGATES, $configSection, $messageSerializer, $logger);
     }
 
     /**
@@ -151,16 +161,19 @@ class EventSourcedManagerFactory
      * @param string                     $type
      * @param ParameterBag               $configSection
      * @param MessageSerializerInterface $messageSerializer
+     * @param LoggerInterface            $logger
      */
     private function __construct(
         string $type,
         ParameterBag $configSection,
-        MessageSerializerInterface $messageSerializer
+        MessageSerializerInterface $messageSerializer,
+        LoggerInterface $logger
     )
     {
         $this->type = $type;
         $this->configSection = $configSection;
         $this->messageSerializer = $messageSerializer;
+        $this->logger = $logger;
     }
 
     /**
