@@ -117,7 +117,7 @@ class AsyncHttpClient implements HttpClientInterface
     {
         $promise = $this->httpClient->getAsync(
             $request->getUrl(),
-            self::getRequestParameters('PUT', $request->getParameters(), $request->getHeaders())
+            self::getRequestParameters('GET', $request->getParameters(), $request->getHeaders())
 
         );
 
