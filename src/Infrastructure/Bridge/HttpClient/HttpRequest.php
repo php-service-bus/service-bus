@@ -46,7 +46,7 @@ class HttpRequest
      * @param array|null|string $parameters
      * @param ParameterBag      $headers
      */
-    public function __construct(string $url, $parameters, ParameterBag $headers = null)
+    public function __construct(string $url, $parameters = null, ParameterBag $headers = null)
     {
         $this->url = $url;
         $this->parameters = $parameters;
