@@ -174,15 +174,18 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
                 $logFailCallable
             )
             ->then(
-                function(Application\Context\KernelContext $context) use ($storageManagersRegistry)
+                function(Application\Context\KernelContext $context) use ($storageManagersRegistry, $logger)
                 {
-                    foreach($storageManagersRegistry as $storageManager)
-                    {
-                        $storageManager->commit($context);
-                    }
+                    $persistProcessor = new Application\Storage\FlushStorageManagersProcessor(
+                        $storageManagersRegistry,
+                        $logger
+                    );
+
+                    $persistProcessor->process($context);
                 },
                 $logFailCallable
-            );
+            )
+            ->then(null, $logFailCallable);
 
         $deferred->resolve($task);
     }

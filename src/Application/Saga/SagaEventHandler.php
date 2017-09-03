@@ -65,21 +65,14 @@ class SagaEventHandler
             $identityNamespace = $this->annotation->identityNamespace;
             $identity = new $identityNamespace($event->{$this->annotation->containingIdentityProperty});
 
-            $saga = $this->storageManager->load($identity);
-
-            if(null !== $saga)
+            if('' !== (string) $identity)
             {
-                $saga->resetUncommittedEvents();
-                $saga->resetCommands();
+                $saga = $this->storageManager->load($identity);
 
-                $saga->transition($event);
-
-                $this->storageManager->commit($context);
-
-                $saga->resetUncommittedEvents();
-                $saga->resetCommands();
-
-                unset($saga);
+                if(null !== $saga)
+                {
+                    $saga->transition($event);
+                }
             }
         }
     }

@@ -63,8 +63,6 @@ class SagaStorageManager extends AbstractStorageManager
             {
                 $this->getPersistMap()->attach($saga);
             }
-
-            $saga->resetCommands();
         }
 
         return $saga;

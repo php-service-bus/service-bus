@@ -47,11 +47,15 @@ abstract class AbstractSaga extends AbstractEventSourced implements SagaInterfac
     private $state;
 
     /**
-     * @inheritdoc
+     * Execute event (for saga listeners only. Don't use this method)
+     *
+     * @param EventInterface $event
+     *
+     * @return void
      */
-    public function resetCommands(): void
+    public function transition(EventInterface $event): void
     {
-        $this->commands = [];
+        $this->raiseEvent($event, false);
     }
 
     /**
@@ -67,15 +71,11 @@ abstract class AbstractSaga extends AbstractEventSourced implements SagaInterfac
     }
 
     /**
-     * Execute event (for saga listeners only. Don't use this method)
-     *
-     * @param EventInterface $event
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function transition(EventInterface $event): void
+    public function resetCommands(): void
     {
-        $this->raiseEvent($event, false);
+        $this->commands = [];
     }
 
     /**

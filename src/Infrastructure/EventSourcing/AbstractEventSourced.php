@@ -85,14 +85,6 @@ abstract class AbstractEventSourced implements EventSourcedInterface
     /**
      * @inheritdoc
      */
-    public function getId(): IdentityInterface
-    {
-        return $this->id;
-    }
-
-    /**
-     * @inheritdoc
-     */
     final public function getToPublishEvents(): array
     {
         $events = $this->toPublishEvents;
@@ -100,6 +92,18 @@ abstract class AbstractEventSourced implements EventSourcedInterface
         $this->resetToPublishEvents();
 
         return $events;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    final public function getEventStream(): DomainEventStream
+    {
+        $eventStream = DomainEventStream::create($this->uncommittedEvents);
+
+        $this->resetUncommittedEvents();
+
+        return $eventStream;
     }
 
     /**
@@ -121,21 +125,17 @@ abstract class AbstractEventSourced implements EventSourcedInterface
     /**
      * @inheritdoc
      */
-    public function getVersion(): int
+    final public function getId(): IdentityInterface
     {
-        return $this->version;
+        return $this->id;
     }
 
     /**
      * @inheritdoc
      */
-    final public function getEventStream(): DomainEventStream
+    public function getVersion(): int
     {
-        $eventStream = DomainEventStream::create($this->uncommittedEvents);
-
-        $this->resetUncommittedEvents();
-
-        return $eventStream;
+        return $this->version;
     }
 
     /**
