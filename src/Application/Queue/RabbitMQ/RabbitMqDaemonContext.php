@@ -117,8 +117,15 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
         $this->channel
             ->exchangeDeclare($destination, 'direct', true)
             ->then(
-                function() use ($destination, $serializedMessage)
+                function() use ($destination, $serializedMessage, $message)
                 {
+                    $this->logger->debug(
+                        \sprintf(
+                            'Publish message "%s" to "%s" destination with routing key "%"',
+                            \get_class($message), $destination, $this->routingKey
+                        )
+                    );
+
                     return $this->channel->publish($serializedMessage, [], $destination, $this->routingKey);
                 },
                 function(\Throwable $throwable)

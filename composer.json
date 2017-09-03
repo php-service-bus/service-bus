@@ -42,7 +42,8 @@
     "bunny/bunny": "^0.2.4",
     "voryx/event-loop": "^2.0",
     "react/react": "v0.4.2",
-    "guzzlehttp/guzzle": "~6.0"
+    "guzzlehttp/guzzle": "~6.0",
+    "wyrihaximus/react-guzzle-psr7": "1.0.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.2"

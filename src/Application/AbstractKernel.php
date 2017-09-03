@@ -124,8 +124,6 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         $this->messagesRouter = $this->initMessagesRouter();
         $this->storageManagersRegistry = $this->initEventSourcedStorage();
         $this->messageBus = $this->initMessageBus();
-
-        $this->initGuzzleHttpQueue();
     }
 
     /**
@@ -219,16 +217,6 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     protected function init(): void
     {
 
-    }
-
-    /**
-     * Init guzzle http queue
-     *
-     * @return void
-     */
-    protected function initGuzzleHttpQueue(): void
-    {
-        EventLoop::getLoop()->addPeriodicTimer(0, [\GuzzleHttp\Promise\queue(), 'run']);
     }
 
     /**

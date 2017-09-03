@@ -14,14 +14,15 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Infrastructure\Bridge\HttpClient;
 
 use Desperado\Framework\Domain\ParameterBag;
+use EventLoop\EventLoop;
 use GuzzleHttp\Client;
-use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\LoggerInterface;
+use WyriHaximus\React\GuzzlePsr7\HttpClientAdapter;
 
 /**
  * Async http client
@@ -55,7 +56,9 @@ class AsyncHttpClient implements HttpClientInterface
      */
     public function __construct(callable $requestHandler = null, array $options = [])
     {
-        $this->handlerStack = HandlerStack::create($requestHandler ?? new CurlMultiHandler());
+        $this->handlerStack = HandlerStack::create(
+            $requestHandler ?? new HttpClientAdapter(EventLoop::getLoop())
+        );
 
         $options = \array_merge(
             self::DEFAULT_REQUEST_OPTIONS,
@@ -134,7 +137,6 @@ class AsyncHttpClient implements HttpClientInterface
      */
     private static function processPromise(PromiseInterface $promise, callable $resultHandler): void
     {
-        $promise->wait();
         $promise->then(
             function(Response $response) use ($resultHandler)
             {

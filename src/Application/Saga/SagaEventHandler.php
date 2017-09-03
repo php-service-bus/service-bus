@@ -71,6 +71,9 @@ class SagaEventHandler
 
                 if(null !== $saga)
                 {
+                    $saga->resetUncommittedEvents();
+                    $saga->resetCommands();
+
                     $saga->transition($event);
                 }
             }

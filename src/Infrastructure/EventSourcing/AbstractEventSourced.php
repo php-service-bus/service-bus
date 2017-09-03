@@ -158,14 +158,19 @@ abstract class AbstractEventSourced implements EventSourcedInterface
      */
     final protected function raiseEvent(EventInterface $event, bool $publishOnFlush = true): void
     {
-        $domainEvent = DomainEvent::new($event, $this->version);
-        $this->applyEvent($domainEvent);
-        $this->version++;
-        $this->uncommittedEvents[] = $domainEvent;
+        $messageId = \spl_object_hash($event);
 
-        if(true === $publishOnFlush)
+        if(false === isset($this->uncommittedEvents[$messageId]))
         {
-            $this->toPublishEvents[] = $event;
+            $domainEvent = DomainEvent::new($event, $this->version);
+            $this->applyEvent($domainEvent);
+            $this->version++;
+            $this->uncommittedEvents[] = $domainEvent;
+
+            if(true === $publishOnFlush)
+            {
+                $this->toPublishEvents[] = $event;
+            }
         }
     }
 

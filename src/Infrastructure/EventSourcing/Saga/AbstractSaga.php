@@ -132,7 +132,12 @@ abstract class AbstractSaga extends AbstractEventSourced implements SagaInterfac
     {
         $this->assertIsProcessing();
 
-        $this->commands[] = $command;
+        $messageId = \spl_object_hash($command);
+
+        if(false === isset($this->commands[$messageId]))
+        {
+            $this->commands[$messageId] = $command;
+        }
     }
 
     /**
