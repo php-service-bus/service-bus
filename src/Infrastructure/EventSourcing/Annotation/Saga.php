@@ -16,13 +16,18 @@ namespace Desperado\Framework\Infrastructure\EventSourcing\Annotation;
 use Desperado\Framework\Domain\Annotation\AbstractAnnotation;
 
 /**
- * Saga listener marker
- *
  * @Annotation
- * @Target("METHOD")
+ * @Target("CLASS")
  */
-class SagaListener extends AbstractAnnotation
+class Saga extends AbstractAnnotation
 {
+    /**
+     * Saga identity class namespace
+     *
+     * @var string
+     */
+    public $identityNamespace;
+
     /**
      * The event property that contains the saga ID
      *

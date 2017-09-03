@@ -38,11 +38,24 @@ class SagaEventHandler
     private $storageManager;
 
     /**
+     * Saga identity namespace
+     *
+     * @var string
+     */
+    private $identityNamespace;
+
+    /**
+     * @param string             $identityNamespace
      * @param SagaListener       $annotation
      * @param SagaStorageManager $storageManager
      */
-    public function __construct(SagaListener $annotation, SagaStorageManager $storageManager)
+    public function __construct(
+        string $identityNamespace,
+        SagaListener $annotation,
+        SagaStorageManager $storageManager
+    )
     {
+        $this->identityNamespace = $identityNamespace;
         $this->annotation = $annotation;
         $this->storageManager = $storageManager;
     }
@@ -62,7 +75,7 @@ class SagaEventHandler
             '' !== (string) $this->annotation->containingIdentityProperty
         )
         {
-            $identityNamespace = $this->annotation->identityNamespace;
+            $identityNamespace = $this->identityNamespace;
             $identity = new $identityNamespace($event->{$this->annotation->containingIdentityProperty});
 
             if('' !== (string) $identity)
