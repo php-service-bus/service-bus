@@ -228,7 +228,7 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
      */
     protected function initGuzzleHttpQueue(): void
     {
-        EventLoop::getLoop()->nextTick([\GuzzleHttp\Promise\queue(), 'run']);
+        EventLoop::getLoop()->addPeriodicTimer(0, [\GuzzleHttp\Promise\queue(), 'run']);
     }
 
     /**
