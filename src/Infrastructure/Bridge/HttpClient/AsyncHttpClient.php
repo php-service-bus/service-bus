@@ -168,7 +168,7 @@ class AsyncHttpClient implements HttpClientInterface
 
         return [
             $payloadIndex => $payload,
-            'headers'     => $headers
+            'headers'     => $headers->all()
         ];
     }
 }
