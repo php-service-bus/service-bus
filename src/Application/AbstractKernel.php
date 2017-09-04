@@ -17,7 +17,6 @@ use Desperado\Framework\Application;
 use Desperado\Framework\Common;
 use Desperado\Framework\Domain;
 use Desperado\Framework\Infrastructure;
-use EventLoop\EventLoop;
 use Psr\Log\LoggerInterface;
 use React\Promise\Deferred;
 

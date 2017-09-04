@@ -84,9 +84,6 @@ class SagaEventHandler
 
                 if(null !== $saga)
                 {
-                    $saga->resetCommands();
-                    $saga->resetToPublishEvents();
-
                     $saga->transition($event);
                 }
             }

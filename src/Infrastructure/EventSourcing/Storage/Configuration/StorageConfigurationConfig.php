@@ -74,7 +74,7 @@ class StorageConfigurationConfig
      *
      * Example:
      *
-     *  - amphpPgSql:localhost:5432?user=postgres&password=123456789&dbname=temp&encoding=UTF-8
+     *  - doctrinePgSql://localhost:5432?user=postgres&password=123456789&dbname=temp&encoding=UTF-8
      *  - inMemory:?
      *
      * @param string $connectionDSN
@@ -139,8 +139,7 @@ class StorageConfigurationConfig
      *
      * @return string
      */
-    public
-    function getDatabase()
+    public function getDatabase()
     {
         return $this->database;
     }

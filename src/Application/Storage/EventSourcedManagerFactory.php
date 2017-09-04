@@ -154,6 +154,8 @@ class EventSourcedManagerFactory
         catch(\Throwable $throwable)
         {
             $this->logger->error(ThrowableFormatter::toString($throwable));
+
+            throw $throwable;
         }
     }
 

@@ -15,6 +15,7 @@ namespace Desperado\Framework\Infrastructure\EventSourcing\Storage;
 
 use Desperado\Framework\Infrastructure\EventSourcing\Storage\Configuration\StorageConfigurationConfig;
 use Desperado\Framework\Infrastructure\EventSourcing\Storage\Configuration\UnSupportedStorageDriverException;
+use Desperado\Framework\Infrastructure\EventSourcing\Storage\Doctrine\SyncDoctrineStorage;
 use Desperado\Framework\Infrastructure\EventSourcing\Storage\InMemory\InMemoryEventStorage;
 
 /**
@@ -23,9 +24,11 @@ use Desperado\Framework\Infrastructure\EventSourcing\Storage\InMemory\InMemoryEv
 class StorageFactory
 {
     public const IN_MEMORY_STORAGE = 'inMemory';
+    public const DOCTRINE_POSTGRES_STORAGE = 'doctrinePgSql';
 
     private const SUPPORTED_DRIVERS = [
         self::IN_MEMORY_STORAGE         => InMemoryEventStorage::class,
+        self::DOCTRINE_POSTGRES_STORAGE => SyncDoctrineStorage::class
     ];
 
     /**
@@ -33,7 +36,7 @@ class StorageFactory
      *
      * Example:
      *
-     *  - amphpPgSql:localhost:5432?user=postgres&password=123456789&dbname=temp&encoding=UTF-8
+     *  - doctrine:localhost:5432?user=postgres&password=123456789&dbname=temp&encoding=UTF-8
      *  - inMemory:?
      *
      * @param string $storageConnectionDSN
@@ -53,8 +56,12 @@ class StorageFactory
 
             switch($config->getDriver())
             {
-                case 'inMemory':
+                case self::IN_MEMORY_STORAGE:
                     $storage = new $storageDriverClass();
+                    break;
+
+                case self::DOCTRINE_POSTGRES_STORAGE:
+                    $storage = new $storageDriverClass($config);
                     break;
 
                 default:
