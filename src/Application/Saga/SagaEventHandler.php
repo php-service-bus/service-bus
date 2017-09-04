@@ -14,8 +14,11 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Application\Saga;
 
 use Desperado\Framework\Application\Context\KernelContext;
+use Desperado\Framework\Common\Formatter\ThrowableFormatter;
 use Desperado\Framework\Domain\Messages\EventInterface;
+use Desperado\Framework\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\Framework\Infrastructure\EventSourcing\Annotation\SagaListener;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\AbstractSaga;
 use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManager;
 
 /**
@@ -80,12 +83,20 @@ class SagaEventHandler
 
             if('' !== (string) $identity)
             {
-                $saga = $this->storageManager->load($identity);
-
-                if(null !== $saga)
-                {
-                    $saga->transition($event);
-                }
+                $this->storageManager->load(
+                    $identity,
+                    function(AbstractSaga $saga = null) use ($event)
+                    {
+                        if(null !== $saga)
+                        {
+                            $saga->transition($event);
+                        }
+                    },
+                    function(\Throwable $throwable)
+                    {
+                        LoggerRegistry::getLogger()->error(ThrowableFormatter::toString($throwable));
+                    }
+                );
             }
         }
     }

@@ -16,7 +16,10 @@ namespace Desperado\Framework\Application\Context\Variables;
 use Desperado\Framework\Application\Context\KernelContext;
 use Desperado\Framework\Application\Context\Exceptions;
 use Desperado\Framework\Application\Storage\StorageManagerRegistry;
-use Desperado\Framework\Infrastructure\StorageManager\AbstractStorageManager;
+use Desperado\Framework\Infrastructure\EventSourcing\Aggregate\AbstractAggregateRoot;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\AbstractSaga;
+use Desperado\Framework\Infrastructure\StorageManager\AggregateStorageManagerInterface;
+use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManagerInterface;
 
 /**
  * Context storages
@@ -54,23 +57,74 @@ class ContextStorage
     }
 
     /**
-     * Get storage for specified entry
+     * Get saga storage manager
      *
-     * @param string $entry
+     * @param string $sagaNamespace
      *
-     * @return AbstractStorageManager
+     * @return SagaStorageManagerInterface
      *
      * @throws Exceptions\StorageManagerWasNotConfiguredException
      */
-    public function getStorage(string $entry): AbstractStorageManager
+    public function getSagaStorageManager(string $sagaNamespace): SagaStorageManagerInterface
     {
-        if(true === $this->storageManagerRegistry->has($entry))
+        if(true === $this->storageManagerRegistry->has($sagaNamespace))
         {
-            return $this->storageManagerRegistry->get($entry);
+            /** @var SagaStorageManagerInterface $sagaManager */
+            $sagaManager = $this->storageManagerRegistry->get($sagaNamespace);
+
+            return $sagaManager;
         }
 
         throw new Exceptions\StorageManagerWasNotConfiguredException(
-            \sprintf('The manager for the "%s" was not configured in "parameters.yaml" file', $entry)
+            \sprintf('The manager for the saga "%s" was not configured in "parameters.yaml" file', $sagaNamespace)
         );
+    }
+
+    /**
+     * Persist saga
+     *
+     * @param AbstractSaga $saga
+     *
+     * @return void
+     */
+    public function persistSaga(AbstractSaga $saga): void
+    {
+        $this->getSagaStorageManager(\get_class($saga))->persist($saga);
+    }
+
+    /**
+     * Get aggregate storage manager
+     *
+     * @param string $aggregateNamespace
+     *
+     * @return AggregateStorageManagerInterface
+     *
+     * @throws Exceptions\StorageManagerWasNotConfiguredException
+     */
+    public function getAggregateStorageManager(string $aggregateNamespace): AggregateStorageManagerInterface
+    {
+        if(true === $this->storageManagerRegistry->has($aggregateNamespace))
+        {
+            /** @var AggregateStorageManagerInterface $aggregateManager */
+            $aggregateManager = $this->storageManagerRegistry->get($aggregateNamespace);
+
+            return $aggregateManager;
+        }
+
+        throw new Exceptions\StorageManagerWasNotConfiguredException(
+            \sprintf('The manager for the aggregate "%s" was not configured in "parameters.yaml" file', $aggregateNamespace)
+        );
+    }
+
+    /**
+     * Persist aggregate
+     *
+     * @param AbstractAggregateRoot $aggregateRoot
+     *
+     * @return void
+     */
+    public function persistAggregate(AbstractAggregateRoot $aggregateRoot): void
+    {
+        $this->getAggregateStorageManager(\get_class($aggregateRoot))->persist($aggregateRoot);
     }
 }

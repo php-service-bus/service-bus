@@ -38,4 +38,12 @@ interface IdentityInterface
      * @return string
      */
     public function toCompositeIndex(): string;
+
+
+    /**
+     * Get identity as composite key (class:identity) in sha1 representation
+     *
+     * @return string
+     */
+    public function toCompositeIndexHash(): string;
 }

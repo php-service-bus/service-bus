@@ -33,20 +33,28 @@ class InMemoryEventStorage implements EventStorageInterface
     /**
      * @inheritdoc
      */
-    public function load(IdentityInterface $id): array
+    public function load(IdentityInterface $id, callable $onLoaded, callable $onFailed = null): void
     {
         $streamId = $id->toCompositeIndex();
 
-        return false !== \array_key_exists($streamId, $this->storage)
+        $result = false !== \array_key_exists($streamId, $this->storage)
             ? $this->storage[$streamId]
             : [];
+
+        $onLoaded($result);
     }
 
     /**
      * @inheritdoc
      */
-    public function loadFromPlayhead(IdentityInterface $id, int $playheadPosition): array
+    public function loadFromPlayhead(
+        IdentityInterface $id,
+        int $playheadPosition,
+        callable $onLoaded,
+        callable $onFailed = null
+    ): void
     {
+        $result = [];
         $streamId = $id->toCompositeIndex();
 
         if(false !== \array_key_exists($streamId, $this->storage))
@@ -63,42 +71,61 @@ class InMemoryEventStorage implements EventStorageInterface
                 }, $this->storage[$streamId]['events']
             );
 
-            return [
+            $result = [
                 'isClosed' => $this->storage[$streamId]['isClosed'],
                 'events'   => $events
             ];
         }
 
-        return [];
+        $onLoaded($result);
     }
 
     /**
      * @inheritdoc
      */
-    public function save(StoredEventStream $storedEventStream): void
+    public function save(
+        StoredEventStream $storedEventStream,
+        callable $onSaved = null,
+        callable $onFailed = null
+    ): void
     {
-        $streamId = \sprintf('%s:%s', $storedEventStream->getClass(), $storedEventStream->getId());
-
-        if(false === isset($this->storage[$streamId]))
+        try
         {
-            $this->storage[$streamId] = [];
-        }
+            $streamId = \sprintf('%s:%s', $storedEventStream->getClass(), $storedEventStream->getId());
 
-        $this->storage[$streamId]['isClosed'] = $storedEventStream->isClosed();
-
-        foreach($storedEventStream->getEvents() as $storedEvent)
-        {
-            if(true === isset($this->storage[$streamId]['events'][$storedEvent->getPlayhead()]))
+            if(false === isset($this->storage[$streamId]))
             {
-                throw new DuplicatePlayheadException(
-                    \sprintf(
-                        'Duplicate playhead ("%s") for stream with ID "%s"',
-                        $storedEvent->getPlayhead(), $storedEventStream->getId()
-                    )
-                );
+                $this->storage[$streamId] = [];
             }
 
-            $this->storage[$streamId]['events'][$storedEvent->getPlayhead()] = $storedEvent->toArray();
+            $this->storage[$streamId]['isClosed'] = $storedEventStream->isClosed();
+
+            foreach($storedEventStream->getEvents() as $storedEvent)
+            {
+                if(true === isset($this->storage[$streamId]['events'][$storedEvent->getPlayhead()]))
+                {
+                    throw new DuplicatePlayheadException(
+                        \sprintf(
+                            'Duplicate playhead ("%s") for stream with ID "%s"',
+                            $storedEvent->getPlayhead(), $storedEventStream->getId()
+                        )
+                    );
+                }
+
+                $this->storage[$streamId]['events'][$storedEvent->getPlayhead()] = $storedEvent->toArray();
+            }
+
+            if(null !== $onSaved)
+            {
+                $onSaved();
+            }
+        }
+        catch(\Throwable $throwable)
+        {
+            if(null !== $onFailed)
+            {
+                $onFailed($throwable);
+            }
         }
     }
 }

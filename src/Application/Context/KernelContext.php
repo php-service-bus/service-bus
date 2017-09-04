@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application\Context;
 
-use Desperado\Framework\Application\Context;
 use Desperado\Framework\Domain\Environment\Environment;
 use Desperado\Framework\Domain\Messages\CommandInterface;
 use Desperado\Framework\Domain\Messages\EventInterface;
@@ -22,7 +21,6 @@ use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryContextInterface;
 use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
 use Desperado\Framework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
 use Desperado\Framework\Infrastructure\CQRS\Context\Options;
-use Desperado\Framework\Infrastructure\StorageManager\AbstractStorageManager;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -127,20 +125,6 @@ class KernelContext implements DeliveryContextInterface, MessageExecutionOptions
     public function getLogger(string $channelName = null): LoggerInterface
     {
         return $this->contextLogger->getLogger($channelName);
-    }
-
-    /**
-     * Get persistence manager
-     *
-     * @param string $entry
-     *
-     * @return AbstractStorageManager
-     *
-     * @throws Context\Exceptions\StorageManagerWasNotConfiguredException
-     */
-    public function getStorage(string $entry): AbstractStorageManager
-    {
-        return $this->contextStorage->getStorage($entry);
     }
 
     /**

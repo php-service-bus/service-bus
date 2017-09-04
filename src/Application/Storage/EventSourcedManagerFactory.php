@@ -113,6 +113,8 @@ class EventSourcedManagerFactory
      * @param StorageManagerRegistry $storageManagerRegistry
      *
      * @return void
+     *
+     * @throws \Throwable
      */
     public function append(StorageManagerRegistry $storageManagerRegistry): void
     {

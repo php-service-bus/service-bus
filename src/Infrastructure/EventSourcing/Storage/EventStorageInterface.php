@@ -25,29 +25,38 @@ interface EventStorageInterface
      * Save event stream
      *
      * @param StoredEventStream $storedEventStream
+     * @param callable|null     $onSaved  function() {}
+     * @param callable|null     $onFailed function(\Throwable $throwable) {}
      *
      * @return void
-     *
-     * @throws DuplicatePlayheadException
      */
-    public function save(StoredEventStream $storedEventStream): void;
+    public function save(StoredEventStream $storedEventStream, callable $onSaved = null, callable $onFailed = null): void;
 
     /**
      * Load stored stream data
      *
      * @param IdentityInterface $id
+     * @param callable          $onLoaded function(array $data = []) {}
+     * @param callable|null     $onFailed function(\Throwable $throwable) {}
      *
-     * @return array
+     * @return void
      */
-    public function load(IdentityInterface $id): array;
+    public function load(IdentityInterface $id, callable $onLoaded, callable $onFailed = null): void;
 
     /**
      * Load stored stream data from specified version
      *
      * @param IdentityInterface $id
      * @param int               $playheadPosition
+     * @param callable          $onLoaded function(array $data = []) {}
+     * @param callable|null     $onFailed function(\Throwable $throwable) {}
      *
-     * @return array
+     * @return void
      */
-    public function loadFromPlayhead(IdentityInterface $id, int $playheadPosition): array;
+    public function loadFromPlayhead(
+        IdentityInterface $id,
+        int $playheadPosition,
+        callable $onLoaded,
+        callable $onFailed = null
+    ): void;
 }

@@ -54,104 +54,131 @@ class SyncDoctrineStorage implements EventStorageInterface
     /**
      * @inheritdoc
      */
-    public function save(StoredEventStream $storedEventStream): void
+    public function save(
+        StoredEventStream $storedEventStream,
+        callable $onSaved = null,
+        callable $onFailed = null
+    ): void
     {
-        $eventsRows = [];
+        try
+        {
+            $eventsRows = [];
 
-        \array_map(
-            function(StoredDomainEvent $storedDomainEvent) use ($storedEventStream, &$eventsRows)
-            {
-                $row[] = [
-                    $storedDomainEvent->getId(),
-                    $storedEventStream->getId(),
-                    $storedDomainEvent->getPlayhead(),
-                    $storedDomainEvent->getOccurredAt(),
-                    DateTime::nowToString(),
-                    $storedDomainEvent->getReceivedEvent()
-
-                ];
-
-                $eventsRows = array_merge($eventsRows, $row);
-            },
-            $storedEventStream->getEvents()
-        );
-
-        $this->connection->transactional(
-            function() use ($eventsRows, $storedEventStream)
-            {
-                $this->connection->executeQuery(
-                    'INSERT INTO event_store_streams (id, identity_class, is_closed) VALUES (?, ?, ?) '
-                    . 'ON CONFLICT (id) DO UPDATE SET is_closed = ?;',
-                    [
+            \array_map(
+                function(StoredDomainEvent $storedDomainEvent) use ($storedEventStream, &$eventsRows)
+                {
+                    $row[] = [
+                        $storedDomainEvent->getId(),
                         $storedEventStream->getId(),
-                        $storedEventStream->getClass(),
-                        (int) $storedEventStream->isClosed(),
-                        (int) $storedEventStream->isClosed()
-                    ]
-                );
-
-                foreach($eventsRows as $insertEntry)
-                {
-                    $query = 'INSERT INTO event_store_events (id, stream_id, playhead, occurred_at, recorded_at, payload) '
-                        . 'VALUES (?, ?, ?, ?, ?, ?)';
-
-
-                    $this->connection->executeQuery($query, $insertEntry);
-                }
-            }
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function load(IdentityInterface $id): array
-    {
-        return $this->loadFromPlayhead($id, 0);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function loadFromPlayhead(IdentityInterface $id, int $playheadPosition): array
-    {
-        $eventStreamEvents = $this->connection
-            ->createQueryBuilder()
-            ->select('events.*, streams.id, streams.identity_class, streams.is_closed')
-            ->from('event_store_streams', 'streams')
-            ->innerJoin('streams', 'event_store_events', 'events', 'events.stream_id = streams.id')
-            ->where('streams.id = ?')
-            ->andWhere('identity_class = ?')
-            ->setParameters([$id->toString(), \get_class($id)])
-            ->execute()
-            ->fetchAll();
-
-        $events = [];
-        $isClosed = false;
-
-        \array_map(
-            function(array $eachEvent) use (&$events, &$isClosed, $playheadPosition)
-            {
-                if($playheadPosition <= $eachEvent['playhead'])
-                {
-                    $isClosed = $eachEvent['is_closed'];
-                    $events[$eachEvent['playhead']] = [
-                        'id'            => $eachEvent['id'],
-                        'playhead'      => $eachEvent['playhead'],
-                        'occurredAt'   => $eachEvent['occurred_at'],
-                        'recordedAt'   => $eachEvent['recorded_at'],
-                        'receivedEvent' => $eachEvent['payload']
+                        $storedDomainEvent->getPlayhead(),
+                        $storedDomainEvent->getOccurredAt(),
+                        DateTime::nowToString(),
+                        $storedDomainEvent->getReceivedEvent()
                     ];
+                    $eventsRows = array_merge($eventsRows, $row);
+                },
+                $storedEventStream->getEvents()
+            );
+
+            $this->connection->transactional(
+                function() use ($eventsRows, $storedEventStream)
+                {
+                    $this->connection->executeQuery(
+                        'INSERT INTO event_store_streams (id, identity_class, is_closed) VALUES (?, ?, ?) '
+                        . 'ON CONFLICT (id) DO UPDATE SET is_closed = ?;',
+                        [
+                            $storedEventStream->getId(),
+                            $storedEventStream->getClass(),
+                            (int) $storedEventStream->isClosed(),
+                            (int) $storedEventStream->isClosed()
+                        ]
+                    );
+
+                    foreach($eventsRows as $insertEntry)
+                    {
+                        $query = 'INSERT INTO event_store_events (id, stream_id, playhead, occurred_at, recorded_at, payload) '
+                            . 'VALUES (?, ?, ?, ?, ?, ?)';
+
+                        $this->connection->executeQuery($query, $insertEntry);
+                    }
                 }
-            },
-            $eventStreamEvents
-        );
+            );
 
-        return [
-            'isClosed' => $isClosed,
-            'events'   => $events
-        ];
+            if(null !== $onFailed)
+            {
+                $onFailed();
+            }
+        }
+        catch(\Throwable $throwable)
+        {
+            if(null !== $onFailed)
+            {
+                $onFailed($throwable);
+            }
+        }
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function load(IdentityInterface $id, callable $onLoaded, callable $onFailed = null): void
+    {
+        $this->loadFromPlayhead($id, 0, $onLoaded, $onFailed);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function loadFromPlayhead(
+        IdentityInterface $id,
+        int $playheadPosition,
+        callable $onLoaded,
+        callable $onFailed = null
+    ): void
+    {
+        try
+        {
+            $eventStreamEvents = $this->connection
+                ->createQueryBuilder()
+                ->select('events.*, streams.id, streams.identity_class, streams.is_closed')
+                ->from('event_store_streams', 'streams')
+                ->innerJoin('streams', 'event_store_events', 'events', 'events.stream_id = streams.id')
+                ->where('streams.id = ?')
+                ->andWhere('identity_class = ?')
+                ->setParameters([$id->toString(), \get_class($id)])
+                ->execute()
+                ->fetchAll();
+
+            $events = [];
+            $isClosed = false;
+
+            \array_map(
+                function(array $eachEvent) use (&$events, &$isClosed, $playheadPosition)
+                {
+                    if($playheadPosition <= $eachEvent['playhead'])
+                    {
+                        $isClosed = $eachEvent['is_closed'];
+                        $events[$eachEvent['playhead']] = [
+                            'id'            => $eachEvent['id'],
+                            'playhead'      => $eachEvent['playhead'],
+                            'occurredAt'    => $eachEvent['occurred_at'],
+                            'recordedAt'    => $eachEvent['recorded_at'],
+                            'receivedEvent' => $eachEvent['payload']
+                        ];
+                    }
+                },
+                $eventStreamEvents
+            );
+
+            $onLoaded(['isClosed' => $isClosed, 'events' => $events]);
+        }
+        catch(\Throwable $throwable)
+        {
+            if(null !== $onFailed)
+            {
+                $onFailed($throwable);
+            }
+        }
     }
 
     /**

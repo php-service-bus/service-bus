@@ -155,26 +155,5 @@ class SagaEventListenersAnnotationReader
                 )
             );
         }
-
-
-        if('' === (string) $annotation->identityNamespace)
-        {
-            throw new EventListenerAnnotationException(
-                \sprintf(
-                    '"identityNamespace" value must be specified for saga "%s"', $saga
-                )
-            );
-        }
-
-        if(false === \class_exists($annotation->identityNamespace))
-        {
-            throw new EventListenerAnnotationException(
-                \sprintf(
-                    '"identityNamespace" value must be contains exists identity class for saga "%s"', $saga
-                )
-            );
-        }
     }
-
-
 }

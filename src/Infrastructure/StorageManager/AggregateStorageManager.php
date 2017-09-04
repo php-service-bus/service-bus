@@ -23,8 +23,15 @@ use Desperado\Framework\Infrastructure\EventSourcing\Aggregate\Contract\Aggregat
 /**
  * Aggregate storage manager
  */
-class AggregateStorageManager extends AbstractStorageManager
+class AggregateStorageManager implements AggregateStorageManagerInterface
 {
+    /**
+     * Aggregate namespace
+     *
+     * @var string
+     */
+    private $aggregateNamespace;
+
     /**
      * Aggregate repository
      *
@@ -33,77 +40,139 @@ class AggregateStorageManager extends AbstractStorageManager
     private $aggregateRepository;
 
     /**
+     * Persist aggregates queue
+     *
+     * @var \SplDoublyLinkedList
+     */
+    private $persistQueue;
+
+    /**
      * @param string                       $aggregateNamespace
      * @param AggregateRepositoryInterface $aggregateRepository
      */
     public function __construct(
         string $aggregateNamespace,
         AggregateRepositoryInterface $aggregateRepository
-
     )
     {
-        parent::__construct($aggregateNamespace);
-
+        $this->aggregateNamespace = $aggregateNamespace;
         $this->aggregateRepository = $aggregateRepository;
+
+        $this->persistQueue = new \SplDoublyLinkedList();
+        $this->persistQueue->setIteratorMode(
+            \SplDoublyLinkedList::IT_MODE_FIFO |
+            \SplDoublyLinkedList::IT_MODE_DELETE
+        );
     }
 
     /**
-     * Load aggregate
-     *
-     * @todo: snapshots
-     *
-     * @param IdentityInterface $identity
-     *
-     * @return AbstractAggregateRoot|null
+     * @inheritdoc
      */
-    public function load(IdentityInterface $identity)
+    public function getAggregateNamespace(): string
     {
-        /** @var AbstractAggregateRoot|null $aggregate */
-        $aggregate = $this->aggregateRepository->load($identity, $this->getEntityNamespace());
-
-        if(null !== $aggregate)
-        {
-            $this->getPersistMap()->attach($aggregate);
-        }
-
-        return $aggregate;
+        return $this->aggregateNamespace;
     }
 
     /**
-     * @todo: close stream implementation
+     * @inheritdoc
+     */
+    public function persist(AbstractAggregateRoot $aggregateRoot): void
+    {
+        if(false === $this->persistQueue->offsetExists($aggregateRoot->getId()->toCompositeIndexHash()))
+        {
+            $this->persistQueue->add($aggregateRoot->getId()->toCompositeIndexHash(), $aggregateRoot);
+        }
+    }
+
+    /**
+     * @todo: snapshots
      *
      * @inheritdoc
      */
-    public function commit(DeliveryContextInterface $context): void
+    public function load(IdentityInterface $identity, callable $onLoaded, callable $onFailed = null): void
     {
-        $deliveryOptions = new DeliveryOptions();
-
-        foreach($this->getPersistMap() as $aggregate)
+        if(true === $this->persistQueue->offsetExists($identity->toCompositeIndexHash()))
         {
-            /** @var AbstractAggregateRoot $aggregate */
+            $onLoaded($this->persistQueue->offsetGet($identity->toCompositeIndexHash()));
+        }
+        else
+        {
+            $this->aggregateRepository->load(
+                $identity,
+                $this->aggregateNamespace,
+                function(AbstractAggregateRoot $aggregateRoot = null) use ($onLoaded)
+                {
+                    if(null !== $aggregateRoot)
+                    {
+                        if(false === $this->persistQueue->offsetExists($aggregateRoot->getId()->toCompositeIndexHash()))
+                        {
+                            $this->persistQueue->add($aggregateRoot->getId()->toCompositeIndexHash(), $aggregateRoot);
+                        }
 
-            $this->aggregateRepository->save($aggregate);
+                        $onLoaded($aggregateRoot);
+                    }
+                },
+                $onFailed
+            );
+        }
+    }
 
-            $savedAggregateEvent = new AggregateEventStreamStored();
-            $savedAggregateEvent->id = $aggregate->getId()->toString();
-            $savedAggregateEvent->type = \get_class($aggregate->getId());
-            $savedAggregateEvent->aggregate = \get_class($aggregate);
-            $savedAggregateEvent->version = $aggregate->getVersion();
+    /**
+     * @inheritdoc
+     */
+    public function commit(DeliveryContextInterface $context, callable $onComplete = null, callable $onFailed = null): void
+    {
+        try
+        {
+            $deliveryOptions = new DeliveryOptions();
+            $queue = clone $this->persistQueue;
 
-            $context->publish($savedAggregateEvent, $deliveryOptions);
-
-            $aggregate->resetUncommittedEvents();
-
-            foreach($aggregate->getToPublishEvents() as $event)
+            while(false === $this->persistQueue->isEmpty())
             {
-                $context->publish($event, $deliveryOptions);
+                /** @var AbstractAggregateRoot $aggregateRoot */
+                $aggregateRoot = $this->persistQueue->shift();
+
+                $this->aggregateRepository->save(
+                    $aggregateRoot,
+                    function() use ($aggregateRoot, $deliveryOptions, $context)
+                    {
+                        $savedAggregateEvent = new AggregateEventStreamStored();
+                        $savedAggregateEvent->id = $aggregateRoot->getId()->toString();
+                        $savedAggregateEvent->type = \get_class($aggregateRoot->getId());
+                        $savedAggregateEvent->aggregate = \get_class($aggregateRoot);
+                        $savedAggregateEvent->version = $aggregateRoot->getVersion();
+
+                        $context->publish($savedAggregateEvent, $deliveryOptions);
+
+                        $aggregateRoot->resetUncommittedEvents();
+
+                        foreach($aggregateRoot->getToPublishEvents() as $event)
+                        {
+                            $context->publish($event, $deliveryOptions);
+                        }
+                    },
+                    function(\Throwable $throwable)
+                    {
+                        throw $throwable;
+                    }
+                );
+
+                $this->persistQueue->offsetUnset($aggregateRoot->getId()->toCompositeIndexHash());
             }
 
-            $this->getPersistMap()->detach($aggregate);
+            $this->persistQueue = $queue;
 
-            unset($aggregate);
+            if(null !== $onComplete)
+            {
+                $onComplete();
+            }
         }
-
-        $this->flushLocalStorage();
+        catch(\Throwable $throwable)
+        {
+            if(null !== $onFailed)
+            {
+                $onFailed($throwable);
+            }
+        }
     }
 }

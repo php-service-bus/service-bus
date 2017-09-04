@@ -52,30 +52,50 @@ class EventStore implements EventStoreInterface
     /**
      * @inheritdoc
      */
-    public function load(IdentityInterface $id): ?DomainEventStream
+    public function load(IdentityInterface $id, callable $onLoaded, callable $onFailed = null): void
     {
-        return $this->eventStreamTransformer->fromStoredEventStreamData(
-            $this->storageDriver->load($id)
+        $this->storageDriver->load($id,
+            function(array $rows) use ($onLoaded)
+            {
+                $onLoaded($this->eventStreamTransformer->fromStoredEventStreamData($rows));
+            },
+            $onFailed
         );
     }
 
     /**
      * @inheritdoc
      */
-    public function loadFromPlayhead(IdentityInterface $id, int $playhead): ?DomainEventStream
+    public function loadFromPlayhead(
+        IdentityInterface $id,
+        int $playhead,
+        callable $onLoaded,
+        callable $onFailed = null
+    ): void
     {
-        return $this->eventStreamTransformer->fromStoredEventStreamData(
-            $this->storageDriver->loadFromPlayhead($id, $playhead)
+        $this->storageDriver->loadFromPlayhead($id, $playhead,
+            function(array $rows) use ($onLoaded)
+            {
+                $onLoaded($this->eventStreamTransformer->fromStoredEventStreamData($rows));
+            },
+            $onFailed
         );
     }
 
     /**
      * @inheritdoc
      */
-    public function append(IdentityInterface $id, DomainEventStream $eventStream): void
+    public function append(
+        IdentityInterface $id,
+        DomainEventStream $eventStream,
+        callable $onSaved = null,
+        callable $onFailed = null
+    ): void
     {
         $this->storageDriver->save(
-            $this->eventStreamTransformer->toStoredStream($id, $eventStream)
+            $this->eventStreamTransformer->toStoredStream($id, $eventStream),
+            $onSaved,
+            $onFailed
         );
     }
 }

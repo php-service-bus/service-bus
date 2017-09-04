@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Infrastructure\EventSourcing\Repository;
 
+use Desperado\Framework\Domain\Event\DomainEventStream;
 use Desperado\Framework\Domain\EventSourced\AggregateRootInterface;
 use Desperado\Framework\Domain\EventStore\EventStoreInterface;
 use Desperado\Framework\Domain\Identity\IdentityInterface;
@@ -39,34 +40,56 @@ class AggregateRepository implements AggregateRepositoryInterface
 
     /**
      * @inheritdoc
-     *
-     * @return AbstractAggregateRoot
      */
-    public function load(IdentityInterface $identity, string $aggregateNamespace): ?AggregateRootInterface
+    public function load(
+        IdentityInterface $identity,
+        string $aggregateNamespace,
+        callable $onLoaded,
+        callable $onFailed = null
+    ): void
     {
-        $eventStream = $this->eventStore->load($identity);
+        $this->eventStore->load(
+            $identity,
+            function(DomainEventStream $eventStream = null) use ($onLoaded, $onFailed, $identity, $aggregateNamespace)
+            {
+                try
+                {
+                    $result = null;
 
-        if(null !== $eventStream)
-        {
-            return \call_user_func_array(
-                \sprintf('%s::fromEventStream', $aggregateNamespace),
-                [$identity, $eventStream]
-            );
-        }
+                    if(null !== $eventStream)
+                    {
+                        $result = \call_user_func_array(
+                            \sprintf('%s::fromEventStream', $aggregateNamespace),
+                            [$identity, $eventStream]
+                        );
+                    }
 
-        return null;
+                    $onLoaded($result);
+                }
+                catch(\Throwable $throwable)
+                {
+                    if(null !== $onFailed)
+                    {
+                        $onFailed($throwable);
+                    }
+                }
+            },
+            $onFailed
+        );
     }
 
     /**
      * @inheritdoc
      */
-    public function save(AggregateRootInterface $aggregateRoot): void
+    public function save(AggregateRootInterface $aggregateRoot, callable $onSaved = null, callable $onFailed = null): void
     {
         /** @var AbstractAggregateRoot $aggregateRoot */
 
         $this->eventStore->append(
             $aggregateRoot->getId(),
-            $aggregateRoot->getEventStream()
+            $aggregateRoot->getEventStream(),
+            $onSaved,
+            $onFailed
         );
 
         $aggregateRoot->resetUncommittedEvents();

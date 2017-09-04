@@ -15,7 +15,7 @@ namespace Desperado\Framework\Application\Storage;
 
 use Desperado\Framework\Application\Context\KernelContext;
 use Desperado\Framework\Common\Formatter\ThrowableFormatter;
-use Desperado\Framework\Infrastructure\StorageManager\AbstractStorageManager;
+use Desperado\Framework\Infrastructure\StorageManager\StorageManagerInterface;
 use Psr\Log\LoggerInterface;
 use React\Promise\Deferred;
 
@@ -66,7 +66,7 @@ class FlushStorageManagersProcessor
         $deferred
             ->promise()
             ->then(
-                function(AbstractStorageManager $storageManager) use ($context)
+                function(StorageManagerInterface $storageManager) use ($context)
                 {
                     $storageManager->commit($context);
                 },
@@ -76,7 +76,7 @@ class FlushStorageManagersProcessor
 
         foreach($this->registry as $storageManager)
         {
-            /** @var AbstractStorageManager $storageManager */
+            /** @var StorageManagerInterface $storageManager */
 
             $deferred->resolve($storageManager);
         }

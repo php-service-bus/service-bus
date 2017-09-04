@@ -25,28 +25,44 @@ interface EventStoreInterface
      * Load event stream by ID
      *
      * @param IdentityInterface $id
+     * @param callable          $onLoaded function(DomainEventStream $eventStream = null) {}
+     * @param callable|null     $onFailed function(\Throwable $throwable) {}
      *
-     * @return DomainEventStream|null
+     * @return void
      */
-    public function load(IdentityInterface $id): ?DomainEventStream;
+    public function load(IdentityInterface $id, callable $onLoaded, callable $onFailed = null): void;
 
     /**
      * Load event stream by ID and specified version
      *
      * @param IdentityInterface $id
      * @param int               $playhead
+     * @param callable          $onLoaded function(DomainEventStream $eventStream = null) {}
+     * @param callable|null     $onFailed function(\Throwable $throwable) {}
      *
-     * @return DomainEventStream|null
+     * @return void
      */
-    public function loadFromPlayhead(IdentityInterface $id, int $playhead): ?DomainEventStream;
+    public function loadFromPlayhead(
+        IdentityInterface $id,
+        int $playhead,
+        callable $onLoaded,
+        callable $onFailed = null
+    ): void;
 
     /**
      * Append events
      *
      * @param IdentityInterface $id
      * @param DomainEventStream $eventStream
+     * @param callable|null     $onSaved  function() {}
+     * @param callable|null     $onFailed function(\Throwable $throwable) {}
      *
      * @return void
      */
-    public function append(IdentityInterface $id, DomainEventStream $eventStream): void;
+    public function append(
+        IdentityInterface $id,
+        DomainEventStream $eventStream,
+        callable $onSaved = null,
+        callable $onFailed = null
+    ): void;
 }

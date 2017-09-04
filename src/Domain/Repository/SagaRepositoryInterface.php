@@ -26,26 +26,37 @@ interface SagaRepositoryInterface
      *
      * @param IdentityInterface $identity
      * @param string            $sagaNamespace
+     * @param callable          $onLoaded function(SagaInterface $saga = null) {}
+     * @param callable|null     $onFailed function(\Throwable $throwable) {}
      *
-     * @return SagaInterface|null
+     * @return void
      */
-    public function load(IdentityInterface $identity, string $sagaNamespace): ?SagaInterface;
+    public function load(
+        IdentityInterface $identity,
+        string $sagaNamespace,
+        callable $onLoaded,
+        callable $onFailed = null
+    ): void;
 
     /**
      * Save saga
      *
      * @param SagaInterface $saga
+     * @param callable|null $onSaved  function() {}
+     * @param callable|null $onFailed function(\Throwable $throwable) {}
      *
      * @return void
      */
-    public function save(SagaInterface $saga): void;
+    public function save(SagaInterface $saga, callable $onSaved = null, callable $onFailed = null): void;
 
     /**
      * Delete saga from storage
      *
      * @param IdentityInterface $identity
+     * @param callable          $onRemoved function() {}
+     * @param callable|null     $onFailed  function(\Throwable $throwable) {}
      *
      * @return void
      */
-    public function remove(IdentityInterface $identity): void;
+    public function remove(IdentityInterface $identity, callable $onRemoved = null, callable $onFailed = null): void;
 }

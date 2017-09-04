@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Infrastructure\EventSourcing\Repository;
 
+use Desperado\Framework\Domain\Event\DomainEventStream;
 use Desperado\Framework\Domain\EventSourced\SagaInterface;
 use Desperado\Framework\Domain\EventStore\EventStoreInterface;
 use Desperado\Framework\Domain\Identity\IdentityInterface;
@@ -42,38 +43,62 @@ class SagaRepository implements SagaRepositoryInterface
      *
      * @return AbstractSaga
      */
-    public function load(IdentityInterface $identity, string $sagaNamespace): ?SagaInterface
+    public function load(
+        IdentityInterface $identity,
+        string $sagaNamespace,
+        callable $onLoaded,
+        callable $onFailed = null
+    ): void
     {
-        $eventStream = $this->eventStore->load($identity);
+        $this->eventStore->load(
+            $identity,
+            function(DomainEventStream $eventStream = null) use ($onLoaded, $onFailed, $identity, $sagaNamespace)
+            {
+                try
+                {
+                    $result = null;
 
-        if(null !== $eventStream)
-        {
-            return \call_user_func_array(
-                \sprintf('%s::fromEventStream', $sagaNamespace),
-                [$identity, $eventStream]
-            );
-        }
+                    if(null !== $eventStream)
+                    {
+                        $result = \call_user_func_array(
+                            \sprintf('%s::fromEventStream', $sagaNamespace),
+                            [$identity, $eventStream]
+                        );
+                    }
 
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function save(SagaInterface $saga): void
-    {
-        /** @var AbstractSaga $saga */
-
-        $this->eventStore->append(
-            $saga->getId(),
-            $saga->getEventStream()
+                    $onLoaded($result);
+                }
+                catch(\Throwable $throwable)
+                {
+                    if(null !== $onFailed)
+                    {
+                        $onFailed($throwable);
+                    }
+                }
+            },
+            $onFailed
         );
     }
 
     /**
      * @inheritdoc
      */
-    public function remove(IdentityInterface $identity): void
+    public function save(SagaInterface $saga, callable $onSaved = null, callable $onFailed = null): void
+    {
+        /** @var AbstractSaga $saga */
+
+        $this->eventStore->append(
+            $saga->getId(),
+            $saga->getEventStream(),
+            $onSaved,
+            $onFailed
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function remove(IdentityInterface $identity, callable $onRemoved = null, callable $onFailed = null): void
     {
         throw new \LogicException('Not implemented');
     }

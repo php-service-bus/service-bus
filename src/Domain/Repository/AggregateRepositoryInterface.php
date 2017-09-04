@@ -26,17 +26,26 @@ interface AggregateRepositoryInterface
      *
      * @param IdentityInterface $identity
      * @param string            $aggregateNamespace
+     * @param callable          $onLoaded function(AggregateRootInterface $aggregate) {}
+     * @param callable|null     $onFailed function(\Throwable $throwable) {}
      *
-     * @return AggregateRootInterface|null
+     * @return void
      */
-    public function load(IdentityInterface $identity, string $aggregateNamespace): ?AggregateRootInterface;
+    public function load(
+        IdentityInterface $identity,
+        string $aggregateNamespace,
+        callable $onLoaded,
+        callable $onFailed = null
+    ): void;
 
     /**
      * Save aggregate
      *
      * @param AggregateRootInterface $aggregateRoot
+     * @param callable|null          $onSaved  function() {}
+     * @param callable|null          $onFailed function(\Throwable $throwable) {}
      *
      * @return void
      */
-    public function save(AggregateRootInterface $aggregateRoot): void;
+    public function save(AggregateRootInterface $aggregateRoot, callable $onSaved = null, callable $onFailed = null): void;
 }

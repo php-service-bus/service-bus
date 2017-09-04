@@ -13,8 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application\Storage;
 
-use Desperado\Framework\Infrastructure\StorageManager\AbstractStorageManager;
-use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManager;
+use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManagerInterface;
+use Desperado\Framework\Infrastructure\StorageManager\StorageManagerInterface;
 
 /**
  * Storage managers registry
@@ -24,7 +24,7 @@ class StorageManagerRegistry implements \IteratorAggregate
     /**
      * Storage managers
      *
-     * @var AbstractStorageManager[]
+     * @var StorageManagerInterface[]
      */
     private $collection = [];
 
@@ -41,9 +41,9 @@ class StorageManagerRegistry implements \IteratorAggregate
      *
      * @param string $entryNamespace
      *
-     * @return AbstractStorageManager
+     * @return StorageManagerInterface
      */
-    public function get(string $entryNamespace): ?AbstractStorageManager
+    public function get(string $entryNamespace): ?StorageManagerInterface
     {
         return true === $this->has($entryNamespace) ? $this->collection[$entryNamespace] : null;
     }
@@ -63,12 +63,12 @@ class StorageManagerRegistry implements \IteratorAggregate
     /**
      * Add storage manager for specified entry
      *
-     * @param string                 $entryNamespace
-     * @param AbstractStorageManager $storageManager
+     * @param string                  $entryNamespace
+     * @param StorageManagerInterface $storageManager
      *
      * @return void
      */
-    public function add(string $entryNamespace, AbstractStorageManager $storageManager): void
+    public function add(string $entryNamespace, StorageManagerInterface $storageManager): void
     {
         $this->collection[$entryNamespace] = $storageManager;
     }
@@ -76,15 +76,15 @@ class StorageManagerRegistry implements \IteratorAggregate
     /**
      * Get sagas store manager
      *
-     * @return SagaStorageManager[]
+     * @return SagaStorageManagerInterface[]
      */
     public function getSagaStorageManagers(): array
     {
         return \array_filter(
             \array_map(
-                function(AbstractStorageManager $storageManager)
+                function(SagaStorageManagerInterface $storageManager)
                 {
-                    return $storageManager instanceof SagaStorageManager ? $storageManager : null;
+                    return $storageManager instanceof SagaStorageManagerInterface ? $storageManager : null;
                 },
                 $this->collection
             )
