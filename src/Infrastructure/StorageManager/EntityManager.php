@@ -45,8 +45,8 @@ class EntityManager implements EntityManagerInterface
     private $entityManager;
 
     /**
-     * @param string        $entityNamespace
-     * @param Connection    $connection
+     * @param string     $entityNamespace
+     * @param Connection $connection
      *
      * @throws \LogicException
      */
@@ -63,7 +63,7 @@ class EntityManager implements EntityManagerInterface
         $doctrineConfiguration = new Configuration();
         $doctrineConfiguration->setMetadataDriverImpl($doctrineConfiguration->newDefaultAnnotationDriver());
 
-        $this->entityManager = DoctrineEntityManager::create($connection, $doctrineConfiguration);
+        $this->entityManager = DoctrineEntityManager::create($this->connection, $doctrineConfiguration);
     }
 
     /**
