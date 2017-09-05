@@ -90,6 +90,16 @@ class KernelContext implements DeliveryContextInterface, MessageExecutionOptions
     }
 
     /**
+     * Get storage context
+     *
+     * @return Variables\ContextStorage
+     */
+    public function getStorageContext(): Variables\ContextStorage
+    {
+        return $this->contextStorage;
+    }
+
+    /**
      * @inheritdoc
      */
     public function appendCommandExecutionOptions(Options\CommandOptions $options): void
