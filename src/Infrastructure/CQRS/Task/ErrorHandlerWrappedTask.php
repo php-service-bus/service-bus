@@ -95,8 +95,8 @@ class ErrorHandlerWrappedTask extends AbstractTask
         $handler = $this->getErrorHandler($exceptionClass, $messageClass);
 
         $logMessage = \sprintf(
-            'An exception "%s" (%s) was thrown during execution of the "%s" message%s',
-            $exceptionClass, $exception->getMessage(), $messageClass,
+            'An exception "%s" (%s %s:%d) was thrown during execution of the "%s" message%s',
+            $exceptionClass, $exception->getMessage(), $exception->getFile(), $exception->getLine(), $messageClass,
             null !== $handler
                 ? '. Error handler found'
                 : '. The error handler was not found'
