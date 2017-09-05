@@ -66,9 +66,16 @@ class FlushStorageManagersProcessor
         $deferred
             ->promise()
             ->then(
-                function(StorageManagerInterface $storageManager) use ($context)
+                function(StorageManagerInterface $storageManager) use ($context, $failHandler)
                 {
-                    $storageManager->commit($context);
+                    try
+                    {
+                        $storageManager->commit($context, null, $failHandler);
+                    }
+                    catch(\Throwable $throwable)
+                    {
+                        $failHandler($throwable);
+                    }
                 },
                 $failHandler
             )

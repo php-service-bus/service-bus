@@ -38,7 +38,7 @@ class SagaStorageManager implements SagaStorageManagerInterface
     /**
      * Persist sagas queue
      *
-     * @var \SplDoublyLinkedList
+     * @var \SplObjectStorage
      */
     private $persistQueue;
 
@@ -54,11 +54,7 @@ class SagaStorageManager implements SagaStorageManagerInterface
         $this->sagaNamespace = $sagaNamespace;
         $this->sagaRepository = $sagaRepository;
 
-        $this->persistQueue = new \SplDoublyLinkedList();
-        $this->persistQueue->setIteratorMode(
-            \SplDoublyLinkedList::IT_MODE_FIFO |
-            \SplDoublyLinkedList::IT_MODE_DELETE
-        );
+        $this->persistQueue = new \SplObjectStorage();
     }
 
     /**
@@ -74,9 +70,9 @@ class SagaStorageManager implements SagaStorageManagerInterface
      */
     public function persist(AbstractSaga $saga): void
     {
-        if(false === $this->persistQueue->offsetExists($saga->getId()->toCompositeIndexHash()))
+        if(false === $this->persistQueue->contains($saga))
         {
-            $this->persistQueue->add($saga->getId()->toCompositeIndexHash(), $saga);
+            $this->persistQueue->attach($saga);
         }
     }
 
@@ -85,30 +81,24 @@ class SagaStorageManager implements SagaStorageManagerInterface
      */
     public function load(IdentityInterface $identity, callable $onLoaded, callable $onFailed = null): void
     {
-        if(true === $this->persistQueue->offsetExists($identity->toCompositeIndexHash()))
-        {
-            $onLoaded($this->persistQueue->offsetGet($identity->toCompositeIndexHash()));
-        }
-        else
-        {
-            $this->sagaRepository->load(
-                $identity,
-                $this->sagaNamespace,
-                function(AbstractSaga $saga = null) use ($onLoaded)
+        $this->sagaRepository->load(
+            $identity,
+            $this->sagaNamespace,
+            function(AbstractSaga $saga = null) use ($onLoaded)
+            {
+                if(null !== $saga)
                 {
-                    if(null !== $saga)
-                    {
-                        if(false === $this->persistQueue->offsetExists($saga->getId()->toCompositeIndexHash()))
-                        {
-                            $this->persistQueue->add($saga->getId()->toCompositeIndexHash(), $saga);
-                        }
+                    $saga->resetCommands();
+                    $saga->resetUncommittedEvents();
+                    $saga->resetToPublishEvents();
 
-                        $onLoaded($saga);
-                    }
-                },
-                $onFailed
-            );
-        }
+                    $this->persist($saga);
+
+                    $onLoaded($saga);
+                }
+            },
+            $onFailed
+        );
     }
 
     /**
@@ -119,17 +109,20 @@ class SagaStorageManager implements SagaStorageManagerInterface
         try
         {
             $deliveryOptions = new DeliveryOptions();
-            $queue = clone $this->persistQueue;
 
-            while(false === $this->persistQueue->isEmpty())
+            $this->persistQueue->rewind();
+
+            while($this->persistQueue->valid())
             {
-                /** @var AbstractSaga $aggregateRoot */
-                $saga = $this->persistQueue->shift();
+                /** @var AbstractSaga $saga */
+                $saga = $this->persistQueue->current();
 
                 $this->sagaRepository->save(
                     $saga,
                     function() use ($saga, $context, $deliveryOptions)
                     {
+                        $this->persistQueue->detach($saga);
+
                         foreach($saga->getToPublishEvents() as $event)
                         {
                             /** @var DomainEvent $domainEvent */
@@ -148,10 +141,10 @@ class SagaStorageManager implements SagaStorageManagerInterface
                     }
                 );
 
-                $this->persistQueue->offsetUnset($aggregateRoot->getId()->toCompositeIndexHash());
+                $this->persistQueue->next();
             }
 
-            $this->persistQueue = $queue;
+            $this->persistQueue = new \SplObjectStorage();
 
             if(null !== $onComplete)
             {

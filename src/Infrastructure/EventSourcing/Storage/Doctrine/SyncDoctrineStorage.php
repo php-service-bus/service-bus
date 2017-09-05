@@ -104,9 +104,9 @@ class SyncDoctrineStorage implements EventStorageInterface
                 }
             );
 
-            if(null !== $onFailed)
+            if(null !== $onSaved)
             {
-                $onFailed();
+                $onSaved();
             }
         }
         catch(\Throwable $throwable)
@@ -123,7 +123,7 @@ class SyncDoctrineStorage implements EventStorageInterface
      */
     public function load(IdentityInterface $id, callable $onLoaded, callable $onFailed = null): void
     {
-        $this->loadFromPlayhead($id, 0, $onLoaded, $onFailed);
+        $this->loadFromPlayhead($id, -1, $onLoaded, $onFailed);
     }
 
     /**
@@ -145,7 +145,9 @@ class SyncDoctrineStorage implements EventStorageInterface
                 ->innerJoin('streams', 'event_store_events', 'events', 'events.stream_id = streams.id')
                 ->where('streams.id = ?')
                 ->andWhere('identity_class = ?')
-                ->setParameters([$id->toString(), \get_class($id)])
+                ->andWhere('events.playhead >= ?')
+                ->orderBy('events.playhead', 'ASC')
+                ->setParameters([$id->toString(), \get_class($id), $playheadPosition])
                 ->execute()
                 ->fetchAll();
 

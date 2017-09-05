@@ -19,6 +19,7 @@ use Desperado\Framework\Application\Storage\StorageManagerRegistry;
 use Desperado\Framework\Infrastructure\EventSourcing\Aggregate\AbstractAggregateRoot;
 use Desperado\Framework\Infrastructure\EventSourcing\Saga\AbstractSaga;
 use Desperado\Framework\Infrastructure\StorageManager\AggregateStorageManagerInterface;
+use Desperado\Framework\Infrastructure\StorageManager\EntityManagerInterface;
 use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManagerInterface;
 
 /**
@@ -77,6 +78,30 @@ class ContextStorage
 
         throw new Exceptions\StorageManagerWasNotConfiguredException(
             \sprintf('The manager for the saga "%s" was not configured in "parameters.yaml" file', $sagaNamespace)
+        );
+    }
+
+    /**
+     * Get entity manager
+     *
+     * @param string $entityNamespace
+     *
+     * @return EntityManagerInterface
+     *
+     * @throws Exceptions\StorageManagerWasNotConfiguredException
+     */
+    public function getEntityManager(string $entityNamespace): EntityManagerInterface
+    {
+        if(true === $this->storageManagerRegistry->has($entityNamespace))
+        {
+            /** @var EntityManagerInterface $entityManager */
+            $entityManager = $this->storageManagerRegistry->get($entityNamespace);
+
+            return $entityManager;
+        }
+
+        throw new Exceptions\StorageManagerWasNotConfiguredException(
+            \sprintf('The manager for the entity "%s" was not configured in "parameters.yaml" file', $entityNamespace)
         );
     }
 

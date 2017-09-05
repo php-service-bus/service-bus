@@ -42,7 +42,7 @@ class AggregateStorageManager implements AggregateStorageManagerInterface
     /**
      * Persist aggregates queue
      *
-     * @var \SplDoublyLinkedList
+     * @var \SplObjectStorage
      */
     private $persistQueue;
 
@@ -58,11 +58,7 @@ class AggregateStorageManager implements AggregateStorageManagerInterface
         $this->aggregateNamespace = $aggregateNamespace;
         $this->aggregateRepository = $aggregateRepository;
 
-        $this->persistQueue = new \SplDoublyLinkedList();
-        $this->persistQueue->setIteratorMode(
-            \SplDoublyLinkedList::IT_MODE_FIFO |
-            \SplDoublyLinkedList::IT_MODE_DELETE
-        );
+        $this->persistQueue = new \SplObjectStorage();
     }
 
     /**
@@ -78,9 +74,9 @@ class AggregateStorageManager implements AggregateStorageManagerInterface
      */
     public function persist(AbstractAggregateRoot $aggregateRoot): void
     {
-        if(false === $this->persistQueue->offsetExists($aggregateRoot->getId()->toCompositeIndexHash()))
+        if(false === $this->persistQueue->contains($aggregateRoot))
         {
-            $this->persistQueue->add($aggregateRoot->getId()->toCompositeIndexHash(), $aggregateRoot);
+            $this->persistQueue->attach($aggregateRoot);
         }
     }
 
@@ -91,30 +87,20 @@ class AggregateStorageManager implements AggregateStorageManagerInterface
      */
     public function load(IdentityInterface $identity, callable $onLoaded, callable $onFailed = null): void
     {
-        if(true === $this->persistQueue->offsetExists($identity->toCompositeIndexHash()))
-        {
-            $onLoaded($this->persistQueue->offsetGet($identity->toCompositeIndexHash()));
-        }
-        else
-        {
-            $this->aggregateRepository->load(
-                $identity,
-                $this->aggregateNamespace,
-                function(AbstractAggregateRoot $aggregateRoot = null) use ($onLoaded)
+        $this->aggregateRepository->load(
+            $identity,
+            $this->aggregateNamespace,
+            function(AbstractAggregateRoot $aggregateRoot = null) use ($onLoaded)
+            {
+                if(null !== $aggregateRoot)
                 {
-                    if(null !== $aggregateRoot)
-                    {
-                        if(false === $this->persistQueue->offsetExists($aggregateRoot->getId()->toCompositeIndexHash()))
-                        {
-                            $this->persistQueue->add($aggregateRoot->getId()->toCompositeIndexHash(), $aggregateRoot);
-                        }
+                    $this->persist($aggregateRoot);
 
-                        $onLoaded($aggregateRoot);
-                    }
-                },
-                $onFailed
-            );
-        }
+                    $onLoaded($aggregateRoot);
+                }
+            },
+            $onFailed
+        );
     }
 
     /**
@@ -125,17 +111,20 @@ class AggregateStorageManager implements AggregateStorageManagerInterface
         try
         {
             $deliveryOptions = new DeliveryOptions();
-            $queue = clone $this->persistQueue;
 
-            while(false === $this->persistQueue->isEmpty())
+            $this->persistQueue->rewind();
+
+            while($this->persistQueue->valid())
             {
                 /** @var AbstractAggregateRoot $aggregateRoot */
-                $aggregateRoot = $this->persistQueue->shift();
+                $aggregateRoot = $this->persistQueue->current();
 
                 $this->aggregateRepository->save(
                     $aggregateRoot,
                     function() use ($aggregateRoot, $deliveryOptions, $context)
                     {
+                        $this->persistQueue->detach($aggregateRoot);
+
                         $savedAggregateEvent = new AggregateEventStreamStored();
                         $savedAggregateEvent->id = $aggregateRoot->getId()->toString();
                         $savedAggregateEvent->type = \get_class($aggregateRoot->getId());
@@ -157,10 +146,10 @@ class AggregateStorageManager implements AggregateStorageManagerInterface
                     }
                 );
 
-                $this->persistQueue->offsetUnset($aggregateRoot->getId()->toCompositeIndexHash());
+                $this->persistQueue->next();
             }
 
-            $this->persistQueue = $queue;
+            $this->persistQueue = new \SplObjectStorage();
 
             if(null !== $onComplete)
             {

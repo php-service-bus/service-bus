@@ -23,6 +23,7 @@ use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
 use Desperado\Framework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
 use Desperado\Framework\Infrastructure\CQRS\Context\Options;
 use Desperado\Framework\Infrastructure\EventSourcing\Saga\AbstractSaga;
+use Desperado\Framework\Infrastructure\StorageManager\EntityManagerInterface;
 use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManagerInterface;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -134,6 +135,22 @@ class KernelContext implements DeliveryContextInterface, MessageExecutionOptions
     public function logMessage(string $message, int $level = Logger::DEBUG): void
     {
         $this->getLogger()->log($level, $message);
+    }
+
+    /**
+     * Get entity manager (Doctrine2 ORM)
+     *
+     * @param $objectOrNamespace
+     *
+     * @return EntityManagerInterface
+     */
+    public function getEntityManager($objectOrNamespace): EntityManagerInterface
+    {
+        $objectOrNamespace = true === \is_object($objectOrNamespace)
+            ? \get_class($objectOrNamespace)
+            : $objectOrNamespace;
+
+        return $this->contextStorage->getEntityManager($objectOrNamespace);
     }
 
     /**

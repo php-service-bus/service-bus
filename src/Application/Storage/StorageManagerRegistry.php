@@ -82,7 +82,7 @@ class StorageManagerRegistry implements \IteratorAggregate
     {
         return \array_filter(
             \array_map(
-                function(SagaStorageManagerInterface $storageManager)
+                function(StorageManagerInterface $storageManager)
                 {
                     return $storageManager instanceof SagaStorageManagerInterface ? $storageManager : null;
                 },

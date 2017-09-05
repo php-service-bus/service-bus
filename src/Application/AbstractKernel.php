@@ -17,6 +17,9 @@ use Desperado\Framework\Application;
 use Desperado\Framework\Common;
 use Desperado\Framework\Domain;
 use Desperado\Framework\Infrastructure;
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Psr\Log\LoggerInterface;
 use React\Promise\Deferred;
 
@@ -103,6 +106,13 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     private $annotationsReader;
 
     /**
+     * DBAL connections
+     *
+     * @var Connection[]
+     */
+    private $dbalConnections = [];
+
+    /**
      * @param string $rootDirectoryPath
      * @param string $environmentFilePath
      */
@@ -121,7 +131,8 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         $this->entryPointName = $this->initEntryPointName();
         $this->messageSerializer = $this->initMessageSerializer();
         $this->messagesRouter = $this->initMessagesRouter();
-        $this->storageManagersRegistry = $this->initEventSourcedStorage();
+        $this->dbalConnections = $this->initDBALConnections();
+        $this->storageManagersRegistry = $this->initStorageManagers();
         $this->messageBus = $this->initMessageBus();
     }
 
@@ -133,16 +144,9 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         Domain\Context\ContextInterface $context
     ): void
     {
-        $environment = $this->environment;
-        $entryPoint = $this->entryPointName;
-        $router = $this->messagesRouter;
-        $logger = $this->logger;
-        $storageManagersRegistry = $this->storageManagersRegistry;
-        $messageBus = $this->messageBus;
-
-        $logFailCallable = function(\Throwable $throwable) use ($logger)
+        $logFailCallable = function(\Throwable $throwable)
         {
-            $logger->error(Common\Formatter\ThrowableFormatter::toString($throwable));
+            $this->logger->error(Common\Formatter\ThrowableFormatter::toString($throwable));
         };
 
         $task = new \stdClass();
@@ -153,12 +157,18 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         $deferred
             ->promise()
             ->then(
-                function(\stdClass $task) use ($entryPoint, $environment, $router, $storageManagersRegistry, $messageBus)
+                function(\stdClass $task)
                 {
                     $loggerContext = new Application\Context\Variables\ContextLogger();
-                    $contextEntryPoint = new Application\Context\Variables\ContextEntryPoint($entryPoint, $environment);
-                    $contextMessages = new Application\Context\Variables\ContextMessages($task->originalContext, $router);
-                    $contextStorage = new Application\Context\Variables\ContextStorage($storageManagersRegistry);
+                    $contextEntryPoint = new Application\Context\Variables\ContextEntryPoint(
+                        $this->entryPointName, $this->environment
+                    );
+                    $contextMessages = new Application\Context\Variables\ContextMessages(
+                        $task->originalContext, $this->messagesRouter
+                    );
+                    $contextStorage = new Application\Context\Variables\ContextStorage(
+                        $this->storageManagersRegistry
+                    );
 
                     $kernelContext = new Application\Context\KernelContext(
                         $contextEntryPoint,
@@ -167,18 +177,18 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
                         $loggerContext
                     );
 
-                    $messageBus->handle($task->message, $kernelContext);
+                    $this->messageBus->handle($task->message, $kernelContext);
 
                     return $kernelContext;
                 },
                 $logFailCallable
             )
             ->then(
-                function(Application\Context\KernelContext $context) use ($storageManagersRegistry, $logger)
+                function(Application\Context\KernelContext $context)
                 {
                     $persistProcessor = new Application\Storage\FlushStorageManagersProcessor(
-                        $storageManagersRegistry,
-                        $logger
+                        $this->storageManagersRegistry,
+                        $this->logger
                     );
 
                     $persistProcessor->process($context);
@@ -216,6 +226,41 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     protected function init(): void
     {
 
+    }
+
+    /**
+     * Init DBAL connections
+     *
+     * @return array
+     */
+    protected function initDBALConnections(): array
+    {
+        $connections = [];
+
+        foreach($this->getDBALConnectionsConfig() as $alias => $connectionDSN)
+        {
+            if('' === (string) $alias || '' === (string) $connectionDSN)
+            {
+                throw new \LogicException(
+                    'The alias of the connection name and the DSN string must be specified'
+                );
+            }
+            $config = Infrastructure\EventSourcing\Storage\Configuration\StorageConfigurationConfig::fromDSN(
+                $connectionDSN
+            );
+
+            $connections[$alias] = DriverManager::getConnection([
+                'dbname'   => $config->getDatabase(),
+                'user'     => $config->getAuth()->getUsername(),
+                'password' => $config->getAuth()->getPassword(),
+                'host'     => $config->getHost()->getHost(),
+                'driver'   => 'doctrinePgSql' === $config->getDriver() ? 'pdo_pgsql' : 'pdo_mysql'
+            ],
+                new Configuration()
+            );
+        }
+
+        return $connections;
     }
 
     /**
@@ -271,22 +316,31 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     }
 
     /**
-     * Init event sourced entries storage
+     * Init storage managers
      *
      * @return Application\Storage\StorageManagerRegistry
      */
-    protected function initEventSourcedStorage(): Application\Storage\StorageManagerRegistry
+    protected function initStorageManagers(): Application\Storage\StorageManagerRegistry
     {
         $registry = new Application\Storage\StorageManagerRegistry();
 
-        $sagasConfig = $this->getSagasConfiguration();
-        $aggregatesConfig = $this->getAggregatesConfiguration();
+        $ormConfig = new Domain\ParameterBag((array) $this->getConfiguration()->get('orm', []));
 
-        Application\Storage\EventSourcedManagerFactory::sagas($sagasConfig, $this->messageSerializer, $this->logger)
-            ->append($registry);
+        $factory = new Application\Storage\StorageManagerFactory(
+            $registry, $this->logger, $this->messageSerializer
+        );
 
-        Application\Storage\EventSourcedManagerFactory::aggregates($aggregatesConfig, $this->messageSerializer, $this->logger)
-            ->append($registry);
+        $factory->appendEventSourced(
+            Application\Storage\StorageManagerFactory::TYPE_SAGAS,
+            $this->getSagasConfiguration()
+        );
+
+        $factory->appendEventSourced(
+            Application\Storage\StorageManagerFactory::TYPE_AGGREGATES,
+            $this->getAggregatesConfiguration()
+        );
+
+        $factory->appendEntities($ormConfig->all(), $this->dbalConnections);
 
         return $registry;
     }
@@ -467,6 +521,18 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     protected function getStorageManagersRegistry(): Storage\StorageManagerRegistry
     {
         return $this->storageManagersRegistry;
+    }
+
+    /**
+     * Get DBAL connections config
+     *
+     * @return Domain\ParameterBag
+     */
+    private function getDBALConnectionsConfig(): Domain\ParameterBag
+    {
+        $dbalSection = new Domain\ParameterBag((array) $this->getConfiguration()->get('dbal', []));
+
+        return new Domain\ParameterBag($dbalSection->get('connections', []));
     }
 
     /**
