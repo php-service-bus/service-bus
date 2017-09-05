@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application\Context;
 
+use Desperado\Framework\Common\Formatter\ThrowableFormatter;
 use Desperado\Framework\Domain\Environment\Environment;
 use Desperado\Framework\Domain\Messages\CommandInterface;
 use Desperado\Framework\Domain\Messages\EventInterface;
@@ -21,6 +22,9 @@ use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryContextInterface;
 use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
 use Desperado\Framework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
 use Desperado\Framework\Infrastructure\CQRS\Context\Options;
+use Desperado\Framework\Infrastructure\EventSourcing\Saga\AbstractSaga;
+use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManagerInterface;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -90,13 +94,45 @@ class KernelContext implements DeliveryContextInterface, MessageExecutionOptions
     }
 
     /**
-     * Get storage context
+     * Log Throwable
      *
-     * @return Variables\ContextStorage
+     * @param \Throwable $throwable
+     * @param int        $level
+     *
+     * @return void
      */
-    public function getStorageContext(): Variables\ContextStorage
+    public function logThrowable(\Throwable $throwable, int $level = Logger::ERROR): void
     {
-        return $this->contextStorage;
+        $this->getLogger()->log($level, ThrowableFormatter::toString($throwable));
+    }
+
+    /**
+     * Log message
+     *
+     * @param string $message
+     * @param int    $level
+     *
+     * @return void
+     */
+    public function logMessage(string $message, int $level = Logger::DEBUG): void
+    {
+        $this->getLogger()->log($level, $message);
+    }
+
+    /**
+     * Get manage for specified saga
+     *
+     * @param string|AbstractSaga $objectOrNamespace
+     *
+     * @return SagaStorageManagerInterface
+     */
+    public function getSagaStorageManager($objectOrNamespace): SagaStorageManagerInterface
+    {
+        $objectOrNamespace = true === \is_object($objectOrNamespace)
+            ? \get_class($objectOrNamespace)
+            : $objectOrNamespace;
+
+        return $this->contextStorage->getSagaStorageManager($objectOrNamespace);
     }
 
     /**
