@@ -107,6 +107,23 @@ class KernelContext implements DeliveryContextInterface, MessageExecutionOptions
     }
 
     /**
+     * Get error logger callable
+     *
+     * @param int $level
+     *
+     * @return callable  function(\Throwable $throwable) {}
+     */
+    public function getLogThrowableCallable(int $level = Logger::ERROR): callable
+    {
+        $logger = $this->getLogger();
+
+        return function(\Throwable $throwable) use ($level, $logger)
+        {
+            $logger->log($level, ThrowableFormatter::toString($throwable));
+        };
+    }
+
+    /**
      * Log message
      *
      * @param string $message
@@ -181,6 +198,24 @@ class KernelContext implements DeliveryContextInterface, MessageExecutionOptions
     public function getEnvironment(): Environment
     {
         return $this->contextEntryPoint->getEnvironment();
+    }
+
+    /**
+     * Send/publish message
+     *
+     * @param MessageInterface     $message
+     * @param DeliveryOptions|null $deliveryOptions
+     *
+     * @return void
+     */
+    public function delivery(MessageInterface $message, DeliveryOptions $deliveryOptions = null)
+    {
+        $deliveryOptions = $deliveryOptions ?? new DeliveryOptions();
+
+        $message instanceof EventInterface
+            ? $this->publish($message, $deliveryOptions)
+            /** @var CommandInterface $message */
+            : $this->send($message, $deliveryOptions);
     }
 
     /**
