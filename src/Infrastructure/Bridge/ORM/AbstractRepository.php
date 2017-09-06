@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Infrastructure\Bridge\ORM;
 
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**

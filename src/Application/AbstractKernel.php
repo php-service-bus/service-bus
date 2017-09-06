@@ -218,6 +218,16 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     }
 
     /**
+     * Get source directory path
+     *
+     * @return string
+     */
+    protected function getSourceDirectoryPath(): string
+    {
+        return \sprintf('%s/src', \rtrim($this->rootDirectoryPath, '/'));
+    }
+
+    /**
      * Application init
      * Custom application initialization
      *
@@ -327,7 +337,7 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         $ormConfig = new Domain\ParameterBag((array) $this->getConfiguration()->get('orm', []));
 
         $factory = new Application\Storage\StorageManagerFactory(
-            $registry, $this->logger, $this->messageSerializer
+            $registry, $this->logger, $this->messageSerializer, $this->environment, $this->getSourceDirectoryPath()
         );
 
         $factory->appendEventSourced(

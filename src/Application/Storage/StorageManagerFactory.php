@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Application\Storage;
 
 use Desperado\Framework\Common\Formatter\ThrowableFormatter;
+use Desperado\Framework\Domain\Environment\Environment;
 use Desperado\Framework\Domain\ParameterBag;
 use Desperado\Framework\Domain\Serializer\MessageSerializerInterface;
 use Desperado\Framework\Infrastructure\EventSourcing\EventStore\EventStore;
@@ -23,7 +24,9 @@ use Desperado\Framework\Infrastructure\EventSourcing\Storage\StorageFactory;
 use Desperado\Framework\Infrastructure\StorageManager\AggregateStorageManager;
 use Desperado\Framework\Infrastructure\StorageManager\EntityManager;
 use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManager;
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\Tools\Setup;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -68,19 +71,39 @@ class StorageManagerFactory
     private $storageManagerRegistry;
 
     /**
+     * Application environment
+     *
+     * @var Environment
+     */
+    private $environment;
+
+    /**
+     * Root directory path
+     *
+     * @var string
+     */
+    private $sourceDirectoryPath;
+
+    /**
      * @param StorageManagerRegistry     $storageManagerRegistry
      * @param LoggerInterface            $logger
      * @param MessageSerializerInterface $messageSerializer
+     * @param Environment                $environment
+     * @param string                     $sourceDirectoryPath
      */
     public function __construct(
         StorageManagerRegistry $storageManagerRegistry,
         LoggerInterface $logger,
-        MessageSerializerInterface $messageSerializer
+        MessageSerializerInterface $messageSerializer,
+        Environment $environment,
+        string $sourceDirectoryPath
     )
     {
         $this->storageManagerRegistry = $storageManagerRegistry;
         $this->logger = $logger;
         $this->messageSerializer = $messageSerializer;
+        $this->environment = $environment;
+        $this->sourceDirectoryPath = $sourceDirectoryPath;
     }
 
     /**
@@ -95,6 +118,21 @@ class StorageManagerFactory
      */
     public function appendEntities(array $entities, array $connections): void
     {
+        if(0 === \count($entities))
+        {
+            $this->logger->debug('Entities list is empty, no configuration required');
+
+            return;
+        }
+
+        $doctrineConfiguration = Setup::createAnnotationMetadataConfiguration(
+            [$this->sourceDirectoryPath],
+            $this->environment->isDebug(),
+            null,
+            new ArrayCache(),
+            false
+        );
+
         try
         {
             foreach($entities as $connection => $connectionEntities)
@@ -107,7 +145,8 @@ class StorageManagerFactory
                             $entity,
                             new EntityManager(
                                 $entity,
-                                $connections[$connection]
+                                $connections[$connection],
+                                $doctrineConfiguration
                             )
                         );
                     }

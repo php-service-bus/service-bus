@@ -50,7 +50,7 @@ class EntityManager implements EntityManagerInterface
      *
      * @throws \LogicException
      */
-    public function __construct(string $entityNamespace, Connection $connection)
+    public function __construct(string $entityNamespace, Connection $connection, Configuration $doctrineConfiguration)
     {
         if('' === $entityNamespace)
         {
@@ -60,10 +60,8 @@ class EntityManager implements EntityManagerInterface
         $this->entityNamespace = $entityNamespace;
         $this->connection = $connection;
 
-        $doctrineConfiguration = new Configuration();
-        $doctrineConfiguration->setMetadataDriverImpl($doctrineConfiguration->newDefaultAnnotationDriver());
 
-        $this->entityManager = DoctrineEntityManager::create($this->connection, $doctrineConfiguration);
+        $this->entityManager = DoctrineEntityManager::create($connection, $doctrineConfiguration);
     }
 
     /**
