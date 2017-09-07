@@ -14,15 +14,11 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Infrastructure\Bridge\ORM;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**
  * Base repository class
  */
-abstract class AbstractRepository
+abstract class AbstractEntityRepository extends EntityRepository
 {
-    public function __construct($em, ClassMetadata $class)
-    {
 
-    }
 }

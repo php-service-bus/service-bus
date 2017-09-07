@@ -13,10 +13,17 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Infrastructure\StorageManager;
 
+use Desperado\Framework\Infrastructure\Bridge\ORM\AbstractEntityRepository;
+
 /**
  *
  */
 interface EntityManagerInterface extends StorageManagerInterface
 {
-
+    /**
+     * Get entity repository instance
+     *
+     * @return AbstractEntityRepository
+     */
+    public function getRepository(): AbstractEntityRepository;
 }

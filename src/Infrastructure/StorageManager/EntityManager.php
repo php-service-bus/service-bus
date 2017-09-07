@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Infrastructure\StorageManager;
 
+use Desperado\Framework\Infrastructure\Bridge\ORM\AbstractEntityRepository;
 use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryContextInterface;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\ORM\Configuration;
@@ -87,9 +88,11 @@ class EntityManager implements EntityManagerInterface
         }
     }
 
-    public function getRepository()
+    /**
+     * @inheritdoc
+     */
+    public function getRepository(): AbstractEntityRepository
     {
-        $this->entityManager->getRepository($this->entityNamespace);
+        return $this->entityManager->getRepository($this->entityNamespace);
     }
-
 }

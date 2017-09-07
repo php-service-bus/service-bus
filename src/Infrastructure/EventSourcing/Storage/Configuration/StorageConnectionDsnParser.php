@@ -36,10 +36,7 @@ class StorageConnectionDsnParser
 
         $parametersBag = new ParameterBag($queryParts);
 
-        $pathParts = \explode(':', $parsedUrl->getAsString('path'));
-
-        $parametersBag->set('host', !empty($pathParts[0]) ? $pathParts[0] : 'localhost');
-        $parametersBag->set('port', !empty($pathParts[1]) ? $pathParts[1] : 5342);
+        $parametersBag->set('host', $parsedUrl->getAsString('path'));
         $parametersBag->set('driver', $parsedUrl->getAsString('scheme', 'inMemory'));
 
         return $parametersBag;
