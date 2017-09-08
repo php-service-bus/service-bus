@@ -157,41 +157,55 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         $deferred
             ->promise()
             ->then(
-                function(\stdClass $task)
+                function(\stdClass $task) use ($logFailCallable)
                 {
-                    $loggerContext = new Application\Context\Variables\ContextLogger();
-                    $contextEntryPoint = new Application\Context\Variables\ContextEntryPoint(
-                        $this->entryPointName, $this->environment
-                    );
-                    $contextMessages = new Application\Context\Variables\ContextMessages(
-                        $task->originalContext, $this->messagesRouter
-                    );
-                    $contextStorage = new Application\Context\Variables\ContextStorage(
-                        $this->storageManagersRegistry
-                    );
+                    try
+                    {
+                        $loggerContext = new Application\Context\Variables\ContextLogger();
+                        $contextEntryPoint = new Application\Context\Variables\ContextEntryPoint(
+                            $this->entryPointName, $this->environment
+                        );
+                        $contextMessages = new Application\Context\Variables\ContextMessages(
+                            $task->originalContext, $this->messagesRouter
+                        );
+                        $contextStorage = new Application\Context\Variables\ContextStorage(
+                            $this->storageManagersRegistry
+                        );
 
-                    $kernelContext = new Application\Context\KernelContext(
-                        $contextEntryPoint,
-                        $contextMessages,
-                        $contextStorage,
-                        $loggerContext
-                    );
+                        $kernelContext = new Application\Context\KernelContext(
+                            $contextEntryPoint,
+                            $contextMessages,
+                            $contextStorage,
+                            $loggerContext
+                        );
 
-                    $this->messageBus->handle($task->message, $kernelContext);
+                        $this->messageBus->handle($task->message, $kernelContext);
 
-                    return $kernelContext;
+                        return $kernelContext;
+                    }
+                    catch(\Throwable $throwable)
+                    {
+                        return $logFailCallable($throwable);
+                    }
                 },
                 $logFailCallable
             )
             ->then(
-                function(Application\Context\KernelContext $context)
+                function(Application\Context\KernelContext $context) use ($logFailCallable)
                 {
-                    $persistProcessor = new Application\Storage\FlushStorageManagersProcessor(
-                        $this->storageManagersRegistry,
-                        $this->logger
-                    );
+                    try
+                    {
+                        $persistProcessor = new Application\Storage\FlushStorageManagersProcessor(
+                            $this->storageManagersRegistry,
+                            $this->logger
+                        );
 
-                    $persistProcessor->process($context);
+                        $persistProcessor->process($context);
+                    }
+                    catch(\Throwable $throwable)
+                    {
+                        $logFailCallable($throwable);
+                    }
                 },
                 $logFailCallable
             )
@@ -308,6 +322,10 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
             if($module instanceof Application\Module\AbstractModule)
             {
                 $module->boot($messageBusBuilder, $this->annotationsReader);
+
+                $this->logger->debug(
+                    \sprintf('Module "%s" successful booted', \get_class($module))
+                );
             }
             else
             {
@@ -320,7 +338,13 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         foreach($this->getBehaviors() as $behavior)
         {
             $messageBusBuilder->addBehavior($behavior);
+
+            $this->logger->debug(
+                \sprintf('Behavior "%s" successful enabled', \get_class($behavior))
+            );
         }
+
+        $this->logger->debug('The message bus has been successfully configured');
 
         return $messageBusBuilder->build();
     }
@@ -352,6 +376,8 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
 
         $factory->appendEntities($ormConfig->all(), $this->dbalConnections);
 
+        $this->logger->debug('Storage managers successfully configured');
+
         return $registry;
     }
 
@@ -364,9 +390,16 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     {
         $responseRoutes = $this->configuration->get('responseMessageRoutes', []);
 
-        return new Infrastructure\MessageRouter\MessageRouter(
-            true === \is_array($responseRoutes) ? $responseRoutes : []
+        $router = new Infrastructure\MessageRouter\MessageRouter(
+            true === \is_array($responseRoutes)
+                ? $responseRoutes
+                : [],
+            $this->logger
         );
+
+        $this->logger->debug('Message router successfully configured');
+
+        return $router;
     }
 
     /**

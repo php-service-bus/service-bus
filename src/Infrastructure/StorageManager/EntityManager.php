@@ -25,13 +25,6 @@ use Doctrine\ORM\EntityManager as DoctrineEntityManager;
 class EntityManager implements EntityManagerInterface
 {
     /**
-     * Entity namespace
-     *
-     * @var string
-     */
-    private $entityNamespace;
-
-    /**
      * Connections pool
      *
      * @var Connection
@@ -46,22 +39,12 @@ class EntityManager implements EntityManagerInterface
     private $entityManager;
 
     /**
-     * @param string     $entityNamespace
-     * @param Connection $connection
-     *
-     * @throws \LogicException
+     * @param Connection    $connection
+     * @param Configuration $doctrineConfiguration
      */
-    public function __construct(string $entityNamespace, Connection $connection, Configuration $doctrineConfiguration)
+    public function __construct(Connection $connection, Configuration $doctrineConfiguration)
     {
-        if('' === $entityNamespace)
-        {
-            throw new \LogicException('Entity namespace can\'t be empty');
-        }
-
-        $this->entityNamespace = $entityNamespace;
         $this->connection = $connection;
-
-
         $this->entityManager = DoctrineEntityManager::create($connection, $doctrineConfiguration);
     }
 
@@ -91,8 +74,34 @@ class EntityManager implements EntityManagerInterface
     /**
      * @inheritdoc
      */
-    public function getRepository(): AbstractEntityRepository
+    public function persist($entityObject): void
     {
-        return $this->entityManager->getRepository($this->entityNamespace);
+        $this->entityManager->persist($entityObject);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function flush($entityObject, callable $onSuccess, callable $onFailed): void
+    {
+        try
+        {
+            $this->entityManager->flush($entityObject);
+
+
+            $onSuccess();
+        }
+        catch(\Throwable $throwable)
+        {
+            $onFailed($throwable);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRepository(string $entityNamespace): AbstractEntityRepository
+    {
+        return $this->entityManager->getRepository($entityNamespace);
     }
 }

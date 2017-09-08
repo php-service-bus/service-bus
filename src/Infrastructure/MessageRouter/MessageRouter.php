@@ -15,12 +15,20 @@ namespace Desperado\Framework\Infrastructure\MessageRouter;
 
 use Desperado\Framework\Domain\MessageRouter\MessageRouterInterface;
 use Desperado\Framework\Domain\Messages\MessageInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Message router
  */
 class MessageRouter implements MessageRouterInterface
 {
+    /**
+     * Logger instance
+     *
+     * @var LoggerInterface
+     */
+    private $logger;
+
     /**
      * Message routes
      *
@@ -37,10 +45,13 @@ class MessageRouter implements MessageRouterInterface
     private $routes = [];
 
     /**
-     * @param array $messageRoutes
+     * @param array           $messageRoutes
+     * @param LoggerInterface $logger
      */
-    public function __construct(array $messageRoutes)
+    public function __construct(array $messageRoutes, LoggerInterface $logger)
     {
+        $this->logger = $logger;
+
         if(0 !== \count($messageRoutes))
         {
             $this->addRoutes($messageRoutes);
@@ -56,6 +67,13 @@ class MessageRouter implements MessageRouterInterface
         {
             if(false === \is_array($messages))
             {
+                $this->logger->debug(
+                    \sprintf(
+                        'The list of routes for destination "%s" is empty. The configuration is not needed',
+                        $destinationExchange
+                    )
+                );
+
                 continue;
             }
 
@@ -63,10 +81,24 @@ class MessageRouter implements MessageRouterInterface
             {
                 if(false === \class_exists($messageNamespace))
                 {
+                    $this->logger->error(
+                        \sprintf(
+                            'Message class "%s" for route "%s" not found',
+                            $messageNamespace, $destinationExchange
+                        )
+                    );
+
                     continue;
                 }
 
                 $this->routes[$messageNamespace][] = $destinationExchange;
+
+                $this->logger->debug(
+                    \sprintf(
+                        'The route for the "%s" message and the destination "%s" was successfully added',
+                        $messageNamespace, $destinationExchange
+                    )
+                );
             }
         }
 

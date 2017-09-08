@@ -18,6 +18,7 @@ use Desperado\Framework\Domain\Environment\Environment;
 use Desperado\Framework\Domain\Messages\CommandInterface;
 use Desperado\Framework\Domain\Messages\EventInterface;
 use Desperado\Framework\Domain\Messages\MessageInterface;
+use Desperado\Framework\Infrastructure\Bridge\ORM\AbstractEntityRepository;
 use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryContextInterface;
 use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
 use Desperado\Framework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
@@ -140,7 +141,7 @@ class KernelContext implements DeliveryContextInterface, MessageExecutionOptions
     /**
      * Get entity manager (Doctrine2 ORM)
      *
-     * @param $objectOrNamespace
+     * @param string|object $objectOrNamespace
      *
      * @return EntityManagerInterface
      */
@@ -151,6 +152,22 @@ class KernelContext implements DeliveryContextInterface, MessageExecutionOptions
             : $objectOrNamespace;
 
         return $this->contextStorage->getEntityManager($objectOrNamespace);
+    }
+
+    /**
+     * Get entity repository (Doctrine2 ORM)
+     *
+     * @param string|object $objectOrNamespace
+     *
+     * @return AbstractEntityRepository
+     */
+    public function getEntityRepository($objectOrNamespace): AbstractEntityRepository
+    {
+        $objectOrNamespace = true === \is_object($objectOrNamespace)
+            ? \get_class($objectOrNamespace)
+            : $objectOrNamespace;
+
+        return $this->contextStorage->getEntityRepository($objectOrNamespace);
     }
 
     /**

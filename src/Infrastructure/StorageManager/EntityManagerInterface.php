@@ -23,7 +23,29 @@ interface EntityManagerInterface extends StorageManagerInterface
     /**
      * Get entity repository instance
      *
+     * @param string $entityNamespace
+     *
      * @return AbstractEntityRepository
      */
-    public function getRepository(): AbstractEntityRepository;
+    public function getRepository(string $entityNamespace): AbstractEntityRepository;
+
+    /**
+     * Persist entity
+     *
+     * @param object $entityObject
+     *
+     * @return void
+     */
+    public function persist($entityObject): void;
+
+    /**
+     * Save changes to database
+     *
+     * @param object   $entityObject
+     * @param callable $onSuccess function() {}
+     * @param callable $onFailed  function(\Throwable $throwable) {}
+     *
+     * @return void
+     */
+    public function flush($entityObject, callable $onSuccess, callable $onFailed): void;
 }

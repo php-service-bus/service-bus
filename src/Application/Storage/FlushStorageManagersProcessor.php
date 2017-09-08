@@ -17,7 +17,6 @@ use Desperado\Framework\Application\Context\KernelContext;
 use Desperado\Framework\Common\Formatter\ThrowableFormatter;
 use Desperado\Framework\Infrastructure\StorageManager\StorageManagerInterface;
 use Psr\Log\LoggerInterface;
-use React\Promise\Deferred;
 
 /**
  * Preservation of observed entities; publishing events / sending commands
@@ -62,30 +61,11 @@ class FlushStorageManagersProcessor
             $this->logger->error(ThrowableFormatter::toString($throwable));
         };
 
-        $deferred = new Deferred();
-        $deferred
-            ->promise()
-            ->then(
-                function(StorageManagerInterface $storageManager) use ($context, $failHandler)
-                {
-                    try
-                    {
-                        $storageManager->commit($context, null, $failHandler);
-                    }
-                    catch(\Throwable $throwable)
-                    {
-                        $failHandler($throwable);
-                    }
-                },
-                $failHandler
-            )
-            ->then(null, $failHandler);
-
         foreach($this->registry as $storageManager)
         {
             /** @var StorageManagerInterface $storageManager */
 
-            $deferred->resolve($storageManager);
+            $storageManager->commit($context, null, $failHandler);
         }
     }
 }

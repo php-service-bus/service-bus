@@ -133,6 +133,8 @@ class StorageManagerFactory
             false
         );
 
+        $managers = [];
+
         try
         {
             foreach($entities as $connection => $connectionEntities)
@@ -141,17 +143,23 @@ class StorageManagerFactory
                 {
                     foreach($connectionEntities as $entity)
                     {
-                        $this->storageManagerRegistry->add(
-                            $entity,
-                            new EntityManager(
-                                $entity,
-                                $connections[$connection],
-                                $doctrineConfiguration
+                        $manager = false === isset($managers[$connection])
+                            ? new EntityManager($connections[$connection], $doctrineConfiguration)
+                            : $managers[$connection];
+
+                        $this->storageManagerRegistry->add($entity, $manager);
+
+                        $this->logger->debug(
+                            \sprintf(
+                                'The manager for the entity "%s" ("%s" connection) was successfully configured',
+                                $entity, $connection
                             )
                         );
                     }
                 }
             }
+
+            unset($managers);
         }
         catch(\Throwable $throwable)
         {
@@ -207,6 +215,13 @@ class StorageManagerFactory
                 $this->storageManagerRegistry->add(
                     $eventSourced,
                     new $managerNamespace($eventSourced, $repository)
+                );
+
+                $this->logger->debug(
+                    \sprintf(
+                        'The manager "%s" for the event sourcing entry "%s" was successfully configured',
+                        $managerNamespace, $eventSourced
+                    )
                 );
             }
         }
