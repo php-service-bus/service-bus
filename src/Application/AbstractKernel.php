@@ -185,7 +185,7 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
                     }
                     catch(\Throwable $throwable)
                     {
-                        return $logFailCallable($throwable);
+                        $logFailCallable($throwable);
                     }
                 },
                 $logFailCallable

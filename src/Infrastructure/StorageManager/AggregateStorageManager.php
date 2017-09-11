@@ -95,9 +95,9 @@ class AggregateStorageManager implements AggregateStorageManagerInterface
                 if(null !== $aggregateRoot)
                 {
                     $this->persist($aggregateRoot);
-
-                    $onLoaded($aggregateRoot);
                 }
+
+                $onLoaded($aggregateRoot);
             },
             $onFailed
         );

@@ -41,7 +41,7 @@ interface AggregateStorageManagerInterface extends StorageManagerInterface
      * Load aggregate
      *
      * @param IdentityInterface $identity
-     * @param callable          $onLoaded function(AggregateRootInterface $aggregate) {}
+     * @param callable          $onLoaded function(AggregateRootInterface $aggregate = null) {}
      * @param callable|null     $onFailed function(\Throwable $throwable) {}
      *
      * @return void

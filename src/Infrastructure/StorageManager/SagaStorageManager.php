@@ -93,9 +93,9 @@ class SagaStorageManager implements SagaStorageManagerInterface
                     $saga->resetToPublishEvents();
 
                     $this->persist($saga);
-
-                    $onLoaded($saga);
                 }
+
+                $onLoaded($saga);
             },
             $onFailed
         );

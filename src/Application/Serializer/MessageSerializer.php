@@ -99,11 +99,7 @@ class MessageSerializer implements MessageSerializerInterface
         catch(\Throwable $throwable)
         {
             throw new MessageSerializationFailException(
-                \sprintf(
-                    'Unserialize message fail. Message payload: %s', $content
-                ),
-                $throwable->getCode(),
-                $throwable
+                'Unserialize message fail', $throwable->getCode(), $throwable
             );
         }
     }

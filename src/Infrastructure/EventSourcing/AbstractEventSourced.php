@@ -149,6 +149,16 @@ abstract class AbstractEventSourced implements EventSourcedInterface
     }
 
     /**
+     * Get event sourced entry identity as string representation
+     *
+     * @return string
+     */
+    protected function getIdentityAsString(): string
+    {
+        return $this->getId()->toString();
+    }
+
+    /**
      * Raise event
      *
      * @param EventInterface $event
@@ -234,8 +244,6 @@ abstract class AbstractEventSourced implements EventSourcedInterface
         $restoredEvent = new EventSourcedEntryRestoredEvent();
         $restoredEvent->id = $identity->toString();
         $restoredEvent->type = \get_class($identity);
-
-        $self->applyEvent(DomainEvent::new($restoredEvent, -1));
 
         return $self;
     }

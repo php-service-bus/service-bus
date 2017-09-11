@@ -24,6 +24,7 @@ use Desperado\Framework\Infrastructure\CQRS\Context\DeliveryOptions;
 use Desperado\Framework\Infrastructure\CQRS\Context\MessageExecutionOptionsContextInterface;
 use Desperado\Framework\Infrastructure\CQRS\Context\Options;
 use Desperado\Framework\Infrastructure\EventSourcing\Saga\AbstractSaga;
+use Desperado\Framework\Infrastructure\StorageManager\AggregateStorageManagerInterface;
 use Desperado\Framework\Infrastructure\StorageManager\EntityManagerInterface;
 use Desperado\Framework\Infrastructure\StorageManager\SagaStorageManagerInterface;
 use Monolog\Logger;
@@ -184,6 +185,22 @@ class KernelContext implements DeliveryContextInterface, MessageExecutionOptions
             : $objectOrNamespace;
 
         return $this->contextStorage->getSagaStorageManager($objectOrNamespace);
+    }
+
+    /**
+     * Get aggregate storage manager
+     *
+     * @param $objectOrNamespace
+     *
+     * @return AggregateStorageManagerInterface
+     */
+    public function getAggregateStorageManager($objectOrNamespace): AggregateStorageManagerInterface
+    {
+        $objectOrNamespace = true === \is_object($objectOrNamespace)
+            ? \get_class($objectOrNamespace)
+            : $objectOrNamespace;
+
+        return $this->contextStorage->getAggregateStorageManager($objectOrNamespace);
     }
 
     /**

@@ -56,7 +56,7 @@ class AggregateRepository implements AggregateRepositoryInterface
                 {
                     $result = null;
 
-                    if(null !== $eventStream)
+                    if(null !== $eventStream && 0 !== \count($eventStream))
                     {
                         $result = \call_user_func_array(
                             \sprintf('%s::fromEventStream', $aggregateNamespace),
