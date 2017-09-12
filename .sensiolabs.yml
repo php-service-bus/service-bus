@@ -3,6 +3,7 @@ php_version: 7.1
 global_exclude_dirs:
     - vendor
     - bin
+    - tests
 
 commit_failure_conditions:
     - "project.severity.critical > 0"
