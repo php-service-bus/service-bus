@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Infrastructure\EventSourcing;
 
 use Desperado\Framework\Common\Utils\ObjectUtils;
-use Desperado\Framework\Domain\DateTime;
 use Desperado\Framework\Domain\Event\DomainEvent;
 use Desperado\Framework\Domain\Event\DomainEventStream;
 use Desperado\Framework\Domain\EventSourced\EventSourcedInterface;
@@ -50,13 +49,6 @@ abstract class AbstractEventSourced implements EventSourcedInterface
      * @var DomainEvent[]
      */
     private $uncommittedEvents = [];
-
-    /**
-     * Created datetime
-     *
-     * @var DateTime
-     */
-    private $createdAt;
 
     /**
      * List of events to be published while saving
@@ -203,7 +195,6 @@ abstract class AbstractEventSourced implements EventSourcedInterface
     final protected function onEventSourcedEntryCreatedEvent(EventSourcedEntryCreatedEvent $event): void
     {
         $this->id = new $event->type($event->id);
-        $this->createdAt = DateTime::fromString($event->createdAt);
 
         $this->onCreated();
     }
