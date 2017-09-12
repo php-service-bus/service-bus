@@ -72,6 +72,7 @@ class ParameterBagTest extends TestCase
     {
         static::assertCount(3, $this->container);
         static::assertTrue(\is_iterable($this->container));
+        static::assertInstanceOf(\Iterator::class, $this->container->getIterator());
         static::assertTrue($this->container->has('string'));
         static::assertFalse($this->container->has('nonExistsKey'));
         static::assertEquals($this->arrayData, $this->container->all());

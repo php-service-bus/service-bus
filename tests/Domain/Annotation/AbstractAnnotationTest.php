@@ -84,4 +84,19 @@ class AbstractAnnotationTest extends TestCase
     {
         $this->annotation->missedProperty;
     }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function setOnConstructor(): void
+    {
+        $annotation = new class(['property' => 'value']) extends AbstractAnnotation
+        {
+            public $property;
+        };
+
+        static::assertEquals('value', $annotation->property);
+    }
 }

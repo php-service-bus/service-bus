@@ -51,5 +51,6 @@ class DomainEventStreamTest extends TestCase
 
         static::assertNotEquals($eventStreamHash, $closedStreamHash);
         static::assertTrue($closedStream->isClosed());
+        static::assertInstanceOf(\Iterator::class, $closedStream->getIterator());
     }
 }
