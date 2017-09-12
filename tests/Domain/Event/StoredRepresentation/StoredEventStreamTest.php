@@ -43,16 +43,16 @@ class StoredEventStreamTest extends TestCase
         $storedDomainEventStream = new StoredEventStream($streamId, $streamClass, $isClosed, $storedDomainEvents);
 
         $expectedArray = [
-            $streamId,
-            $streamClass,
-            $isClosed,
-            [
+            'id'       => $streamId,
+            'class'    => $streamClass,
+            'isClosed' => $isClosed,
+            'events'   => [
                 [
-                    $eventId,
-                    $playhead,
-                    $eventPayload,
-                    $currentDate,
-                    $currentDate
+                    'id'            => $eventId,
+                    'playhead'      => $playhead,
+                    'receivedEvent' => $eventPayload,
+                    'occurredAt'    => $currentDate,
+                    'recordedAt'    => $currentDate
                 ]
             ]
         ];

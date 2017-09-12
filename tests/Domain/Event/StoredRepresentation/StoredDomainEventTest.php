@@ -34,11 +34,11 @@ class StoredDomainEventTest extends TestCase
         $eventPayload = 'someEventPayload';
 
         $expectedArray = [
-            $eventId,
-            $playhead,
-            $eventPayload,
-            $currentDate,
-            $currentDate
+            'id'            => $eventId,
+            'playhead'      => $playhead,
+            'receivedEvent' => $eventPayload,
+            'occurredAt'    => $currentDate,
+            'recordedAt'    => $currentDate
         ];
 
         $storedDomainEvent = new StoredDomainEvent($eventId, $playhead, $eventPayload, $currentDate, $currentDate);
