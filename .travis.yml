@@ -1,0 +1,18 @@
+language: php
+sudo: false
+matrix:
+    include:
+        - php: 7.1
+        - php: 7.2
+        - nightly
+    fast_finish: true
+before_script:
+  - composer self-update
+install: travis_retry composer update --prefer-dist
+notifications:
+  email:
+    - desperado@minsk-info.ru
+cache:
+  directories:
+    - $HOME/.composer/cache
+script: ./vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml.dist --coverage-text --testdox ./tests
