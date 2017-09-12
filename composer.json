@@ -1,5 +1,5 @@
 {
-  "name": "desperado/php-es-cqrs",
+  "name": "mmasiukevich/php-es-cqrs",
   "description": "Command Query Responsibility Segregation/Event Sourcing implementation",
   "type": "library",
   "keywords": [
