@@ -79,12 +79,12 @@ class SagaEventHandler
         )
         {
             $identityNamespace = $this->identityNamespace;
-            $identity = new $identityNamespace($event->{$this->annotation->containingIdentityProperty});
+            $identityValue = (string) $event->{$this->annotation->containingIdentityProperty};
 
-            if('' !== (string) $identity)
+            if('' !== $identityValue)
             {
                 $this->storageManager->load(
-                    $identity,
+                    new $identityNamespace($identityValue),
                     function(AbstractSaga $saga = null) use ($event)
                     {
                         if(null !== $saga)
