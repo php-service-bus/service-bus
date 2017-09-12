@@ -77,11 +77,11 @@ class StoredDomainEvent
     public function toArray(): array
     {
         return [
-            'id'            => $this->id,
-            'playhead'      => $this->playhead,
-            'receivedEvent' => $this->receivedEvent,
-            'occurredAt'    => $this->occurredAt,
-            'recordedAt'    => $this->occurredAt
+            $this->id,
+            $this->playhead,
+            $this->receivedEvent,
+            $this->occurredAt,
+            $this->occurredAt
         ];
     }
 

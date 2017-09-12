@@ -48,12 +48,11 @@ final class DomainEventStream implements \Countable, \IteratorAggregate
     /**
      * Close stream
      *
-     * @return void
+     * @return self
      */
-    public function closeStream(): void
+    public function closeStream(): self
     {
-        $this->isClosed = true;
-
+        return new self($this->events, true);
     }
 
     /**
@@ -86,7 +85,7 @@ final class DomainEventStream implements \Countable, \IteratorAggregate
      * @param DomainEvent[] $events
      * @param bool          $isClosed
      */
-    public function __construct(array $events, bool $isClosed)
+    private function __construct(array $events, bool $isClosed)
     {
         $this->isClosed = $isClosed;
         $this->events = $events;

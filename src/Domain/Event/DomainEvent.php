@@ -82,7 +82,7 @@ final class DomainEvent
      * @param EventInterface $receivedEvent
      * @param int            $playhead
      * @param DateTime       $occurredAt
-     * @param DateTime|null  $recordedAt
+     * @param DateTime  $recordedAt
      *
      * @return DomainEvent
      */
@@ -91,7 +91,7 @@ final class DomainEvent
         EventInterface $receivedEvent,
         int $playhead,
         DateTime $occurredAt,
-        DateTime $recordedAt = null
+        DateTime $recordedAt
     ): self
     {
         return new self(

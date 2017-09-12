@@ -54,7 +54,7 @@ abstract class AbstractIdentity implements IdentityInterface
     /**
      * @inheritdoc
      */
-    public function toCompositeIndexHash(): string
+    final public function toCompositeIndexHash(): string
     {
         return \sha1($this->toCompositeIndex());
     }

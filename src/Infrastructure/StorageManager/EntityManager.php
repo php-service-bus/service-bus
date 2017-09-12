@@ -25,13 +25,6 @@ use Doctrine\ORM\EntityManager as DoctrineEntityManager;
 class EntityManager implements EntityManagerInterface
 {
     /**
-     * Connections pool
-     *
-     * @var Connection
-     */
-    private $connection;
-
-    /**
      * Entity manager
      *
      * @var EntityManager
@@ -44,7 +37,6 @@ class EntityManager implements EntityManagerInterface
      */
     public function __construct(Connection $connection, Configuration $doctrineConfiguration)
     {
-        $this->connection = $connection;
         $this->entityManager = DoctrineEntityManager::create($connection, $doctrineConfiguration);
     }
 

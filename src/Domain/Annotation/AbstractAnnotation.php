@@ -21,7 +21,7 @@ abstract class AbstractAnnotation
     /**
      * @param array $data
      */
-    public final function __construct(array $data)
+    final public function __construct(array $data)
     {
         foreach($data as $key => $value)
         {
