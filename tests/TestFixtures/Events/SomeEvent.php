@@ -23,14 +23,14 @@ class SomeEvent implements EventInterface
     /**
      * ID
      *
-     * @var string
+     * @var string|null
      */
     public $someEventId;
 
     /**
      * Some value
      *
-     * @var string
+     * @var string|null
      */
     public $someEventValue;
 }
