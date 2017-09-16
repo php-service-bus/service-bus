@@ -16,20 +16,21 @@ CREATE TABLE IF NOT EXISTS event_store_events
   playhead    INT DEFAULT 0 NOT NULL,
   occurred_at TIMESTAMP     NOT NULL,
   recorded_at TIMESTAMP     NOT NULL,
-  payload     JSONB         NOT NULL,
+  payload     TEXT         NOT NULL,
   CONSTRAINT events_stream_key FOREIGN KEY (stream_id) REFERENCES event_store_streams (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
-CREATE INDEX IF NOT EXISTS event_stream_id
-  ON event_store_events (stream_id);
+CREATE INDEX IF NOT EXISTS event_stream_id ON event_store_events (stream_id);
 
 
-CREATE UNIQUE INDEX IF NOT EXISTS event_streams_identity
-  ON event_store_streams (id, identity_class);
+CREATE UNIQUE INDEX IF NOT EXISTS event_streams_identity ON event_store_streams (id, identity_class);
 
 
 COMMENT ON TABLE event_store_events IS 'Event list';
 
 
 COMMENT ON TABLE event_store_streams IS 'Event streams list';
+
+
+CREATE INDEX event_store_events_playhead ON event_store_events (playhead);
