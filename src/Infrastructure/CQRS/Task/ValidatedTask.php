@@ -62,6 +62,15 @@ class ValidatedTask extends AbstractTask
         /** @var Validator\ConstraintViolationListInterface $violations */
         $violations = $this->validator->validate($message);
 
+        /** Validate message DTO */
+        foreach(\get_object_vars($message) as $key => $dto)
+        {
+            if(true === \is_object($message))
+            {
+                $violations->addAll($this->validator->validate([$key => $dto]));
+            }
+        }
+
         if(0 !== \count($violations))
         {
             $logger = $this->getLogger($message, $context);
@@ -93,4 +102,5 @@ class ValidatedTask extends AbstractTask
 
         return \call_user_func_array($this->originalTask, [$message, $context]);
     }
+
 }
