@@ -236,6 +236,7 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     protected function getBehaviors(): array
     {
         return [
+            new  Infrastructure\CQRS\Behavior\ValidationErrorBehavior(),
             new Infrastructure\CQRS\Behavior\HandleErrorBehavior()
         ];
     }

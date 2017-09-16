@@ -32,8 +32,9 @@
   "require": {
     "php": ">=7.1",
     "monolog/monolog": "1.23.0",
-    "symfony/yaml": "^3.3",
-    "symfony/dotenv": "^3.3",
+    "symfony/yaml": "^3.3.6",
+    "symfony/dotenv": "^3.3.6",
+    "symfony/validator": "v3.3.6",
     "symfony/serializer": "v3.3.6",
     "symfony/property-info": "v3.3.6",
     "symfony/property-access": "v3.3.6",

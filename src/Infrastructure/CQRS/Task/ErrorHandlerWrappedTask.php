@@ -58,9 +58,7 @@ class ErrorHandlerWrappedTask extends AbstractTask
 
         try
         {
-            $task = $this->originalTask;
-
-            return $task($message, $context);
+            return \call_user_func_array($this->originalTask, [$message, $context]);
         }
         catch(\Exception $exception)
         {

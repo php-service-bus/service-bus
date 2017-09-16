@@ -15,6 +15,7 @@ namespace Desperado\Framework\Application\Storage;
 
 use Desperado\Framework\Application\Context\KernelContext;
 use Desperado\Framework\Common\Formatter\ThrowableFormatter;
+use Desperado\Framework\Infrastructure\StorageManager\EntityManagerInterface;
 use Desperado\Framework\Infrastructure\StorageManager\StorageManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -63,6 +64,11 @@ class FlushStorageManagersProcessor
 
         foreach($this->registry as $storageManager)
         {
+            if($storageManager instanceof EntityManagerInterface)
+            {
+                continue;
+            }
+
             /** @var StorageManagerInterface $storageManager */
 
             $storageManager->commit($context, null, $failHandler);
