@@ -13,8 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Infrastructure\Bridge\Logger\Handlers;
 
-use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use Monolog\Handler\AbstractProcessingHandler;
 
 /**
  * Simple console echo handler
@@ -45,15 +45,17 @@ class StdoutHandler extends AbstractProcessingHandler
      */
     protected function write(array $record): void
     {
-        $color = isset(self::COLORS_BY_LEVEL[$record['level']])
-            ? self::COLORS_BY_LEVEL[$record['level']]
-            : 31;
-
         if('cli' === \PHP_SAPI)
         {
-            echo \sprintf(
+            $color = isset(self::COLORS_BY_LEVEL[$record['level']])
+                ? self::COLORS_BY_LEVEL[$record['level']]
+                : 31;
+
+            $message = \sprintf(
                 '%s[%dm%s%s[0m', \chr(27), $color, $record['formatted'], \chr(27)
             );
+
+            \fwrite(\STDOUT, $message);
         }
     }
 }

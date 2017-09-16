@@ -26,6 +26,11 @@ use Desperado\Framework\Infrastructure\EventSourcing\Saga\AbstractSaga;
  */
 class SagaStorageManager implements SagaStorageManagerInterface
 {
+    /**
+     * Saga class namespace
+     *
+     * @var string
+     */
     private $sagaNamespace;
 
     /**

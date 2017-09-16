@@ -139,59 +139,37 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
     /**
      * @inheritdoc
      */
-    public function handleMessage(
+    final public function handleMessage(
         Domain\Messages\MessageInterface $message,
         Domain\Context\ContextInterface $context
     ): void
     {
-        $logFailCallable = function(\Throwable $throwable)
-        {
-            $this->logger->error(Common\Formatter\ThrowableFormatter::toString($throwable));
-        };
+        /** @var Infrastructure\CQRS\Context\DeliveryContextInterface $context */
 
-        $task = new \stdClass();
-        $task->message = $message;
-        $task->originalContext = $context;
+        $executionContext = $this->createExecutionContext($context);
 
         $deferred = new Deferred();
         $deferred
             ->promise()
             ->then(
-                function(\stdClass $task) use ($logFailCallable)
+            /** Handle message */
+                function(Domain\Messages\MessageInterface $message) use ($executionContext)
                 {
                     try
                     {
-                        $loggerContext = new Application\Context\Variables\ContextLogger();
-                        $contextEntryPoint = new Application\Context\Variables\ContextEntryPoint(
-                            $this->entryPointName, $this->environment
-                        );
-                        $contextMessages = new Application\Context\Variables\ContextMessages(
-                            $task->originalContext, $this->messagesRouter
-                        );
-                        $contextStorage = new Application\Context\Variables\ContextStorage(
-                            $this->storageManagersRegistry
-                        );
-
-                        $kernelContext = new Application\Context\KernelContext(
-                            $contextEntryPoint,
-                            $contextMessages,
-                            $contextStorage,
-                            $loggerContext
-                        );
-
-                        $this->messageBus->handle($task->message, $kernelContext);
-
-                        return $kernelContext;
+                        $this->messageBus->handle($message, $executionContext);
                     }
                     catch(\Throwable $throwable)
                     {
-                        $logFailCallable($throwable);
+                        $executionContext->logThrowable($throwable);
                     }
-                },
-                $logFailCallable
+
+                    return $executionContext;
+                }
             )
             ->then(
-                function(Application\Context\KernelContext $context) use ($logFailCallable)
+            /** Save aggregates, publish events/send commands */
+                function(Application\Context\KernelContext $executionContext)
                 {
                     try
                     {
@@ -200,18 +178,49 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
                             $this->logger
                         );
 
-                        $persistProcessor->process($context);
+                        $persistProcessor->process($executionContext);
                     }
                     catch(\Throwable $throwable)
                     {
-                        $logFailCallable($throwable);
+                        $executionContext->logThrowable($throwable);
                     }
-                },
-                $logFailCallable
-            )
-            ->then(null, $logFailCallable);
 
-        $deferred->resolve($task);
+                    return $executionContext;
+                }
+            )
+            ->then(null, $executionContext->getLogThrowableCallable());
+
+        $deferred->resolve($message);
+    }
+
+    /**
+     * Create message execution context
+     *
+     * @param Infrastructure\CQRS\Context\DeliveryContextInterface $originalContext
+     *
+     * @return Context\KernelContext
+     */
+    protected function createExecutionContext(
+        Infrastructure\CQRS\Context\DeliveryContextInterface $originalContext
+    ): Application\Context\KernelContext
+    {
+        $loggerContext = new Application\Context\Variables\ContextLogger();
+        $contextEntryPoint = new Application\Context\Variables\ContextEntryPoint(
+            $this->entryPointName, $this->environment
+        );
+        $contextMessages = new Application\Context\Variables\ContextMessages(
+            $originalContext, $this->messagesRouter
+        );
+        $contextStorage = new Application\Context\Variables\ContextStorage(
+            $this->storageManagersRegistry
+        );
+
+        return new Application\Context\KernelContext(
+            $contextEntryPoint,
+            $contextMessages,
+            $contextStorage,
+            $loggerContext
+        );
     }
 
     /**
@@ -361,7 +370,11 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         $ormConfig = new Domain\ParameterBag((array) $this->getConfiguration()->get('orm', []));
 
         $factory = new Application\Storage\StorageManagerFactory(
-            $registry, $this->logger, $this->messageSerializer, $this->environment, $this->getSourceDirectoryPath()
+            $registry,
+            $this->logger,
+            new Application\Serializer\StoreEventPayloadSerializer($this->messageSerializer),
+            $this->environment,
+            $this->getSourceDirectoryPath()
         );
 
         $factory->appendEventSourced(

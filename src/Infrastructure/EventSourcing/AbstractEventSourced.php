@@ -200,18 +200,6 @@ abstract class AbstractEventSourced implements EventSourcedInterface
     }
 
     /**
-     * Apply restore event
-     *
-     * @param EventSourcedEntryRestoredEvent $event
-     *
-     * @return void
-     */
-    final protected function onEventSourcedEntryRestoredEvent(EventSourcedEntryRestoredEvent $event): void
-    {
-        $this->id = new $event->type($event->id);
-    }
-
-    /**
      * Close constructor
      *
      * @codeCoverageIgnore
@@ -231,10 +219,7 @@ abstract class AbstractEventSourced implements EventSourcedInterface
     private static function restore(IdentityInterface $identity): self
     {
         $self = new static();
-
-        $restoredEvent = new EventSourcedEntryRestoredEvent();
-        $restoredEvent->id = $identity->toString();
-        $restoredEvent->type = \get_class($identity);
+        $self->id = $identity;
 
         return $self;
     }

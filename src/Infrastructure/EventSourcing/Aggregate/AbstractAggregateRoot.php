@@ -40,7 +40,7 @@ abstract class AbstractAggregateRoot extends AbstractEventSourced implements Agg
         $createdEvent->type = \get_class($identity);
         $createdEvent->createdAt = DateTime::nowToString();
 
-        $self->raiseEvent($createdEvent);
+        $self->raiseEvent($createdEvent, false);
 
         return $self;
     }
