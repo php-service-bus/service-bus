@@ -20,7 +20,6 @@ use Desperado\Framework\Domain\EventSourced\EventSourcedInterface;
 use Desperado\Framework\Domain\Identity\IdentityInterface;
 use Desperado\Framework\Domain\Messages\EventInterface;
 use Desperado\Framework\Infrastructure\EventSourcing\Contract\EventSourcedEntryCreatedEvent;
-use Desperado\Framework\Infrastructure\EventSourcing\Contract\EventSourcedEntryRestoredEvent;
 
 /**
  * Base event sourced entry
