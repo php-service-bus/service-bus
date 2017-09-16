@@ -36,5 +36,5 @@ COMMENT ON TABLE event_store_events IS 'Event list';
 COMMENT ON TABLE event_store_streams IS 'Event streams list';
 
 
-CREATE INDEX event_store_events_playhead
+CREATE INDEX IF NOT EXISTS event_store_events_playhead
   ON event_store_events (playhead);
