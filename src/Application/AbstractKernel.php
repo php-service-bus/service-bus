@@ -134,6 +134,8 @@ abstract class AbstractKernel implements Domain\Application\KernelInterface
         $this->dbalConnections = $this->initDBALConnections();
         $this->storageManagersRegistry = $this->initStorageManagers();
         $this->messageBus = $this->initMessageBus();
+
+        $this->init();
     }
 
     /**
