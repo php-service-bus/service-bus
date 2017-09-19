@@ -1,5 +1,5 @@
 {
-  "name": "mmasiukevich/php-es-cqrs",
+  "name": "mmasiukevich/framework",
   "description": "Command Query Responsibility Segregation/Event Sourcing implementation",
   "type": "library",
   "keywords": [
