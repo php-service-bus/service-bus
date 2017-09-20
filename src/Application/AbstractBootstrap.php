@@ -287,6 +287,36 @@ abstract class AbstractBootstrap
     }
 
     /**
+     * Get root directory path
+     *
+     * @return string
+     */
+    protected function getRootDirectoryPath(): string
+    {
+        return $this->rootDirectoryPath;
+    }
+
+    /**
+     * Get entry point name
+     *
+     * @return string
+     */
+    protected function getEntryPointName(): string
+    {
+        return $this->entryPointName;
+    }
+
+    /**
+     * Get application environment
+     *
+     * @return Environment
+     */
+    protected function getEnvironment(): Environment
+    {
+        return $this->environment;
+    }
+
+    /**
      * Init application modules
      *
      * @param MessageBusBuilder $messageBusBuilder
