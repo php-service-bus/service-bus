@@ -16,9 +16,11 @@ namespace Desperado\Framework\Application;
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
 use Desperado\Domain\ContextInterface;
+use Desperado\Domain\MessageRouterInterface;
 use Desperado\Domain\Messages\CommandInterface;
 use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
+use Desperado\Framework\StorageManager\StorageManagerRegistry;
 
 /**
  * Base entry point context
@@ -32,7 +34,35 @@ class EntryPointContext implements DeliveryContextInterface
      */
     private $originContext;
 
+    /**
+     * Message router
+     *
+     * @var MessageRouterInterface
+     */
     private $messageRouter;
+
+    /**
+     * Storage managers registry for aggregates/sagas
+     *
+     * @var StorageManagerRegistry
+     */
+    private $storageManagersRegistry;
+
+    /**
+     * @param ContextInterface       $originContext
+     * @param MessageRouterInterface $messageRouter
+     * @param StorageManagerRegistry $storageManagersRegistry
+     */
+    public function __construct(
+        ContextInterface $originContext,
+        MessageRouterInterface $messageRouter,
+        StorageManagerRegistry $storageManagersRegistry
+    )
+    {
+        $this->originContext = $originContext;
+        $this->messageRouter = $messageRouter;
+        $this->storageManagersRegistry = $storageManagersRegistry;
+    }
 
     /**
      * @inheritdoc

@@ -127,7 +127,11 @@ final class EntryPoint implements EntryPointInterface
             $context = new LocalDeliveryContext();
         }
 
-
+        $entryPointContext = new EntryPointContext(
+            $context,
+            $this->messageRouter,
+            $this->storageManagersRegistry
+        );
 
         $rejectHandler = $this->getRejectPromiseHandler($message, $entryPointContext);
         $flushHandler = $this->getFlushPromiseHandler($entryPointContext);
@@ -138,11 +142,6 @@ final class EntryPoint implements EntryPointInterface
             ->getMessageExecutionPromise($message, $entryPointContext)
             ->then($flushHandler, $rejectHandler)
             ->then($finishedHandler, $rejectHandler, $processingHandler);
-    }
-
-    public function applyApplicationContext(ApplicationContext $applicationContext)
-    {
-
     }
 
     /**
