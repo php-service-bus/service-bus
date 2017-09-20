@@ -245,7 +245,7 @@ class RabbitMQDaemon implements DaemonInterface
                                         {
                                             ApplicationLogger::info(
                                                 self::LOG_CHANNEL_NAME,
-                                                'RabbitMQ daemon tarted'
+                                                'RabbitMQ daemon started'
                                             );
 
                                             return $channel->consume(

@@ -15,7 +15,6 @@ namespace Desperado\Framework\Application;
 
 use Desperado\CQRS\Configuration\AnnotationsExtractor;
 use Desperado\CQRS\MessageBusBuilder;
-use Desperado\Domain\ContextInterface;
 use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\EventStorageInterface;
 use Desperado\Domain\MessageRouterInterface;
@@ -263,16 +262,20 @@ abstract class AbstractBootstrap
     protected function getModules(): array
     {
         $modules = [
-            new MessageValidationModule(),
             new MessageErrorHandlerModule()
         ];
 
-        if(true === \class_exists(AbstractSaga::class))
+        if(true === \class_exists('Desperado\EventSourcing\Saga\AbstractSaga'))
         {
             $modules[] = new SagaModule(
                 $this->getStorageManagersRegistry()->getSagaManagers(),
                 new AnnotationsSagaConfigurationExtractor($this->annotationsReader)
             );
+        }
+
+        if(true === \class_exists('Symfony\Component\Validator'))
+        {
+            $modules[] = new MessageValidationModule();
         }
 
         return $modules;

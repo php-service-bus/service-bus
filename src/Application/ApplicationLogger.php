@@ -132,7 +132,8 @@ class ApplicationLogger
         $logger = LoggerRegistry::getLogger($channel);
         $extraData = [
             'environment' => (string) self::$environment,
-            'entryPoint'  => (string) self::$entryPointName
+            'entryPoint'  => (string) self::$entryPointName,
+            'hostname'    => \gethostname()
         ];
 
         $logger->log($level, $message, \array_merge($extraData, $extra));
