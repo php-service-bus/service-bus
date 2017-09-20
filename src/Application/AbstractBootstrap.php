@@ -134,6 +134,9 @@ abstract class AbstractBootstrap
         $this->initEnvironment();
         $this->initEntryPoint();
         $this->initLoggerRegistry();
+
+        $this->init();
+
         $this->initAggregatesStorage();
         $this->initMessageRouter();
 
@@ -141,8 +144,6 @@ abstract class AbstractBootstrap
         {
             $this->initSagaStorage();
         }
-
-        $this->init();
     }
 
     /**
