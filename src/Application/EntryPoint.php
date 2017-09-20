@@ -24,6 +24,7 @@ use Desperado\Domain\Serializer\MessageSerializerInterface;
 use Desperado\Framework\StorageManager\FlushProcessor;
 use Desperado\Framework\StorageManager\StorageManagerRegistry;
 use EventLoop\EventLoop;
+use Psr\Log\LogLevel;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
@@ -210,6 +211,7 @@ final class EntryPoint implements EntryPointInterface
             ApplicationLogger::throwable(
                 $this->getLogChannelName(),
                 $throwable,
+                LogLevel::ERROR,
                 [
                     'message' => \get_class($message),
                     'payload' => \json_encode(\get_object_vars($message)),

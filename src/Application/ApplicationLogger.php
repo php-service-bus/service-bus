@@ -145,11 +145,17 @@ class ApplicationLogger
      * @param string     $channel
      * @param \Throwable $throwable
      * @param string     $level
+     * @param array      $extra
      *
      * @return void
      */
-    public static function throwable(string $channel, \Throwable $throwable, string $level = LogLevel::ERROR): void
+    public static function throwable(
+        string $channel,
+        \Throwable $throwable,
+        string $level = LogLevel::ERROR,
+        array $extra = []
+    ): void
     {
-        self::log($channel, ThrowableFormatter::toString($throwable), $level);
+        self::log($channel, ThrowableFormatter::toString($throwable), $level, $extra);
     }
 }
