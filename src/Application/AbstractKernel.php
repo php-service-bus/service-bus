@@ -13,6 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application;
 
+use Desperado\Domain\ContextInterface;
+use Desperado\Domain\Environment\Environment;
+use Desperado\Domain\MessageBusInterface;
+use Desperado\Domain\MessageRouterInterface;
 use Desperado\Domain\Messages\MessageInterface;
 use Desperado\Framework\StorageManager\FlushProcessor;
 use Desperado\Framework\StorageManager\StorageManagerRegistry;
@@ -27,51 +31,61 @@ use React\Promise\PromiseInterface;
 abstract class AbstractKernel
 {
     /**
-     * Entry point
+     * Application environment
      *
-     * @var EntryPoint
+     * @var Environment
      */
-    private $entryPoint;
+    private $environment;
 
     /**
-     * Storage managers registry for aggregates/sagas
+     * Storage managers registry
      *
      * @var StorageManagerRegistry
      */
     private $storageManagersRegistry;
 
     /**
-     * @param EntryPoint             $entryPoint
-     * @param StorageManagerRegistry $storageManagersRegistry
+     * Message router
+     *
+     * @var MessageRouterInterface
      */
-    public function __construct(EntryPoint $entryPoint, StorageManagerRegistry $storageManagersRegistry)
-    {
-        $this->entryPoint = $entryPoint;
-        $this->storageManagersRegistry = $storageManagersRegistry;
-    }
+    private $messageRouter;
 
     /**
-     * Create application context
+     * Message bus
      *
-     * @param EntryPointContext      $context
-     * @param StorageManagerRegistry $storageManagersRegistry
-     *
-     * @return AbstractApplicationContext
+     * @var MessageBusInterface
      */
-    abstract public function createApplicationContext(
-        EntryPointContext $context,
-        StorageManagerRegistry $storageManagersRegistry
-    ): AbstractApplicationContext;
+    private $messageBus;
+
+    /**
+     * @param Environment            $environment
+     * @param StorageManagerRegistry $storageManagersRegistry
+     * @param MessageRouterInterface $messageRouter
+     * @param MessageBusInterface    $messageBus
+     */
+    public function __construct(
+        Environment $environment,
+        StorageManagerRegistry $storageManagersRegistry,
+        MessageRouterInterface $messageRouter,
+        MessageBusInterface $messageBus
+    )
+    {
+        $this->environment = $environment;
+        $this->storageManagersRegistry = $storageManagersRegistry;
+        $this->messageRouter = $messageRouter;
+        $this->messageBus = $messageBus;
+    }
 
     /**
      * Handle message
      *
-     * @param MessageInterface  $message
-     * @param EntryPointContext $context
+     * @param MessageInterface $message
+     * @param ContextInterface $context
      *
      * @return PromiseInterface
      */
-    public function handleMessage(MessageInterface $message, EntryPointContext $context): PromiseInterface
+    final public function handle(MessageInterface $message, ContextInterface $context): PromiseInterface
     {
         $applicationContext = $this->createApplicationContext($context, $this->storageManagersRegistry);
 
@@ -87,6 +101,39 @@ abstract class AbstractKernel
     }
 
     /**
+     * Create application context
+     *
+     * @param ContextInterface       $originContext
+     * @param StorageManagerRegistry $storageManagersRegistry
+     *
+     * @return AbstractApplicationContext
+     */
+    abstract protected function createApplicationContext(
+        ContextInterface $originContext,
+        StorageManagerRegistry $storageManagersRegistry
+    ): AbstractApplicationContext;
+
+    /**
+     * Get environment
+     *
+     * @return Environment
+     */
+    final protected function getEnvironment(): Environment
+    {
+        return $this->environment;
+    }
+
+    /**
+     * Get storage manager registry
+     *
+     * @return StorageManagerRegistry
+     */
+    final protected function getStorageManagersRegistry(): StorageManagerRegistry
+    {
+        return $this->storageManagersRegistry;
+    }
+
+    /**
      * Get finished message execution handler
      *
      * @param MessageInterface $message
@@ -98,7 +145,7 @@ abstract class AbstractKernel
         return function() use ($message)
         {
             ApplicationLogger::debug(
-                $this->getLogChannelName(),
+                'kernel',
                 \sprintf('Message "%s" is still in process', \get_class($message))
             );
         };
@@ -116,7 +163,7 @@ abstract class AbstractKernel
         return function() use ($message)
         {
             ApplicationLogger::debug(
-                $this->getLogChannelName(),
+                'kernel',
                 \sprintf('Message "%s" execution complete', \get_class($message))
             );
         };
@@ -150,7 +197,7 @@ abstract class AbstractKernel
         return function(\Throwable $throwable) use ($message, $context)
         {
             ApplicationLogger::throwable(
-                $this->getLogChannelName(),
+                'kernel',
                 $throwable,
                 LogLevel::ERROR,
                 [
@@ -170,7 +217,10 @@ abstract class AbstractKernel
      *
      * @return PromiseInterface
      */
-    private function getMessageExecutionPromise(MessageInterface $message, AbstractApplicationContext $context): PromiseInterface
+    private function getMessageExecutionPromise(
+        MessageInterface $message,
+        AbstractApplicationContext $context
+    ): PromiseInterface
     {
         return new Promise(
             function($resolve, $reject) use ($message, $context)
@@ -180,7 +230,7 @@ abstract class AbstractKernel
                     {
                         try
                         {
-                            $this->entryPoint->handleMessage($message, $context);
+                            $this->messageBus->handle($message, $context);
 
                             $resolve();
                         }
@@ -192,15 +242,5 @@ abstract class AbstractKernel
                 );
             }
         );
-    }
-
-    /**
-     * Get log channel name
-     *
-     * @return string
-     */
-    private function getLogChannelName(): string
-    {
-        return \sprintf('%sEntryPoint', $this->entryPoint->getEntryPointName());
     }
 }

@@ -15,104 +15,126 @@ namespace Desperado\Framework\Application;
 
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
+use Desperado\Domain\ContextInterface;
+use Desperado\Domain\MessageRouterInterface;
 use Desperado\Domain\Messages\CommandInterface;
 use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
-use Desperado\EventSourcing\AggregateStorageManagerInterface;
-use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
-use Desperado\Framework\Exceptions\ApplicationContextException;
+use Desperado\Framework\StorageManager\StorageManagerRegistry;
 
 /**
  * Base application context
  */
-class AbstractApplicationContext implements DeliveryContextInterface
+abstract class AbstractApplicationContext implements DeliveryContextInterface
 {
     /**
-     * Entry point context
+     * Origin context
      *
-     * @var EntryPointContext
+     * @var DeliveryContextInterface
      */
-    private $entryPointContext;
+    private $originContext;
 
     /**
-     * @param EntryPointContext $entryPointContext
+     * Entry point name
+     *
+     * @var string
      */
-    public function __construct(EntryPointContext $entryPointContext)
-    {
-        $this->entryPointContext = $entryPointContext;
-    }
+    private $entryPointName;
 
     /**
-     * Get manager for specified aggregate
+     * Storage managers registry for aggregates/sagas
      *
-     * @param string $aggregateNamespace
-     *
-     * @return AggregateStorageManagerInterface
+     * @var StorageManagerRegistry
      */
-    public function getAggregateManager(string $aggregateNamespace): AggregateStorageManagerInterface
-    {
-        $manager = $this->entryPointContext
-            ->getStorageManagersRegistry()
-            ->getAggregateManager($aggregateNamespace);
-
-        if(null !== $manager)
-        {
-            return $manager;
-        }
-
-        throw new ApplicationContextException(
-            \sprintf(
-                'The manager for aggregate "%s" was not configured', $aggregateNamespace
-            )
-        );
-    }
+    private $storageManagersRegistry;
 
     /**
-     * Get manager for specified saga
+     * Message router
      *
-     * @param string $sagaNamespace
-     *
-     * @return SagaStorageManagerInterface
+     * @var MessageRouterInterface
      */
-    public function getSagaManager(string $sagaNamespace): SagaStorageManagerInterface
+    private $messageRouter;
+
+    /**
+     * @param DeliveryContextInterface $originContext
+     * @param                          $entryPointName
+     * @param                          $storageManagersRegistry
+     * @param MessageRouterInterface   $messageRouter
+     */
+    public function __construct(
+        DeliveryContextInterface $originContext,
+        string $entryPointName,
+        StorageManagerRegistry $storageManagersRegistry,
+        MessageRouterInterface $messageRouter
+    )
     {
-        $manager = $this->entryPointContext
-            ->getStorageManagersRegistry()
-            ->getSagaManager($sagaNamespace);
-
-        if(null !== $manager)
-        {
-            return $manager;
-        }
-
-        throw new ApplicationContextException(
-            \sprintf(
-                'The manager for saga "%s" was not configured', $sagaNamespace
-            )
-        );
+        $this->originContext = $originContext;
+        $this->entryPointName = $entryPointName;
+        $this->storageManagersRegistry = $storageManagersRegistry;
+        $this->messageRouter = $messageRouter;
     }
 
     /**
      * @inheritdoc
      */
-    public function send(CommandInterface $command, DeliveryOptions $deliveryOptions): void
+    final public function send(CommandInterface $command, DeliveryOptions $deliveryOptions): void
     {
-        $this->entryPointContext->delivery($command, $deliveryOptions);
+        $this->originContext->delivery($command, $deliveryOptions);
     }
 
     /**
      * @inheritdoc
      */
-    public function delivery(MessageInterface $message, DeliveryOptions $deliveryOptions = null): void
+    final public function delivery(MessageInterface $message, DeliveryOptions $deliveryOptions = null): void
     {
-        $this->entryPointContext->delivery($message, $deliveryOptions);
+        $this->originContext->delivery($message, $deliveryOptions);
     }
 
     /**
      * @inheritdoc
      */
-    public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
+    final public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
     {
-        $this->entryPointContext->publish($event, $deliveryOptions);
+        $this->originContext->publish($event, $deliveryOptions);
+    }
+
+    /**
+     * Get origin context
+     *
+     * @return DeliveryContextInterface
+     */
+    final protected function getOriginContext(): DeliveryContextInterface
+    {
+        return $this->originContext;
+    }
+
+    /**
+     * Get entry point name
+     *
+     * @return string
+     */
+    final  protected function getEntryPointName()
+    {
+        return $this->entryPointName;
+    }
+
+    /**
+     * Get storage manager registry
+     *
+     * @return StorageManagerRegistry
+     */
+    final  protected function getStorageManagersRegistry()
+    {
+        return $this->storageManagersRegistry;
+    }
+
+    /**
+     * Get messages router
+     *
+     * @return MessageRouterInterface
+     */
+    final protected function getMessageRouter(): MessageRouterInterface
+    {
+        return $this->messageRouter;
     }
 }

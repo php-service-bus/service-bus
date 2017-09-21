@@ -17,6 +17,7 @@ use Desperado\CQRS\Configuration\AnnotationsExtractor;
 use Desperado\CQRS\MessageBusBuilder;
 use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\EventStorageInterface;
+use Desperado\Domain\MessageBusInterface;
 use Desperado\Domain\MessageRouterInterface;
 use Desperado\Domain\Serializer\MessageSerializerInterface;
 use Desperado\Domain\ServiceInterface;
@@ -110,6 +111,13 @@ abstract class AbstractBootstrap
     private $messageRouter;
 
     /**
+     * Message bus
+     *
+     * @var MessageBusInterface
+     */
+    private $messageBus;
+
+    /**
      * @param string                          $rootDirectoryPath
      * @param string                          $environmentFilePath
      * @param MessageSerializerInterface      $messageSerializer
@@ -144,32 +152,6 @@ abstract class AbstractBootstrap
         {
             $this->initSagaStorage();
         }
-    }
-
-    /**
-     * Create application entry point
-     *
-     * @return EntryPoint
-     */
-    public function createEntryPoint(): EntryPoint
-    {
-        $messageBusBuilder = new MessageBusBuilder(
-            new AnnotationsExtractor(
-                $this->annotationsReader
-            )
-        );
-
-        $this->initModules($messageBusBuilder);
-        $this->initServices($messageBusBuilder);
-
-        return new EntryPoint(
-            $this->entryPointName,
-            $this->environment,
-            $this->messageSerializer,
-            $this->getStorageManagersRegistry(),
-            $messageBusBuilder->build(),
-            $this->messageRouter
-        );
     }
 
     /**
@@ -256,6 +238,37 @@ abstract class AbstractBootstrap
     abstract protected function getServices(): array;
 
     /**
+     * Create application kernel
+     *
+     * @return AbstractKernel
+     */
+    abstract public function createKernel(): AbstractKernel;
+
+    /**
+     * Boot application
+     *
+     * @return EntryPoint
+     */
+    final public function boot(): EntryPoint
+    {
+        $messageBusBuilder = new MessageBusBuilder(
+            new AnnotationsExtractor(
+                $this->annotationsReader
+            )
+        );
+
+        $this->initModules($messageBusBuilder);
+        $this->initServices($messageBusBuilder);
+
+        $this->messageBus = $messageBusBuilder->build();
+
+        $kernel = $this->createKernel();
+        $entryPoint = $this->createEntryPoint($kernel);
+
+        return $entryPoint;
+    }
+
+    /**
      * Get modules list
      *
      * @return ModuleInterface[]
@@ -282,9 +295,14 @@ abstract class AbstractBootstrap
         return $modules;
     }
 
-    private function initMessageRouter(): void
+    /**
+     * Get message bus
+     *
+     * @return MessageBusInterface
+     */
+    final protected function getMessageBus(): MessageBusInterface
     {
-        $this->messageRouter = new MessageRouter();
+        return $this->messageBus;
     }
 
     /**
@@ -292,7 +310,7 @@ abstract class AbstractBootstrap
      *
      * @return string
      */
-    protected function getRootDirectoryPath(): string
+    final protected function getRootDirectoryPath(): string
     {
         return $this->rootDirectoryPath;
     }
@@ -302,7 +320,7 @@ abstract class AbstractBootstrap
      *
      * @return string
      */
-    protected function getEntryPointName(): string
+    final protected function getEntryPointName(): string
     {
         return $this->entryPointName;
     }
@@ -312,9 +330,90 @@ abstract class AbstractBootstrap
      *
      * @return Environment
      */
-    protected function getEnvironment(): Environment
+    final protected function getEnvironment(): Environment
     {
         return $this->environment;
+    }
+
+    /**
+     * Get annotations reader
+     *
+     * @return AnnotationsReaderInterface
+     */
+    final protected function getAnnotationsReader(): AnnotationsReaderInterface
+    {
+        return $this->annotationsReader;
+    }
+
+    /**
+     * Get message serializer
+     *
+     * @return MessageSerializerInterface
+     */
+    final protected function getMessageSerializer(): MessageSerializerInterface
+    {
+        return $this->messageSerializer;
+    }
+
+    /**
+     * Get stored message serializer
+     *
+     * @return MessageSerializerInterface
+     */
+    final protected function getStoredMessageSerializer(): MessageSerializerInterface
+    {
+        return $this->storedMessageSerializer;
+    }
+
+    /**
+     * Get storage managers registry
+     *
+     * @return StorageManagerRegistry
+     */
+    final protected function getStorageManagersRegistry(): StorageManagerRegistry
+    {
+        if(null === $this->storageManagersRegistry)
+        {
+            $this->storageManagersRegistry = new StorageManagerRegistry();
+        }
+
+        return $this->storageManagersRegistry;
+    }
+
+    /**
+     * Get message router
+     *
+     * @return MessageRouterInterface
+     */
+    final protected function getMessageRouter(): MessageRouterInterface
+    {
+        return $this->messageRouter;
+    }
+
+    /**
+     * Init message router
+     *
+     * @return void
+     */
+    private function initMessageRouter(): void
+    {
+        $this->messageRouter = new MessageRouter($this->getMessageRouterConfiguration());
+    }
+
+    /**
+     * Create application entry point
+     *
+     * @param AbstractKernel $kernel
+     *
+     * @return EntryPoint
+     */
+    private function createEntryPoint(AbstractKernel $kernel): EntryPoint
+    {
+        return new EntryPoint(
+            $this->entryPointName,
+            $this->messageSerializer,
+            $kernel
+        );
     }
 
     /**
@@ -527,18 +626,4 @@ abstract class AbstractBootstrap
         }
     }
 
-    /**
-     * Get storage managers registry
-     *
-     * @return StorageManagerRegistry
-     */
-    private function getStorageManagersRegistry(): StorageManagerRegistry
-    {
-        if(null === $this->storageManagersRegistry)
-        {
-            $this->storageManagersRegistry = new StorageManagerRegistry();
-        }
-
-        return $this->storageManagersRegistry;
-    }
 }
