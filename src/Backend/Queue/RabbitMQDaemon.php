@@ -72,7 +72,7 @@ class RabbitMQDaemon implements DaemonInterface
         $this->connect(
             function(Message $incoming, Channel $channel) use ($entryPoint)
             {
-                EventLoop::getLoop()->futureTick(
+                EventLoop::getLoop()->nextTick(
                     function() use ($incoming, $channel, $entryPoint)
                     {
                         $this->handleMessage($entryPoint, $incoming, $channel);

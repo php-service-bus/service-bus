@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application;
 
+use Desperado\CQRS\Context\ContextLoggerInterface;
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
 use Desperado\CQRS\Context\ExecutionOptionsContextInterface;
@@ -31,7 +32,8 @@ use Psr\Log\LogLevel;
 /**
  * Base application context
  */
-abstract class AbstractApplicationContext implements DeliveryContextInterface, ExecutionOptionsContextInterface
+abstract class AbstractApplicationContext
+    implements DeliveryContextInterface, ExecutionOptionsContextInterface, ContextLoggerInterface
 {
     /**
      * Origin context
@@ -69,13 +71,6 @@ abstract class AbstractApplicationContext implements DeliveryContextInterface, E
     private $eventListenerOptions;
 
     /**
-     * Logger callable for command execution context
-     *
-     * @var callable
-     */
-    private $throwableCallableLogger;
-
-    /**
      * @param DeliveryContextInterface $originContext
      * @param string                   $entryPointName
      * @param StorageManagerRegistry   $storageManagersRegistry
@@ -92,60 +87,54 @@ abstract class AbstractApplicationContext implements DeliveryContextInterface, E
     }
 
     /**
-     * Log message in command context
-     *
-     * @param string $message
-     * @param string $level
-     * @param array  $extra
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function logCommandContextMessage(string $message, string $level = LogLevel::DEBUG, array $extra = []): void
+    public function logContextMessage(
+        MessageInterface $message,
+        string $logMessage,
+        string $level = LogLevel::DEBUG,
+        array $extra = []
+    ): void
     {
+        $options = $message instanceof CommandInterface
+            ? $this->commandExecutionOptions
+            : $this->eventListenerOptions;
+
+        $messageChannel = null !== $options
+            ? $options->getLoggerChannel()
+            : '';
+
         ApplicationLogger::log(
-            $this->commandExecutionOptions->getLoggerChannel(),
-            $message,
+            $messageChannel,
+            $logMessage,
             $level,
             $extra
         );
     }
 
     /**
-     * Log Throwable in command context
-     *
-     * @param \Throwable $throwable
-     * @param string     $level
-     * @param array      $extra
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function logCommandContextThrowable(\Throwable $throwable, string $level = LogLevel::ERROR, array $extra = []): void
+    public function getContextThrowableCallableLogger(
+        MessageInterface $message,
+        string $level = LogLevel::ERROR
+    ): callable
     {
-        $this->logCommandContextMessage(
-            ThrowableFormatter::toString($throwable),
-            $level,
-            $extra
-        );
-    }
-
-    /**
-     * Get logger callable for command execution context
-     *
-     * @param string $level
-     *
-     * @return callable
-     */
-    public function getCommandThrowableCallableLogger(string $level = LogLevel::ERROR): callable
-    {
-        if(null === $this->throwableCallableLogger)
+        return function(\Throwable $throwable) use ($message, $level)
         {
-            $this->throwableCallableLogger = function(\Throwable $throwable) use ($level)
-            {
-                $this->logCommandContextThrowable($throwable, $level);
-            };
-        }
+            $this->logContextMessage($message, ThrowableFormatter::toString($throwable), $level);
+        };
+    }
 
-        return $this->throwableCallableLogger;
+    /**
+     * @inheritdoc
+     */
+    public function getThrowableCallableLogger(string $level = LogLevel::ERROR): callable
+    {
+        return function(\Throwable $throwable) use ($level)
+        {
+            ApplicationLogger::info('default', ThrowableFormatter::toString($throwable), $level);
+        };
     }
 
     /**

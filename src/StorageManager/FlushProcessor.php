@@ -16,7 +16,7 @@ namespace Desperado\Framework\StorageManager;
 use Desperado\Domain\ContextInterface;
 use Desperado\EventSourcing\AggregateStorageManagerInterface;
 use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
-use React\Promise\PromiseInterface;
+use EventLoop\EventLoop;
 
 /**
  * Flush storage managers processor
@@ -41,29 +41,26 @@ class FlushProcessor
     /**
      * @param ContextInterface $context
      *
-     * @return PromiseInterface
+     * @return void
      */
-    public function process(ContextInterface $context): PromiseInterface
+    public function process(ContextInterface $context): void
     {
-        $promises = [];
-
-        \array_map(
-            function(AggregateStorageManagerInterface $aggregateStorageManager) use ($context, &$promises)
-            {
-                $promises[] = $aggregateStorageManager->commit($context);
-            },
-            $this->registry->getAggregateManagers()
-        );
-
-        \array_map(
-            function(SagaStorageManagerInterface $sagaStorageManager) use ($context, &$promises)
-            {
-                $promises[] = $sagaStorageManager->commit($context);
-            },
-            $this->registry->getSagaManagers()
-        );
-
-        return \React\Promise\all($promises);
+        $this->commitManagers($this->registry->getAggregateManagers(), $context);
+        $this->commitManagers($this->registry->getSagaManagers(), $context);
     }
 
+    private function commitManagers(array $collection, ContextInterface $context): void
+    {
+        foreach($collection as $storageManager)
+        {
+            /** @var SagaStorageManagerInterface|AggregateStorageManagerInterface $storageManager */
+
+            EventLoop::getLoop()->nextTick(
+                function() use ($storageManager, $context)
+                {
+                    $storageManager->commit($context);
+                }
+            );
+        }
+    }
 }

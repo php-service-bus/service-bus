@@ -18,6 +18,7 @@ use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\MessageBusInterface;
 use Desperado\Domain\MessageRouterInterface;
 use Desperado\Domain\Messages\MessageInterface;
+use Desperado\Domain\ThrowableFormatter;
 use Desperado\Framework\StorageManager\FlushProcessor;
 use Desperado\Framework\StorageManager\StorageManagerRegistry;
 use EventLoop\EventLoop;
@@ -101,8 +102,8 @@ abstract class AbstractKernel
 
         $rejectHandler = $this->getRejectPromiseHandler($message, $applicationContext);
         $flushHandler = $this->getFlushPromiseHandler($applicationContext);
-        $processingHandler = $this->getMessageProcessingPromiseHandler($message);
-        $finishedHandler = $this->getSuccessFinishedMessagePromiseHandler($message);
+        $processingHandler = $this->getMessageProcessingPromiseHandler($message, $applicationContext);
+        $finishedHandler = $this->getSuccessFinishedMessagePromiseHandler($message, $applicationContext);
 
         return $this
             ->getMessageExecutionPromise($message, $applicationContext)
@@ -156,16 +157,20 @@ abstract class AbstractKernel
     /**
      * Get finished message execution handler
      *
-     * @param MessageInterface $message
+     * @param MessageInterface           $message
+     * @param AbstractApplicationContext $context
      *
      * @return callable
      */
-    private function getMessageProcessingPromiseHandler(MessageInterface $message): callable
+    private function getMessageProcessingPromiseHandler(
+        MessageInterface $message,
+        AbstractApplicationContext $context
+    ): callable
     {
-        return function() use ($message)
+        return function() use ($message, $context)
         {
-            ApplicationLogger::debug(
-                'kernel',
+            $context->logContextMessage(
+                $message,
                 \sprintf('Message "%s" is still in process', \get_class($message))
             );
         };
@@ -174,16 +179,20 @@ abstract class AbstractKernel
     /**
      * Get success finished message execution promise handler
      *
-     * @param MessageInterface $message
+     * @param MessageInterface           $message
+     * @param AbstractApplicationContext $context
      *
      * @return callable
      */
-    private function getSuccessFinishedMessagePromiseHandler(MessageInterface $message): callable
+    private function getSuccessFinishedMessagePromiseHandler(
+        MessageInterface $message,
+        AbstractApplicationContext $context
+    ): callable
     {
-        return function() use ($message)
+        return function() use ($message, $context)
         {
-            ApplicationLogger::debug(
-                'kernel',
+            $context->logContextMessage(
+                $message,
                 \sprintf('Message "%s" execution complete', \get_class($message))
             );
         };
@@ -200,7 +209,7 @@ abstract class AbstractKernel
     {
         return function() use ($context)
         {
-            return (new FlushProcessor($this->storageManagersRegistry))->process($context);
+            (new FlushProcessor($this->storageManagersRegistry))->process($context);
         };
     }
 
@@ -216,14 +225,14 @@ abstract class AbstractKernel
     {
         return function(\Throwable $throwable) use ($message, $context)
         {
-            ApplicationLogger::throwable(
-                'kernel',
-                $throwable,
+            $context->logContextMessage(
+                $message,
+                ThrowableFormatter::toString($throwable),
                 LogLevel::ERROR,
                 [
                     'message' => \get_class($message),
-                    'payload' => \json_encode(\get_object_vars($message)),
-                    'context' => \get_class($context)
+                    'context' => \get_class($context),
+                    'payload' => \json_encode(\get_object_vars($message))
                 ]
             );
         };
@@ -248,6 +257,11 @@ abstract class AbstractKernel
                 EventLoop::getLoop()->futureTick(
                     function() use ($resolve, $reject, $message, $context)
                     {
+                        $context->logContextMessage(
+                            $message,
+                            \sprintf('Message "%s" execution started', \get_class($message))
+                        );
+
                         try
                         {
                             $this->messageBus->handle($message, $context);
