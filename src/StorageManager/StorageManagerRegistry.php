@@ -126,7 +126,7 @@ class StorageManagerRegistry
      */
     public function getSagaManager(string $sagaNamespace): ?SagaStorageManagerInterface
     {
-        return true === $this->hasAggregateManager($sagaNamespace)
+        return true === $this->hasSagaManager($sagaNamespace)
             ? $this->sagaManagers[$sagaNamespace]
             : null;
     }
