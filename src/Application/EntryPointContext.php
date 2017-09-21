@@ -65,6 +65,16 @@ class EntryPointContext implements DeliveryContextInterface
     }
 
     /**
+     * Get storage manager registry
+     *
+     * @return StorageManagerRegistry
+     */
+    public function getStorageManagersRegistry(): StorageManagerRegistry
+    {
+        return $this->storageManagersRegistry;
+    }
+
+    /**
      * @inheritdoc
      */
     public function send(CommandInterface $command, DeliveryOptions $deliveryOptions): void
