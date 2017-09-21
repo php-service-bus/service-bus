@@ -15,18 +15,23 @@ namespace Desperado\Framework\Application;
 
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
+use Desperado\CQRS\Context\ExecutionOptionsContextInterface;
+use Desperado\CQRS\ExecutionContextOptions\CommandHandlerOptions;
+use Desperado\CQRS\ExecutionContextOptions\EventListenerOptions;
 use Desperado\Domain\Messages\CommandInterface;
 use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
+use Desperado\Domain\ThrowableFormatter;
 use Desperado\EventSourcing\AggregateStorageManagerInterface;
 use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
 use Desperado\Framework\Exceptions\ApplicationContextException;
 use Desperado\Framework\StorageManager\StorageManagerRegistry;
+use Psr\Log\LogLevel;
 
 /**
  * Base application context
  */
-abstract class AbstractApplicationContext implements DeliveryContextInterface
+abstract class AbstractApplicationContext implements DeliveryContextInterface, ExecutionOptionsContextInterface
 {
     /**
      * Origin context
@@ -50,6 +55,27 @@ abstract class AbstractApplicationContext implements DeliveryContextInterface
     private $storageManagersRegistry;
 
     /**
+     * Execute command options
+     *
+     * @var CommandHandlerOptions
+     */
+    private $commandExecutionOptions;
+
+    /**
+     * Event execution options
+     *
+     * @var EventListenerOptions
+     */
+    private $eventListenerOptions;
+
+    /**
+     * Logger callable for command execution context
+     *
+     * @var callable
+     */
+    private $throwableCallableLogger;
+
+    /**
      * @param DeliveryContextInterface $originContext
      * @param string                   $entryPointName
      * @param StorageManagerRegistry   $storageManagersRegistry
@@ -63,6 +89,63 @@ abstract class AbstractApplicationContext implements DeliveryContextInterface
         $this->originContext = $originContext;
         $this->entryPointName = $entryPointName;
         $this->storageManagersRegistry = $storageManagersRegistry;
+    }
+
+    /**
+     * Log message in command context
+     *
+     * @param string $message
+     * @param string $level
+     * @param array  $extra
+     *
+     * @return void
+     */
+    public function logCommandContextMessage(string $message, string $level = LogLevel::DEBUG, array $extra = []): void
+    {
+        ApplicationLogger::log(
+            $this->commandExecutionOptions->getLoggerChannel(),
+            $message,
+            $level,
+            $extra
+        );
+    }
+
+    /**
+     * Log Throwable in command context
+     *
+     * @param \Throwable $throwable
+     * @param string     $level
+     * @param array      $extra
+     *
+     * @return void
+     */
+    public function logCommandContextThrowable(\Throwable $throwable, string $level = LogLevel::ERROR, array $extra = []): void
+    {
+        $this->logCommandContextMessage(
+            ThrowableFormatter::toString($throwable),
+            $level,
+            $extra
+        );
+    }
+
+    /**
+     * Get logger callable for command execution context
+     *
+     * @param string $level
+     *
+     * @return callable
+     */
+    public function getCommandThrowableCallableLogger(string $level = LogLevel::ERROR): callable
+    {
+        if(null === $this->throwableCallableLogger)
+        {
+            $this->throwableCallableLogger = function(\Throwable $throwable) use ($level)
+            {
+                $this->logCommandContextThrowable($throwable, $level);
+            };
+        }
+
+        return $this->throwableCallableLogger;
     }
 
     /**
@@ -137,6 +220,38 @@ abstract class AbstractApplicationContext implements DeliveryContextInterface
                 'The manager for saga "%s" was not configured', $sagaNamespace
             )
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    final public function appendCommandExecutionOptions(CommandHandlerOptions $options): void
+    {
+        $this->commandExecutionOptions = $options;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    final public function appendEventListenerOptions(EventListenerOptions $options): void
+    {
+        $this->eventListenerOptions = $options;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    final public function getCommandHandlerOptions(): CommandHandlerOptions
+    {
+        return $this->commandExecutionOptions;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEventListenerOptions(): EventListenerOptions
+    {
+        return $this->eventListenerOptions;
     }
 
     /**

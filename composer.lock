@@ -427,12 +427,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "142274cb5eb3125363b5c3a972d2529e2c2d2338"
+                "reference": "c4bc6a872c0660fcf6a021c942e936e97bb7b3e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/142274cb5eb3125363b5c3a972d2529e2c2d2338",
-                "reference": "142274cb5eb3125363b5c3a972d2529e2c2d2338",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/c4bc6a872c0660fcf6a021c942e936e97bb7b3e2",
+                "reference": "c4bc6a872c0660fcf6a021c942e936e97bb7b3e2",
                 "shasum": ""
             },
             "require": {
@@ -446,6 +446,8 @@
                 "symfony/validator": "v3.3.6"
             },
             "suggest": {
+                "doctrine/annotations": "Enabling annotation based constraint mapping",
+                "doctrine/cache": "Enabling annotation based constraint mapping",
                 "monolog/monolog": "Logger implementation",
                 "symfony/validator": "Provides message payload validation behavior"
             },
@@ -477,7 +479,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-09-20 12:18:59"
+            "time": "2017-09-21 10:57:57"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -599,12 +601,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-saga.git",
-                "reference": "e3f6c2c404dc3a6fdc528b39030feef24c4ccb02"
+                "reference": "84d2c5f7bcd261da48921e0da0937ca23b746bf5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/e3f6c2c404dc3a6fdc528b39030feef24c4ccb02",
-                "reference": "e3f6c2c404dc3a6fdc528b39030feef24c4ccb02",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/84d2c5f7bcd261da48921e0da0937ca23b746bf5",
+                "reference": "84d2c5f7bcd261da48921e0da0937ca23b746bf5",
                 "shasum": ""
             },
             "require": {
@@ -651,7 +653,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-09-20 12:03:56"
+            "time": "2017-09-20 15:42:57"
         },
         {
             "name": "mmasiukevich/event-storage-pgsql",
@@ -659,12 +661,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-storage-pgsql.git",
-                "reference": "c8d24c4f9fdcdbbb9ddfe587b5c8f163edd6e81e"
+                "reference": "a032e4f9429b76e180906c2ca680178a07d63293"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-storage-pgsql/zipball/c8d24c4f9fdcdbbb9ddfe587b5c8f163edd6e81e",
-                "reference": "c8d24c4f9fdcdbbb9ddfe587b5c8f163edd6e81e",
+                "url": "https://api.github.com/repos/mmasiukevich/event-storage-pgsql/zipball/a032e4f9429b76e180906c2ca680178a07d63293",
+                "reference": "a032e4f9429b76e180906c2ca680178a07d63293",
                 "shasum": ""
             },
             "require": {
@@ -701,7 +703,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-09-19 07:21:53"
+            "time": "2017-09-20 14:45:32"
         },
         {
             "name": "mmasiukevich/infrastructure",
