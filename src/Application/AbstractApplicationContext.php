@@ -15,7 +15,6 @@ namespace Desperado\Framework\Application;
 
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
-use Desperado\Domain\ContextInterface;
 use Desperado\Domain\MessageRouterInterface;
 use Desperado\Domain\Messages\CommandInterface;
 use Desperado\Domain\Messages\EventInterface;

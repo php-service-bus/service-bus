@@ -31,6 +31,13 @@ use React\Promise\PromiseInterface;
 abstract class AbstractKernel
 {
     /**
+     * Entry point name
+     *
+     * @var string
+     */
+    private $entryPointName;
+
+    /**
      * Application environment
      *
      * @var Environment
@@ -59,18 +66,21 @@ abstract class AbstractKernel
     private $messageBus;
 
     /**
+     * @param string                 $entryPointName
      * @param Environment            $environment
      * @param StorageManagerRegistry $storageManagersRegistry
      * @param MessageRouterInterface $messageRouter
      * @param MessageBusInterface    $messageBus
      */
     public function __construct(
+        string $entryPointName,
         Environment $environment,
         StorageManagerRegistry $storageManagersRegistry,
         MessageRouterInterface $messageRouter,
         MessageBusInterface $messageBus
     )
     {
+        $this->entryPointName = $entryPointName;
         $this->environment = $environment;
         $this->storageManagersRegistry = $storageManagersRegistry;
         $this->messageRouter = $messageRouter;
@@ -112,6 +122,16 @@ abstract class AbstractKernel
         ContextInterface $originContext,
         StorageManagerRegistry $storageManagersRegistry
     ): AbstractApplicationContext;
+
+    /**
+     * Get entry point name
+     *
+     * @return string
+     */
+    final protected function getEntryPointName(): string
+    {
+        return $this->entryPointName;
+    }
 
     /**
      * Get environment
