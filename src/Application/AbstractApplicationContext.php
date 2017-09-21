@@ -15,7 +15,6 @@ namespace Desperado\Framework\Application;
 
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
-use Desperado\Domain\MessageRouterInterface;
 use Desperado\Domain\Messages\CommandInterface;
 use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
@@ -48,29 +47,19 @@ abstract class AbstractApplicationContext implements DeliveryContextInterface
     private $storageManagersRegistry;
 
     /**
-     * Message router
-     *
-     * @var MessageRouterInterface
-     */
-    private $messageRouter;
-
-    /**
      * @param DeliveryContextInterface $originContext
-     * @param                          $entryPointName
-     * @param                          $storageManagersRegistry
-     * @param MessageRouterInterface   $messageRouter
+     * @param string                   $entryPointName
+     * @param StorageManagerRegistry   $storageManagersRegistry
      */
     public function __construct(
         DeliveryContextInterface $originContext,
         string $entryPointName,
-        StorageManagerRegistry $storageManagersRegistry,
-        MessageRouterInterface $messageRouter
+        StorageManagerRegistry $storageManagersRegistry
     )
     {
         $this->originContext = $originContext;
         $this->entryPointName = $entryPointName;
         $this->storageManagersRegistry = $storageManagersRegistry;
-        $this->messageRouter = $messageRouter;
     }
 
     /**
@@ -125,15 +114,5 @@ abstract class AbstractApplicationContext implements DeliveryContextInterface
     final  protected function getStorageManagersRegistry()
     {
         return $this->storageManagersRegistry;
-    }
-
-    /**
-     * Get messages router
-     *
-     * @return MessageRouterInterface
-     */
-    final protected function getMessageRouter(): MessageRouterInterface
-    {
-        return $this->messageRouter;
     }
 }
