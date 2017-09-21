@@ -49,6 +49,14 @@ class FlushProcessor
         $this->commitManagers($this->registry->getSagaManagers(), $context);
     }
 
+    /**
+     * Commit data
+     *
+     * @param array            $collection
+     * @param ContextInterface $context
+     *
+     * @return void
+     */
     private function commitManagers(array $collection, ContextInterface $context): void
     {
         foreach($collection as $storageManager)
