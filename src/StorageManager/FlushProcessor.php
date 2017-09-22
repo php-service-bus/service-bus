@@ -16,7 +16,6 @@ namespace Desperado\Framework\StorageManager;
 use Desperado\Domain\ContextInterface;
 use Desperado\EventSourcing\AggregateStorageManagerInterface;
 use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
-use EventLoop\EventLoop;
 
 /**
  * Flush storage managers processor
@@ -63,12 +62,7 @@ class FlushProcessor
         {
             /** @var SagaStorageManagerInterface|AggregateStorageManagerInterface $storageManager */
 
-            EventLoop::getLoop()->nextTick(
-                function() use ($storageManager, $context)
-                {
-                    $storageManager->commit($context);
-                }
-            );
+            $storageManager->commit($context);
         }
     }
 }

@@ -21,7 +21,6 @@ use Desperado\Domain\Messages\MessageInterface;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\Framework\StorageManager\FlushProcessor;
 use Desperado\Framework\StorageManager\StorageManagerRegistry;
-use EventLoop\EventLoop;
 use Psr\Log\LogLevel;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
@@ -254,26 +253,21 @@ abstract class AbstractKernel
         return new Promise(
             function($resolve, $reject) use ($message, $context)
             {
-                EventLoop::getLoop()->futureTick(
-                    function() use ($resolve, $reject, $message, $context)
-                    {
-                        $context->logContextMessage(
-                            $message,
-                            \sprintf('Message "%s" execution started', \get_class($message))
-                        );
-
-                        try
-                        {
-                            $this->messageBus->handle($message, $context);
-
-                            $resolve();
-                        }
-                        catch(\Throwable $throwable)
-                        {
-                            $reject($throwable);
-                        }
-                    }
+                $context->logContextMessage(
+                    $message,
+                    \sprintf('Message "%s" execution started', \get_class($message))
                 );
+
+                try
+                {
+                    $this->messageBus->handle($message, $context);
+
+                    $resolve();
+                }
+                catch(\Throwable $throwable)
+                {
+                    $reject($throwable);
+                }
             }
         );
     }
