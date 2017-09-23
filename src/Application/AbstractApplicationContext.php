@@ -115,6 +115,19 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
+    public function logContextThrowable(
+        MessageInterface $message,
+        \Throwable $throwable,
+        string $level = LogLevel::ERROR,
+        array $extra = []
+    ): void
+    {
+        $this->logContextMessage($message, ThrowableFormatter::toString($throwable), $level, $extra);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getContextThrowableCallableLogger(
         MessageInterface $message,
         string $level = LogLevel::ERROR
