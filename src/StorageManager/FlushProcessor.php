@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\StorageManager;
 
-use Desperado\CQRS\Context\ContextLoggerInterface;
 use Desperado\Domain\ContextInterface;
 use Desperado\EventSourcing\AggregateStorageManagerInterface;
 use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
