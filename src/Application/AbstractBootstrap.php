@@ -30,6 +30,8 @@ use Desperado\EventSourcing\Saga\SagaRepository;
 use Desperado\EventSourcing\Saga\SagaStorageManager;
 use Desperado\Framework\Exceptions\EntryPointException;
 use Desperado\Framework\MessageRouter;
+use Desperado\Framework\Metrics\MetricsCollectorInterface;
+use Desperado\Framework\Metrics\NullMetricsCollector;
 use Desperado\Framework\Modules\MessageErrorHandlerModule;
 use Desperado\Framework\Modules\MessageValidationModule;
 use Desperado\Framework\Modules\ModuleInterface;
@@ -118,6 +120,13 @@ abstract class AbstractBootstrap
     private $messageBus;
 
     /**
+     * Execution metrics collector
+     *
+     * @var MetricsCollectorInterface
+     */
+    private $executionMetricsCollector;
+
+    /**
      * @param string                          $rootDirectoryPath
      * @param string                          $environmentFilePath
      * @param MessageSerializerInterface      $messageSerializer
@@ -152,6 +161,8 @@ abstract class AbstractBootstrap
         {
             $this->initSagaStorage();
         }
+
+        $this->executionMetricsCollector = $this->getMetricsCollector();
     }
 
     /**
@@ -162,6 +173,16 @@ abstract class AbstractBootstrap
     protected function init(): void
     {
 
+    }
+
+    /**
+     * Get execution metrics collector
+     *
+     * @return MetricsCollectorInterface
+     */
+    protected function getMetricsCollector(): MetricsCollectorInterface
+    {
+        return new NullMetricsCollector();
     }
 
     /**
@@ -388,6 +409,16 @@ abstract class AbstractBootstrap
     final protected function getMessageRouter(): MessageRouterInterface
     {
         return $this->messageRouter;
+    }
+
+    /**
+     * Get execution metrics collector
+     *
+     * @return MetricsCollectorInterface
+     */
+    final protected function getExecutionMetricsCollector(): MetricsCollectorInterface
+    {
+        return $this->executionMetricsCollector;
     }
 
     /**

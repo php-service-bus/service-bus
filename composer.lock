@@ -427,12 +427,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "c29330dadefb5f79a3b32468fb1a75f3207b9b45"
+                "reference": "cbd1271560252b6217832c0d81f6989898036647"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/c29330dadefb5f79a3b32468fb1a75f3207b9b45",
-                "reference": "c29330dadefb5f79a3b32468fb1a75f3207b9b45",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/cbd1271560252b6217832c0d81f6989898036647",
+                "reference": "cbd1271560252b6217832c0d81f6989898036647",
                 "shasum": ""
             },
             "require": {
@@ -479,7 +479,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-09-28 12:24:16"
+            "time": "2017-09-29 09:45:10"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -542,22 +542,22 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "217e600ca45c28e69b576ec8f89b783b421409c4"
+                "reference": "739d44d2db2922a50958c0d06e5f23b5e4bbb5f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/217e600ca45c28e69b576ec8f89b783b421409c4",
-                "reference": "217e600ca45c28e69b576ec8f89b783b421409c4",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/739d44d2db2922a50958c0d06e5f23b5e4bbb5f6",
+                "reference": "739d44d2db2922a50958c0d06e5f23b5e4bbb5f6",
                 "shasum": ""
             },
             "require": {
                 "mmasiukevich/domain-common": "dev-master",
+                "mmasiukevich/event-sourcing-snapshotter": "^0.1",
                 "php": ">=7.1",
                 "react/react": "v0.4.2",
                 "voryx/event-loop": "^2.0"
             },
             "require-dev": {
-                "mmasiukevich/event-sourcing-snapshotter": "^0.1",
                 "mmasiukevich/event-storage-in-memory": "^0.1",
                 "mmasiukevich/message-serializer": "^0.1",
                 "phpunit/phpunit": "^6.2"
@@ -594,7 +594,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-09-28 12:25:17"
+            "time": "2017-09-28 15:25:23"
         },
         {
             "name": "mmasiukevich/event-sourcing-saga",
@@ -602,12 +602,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-saga.git",
-                "reference": "0081c9bea095b31b6503b7f222bf0ee8f251aba5"
+                "reference": "9ece276d21d80d1e96e028efde6e99e677a96c95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/0081c9bea095b31b6503b7f222bf0ee8f251aba5",
-                "reference": "0081c9bea095b31b6503b7f222bf0ee8f251aba5",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/9ece276d21d80d1e96e028efde6e99e677a96c95",
+                "reference": "9ece276d21d80d1e96e028efde6e99e677a96c95",
                 "shasum": ""
             },
             "require": {
@@ -654,7 +654,63 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-09-28 12:13:08"
+            "time": "2017-09-28 12:29:23"
+        },
+        {
+            "name": "mmasiukevich/event-sourcing-snapshotter",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mmasiukevich/event-sourcing-snapshotter.git",
+                "reference": "3e15bcd8756d42947a72d26ff0907a808072766b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-snapshotter/zipball/3e15bcd8756d42947a72d26ff0907a808072766b",
+                "reference": "3e15bcd8756d42947a72d26ff0907a808072766b",
+                "shasum": ""
+            },
+            "require": {
+                "mmasiukevich/domain-common": "^0.1",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.2"
+            },
+            "suggest": {
+                "mmasiukevich/snapshot-storage-in-memory": "Provides InMemory snapshot storage",
+                "mmasiukevich/snapshot-storage-pgsql": "Provides PostgreSQL snapshot storage"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Desperado\\EventSourcing\\Snapshot\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "desperado@minsk-info.ru",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Event Sourcing snapshotter implementation",
+            "keywords": [
+                "Snapshotter",
+                "event sourcing",
+                "snapshot"
+            ],
+            "time": "2017-09-28 12:29:45"
         },
         {
             "name": "mmasiukevich/event-storage-pgsql",
@@ -662,12 +718,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-storage-pgsql.git",
-                "reference": "6b5698b3de88a5ec8a0b5b391f1e77733d14533e"
+                "reference": "47d1791193c64774e7114e7840748f69a3b09120"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-storage-pgsql/zipball/6b5698b3de88a5ec8a0b5b391f1e77733d14533e",
-                "reference": "6b5698b3de88a5ec8a0b5b391f1e77733d14533e",
+                "url": "https://api.github.com/repos/mmasiukevich/event-storage-pgsql/zipball/47d1791193c64774e7114e7840748f69a3b09120",
+                "reference": "47d1791193c64774e7114e7840748f69a3b09120",
                 "shasum": ""
             },
             "require": {
@@ -704,7 +760,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-09-28 12:14:52"
+            "time": "2017-09-28 13:41:25"
         },
         {
             "name": "mmasiukevich/infrastructure",
@@ -712,12 +768,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "4788a8639629b56df1d2bf7a090a0c3f3942f245"
+                "reference": "f071747962ca1f2401051b22d7d5ceb764232be8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/4788a8639629b56df1d2bf7a090a0c3f3942f245",
-                "reference": "4788a8639629b56df1d2bf7a090a0c3f3942f245",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/f071747962ca1f2401051b22d7d5ceb764232be8",
+                "reference": "f071747962ca1f2401051b22d7d5ceb764232be8",
                 "shasum": ""
             },
             "require": {
@@ -762,7 +818,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-09-28 12:16:41"
+            "time": "2017-09-28 12:31:29"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -770,12 +826,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/message-serializer.git",
-                "reference": "762d098926a683b7c8ac07b8278466f68918edf2"
+                "reference": "22fe3412351b2bf7facdeaa3126d73fe14abc19a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/762d098926a683b7c8ac07b8278466f68918edf2",
-                "reference": "762d098926a683b7c8ac07b8278466f68918edf2",
+                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/22fe3412351b2bf7facdeaa3126d73fe14abc19a",
+                "reference": "22fe3412351b2bf7facdeaa3126d73fe14abc19a",
                 "shasum": ""
             },
             "require": {
@@ -812,7 +868,7 @@
                 }
             ],
             "description": "Message serializer",
-            "time": "2017-09-28 12:17:25"
+            "time": "2017-09-28 12:32:07"
         },
         {
             "name": "monolog/monolog",

@@ -19,6 +19,7 @@ use Desperado\Domain\MessageBusInterface;
 use Desperado\Domain\MessageRouterInterface;
 use Desperado\Domain\Messages\MessageInterface;
 use Desperado\Domain\ThrowableFormatter;
+use Desperado\Framework\Metrics\MetricsCollectorInterface;
 use Desperado\Framework\StorageManager\FlushProcessor;
 use Desperado\Framework\StorageManager\StorageManagerRegistry;
 use Psr\Log\LogLevel;
@@ -66,18 +67,27 @@ abstract class AbstractKernel
     private $messageBus;
 
     /**
-     * @param string                 $entryPointName
-     * @param Environment            $environment
-     * @param StorageManagerRegistry $storageManagersRegistry
-     * @param MessageRouterInterface $messageRouter
-     * @param MessageBusInterface    $messageBus
+     * Metrics collector
+     *
+     * @var MetricsCollectorInterface
+     */
+    private $metricsCollector;
+
+    /**
+     * @param string                    $entryPointName
+     * @param Environment               $environment
+     * @param StorageManagerRegistry    $storageManagersRegistry
+     * @param MessageRouterInterface    $messageRouter
+     * @param MessageBusInterface       $messageBus
+     * @param MetricsCollectorInterface $metricsCollector
      */
     public function __construct(
         string $entryPointName,
         Environment $environment,
         StorageManagerRegistry $storageManagersRegistry,
         MessageRouterInterface $messageRouter,
-        MessageBusInterface $messageBus
+        MessageBusInterface $messageBus,
+        MetricsCollectorInterface $metricsCollector
     )
     {
         $this->entryPointName = $entryPointName;
@@ -85,6 +95,7 @@ abstract class AbstractKernel
         $this->storageManagersRegistry = $storageManagersRegistry;
         $this->messageRouter = $messageRouter;
         $this->messageBus = $messageBus;
+        $this->metricsCollector = $metricsCollector;
     }
 
     /**
@@ -188,8 +199,26 @@ abstract class AbstractKernel
         AbstractApplicationContext $context
     ): callable
     {
-        return function() use ($message, $context)
+        return function(array $metricsData) use ($message, $context)
         {
+            [$timeStart, $memoryUsageBytesOnStart, $tags] = $metricsData;
+
+            $workTime = \microtime(true) - $timeStart;
+            $memoryUsage = self::formatBytes(\memory_get_usage() - $memoryUsageBytesOnStart);
+
+            /** Save metrics */
+            $this->metricsCollector->push(
+                MetricsCollectorInterface::TYPE_FLUSH_MEMORY_USAGE,
+                $memoryUsage,
+                $tags
+            );
+
+            $this->metricsCollector->push(
+                MetricsCollectorInterface::TYPE_FLUSH_WORK_TIME,
+                $workTime,
+                $tags
+            );
+
             $context->logContextMessage(
                 $message,
                 \sprintf('Message "%s" execution complete', \get_class($message))
@@ -208,7 +237,13 @@ abstract class AbstractKernel
     {
         return function() use ($context)
         {
+            $tags = ['environment' => (string) $this->environment];
+            $timeStart = \microtime(true);
+            $memoryUsageBytesOnStart = \memory_get_usage();
+
             (new FlushProcessor($this->storageManagersRegistry))->process($context);
+
+            return [$timeStart, $memoryUsageBytesOnStart, $tags];
         };
     }
 
@@ -260,8 +295,31 @@ abstract class AbstractKernel
 
                 try
                 {
+                    $tags = ['message' => \get_class($message), 'environment' => (string) $this->environment];
+
+                    $timeStart = \microtime(true);
+                    $memoryUsageBytesOnStart = \memory_get_usage();
+
+                    /** Handle message */
                     $this->messageBus->handle($message, $context);
 
+                    $workTime = \microtime(true) - $timeStart;
+                    $memoryUsage = self::formatBytes(\memory_get_usage() - $memoryUsageBytesOnStart);
+
+                    /** Save metrics */
+                    $this->metricsCollector->push(
+                        MetricsCollectorInterface::TYPE_HANDLE_MEMORY_USAGE,
+                        $memoryUsage,
+                        $tags
+                    );
+
+                    $this->metricsCollector->push(
+                        MetricsCollectorInterface::TYPE_HANDLE_WORK_TIME,
+                        $workTime,
+                        $tags
+                    );
+
+                    /** Resolve promise */
                     $resolve();
                 }
                 catch(\Throwable $throwable)
@@ -270,5 +328,28 @@ abstract class AbstractKernel
                 }
             }
         );
+    }
+
+    /**
+     * Format bytes
+     *
+     * @param int $bytes
+     *
+     * @return string
+     */
+    private static function formatBytes(int $bytes)
+    {
+        $bytes = (int) $bytes;
+
+        if($bytes > 1024 * 1024)
+        {
+            return \round($bytes / 1024 / 1024, 2) . ' MB';
+        }
+        else if($bytes > 1024)
+        {
+            return \round($bytes / 1024, 2) . ' KB';
+        }
+
+        return $bytes . ' B';
     }
 }
