@@ -68,6 +68,11 @@ class MonologMetricsCollector implements MetricsCollectorInterface
                 {
                     $value = (string) $this->valueFormatter->format(['data' => $value])['data'];
 
+                    if(true === \is_numeric($value))
+                    {
+                        $value = \round($value, 4);
+                    }
+
                     $this->logger->log($this->logLevel, \sprintf('%s: %s', $type, $value), $tags);
 
                     $resolve();
