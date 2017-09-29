@@ -203,7 +203,7 @@ abstract class AbstractKernel
         {
             [$timeStart, $memoryUsageBytesOnStart, $tags] = $metricsData;
 
-            $workTime = \microtime(true) - $timeStart;
+            $workTime = \round(\microtime(true) - $timeStart, 4);
             $memoryUsage = self::formatBytes(\memory_get_usage() - $memoryUsageBytesOnStart);
 
             /** Save metrics */
@@ -303,7 +303,7 @@ abstract class AbstractKernel
                     /** Handle message */
                     $this->messageBus->handle($message, $context);
 
-                    $workTime = \microtime(true) - $timeStart;
+                    $workTime = \round(\microtime(true) - $timeStart, 4);
                     $memoryUsage = self::formatBytes(\memory_get_usage() - $memoryUsageBytesOnStart);
 
                     /** Save metrics */
@@ -339,17 +339,17 @@ abstract class AbstractKernel
      */
     private static function formatBytes(int $bytes)
     {
-        $bytes = (int) $bytes;
+        $bytes = 0 < $bytes ? (int) $bytes : 0;
 
         if($bytes > 1024 * 1024)
         {
-            return \round($bytes / 1024 / 1024, 2) . ' MB';
+            return \round($bytes / 1024 / 1024, 2) . ' mb';
         }
         else if($bytes > 1024)
         {
-            return \round($bytes / 1024, 2) . ' KB';
+            return \round($bytes / 1024, 2) . ' kb';
         }
 
-        return $bytes . ' B';
+        return $bytes . ' b';
     }
 }
