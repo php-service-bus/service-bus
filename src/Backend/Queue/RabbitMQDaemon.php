@@ -69,6 +69,11 @@ class RabbitMQDaemon implements DaemonInterface
      */
     public function run(EntryPointInterface $entryPoint, array $clients = []): void
     {
+        ApplicationLogger::info(
+            self::LOG_CHANNEL_NAME,
+            \sprintf('"%s" created', \get_class(EventLoop::getLoop()))
+        );
+
         $this->connect(
             function(Message $incoming, Channel $channel) use ($entryPoint)
             {
