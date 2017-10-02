@@ -280,11 +280,6 @@ abstract class AbstractKernel
         return new Promise(
             function($resolve, $reject) use ($message, $context)
             {
-                $context->logContextMessage(
-                    $message,
-                    \sprintf('Message "%s" execution started', \get_class($message))
-                );
-
                 try
                 {
                     $tags = ['message' => \get_class($message), 'environment' => (string) $this->environment];
