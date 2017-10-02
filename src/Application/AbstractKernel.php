@@ -179,10 +179,7 @@ abstract class AbstractKernel
     {
         return function() use ($message, $context)
         {
-            $context->logContextMessage(
-                $message,
-                \sprintf('Message "%s" is still in process', \get_class($message))
-            );
+
         };
     }
 
@@ -217,11 +214,6 @@ abstract class AbstractKernel
                 MetricsCollectorInterface::TYPE_FLUSH_WORK_TIME,
                 $workTime,
                 $tags
-            );
-
-            $context->logContextMessage(
-                $message,
-                \sprintf('Message "%s" execution complete', \get_class($message))
             );
         };
     }
