@@ -24,6 +24,8 @@ use React\Promise\PromiseInterface;
  */
 class InfluxDbCollector implements MetricsCollectorInterface
 {
+    private const DEFAULT_BULK_SIZE = 20;
+
     /**
      * Database client
      *
@@ -32,11 +34,27 @@ class InfluxDbCollector implements MetricsCollectorInterface
     private $database;
 
     /**
-     * @param string $connectionDSN
+     * Local points storage
+     *
+     * @var Point[]
      */
-    public function __construct(string $connectionDSN)
+    private $points = [];
+
+    /**
+     * Number of entries required to send to the database
+     *
+     * @var int
+     */
+    private $bulkSize;
+
+    /**
+     * @param string $connectionDSN
+     * @param int    $bulkSize
+     */
+    public function __construct(string $connectionDSN, int $bulkSize = self::DEFAULT_BULK_SIZE)
     {
         $this->database = Client::fromDSN($connectionDSN);
+        $this->bulkSize = $bulkSize;
     }
 
     /**
@@ -49,9 +67,14 @@ class InfluxDbCollector implements MetricsCollectorInterface
             {
                 try
                 {
-                    $point = new Point($type, $value, $tags, $this->getProcessInfo());
+                    $this->points[] = new Point($type, $value, $tags, $this->getProcessInfo());
 
-                    $this->database->writePoints([$point], Database::PRECISION_MILLISECONDS);
+                    if($this->bulkSize <= \count($this->points))
+                    {
+                        $this->database->writePoints($this->points, Database::PRECISION_MILLISECONDS);
+
+                        $this->points = [];
+                    }
 
                     $resolve();
                 }
