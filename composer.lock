@@ -494,12 +494,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "cbd1271560252b6217832c0d81f6989898036647"
+                "reference": "6520ca75192d85194d8c7f49442acf9a267b7ffc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/cbd1271560252b6217832c0d81f6989898036647",
-                "reference": "cbd1271560252b6217832c0d81f6989898036647",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/6520ca75192d85194d8c7f49442acf9a267b7ffc",
+                "reference": "6520ca75192d85194d8c7f49442acf9a267b7ffc",
                 "shasum": ""
             },
             "require": {
@@ -510,12 +510,14 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^6.2",
+                "symfony/debug": "v3.3.6",
                 "symfony/validator": "v3.3.6"
             },
             "suggest": {
                 "doctrine/annotations": "Enabling annotation based constraint mapping",
                 "doctrine/cache": "Enabling annotation based constraint mapping",
                 "monolog/monolog": "Logger implementation",
+                "symfony/debug": "Provides error handler",
                 "symfony/validator": "Provides message payload validation behavior"
             },
             "type": "library",
@@ -546,7 +548,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-09-29 09:45:10"
+            "time": "2017-10-03 07:23:10"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -554,12 +556,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "ce3f83787b156bacc2a60267ed89efc110ab121b"
+                "reference": "17e23e09f04a7eb48613783323b4a381e5f882c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/ce3f83787b156bacc2a60267ed89efc110ab121b",
-                "reference": "ce3f83787b156bacc2a60267ed89efc110ab121b",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/17e23e09f04a7eb48613783323b4a381e5f882c9",
+                "reference": "17e23e09f04a7eb48613783323b4a381e5f882c9",
                 "shasum": ""
             },
             "require": {
@@ -601,7 +603,7 @@
                 "event sourcing",
                 "framework"
             ],
-            "time": "2017-09-28 12:24:43"
+            "time": "2017-10-03 06:34:32"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -609,16 +611,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "739d44d2db2922a50958c0d06e5f23b5e4bbb5f6"
+                "reference": "3732a1b44e55a7546cdaefde88cbf0d37c0dfba9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/739d44d2db2922a50958c0d06e5f23b5e4bbb5f6",
-                "reference": "739d44d2db2922a50958c0d06e5f23b5e4bbb5f6",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/3732a1b44e55a7546cdaefde88cbf0d37c0dfba9",
+                "reference": "3732a1b44e55a7546cdaefde88cbf0d37c0dfba9",
                 "shasum": ""
             },
             "require": {
-                "mmasiukevich/domain-common": "dev-master",
+                "mmasiukevich/domain-common": "^0.1",
                 "mmasiukevich/event-sourcing-snapshotter": "^0.1",
                 "php": ">=7.1",
                 "react/react": "v0.4.2",
@@ -661,7 +663,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-09-28 15:25:23"
+            "time": "2017-10-03 07:29:55"
         },
         {
             "name": "mmasiukevich/event-sourcing-saga",
@@ -669,12 +671,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-saga.git",
-                "reference": "9ece276d21d80d1e96e028efde6e99e677a96c95"
+                "reference": "02ed9a8ad59a8fba7c7d774afe7c10374f23ea00"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/9ece276d21d80d1e96e028efde6e99e677a96c95",
-                "reference": "9ece276d21d80d1e96e028efde6e99e677a96c95",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/02ed9a8ad59a8fba7c7d774afe7c10374f23ea00",
+                "reference": "02ed9a8ad59a8fba7c7d774afe7c10374f23ea00",
                 "shasum": ""
             },
             "require": {
@@ -721,7 +723,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-09-28 12:29:23"
+            "time": "2017-10-03 07:33:48"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -835,12 +837,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "f071747962ca1f2401051b22d7d5ceb764232be8"
+                "reference": "ddacb08fbf47117c4665ae847412a893b7195417"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/f071747962ca1f2401051b22d7d5ceb764232be8",
-                "reference": "f071747962ca1f2401051b22d7d5ceb764232be8",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/ddacb08fbf47117c4665ae847412a893b7195417",
+                "reference": "ddacb08fbf47117c4665ae847412a893b7195417",
                 "shasum": ""
             },
             "require": {
@@ -885,7 +887,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-09-28 12:31:29"
+            "time": "2017-10-03 07:40:41"
         },
         {
             "name": "mmasiukevich/message-serializer",
