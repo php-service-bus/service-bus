@@ -12,7 +12,7 @@ commit_failure_conditions:
 rules:
     php.use_exit_function:
         enabled: true
-        ignore_files: [src/Application/Queue/RabbitMQ/RabbitMqDaemon.php]
+        ignore_files: [src/Backend/Queue/RabbitMQDaemon.php]
     task_fixme_comment:
         enabled: false
     task_todo_comment:
