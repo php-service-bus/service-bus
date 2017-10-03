@@ -112,13 +112,12 @@ abstract class AbstractKernel
 
         $rejectHandler = $this->getRejectPromiseHandler($message, $applicationContext);
         $flushHandler = $this->getFlushPromiseHandler($applicationContext);
-        $processingHandler = $this->getMessageProcessingPromiseHandler($message, $applicationContext);
-        $finishedHandler = $this->getSuccessFinishedMessagePromiseHandler($message, $applicationContext);
+        $finishedHandler = $this->getSuccessFinishedMessagePromiseHandler($applicationContext);
 
         return $this
             ->getMessageExecutionPromise($message, $applicationContext)
             ->then($flushHandler, $rejectHandler)
-            ->then($finishedHandler, $rejectHandler, $processingHandler);
+            ->then($finishedHandler, $rejectHandler);
     }
 
     /**
@@ -155,6 +154,26 @@ abstract class AbstractKernel
     }
 
     /**
+     * Get message router
+     *
+     * @return MessageRouterInterface
+     */
+    final protected function getMessageRouter(): MessageRouterInterface
+    {
+        return $this->messageRouter;
+    }
+
+    /**
+     * Get get metrics collector
+     *
+     * @return MetricsCollectorInterface
+     */
+    final protected function getMetricsCollector(): MetricsCollectorInterface
+    {
+        return $this->metricsCollector;
+    }
+
+    /**
      * Get storage manager registry
      *
      * @return StorageManagerRegistry
@@ -165,38 +184,15 @@ abstract class AbstractKernel
     }
 
     /**
-     * Get finished message execution handler
-     *
-     * @param MessageInterface           $message
-     * @param AbstractApplicationContext $context
-     *
-     * @return callable
-     */
-    private function getMessageProcessingPromiseHandler(
-        MessageInterface $message,
-        AbstractApplicationContext $context
-    ): callable
-    {
-        return function() use ($message, $context)
-        {
-
-        };
-    }
-
-    /**
      * Get success finished message execution promise handler
      *
-     * @param MessageInterface           $message
      * @param AbstractApplicationContext $context
      *
      * @return callable
      */
-    private function getSuccessFinishedMessagePromiseHandler(
-        MessageInterface $message,
-        AbstractApplicationContext $context
-    ): callable
+    private function getSuccessFinishedMessagePromiseHandler(AbstractApplicationContext $context): callable
     {
-        return function(array $metricsData) use ($message, $context)
+        return function(array $metricsData) use ($context)
         {
             [$timeStart, $memoryUsageBytesOnStart, $tags] = $metricsData;
 
