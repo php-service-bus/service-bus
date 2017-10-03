@@ -106,7 +106,7 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
      *
      * @return void
      */
-    private function publishMessage(string $destination, MessageInterface $message)
+    private function publishMessage(string $destination, MessageInterface $message): void
     {
         $destination = '' !== $destination ? $destination : $this->exchange;
         $serializedMessage = $this->serializer->serialize($message);
