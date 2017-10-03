@@ -112,7 +112,7 @@ abstract class AbstractKernel
 
         $rejectHandler = $this->getRejectPromiseHandler($message, $applicationContext);
         $flushHandler = $this->getFlushPromiseHandler($applicationContext);
-        $finishedHandler = $this->getSuccessFinishedMessagePromiseHandler($applicationContext);
+        $finishedHandler = $this->getSuccessFinishedMessagePromiseHandler();
 
         return $this
             ->getMessageExecutionPromise($message, $applicationContext)
@@ -186,13 +186,11 @@ abstract class AbstractKernel
     /**
      * Get success finished message execution promise handler
      *
-     * @param AbstractApplicationContext $context
-     *
      * @return callable
      */
-    private function getSuccessFinishedMessagePromiseHandler(AbstractApplicationContext $context): callable
+    private function getSuccessFinishedMessagePromiseHandler(): callable
     {
-        return function(array $metricsData) use ($context)
+        return function(array $metricsData)
         {
             [$timeStart, $memoryUsageBytesOnStart, $tags] = $metricsData;
 
