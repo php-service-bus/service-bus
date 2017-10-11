@@ -64,13 +64,13 @@ class ApplicationLogger
     /**
      * Log debug message
      *
-     * @param string $channel
-     * @param string $message
-     * @param array  $extra
+     * @param string|null $channel
+     * @param string      $message
+     * @param array       $extra
      *
      * @return void
      */
-    public static function debug(string $channel, string $message, array $extra = []): void
+    public static function debug(?string $channel, string $message, array $extra = []): void
     {
         self::log($channel, $message, LogLevel::DEBUG, $extra);
     }
@@ -78,13 +78,13 @@ class ApplicationLogger
     /**
      * Log info message
      *
-     * @param string $channel
-     * @param string $message
-     * @param array  $extra
+     * @param string|null $channel
+     * @param string      $message
+     * @param array       $extra
      *
      * @return void
      */
-    public static function info(string $channel, string $message, array $extra = []): void
+    public static function info(?string $channel, string $message, array $extra = []): void
     {
         self::log($channel, $message, LogLevel::INFO, $extra);
     }
@@ -92,13 +92,13 @@ class ApplicationLogger
     /**
      * Log error message
      *
-     * @param string $channel
-     * @param string $message
-     * @param array  $extra
+     * @param string|null $channel
+     * @param string      $message
+     * @param array       $extra
      *
      * @return void
      */
-    public static function error(string $channel, string $message, array $extra = []): void
+    public static function error(?string $channel, string $message, array $extra = []): void
     {
         self::log($channel, $message, LogLevel::ERROR, $extra);
     }
@@ -106,13 +106,13 @@ class ApplicationLogger
     /**
      * Log critical message
      *
-     * @param string $channel
-     * @param string $message
-     * @param array  $extra
+     * @param string|null $channel
+     * @param string      $message
+     * @param array       $extra
      *
      * @return void
      */
-    public static function critical(string $channel, string $message, array $extra = []): void
+    public static function critical(?string $channel, string $message, array $extra = []): void
     {
         self::log($channel, $message, LogLevel::CRITICAL, $extra);
     }
