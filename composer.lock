@@ -494,12 +494,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "6520ca75192d85194d8c7f49442acf9a267b7ffc"
+                "reference": "8906df68115b1a6aed71118c0a4377eb6fa3fba5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/6520ca75192d85194d8c7f49442acf9a267b7ffc",
-                "reference": "6520ca75192d85194d8c7f49442acf9a267b7ffc",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/8906df68115b1a6aed71118c0a4377eb6fa3fba5",
+                "reference": "8906df68115b1a6aed71118c0a4377eb6fa3fba5",
                 "shasum": ""
             },
             "require": {
@@ -548,7 +548,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-10-03 07:23:10"
+            "time": "2017-10-11 10:42:25"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -556,12 +556,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "17e23e09f04a7eb48613783323b4a381e5f882c9"
+                "reference": "870e25279c6d87d284a7a0eb6a888d1044a3460d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/17e23e09f04a7eb48613783323b4a381e5f882c9",
-                "reference": "17e23e09f04a7eb48613783323b4a381e5f882c9",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/870e25279c6d87d284a7a0eb6a888d1044a3460d",
+                "reference": "870e25279c6d87d284a7a0eb6a888d1044a3460d",
                 "shasum": ""
             },
             "require": {
@@ -603,7 +603,7 @@
                 "event sourcing",
                 "framework"
             ],
-            "time": "2017-10-03 06:34:32"
+            "time": "2017-10-11 10:46:05"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -671,12 +671,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-saga.git",
-                "reference": "02ed9a8ad59a8fba7c7d774afe7c10374f23ea00"
+                "reference": "678874d5064a0e0442bb53da9e66cceaaa56de31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/02ed9a8ad59a8fba7c7d774afe7c10374f23ea00",
-                "reference": "02ed9a8ad59a8fba7c7d774afe7c10374f23ea00",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/678874d5064a0e0442bb53da9e66cceaaa56de31",
+                "reference": "678874d5064a0e0442bb53da9e66cceaaa56de31",
                 "shasum": ""
             },
             "require": {
@@ -723,7 +723,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-10-03 07:33:48"
+            "time": "2017-10-11 12:12:22"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -1829,7 +1829,7 @@
         },
         {
             "name": "symfony/dotenv",
-            "version": "v3.3.9",
+            "version": "v3.3.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dotenv.git",
@@ -1886,16 +1886,16 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v3.3.9",
+            "version": "v3.3.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "54ca9520a00386f83bca145819ad3b619aaa2485"
+                "reference": "d7ba037e4b8221956ab1e221c73c9e27e05dd423"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/54ca9520a00386f83bca145819ad3b619aaa2485",
-                "reference": "54ca9520a00386f83bca145819ad3b619aaa2485",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/d7ba037e4b8221956ab1e221c73c9e27e05dd423",
+                "reference": "d7ba037e4b8221956ab1e221c73c9e27e05dd423",
                 "shasum": ""
             },
             "require": {
@@ -1945,11 +1945,11 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2017-07-29 21:54:42"
+            "time": "2017-10-02 06:42:24"
         },
         {
             "name": "symfony/inflector",
-            "version": "v3.3.9",
+            "version": "v3.3.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/inflector.git",
@@ -2286,16 +2286,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.3.9",
+            "version": "v3.3.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "1d8c2a99c80862bdc3af94c1781bf70f86bccac0"
+                "reference": "8c7bf1e7d5d6b05a690b715729cb4cd0c0a99c46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/1d8c2a99c80862bdc3af94c1781bf70f86bccac0",
-                "reference": "1d8c2a99c80862bdc3af94c1781bf70f86bccac0",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/8c7bf1e7d5d6b05a690b715729cb4cd0c0a99c46",
+                "reference": "8c7bf1e7d5d6b05a690b715729cb4cd0c0a99c46",
                 "shasum": ""
             },
             "require": {
@@ -2337,7 +2337,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-07-29 21:54:42"
+            "time": "2017-10-05 14:43:42"
         },
         {
             "name": "voryx/event-loop",
@@ -3146,16 +3146,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "6.3.1",
+            "version": "6.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c0ff817b36a827e64bf5f57bc72278150cf30a77"
+                "reference": "b770d8ba7e60295ee91d69d5a5e01ae833cac220"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c0ff817b36a827e64bf5f57bc72278150cf30a77",
-                "reference": "c0ff817b36a827e64bf5f57bc72278150cf30a77",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b770d8ba7e60295ee91d69d5a5e01ae833cac220",
+                "reference": "b770d8ba7e60295ee91d69d5a5e01ae833cac220",
                 "shasum": ""
             },
             "require": {
@@ -3200,7 +3200,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "6.3.x-dev"
+                    "dev-master": "6.4.x-dev"
                 }
             },
             "autoload": {
@@ -3226,7 +3226,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-09-24 07:25:54"
+            "time": "2017-10-07 17:53:53"
         },
         {
             "name": "phpunit/phpunit-mock-objects",

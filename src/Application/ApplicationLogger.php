@@ -120,14 +120,14 @@ class ApplicationLogger
     /**
      * Logging message
      *
-     * @param string $channel
-     * @param string $message
-     * @param string $level
-     * @param array  $extra
+     * @param string|null $channel
+     * @param string      $message
+     * @param string      $level
+     * @param array       $extra
      *
      * @return void
      */
-    public static function log(string $channel, string $message, string $level = LogLevel::DEBUG, array $extra = []): void
+    public static function log(?string $channel, string $message, string $level = LogLevel::DEBUG, array $extra = []): void
     {
         $logger = LoggerRegistry::getLogger($channel);
         $extraData = [
