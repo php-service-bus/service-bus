@@ -671,12 +671,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-saga.git",
-                "reference": "678874d5064a0e0442bb53da9e66cceaaa56de31"
+                "reference": "15e10707b2b0f8ad12ffb43d01493fef6c37aa9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/678874d5064a0e0442bb53da9e66cceaaa56de31",
-                "reference": "678874d5064a0e0442bb53da9e66cceaaa56de31",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/15e10707b2b0f8ad12ffb43d01493fef6c37aa9c",
+                "reference": "15e10707b2b0f8ad12ffb43d01493fef6c37aa9c",
                 "shasum": ""
             },
             "require": {
@@ -723,7 +723,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-10-11 12:12:22"
+            "time": "2017-10-12 11:00:59"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -837,12 +837,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "ddacb08fbf47117c4665ae847412a893b7195417"
+                "reference": "6c2eb012fdae6e9e79d960aa297fcf4795179453"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/ddacb08fbf47117c4665ae847412a893b7195417",
-                "reference": "ddacb08fbf47117c4665ae847412a893b7195417",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/6c2eb012fdae6e9e79d960aa297fcf4795179453",
+                "reference": "6c2eb012fdae6e9e79d960aa297fcf4795179453",
                 "shasum": ""
             },
             "require": {
@@ -887,7 +887,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-10-03 07:40:41"
+            "time": "2017-10-12 09:18:53"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -3146,16 +3146,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "6.4.1",
+            "version": "6.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "b770d8ba7e60295ee91d69d5a5e01ae833cac220"
+                "reference": "ae6e2e062ff55263c7b04374c190aca45872b26a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b770d8ba7e60295ee91d69d5a5e01ae833cac220",
-                "reference": "b770d8ba7e60295ee91d69d5a5e01ae833cac220",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ae6e2e062ff55263c7b04374c190aca45872b26a",
+                "reference": "ae6e2e062ff55263c7b04374c190aca45872b26a",
                 "shasum": ""
             },
             "require": {
@@ -3226,7 +3226,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-10-07 17:53:53"
+            "time": "2017-10-15 06:16:19"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
