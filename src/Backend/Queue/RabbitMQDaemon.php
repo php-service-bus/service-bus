@@ -31,7 +31,7 @@ use React\Promise\RejectedPromise;
  */
 class RabbitMQDaemon implements DaemonInterface
 {
-    protected const MAX_TASK_IN_PROGRESS = 10;
+    protected const MAX_TASK_IN_PROGRESS = 5;
     protected const LOG_CHANNEL_NAME = 'rabbitMq';
 
     /** Exchange types */
