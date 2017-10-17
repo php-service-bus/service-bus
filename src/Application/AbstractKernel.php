@@ -270,6 +270,7 @@ abstract class AbstractKernel
                     /** Handle message */
                     $promise = $this->messageBus->handle($message, $context);
 
+                    /** If null, then task for specified message was not configured */
                     if(null !== $promise)
                     {
                         $promise->then(
