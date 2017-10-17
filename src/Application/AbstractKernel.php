@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application;
 
+use Desperado\CQRS\MessageBus;
 use Desperado\Domain\ContextInterface;
 use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\MessageBusInterface;
@@ -62,7 +63,7 @@ abstract class AbstractKernel
     /**
      * Message bus
      *
-     * @var MessageBusInterface
+     * @var MessageBus
      */
     private $messageBus;
 
@@ -190,24 +191,14 @@ abstract class AbstractKernel
      */
     private function getSuccessFinishedMessagePromiseHandler(): callable
     {
-        return function(array $metricsData)
+        return function(float $timeStart)
         {
-            [$timeStart, $memoryUsageBytesOnStart, $tags] = $metricsData;
-
             $workTime = \microtime(true) - $timeStart;
-            $memoryUsage = self::formatBytes(\memory_get_usage() - $memoryUsageBytesOnStart);
 
             /** Save metrics */
             $this->metricsCollector->push(
-                MetricsCollectorInterface::TYPE_FLUSH_MEMORY_USAGE,
-                $memoryUsage,
-                $tags
-            );
-
-            $this->metricsCollector->push(
                 MetricsCollectorInterface::TYPE_FLUSH_WORK_TIME,
-                $workTime,
-                $tags
+                $workTime
             );
         };
     }
@@ -223,13 +214,11 @@ abstract class AbstractKernel
     {
         return function() use ($context)
         {
-            $tags = ['environment' => (string) $this->environment];
             $timeStart = \microtime(true);
-            $memoryUsageBytesOnStart = \memory_get_usage();
 
             (new FlushProcessor($this->storageManagersRegistry))->process($context);
 
-            return [$timeStart, $memoryUsageBytesOnStart, $tags];
+            return $timeStart;
         };
     }
 
@@ -276,32 +265,35 @@ abstract class AbstractKernel
             {
                 try
                 {
-                    $tags = ['message' => \get_class($message), 'environment' => (string) $this->environment];
-
                     $timeStart = \microtime(true);
-                    $memoryUsageBytesOnStart = \memory_get_usage();
 
                     /** Handle message */
-                    $this->messageBus->handle($message, $context);
+                    $this->messageBus
+                        ->handle($message, $context)
+                        ->then(
+                            function() use ($resolve, $timeStart, $message)
+                            {
+                                try
+                                {
+                                    /** Save metrics */
+                                    $this->metricsCollector->push(
+                                        MetricsCollectorInterface::TYPE_HANDLE_WORK_TIME,
+                                        \microtime(true) - $timeStart,
+                                        ['message' => \get_class($message)]
+                                    );
+                                }
+                                catch(\Throwable $throwable)
+                                {
+                                    unset($throwable);
+                                }
 
-                    $workTime = \microtime(true) - $timeStart;
-                    $memoryUsage = self::formatBytes(\memory_get_usage() - $memoryUsageBytesOnStart);
-
-                    /** Save metrics */
-                    $this->metricsCollector->push(
-                        MetricsCollectorInterface::TYPE_HANDLE_MEMORY_USAGE,
-                        $memoryUsage,
-                        $tags
-                    );
-
-                    $this->metricsCollector->push(
-                        MetricsCollectorInterface::TYPE_HANDLE_WORK_TIME,
-                        $workTime,
-                        $tags
-                    );
-
-                    /** Resolve promise */
-                    $resolve();
+                                $resolve();
+                            },
+                            function(\Throwable $throwable) use ($reject)
+                            {
+                                $reject($throwable);
+                            }
+                        );
                 }
                 catch(\Throwable $throwable)
                 {
@@ -309,28 +301,5 @@ abstract class AbstractKernel
                 }
             }
         );
-    }
-
-    /**
-     * Format bytes
-     *
-     * @param int $bytes
-     *
-     * @return string
-     */
-    private static function formatBytes(int $bytes)
-    {
-        $bytes = 0 < $bytes ? (int) $bytes : 0;
-
-        if($bytes > 1024 * 1024)
-        {
-            return \round($bytes / 1024 / 1024, 2) . ' MB';
-        }
-        else if($bytes > 1024)
-        {
-            return \round($bytes / 1024, 2) . ' kb';
-        }
-
-        return $bytes . ' b';
     }
 }

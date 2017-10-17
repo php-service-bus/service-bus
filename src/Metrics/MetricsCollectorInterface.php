@@ -20,10 +20,7 @@ use React\Promise\PromiseInterface;
  */
 interface MetricsCollectorInterface
 {
-    public const TYPE_HANDLE_MEMORY_USAGE = 'handleMemoryUsage';
     public const TYPE_HANDLE_WORK_TIME = 'handleWorkTime';
-
-    public const TYPE_FLUSH_MEMORY_USAGE = 'flushMemoryUsage';
     public const TYPE_FLUSH_WORK_TIME = 'flushWorkTime';
 
     /**

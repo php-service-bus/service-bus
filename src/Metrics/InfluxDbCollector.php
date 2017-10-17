@@ -24,7 +24,7 @@ use React\Promise\PromiseInterface;
  */
 class InfluxDbCollector implements MetricsCollectorInterface
 {
-    private const DEFAULT_BULK_SIZE = 20;
+    private const DEFAULT_BULK_SIZE = 15;
 
     /**
      * Database client
