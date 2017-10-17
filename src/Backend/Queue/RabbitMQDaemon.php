@@ -23,12 +23,15 @@ use Desperado\Domain\ReceivedMessage;
 use Desperado\Framework\Application\ApplicationLogger;
 use EventLoop\EventLoop;
 use Psr\Log\LogLevel;
+use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
 
 /**
  * RabbitMQ subscriber
  */
 class RabbitMQDaemon implements DaemonInterface
 {
+    protected const MAX_TASK_IN_PROGRESS = 10;
     protected const LOG_CHANNEL_NAME = 'rabbitMq';
 
     /** Exchange types */
@@ -49,6 +52,13 @@ class RabbitMQDaemon implements DaemonInterface
      * @var callable
      */
     private $failPromiseResultHandler;
+
+    /**
+     * In progress task registry
+     *
+     * @var array
+     */
+    private $tasksInProgress = [];
 
     /**
      * @param string $connectionDSN
@@ -80,9 +90,23 @@ class RabbitMQDaemon implements DaemonInterface
                 EventLoop::getLoop()->futureTick(
                     function() use ($incoming, $channel, $entryPoint)
                     {
-                        $this->handleMessage($entryPoint, $incoming, $channel);
+                        $incomeMessageHash = \hash('sha512', $incoming->content);
 
-                        $channel->ack($incoming);
+                        if(self::MAX_TASK_IN_PROGRESS > \count($this->tasksInProgress))
+                        {
+                            $this->tasksInProgress[$incomeMessageHash] = 1;
+
+                            $callable = function() use ($channel, $incoming, $incomeMessageHash)
+                            {
+                                unset($this->tasksInProgress[$incomeMessageHash]);
+
+                                $channel->ack($incoming);
+                            };
+
+                            $this
+                                ->handleMessage($entryPoint, $incoming, $channel)
+                                ->then($callable, $callable);
+                        }
                     }
                 );
             },
@@ -122,9 +146,9 @@ class RabbitMQDaemon implements DaemonInterface
      * @param Message             $incoming
      * @param Channel             $channel
      *
-     * @return void
+     * @return PromiseInterface
      */
-    private function handleMessage(EntryPointInterface $entryPoint, Message $incoming, Channel $channel): void
+    private function handleMessage(EntryPointInterface $entryPoint, Message $incoming, Channel $channel): PromiseInterface
     {
         try
         {
@@ -134,12 +158,14 @@ class RabbitMQDaemon implements DaemonInterface
             /** @var ReceivedMessage $message */
             $receivedMessage = $serializer->unserialize($incoming->content);
 
-            $entryPoint->handleMessage($receivedMessage->message, $context);
+            return $entryPoint->handleMessage($receivedMessage->message, $context);
         }
         catch(\Throwable $throwable)
         {
             ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
         }
+
+        return new RejectedPromise();
     }
 
     /**

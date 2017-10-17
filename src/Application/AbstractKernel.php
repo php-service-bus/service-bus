@@ -200,6 +200,8 @@ abstract class AbstractKernel
                 MetricsCollectorInterface::TYPE_FLUSH_WORK_TIME,
                 $workTime
             );
+
+            return true;
         };
     }
 
@@ -244,6 +246,8 @@ abstract class AbstractKernel
                     'payload' => \json_encode(\get_object_vars($message))
                 ]
             );
+
+            return false;
         };
     }
 

@@ -494,12 +494,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "872f1a00084f189d841053b43886ed668627cc28"
+                "reference": "ac81990f09cb8df56b63bbab4c30b33ee940dcd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/872f1a00084f189d841053b43886ed668627cc28",
-                "reference": "872f1a00084f189d841053b43886ed668627cc28",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/ac81990f09cb8df56b63bbab4c30b33ee940dcd1",
+                "reference": "ac81990f09cb8df56b63bbab4c30b33ee940dcd1",
                 "shasum": ""
             },
             "require": {
@@ -548,7 +548,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-10-17 07:51:11"
+            "time": "2017-10-17 08:00:51"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -556,12 +556,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "09a89e31551f58ca39444056e14971c5acfa8883"
+                "reference": "24954b84cc5ee84834d24d4ae7aef4296ae7f0d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/09a89e31551f58ca39444056e14971c5acfa8883",
-                "reference": "09a89e31551f58ca39444056e14971c5acfa8883",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/24954b84cc5ee84834d24d4ae7aef4296ae7f0d6",
+                "reference": "24954b84cc5ee84834d24d4ae7aef4296ae7f0d6",
                 "shasum": ""
             },
             "require": {
@@ -603,7 +603,7 @@
                 "event sourcing",
                 "framework"
             ],
-            "time": "2017-10-17 07:07:02"
+            "time": "2017-10-17 12:15:17"
         },
         {
             "name": "mmasiukevich/event-sourcing",
