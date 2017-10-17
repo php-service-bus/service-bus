@@ -92,7 +92,7 @@ abstract class AbstractApplicationContext
     public function logContextMessage(
         MessageInterface $message,
         string $logMessage,
-        string $level = LogLevel::DEBUG,
+        string $level = LogLevel::INFO,
         array $extra = []
     ): void
     {
