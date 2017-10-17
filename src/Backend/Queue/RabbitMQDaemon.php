@@ -213,6 +213,21 @@ class RabbitMQDaemon implements DaemonInterface
                     return $client
                         ->channel()
                         ->then(
+                            function(Channel $channel)
+                            {
+                                return $channel
+                                    ->qos(0, 1)
+                                    ->then(
+                                        function() use ($channel)
+                                        {
+                                            return $channel;
+                                        },
+                                        $this->failPromiseResultHandler
+                                    );
+                            },
+                            $this->failPromiseResultHandler
+                        )
+                        ->then(
                             function(Channel $channel) use ($consumeCallable, $entryPoint, $clients)
                             {
                                 $entryPointName = $entryPoint->getEntryPointName();
