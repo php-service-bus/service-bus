@@ -268,9 +268,11 @@ abstract class AbstractKernel
                     $timeStart = \microtime(true);
 
                     /** Handle message */
-                    $this->messageBus
-                        ->handle($message, $context)
-                        ->then(
+                    $promise = $this->messageBus->handle($message, $context);
+
+                    if(null !== $promise)
+                    {
+                        $promise->then(
                             function() use ($resolve, $timeStart, $message)
                             {
                                 try
@@ -294,6 +296,11 @@ abstract class AbstractKernel
                                 $reject($throwable);
                             }
                         );
+                    }
+                    else
+                    {
+                        $resolve();
+                    }
                 }
                 catch(\Throwable $throwable)
                 {
