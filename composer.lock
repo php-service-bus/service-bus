@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e0429951f64066ba9fae580326645cd6",
-    "content-hash": "f6658eb232cf7b4efe4e703fc8179b85",
+    "hash": "8bb326a32c0a6a8ed57760eb8c3b0c3c",
+    "content-hash": "d72bdc276de1de09538f208c14673700",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -556,12 +556,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "24954b84cc5ee84834d24d4ae7aef4296ae7f0d6"
+                "reference": "a335a92bb1736aab550bc84061aa4cd3caa97d56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/24954b84cc5ee84834d24d4ae7aef4296ae7f0d6",
-                "reference": "24954b84cc5ee84834d24d4ae7aef4296ae7f0d6",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/a335a92bb1736aab550bc84061aa4cd3caa97d56",
+                "reference": "a335a92bb1736aab550bc84061aa4cd3caa97d56",
                 "shasum": ""
             },
             "require": {
@@ -603,7 +603,7 @@
                 "event sourcing",
                 "framework"
             ],
-            "time": "2017-10-17 12:15:17"
+            "time": "2017-10-18 11:55:18"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -611,19 +611,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "3732a1b44e55a7546cdaefde88cbf0d37c0dfba9"
+                "reference": "825c45ce860cb440ab76830eb09e4c4b599d5741"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/3732a1b44e55a7546cdaefde88cbf0d37c0dfba9",
-                "reference": "3732a1b44e55a7546cdaefde88cbf0d37c0dfba9",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/825c45ce860cb440ab76830eb09e4c4b599d5741",
+                "reference": "825c45ce860cb440ab76830eb09e4c4b599d5741",
                 "shasum": ""
             },
             "require": {
                 "mmasiukevich/domain-common": "^0.1",
                 "mmasiukevich/event-sourcing-snapshotter": "^0.1",
                 "php": ">=7.1",
-                "react/react": "v0.4.2",
+                "react/promise": "v2.5.1",
                 "voryx/event-loop": "^2.0"
             },
             "require-dev": {
@@ -663,7 +663,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-10-03 07:29:55"
+            "time": "2017-10-18 13:17:09"
         },
         {
             "name": "mmasiukevich/event-sourcing-saga",
@@ -671,12 +671,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-saga.git",
-                "reference": "15e10707b2b0f8ad12ffb43d01493fef6c37aa9c"
+                "reference": "e606b0108700a5b3e0d0ed85cf7a19a1e72f5fb8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/15e10707b2b0f8ad12ffb43d01493fef6c37aa9c",
-                "reference": "15e10707b2b0f8ad12ffb43d01493fef6c37aa9c",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/e606b0108700a5b3e0d0ed85cf7a19a1e72f5fb8",
+                "reference": "e606b0108700a5b3e0d0ed85cf7a19a1e72f5fb8",
                 "shasum": ""
             },
             "require": {
@@ -685,8 +685,7 @@
                 "mmasiukevich/domain-common": "^0.1",
                 "mmasiukevich/infrastructure": "^0.1",
                 "php": ">=7.1",
-                "react/react": "v0.4.2",
-                "voryx/event-loop": "^2.0"
+                "react/promise": "v2.5.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "^6.2"
@@ -723,7 +722,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-10-12 11:00:59"
+            "time": "2017-10-18 13:18:40"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -731,12 +730,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-snapshotter.git",
-                "reference": "3e15bcd8756d42947a72d26ff0907a808072766b"
+                "reference": "a4cc85528622c17c953dfeede8ad1d3290e573e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-snapshotter/zipball/3e15bcd8756d42947a72d26ff0907a808072766b",
-                "reference": "3e15bcd8756d42947a72d26ff0907a808072766b",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-snapshotter/zipball/a4cc85528622c17c953dfeede8ad1d3290e573e5",
+                "reference": "a4cc85528622c17c953dfeede8ad1d3290e573e5",
                 "shasum": ""
             },
             "require": {
@@ -779,7 +778,7 @@
                 "event sourcing",
                 "snapshot"
             ],
-            "time": "2017-09-28 12:29:45"
+            "time": "2017-10-18 13:20:24"
         },
         {
             "name": "mmasiukevich/event-storage-pgsql",
@@ -837,12 +836,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "1abf42b746c8a349fcb3d5fbca5838d368f80f92"
+                "reference": "93b3f952bd94b1b6eebbf939721ada801c6d6811"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/1abf42b746c8a349fcb3d5fbca5838d368f80f92",
-                "reference": "1abf42b746c8a349fcb3d5fbca5838d368f80f92",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/93b3f952bd94b1b6eebbf939721ada801c6d6811",
+                "reference": "93b3f952bd94b1b6eebbf939721ada801c6d6811",
                 "shasum": ""
             },
             "require": {
@@ -850,6 +849,7 @@
                 "guzzlehttp/guzzle": "~6.0",
                 "mmasiukevich/domain-common": "^0.1",
                 "monolog/monolog": "1.23.0",
+                "nikic/fast-route": "v1.2.0",
                 "php": ">=7.1",
                 "symfony/yaml": "^3.3.6",
                 "voryx/event-loop": "^2.0",
@@ -887,7 +887,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-10-16 12:01:40"
+            "time": "2017-10-18 12:26:19"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -1016,6 +1016,49 @@
                 "psr-3"
             ],
             "time": "2017-06-19 01:22:40"
+        },
+        {
+            "name": "nikic/fast-route",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nikic/FastRoute.git",
+                "reference": "b5f95749071c82a8e0f58586987627054400cdf6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nikic/FastRoute/zipball/b5f95749071c82a8e0f58586987627054400cdf6",
+                "reference": "b5f95749071c82a8e0f58586987627054400cdf6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FastRoute\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Nikita Popov",
+                    "email": "nikic@php.net"
+                }
+            ],
+            "description": "Fast request router for PHP",
+            "keywords": [
+                "router",
+                "routing"
+            ],
+            "time": "2017-01-19 11:35:12"
         },
         {
             "name": "paragonie/random_compat",
@@ -2484,6 +2527,58 @@
             ],
             "description": "Asyncronous Guzzle (PSR7) adapter powered by react/http-client",
             "time": "2015-08-09 20:04:16"
+        },
+        {
+            "name": "zendframework/zend-diactoros",
+            "version": "1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/zend-diactoros.git",
+                "reference": "c8664b92a6d5bc229e48b0923486c097e45a7877"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/c8664b92a6d5bc229e48b0923486c097e45a7877",
+                "reference": "c8664b92a6d5bc229e48b0923486c097e45a7877",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6 || ^7.0",
+                "psr/http-message": "^1.0"
+            },
+            "provide": {
+                "psr/http-message-implementation": "1.0"
+            },
+            "require-dev": {
+                "ext-dom": "*",
+                "ext-libxml": "*",
+                "phpunit/phpunit": "^5.7.16 || ^6.0.8",
+                "zendframework/zend-coding-standard": "~1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.6-dev",
+                    "dev-develop": "1.7-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zend\\Diactoros\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "description": "PSR HTTP Message implementations",
+            "homepage": "https://github.com/zendframework/zend-diactoros",
+            "keywords": [
+                "http",
+                "psr",
+                "psr-7"
+            ],
+            "time": "2017-10-12 15:24:51"
         }
     ],
     "packages-dev": [
