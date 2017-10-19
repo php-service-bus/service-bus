@@ -22,6 +22,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Request;
 use React\Http\Response;
 use React\Http\Server as HttpServer;
+use React\Promise\PromiseInterface;
 use React\Socket\Server as SimpleSocketServer;
 use React\Socket\SecureServer as SecuredSocketServer;
 use Desperado\Domain\DaemonInterface;
@@ -130,7 +131,10 @@ class ReactPhpDaemon implements DaemonInterface
 
         if(
             true === $this->isSecured &&
-            false === (true === \file_exists($this->certificateFilePath) && true === \is_readable($this->certificateFilePath))
+            false === (
+                true === \file_exists($this->certificateFilePath) &&
+                true === \is_readable($this->certificateFilePath)
+            )
         )
         {
             throw new \LogicException('Invalid ssl certificate file path');
@@ -186,6 +190,16 @@ class ReactPhpDaemon implements DaemonInterface
 
         $this->socketServer->listen($this->listenPort, $this->listenHost);
 
+        ApplicationLogger::info(
+            self::LOG_CHANNEL_NAME,
+            \sprintf('"%s" created', \get_class(EventLoop::getLoop()))
+        );
+
+        ApplicationLogger::info(
+            self::LOG_CHANNEL_NAME,
+            \sprintf('ReactPHP daemon started. Listen: %s:%s', $this->listenHost, $this->listenPort)
+        );
+
         EventLoop::getLoop()->run();
     }
 
@@ -197,6 +211,8 @@ class ReactPhpDaemon implements DaemonInterface
         $this->socketServer->shutdown();
 
         EventLoop::getLoop()->stop();
+
+        ApplicationLogger::info(self::LOG_CHANNEL_NAME, 'ReactPHP daemon stopped');
     }
 
     /**
@@ -205,7 +221,7 @@ class ReactPhpDaemon implements DaemonInterface
      * @param EntryPointInterface $entryPoint
      * @param Request             $request
      * @param Response            $response
-     * @param string              $bodyContent
+     * @param string|null         $bodyContent
      *
      * @return void
      */
@@ -213,10 +229,10 @@ class ReactPhpDaemon implements DaemonInterface
         EntryPointInterface $entryPoint,
         Request $request,
         Response $response,
-        string $bodyContent = ''
+        ?string $bodyContent = null
     ): void
     {
-        $serverRequest = $this->convertRequestInstance($request, $bodyContent);
+        $serverRequest = $this->convertRequestInstance($request, (string) $bodyContent);
         $serializer = $entryPoint->getMessageSerializer();
 
         $context = new ReactPhpContext(
@@ -230,7 +246,21 @@ class ReactPhpDaemon implements DaemonInterface
 
         $message = QueryMessage::fromRequest($serverRequest);
 
-        $entryPoint->handleMessage($message, $context);
+        $result = $entryPoint->handleMessage($message, $context);
+
+        if($result instanceof PromiseInterface)
+        {
+            $result->then(
+                function() use ($response)
+                {
+                    $response->end();
+                }
+            );
+        }
+        else if(true === \is_scalar($result))
+        {
+            $response->end((string) $result);
+        }
     }
 
     /**
@@ -241,7 +271,7 @@ class ReactPhpDaemon implements DaemonInterface
      *
      * @return ServerRequestInterface
      */
-    protected function convertRequestInstance(Request $request, string $bodyContent = ''): ServerRequestInterface
+    protected function convertRequestInstance(Request $request, string $bodyContent): ServerRequestInterface
     {
         $bodyStream = new Stream('php://temp', 'wb+');
         $bodyStream->write($bodyContent);
