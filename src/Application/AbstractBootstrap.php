@@ -41,6 +41,8 @@ use Desperado\Infrastructure\Bridge\AnnotationsReader\AnnotationsReaderInterface
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
 use Desperado\Infrastructure\Bridge\Logger\Handlers\ColorizeStdOutHandler;
 use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
+use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
+use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use Desperado\MessageSerializer\StoreEventPayloadSerializer;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -127,6 +129,13 @@ abstract class AbstractBootstrap
     private $executionMetricsCollector;
 
     /**
+     * Http requests router
+     *
+     * @var RouterInterface
+     */
+    private $httpRouter;
+
+    /**
      * @param string                          $rootDirectoryPath
      * @param string                          $environmentFilePath
      * @param MessageSerializerInterface      $messageSerializer
@@ -156,6 +165,7 @@ abstract class AbstractBootstrap
 
         $this->initAggregatesStorage();
         $this->initMessageRouter();
+        $this->initHttpRouter();
 
         if(true === \class_exists(AbstractSaga::class))
         {
@@ -272,14 +282,13 @@ abstract class AbstractBootstrap
      */
     final public function boot(): EntryPoint
     {
-        $messageBusBuilder = new MessageBusBuilder(
-            new AnnotationsExtractor(
-                $this->annotationsReader
-            )
-        );
+        $annotationsExtractor = new AnnotationsExtractor($this->annotationsReader);
+        $messageBusBuilder = new MessageBusBuilder($annotationsExtractor, $this->httpRouter);
 
         $this->initModules($messageBusBuilder);
         $this->initServices($messageBusBuilder);
+
+        /** Configure http request (ex. ReactPHP daemon) handlers */
 
         $this->messageBus = $messageBusBuilder->build();
 
@@ -422,6 +431,16 @@ abstract class AbstractBootstrap
     }
 
     /**
+     * Get http request router
+     *
+     * @return RouterInterface
+     */
+    final protected function getHttpRouter(): RouterInterface
+    {
+        return $this->httpRouter;
+    }
+
+    /**
      * Init message router
      *
      * @return void
@@ -429,6 +448,16 @@ abstract class AbstractBootstrap
     private function initMessageRouter(): void
     {
         $this->messageRouter = new MessageRouter($this->getMessageRouterConfiguration());
+    }
+
+    /**
+     * Init http request route
+     *
+     * @return void
+     */
+    private function initHttpRouter(): void
+    {
+        $this->httpRouter = new FastRouterBridge();
     }
 
     /**
