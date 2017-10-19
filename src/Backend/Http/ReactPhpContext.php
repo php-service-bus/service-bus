@@ -72,7 +72,7 @@ class ReactPhpContext implements DeliveryContextInterface
 
     /**
      * @param ServerRequestInterface     $serverRequest
-     * @param Response                  $response
+     * @param Response                   $response
      * @param MessageSerializerInterface $serializer
      * @param PublisherInterface         $publisher
      * @param string                     $entryPointName
@@ -106,13 +106,18 @@ class ReactPhpContext implements DeliveryContextInterface
     }
 
     /**
-     * Get response instance
+     * Write response data
      *
-     * @return Response
+     * @param int         $httpCode
+     * @param null|string $responseBody
+     * @param array       $headers
+     *
+     * @return void
      */
-    public function getResponse(): Response
+    public function writeResponse(int $httpCode, ?string $responseBody = null, array $headers = []): void
     {
-        return $this->response;
+        $this->response->writeHead($httpCode, $headers);
+        $this->response->write($responseBody);
     }
 
     /**
