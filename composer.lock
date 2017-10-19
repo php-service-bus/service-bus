@@ -556,16 +556,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "a335a92bb1736aab550bc84061aa4cd3caa97d56"
+                "reference": "3cdf42745ccd0bfd7d25dde93c034dae5f3798a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/a335a92bb1736aab550bc84061aa4cd3caa97d56",
-                "reference": "a335a92bb1736aab550bc84061aa4cd3caa97d56",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/3cdf42745ccd0bfd7d25dde93c034dae5f3798a2",
+                "reference": "3cdf42745ccd0bfd7d25dde93c034dae5f3798a2",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1",
+                "psr/http-message": "^1.0",
                 "ramsey/uuid": "3.7.0"
             },
             "require-dev": {
@@ -596,14 +597,11 @@
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing implementation domain layer",
             "keywords": [
-                "Async PHP",
                 "command query responsibility segregation",
-                "concurrency",
                 "cqrs",
-                "event sourcing",
-                "framework"
+                "event sourcing"
             ],
-            "time": "2017-10-18 11:55:18"
+            "time": "2017-10-19 09:32:51"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -836,15 +834,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "93b3f952bd94b1b6eebbf939721ada801c6d6811"
+                "reference": "f985137bf2bd73c513230efa41f69c29ea5c07da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/93b3f952bd94b1b6eebbf939721ada801c6d6811",
-                "reference": "93b3f952bd94b1b6eebbf939721ada801c6d6811",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/f985137bf2bd73c513230efa41f69c29ea5c07da",
+                "reference": "f985137bf2bd73c513230efa41f69c29ea5c07da",
                 "shasum": ""
             },
             "require": {
+                "bunny/bunny": "^0.2.4",
                 "doctrine/annotations": "v1.5.0",
                 "guzzlehttp/guzzle": "~6.0",
                 "mmasiukevich/domain-common": "^0.1",
@@ -887,7 +886,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-10-18 12:26:19"
+            "time": "2017-10-19 07:57:01"
         },
         {
             "name": "mmasiukevich/message-serializer",

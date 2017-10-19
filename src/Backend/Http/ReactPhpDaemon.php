@@ -13,9 +13,12 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Backend\Http;
 
+use Desperado\Domain\Messages\QueryMessage;
 use Desperado\Domain\ParameterBag;
 use Desperado\Framework\Application\ApplicationLogger;
+use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
 use EventLoop\EventLoop;
+use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Request;
 use React\Http\Response;
 use React\Http\Server as HttpServer;
@@ -25,6 +28,8 @@ use Desperado\Domain\DaemonInterface;
 use Desperado\Domain\EntryPointInterface;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use React\Socket\ServerInterface;
+use Zend\Diactoros\ServerRequest;
+use Zend\Diactoros\Stream;
 
 /**
  * ReactPHP daemon
@@ -78,6 +83,20 @@ class ReactPhpDaemon implements DaemonInterface
     private $socketServer;
 
     /**
+     * Default routing key
+     *
+     * @var string
+     */
+    private $publisherRoutingKey;
+
+    /**
+     * Publisher
+     *
+     * @var PublisherInterface
+     */
+    private $publisher;
+
+    /**
      * [
      *     'isSecured'       => false,
      *     'certificatePath' => null,
@@ -85,20 +104,29 @@ class ReactPhpDaemon implements DaemonInterface
      *     'port'            => 1337
      * ]
      *
-     * @param array           $daemonOptions
-     * @param RouterInterface $router
+     * @param array              $daemonOptions
+     * @param RouterInterface    $router
+     * @param PublisherInterface $publisher
+     * @param string             $publisherRoutingKey
      *
      * @throws \LogicException
      */
-    public function __construct(array $daemonOptions, RouterInterface $router)
+    public function __construct(
+        array $daemonOptions,
+        RouterInterface $router,
+        PublisherInterface $publisher,
+        string $publisherRoutingKey
+    )
     {
         $parameters = new ParameterBag($daemonOptions);
 
         $this->isSecured = (bool) $parameters->getAsInt('isSecured');
         $this->certificateFilePath = $parameters->getAsString('certificatePath');
         $this->listenHost = $parameters->getAsString('host', self::DEFAULT_HOST);
-        $this->listenPort = $parameters->getAsString('port', self::DEFAULT_PORT);
+        $this->listenPort = $parameters->getAsInt('port', self::DEFAULT_PORT);
         $this->router = $router;
+        $this->publisher = $publisher;
+        $this->publisherRoutingKey = $publisherRoutingKey;
 
         if(
             true === $this->isSecured &&
@@ -131,17 +159,17 @@ class ReactPhpDaemon implements DaemonInterface
 
         $httpServer->on(
             'request',
-            function(Request $request, Response $response)
+            function(Request $request, Response $response) use ($entryPoint)
             {
                 $request->on(
                     'data',
-                    function($data) use ($request, $response)
+                    function($data) use ($request, $response, $entryPoint)
                     {
-                        $this->handleRequest($request, $response, (string) $data);
+                        $this->handleRequest($entryPoint, $request, $response, (string) $data);
                     }
                 );
 
-                $this->handleRequest($request, $response);
+                $this->handleRequest($entryPoint, $request, $response);
             }
         );
 
@@ -174,20 +202,61 @@ class ReactPhpDaemon implements DaemonInterface
     /**
      * Execute request
      *
-     * @param Request  $request
-     * @param Response $response
-     * @param string   $bodyContent
+     * @param EntryPointInterface $entryPoint
+     * @param Request             $request
+     * @param Response            $response
+     * @param string              $bodyContent
      *
      * @return void
      */
     private function handleRequest(
+        EntryPointInterface $entryPoint,
         Request $request,
         Response $response,
         string $bodyContent = ''
     ): void
     {
-        $response->writeHead(200);
-        $response->end('Success');
+        $serverRequest = $this->convertRequestInstance($request, $bodyContent);
+        $serializer = $entryPoint->getMessageSerializer();
+
+        $context = new ReactPhpContext(
+            $serverRequest,
+            $response,
+            $serializer,
+            $this->publisher,
+            $entryPoint->getEntryPointName(),
+            $this->publisherRoutingKey
+        );
+
+        $message = QueryMessage::fromRequest($serverRequest);
+
+        $entryPoint->handleMessage($message, $context);
+    }
+
+    /**
+     * Create psr server request instance
+     *
+     * @param Request $request
+     * @param string  $bodyContent
+     *
+     * @return ServerRequestInterface
+     */
+    protected function convertRequestInstance(Request $request, string $bodyContent = ''): ServerRequestInterface
+    {
+        $bodyStream = new Stream('php://temp', 'wb+');
+        $bodyStream->write($bodyContent);
+        $bodyStream->rewind();
+
+        return new ServerRequest(
+            ['REMOTE_ADDR' => $request->remoteAddress],
+            [],
+            $request->getPath(),
+            $request->getMethod(),
+            $bodyStream,
+            $request->getHeaders(),
+            [],
+            $request->getQuery()
+        );
     }
 
     /**
