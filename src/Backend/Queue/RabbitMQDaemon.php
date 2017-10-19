@@ -32,7 +32,7 @@ use React\Promise\RejectedPromise;
 class RabbitMQDaemon implements DaemonInterface
 {
     protected const MAX_TASK_IN_PROGRESS = 5;
-    protected const LOG_CHANNEL_NAME = 'rabbitMq';
+    protected const LOG_CHANNEL_NAME = 'rabbitMQ';
 
     /** Exchange types */
     protected const EXCHANGE_TYPE_DIRECT = 'direct';

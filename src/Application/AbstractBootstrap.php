@@ -288,8 +288,6 @@ abstract class AbstractBootstrap
         $this->initModules($messageBusBuilder);
         $this->initServices($messageBusBuilder);
 
-        /** Configure http request (ex. ReactPHP daemon) handlers */
-
         $this->messageBus = $messageBusBuilder->build();
 
         $kernel = $this->createKernel();

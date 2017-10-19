@@ -13,10 +13,11 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Backend\Http;
 
-use Desperado\Domain\Messages\QueryMessage;
+use Desperado\Domain\Messages\AbstractQueryMessage;
 use Desperado\Domain\ParameterBag;
 use Desperado\Framework\Application\ApplicationLogger;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
+use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
 use EventLoop\EventLoop;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Request;
@@ -37,7 +38,7 @@ use Zend\Diactoros\Stream;
  */
 class ReactPhpDaemon implements DaemonInterface
 {
-    protected const LOG_CHANNEL_NAME = 'reactPhp';
+    protected const LOG_CHANNEL_NAME = 'reactPHP';
     protected const DEFAULT_HOST = '0.0.0.0:0';
     protected const DEFAULT_PORT = 1337;
 
@@ -232,34 +233,70 @@ class ReactPhpDaemon implements DaemonInterface
         ?string $bodyContent = null
     ): void
     {
-        $serverRequest = $this->convertRequestInstance($request, (string) $bodyContent);
-        $serializer = $entryPoint->getMessageSerializer();
-
-        $context = new ReactPhpContext(
-            $serverRequest,
-            $response,
-            $serializer,
-            $this->publisher,
-            $entryPoint->getEntryPointName(),
-            $this->publisherRoutingKey
-        );
-
-        $message = QueryMessage::fromRequest($serverRequest);
-
-        $result = $entryPoint->handleMessage($message, $context);
-
-        if($result instanceof PromiseInterface)
+        try
         {
-            $result->then(
-                function() use ($response)
-                {
-                    $response->end();
-                }
+            $serverRequest = $this->convertRequestInstance($request, (string) $bodyContent);
+            $serializer = $entryPoint->getMessageSerializer();
+
+            ApplicationLogger::debug(
+                self::LOG_CHANNEL_NAME,
+                \sprintf(
+                    'Received "%s" request with %s',
+                    $serverRequest->getMethod(),
+                    'GET' === $serverRequest->getMethod()
+                        ? \sprintf('"%s" parameters', \http_build_query($serverRequest->getQueryParams()))
+                        : \sprintf('"%s" body', (string) $serverRequest->getBody())
+                )
             );
+
+            $context = new ReactPhpContext(
+                $serverRequest,
+                $response,
+                $serializer,
+                $this->publisher,
+                $entryPoint->getEntryPointName(),
+                $this->publisherRoutingKey
+            );
+
+            $handlerData = $this->router->match($request->getPath(), $request->getMethod());
+            $messageNamespace = $handlerData();
+
+            if(true === \class_exists($messageNamespace))
+            {
+                /** @var AbstractQueryMessage $message */
+                $message = \call_user_func(\sprintf('%s::fromRequest', $messageNamespace), $serverRequest);
+
+                $result = $entryPoint->handleMessage($message, $context);
+
+                if($result instanceof PromiseInterface)
+                {
+                    $result->then(
+                        function() use ($response)
+                        {
+                            $response->end();
+                        }
+                    );
+                }
+                else if(true === \is_scalar($result))
+                {
+                    $response->end((string) $result);
+                }
+            }
+
         }
-        else if(true === \is_scalar($result))
+        catch(HttpException $httpException)
         {
-            $response->end((string) $result);
+            $response->writeHead($httpException->getHttpCode());
+            $response->end($httpException->getResponseMessage());
+        }
+
+        catch
+        (\Throwable $throwable)
+        {
+            ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
+
+            $response->writeHead(500);
+            $response->end('Application error');
         }
     }
 
