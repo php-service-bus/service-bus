@@ -76,7 +76,7 @@ abstract class AbstractApplicationContext
      *
      * @var QueryHandlerOptions
      */
-    private $queryListenerOptions;
+    private $queryHandlerOptions;
 
     /**
      * @param DeliveryContextInterface $originContext
@@ -251,9 +251,9 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
-    final public function appendQueryListenerOptions(QueryHandlerOptions $options): void
+    final public function appendQueryHandlerOptions(QueryHandlerOptions $options): void
     {
-        $this->queryListenerOptions = $options;
+        $this->queryHandlerOptions = $options;
     }
 
     /**
@@ -270,6 +270,14 @@ abstract class AbstractApplicationContext
     public function getEventListenerOptions(): EventListenerOptions
     {
         return $this->eventListenerOptions;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getQueryHandlerOptions(): QueryHandlerOptions
+    {
+        return $this->queryHandlerOptions;
     }
 
     /**
