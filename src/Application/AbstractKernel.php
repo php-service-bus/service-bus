@@ -13,16 +13,19 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application;
 
+use Desperado\CQRS\Context\HttpRequestContextInterface;
 use Desperado\CQRS\MessageBus;
 use Desperado\Domain\ContextInterface;
 use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\MessageBusInterface;
 use Desperado\Domain\MessageRouterInterface;
+use Desperado\Domain\Messages\AbstractQueryMessage;
 use Desperado\Domain\Messages\MessageInterface;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\Framework\Metrics\MetricsCollectorInterface;
 use Desperado\Framework\StorageManager\FlushProcessor;
 use Desperado\Framework\StorageManager\StorageManagerRegistry;
+use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
 use Psr\Log\LogLevel;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
@@ -296,8 +299,21 @@ abstract class AbstractKernel
 
                                 $resolve();
                             },
-                            function(\Throwable $throwable) use ($reject)
+                            function(\Throwable $throwable) use ($message, $reject, $context)
                             {
+                                if(
+                                    $message instanceof AbstractQueryMessage &&
+                                    $throwable instanceof HttpException &&
+                                    $context instanceof HttpRequestContextInterface
+                                )
+                                {
+                                    $context->sendResponse(
+                                        $message,
+                                        $throwable->getHttpCode(),
+                                        $throwable->getResponseMessage()
+                                    );
+                                }
+
                                 $reject($throwable);
                             }
                         );
