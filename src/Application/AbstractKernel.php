@@ -303,14 +303,25 @@ abstract class AbstractKernel
                             {
                                 if(
                                     $message instanceof AbstractQueryMessage &&
-                                    $throwable instanceof HttpException &&
                                     $context instanceof HttpRequestContextInterface
                                 )
                                 {
+                                    /** @var \Throwable|HttpException $throwable */
+
+                                    $isHttpException = $throwable instanceof HttpException;
+                                    $httpResponseCode = true === $isHttpException
+                                        ? $throwable->getHttpCode()
+                                        : 500;
+
+                                    $httpExceptionMessage = true === $isHttpException
+                                        ? $throwable->getResponseMessage()
+                                        : 'Application error';
+
+
                                     $context->sendResponse(
                                         $message,
-                                        $throwable->getHttpCode(),
-                                        $throwable->getResponseMessage()
+                                        $httpResponseCode,
+                                        $httpExceptionMessage
                                     );
                                 }
 

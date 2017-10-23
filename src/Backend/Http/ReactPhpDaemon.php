@@ -18,15 +18,20 @@ use Desperado\Framework\Application\ApplicationLogger;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
 use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
 use EventLoop\EventLoop;
+use function GuzzleHttp\Psr7\parse_query;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Response;
 use React\Http\Server as HttpServer;
+use React\Promise\Deferred;
+use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use React\Socket\Server as SocketServer;
 use Desperado\Domain\DaemonInterface;
 use Desperado\Domain\EntryPointInterface;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use React\Socket\ServerInterface;
+use React\Stream\CompositeStream;
+use React\Stream\ThroughStream;
 
 /**
  * ReactPHP daemon
@@ -136,61 +141,107 @@ class ReactPhpDaemon implements DaemonInterface
         $server = new HttpServer(
             function(ServerRequestInterface $request) use ($entryPoint)
             {
-                try
-                {
-                    $handlerData = $this->router->match($request->getRequestTarget(), $request->getMethod());
-                    $messageNamespace = (string) $handlerData();
-
-                    if('' !== $messageNamespace && true === \class_exists($messageNamespace))
+                $requestPromise = new Promise(
+                    function($resolve, $reject) use ($request, $entryPoint)
                     {
-                        $serializer = $entryPoint->getMessageSerializer();
-
-                        $context = new ReactPhpContext(
-                            $serializer,
-                            $this->publisher,
-                            $entryPoint->getEntryPointName(),
-                            $this->publisherRoutingKey
-                        );
-
-                        /** @var \Desperado\Domain\Messages\AbstractQueryMessage $message */
-                        $message = new $messageNamespace(
-                            (string ) $request->getMethod(),
-                            (string ) $request->getRequestTarget(),
-                            (string) $request->getBody(),
-                            $request->getQueryParams(),
-                            $request->getServerParams(),
-                            $request->getCookieParams(),
-                            $request->getHeaders(),
-                            $request->getUploadedFiles()
-                        );
-
-                        /** @var PromiseInterface $promise */
-                        $promise = $entryPoint->handleMessage($message, $context);
-
-                        $promise->then(
-                            function($parameter)
+                        $requestHandler = function(ServerRequestInterface $request, ?string $requestBody = null) use (
+                            $entryPoint, $resolve, $reject
+                        )
+                        {
+                            try
                             {
-                                die(var_export($parameter));
-                            },
-                            function(\Throwable $throwable)
-                            {
-                                ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
+                                $handlerData = $this->router->match($request->getRequestTarget(), $request->getMethod());
+                                $messageNamespace = (string) $handlerData();
+
+                                if('' !== $messageNamespace && true === \class_exists($messageNamespace))
+                                {
+                                    /** @var \Desperado\Domain\Messages\AbstractQueryMessage $message */
+                                    $message = new $messageNamespace(
+                                        (string ) $request->getMethod(),
+                                        (string ) $request->getRequestTarget(),
+                                        (string ) $requestBody,
+                                        $request->getQueryParams(),
+                                        $request->getServerParams(),
+                                        $request->getCookieParams(),
+                                        $request->getHeaders(),
+                                        $request->getUploadedFiles()
+                                    );
+
+                                    $serializer = $entryPoint->getMessageSerializer();
+
+                                    $context = new ReactPhpContext(
+                                        $serializer,
+                                        $this->publisher,
+                                        $entryPoint->getEntryPointName(),
+                                        $this->publisherRoutingKey
+                                    );
+
+                                    /** @var PromiseInterface $handlerMessagePromise */
+                                    $handlerMessagePromise = $entryPoint->handleMessage($message, $context);
+
+                                    $handlerMessagePromise->then(
+                                        function() use ($resolve, $reject, $context)
+                                        {
+                                            try
+                                            {
+                                                return $resolve($context->getResponse());
+                                            }
+                                            catch(\Throwable $throwable)
+                                            {
+                                                return $reject($throwable);
+                                            }
+                                        },
+                                        function(\Throwable $throwable) use ($reject)
+                                        {
+                                            return $reject($throwable);
+                                        }
+                                    );
+                                }
                             }
-                        );
+                            catch(\Throwable $throwable)
+                            {
+                                return $reject($throwable);
+                            }
+                        };
 
+                        if(true === \in_array($request->getMethod(), ['GET', 'HEAD', 'DELETE']))
+                        {
+                            return $requestHandler($request);
+                        }
+                        else
+                        {
+                            $request->getBody()->on(
+                                'data',
+                                function(string $requestBody) use ($request, $requestHandler)
+                                {
+                                    return $requestHandler($request, $requestBody);
+                                }
+                            );
+                        }
                     }
-                }
-                catch(HttpException $httpException)
-                {
-                    return new Response($httpException->getHttpCode(), [], $httpException->getResponseMessage());
-                }
-                catch(\Throwable $throwable)
-                {
-                    ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
+                );
 
-                    return new Response(500, [], 'Application error');
-                }
+                return $requestPromise
+                    ->then(
+                        function(Response $response)
+                        {
+                            ApplicationLogger::debug(
+                                self::LOG_CHANNEL_NAME,
+                                \sprintf(
+                                    'Render response with http code "%s" and body: "%s"',
+                                    $response->getStatusCode(), (string) $response->getBody()
+                                )
+                            );
 
+                            return $response;
+                        },
+                        function(\Throwable $throwable)
+                        {
+                            ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
+
+                            return new Response(500, 'Application error');
+                        }
+                    );
             }
         );
 
@@ -201,6 +252,14 @@ class ReactPhpDaemon implements DaemonInterface
         );
 
         $server->listen($this->socketServer);
+
+        ApplicationLogger::info(
+            self::LOG_CHANNEL_NAME,
+            \sprintf(
+                'ReactPHP daemon started on %s',
+                \str_replace(['tcp:', 'tls:'], ['http:', 'https:'], $this->socketServer->getAddress())
+            )
+        );
     }
 
     /**
