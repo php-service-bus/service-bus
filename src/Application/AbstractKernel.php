@@ -270,6 +270,11 @@ abstract class AbstractKernel
         return new Promise(
             function($resolve, $reject) use ($message, $context)
             {
+                ApplicationLogger::debug(
+                    'messages',
+                    \sprintf('Execution message "%s" started', \get_class($message))
+                );
+
                 try
                 {
                     $timeStart = \microtime(true);
