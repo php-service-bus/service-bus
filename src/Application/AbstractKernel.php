@@ -281,7 +281,7 @@ abstract class AbstractKernel
                     if(null !== $promise)
                     {
                         $promise->then(
-                            function() use ($resolve, $timeStart, $message)
+                            function($resultData = null) use ($resolve, $timeStart, $message)
                             {
                                 try
                                 {
@@ -297,7 +297,7 @@ abstract class AbstractKernel
                                     unset($throwable);
                                 }
 
-                                $resolve();
+                                return $resolve($resultData);
                             },
                             function(\Throwable $throwable) use ($message, $reject, $context)
                             {
@@ -314,19 +314,21 @@ abstract class AbstractKernel
                                     );
                                 }
 
-                                $reject($throwable);
+                                return $reject($throwable);
                             }
                         );
                     }
                     else
                     {
-                        $resolve();
+                        return $resolve(null);
                     }
                 }
                 catch(\Throwable $throwable)
                 {
-                    $reject($throwable);
+                    return $reject($throwable);
                 }
+
+                return $resolve(null);
             }
         );
     }

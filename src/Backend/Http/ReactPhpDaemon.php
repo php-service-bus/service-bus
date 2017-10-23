@@ -18,12 +18,11 @@ use Desperado\Framework\Application\ApplicationLogger;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
 use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
 use EventLoop\EventLoop;
-use React\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Response;
 use React\Http\Server as HttpServer;
 use React\Promise\PromiseInterface;
-use React\Socket\Server as SimpleSocketServer;
-use React\Socket\SecureServer as SecuredSocketServer;
+use React\Socket\Server as SocketServer;
 use Desperado\Domain\DaemonInterface;
 use Desperado\Domain\EntryPointInterface;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
@@ -35,8 +34,6 @@ use React\Socket\ServerInterface;
 class ReactPhpDaemon implements DaemonInterface
 {
     protected const LOG_CHANNEL_NAME = 'reactPHP';
-    protected const DEFAULT_HOST = '0.0.0.0:0';
-    protected const DEFAULT_PORT = 1337;
 
     /**
      * Is https server
@@ -53,18 +50,11 @@ class ReactPhpDaemon implements DaemonInterface
     private $certificateFilePath;
 
     /**
-     * Listen host
+     * Server host DSN
      *
      * @var string
      */
-    private $listenHost;
-
-    /**
-     * Listen port
-     *
-     * @var int
-     */
-    private $listenPort;
+    private $reactDSN;
 
     /**
      * Http router
@@ -96,10 +86,8 @@ class ReactPhpDaemon implements DaemonInterface
 
     /**
      * [
-     *     'isSecured'       => false,
-     *     'certificatePath' => null,
-     *     'host'            => '127.0.0.1',
-     *     'port'            => 1337
+     *     'dsn'             => 'tls://0.0.0.0:1337',
+     *     'certificatePath' => null
      * ]
      *
      * @param array              $daemonOptions
@@ -117,11 +105,11 @@ class ReactPhpDaemon implements DaemonInterface
     )
     {
         $parameters = new ParameterBag($daemonOptions);
+        $dsnParameters = new ParameterBag(\parse_url($daemonOptions['dsn'] ?? 'tcp://0.0.0.0:1337'));
 
-        $this->isSecured = (bool) $parameters->getAsInt('isSecured');
+        $this->isSecured = 'tls' === $dsnParameters->getAsString('scheme', 'tcp');
         $this->certificateFilePath = $parameters->getAsString('certificatePath');
-        $this->listenHost = $parameters->getAsString('host', self::DEFAULT_HOST);
-        $this->listenPort = $parameters->getAsInt('port', self::DEFAULT_PORT);
+        $this->reactDSN = $parameters->getAsString('dsn');
         $this->router = $router;
         $this->publisher = $publisher;
         $this->publisherRoutingKey = $publisherRoutingKey;
@@ -145,59 +133,74 @@ class ReactPhpDaemon implements DaemonInterface
      */
     public function run(EntryPointInterface $entryPoint, array $clients = []): void
     {
-        $this->socketServer = new SimpleSocketServer(EventLoop::getLoop());
-
-        if(true === $this->isSecured)
-        {
-            $this->socketServer = new SecuredSocketServer(
-                $this->socketServer,
-                EventLoop::getLoop(),
-                ['local_cert' => $this->certificateFilePath]
-            );
-        }
-
-        $httpServer = new HttpServer($this->socketServer);
-
-        $httpServer->on(
-            'request',
-            function(Request $request, Response $response) use ($entryPoint)
+        $server = new HttpServer(
+            function(ServerRequestInterface $request) use ($entryPoint)
             {
-                $request->on(
-                    'data',
-                    function($data) use ($request, $response, $entryPoint)
+                try
+                {
+                    $handlerData = $this->router->match($request->getRequestTarget(), $request->getMethod());
+                    $messageNamespace = (string) $handlerData();
+
+                    if('' !== $messageNamespace && true === \class_exists($messageNamespace))
                     {
-                        $this->handleRequest($entryPoint, $request, $response, (string) $data);
+                        $serializer = $entryPoint->getMessageSerializer();
+
+                        $context = new ReactPhpContext(
+                            $serializer,
+                            $this->publisher,
+                            $entryPoint->getEntryPointName(),
+                            $this->publisherRoutingKey
+                        );
+
+                        /** @var \Desperado\Domain\Messages\AbstractQueryMessage $message */
+                        $message = new $messageNamespace(
+                            (string ) $request->getMethod(),
+                            (string ) $request->getRequestTarget(),
+                            (string) $request->getBody(),
+                            $request->getQueryParams(),
+                            $request->getServerParams(),
+                            $request->getCookieParams(),
+                            $request->getHeaders(),
+                            $request->getUploadedFiles()
+                        );
+
+                        /** @var PromiseInterface $promise */
+                        $promise = $entryPoint->handleMessage($message, $context);
+
+                        $promise->then(
+                            function($parameter)
+                            {
+                                die(var_export($parameter));
+                            },
+                            function(\Throwable $throwable)
+                            {
+                                ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
+                            }
+                        );
+
                     }
-                );
+                }
+                catch(HttpException $httpException)
+                {
+                    return new Response($httpException->getHttpCode(), [], $httpException->getResponseMessage());
+                }
+                catch(\Throwable $throwable)
+                {
+                    ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
 
-                $this->handleRequest($entryPoint, $request, $response);
+                    return new Response(500, [], 'Application error');
+                }
+
             }
         );
 
-        $httpServer->on(
-            'error',
-            function(\Throwable $throwable, Response $response)
-            {
-                ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
-
-                $response->writeHead(500);
-                $response->end('Internal error');
-            }
+        $this->socketServer = new SocketServer(
+            $this->reactDSN,
+            EventLoop::getLoop(),
+            ['local_cert' => $this->certificateFilePath]
         );
 
-        $this->socketServer->listen($this->listenPort, $this->listenHost);
-
-        ApplicationLogger::info(
-            self::LOG_CHANNEL_NAME,
-            \sprintf('"%s" created', \get_class(EventLoop::getLoop()))
-        );
-
-        ApplicationLogger::info(
-            self::LOG_CHANNEL_NAME,
-            \sprintf('ReactPHP daemon started. Listen: %s:%s', $this->listenHost, $this->listenPort)
-        );
-
-        EventLoop::getLoop()->run();
+        $server->listen($this->socketServer);
     }
 
     /**
@@ -205,101 +208,11 @@ class ReactPhpDaemon implements DaemonInterface
      */
     public function stop(): void
     {
-        $this->socketServer->shutdown();
+        $this->socketServer->close();
 
         EventLoop::getLoop()->stop();
 
         ApplicationLogger::info(self::LOG_CHANNEL_NAME, 'ReactPHP daemon stopped');
-    }
-
-    /**
-     * Execute request
-     *
-     * @param EntryPointInterface $entryPoint
-     * @param Request             $request
-     * @param Response            $response
-     * @param string|null         $bodyContent
-     *
-     * @return void
-     */
-    private function handleRequest(
-        EntryPointInterface $entryPoint,
-        Request $request,
-        Response $response,
-        ?string $bodyContent = null
-    ): void
-    {
-        try
-        {
-            $serializer = $entryPoint->getMessageSerializer();
-
-            ApplicationLogger::debug(
-                self::LOG_CHANNEL_NAME,
-                \sprintf(
-                    'Received "%s" request with %s',
-                    $request->getMethod(),
-                    'GET' === $request->getMethod()
-                        ? \sprintf('"%s" parameters', \http_build_query($request->getQuery()))
-                        : \sprintf('"%s" body', (string) $bodyContent)
-                )
-            );
-
-            $context = new ReactPhpContext(
-                $response,
-                $serializer,
-                $this->publisher,
-                $entryPoint->getEntryPointName(),
-                $this->publisherRoutingKey
-            );
-
-            $handlerData = $this->router->match($request->getPath(), $request->getMethod());
-            $messageNamespace = $handlerData();
-
-            if(true === \class_exists($messageNamespace))
-            {
-                /** @var \Desperado\Domain\Messages\AbstractQueryMessage $message */
-                $message = new $messageNamespace(
-                    (string ) $request->getMethod(),
-                    (string ) $request->getPath(),
-                    (string) $bodyContent,
-                    $request->getQuery(),
-                    ['REMOTE_ADDR' => $request->remoteAddress],
-                    [], // @todo: fix me
-                    $request->getHeaders()
-                );
-
-                $result = $entryPoint->handleMessage($message, $context);
-
-                if($result instanceof PromiseInterface)
-                {
-                    $result->then(
-                        function() use ($response)
-                        {
-                            $response->end();
-                        }
-                    );
-                }
-                else if(true === \is_scalar($result))
-                {
-                    $response->end((string) $result);
-                }
-            }
-
-        }
-        catch(HttpException $httpException)
-        {
-            $response->writeHead($httpException->getHttpCode());
-            $response->end($httpException->getResponseMessage());
-        }
-
-        catch
-        (\Throwable $throwable)
-        {
-            ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
-
-            $response->writeHead(500);
-            $response->end('Application error');
-        }
     }
 
     /**

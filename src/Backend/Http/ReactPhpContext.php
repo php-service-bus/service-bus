@@ -20,7 +20,6 @@ use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
 use Desperado\Domain\Serializer\MessageSerializerInterface;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
-use React\Http\Response;
 
 /**
  * ReactPHP execution context
@@ -56,47 +55,22 @@ class ReactPhpContext implements DeliveryContextInterface
     private $routingKey;
 
     /**
-     * Response instance
-     *
-     * @var Response
-     */
-    private $response;
-
-    /**
-     * @param Response                   $response
      * @param MessageSerializerInterface $serializer
      * @param PublisherInterface         $publisher
      * @param string                     $entryPointName
      * @param string                     $routingKey
      */
     public function __construct(
-        Response $response,
         MessageSerializerInterface $serializer,
         PublisherInterface $publisher,
         string $entryPointName,
         string $routingKey
     )
     {
-        $this->response = $response;
         $this->serializer = $serializer;
         $this->publisher = $publisher;
         $this->entryPointName = $entryPointName;
         $this->routingKey = $routingKey;
-    }
-
-    /**
-     * Write response data
-     *
-     * @param int         $httpCode
-     * @param null|string $responseBody
-     * @param array       $headers
-     *
-     * @return void
-     */
-    public function writeResponse(int $httpCode, ?string $responseBody = null, array $headers = []): void
-    {
-        $this->response->writeHead($httpCode, $headers);
-        $this->response->write($responseBody);
     }
 
     /**
