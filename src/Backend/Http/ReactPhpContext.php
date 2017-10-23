@@ -20,7 +20,6 @@ use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
 use Desperado\Domain\Serializer\MessageSerializerInterface;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Response;
 
 /**
@@ -57,13 +56,6 @@ class ReactPhpContext implements DeliveryContextInterface
     private $routingKey;
 
     /**
-     * Http request instance
-     *
-     * @var ServerRequestInterface
-     */
-    private $serverRequest;
-
-    /**
      * Response instance
      *
      * @var Response
@@ -71,7 +63,6 @@ class ReactPhpContext implements DeliveryContextInterface
     private $response;
 
     /**
-     * @param ServerRequestInterface     $serverRequest
      * @param Response                   $response
      * @param MessageSerializerInterface $serializer
      * @param PublisherInterface         $publisher
@@ -79,7 +70,6 @@ class ReactPhpContext implements DeliveryContextInterface
      * @param string                     $routingKey
      */
     public function __construct(
-        ServerRequestInterface $serverRequest,
         Response $response,
         MessageSerializerInterface $serializer,
         PublisherInterface $publisher,
@@ -87,22 +77,11 @@ class ReactPhpContext implements DeliveryContextInterface
         string $routingKey
     )
     {
-        $this->serverRequest = $serverRequest;
         $this->response = $response;
         $this->serializer = $serializer;
         $this->publisher = $publisher;
         $this->entryPointName = $entryPointName;
         $this->routingKey = $routingKey;
-    }
-
-    /**
-     * Get request instance
-     *
-     * @return ServerRequestInterface
-     */
-    public function getServerRequest(): ServerRequestInterface
-    {
-        return $this->serverRequest;
     }
 
     /**

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8bb326a32c0a6a8ed57760eb8c3b0c3c",
-    "content-hash": "d72bdc276de1de09538f208c14673700",
+    "hash": "743035741290842fbc62b05c3704488b",
+    "content-hash": "31362b9c0b9ccba33f58d12d08992a4c",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -494,12 +494,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "5fc9131dd0de68a1d80b19b57b4459a6eceb0f4a"
+                "reference": "89aa1da4d1dda204447ce54be197db4a5d465c31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/5fc9131dd0de68a1d80b19b57b4459a6eceb0f4a",
-                "reference": "5fc9131dd0de68a1d80b19b57b4459a6eceb0f4a",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/89aa1da4d1dda204447ce54be197db4a5d465c31",
+                "reference": "89aa1da4d1dda204447ce54be197db4a5d465c31",
                 "shasum": ""
             },
             "require": {
@@ -548,7 +548,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-10-20 10:33:45"
+            "time": "2017-10-20 14:11:56"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -556,12 +556,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "3f87b20cc49ceb5b973dc0aa5d2414fa8dbc5a5c"
+                "reference": "5430da1fb1d83498772d61b137b61b3c911cab22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/3f87b20cc49ceb5b973dc0aa5d2414fa8dbc5a5c",
-                "reference": "3f87b20cc49ceb5b973dc0aa5d2414fa8dbc5a5c",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/5430da1fb1d83498772d61b137b61b3c911cab22",
+                "reference": "5430da1fb1d83498772d61b137b61b3c911cab22",
                 "shasum": ""
             },
             "require": {
@@ -601,7 +601,7 @@
                 "cqrs",
                 "event sourcing"
             ],
-            "time": "2017-10-19 12:42:07"
+            "time": "2017-10-23 09:04:24"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -2526,58 +2526,6 @@
             ],
             "description": "Asyncronous Guzzle (PSR7) adapter powered by react/http-client",
             "time": "2015-08-09 20:04:16"
-        },
-        {
-            "name": "zendframework/zend-diactoros",
-            "version": "1.6.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/zend-diactoros.git",
-                "reference": "c8664b92a6d5bc229e48b0923486c097e45a7877"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/c8664b92a6d5bc229e48b0923486c097e45a7877",
-                "reference": "c8664b92a6d5bc229e48b0923486c097e45a7877",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.6 || ^7.0",
-                "psr/http-message": "^1.0"
-            },
-            "provide": {
-                "psr/http-message-implementation": "1.0"
-            },
-            "require-dev": {
-                "ext-dom": "*",
-                "ext-libxml": "*",
-                "phpunit/phpunit": "^5.7.16 || ^6.0.8",
-                "zendframework/zend-coding-standard": "~1.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.6-dev",
-                    "dev-develop": "1.7-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Zend\\Diactoros\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-2-Clause"
-            ],
-            "description": "PSR HTTP Message implementations",
-            "homepage": "https://github.com/zendframework/zend-diactoros",
-            "keywords": [
-                "http",
-                "psr",
-                "psr-7"
-            ],
-            "time": "2017-10-12 15:24:51"
         }
     ],
     "packages-dev": [

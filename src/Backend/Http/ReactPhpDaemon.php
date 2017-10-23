@@ -13,13 +13,11 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Backend\Http;
 
-use Desperado\Domain\Messages\AbstractQueryMessage;
 use Desperado\Domain\ParameterBag;
 use Desperado\Framework\Application\ApplicationLogger;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
 use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
 use EventLoop\EventLoop;
-use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Request;
 use React\Http\Response;
 use React\Http\Server as HttpServer;
@@ -30,8 +28,6 @@ use Desperado\Domain\DaemonInterface;
 use Desperado\Domain\EntryPointInterface;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use React\Socket\ServerInterface;
-use Zend\Diactoros\ServerRequest;
-use Zend\Diactoros\Stream;
 
 /**
  * ReactPHP daemon
@@ -235,22 +231,20 @@ class ReactPhpDaemon implements DaemonInterface
     {
         try
         {
-            $serverRequest = $this->convertRequestInstance($request, (string) $bodyContent);
             $serializer = $entryPoint->getMessageSerializer();
 
             ApplicationLogger::debug(
                 self::LOG_CHANNEL_NAME,
                 \sprintf(
                     'Received "%s" request with %s',
-                    $serverRequest->getMethod(),
-                    'GET' === $serverRequest->getMethod()
-                        ? \sprintf('"%s" parameters', \http_build_query($serverRequest->getQueryParams()))
-                        : \sprintf('"%s" body', (string) $serverRequest->getBody())
+                    $request->getMethod(),
+                    'GET' === $request->getMethod()
+                        ? \sprintf('"%s" parameters', \http_build_query($request->getQuery()))
+                        : \sprintf('"%s" body', (string) $bodyContent)
                 )
             );
 
             $context = new ReactPhpContext(
-                $serverRequest,
                 $response,
                 $serializer,
                 $this->publisher,
@@ -263,8 +257,16 @@ class ReactPhpDaemon implements DaemonInterface
 
             if(true === \class_exists($messageNamespace))
             {
-                /** @var AbstractQueryMessage $message */
-                $message = \call_user_func(\sprintf('%s::fromRequest', $messageNamespace), $serverRequest);
+                /** @var \Desperado\Domain\Messages\AbstractQueryMessage $message */
+                $message = new $messageNamespace(
+                    (string ) $request->getMethod(),
+                    (string ) $request->getPath(),
+                    (string) $bodyContent,
+                    $request->getQuery(),
+                    ['REMOTE_ADDR' => $request->remoteAddress],
+                    [], // @todo: fix me
+                    $request->getHeaders()
+                );
 
                 $result = $entryPoint->handleMessage($message, $context);
 
@@ -298,32 +300,6 @@ class ReactPhpDaemon implements DaemonInterface
             $response->writeHead(500);
             $response->end('Application error');
         }
-    }
-
-    /**
-     * Create psr server request instance
-     *
-     * @param Request $request
-     * @param string  $bodyContent
-     *
-     * @return ServerRequestInterface
-     */
-    protected function convertRequestInstance(Request $request, string $bodyContent): ServerRequestInterface
-    {
-        $bodyStream = new Stream('php://temp', 'wb+');
-        $bodyStream->write($bodyContent);
-        $bodyStream->rewind();
-
-        return new ServerRequest(
-            ['REMOTE_ADDR' => $request->remoteAddress],
-            [],
-            $request->getPath(),
-            $request->getMethod(),
-            $bodyStream,
-            $request->getHeaders(),
-            [],
-            $request->getQuery()
-        );
     }
 
     /**
