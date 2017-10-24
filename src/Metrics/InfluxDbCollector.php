@@ -110,20 +110,24 @@ class InfluxDbCollector implements MetricsCollectorInterface
                             $this->endpointUrl, $requestBody, $this->requestHeaders
                         );
 
-                        $this->httpClient
-                            ->post($httpRequestData)
-                            ->then(
-                                function() use ($resolve)
-                                {
-                                    $this->entriesBuffer = [];
+                        if($this->bulkSize <= \count($this->entriesBuffer))
+                        {
+                            $this->entriesBuffer = [];
 
-                                    return $resolve();
-                                },
-                                function(\Throwable $throwable) use ($reject)
-                                {
-                                    return $reject($throwable);
-                                }
-                            );
+                            $this->httpClient
+                                ->post($httpRequestData)
+                                ->then(
+                                    function() use ($resolve)
+                                    {
+                                        return $resolve();
+                                    },
+                                    function(\Throwable $throwable) use ($reject)
+                                    {
+                                        return $reject($throwable);
+                                    }
+                                );
+                        }
+
                     }
                     catch(\Throwable $throwable)
                     {
