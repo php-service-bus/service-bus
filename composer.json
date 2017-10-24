@@ -39,7 +39,7 @@
     "mmasiukevich/domain-common": "^0.1",
     "mmasiukevich/cqrs": "^0.1",
     "bunny/bunny": "^0.2.4",
-    "symfony/dotenv": "^3.3.6",
+    "symfony/dotenv": "^3.3.10",
     "react/http": "v0.7.4"
   },
   "require-dev": {
