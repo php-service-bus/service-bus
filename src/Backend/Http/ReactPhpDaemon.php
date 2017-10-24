@@ -16,13 +16,10 @@ namespace Desperado\Framework\Backend\Http;
 use Desperado\Domain\ParameterBag;
 use Desperado\Framework\Application\ApplicationLogger;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
-use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
 use EventLoop\EventLoop;
-use function GuzzleHttp\Psr7\parse_query;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Response;
 use React\Http\Server as HttpServer;
-use React\Promise\Deferred;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use React\Socket\Server as SocketServer;
@@ -30,8 +27,6 @@ use Desperado\Domain\DaemonInterface;
 use Desperado\Domain\EntryPointInterface;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use React\Socket\ServerInterface;
-use React\Stream\CompositeStream;
-use React\Stream\ThroughStream;
 
 /**
  * ReactPHP daemon

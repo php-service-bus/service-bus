@@ -15,7 +15,6 @@ namespace Desperado\Framework\Backend\Http;
 
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
-use Desperado\Domain\Messages\AbstractQueryMessage;
 use Desperado\Domain\Messages\CommandInterface;
 use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
