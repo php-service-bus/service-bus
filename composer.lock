@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e1faa2739bffa8736745567f0c19555d",
-    "content-hash": "cf9e49a999c5b9ff947b14cbe93e9041",
+    "hash": "d9a000e376c7ad41998e221c9d8d39a1",
+    "content-hash": "f27befb5e9474c5c75449712f0d61b65",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -69,6 +69,171 @@
                 "reactphp"
             ],
             "time": "2016-09-13 18:57:54"
+        },
+        {
+            "name": "clue/buzz-react",
+            "version": "v2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/php-buzz-react.git",
+                "reference": "3aadd4636448765b242b5c56fb02196e6c63dc06"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/php-buzz-react/zipball/3aadd4636448765b242b5c56fb02196e6c63dc06",
+                "reference": "3aadd4636448765b242b5c56fb02196e6c63dc06",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4",
+                "psr/http-message": "^1.0",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3",
+                "react/http-client": "^0.5.6",
+                "react/promise": "^2.2.1",
+                "react/promise-stream": "^0.1.1",
+                "react/socket": "^1.0 || ^0.8.4",
+                "react/stream": "^1.0 || ^0.7",
+                "ringcentral/psr7": "^1.2"
+            },
+            "require-dev": {
+                "clue/block-react": "^1.0",
+                "clue/socks-react": "^0.8",
+                "phpunit/phpunit": "^4.5",
+                "react/http": "^0.7.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Clue\\React\\Buzz\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@lueck.tv"
+                }
+            ],
+            "description": "Simple, async PSR-7 HTTP client for concurrently processing any number of HTTP requests, built on top of ReactPHP",
+            "homepage": "https://github.com/clue/php-buzz-react",
+            "keywords": [
+                "async",
+                "http",
+                "http client",
+                "psr-7",
+                "reactphp"
+            ],
+            "time": "2017-09-17 17:16:22"
+        },
+        {
+            "name": "clue/http-proxy-react",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/php-http-proxy-react.git",
+                "reference": "06bc84cda43c724edc5b5a19f61452e8094ba99d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/php-http-proxy-react/zipball/06bc84cda43c724edc5b5a19f61452e8094ba99d",
+                "reference": "06bc84cda43c724edc5b5a19f61452e8094ba99d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "react/promise": " ^2.1 || ^1.2.1",
+                "react/socket": "^1.0 || ^0.8 || ^0.7.1",
+                "ringcentral/psr7": "^1.2"
+            },
+            "require-dev": {
+                "clue/block-react": "^1.1",
+                "phpunit/phpunit": "^5.0 || ^4.8",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Clue\\React\\HttpProxy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@lueck.tv"
+                }
+            ],
+            "description": "Async HTTP CONNECT proxy connector, use any TCP/IP protocol through an HTTP proxy server, built on top of ReactPHP",
+            "homepage": "https://github.com/clue/php-http-proxy-react",
+            "keywords": [
+                "async",
+                "connect",
+                "http",
+                "proxy",
+                "reactphp"
+            ],
+            "time": "2017-08-30 06:47:01"
+        },
+        {
+            "name": "clue/socks-react",
+            "version": "v0.8.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/php-socks-react.git",
+                "reference": "4ebbec53c44fdfcdac98ce195d9219593ec5feb5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/php-socks-react/zipball/4ebbec53c44fdfcdac98ce195d9219593ec5feb5",
+                "reference": "4ebbec53c44fdfcdac98ce195d9219593ec5feb5",
+                "shasum": ""
+            },
+            "require": {
+                "evenement/evenement": "~3.0|~1.0|~2.0",
+                "php": ">=5.3",
+                "react/promise": "^2.1 || ^1.2",
+                "react/socket": "^1.0 || ^0.8 || ^0.7"
+            },
+            "require-dev": {
+                "clue/block-react": "^1.1",
+                "clue/connection-manager-extra": "^1.0 || ^0.7",
+                "phpunit/phpunit": "^5.0 || ^4.8",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Clue\\React\\Socks\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@lueck.tv"
+                }
+            ],
+            "description": "Async SOCKS4, SOCKS4a and SOCKS5 proxy client and server implementation, built on top of ReactPHP",
+            "homepage": "https://github.com/clue/php-socks-react",
+            "keywords": [
+                "async",
+                "proxy",
+                "reactphp",
+                "socks client",
+                "socks protocol",
+                "socks server",
+                "tcp tunnel"
+            ],
+            "time": "2017-09-17 15:09:14"
         },
         {
             "name": "doctrine/annotations",
@@ -234,51 +399,6 @@
                 "event-emitter"
             ],
             "time": "2017-07-23 21:35:13"
-        },
-        {
-            "name": "guzzle/parser",
-            "version": "v3.9.2",
-            "target-dir": "Guzzle/Parser",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Guzzle3/parser.git",
-                "reference": "6874d171318a8e93eb6d224cf85e4678490b625c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Guzzle3/parser/zipball/6874d171318a8e93eb6d224cf85e4678490b625c",
-                "reference": "6874d171318a8e93eb6d224cf85e4678490b625c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.7-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Guzzle\\Parser": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Interchangeable parsers used by Guzzle",
-            "homepage": "http://guzzlephp.org/",
-            "keywords": [
-                "URI Template",
-                "cookie",
-                "http",
-                "message",
-                "url"
-            ],
-            "abandoned": "guzzle/guzzle",
-            "time": "2014-02-05 18:29:46"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -460,73 +580,6 @@
                 "url"
             ],
             "time": "2017-03-20 17:10:46"
-        },
-        {
-            "name": "influxdb/influxdb-php",
-            "version": "1.14.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/influxdata/influxdb-php.git",
-                "reference": "c938497f4c95f636c872af148ae311102953a317"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/influxdata/influxdb-php/zipball/c938497f4c95f636c872af148ae311102953a317",
-                "reference": "c938497f4c95f636c872af148ae311102953a317",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "6.*",
-                "php": "^5.5 | ^7.0",
-                "symfony/event-dispatcher": "2.*|3.*"
-            },
-            "require-dev": {
-                "codeclimate/php-test-reporter": "0.*",
-                "phpunit/phpunit": "^4.0",
-                "symfony/config": "~2.8",
-                "symfony/console": "~2.8",
-                "symfony/filesystem": "~2.8",
-                "symfony/stopwatch": "~2.8",
-                "symfony/yaml": "~2.8"
-            },
-            "suggest": {
-                "stefanotorresi/influxdb-php-async": "An asyncronous client for InfluxDB, implemented via ReactPHP."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "InfluxDB\\": "src/InfluxDB"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Gianluca Arbezzano",
-                    "email": "gianarb92@gmail.com"
-                },
-                {
-                    "name": "Daniel Martinez",
-                    "email": "danimartcas@hotmail.com"
-                },
-                {
-                    "name": "Stephen Hoogendijk",
-                    "email": "stephen@tca0.nl"
-                }
-            ],
-            "description": "InfluxDB client library for PHP",
-            "keywords": [
-                "client",
-                "influxdata",
-                "influxdb",
-                "influxdb class",
-                "influxdb client",
-                "influxdb library",
-                "time series"
-            ],
-            "time": "2017-05-17 13:42:08"
         },
         {
             "name": "mmasiukevich/cqrs",
@@ -874,12 +927,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "27dc8aeabe16e205bf7cc7404a6a9a817868e80e"
+                "reference": "50a7c860d341eb28c550c5e26f4b1be4b67df4f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/27dc8aeabe16e205bf7cc7404a6a9a817868e80e",
-                "reference": "27dc8aeabe16e205bf7cc7404a6a9a817868e80e",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/50a7c860d341eb28c550c5e26f4b1be4b67df4f1",
+                "reference": "50a7c860d341eb28c550c5e26f4b1be4b67df4f1",
                 "shasum": ""
             },
             "require": {
@@ -890,13 +943,13 @@
                 "monolog/monolog": "1.23.0",
                 "nikic/fast-route": "v1.2.0",
                 "php": ">=7.1",
+                "react/http-client": "v0.5.6",
                 "symfony/yaml": "^3.3.6",
                 "voryx/event-loop": "^2.0",
-                "wyrihaximus/react-guzzle-psr7": "1.0.0"
+                "wyrihaximus/react-guzzle-psr7": "2.0.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.2",
-                "react/filesystem": "v0.1.0"
+                "phpunit/phpunit": "^6.2"
             },
             "suggest": {
                 "react/filesystem": "Provides async file logger support",
@@ -926,7 +979,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-10-20 13:52:26"
+            "time": "2017-10-24 11:41:54"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -1499,44 +1552,45 @@
         },
         {
             "name": "react/http-client",
-            "version": "v0.4.0",
+            "version": "v0.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/http-client.git",
-                "reference": "a0becdbdb6929b45a1d504f0e069bbc5b6d1c61c"
+                "reference": "eb521c0f9de9b9780b9ced78d90314085632377f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http-client/zipball/a0becdbdb6929b45a1d504f0e069bbc5b6d1c61c",
-                "reference": "a0becdbdb6929b45a1d504f0e069bbc5b6d1c61c",
+                "url": "https://api.github.com/repos/reactphp/http-client/zipball/eb521c0f9de9b9780b9ced78d90314085632377f",
+                "reference": "eb521c0f9de9b9780b9ced78d90314085632377f",
                 "shasum": ""
             },
             "require": {
-                "guzzle/parser": "~3.0",
+                "evenement/evenement": "^3.0 || ^2.0",
+                "guzzlehttp/psr7": "^1.0",
                 "php": ">=5.4.0",
-                "react/dns": "0.4.*",
-                "react/socket-client": "0.4.*"
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3",
+                "react/promise": "~2.2",
+                "react/socket": "^1.0 || ^0.8.4",
+                "react/stream": "^1.0 || ^0.7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.0 || ^4.8.10"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.4-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
-                    "React\\HttpClient\\": ""
+                    "React\\HttpClient\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
-            "description": "Asynchronous HTTP client library.",
+            "description": "Event-driven, streaming HTTP client for ReactPHP",
             "keywords": [
                 "http"
             ],
-            "time": "2014-02-02 01:11:26"
+            "time": "2017-09-17 14:41:00"
         },
         {
             "name": "react/promise",
@@ -1583,6 +1637,62 @@
                 "promises"
             ],
             "time": "2017-03-25 12:08:31"
+        },
+        {
+            "name": "react/promise-stream",
+            "version": "v0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/reactphp/promise-stream.git",
+                "reference": "f4123898734cfa532099efceaf91d5592e5afe74"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/reactphp/promise-stream/zipball/f4123898734cfa532099efceaf91d5592e5afe74",
+                "reference": "f4123898734cfa532099efceaf91d5592e5afe74",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "react/promise": "^2.1 || ^1.2",
+                "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4 || ^0.3"
+            },
+            "require-dev": {
+                "clue/block-react": "^1.0",
+                "phpunit/phpunit": "^4.8",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3",
+                "react/promise-timer": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "React\\Promise\\Stream\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@lueck.tv"
+                }
+            ],
+            "description": "The missing link between Promise-land and Stream-land for React PHP",
+            "homepage": "https://github.com/reactphp/promise-stream",
+            "keywords": [
+                "Buffer",
+                "async",
+                "promise",
+                "reactphp",
+                "stream",
+                "unwrap"
+            ],
+            "time": "2017-10-18 15:23:47"
         },
         {
             "name": "react/promise-timer",
@@ -1639,16 +1749,16 @@
         },
         {
             "name": "react/socket",
-            "version": "v0.8.4",
+            "version": "v0.8.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "ce2b577c2d69ee071c3f9e552942c320caa87e0a"
+                "reference": "d169d1ed24e39bf182781d72ddd224dbbd449aa8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/ce2b577c2d69ee071c3f9e552942c320caa87e0a",
-                "reference": "ce2b577c2d69ee071c3f9e552942c320caa87e0a",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/d169d1ed24e39bf182781d72ddd224dbbd449aa8",
+                "reference": "d169d1ed24e39bf182781d72ddd224dbbd449aa8",
                 "shasum": ""
             },
             "require": {
@@ -1661,8 +1771,8 @@
                 "react/stream": "^1.0 || ^0.7.1"
             },
             "require-dev": {
-                "clue/block-react": "^1.1",
-                "phpunit/phpunit": "~4.8"
+                "clue/block-react": "^1.2",
+                "phpunit/phpunit": "^5.0 || ^4.8"
             },
             "type": "library",
             "autoload": {
@@ -1682,48 +1792,7 @@
                 "reactphp",
                 "stream"
             ],
-            "time": "2017-09-16 17:16:49"
-        },
-        {
-            "name": "react/socket-client",
-            "version": "v0.4.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/socket-client.git",
-                "reference": "6ec8c3aefc018acec763fa6e950e1baa947231fc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket-client/zipball/6ec8c3aefc018acec763fa6e950e1baa947231fc",
-                "reference": "6ec8c3aefc018acec763fa6e950e1baa947231fc",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0",
-                "react/dns": "0.4.*",
-                "react/event-loop": "0.4.*",
-                "react/promise": "~2.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.4-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "React\\SocketClient\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Async connector to open TCP/IP and SSL/TLS based connections.",
-            "keywords": [
-                "Socket"
-            ],
-            "time": "2014-02-02 01:11:26"
+            "time": "2017-10-23 21:45:58"
         },
         {
             "name": "react/stream",
@@ -1888,69 +1957,6 @@
                 "environment"
             ],
             "time": "2017-09-05 07:59:31"
-        },
-        {
-            "name": "symfony/event-dispatcher",
-            "version": "v3.3.10",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "d7ba037e4b8221956ab1e221c73c9e27e05dd423"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/d7ba037e4b8221956ab1e221c73c9e27e05dd423",
-                "reference": "d7ba037e4b8221956ab1e221c73c9e27e05dd423",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5.9|>=7.0.8"
-            },
-            "conflict": {
-                "symfony/dependency-injection": "<3.3"
-            },
-            "require-dev": {
-                "psr/log": "~1.0",
-                "symfony/config": "~2.8|~3.0",
-                "symfony/dependency-injection": "~3.3",
-                "symfony/expression-language": "~2.8|~3.0",
-                "symfony/stopwatch": "~2.8|~3.0"
-            },
-            "suggest": {
-                "symfony/dependency-injection": "",
-                "symfony/http-kernel": ""
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\EventDispatcher\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony EventDispatcher Component",
-            "homepage": "https://symfony.com",
-            "time": "2017-10-02 06:42:24"
         },
         {
             "name": "symfony/inflector",
@@ -2399,28 +2405,31 @@
         },
         {
             "name": "wyrihaximus/react-guzzle-http-client",
-            "version": "3.0.2",
+            "version": "4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WyriHaximus/react-guzzle-http-client.git",
-                "reference": "a4606fd093b4d2d61a155930fb303ac760c2be1d"
+                "reference": "70a1134f76c12db07bfbe841f03a4d53775bbba7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WyriHaximus/react-guzzle-http-client/zipball/a4606fd093b4d2d61a155930fb303ac760c2be1d",
-                "reference": "a4606fd093b4d2d61a155930fb303ac760c2be1d",
+                "url": "https://api.github.com/repos/WyriHaximus/react-guzzle-http-client/zipball/70a1134f76c12db07bfbe841f03a4d53775bbba7",
+                "reference": "70a1134f76c12db07bfbe841f03a4d53775bbba7",
                 "shasum": ""
             },
             "require": {
+                "clue/buzz-react": "^2.0 || ^1.4",
+                "clue/http-proxy-react": "^1.2",
+                "clue/socks-react": "^0.8.5",
                 "guzzlehttp/psr7": "^1.0",
                 "php": "^5.4|^7.0",
                 "psr/http-message": "^1.0",
-                "react/dns": "^0.4.1",
-                "react/http-client": "^0.4"
+                "wyrihaximus/ticking-promise": "^1.6"
             },
             "require-dev": {
+                "clue/block-react": "^1.1",
                 "phake/phake": "~1.0.6",
-                "phpunit/phpunit": "^4.0|^5.0",
+                "phpunit/phpunit": "^5.0 || ^4.8",
                 "squizlabs/php_codesniffer": "~1.5.0",
                 "vectorface/dunit": "~2"
             },
@@ -2441,33 +2450,33 @@
                     "homepage": "http://wyrihaximus.net/"
                 }
             ],
-            "description": "Asyncronous GuzzleRing adapter powered by react/http-client",
-            "time": "2016-03-27 19:35:08"
+            "description": "Asynchronous adapter for different Guzzle versions powered by react/http-client",
+            "time": "2017-09-20 20:42:39"
         },
         {
             "name": "wyrihaximus/react-guzzle-psr7",
-            "version": "1.0.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WyriHaximus/react-guzzle-psr7.git",
-                "reference": "7c32b5882f80bf66d2d69a6e1ace2b2fc26472a0"
+                "reference": "300f22e700821422b325d4c0944d75447e6250b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WyriHaximus/react-guzzle-psr7/zipball/7c32b5882f80bf66d2d69a6e1ace2b2fc26472a0",
-                "reference": "7c32b5882f80bf66d2d69a6e1ace2b2fc26472a0",
+                "url": "https://api.github.com/repos/WyriHaximus/react-guzzle-psr7/zipball/300f22e700821422b325d4c0944d75447e6250b0",
+                "reference": "300f22e700821422b325d4c0944d75447e6250b0",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "~6.0",
-                "react/dns": "^0.4.1",
-                "wyrihaximus/react-guzzle-http-client": "^3.0.0"
+                "guzzlehttp/guzzle": "^6.0",
+                "php": "^5.5|^7.0",
+                "wyrihaximus/react-guzzle-http-client": "^4.0"
             },
             "require-dev": {
                 "phake/phake": "~1.0.6",
-                "phpunit/phpunit": "~4.0",
-                "squizlabs/php_codesniffer": "~1.5.0",
-                "vectorface/dunit": "~2.0"
+                "phpunit/phpunit": "^4.0|^5.0",
+                "squizlabs/php_codesniffer": "~1.5.6",
+                "vectorface/dunit": "^2.0"
             },
             "type": "library",
             "autoload": {
@@ -2487,7 +2496,53 @@
                 }
             ],
             "description": "Asyncronous Guzzle (PSR7) adapter powered by react/http-client",
-            "time": "2015-08-09 20:04:16"
+            "time": "2017-09-22 18:01:43"
+        },
+        {
+            "name": "wyrihaximus/ticking-promise",
+            "version": "1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/WyriHaximus/TickingPromise.git",
+                "reference": "8d26b1458e32c367ba6fb8ad5042046279acdb12"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/WyriHaximus/TickingPromise/zipball/8d26b1458e32c367ba6fb8ad5042046279acdb12",
+                "reference": "8d26b1458e32c367ba6fb8ad5042046279acdb12",
+                "shasum": ""
+            },
+            "require": {
+                "react/event-loop": "^0.4",
+                "react/promise": "~2.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.4",
+                "squizlabs/php_codesniffer": "^1.5.6",
+                "vectorface/dunit": "~1.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "WyriHaximus\\React\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cees-Jan Kiewiet",
+                    "email": "ceesjank@gmail.com",
+                    "homepage": "http://wyrihaximus.net/"
+                }
+            ],
+            "description": "Wrapping ticks into a promise",
+            "time": "2016-03-05 20:23:05"
         }
     ],
     "packages-dev": [
