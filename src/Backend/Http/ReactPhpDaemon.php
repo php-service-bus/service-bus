@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Backend\Http;
 
+use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\ParameterBag;
 use Desperado\Framework\Application\ApplicationLogger;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
@@ -85,6 +86,13 @@ class ReactPhpDaemon implements DaemonInterface
     private $publisher;
 
     /**
+     * Application environment
+     *
+     * @var Environment
+     */
+    private $environment;
+
+    /**
      * [
      *     'dsn'             => 'tls://0.0.0.0:1337',
      *     'certificatePath' => null
@@ -94,6 +102,7 @@ class ReactPhpDaemon implements DaemonInterface
      * @param RouterInterface    $router
      * @param PublisherInterface $publisher
      * @param string             $publisherRoutingKey
+     * @param Environment        $environment
      *
      * @throws \LogicException
      */
@@ -101,7 +110,8 @@ class ReactPhpDaemon implements DaemonInterface
         array $daemonOptions,
         RouterInterface $router,
         PublisherInterface $publisher,
-        string $publisherRoutingKey
+        string $publisherRoutingKey,
+        Environment $environment
     )
     {
         $parameters = new ParameterBag($daemonOptions);
@@ -113,6 +123,7 @@ class ReactPhpDaemon implements DaemonInterface
         $this->router = $router;
         $this->publisher = $publisher;
         $this->publisherRoutingKey = $publisherRoutingKey;
+        $this->environment = $environment;
 
         if(
             true === $this->isSecured &&
@@ -143,6 +154,21 @@ class ReactPhpDaemon implements DaemonInterface
                             $entryPoint, $resolve, $reject
                         )
                         {
+                            if(true === $this->environment->isDebug())
+                            {
+                                ApplicationLogger::debug(
+                                    self::LOG_CHANNEL_NAME,
+                                    \sprintf(
+                                        '"%s" request on "%s" received with parameters: "%s"',
+                                        $request->getMethod(),
+                                        $request->getUri(),
+                                        'GET' === $request->getMethod()
+                                            ? \urldecode(\http_build_query($request->getQueryParams()))
+                                            : $requestBody
+                                    )
+                                );
+                            }
+
                             try
                             {
                                 $handlerData = $this->router->match($request->getRequestTarget(), $request->getMethod());
@@ -168,7 +194,8 @@ class ReactPhpDaemon implements DaemonInterface
                                         $serializer,
                                         $this->publisher,
                                         $entryPoint->getEntryPointName(),
-                                        $this->publisherRoutingKey
+                                        $this->publisherRoutingKey,
+                                        $this->environment
                                     );
 
                                     /** @var PromiseInterface $handlerMessagePromise */
@@ -220,13 +247,16 @@ class ReactPhpDaemon implements DaemonInterface
                     ->then(
                         function(Response $response)
                         {
-                            ApplicationLogger::debug(
-                                self::LOG_CHANNEL_NAME,
-                                \sprintf(
-                                    'Render response with http code "%s" and body: "%s"',
-                                    $response->getStatusCode(), (string) $response->getBody()
-                                )
-                            );
+                            if(true === $this->environment->isDebug())
+                            {
+                                ApplicationLogger::debug(
+                                    self::LOG_CHANNEL_NAME,
+                                    \sprintf(
+                                        'Render response with http code "%s" and body: "%s"',
+                                        $response->getStatusCode(), (string) $response->getBody()
+                                    )
+                                );
+                            }
 
                             return $response;
                         },

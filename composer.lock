@@ -72,16 +72,16 @@
         },
         {
             "name": "clue/buzz-react",
-            "version": "v2.1.0",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-buzz-react.git",
-                "reference": "3aadd4636448765b242b5c56fb02196e6c63dc06"
+                "reference": "3fec9c17ffd4f7443f853de986e734b4c131f98e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-buzz-react/zipball/3aadd4636448765b242b5c56fb02196e6c63dc06",
-                "reference": "3aadd4636448765b242b5c56fb02196e6c63dc06",
+                "url": "https://api.github.com/repos/clue/php-buzz-react/zipball/3fec9c17ffd4f7443f853de986e734b4c131f98e",
+                "reference": "3fec9c17ffd4f7443f853de986e734b4c131f98e",
                 "shasum": ""
             },
             "require": {
@@ -90,7 +90,7 @@
                 "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3",
                 "react/http-client": "^0.5.6",
                 "react/promise": "^2.2.1",
-                "react/promise-stream": "^0.1.1",
+                "react/promise-stream": "^1.0 || ^0.1.1",
                 "react/socket": "^1.0 || ^0.8.4",
                 "react/stream": "^1.0 || ^0.7",
                 "ringcentral/psr7": "^1.2"
@@ -126,7 +126,7 @@
                 "psr-7",
                 "reactphp"
             ],
-            "time": "2017-09-17 17:16:22"
+            "time": "2017-10-24 17:53:40"
         },
         {
             "name": "clue/http-proxy-react",
@@ -926,18 +926,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "88d8490de787aec03e041a3c7e17dfcac70bafa5"
+                "reference": "722638e9d0cdbad3393556b6103fc209b6f76d7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/88d8490de787aec03e041a3c7e17dfcac70bafa5",
-                "reference": "88d8490de787aec03e041a3c7e17dfcac70bafa5",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/722638e9d0cdbad3393556b6103fc209b6f76d7c",
+                "reference": "722638e9d0cdbad3393556b6103fc209b6f76d7c",
                 "shasum": ""
             },
             "require": {
                 "bunny/bunny": "^0.2.4",
                 "doctrine/annotations": "v1.5.0",
-                "guzzlehttp/guzzle": "~6.0",
+                "guzzlehttp/psr7": "1.4.2",
                 "mmasiukevich/domain-common": "^0.1",
                 "monolog/monolog": "1.23.0",
                 "nikic/fast-route": "v1.2.0",
@@ -952,7 +952,8 @@
             },
             "suggest": {
                 "react/filesystem": "Provides async file logger support",
-                "react/socket": "Provides async external syslog handler support"
+                "react/socket": "Provides async external syslog handler support",
+                "wyrihaximus/react-guzzle-psr7": "Provides Guzzle async http client"
             },
             "type": "library",
             "extra": {
@@ -978,7 +979,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-10-24 13:07:21"
+            "time": "2017-10-25 10:51:03"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -1639,16 +1640,16 @@
         },
         {
             "name": "react/promise-stream",
-            "version": "v0.1.2",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise-stream.git",
-                "reference": "f4123898734cfa532099efceaf91d5592e5afe74"
+                "reference": "1503761d01116bf893f86b9843b3bc7a80682587"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise-stream/zipball/f4123898734cfa532099efceaf91d5592e5afe74",
-                "reference": "f4123898734cfa532099efceaf91d5592e5afe74",
+                "url": "https://api.github.com/repos/reactphp/promise-stream/zipball/1503761d01116bf893f86b9843b3bc7a80682587",
+                "reference": "1503761d01116bf893f86b9843b3bc7a80682587",
                 "shasum": ""
             },
             "require": {
@@ -1681,7 +1682,7 @@
                     "email": "christian@lueck.tv"
                 }
             ],
-            "description": "The missing link between Promise-land and Stream-land for React PHP",
+            "description": "The missing link between Promise-land and Stream-land for ReactPHP",
             "homepage": "https://github.com/reactphp/promise-stream",
             "keywords": [
                 "Buffer",
@@ -1691,7 +1692,7 @@
                 "stream",
                 "unwrap"
             ],
-            "time": "2017-10-18 15:23:47"
+            "time": "2017-10-24 14:35:40"
         },
         {
             "name": "react/promise-timer",

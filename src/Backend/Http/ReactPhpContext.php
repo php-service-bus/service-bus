@@ -15,10 +15,12 @@ namespace Desperado\Framework\Backend\Http;
 
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
+use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\Messages\CommandInterface;
 use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
 use Desperado\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Framework\Application\ApplicationLogger;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
 use Psr\Http\Message\ResponseInterface;
 use React\Http\Response;
@@ -64,22 +66,32 @@ class ReactPhpContext implements DeliveryContextInterface
     private $response;
 
     /**
+     * Application environment
+     *
+     * @var Environment
+     */
+    private $environment;
+
+    /**
      * @param MessageSerializerInterface $serializer
      * @param PublisherInterface         $publisher
      * @param string                     $entryPointName
      * @param string                     $routingKey
+     * @param Environment                $environment
      */
     public function __construct(
         MessageSerializerInterface $serializer,
         PublisherInterface $publisher,
         string $entryPointName,
-        string $routingKey
+        string $routingKey,
+        Environment $environment
     )
     {
         $this->serializer = $serializer;
         $this->publisher = $publisher;
         $this->entryPointName = $entryPointName;
         $this->routingKey = $routingKey;
+        $this->environment = $environment;
     }
 
     /**
@@ -167,6 +179,23 @@ class ReactPhpContext implements DeliveryContextInterface
     {
         $destination = '' !== $destination ? $destination : $this->entryPointName;
         $serializedMessage = $this->serializer->serialize($message);
+
+        if(true === $this->environment->isDebug())
+        {
+            ApplicationLogger::debug(
+                'reactPHP',
+                \sprintf(
+                    '%s "%s" to "%s" exchange with routing key "%s". Message data: %s',
+                    $message instanceof CommandInterface
+                        ? 'Send message'
+                        : 'Publish event',
+                    \get_class($message),
+                    $destination,
+                    $this->routingKey
+                ),
+                $serializedMessage
+            );
+        }
 
         $this->publisher->publish($destination, $this->routingKey, $serializedMessage);
     }

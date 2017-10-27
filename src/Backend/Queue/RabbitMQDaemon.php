@@ -19,6 +19,7 @@ use Bunny\Message;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use Desperado\Domain\DaemonInterface;
 use Desperado\Domain\EntryPointInterface;
+use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\ReceivedMessage;
 use Desperado\Framework\Application\ApplicationLogger;
 use EventLoop\EventLoop;
@@ -61,13 +62,22 @@ class RabbitMQDaemon implements DaemonInterface
     private $tasksInProgress = [];
 
     /**
-     * @param string $connectionDSN
+     * Application environment
+     *
+     * @var Environment
      */
-    public function __construct(string $connectionDSN)
+    private $environment;
+
+    /**
+     * @param string      $connectionDSN
+     * @param Environment $environment
+     */
+    public function __construct(string $connectionDSN, Environment $environment)
     {
         $this->initSignals();
         $this->initFailHandler();
 
+        $this->environment = $environment;
         $this->client = new Client(
             EventLoop::getLoop(),
             \parse_url($connectionDSN)
@@ -150,11 +160,19 @@ class RabbitMQDaemon implements DaemonInterface
      */
     private function handleMessage(EntryPointInterface $entryPoint, Message $incoming, Channel $channel): PromiseInterface
     {
+        if(true === $this->environment->isDebug())
+        {
+            ApplicationLogger::debug(
+                self::LOG_CHANNEL_NAME,
+                \sprintf('Message received: %s', $incoming->content)
+            );
+        }
+
         try
         {
             $serializer = $entryPoint->getMessageSerializer();
 
-            $context = new RabbitMqDaemonContext($incoming, $channel, $serializer);
+            $context = new RabbitMqDaemonContext($incoming, $channel, $serializer, $this->environment);
             /** @var ReceivedMessage $message */
             $receivedMessage = $serializer->unserialize($incoming->content);
 

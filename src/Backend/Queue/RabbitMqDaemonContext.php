@@ -17,6 +17,7 @@ use Bunny\Channel;
 use Bunny\Message;
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
+use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\Messages\CommandInterface;
 use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
@@ -59,16 +60,30 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
     private $routingKey;
 
     /**
+     * Application environment
+     *
+     * @var Environment
+     */
+    private $environment;
+
+    /**
      * @param Message                    $incoming
      * @param Channel                    $channel
      * @param MessageSerializerInterface $serializer
+     * @param Environment                $environment
      */
-    public function __construct(Message $incoming, Channel $channel, MessageSerializerInterface $serializer)
+    public function __construct(
+        Message $incoming,
+        Channel $channel,
+        MessageSerializerInterface $serializer,
+        Environment $environment
+    )
     {
         $this->exchange = $incoming->exchange;
         $this->routingKey = $incoming->routingKey;
         $this->channel = $channel;
         $this->serializer = $serializer;
+        $this->environment = $environment;
     }
 
     /**
@@ -116,18 +131,22 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
             ->then(
                 function() use ($destination, $serializedMessage, $message)
                 {
-                    ApplicationLogger::debug(
-                        self::LOG_CHANNEL_NAME,
-                        \sprintf(
-                            '%s "%s" to "%s" exchange with routing key "%s"',
-                            $message instanceof CommandInterface
-                                ? 'Send message'
-                                : 'Publish event',
-                            \get_class($message),
-                            $destination,
-                            $this->routingKey
-                        )
-                    );
+                    if(true === $this->environment->isDebug())
+                    {
+                        ApplicationLogger::debug(
+                            self::LOG_CHANNEL_NAME,
+                            \sprintf(
+                                '%s "%s" to "%s" exchange with routing key "%s". Message data: %s',
+                                $message instanceof CommandInterface
+                                    ? 'Send message'
+                                    : 'Publish event',
+                                \get_class($message),
+                                $destination,
+                                $this->routingKey
+                            ),
+                            $serializedMessage
+                        );
+                    }
 
                     return $this->channel->publish($serializedMessage, [], $destination, $this->routingKey);
                 },
