@@ -142,9 +142,9 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
                                     : 'Publish event',
                                 \get_class($message),
                                 $destination,
-                                $this->routingKey
-                            ),
-                            $serializedMessage
+                                $this->routingKey,
+                                $serializedMessage
+                            )
                         );
                     }
 
