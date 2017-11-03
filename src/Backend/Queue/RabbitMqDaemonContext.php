@@ -21,6 +21,7 @@ use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\Messages\CommandInterface;
 use Desperado\Domain\Messages\EventInterface;
 use Desperado\Domain\Messages\MessageInterface;
+use Desperado\Domain\ParameterBag;
 use Desperado\Domain\Serializer\MessageSerializerInterface;
 use Desperado\Framework\Application\ApplicationLogger;
 
@@ -67,6 +68,13 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
     private $environment;
 
     /**
+     * Message metadata (headers)
+     *
+     * @var ParameterBag
+     */
+    private $messageMetadata;
+
+    /**
      * @param Message                    $incoming
      * @param Channel                    $channel
      * @param MessageSerializerInterface $serializer
@@ -81,9 +89,22 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
     {
         $this->exchange = $incoming->exchange;
         $this->routingKey = $incoming->routingKey;
+        $this->messageMetadata = new ParameterBag(
+            true === \is_array($incoming->headers)
+                ? $incoming->headers
+                : []
+        );
         $this->channel = $channel;
         $this->serializer = $serializer;
         $this->environment = $environment;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMessageMetadata(): ParameterBag
+    {
+        return $this->messageMetadata;
     }
 
     /**
@@ -95,6 +116,7 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
 
         $message instanceof CommandInterface
             ? $this->send($message, $deliveryOptions)
+            /** @var EventInterface $message */
             : $this->publish($message, $deliveryOptions);
     }
 
@@ -103,7 +125,7 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
      */
     public function send(CommandInterface $command, DeliveryOptions $deliveryOptions): void
     {
-        $this->publishMessage($deliveryOptions->getDestination(), $command);
+        $this->publishMessage($deliveryOptions, $command);
     }
 
     /**
@@ -111,46 +133,65 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
      */
     public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
     {
-        $this->publishMessage($deliveryOptions->getDestination(), $event);
-        $this->publishMessage(\sprintf('%s.events', $this->exchange), $event);
+        $this->publishMessage($deliveryOptions, $event);
+        $this->publishMessage(
+            $deliveryOptions->changeDestination(
+                \sprintf('%s.events', $this->exchange)
+            ),
+            $event
+        );
     }
 
     /**
      * Send message to broker
      *
-     * @param string           $destination
+     * @param  DeliveryOptions $deliveryOptions
      * @param MessageInterface $message
      *
      * @return void
      */
-    private function publishMessage(string $destination, MessageInterface $message): void
+    private function publishMessage(DeliveryOptions $deliveryOptions, MessageInterface $message): void
     {
-        $destination = '' !== $destination ? $destination : $this->exchange;
+        $destination = '' !== $deliveryOptions->getDestination()
+            ? $deliveryOptions->getDestination()
+            : $this->exchange;
+
         $serializedMessage = $this->serializer->serialize($message);
+
+        $messageHeaders = $deliveryOptions->getHeaders();
+
+        $messageHeaders->set('fromHost', \gethostname());
+        $messageHeaders->set('daemon', 'rabbitMQ');
 
         $this->channel
             ->exchangeDeclare($destination, 'direct', true)
             ->then(
-                function() use ($destination, $serializedMessage, $message)
+                function() use ($destination, $serializedMessage, $messageHeaders, $message)
                 {
                     if(true === $this->environment->isDebug())
                     {
                         ApplicationLogger::debug(
                             self::LOG_CHANNEL_NAME,
                             \sprintf(
-                                '%s "%s" to "%s" exchange with routing key "%s". Message data: %s',
+                                '%s "%s" to "%s" exchange with routing key "%s". Message data: %s (with headers "%s")',
                                 $message instanceof CommandInterface
                                     ? 'Send message'
                                     : 'Publish event',
                                 \get_class($message),
                                 $destination,
                                 $this->routingKey,
-                                $serializedMessage
+                                $serializedMessage,
+                                \urldecode(\http_build_query($messageHeaders->all()))
                             )
                         );
                     }
 
-                    return $this->channel->publish($serializedMessage, [], $destination, $this->routingKey);
+                    return $this->channel->publish(
+                        $serializedMessage,
+                        $messageHeaders->all(),
+                        $destination,
+                        $this->routingKey
+                    );
                 },
                 function(\Throwable $throwable)
                 {

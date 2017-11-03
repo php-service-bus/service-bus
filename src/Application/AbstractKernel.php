@@ -13,22 +13,19 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application;
 
-use Desperado\CQRS\Context\HttpRequestContextInterface;
 use Desperado\CQRS\MessageBus;
 use Desperado\Domain\ContextInterface;
 use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\MessageBusInterface;
 use Desperado\Domain\MessageRouterInterface;
-use Desperado\Domain\Messages\AbstractQueryMessage;
 use Desperado\Domain\Messages\MessageInterface;
-use Desperado\Domain\ThrowableFormatter;
+use Desperado\Framework\FrameworkEventsInterface;
+use Desperado\Framework\Listeners as FrameworkListeners;
+use Desperado\Framework\MessageProcessor;
 use Desperado\Framework\Metrics\MetricsCollectorInterface;
-use Desperado\Framework\StorageManager\FlushProcessor;
 use Desperado\Framework\StorageManager\StorageManagerRegistry;
-use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
-use Psr\Log\LogLevel;
-use React\Promise\Promise;
 use React\Promise\PromiseInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Application kernel
@@ -78,6 +75,20 @@ abstract class AbstractKernel
     private $metricsCollector;
 
     /**
+     * Message execution processor
+     *
+     * @var MessageProcessor
+     */
+    private $messageProcessor;
+
+    /**
+     * Core event dispatcher
+     *
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+
+    /**
      * @param string                    $entryPointName
      * @param Environment               $environment
      * @param StorageManagerRegistry    $storageManagersRegistry
@@ -100,6 +111,15 @@ abstract class AbstractKernel
         $this->messageRouter = $messageRouter;
         $this->messageBus = $messageBus;
         $this->metricsCollector = $metricsCollector;
+
+        $this->eventDispatcher = new EventDispatcher();
+
+        $this->initDefaultCoreListeners();
+
+        $this->messageProcessor = new MessageProcessor(
+            $this->eventDispatcher,
+            $this->messageBus
+        );
     }
 
     /**
@@ -112,16 +132,10 @@ abstract class AbstractKernel
      */
     final public function handle(MessageInterface $message, ContextInterface $context): PromiseInterface
     {
-        $applicationContext = $this->createApplicationContext($context, $this->storageManagersRegistry);
+        $context = $this->createApplicationContext($context, $this->storageManagersRegistry);
 
-        $rejectHandler = $this->getRejectPromiseHandler($message, $applicationContext);
-        $flushHandler = $this->getFlushPromiseHandler($applicationContext);
-        $finishedHandler = $this->getSuccessFinishedMessagePromiseHandler();
 
-        return $this
-            ->getMessageExecutionPromise($message, $applicationContext)
-            ->then($flushHandler, $rejectHandler)
-            ->then($finishedHandler, $rejectHandler);
+        return $this->messageProcessor->execute($message, $context);
     }
 
     /**
@@ -188,164 +202,49 @@ abstract class AbstractKernel
     }
 
     /**
-     * Get success finished message execution promise handler
+     * Add framework core event listener
      *
-     * @return callable
+     * @param string   $eventName
+     * @param callable $listener
+     * @param int      $priority
+     *
+     * @return void
      */
-    private function getSuccessFinishedMessagePromiseHandler(): callable
+    final protected function addCoreEventListener(string $eventName, callable $listener, int $priority = 0)
     {
-        return function(float $timeStart)
-        {
-            $workTime = \microtime(true) - $timeStart;
-
-            /** Save metrics */
-            $this->metricsCollector->push(
-                MetricsCollectorInterface::TYPE_FLUSH_WORK_TIME,
-                $workTime
-            );
-
-            return true;
-        };
+        $this->eventDispatcher->addListener($eventName, $listener, $priority);
     }
 
     /**
-     * Get flush storage managers handler
+     * Init default event listeners
      *
-     * @param AbstractApplicationContext $context
-     *
-     * @return callable
+     * @return void
      */
-    private function getFlushPromiseHandler(AbstractApplicationContext $context): callable
+    private function initDefaultCoreListeners(): void
     {
-        return function() use ($context)
-        {
-            $timeStart = \microtime(true);
-
-            (new FlushProcessor($this->storageManagersRegistry))->process($context);
-
-            return $timeStart;
-        };
-    }
-
-    /**
-     * Get reject promise handler
-     *
-     * @param MessageInterface           $message
-     * @param AbstractApplicationContext $context
-     *
-     * @return callable
-     */
-    private function getRejectPromiseHandler(MessageInterface $message, AbstractApplicationContext $context): callable
-    {
-        return function(\Throwable $throwable) use ($message, $context)
-        {
-            $context->logContextMessage(
-                $message,
-                ThrowableFormatter::toString($throwable),
-                LogLevel::ERROR,
-                [
-                    'message' => \get_class($message),
-                    'context' => \get_class($context),
-                    'payload' => \json_encode(\get_object_vars($message))
-                ]
-            );
-
-            return false;
-        };
-    }
-
-    /**
-     * Create handle message promise
-     *
-     * @param MessageInterface           $message
-     * @param AbstractApplicationContext $context
-     *
-     * @return PromiseInterface
-     */
-    private function getMessageExecutionPromise(
-        MessageInterface $message,
-        AbstractApplicationContext $context
-    ): PromiseInterface
-    {
-        return new Promise(
-            function($resolve, $reject) use ($message, $context)
-            {
-                ApplicationLogger::debug(
-                    'messages',
-                    \sprintf('Execution message "%s" started', \get_class($message))
-                );
-
-                try
-                {
-                    $timeStart = \microtime(true);
-
-                    /** Handle message */
-                    $promise = $this->messageBus->handle($message, $context);
-
-                    /** If null, then task for specified message was not configured */
-                    if(null !== $promise)
-                    {
-                        $promise->then(
-                            function($resultData = null) use ($resolve, $timeStart, $message)
-                            {
-                                try
-                                {
-                                    /** Save metrics */
-                                    $this->metricsCollector->push(
-                                        MetricsCollectorInterface::TYPE_HANDLE_WORK_TIME,
-                                        \microtime(true) - $timeStart,
-                                        ['message' => \get_class($message)]
-                                    );
-                                }
-                                catch(\Throwable $throwable)
-                                {
-                                    unset($throwable);
-                                }
-
-                                return $resolve($resultData);
-                            },
-                            function(\Throwable $throwable) use ($message, $reject, $context)
-                            {
-                                if(
-                                    $message instanceof AbstractQueryMessage &&
-                                    $context instanceof HttpRequestContextInterface
-                                )
-                                {
-                                    /** @var \Throwable|HttpException $throwable */
-
-                                    $isHttpException = $throwable instanceof HttpException;
-                                    $httpResponseCode = true === $isHttpException
-                                        ? $throwable->getHttpCode()
-                                        : 500;
-
-                                    $httpExceptionMessage = true === $isHttpException
-                                        ? $throwable->getResponseMessage()
-                                        : 'Application error';
-
-
-                                    $context->sendResponse(
-                                        $message,
-                                        $httpResponseCode,
-                                        $httpExceptionMessage
-                                    );
-                                }
-
-                                return $reject($throwable);
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return $resolve(null);
-                    }
-                }
-                catch(\Throwable $throwable)
-                {
-                    return $reject($throwable);
-                }
-
-                return $resolve(null);
-            }
+        $flushManagersListener = new FrameworkListeners\FlushStoragesListener(
+            $this->storageManagersRegistry,
+            $this->eventDispatcher
         );
+
+        $collection = [
+            FrameworkEventsInterface::BEFORE_MESSAGE_EXECUTION => [
+                new FrameworkListeners\StartMessageExecutionListener()
+            ],
+            FrameworkEventsInterface::AFTER_MESSAGE_EXECUTION  => [
+                $flushManagersListener
+            ],
+            FrameworkEventsInterface::MESSAGE_EXECUTION_FAILED => [
+                $flushManagersListener
+            ]
+        ];
+
+        foreach($collection as $key => $listeners)
+        {
+            foreach($listeners as $listener)
+            {
+                $this->addCoreEventListener($key, $listener);
+            }
+        }
     }
 }

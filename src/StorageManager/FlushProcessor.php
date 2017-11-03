@@ -18,6 +18,8 @@ use Desperado\EventSourcing\AggregateStorageManagerInterface;
 use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
 use Desperado\Framework\Application\ApplicationLogger;
 use Psr\Log\LogLevel;
+use React\Promise\Promise;
+use React\Promise\PromiseInterface;
 
 /**
  * Flush storage managers processor
@@ -42,12 +44,26 @@ class FlushProcessor
     /**
      * @param ContextInterface $context
      *
-     * @return void
+     * @return PromiseInterface
      */
-    public function process(ContextInterface $context): void
+    public function process(ContextInterface $context): PromiseInterface
     {
-        $this->commitManagers($this->registry->getAggregateManagers(), $context);
-        $this->commitManagers($this->registry->getSagaManagers(), $context);
+        return new Promise(
+            function($resolve, $reject) use ($context)
+            {
+                try
+                {
+                    $this->commitManagers($this->registry->getAggregateManagers(), $context);
+                    $this->commitManagers($this->registry->getSagaManagers(), $context);
+
+                    $resolve();
+                }
+                catch(\Throwable $throwable)
+                {
+                    $reject($throwable);
+                }
+            }
+        );
     }
 
     /**
@@ -56,23 +72,32 @@ class FlushProcessor
      * @param array            $collection
      * @param ContextInterface $context
      *
-     * @return void
+     * @return PromiseInterface
      */
-    private function commitManagers(array $collection, ContextInterface $context): void
+    private function commitManagers(array $collection, ContextInterface $context): PromiseInterface
     {
-        foreach($collection as $storageManager)
-        {
-            /** @var SagaStorageManagerInterface|AggregateStorageManagerInterface $storageManager */
+        $promises = \array_map(
+            function($storageManager) use ($context)
+            {
+                /** @var SagaStorageManagerInterface|AggregateStorageManagerInterface $storageManager */
+                return $storageManager
+                    ->commit($context)
+                    ->then(
+                        function()
+                        {
+                            return true;
+                        },
+                        function(\Throwable $throwable)
+                        {
+                            ApplicationLogger::throwable('flushProcessor', $throwable, LogLevel::EMERGENCY);
 
-            $promise = $storageManager->commit($context);
-            $promise
-                ->then(
-                    null,
-                    function(\Throwable $throwable)
-                    {
-                        ApplicationLogger::throwable('flushProcessor', $throwable, LogLevel::EMERGENCY);
-                    }
-                );
-        }
+                            return false;
+                        }
+                    );
+            },
+            $collection
+        );
+
+        return \React\Promise\all($promises);
     }
 }

@@ -20,7 +20,6 @@ use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use Desperado\Domain\DaemonInterface;
 use Desperado\Domain\EntryPointInterface;
 use Desperado\Domain\Environment\Environment;
-use Desperado\Domain\ReceivedMessage;
 use Desperado\Framework\Application\ApplicationLogger;
 use EventLoop\EventLoop;
 use Psr\Log\LogLevel;
@@ -164,7 +163,11 @@ class RabbitMQDaemon implements DaemonInterface
         {
             ApplicationLogger::debug(
                 self::LOG_CHANNEL_NAME,
-                \sprintf('Message received: %s', $incoming->content)
+                \sprintf(
+                    'Message received: "%s" with headers "%s"',
+                    $incoming->content,
+                    \urldecode(http_build_query((array) $incoming->headers))
+                )
             );
         }
 
@@ -173,17 +176,16 @@ class RabbitMQDaemon implements DaemonInterface
             $serializer = $entryPoint->getMessageSerializer();
 
             $context = new RabbitMqDaemonContext($incoming, $channel, $serializer, $this->environment);
-            /** @var ReceivedMessage $message */
-            $receivedMessage = $serializer->unserialize($incoming->content);
 
-            return $entryPoint->handleMessage($receivedMessage->message, $context);
+            return $entryPoint->handleMessage(
+                $serializer->unserialize($incoming->content),
+                $context
+            );
         }
         catch(\Throwable $throwable)
         {
-            ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
+            return new RejectedPromise($throwable);
         }
-
-        return new RejectedPromise();
     }
 
     /**

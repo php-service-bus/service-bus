@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e4e4f0cceba419528f02aedd81b73ed2",
-    "content-hash": "58eb3aa606e9b7cebd5ee20c8629d1c9",
+    "hash": "36cc32003ef58138a4271f6aecc806e2",
+    "content-hash": "8518a26f17fde15897844ba31e3cf4ba",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -587,12 +587,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "7a9199e6bf2de2c1640078e7b14261a5b1d51188"
+                "reference": "7e9b06db7f0f41b20104d4deff01f28a62a816ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/7a9199e6bf2de2c1640078e7b14261a5b1d51188",
-                "reference": "7a9199e6bf2de2c1640078e7b14261a5b1d51188",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/7e9b06db7f0f41b20104d4deff01f28a62a816ef",
+                "reference": "7e9b06db7f0f41b20104d4deff01f28a62a816ef",
                 "shasum": ""
             },
             "require": {
@@ -641,7 +641,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-10-24 12:57:46"
+            "time": "2017-10-31 08:25:13"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -649,12 +649,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "5430da1fb1d83498772d61b137b61b3c911cab22"
+                "reference": "a4ac493475766d072330eeaeb004ef8c37c41d01"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/5430da1fb1d83498772d61b137b61b3c911cab22",
-                "reference": "5430da1fb1d83498772d61b137b61b3c911cab22",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/a4ac493475766d072330eeaeb004ef8c37c41d01",
+                "reference": "a4ac493475766d072330eeaeb004ef8c37c41d01",
                 "shasum": ""
             },
             "require": {
@@ -694,7 +694,7 @@
                 "cqrs",
                 "event sourcing"
             ],
-            "time": "2017-10-23 09:04:24"
+            "time": "2017-11-03 10:50:40"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -761,12 +761,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-saga.git",
-                "reference": "50925279d30d18d02e77e8a02ca01835ed5d8317"
+                "reference": "3948ef27a3f3b0670feebd13ead7b18e1aa0e354"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/50925279d30d18d02e77e8a02ca01835ed5d8317",
-                "reference": "50925279d30d18d02e77e8a02ca01835ed5d8317",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-saga/zipball/3948ef27a3f3b0670feebd13ead7b18e1aa0e354",
+                "reference": "3948ef27a3f3b0670feebd13ead7b18e1aa0e354",
                 "shasum": ""
             },
             "require": {
@@ -812,7 +812,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-10-24 13:02:07"
+            "time": "2017-10-27 12:54:22"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -926,12 +926,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "722638e9d0cdbad3393556b6103fc209b6f76d7c"
+                "reference": "55f3072c8c0277af986d450a7721297d24c3c7b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/722638e9d0cdbad3393556b6103fc209b6f76d7c",
-                "reference": "722638e9d0cdbad3393556b6103fc209b6f76d7c",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/55f3072c8c0277af986d450a7721297d24c3c7b2",
+                "reference": "55f3072c8c0277af986d450a7721297d24c3c7b2",
                 "shasum": ""
             },
             "require": {
@@ -979,7 +979,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-10-25 10:51:03"
+            "time": "2017-10-27 13:21:55"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -987,12 +987,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/message-serializer.git",
-                "reference": "3ea50b6bc5cfc35a537f58b078ab986a80516662"
+                "reference": "5a30242335b0d829e59514f260e6aec7e0118078"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/3ea50b6bc5cfc35a537f58b078ab986a80516662",
-                "reference": "3ea50b6bc5cfc35a537f58b078ab986a80516662",
+                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/5a30242335b0d829e59514f260e6aec7e0118078",
+                "reference": "5a30242335b0d829e59514f260e6aec7e0118078",
                 "shasum": ""
             },
             "require": {
@@ -1029,7 +1029,7 @@
                 }
             ],
             "description": "Message serializer",
-            "time": "2017-10-24 13:08:17"
+            "time": "2017-11-03 11:11:37"
         },
         {
             "name": "monolog/monolog",
@@ -1959,6 +1959,69 @@
             "time": "2017-09-05 07:59:31"
         },
         {
+            "name": "symfony/event-dispatcher",
+            "version": "v3.3.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/event-dispatcher.git",
+                "reference": "d7ba037e4b8221956ab1e221c73c9e27e05dd423"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/d7ba037e4b8221956ab1e221c73c9e27e05dd423",
+                "reference": "d7ba037e4b8221956ab1e221c73c9e27e05dd423",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5.9|>=7.0.8"
+            },
+            "conflict": {
+                "symfony/dependency-injection": "<3.3"
+            },
+            "require-dev": {
+                "psr/log": "~1.0",
+                "symfony/config": "~2.8|~3.0",
+                "symfony/dependency-injection": "~3.3",
+                "symfony/expression-language": "~2.8|~3.0",
+                "symfony/stopwatch": "~2.8|~3.0"
+            },
+            "suggest": {
+                "symfony/dependency-injection": "",
+                "symfony/http-kernel": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\EventDispatcher\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony EventDispatcher Component",
+            "homepage": "https://symfony.com",
+            "time": "2017-10-02 06:42:24"
+        },
+        {
             "name": "symfony/inflector",
             "version": "v3.3.10",
             "source": {
@@ -2500,20 +2563,21 @@
         },
         {
             "name": "wyrihaximus/ticking-promise",
-            "version": "1.6.1",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WyriHaximus/TickingPromise.git",
-                "reference": "8d26b1458e32c367ba6fb8ad5042046279acdb12"
+                "reference": "6b9f9abc74bb52ba3a479f8d3b8889579cd2cd6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WyriHaximus/TickingPromise/zipball/8d26b1458e32c367ba6fb8ad5042046279acdb12",
-                "reference": "8d26b1458e32c367ba6fb8ad5042046279acdb12",
+                "url": "https://api.github.com/repos/WyriHaximus/TickingPromise/zipball/6b9f9abc74bb52ba3a479f8d3b8889579cd2cd6f",
+                "reference": "6b9f9abc74bb52ba3a479f8d3b8889579cd2cd6f",
                 "shasum": ""
             },
             "require": {
-                "react/event-loop": "^0.4",
+                "php": "^7.0 || ^5.4",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4",
                 "react/promise": "~2.1"
             },
             "require-dev": {
@@ -2542,7 +2606,7 @@
                 }
             ],
             "description": "Wrapping ticks into a promise",
-            "time": "2016-03-05 20:23:05"
+            "time": "2017-10-31 21:46:39"
         }
     ],
     "packages-dev": [
@@ -2958,16 +3022,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "5.2.2",
+            "version": "5.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "8ed1902a57849e117b5651fc1a5c48110946c06b"
+                "reference": "8e1d2397d8adf59a3f12b2878a3aaa66d1ab189d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/8ed1902a57849e117b5651fc1a5c48110946c06b",
-                "reference": "8ed1902a57849e117b5651fc1a5c48110946c06b",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/8e1d2397d8adf59a3f12b2878a3aaa66d1ab189d",
+                "reference": "8e1d2397d8adf59a3f12b2878a3aaa66d1ab189d",
                 "shasum": ""
             },
             "require": {
@@ -2976,7 +3040,7 @@
                 "php": "^7.0",
                 "phpunit/php-file-iterator": "^1.4.2",
                 "phpunit/php-text-template": "^1.2.1",
-                "phpunit/php-token-stream": "^1.4.11 || ^2.0",
+                "phpunit/php-token-stream": "^2.0",
                 "sebastian/code-unit-reverse-lookup": "^1.0.1",
                 "sebastian/environment": "^3.0",
                 "sebastian/version": "^2.0.1",
@@ -3018,7 +3082,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-08-03 12:40:43"
+            "time": "2017-11-03 13:47:33"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -3396,30 +3460,30 @@
         },
         {
             "name": "sebastian/comparator",
-            "version": "2.0.2",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/comparator.git",
-                "reference": "ae068fede81d06e7bb9bb46a367210a3d3e1fe6a"
+                "reference": "1174d9018191e93cb9d719edec01257fc05f8158"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/ae068fede81d06e7bb9bb46a367210a3d3e1fe6a",
-                "reference": "ae068fede81d06e7bb9bb46a367210a3d3e1fe6a",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/1174d9018191e93cb9d719edec01257fc05f8158",
+                "reference": "1174d9018191e93cb9d719edec01257fc05f8158",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.0",
                 "sebastian/diff": "^2.0",
-                "sebastian/exporter": "^3.0"
+                "sebastian/exporter": "^3.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.0"
+                "phpunit/phpunit": "^6.4"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0.x-dev"
+                    "dev-master": "2.1.x-dev"
                 }
             },
             "autoload": {
@@ -3450,13 +3514,13 @@
                 }
             ],
             "description": "Provides the functionality to compare PHP values for equality",
-            "homepage": "http://www.github.com/sebastianbergmann/comparator",
+            "homepage": "https://github.com/sebastianbergmann/comparator",
             "keywords": [
                 "comparator",
                 "compare",
                 "equality"
             ],
-            "time": "2017-08-03 07:14:59"
+            "time": "2017-11-03 07:16:52"
         },
         {
             "name": "sebastian/diff",

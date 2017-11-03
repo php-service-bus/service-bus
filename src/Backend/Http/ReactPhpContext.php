@@ -147,7 +147,7 @@ class ReactPhpContext implements DeliveryContextInterface
     {
         $deliveryOptions = $deliveryOptions ?? new DeliveryOptions();
 
-        $this->publishMessage($deliveryOptions->getDestination(), $message);
+        $this->publishMessage($deliveryOptions, $message);
     }
 
     /**
@@ -155,7 +155,7 @@ class ReactPhpContext implements DeliveryContextInterface
      */
     public function send(CommandInterface $command, DeliveryOptions $deliveryOptions): void
     {
-        $this->publishMessage($deliveryOptions->getDestination(), $command);
+        $this->publishMessage($deliveryOptions, $command);
     }
 
     /**
@@ -163,40 +163,58 @@ class ReactPhpContext implements DeliveryContextInterface
      */
     public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
     {
-        $this->publishMessage($deliveryOptions->getDestination(), $event);
-        $this->publishMessage(\sprintf('%s.events', $this->entryPointName), $event);
+        $this->publishMessage($deliveryOptions, $event);
+        $this->publishMessage(
+            $deliveryOptions->changeDestination(
+                \sprintf('%s.events', $this->entryPointName)
+            ),
+            $event
+        );
     }
 
     /**
      * Send message to broker
      *
-     * @param string           $destination
+     * @param DeliveryOptions  $deliveryOptions
      * @param MessageInterface $message
      *
      * @return void
      */
-    private function publishMessage(string $destination, MessageInterface $message): void
+    private function publishMessage(DeliveryOptions $deliveryOptions, MessageInterface $message): void
     {
-        $destination = '' !== $destination ? $destination : $this->entryPointName;
+        $destination = '' !== $deliveryOptions->getDestination()
+            ? $deliveryOptions->getDestination()
+            : $this->entryPointName;
+
         $serializedMessage = $this->serializer->serialize($message);
+
+        $messageHeaders = $deliveryOptions->getHeaders();
+
+        $messageHeaders->set('fromHost', \gethostname());
+        $messageHeaders->set('daemon', 'reactPHP');
 
         if(true === $this->environment->isDebug())
         {
             ApplicationLogger::debug(
                 'reactPHP',
                 \sprintf(
-                    '%s "%s" to "%s" exchange with routing key "%s". Message data: %s',
+                    '%s "%s" to "%s" exchange with routing key "%s". Message data: %s (with headers "%s")',
                     $message instanceof CommandInterface
                         ? 'Send message'
                         : 'Publish event',
                     \get_class($message),
                     $destination,
                     $this->routingKey,
-                    $serializedMessage
+                    $serializedMessage,
+                    \urldecode(
+                        \http_build_query(
+                            $messageHeaders->all()
+                        )
+                    )
                 )
             );
         }
 
-        $this->publisher->publish($destination, $this->routingKey, $serializedMessage);
+        $this->publisher->publish($destination, $this->routingKey, $serializedMessage, $messageHeaders->all());
     }
 }
