@@ -14,25 +14,28 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Listeners;
 
 use Desperado\Framework\Application\ApplicationLogger;
-use Desperado\Framework\Events\OnMessageExecutionStartedEvent;
+use Desperado\Framework\Events\OnFlushExecutionStartedEvent;
 
 /**
- * Message execution started
+ * Log start flush storages event
  */
-final class StartMessageExecutionListener
+class StartFlushStoragesListener
 {
     /**
-     * Execute event
+     * Log data
      *
-     * @param OnMessageExecutionStartedEvent $event
+     * @param OnFlushExecutionStartedEvent $event
      *
      * @return void
      */
-    public function __invoke(OnMessageExecutionStartedEvent $event): void
+    public function __invoke(OnFlushExecutionStartedEvent $event): void
     {
         ApplicationLogger::debug(
             'core',
-            \sprintf('Execution message "%s" started', \get_class($event->getMessage()))
+            \sprintf(
+                'Execute saving data/sending messages after processing the message "%s" completed',
+                \get_class($event->getMessage())
+            )
         );
     }
 }

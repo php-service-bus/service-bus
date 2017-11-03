@@ -232,10 +232,17 @@ abstract class AbstractKernel
                 new FrameworkListeners\StartMessageExecutionListener()
             ],
             FrameworkEventsInterface::AFTER_MESSAGE_EXECUTION  => [
-                $flushManagersListener
+                $flushManagersListener,
+                new FrameworkListeners\LogFinishedMessageExecutionListener()
             ],
             FrameworkEventsInterface::MESSAGE_EXECUTION_FAILED => [
                 $flushManagersListener
+            ],
+            FrameworkEventsInterface::BEFORE_FLUSH_EXECUTION   => [
+                new FrameworkListeners\StartFlushStoragesListener()
+            ],
+            FrameworkEventsInterface::BEFORE_FLUSH_EXECUTION   => [
+                new FrameworkListeners\FinishedFlushStoragesListener()
             ]
         ];
 

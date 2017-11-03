@@ -69,14 +69,20 @@ final class FlushStoragesListener
             new FrameworkEvents\OnFlushExecutionStartedEvent($message, $context)
         );
 
+        $startTime = \microtime(true);
+
         $promise = (new FlushProcessor($this->storageManagersRegistry))->process($context);
 
         $promise->then(
-            function() use ($message, $context)
+            function() use ($message, $context, $startTime)
             {
                 $this->eventDispatcher->dispatch(
                     FrameworkEventsInterface::AFTER_FLUSH_EXECUTION,
-                    new FrameworkEvents\OnFlushExecutionFinishedEvent($message, $context)
+                    new FrameworkEvents\OnFlushExecutionFinishedEvent(
+                        $message,
+                        $context,
+                        \microtime(true) - $startTime
+                    )
                 );
             },
             function(\Throwable $throwable) use ($message, $context)
