@@ -105,7 +105,7 @@ class MessageProcessor
                     }
 
                     $promise->then(
-                        function() use ($message, $context, $resolve, $reject, $messageStartTime)
+                        function() use ($message, $context, $resolve, $messageStartTime)
                         {
                             $this->eventDispatcher->dispatch(
                                 FrameworkEventsInterface::AFTER_MESSAGE_EXECUTION,
