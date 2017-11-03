@@ -93,7 +93,9 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
     {
         $deliveryOptions = $deliveryOptions ?? new DeliveryOptions();
 
-        $this->publishMessage($deliveryOptions->getDestination(), $message);
+        $message instanceof CommandInterface
+            ? $this->send($message, $deliveryOptions)
+            : $this->publish($message, $deliveryOptions);
     }
 
     /**
