@@ -16,9 +16,9 @@ namespace Desperado\Framework\Modules;
 use Desperado\CQRS\Configuration\MessageHandlerData;
 use Desperado\CQRS\ExecutionContextOptions\EventListenerOptions;
 use Desperado\CQRS\MessageBusBuilder;
-use Desperado\EventSourcing\Saga\Configuration\SagaConfigurationExtractorInterface;
-use Desperado\EventSourcing\Saga\SagaEventHandler;
-use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
+use Desperado\Saga\Configuration\SagaConfigurationExtractorInterface;
+use Desperado\Saga\SagaEventHandler;
+use Desperado\Saga\SagaStorageManagerInterface;
 
 /**
  * Saga support module

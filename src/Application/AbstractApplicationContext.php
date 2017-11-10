@@ -20,14 +20,14 @@ use Desperado\CQRS\Context\ExecutionOptionsContextInterface;
 use Desperado\CQRS\ExecutionContextOptions\CommandHandlerOptions;
 use Desperado\CQRS\ExecutionContextOptions\EventListenerOptions;
 use Desperado\CQRS\ExecutionContextOptions\QueryHandlerOptions;
-use Desperado\Domain\Messages\CommandInterface;
-use Desperado\Domain\Messages\EventInterface;
-use Desperado\Domain\Messages\MessageInterface;
+use Desperado\Domain\Message\CommandInterface;
+use Desperado\Domain\Message\EventInterface;
+use Desperado\Domain\Message\MessageInterface;
 use Desperado\Domain\ThrowableFormatter;
-use Desperado\EventSourcing\AggregateStorageManagerInterface;
-use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
+use Desperado\EventSourcing\Manager\AggregateStorageManagerInterface;
 use Desperado\Framework\Exceptions\ApplicationContextException;
 use Desperado\Framework\StorageManager\StorageManagerRegistry;
+use Desperado\Saga\SagaStorageManagerInterface;
 use Psr\Log\LogLevel;
 
 /**
@@ -177,7 +177,7 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
-    final public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
+    final public function publish(EventInterface$event, DeliveryOptions $deliveryOptions): void
     {
         $this->originContext->publish($event, $deliveryOptions);
     }

@@ -13,10 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application;
 
-use Desperado\Domain\ContextInterface;
-use Desperado\Domain\EntryPointInterface;
-use Desperado\Domain\Messages\MessageInterface;
-use Desperado\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Domain\CQRS\ContextInterface;
+use Desperado\Domain\EntryPoint\EntryPointInterface;
+use Desperado\Domain\Message\MessageInterface;
+use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use React\Promise\PromiseInterface;
 
 /**

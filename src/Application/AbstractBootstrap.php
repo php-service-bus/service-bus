@@ -15,19 +15,17 @@ namespace Desperado\Framework\Application;
 
 use Desperado\CQRS\Configuration\AnnotationsExtractor;
 use Desperado\CQRS\MessageBusBuilder;
+use Desperado\Domain\CQRS\MessageBusInterface;
+use Desperado\Domain\CQRS\ServiceInterface;
+use Desperado\Domain\EntryPoint\MessageRouterInterface;
 use Desperado\Domain\Environment\Environment;
-use Desperado\Domain\EventStorageInterface;
-use Desperado\Domain\MessageBusInterface;
-use Desperado\Domain\MessageRouterInterface;
-use Desperado\Domain\Serializer\MessageSerializerInterface;
-use Desperado\Domain\ServiceInterface;
-use Desperado\EventSourcing\AggregateRepository;
-use Desperado\EventSourcing\AggregateStorageManager;
-use Desperado\EventSourcing\EventStore;
-use Desperado\EventSourcing\Saga\AbstractSaga;
-use Desperado\EventSourcing\Saga\Configuration\AnnotationsSagaConfigurationExtractor;
-use Desperado\EventSourcing\Saga\SagaRepository;
-use Desperado\EventSourcing\Saga\SagaStorageManager;
+use Desperado\Domain\EventStore\EventStorageInterface;
+use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
+use Desperado\Domain\Saga\SagaSerializer\SagaSerializerInterface;
+use Desperado\Domain\SagaStore\SagaStorageInterface;
+use Desperado\EventSourcing\Manager\AggregateStorageManager;
+use Desperado\EventSourcing\Repository\AggregateRepository;
+use Desperado\EventSourcing\Store\EventStore;
 use Desperado\Framework\Exceptions\EntryPointException;
 use Desperado\Framework\MessageRouter;
 use Desperado\Framework\Metrics\MetricsCollectorInterface;
@@ -44,6 +42,11 @@ use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use Desperado\MessageSerializer\StoreEventPayloadSerializer;
+use Desperado\Saga\AbstractSaga;
+use Desperado\Saga\Configuration\AnnotationsSagaConfigurationExtractor;
+use Desperado\Saga\SagaStorageManager;
+use Desperado\Saga\SagaStore;
+use Desperado\Saga\Serializer\SagaSerializer;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
@@ -96,7 +99,7 @@ abstract class AbstractBootstrap
     /**
      * A serializer for storing events in the database
      *
-     * @var MessageSerializerInterface
+     * @var SagaSerializerInterface
      */
     private $storedMessageSerializer;
 
@@ -243,11 +246,11 @@ abstract class AbstractBootstrap
     abstract protected function getAggregateEventStorage(): EventStorageInterface;
 
     /**
-     * Get sagas event storage
+     * Get sagas storage
      *
-     * @return EventStorageInterface
+     * @return SagaStorageInterface
      */
-    abstract protected function getSagaEventStorage(): EventStorageInterface;
+    abstract protected function getSagaStorage(): SagaStorageInterface;
 
     /**
      * Get logger handlers
@@ -321,6 +324,16 @@ abstract class AbstractBootstrap
         }
 
         return $modules;
+    }
+
+    /**
+     * Get sagas serializer
+     *
+     * @return SagaSerializerInterface
+     */
+    protected function getSagaSerializer(): SagaSerializerInterface
+    {
+        return new SagaSerializer();
     }
 
     /**
@@ -611,12 +624,10 @@ abstract class AbstractBootstrap
      */
     private function initSagaStorage(): void
     {
-        $eventStore = new EventStore(
-            $this->getSagaEventStorage(),
-            $this->storedMessageSerializer
+        $sagaStore = new SagaStore(
+            $this->getSagaStorage(),
+            $this->getSagaSerializer()
         );
-
-        $sagaRepository = new SagaRepository($eventStore);
 
         foreach($this->getSagasList() as $sagaNamespace)
         {
@@ -628,7 +639,7 @@ abstract class AbstractBootstrap
                         $sagaNamespace,
                         new SagaStorageManager(
                             $sagaNamespace,
-                            $sagaRepository
+                            $sagaStore
                         )
                     );
             }

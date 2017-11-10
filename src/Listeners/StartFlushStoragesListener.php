@@ -30,6 +30,8 @@ class StartFlushStoragesListener
      */
     public function __invoke(OnFlushExecutionStartedEvent $event): void
     {
+        
+
         ApplicationLogger::debug(
             'core',
             \sprintf(

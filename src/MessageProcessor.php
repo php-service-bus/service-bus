@@ -15,8 +15,8 @@ namespace Desperado\Framework;
 
 use Desperado\CQRS\Context\HttpRequestContextInterface;
 use Desperado\CQRS\MessageBus;
-use Desperado\Domain\Messages\AbstractQueryMessage;
-use Desperado\Domain\Messages\MessageInterface;
+use Desperado\Domain\Message\AbstractQueryMessage;
+use Desperado\Domain\Message\MessageInterface;
 use Desperado\Framework\Application\AbstractApplicationContext;
 use Desperado\Framework\Events as FrameworkEvents;
 use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;

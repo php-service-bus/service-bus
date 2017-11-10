@@ -16,10 +16,11 @@ namespace Desperado\Framework\Backend\Http;
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
 use Desperado\Domain\Environment\Environment;
-use Desperado\Domain\Messages\CommandInterface;
-use Desperado\Domain\Messages\EventInterface;
-use Desperado\Domain\Messages\MessageInterface;
-use Desperado\Domain\Serializer\MessageSerializerInterface;
+use Desperado\Domain\Message\CommandInterface;
+use Desperado\Domain\Message\EventInterface;
+use Desperado\Domain\Message\MessageInterface;
+use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
+use Desperado\Domain\ParameterBag;
 use Desperado\Framework\Application\ApplicationLogger;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -170,6 +171,14 @@ class ReactPhpContext implements DeliveryContextInterface
             ),
             $event
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMessageMetadata(): ParameterBag
+    {
+        return new ParameterBag();
     }
 
     /**

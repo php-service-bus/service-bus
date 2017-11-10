@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Events;
 
-use Desperado\Domain\Messages\MessageInterface;
+use Desperado\Domain\Message\MessageInterface;
 use Desperado\Framework\Application\AbstractApplicationContext;
 
 /**

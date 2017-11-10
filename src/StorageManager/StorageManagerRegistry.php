@@ -13,8 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\StorageManager;
 
-use Desperado\EventSourcing\AggregateStorageManagerInterface;
-use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
+use Desperado\EventSourcing\Manager\AggregateStorageManagerInterface;
+use Desperado\Saga\SagaStorageManagerInterface;
 
 /**
  * Storage managers registry

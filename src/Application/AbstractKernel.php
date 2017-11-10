@@ -14,11 +14,11 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Application;
 
 use Desperado\CQRS\MessageBus;
-use Desperado\Domain\ContextInterface;
+use Desperado\Domain\CQRS\ContextInterface;
+use Desperado\Domain\CQRS\MessageBusInterface;
+use Desperado\Domain\EntryPoint\MessageRouterInterface;
 use Desperado\Domain\Environment\Environment;
-use Desperado\Domain\MessageBusInterface;
-use Desperado\Domain\MessageRouterInterface;
-use Desperado\Domain\Messages\MessageInterface;
+use Desperado\Domain\Message\MessageInterface;
 use Desperado\Framework\FrameworkEventsInterface;
 use Desperado\Framework\Listeners as FrameworkListeners;
 use Desperado\Framework\MessageProcessor;

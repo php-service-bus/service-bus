@@ -13,10 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\StorageManager;
 
-use Desperado\Domain\ContextInterface;
-use Desperado\EventSourcing\AggregateStorageManagerInterface;
-use Desperado\EventSourcing\Saga\SagaStorageManagerInterface;
+use Desperado\Domain\CQRS\ContextInterface;
+use Desperado\EventSourcing\Manager\AggregateStorageManagerInterface;
 use Desperado\Framework\Application\ApplicationLogger;
+use Desperado\Saga\SagaStorageManagerInterface;
 use Psr\Log\LogLevel;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;

@@ -13,8 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework;
 
-use Desperado\Domain\MessageRouterInterface;
-use Desperado\Domain\Messages\MessageInterface;
+use Desperado\Domain\EntryPoint\MessageRouterInterface;
+use Desperado\Domain\Message\MessageInterface;
 use Desperado\Framework\Exceptions\EntryPointException;
 
 /**

@@ -13,7 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Backend\Http;
 
+use Desperado\Domain\EntryPoint\DaemonInterface;
+use Desperado\Domain\EntryPoint\EntryPointInterface;
 use Desperado\Domain\Environment\Environment;
+use Desperado\Domain\Message\AbstractQueryMessage;
 use Desperado\Domain\ParameterBag;
 use Desperado\Framework\Application\ApplicationLogger;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
@@ -24,8 +27,6 @@ use React\Http\Server as HttpServer;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use React\Socket\Server as SocketServer;
-use Desperado\Domain\DaemonInterface;
-use Desperado\Domain\EntryPointInterface;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use React\Socket\ServerInterface;
 
@@ -176,7 +177,7 @@ class ReactPhpDaemon implements DaemonInterface
 
                                 if('' !== $messageNamespace && true === \class_exists($messageNamespace))
                                 {
-                                    /** @var \Desperado\Domain\Messages\AbstractQueryMessage $message */
+                                    /** @var AbstractQueryMessage $message */
                                     $message = new $messageNamespace(
                                         (string ) $request->getMethod(),
                                         (string ) $request->getRequestTarget(),
