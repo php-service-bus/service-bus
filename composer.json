@@ -32,10 +32,11 @@
   "require": {
     "php": ">=7.1",
     "mmasiukevich/infrastructure": "^0.1",
-    "mmasiukevich/event-sourcing-saga": "^0.1",
-    "mmasiukevich/event-storage-pgsql": "^0.1",
+    "mmasiukevich/saga": "^0.1",
+    "mmasiukevich/saga-storage-in-memory": "^0.1",
     "mmasiukevich/message-serializer": "^0.1",
     "mmasiukevich/event-sourcing": "^0.1",
+    "mmasiukevich/event-storage-in-memory": "^0.1",
     "mmasiukevich/domain-common": "^0.1",
     "mmasiukevich/cqrs": "^0.1",
     "bunny/bunny": "^0.2.4",

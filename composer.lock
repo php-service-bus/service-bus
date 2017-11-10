@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "36cc32003ef58138a4271f6aecc806e2",
-    "content-hash": "8518a26f17fde15897844ba31e3cf4ba",
+    "hash": "d840ac07902716ceaed7f478783e1012",
+    "content-hash": "4682597fbeadfc94be0245add18143b6",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -756,67 +756,6 @@
             "time": "2017-11-10 10:10:49"
         },
         {
-            "name": "mmasiukevich/event-sourcing-saga",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "71cfe23d906634dddcee85ffad7b92084529c19d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/71cfe23d906634dddcee85ffad7b92084529c19d",
-                "reference": "71cfe23d906634dddcee85ffad7b92084529c19d",
-                "shasum": ""
-            },
-            "require": {
-                "doctrine/annotations": "v1.5.0",
-                "mmasiukevich/cqrs": "^0.1",
-                "mmasiukevich/domain-common": "^0.1",
-                "mmasiukevich/infrastructure": "^0.1",
-                "php": ">=7.1",
-                "react/promise": "v2.5.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6.2"
-            },
-            "suggest": {
-                "mmasiukevich/saga-storage-in-memory": "Provides inMemory event storage",
-                "mmasiukevich/saga-storage-mongodb": "Provides MongoDB event storage",
-                "mmasiukevich/saga-storage-pgsql": "Provides PostgreSQL event storage"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Desperado\\Saga\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Masiukevich Maksim",
-                    "email": "desperado@minsk-info.ru",
-                    "homepage": "https://github.com/mmasiukevich",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Sagas implementation",
-            "keywords": [
-                "event sourcing",
-                "saga"
-            ],
-            "abandoned": "mmasiukevich/saga",
-            "time": "2017-11-09 15:21:57"
-        },
-        {
             "name": "mmasiukevich/event-sourcing-snapshotter",
             "version": "dev-master",
             "source": {
@@ -873,17 +812,17 @@
             "time": "2017-11-10 11:02:05"
         },
         {
-            "name": "mmasiukevich/event-storage-pgsql",
+            "name": "mmasiukevich/event-storage-in-memory",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mmasiukevich/event-storage-pgsql.git",
-                "reference": "42bd7de430e637c7e351e4b55655bf7a6b114ad4"
+                "url": "https://github.com/mmasiukevich/event-storage-in-memory.git",
+                "reference": "b3fd70bfa7325cc8f1f296128e702a056f8566b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-storage-pgsql/zipball/42bd7de430e637c7e351e4b55655bf7a6b114ad4",
-                "reference": "42bd7de430e637c7e351e4b55655bf7a6b114ad4",
+                "url": "https://api.github.com/repos/mmasiukevich/event-storage-in-memory/zipball/b3fd70bfa7325cc8f1f296128e702a056f8566b2",
+                "reference": "b3fd70bfa7325cc8f1f296128e702a056f8566b2",
                 "shasum": ""
             },
             "require": {
@@ -916,11 +855,11 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Event Sourcing PostgreSQL storage",
+            "description": "Event Sourcing inMemory storage",
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-11-09 15:21:18"
+            "time": "2017-11-09 15:04:53"
         },
         {
             "name": "mmasiukevich/infrastructure",
@@ -1032,6 +971,116 @@
             ],
             "description": "Message serializer",
             "time": "2017-11-10 09:46:43"
+        },
+        {
+            "name": "mmasiukevich/saga",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mmasiukevich/saga.git",
+                "reference": "fca5e50539a66d8be33f9d8c64d55c0a19439609"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/fca5e50539a66d8be33f9d8c64d55c0a19439609",
+                "reference": "fca5e50539a66d8be33f9d8c64d55c0a19439609",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/annotations": "v1.5.0",
+                "mmasiukevich/cqrs": "^0.1",
+                "mmasiukevich/domain-common": "^0.1",
+                "mmasiukevich/infrastructure": "^0.1",
+                "php": ">=7.1",
+                "react/promise": "v2.5.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.2"
+            },
+            "suggest": {
+                "mmasiukevich/saga-storage-in-memory": "Provides inMemory event storage",
+                "mmasiukevich/saga-storage-mongodb": "Provides MongoDB event storage",
+                "mmasiukevich/saga-storage-pgsql": "Provides PostgreSQL event storage"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Desperado\\Saga\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "desperado@minsk-info.ru",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Sagas implementation",
+            "keywords": [
+                "event sourcing",
+                "saga"
+            ],
+            "time": "2017-11-10 14:50:47"
+        },
+        {
+            "name": "mmasiukevich/saga-storage-in-memory",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mmasiukevich/saga-storage-in-memory.git",
+                "reference": "661ee3509b3dd954e53f0d25037b3d64e7e8dddd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mmasiukevich/saga-storage-in-memory/zipball/661ee3509b3dd954e53f0d25037b3d64e7e8dddd",
+                "reference": "661ee3509b3dd954e53f0d25037b3d64e7e8dddd",
+                "shasum": ""
+            },
+            "require": {
+                "mmasiukevich/domain-common": "^0.1",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Desperado\\Saga\\Storage\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "desperado@minsk-info.ru",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Sagas InMemory storage",
+            "keywords": [
+                "saga"
+            ],
+            "time": "2017-11-09 10:13:40"
         },
         {
             "name": "monolog/monolog",
