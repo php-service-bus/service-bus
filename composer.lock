@@ -649,12 +649,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "fa0ca3a5aea90d83bc6b424e2e2eb65e44cb38de"
+                "reference": "3375c32e93f4332bc1b76ed0404d44bdca8eadce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/fa0ca3a5aea90d83bc6b424e2e2eb65e44cb38de",
-                "reference": "fa0ca3a5aea90d83bc6b424e2e2eb65e44cb38de",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/3375c32e93f4332bc1b76ed0404d44bdca8eadce",
+                "reference": "3375c32e93f4332bc1b76ed0404d44bdca8eadce",
                 "shasum": ""
             },
             "require": {
@@ -694,7 +694,7 @@
                 "cqrs",
                 "event sourcing"
             ],
-            "time": "2017-11-10 09:54:30"
+            "time": "2017-11-13 08:36:49"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -978,12 +978,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "fca5e50539a66d8be33f9d8c64d55c0a19439609"
+                "reference": "4abccc0d5196958246e5cedfe2861ba693285960"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/fca5e50539a66d8be33f9d8c64d55c0a19439609",
-                "reference": "fca5e50539a66d8be33f9d8c64d55c0a19439609",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/4abccc0d5196958246e5cedfe2861ba693285960",
+                "reference": "4abccc0d5196958246e5cedfe2861ba693285960",
                 "shasum": ""
             },
             "require": {
@@ -1030,7 +1030,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-11-10 14:50:47"
+            "time": "2017-11-13 08:45:34"
         },
         {
             "name": "mmasiukevich/saga-storage-in-memory",
@@ -1954,7 +1954,7 @@
         },
         {
             "name": "symfony/dotenv",
-            "version": "v3.3.10",
+            "version": "v3.3.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dotenv.git",
@@ -2011,16 +2011,16 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v3.3.10",
+            "version": "v3.3.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "d7ba037e4b8221956ab1e221c73c9e27e05dd423"
+                "reference": "271d8c27c3ec5ecee6e2ac06016232e249d638d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/d7ba037e4b8221956ab1e221c73c9e27e05dd423",
-                "reference": "d7ba037e4b8221956ab1e221c73c9e27e05dd423",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/271d8c27c3ec5ecee6e2ac06016232e249d638d9",
+                "reference": "271d8c27c3ec5ecee6e2ac06016232e249d638d9",
                 "shasum": ""
             },
             "require": {
@@ -2070,11 +2070,11 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2017-10-02 06:42:24"
+            "time": "2017-11-05 15:47:03"
         },
         {
             "name": "symfony/inflector",
-            "version": "v3.3.10",
+            "version": "v3.3.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/inflector.git",
@@ -2411,16 +2411,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.3.10",
+            "version": "v3.3.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "8c7bf1e7d5d6b05a690b715729cb4cd0c0a99c46"
+                "reference": "0938408c4faa518d95230deabb5f595bf0de31b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/8c7bf1e7d5d6b05a690b715729cb4cd0c0a99c46",
-                "reference": "8c7bf1e7d5d6b05a690b715729cb4cd0c0a99c46",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/0938408c4faa518d95230deabb5f595bf0de31b9",
+                "reference": "0938408c4faa518d95230deabb5f595bf0de31b9",
                 "shasum": ""
             },
             "require": {
@@ -2462,7 +2462,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-10-05 14:43:42"
+            "time": "2017-11-10 18:26:04"
         },
         {
             "name": "voryx/event-loop",

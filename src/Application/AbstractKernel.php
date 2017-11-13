@@ -134,7 +134,6 @@ abstract class AbstractKernel
     {
         $context = $this->createApplicationContext($context, $this->storageManagersRegistry);
 
-
         return $this->messageProcessor->execute($message, $context);
     }
 
@@ -241,7 +240,7 @@ abstract class AbstractKernel
             FrameworkEventsInterface::BEFORE_FLUSH_EXECUTION   => [
                 new FrameworkListeners\StartFlushStoragesListener()
             ],
-            FrameworkEventsInterface::BEFORE_FLUSH_EXECUTION   => [
+            FrameworkEventsInterface::AFTER_FLUSH_EXECUTION   => [
                 new FrameworkListeners\FinishedFlushStoragesListener()
             ]
         ];

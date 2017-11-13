@@ -107,16 +107,23 @@ class MessageProcessor
                     $promise->then(
                         function() use ($message, $context, $resolve, $messageStartTime)
                         {
-                            $this->eventDispatcher->dispatch(
-                                FrameworkEventsInterface::AFTER_MESSAGE_EXECUTION,
-                                new FrameworkEvents\OnMessageExecutionFinishedEvent(
-                                    $message,
-                                    $context,
-                                    \microtime(true) - $messageStartTime
-                                )
-                            );
+                            try
+                            {
+                                $this->eventDispatcher->dispatch(
+                                    FrameworkEventsInterface::AFTER_MESSAGE_EXECUTION,
+                                    new FrameworkEvents\OnMessageExecutionFinishedEvent(
+                                        $message,
+                                        $context,
+                                        \microtime(true) - $messageStartTime
+                                    )
+                                );
 
-                            $resolve();
+                                $resolve();
+                            }
+                            catch(\Throwable $throwable)
+                            {
+                                $context->logContextThrowable($message, $throwable);
+                            }
                         },
                         function(\Throwable $throwable) use ($message, $context, $reject)
                         {
