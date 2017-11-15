@@ -494,6 +494,11 @@ abstract class AbstractBootstrap
                 )
             )
         );
+
+        foreach($this->getAggregatesList() as $aggregateNamespace => $identityNamespace)
+        {
+            $this->eventSourcingService->configure($aggregateNamespace, $identityNamespace);
+        }
     }
 
     /**
