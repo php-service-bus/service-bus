@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d840ac07902716ceaed7f478783e1012",
-    "content-hash": "4682597fbeadfc94be0245add18143b6",
+    "hash": "93523a15ee3050d1c7a2583ab32e6b79",
+    "content-hash": "bac6771e84fc5aafa16a39e480d203b5",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -587,12 +587,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "1cd8c21dbbb5e4a20db76b2d2dc601bdee9ce690"
+                "reference": "d976598a61fcc6dabd2a0cbb221243204cad93af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/1cd8c21dbbb5e4a20db76b2d2dc601bdee9ce690",
-                "reference": "1cd8c21dbbb5e4a20db76b2d2dc601bdee9ce690",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/d976598a61fcc6dabd2a0cbb221243204cad93af",
+                "reference": "d976598a61fcc6dabd2a0cbb221243204cad93af",
                 "shasum": ""
             },
             "require": {
@@ -641,7 +641,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-11-10 10:22:14"
+            "time": "2017-11-14 09:38:54"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -649,12 +649,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "3375c32e93f4332bc1b76ed0404d44bdca8eadce"
+                "reference": "0094bc960a8903f6d611b13cae3ff7d62f6c8063"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/3375c32e93f4332bc1b76ed0404d44bdca8eadce",
-                "reference": "3375c32e93f4332bc1b76ed0404d44bdca8eadce",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/0094bc960a8903f6d611b13cae3ff7d62f6c8063",
+                "reference": "0094bc960a8903f6d611b13cae3ff7d62f6c8063",
                 "shasum": ""
             },
             "require": {
@@ -694,7 +694,7 @@
                 "cqrs",
                 "event sourcing"
             ],
-            "time": "2017-11-13 08:36:49"
+            "time": "2017-11-14 14:55:10"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -702,12 +702,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "6e90ca0ed3fe40c761c0c76ed31ff1b436482417"
+                "reference": "4e069e1b394ab4979fcc5912db52ae73a1fdc704"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/6e90ca0ed3fe40c761c0c76ed31ff1b436482417",
-                "reference": "6e90ca0ed3fe40c761c0c76ed31ff1b436482417",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/4e069e1b394ab4979fcc5912db52ae73a1fdc704",
+                "reference": "4e069e1b394ab4979fcc5912db52ae73a1fdc704",
                 "shasum": ""
             },
             "require": {
@@ -722,7 +722,6 @@
                 "phpunit/phpunit": "^6.2"
             },
             "suggest": {
-                "mmasiukevich/event-sourcing-saga": "Provides Saga support",
                 "mmasiukevich/event-storage-in-memory": "Provides inMemory event storage",
                 "mmasiukevich/event-storage-pgsql": "Provides PostgreSQL event storage"
             },
@@ -753,7 +752,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-11-10 10:10:49"
+            "time": "2017-11-15 07:21:54"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -810,56 +809,6 @@
                 "snapshot"
             ],
             "time": "2017-11-10 11:02:05"
-        },
-        {
-            "name": "mmasiukevich/event-storage-in-memory",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mmasiukevich/event-storage-in-memory.git",
-                "reference": "b3fd70bfa7325cc8f1f296128e702a056f8566b2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-storage-in-memory/zipball/b3fd70bfa7325cc8f1f296128e702a056f8566b2",
-                "reference": "b3fd70bfa7325cc8f1f296128e702a056f8566b2",
-                "shasum": ""
-            },
-            "require": {
-                "mmasiukevich/domain-common": "^0.1",
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6.2"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Desperado\\EventSourcing\\Storage\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Masiukevich Maksim",
-                    "email": "desperado@minsk-info.ru",
-                    "homepage": "https://github.com/mmasiukevich",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Event Sourcing inMemory storage",
-            "keywords": [
-                "event sourcing"
-            ],
-            "time": "2017-11-09 15:04:53"
         },
         {
             "name": "mmasiukevich/infrastructure",
@@ -978,12 +927,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "4abccc0d5196958246e5cedfe2861ba693285960"
+                "reference": "03bd701282788b2896a5a1219541caf640706dec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/4abccc0d5196958246e5cedfe2861ba693285960",
-                "reference": "4abccc0d5196958246e5cedfe2861ba693285960",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/03bd701282788b2896a5a1219541caf640706dec",
+                "reference": "03bd701282788b2896a5a1219541caf640706dec",
                 "shasum": ""
             },
             "require": {
@@ -1030,57 +979,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-11-13 08:45:34"
-        },
-        {
-            "name": "mmasiukevich/saga-storage-in-memory",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mmasiukevich/saga-storage-in-memory.git",
-                "reference": "661ee3509b3dd954e53f0d25037b3d64e7e8dddd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga-storage-in-memory/zipball/661ee3509b3dd954e53f0d25037b3d64e7e8dddd",
-                "reference": "661ee3509b3dd954e53f0d25037b3d64e7e8dddd",
-                "shasum": ""
-            },
-            "require": {
-                "mmasiukevich/domain-common": "^0.1",
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6.2"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Desperado\\Saga\\Storage\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Masiukevich Maksim",
-                    "email": "desperado@minsk-info.ru",
-                    "homepage": "https://github.com/mmasiukevich",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Sagas InMemory storage",
-            "keywords": [
-                "saga"
-            ],
-            "time": "2017-11-09 10:13:40"
+            "time": "2017-11-15 09:39:10"
         },
         {
             "name": "monolog/monolog",
@@ -1954,7 +1853,7 @@
         },
         {
             "name": "symfony/dotenv",
-            "version": "v3.3.11",
+            "version": "v3.3.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dotenv.git",
@@ -2010,71 +1909,8 @@
             "time": "2017-09-05 07:59:31"
         },
         {
-            "name": "symfony/event-dispatcher",
-            "version": "v3.3.11",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "271d8c27c3ec5ecee6e2ac06016232e249d638d9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/271d8c27c3ec5ecee6e2ac06016232e249d638d9",
-                "reference": "271d8c27c3ec5ecee6e2ac06016232e249d638d9",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5.9|>=7.0.8"
-            },
-            "conflict": {
-                "symfony/dependency-injection": "<3.3"
-            },
-            "require-dev": {
-                "psr/log": "~1.0",
-                "symfony/config": "~2.8|~3.0",
-                "symfony/dependency-injection": "~3.3",
-                "symfony/expression-language": "~2.8|~3.0",
-                "symfony/stopwatch": "~2.8|~3.0"
-            },
-            "suggest": {
-                "symfony/dependency-injection": "",
-                "symfony/http-kernel": ""
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.3-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\EventDispatcher\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony EventDispatcher Component",
-            "homepage": "https://symfony.com",
-            "time": "2017-11-05 15:47:03"
-        },
-        {
             "name": "symfony/inflector",
-            "version": "v3.3.11",
+            "version": "v3.3.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/inflector.git",
@@ -2411,7 +2247,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.3.11",
+            "version": "v3.3.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",

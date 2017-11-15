@@ -23,9 +23,6 @@ use Desperado\Domain\EventStore\EventStorageInterface;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\Saga\SagaSerializer\SagaSerializerInterface;
 use Desperado\Domain\SagaStore\SagaStorageInterface;
-use Desperado\EventSourcing\Manager\AggregateStorageManager;
-use Desperado\EventSourcing\Repository\AggregateRepository;
-use Desperado\EventSourcing\Store\EventStore;
 use Desperado\Framework\Exceptions\EntryPointException;
 use Desperado\Framework\MessageRouter;
 use Desperado\Framework\Metrics\MetricsCollectorInterface;
@@ -34,7 +31,6 @@ use Desperado\Framework\Modules\MessageErrorHandlerModule;
 use Desperado\Framework\Modules\MessageValidationModule;
 use Desperado\Framework\Modules\ModuleInterface;
 use Desperado\Framework\Modules\SagaModule;
-use Desperado\Framework\StorageManager\StorageManagerRegistry;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\AnnotationsReaderInterface;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
 use Desperado\Infrastructure\Bridge\Logger\Handlers\ColorizeStdOutHandler;
@@ -42,11 +38,9 @@ use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use Desperado\MessageSerializer\StoreEventPayloadSerializer;
-use Desperado\Saga\AbstractSaga;
-use Desperado\Saga\Configuration\AnnotationsSagaConfigurationExtractor;
-use Desperado\Saga\SagaStorageManager;
-use Desperado\Saga\SagaStore;
 use Desperado\Saga\Serializer\SagaSerializer;
+use Desperado\Saga\Service\SagaService;
+use Desperado\Saga\Store\SagaStore;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
@@ -104,13 +98,6 @@ abstract class AbstractBootstrap
     private $storedMessageSerializer;
 
     /**
-     * Storage managers registry
-     *
-     * @var StorageManagerRegistry
-     */
-    private $storageManagersRegistry;
-
-    /**
      * Message router
      *
      * @var MessageRouterInterface
@@ -137,6 +124,13 @@ abstract class AbstractBootstrap
      * @var RouterInterface
      */
     private $httpRouter;
+
+    /**
+     * Saga service
+     *
+     * @var SagaService|null
+     */
+    private $sagaService;
 
     /**
      * @param string                          $rootDirectoryPath
@@ -166,14 +160,8 @@ abstract class AbstractBootstrap
 
         $this->init();
 
-        $this->initAggregatesStorage();
         $this->initMessageRouter();
         $this->initHttpRouter();
-
-        if(true === \class_exists(AbstractSaga::class))
-        {
-            $this->initSagaStorage();
-        }
 
         $this->executionMetricsCollector = $this->getMetricsCollector();
     }
@@ -214,8 +202,8 @@ abstract class AbstractBootstrap
      * Get aggregates list
      *
      * [
-     *     0 => 'someAggregateNamespace',
-     *     1 => 'someAggregateNamespace',
+     *     'someAggregateNamespace' => 'someAggregateIdentityClassNamespace',
+     *     'someAggregateNamespace' => 'someAggregateIdentityClassNamespace',
      *     ....
      * ]
      *
@@ -228,8 +216,8 @@ abstract class AbstractBootstrap
      * Get sagas list
      *
      * [
-     *     0 => 'someSagaNamespace',
-     *     1 => 'someSagaNamespace',
+     *     'someSagaNamespace' => 'someSagaIdentityClassNamespace',
+     *     'someSagaNamespace' => 'someSagaIdentityClassNamespace',
      *     ....
      * ]
      *
@@ -310,13 +298,17 @@ abstract class AbstractBootstrap
             new MessageErrorHandlerModule()
         ];
 
-        if(true === \class_exists('Desperado\EventSourcing\Saga\AbstractSaga'))
-        {
-            $modules[] = new SagaModule(
-                $this->getStorageManagersRegistry()->getSagaManagers(),
-                new AnnotationsSagaConfigurationExtractor($this->annotationsReader)
-            );
-        }
+        $this->sagaService = new SagaService(
+            new SagaStore(
+                $this->getSagaStorage(),
+                $this->getSagaSerializer()
+            )
+        );
+
+        $modules[] = new SagaModule(
+            $this->sagaService,
+            $this->getSagasList()
+        );
 
         if(true === \class_exists('Symfony\Component\Validator'))
         {
@@ -404,21 +396,6 @@ abstract class AbstractBootstrap
     final protected function getStoredMessageSerializer(): MessageSerializerInterface
     {
         return $this->storedMessageSerializer;
-    }
-
-    /**
-     * Get storage managers registry
-     *
-     * @return StorageManagerRegistry
-     */
-    final protected function getStorageManagersRegistry(): StorageManagerRegistry
-    {
-        if(null === $this->storageManagersRegistry)
-        {
-            $this->storageManagersRegistry = new StorageManagerRegistry();
-        }
-
-        return $this->storageManagersRegistry;
     }
 
     /**
@@ -614,85 +591,4 @@ abstract class AbstractBootstrap
 
         LoggerRegistry::setupHandlers($this->getLoggerHandlers());
     }
-
-    /**
-     * Init saga storage managers
-     *
-     * @return void
-     *
-     * @throws EntryPointException
-     */
-    private function initSagaStorage(): void
-    {
-        $sagaStore = new SagaStore(
-            $this->getSagaStorage(),
-            $this->getSagaSerializer()
-        );
-
-        foreach($this->getSagasList() as $sagaNamespace)
-        {
-            if(true === \class_exists($sagaNamespace))
-            {
-                $this
-                    ->getStorageManagersRegistry()
-                    ->addSagaStorageManager(
-                        $sagaNamespace,
-                        new SagaStorageManager(
-                            $sagaNamespace,
-                            $sagaStore
-                        )
-                    );
-            }
-            else
-            {
-                throw new EntryPointException(
-                    \sprintf(
-                        'Saga class "%s" not found', $sagaNamespace
-                    )
-                );
-            }
-        }
-    }
-
-    /**
-     * Init aggregates storage managers
-     *
-     * @return void
-     *
-     * @throws EntryPointException
-     */
-    private function initAggregatesStorage(): void
-    {
-        $eventStore = new EventStore(
-            $this->getAggregateEventStorage(),
-            $this->storedMessageSerializer
-        );
-
-        $aggregateRepository = new AggregateRepository($eventStore);
-
-        foreach($this->getAggregatesList() as $aggregateNamespace)
-        {
-            if(true === \class_exists($aggregateNamespace))
-            {
-                $this
-                    ->getStorageManagersRegistry()
-                    ->addAggregateStorageManager(
-                        $aggregateNamespace,
-                        new AggregateStorageManager(
-                            $aggregateNamespace,
-                            $aggregateRepository
-                        )
-                    );
-            }
-            else
-            {
-                throw new EntryPointException(
-                    \sprintf(
-                        'Aggregate class "%s" not found', $aggregateNamespace
-                    )
-                );
-            }
-        }
-    }
-
 }

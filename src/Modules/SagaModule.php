@@ -13,12 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Modules;
 
-use Desperado\CQRS\Configuration\MessageHandlerData;
-use Desperado\CQRS\ExecutionContextOptions\EventListenerOptions;
 use Desperado\CQRS\MessageBusBuilder;
-use Desperado\Saga\Configuration\SagaConfigurationExtractorInterface;
-use Desperado\Saga\SagaEventHandler;
-use Desperado\Saga\SagaStorageManagerInterface;
+use Desperado\Saga\Service\SagaService;
 
 /**
  * Saga support module
@@ -26,30 +22,33 @@ use Desperado\Saga\SagaStorageManagerInterface;
 class SagaModule implements ModuleInterface
 {
     /**
-     * Saga storage managers
+     * List of sagas
      *
-     * @var SagaStorageManagerInterface[]
+     * [
+     *     'someSagaNamespace' => 'someSagaIdentityClassNamespace',
+     *     'someSagaNamespace' => 'someSagaIdentityClassNamespace',
+     *     ....
+     * ]
+     *
+     * @var array
      */
-    private $sagaStorageManagers;
+    private $sagas = [];
 
     /**
-     * Saga configuration extractor
+     * Saga service
      *
-     * @var SagaConfigurationExtractorInterface
+     * @var SagaService
      */
-    private $configurationExtractor;
+    private $sagaService;
 
     /**
-     * @param SagaStorageManagerInterface[]       $sagaStorageManagers
-     * @param SagaConfigurationExtractorInterface $configurationExtractor
+     * @param SagaService $sagaService
+     * @param array       $sagas
      */
-    public function __construct(
-        array $sagaStorageManagers,
-        SagaConfigurationExtractorInterface $configurationExtractor
-    )
+    public function __construct(SagaService $sagaService, array $sagas)
     {
-        $this->sagaStorageManagers = $sagaStorageManagers;
-        $this->configurationExtractor = $configurationExtractor;
+        $this->sagaService = $sagaService;
+        $this->sagas = $sagas;
     }
 
     /**
@@ -57,32 +56,9 @@ class SagaModule implements ModuleInterface
      */
     public function boot(MessageBusBuilder $messageBusBuilder): void
     {
-        foreach($this->sagaStorageManagers as $storageManager)
+        foreach($this->sagas as $sagaNamespace => $sagaIdentityNamespace)
         {
-            $sagaNamespace = $storageManager->getSagaNamespace();
-            $headerDeclaration = $this->configurationExtractor->extractConfigDeclaration($sagaNamespace);
-
-            $eventListeners = $this->configurationExtractor->extractEventListeners($sagaNamespace);
-
-            foreach($eventListeners as $eventListenerData)
-            {
-                $eventListenerData->containingIdentityProperty = '' !== (string) $eventListenerData->containingIdentityProperty
-                    ? $eventListenerData->containingIdentityProperty
-                    : $headerDeclaration->containingIdentityProperty;
-
-                $handlerCallable = new SagaEventHandler(
-                    $headerDeclaration->identityNamespace,
-                    $storageManager,
-                    $eventListenerData
-                );
-
-                $messageHandler = new MessageHandlerData();
-                $messageHandler->messageClassNamespace = $eventListenerData->eventNamespace;
-                $messageHandler->executionOptions = new EventListenerOptions();
-                $messageHandler->messageHandler = \Closure::fromCallable($handlerCallable);
-
-                $messageBusBuilder->pushMessageHandler($messageHandler);
-            }
+            $this->sagaService->configure($messageBusBuilder, $sagaNamespace);
         }
     }
 }

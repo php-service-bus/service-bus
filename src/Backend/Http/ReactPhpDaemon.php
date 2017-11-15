@@ -207,33 +207,36 @@ class ReactPhpDaemon implements DaemonInterface
                                         {
                                             try
                                             {
-                                                return $resolve($context->getResponse());
+                                                $resolve($context->getResponse());
                                             }
                                             catch(\Throwable $throwable)
                                             {
-                                                return $reject($throwable);
+                                                $reject($throwable);
                                             }
                                         },
                                         function(\Throwable $throwable) use ($reject)
                                         {
-                                            return $reject($throwable);
+                                            $reject($throwable);
                                         }
                                     );
                                 }
                             }
                             catch(\Throwable $throwable)
                             {
-                                return $reject($throwable);
+                                $reject($throwable);
                             }
                         };
 
                         if(true === \in_array($request->getMethod(), ['GET', 'HEAD', 'DELETE']))
                         {
-                            return $requestHandler($request);
+                            $requestHandler($request);
                         }
                         else
                         {
-                            $request->getBody()->on(
+                            /** @var \Evenement\EventEmitterInterface $eventEmitter */
+                            $eventEmitter = $request->getBody();
+
+                            $eventEmitter->on(
                                 'data',
                                 function(string $requestBody) use ($request, $requestHandler)
                                 {

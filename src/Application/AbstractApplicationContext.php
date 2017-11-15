@@ -24,10 +24,8 @@ use Desperado\Domain\Message\CommandInterface;
 use Desperado\Domain\Message\EventInterface;
 use Desperado\Domain\Message\MessageInterface;
 use Desperado\Domain\ThrowableFormatter;
-use Desperado\EventSourcing\Manager\AggregateStorageManagerInterface;
-use Desperado\Framework\Exceptions\ApplicationContextException;
-use Desperado\Framework\StorageManager\StorageManagerRegistry;
-use Desperado\Saga\SagaStorageManagerInterface;
+use Desperado\EventSourcing\EventSourcingService;
+use Desperado\Saga\Service\SagaService;
 use Psr\Log\LogLevel;
 
 /**
@@ -51,13 +49,6 @@ abstract class AbstractApplicationContext
     private $entryPointName;
 
     /**
-     * Storage managers registry for aggregates/sagas
-     *
-     * @var StorageManagerRegistry
-     */
-    private $storageManagersRegistry;
-
-    /**
      * Execute command options
      *
      * @var CommandHandlerOptions
@@ -79,19 +70,36 @@ abstract class AbstractApplicationContext
     private $queryHandlerOptions;
 
     /**
+     * Event sourcing service
+     *
+     * @var EventSourcingService
+     */
+    private $eventSourcingService;
+
+    /**
+     * Sagas service
+     *
+     * @var SagaService
+     */
+    private $sagaService;
+
+    /**
      * @param DeliveryContextInterface $originContext
      * @param string                   $entryPointName
-     * @param StorageManagerRegistry   $storageManagersRegistry
+     * @param EventSourcingService     $eventSourcingService
+     * @param SagaService              $sagaService
      */
     public function __construct(
         DeliveryContextInterface $originContext,
         string $entryPointName,
-        StorageManagerRegistry $storageManagersRegistry
+        EventSourcingService $eventSourcingService,
+        SagaService $sagaService
     )
     {
         $this->originContext = $originContext;
         $this->entryPointName = $entryPointName;
-        $this->storageManagersRegistry = $storageManagersRegistry;
+        $this->eventSourcingService = $eventSourcingService;
+        $this->sagaService = $sagaService;
     }
 
     /**
@@ -177,59 +185,29 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
-    final public function publish(EventInterface$event, DeliveryOptions $deliveryOptions): void
+    final public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
     {
         $this->originContext->publish($event, $deliveryOptions);
     }
 
     /**
-     * Get manager for specified aggregate
+     * Get event sourcing (aggregate) service
      *
-     * @param string $aggregateNamespace
-     *
-     * @return AggregateStorageManagerInterface
+     * @return EventSourcingService
      */
-    public function getAggregateManager(string $aggregateNamespace): AggregateStorageManagerInterface
+    final public function getAggregateService(): EventSourcingService
     {
-        $manager = $this
-            ->getStorageManagersRegistry()
-            ->getAggregateManager($aggregateNamespace);
-
-        if(null !== $manager)
-        {
-            return $manager;
-        }
-
-        throw new ApplicationContextException(
-            \sprintf(
-                'The manager for aggregate "%s" was not configured', $aggregateNamespace
-            )
-        );
+        return $this->eventSourcingService;
     }
 
     /**
-     * Get manager for specified saga
+     * Get saga service
      *
-     * @param string $sagaNamespace
-     *
-     * @return SagaStorageManagerInterface
+     * @return SagaService
      */
-    public function getSagaManager(string $sagaNamespace): SagaStorageManagerInterface
+    final public function getSagaService(): SagaService
     {
-        $manager = $this
-            ->getStorageManagersRegistry()
-            ->getSagaManager($sagaNamespace);
-
-        if(null !== $manager)
-        {
-            return $manager;
-        }
-
-        throw new ApplicationContextException(
-            \sprintf(
-                'The manager for saga "%s" was not configured', $sagaNamespace
-            )
-        );
+        return $this->sagaService;
     }
 
     /**
@@ -298,15 +276,5 @@ abstract class AbstractApplicationContext
     final protected function getEntryPointName()
     {
         return $this->entryPointName;
-    }
-
-    /**
-     * Get storage manager registry
-     *
-     * @return StorageManagerRegistry
-     */
-    final protected function getStorageManagersRegistry()
-    {
-        return $this->storageManagersRegistry;
     }
 }

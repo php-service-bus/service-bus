@@ -19,13 +19,11 @@ use Desperado\Domain\CQRS\MessageBusInterface;
 use Desperado\Domain\EntryPoint\MessageRouterInterface;
 use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\Message\MessageInterface;
-use Desperado\Framework\FrameworkEventsInterface;
-use Desperado\Framework\Listeners as FrameworkListeners;
+use Desperado\EventSourcing\EventSourcingService;
 use Desperado\Framework\MessageProcessor;
 use Desperado\Framework\Metrics\MetricsCollectorInterface;
-use Desperado\Framework\StorageManager\StorageManagerRegistry;
+use Desperado\Saga\Service\SagaService;
 use React\Promise\PromiseInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Application kernel
@@ -45,13 +43,6 @@ abstract class AbstractKernel
      * @var Environment
      */
     private $environment;
-
-    /**
-     * Storage managers registry
-     *
-     * @var StorageManagerRegistry
-     */
-    private $storageManagersRegistry;
 
     /**
      * Message router
@@ -82,43 +73,50 @@ abstract class AbstractKernel
     private $messageProcessor;
 
     /**
-     * Core event dispatcher
+     * Aggregates service
      *
-     * @var EventDispatcher
+     * @var EventSourcingService
      */
-    private $eventDispatcher;
+    private $eventSourcingService;
+
+    /**
+     * Sagas service
+     *
+     * @var SagaService
+     */
+    private $sagaService;
 
     /**
      * @param string                    $entryPointName
      * @param Environment               $environment
-     * @param StorageManagerRegistry    $storageManagersRegistry
      * @param MessageRouterInterface    $messageRouter
      * @param MessageBusInterface       $messageBus
      * @param MetricsCollectorInterface $metricsCollector
+     * @param EventSourcingService      $eventSourcingService
+     * @param SagaService               $sagaService
      */
     public function __construct(
         string $entryPointName,
         Environment $environment,
-        StorageManagerRegistry $storageManagersRegistry,
         MessageRouterInterface $messageRouter,
         MessageBusInterface $messageBus,
-        MetricsCollectorInterface $metricsCollector
+        MetricsCollectorInterface $metricsCollector,
+        EventSourcingService $eventSourcingService,
+        SagaService $sagaService
     )
     {
         $this->entryPointName = $entryPointName;
         $this->environment = $environment;
-        $this->storageManagersRegistry = $storageManagersRegistry;
         $this->messageRouter = $messageRouter;
         $this->messageBus = $messageBus;
         $this->metricsCollector = $metricsCollector;
-
-        $this->eventDispatcher = new EventDispatcher();
-
-        $this->initDefaultCoreListeners();
+        $this->eventSourcingService = $eventSourcingService;
+        $this->sagaService = $sagaService;
 
         $this->messageProcessor = new MessageProcessor(
-            $this->eventDispatcher,
-            $this->messageBus
+            $this->messageBus,
+            $this->eventSourcingService,
+            $this->sagaService
         );
     }
 
@@ -132,7 +130,7 @@ abstract class AbstractKernel
      */
     final public function handle(MessageInterface $message, ContextInterface $context): PromiseInterface
     {
-        $context = $this->createApplicationContext($context, $this->storageManagersRegistry);
+        $context = $this->createApplicationContext($context);
 
         return $this->messageProcessor->execute($message, $context);
     }
@@ -140,14 +138,12 @@ abstract class AbstractKernel
     /**
      * Create application context
      *
-     * @param ContextInterface       $originContext
-     * @param StorageManagerRegistry $storageManagersRegistry
+     * @param ContextInterface $originContext
      *
      * @return AbstractApplicationContext
      */
     abstract protected function createApplicationContext(
-        ContextInterface $originContext,
-        StorageManagerRegistry $storageManagersRegistry
+        ContextInterface $originContext
     ): AbstractApplicationContext;
 
     /**
@@ -171,6 +167,26 @@ abstract class AbstractKernel
     }
 
     /**
+     * Get event sourcing service
+     *
+     * @return EventSourcingService
+     */
+    final protected function getEventSourcingService(): EventSourcingService
+    {
+        return $this->eventSourcingService;
+    }
+
+    /**
+     * Get sagas service
+     *
+     * @return SagaService
+     */
+    final protected function getSagaService(): SagaService
+    {
+        return $this->sagaService;
+    }
+
+    /**
      * Get message router
      *
      * @return MessageRouterInterface
@@ -188,69 +204,5 @@ abstract class AbstractKernel
     final protected function getMetricsCollector(): MetricsCollectorInterface
     {
         return $this->metricsCollector;
-    }
-
-    /**
-     * Get storage manager registry
-     *
-     * @return StorageManagerRegistry
-     */
-    final protected function getStorageManagersRegistry(): StorageManagerRegistry
-    {
-        return $this->storageManagersRegistry;
-    }
-
-    /**
-     * Add framework core event listener
-     *
-     * @param string   $eventName
-     * @param callable $listener
-     * @param int      $priority
-     *
-     * @return void
-     */
-    final protected function addCoreEventListener(string $eventName, callable $listener, int $priority = 0)
-    {
-        $this->eventDispatcher->addListener($eventName, $listener, $priority);
-    }
-
-    /**
-     * Init default event listeners
-     *
-     * @return void
-     */
-    private function initDefaultCoreListeners(): void
-    {
-        $flushManagersListener = new FrameworkListeners\FlushStoragesListener(
-            $this->storageManagersRegistry,
-            $this->eventDispatcher
-        );
-
-        $collection = [
-            FrameworkEventsInterface::BEFORE_MESSAGE_EXECUTION => [
-                new FrameworkListeners\StartMessageExecutionListener()
-            ],
-            FrameworkEventsInterface::AFTER_MESSAGE_EXECUTION  => [
-                $flushManagersListener,
-                new FrameworkListeners\LogFinishedMessageExecutionListener()
-            ],
-            FrameworkEventsInterface::MESSAGE_EXECUTION_FAILED => [
-                $flushManagersListener
-            ],
-            FrameworkEventsInterface::BEFORE_FLUSH_EXECUTION   => [
-                new FrameworkListeners\StartFlushStoragesListener()
-            ],
-            FrameworkEventsInterface::AFTER_FLUSH_EXECUTION   => [
-                new FrameworkListeners\FinishedFlushStoragesListener()
-            ]
-        ];
-
-        foreach($collection as $key => $listeners)
-        {
-            foreach($listeners as $listener)
-            {
-                $this->addCoreEventListener($key, $listener);
-            }
-        }
     }
 }

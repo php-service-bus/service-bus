@@ -17,13 +17,14 @@ use Desperado\CQRS\Context\HttpRequestContextInterface;
 use Desperado\CQRS\MessageBus;
 use Desperado\Domain\Message\AbstractQueryMessage;
 use Desperado\Domain\Message\MessageInterface;
+use Desperado\EventSourcing\EventSourcingService;
 use Desperado\Framework\Application\AbstractApplicationContext;
-use Desperado\Framework\Events as FrameworkEvents;
 use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
+use Desperado\Saga\Service\SagaService;
+use function React\Promise\all;
 use React\Promise\FulfilledPromise;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Message execution processor
@@ -38,24 +39,33 @@ class MessageProcessor
     private $messageBus;
 
     /**
-     * Framework event dispatcher
+     * Event sourcing service
      *
-     * @var EventDispatcherInterface
+     * @var EventSourcingService
      */
-    private $eventDispatcher;
+    private $eventSourcingService;
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param MessageBus               $messageBus
+     * Sagas service
+     *
+     * @var SagaService
+     */
+    private $sagaService;
+
+    /**
+     * @param MessageBus           $messageBus
+     * @param EventSourcingService $eventSourcingService
+     * @param SagaService          $sagaService
      */
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        MessageBus $messageBus
+        MessageBus $messageBus,
+        EventSourcingService $eventSourcingService,
+        SagaService $sagaService
     )
     {
-        $this->eventDispatcher = $dispatcher;
         $this->messageBus = $messageBus;
-
+        $this->eventSourcingService = $eventSourcingService;
+        $this->sagaService = $sagaService;
     }
 
     /**
@@ -87,15 +97,8 @@ class MessageProcessor
         return new Promise(
             function($resolve, $reject) use ($message, $context)
             {
-                $this->eventDispatcher->dispatch(
-                    FrameworkEventsInterface::BEFORE_MESSAGE_EXECUTION,
-                    new FrameworkEvents\OnMessageExecutionStartedEvent($message, $context)
-                );
-
                 try
                 {
-                    $messageStartTime = \microtime(true);
-
                     /** Handle message */
                     $promise = $this->messageBus->handle($message, $context);
 
@@ -105,33 +108,34 @@ class MessageProcessor
                     }
 
                     $promise->then(
-                        function() use ($message, $context, $resolve, $messageStartTime)
+                        function() use ($message, $context, $resolve, $reject)
                         {
                             try
                             {
-                                $this->eventDispatcher->dispatch(
-                                    FrameworkEventsInterface::AFTER_MESSAGE_EXECUTION,
-                                    new FrameworkEvents\OnMessageExecutionFinishedEvent(
-                                        $message,
-                                        $context,
-                                        \microtime(true) - $messageStartTime
-                                    )
-                                );
+                                $promise = all([
+                                    $this->eventSourcingService->commitAll($context),
+                                    $this->sagaService->commitAll($context),
+                                ]);
 
-                                $resolve();
+                                $promise->then(
+                                    $resolve,
+                                    function(\Throwable $throwable) use ($reject, $context, $message)
+                                    {
+                                        $context->logContextThrowable($message, $throwable);
+
+                                        $reject($throwable);
+                                    }
+                                );
                             }
                             catch(\Throwable $throwable)
                             {
                                 $context->logContextThrowable($message, $throwable);
+
+                                $reject($throwable);
                             }
                         },
                         function(\Throwable $throwable) use ($message, $context, $reject)
                         {
-                            $this->eventDispatcher->dispatch(
-                                FrameworkEventsInterface::MESSAGE_EXECUTION_FAILED,
-                                new FrameworkEvents\OnMessageExecutionFailedEvent($message, $context, $throwable)
-                            );
-
                             if(
                                 $message instanceof AbstractQueryMessage &&
                                 $context instanceof HttpRequestContextInterface
@@ -162,10 +166,7 @@ class MessageProcessor
                 }
                 catch(\Throwable $throwable)
                 {
-                    $this->eventDispatcher->dispatch(
-                        FrameworkEventsInterface::MESSAGE_EXECUTION_FAILED,
-                        new FrameworkEvents\OnMessageExecutionFailedEvent($message, $context, $throwable)
-                    );
+                    $context->logContextThrowable($message, $throwable);
 
                     $reject($throwable);
                 }
