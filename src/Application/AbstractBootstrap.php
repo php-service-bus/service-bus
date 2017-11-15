@@ -23,6 +23,9 @@ use Desperado\Domain\EventStore\EventStorageInterface;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\Saga\SagaSerializer\SagaSerializerInterface;
 use Desperado\Domain\SagaStore\SagaStorageInterface;
+use Desperado\EventSourcing\EventSourcingService;
+use Desperado\EventSourcing\Repository\AggregateRepository;
+use Desperado\EventSourcing\Store\EventStore;
 use Desperado\Framework\Exceptions\EntryPointException;
 use Desperado\Framework\MessageRouter;
 use Desperado\Framework\Metrics\MetricsCollectorInterface;
@@ -128,9 +131,16 @@ abstract class AbstractBootstrap
     /**
      * Saga service
      *
-     * @var SagaService|null
+     * @var SagaService
      */
     private $sagaService;
+
+    /**
+     * Event sourcing service
+     *
+     * @var EventSourcingService
+     */
+    private $eventSourcingService;
 
     /**
      * @param string                          $rootDirectoryPath
@@ -276,6 +286,7 @@ abstract class AbstractBootstrap
         $annotationsExtractor = new AnnotationsExtractor($this->annotationsReader);
         $messageBusBuilder = new MessageBusBuilder($annotationsExtractor, $this->httpRouter);
 
+        $this->initEventSourcingService();
         $this->initModules($messageBusBuilder);
         $this->initServices($messageBusBuilder);
 
@@ -429,6 +440,26 @@ abstract class AbstractBootstrap
     }
 
     /**
+     * Get saga service
+     *
+     * @return SagaService
+     */
+    final protected function getSagaService()
+    {
+        return $this->sagaService;
+    }
+
+    /**
+     * Get event sourcing service
+     *
+     * @return EventSourcingService
+     */
+    final protected function getEventSourcingService(): EventSourcingService
+    {
+        return $this->eventSourcingService;
+    }
+
+    /**
      * Init message router
      *
      * @return void
@@ -446,6 +477,23 @@ abstract class AbstractBootstrap
     private function initHttpRouter(): void
     {
         $this->httpRouter = new FastRouterBridge();
+    }
+
+    /**
+     * Init event sourcing (aggregates) service
+     *
+     * @return void
+     */
+    private function initEventSourcingService(): void
+    {
+        $this->eventSourcingService = new EventSourcingService(
+            new AggregateRepository(
+                new EventStore(
+                    $this->getAggregateEventStorage(),
+                    $this->getStoredMessageSerializer()
+                )
+            )
+        );
     }
 
     /**
