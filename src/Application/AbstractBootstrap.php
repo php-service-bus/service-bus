@@ -313,7 +313,9 @@ abstract class AbstractBootstrap
             new SagaStore(
                 $this->getSagaStorage(),
                 $this->getSagaSerializer()
-            )
+            ),
+            null,
+            LoggerRegistry::getLogger('sagas')
         );
 
         $modules[] = new SagaModule(

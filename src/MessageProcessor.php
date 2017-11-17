@@ -117,15 +117,16 @@ class MessageProcessor
                                     $this->sagaService->commitAll($context),
                                 ]);
 
-                                $promise->then(
-                                    $resolve,
-                                    function(\Throwable $throwable) use ($reject, $context, $message)
-                                    {
-                                        $context->logContextThrowable($message, $throwable);
+                                $promise
+                                    ->then(
+                                        $resolve,
+                                        function(\Throwable $throwable) use ($reject, $context, $message)
+                                        {
+                                            $context->logContextThrowable($message, $throwable);
 
-                                        $reject($throwable);
-                                    }
-                                );
+                                            $reject($throwable);
+                                        }
+                                    );
                             }
                             catch(\Throwable $throwable)
                             {

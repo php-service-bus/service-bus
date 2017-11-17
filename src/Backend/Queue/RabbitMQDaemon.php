@@ -108,8 +108,6 @@ class RabbitMQDaemon implements DaemonInterface
                             $callable = function() use ($channel, $incoming, $incomeMessageHash)
                             {
                                 unset($this->tasksInProgress[$incomeMessageHash]);
-
-                                $channel->ack($incoming);
                             };
 
                             $this
@@ -177,9 +175,28 @@ class RabbitMQDaemon implements DaemonInterface
 
             $context = new RabbitMqDaemonContext($incoming, $channel, $serializer, $this->environment);
 
-            return $entryPoint->handleMessage(
+            /** @var PromiseInterface $promise */
+            $promise = $entryPoint->handleMessage(
                 $serializer->unserialize($incoming->content),
                 $context
+            );
+
+            return $promise->then(
+                function() use ($channel, $incoming)
+                {
+                    $channel->ack($incoming);
+
+                    return true;
+                },
+                function(\Throwable $throwable) use ($channel, $incoming)
+                {
+                    if(false === ($throwable instanceof \LogicException))
+                    {
+                        $channel->nack($incoming);
+                    }
+
+                    return false;
+                }
             );
         }
         catch(\Throwable $throwable)

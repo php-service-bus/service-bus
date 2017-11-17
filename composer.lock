@@ -587,12 +587,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "d976598a61fcc6dabd2a0cbb221243204cad93af"
+                "reference": "b65924b101755097b95c297920a294187581c78d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/d976598a61fcc6dabd2a0cbb221243204cad93af",
-                "reference": "d976598a61fcc6dabd2a0cbb221243204cad93af",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/b65924b101755097b95c297920a294187581c78d",
+                "reference": "b65924b101755097b95c297920a294187581c78d",
                 "shasum": ""
             },
             "require": {
@@ -641,7 +641,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-11-14 09:38:54"
+            "time": "2017-11-17 12:22:26"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -649,12 +649,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "0094bc960a8903f6d611b13cae3ff7d62f6c8063"
+                "reference": "23178d99e85dff3773ba9c750378134f3d4a4fd2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/0094bc960a8903f6d611b13cae3ff7d62f6c8063",
-                "reference": "0094bc960a8903f6d611b13cae3ff7d62f6c8063",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/23178d99e85dff3773ba9c750378134f3d4a4fd2",
+                "reference": "23178d99e85dff3773ba9c750378134f3d4a4fd2",
                 "shasum": ""
             },
             "require": {
@@ -694,7 +694,7 @@
                 "cqrs",
                 "event sourcing"
             ],
-            "time": "2017-11-14 14:55:10"
+            "time": "2017-11-17 12:17:52"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -702,12 +702,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "4e069e1b394ab4979fcc5912db52ae73a1fdc704"
+                "reference": "837652a54fcb9eef20fc157155e653c26d85cc29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/4e069e1b394ab4979fcc5912db52ae73a1fdc704",
-                "reference": "4e069e1b394ab4979fcc5912db52ae73a1fdc704",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/837652a54fcb9eef20fc157155e653c26d85cc29",
+                "reference": "837652a54fcb9eef20fc157155e653c26d85cc29",
                 "shasum": ""
             },
             "require": {
@@ -752,7 +752,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-11-15 07:21:54"
+            "time": "2017-11-17 12:23:37"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -760,12 +760,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-snapshotter.git",
-                "reference": "ec3c160d5e27e9e6ad1d3ba6a4c6e865a09fadd2"
+                "reference": "a9166e1e5a30b9e6bbc9d764f96e6fea0f24ef77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-snapshotter/zipball/ec3c160d5e27e9e6ad1d3ba6a4c6e865a09fadd2",
-                "reference": "ec3c160d5e27e9e6ad1d3ba6a4c6e865a09fadd2",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-snapshotter/zipball/a9166e1e5a30b9e6bbc9d764f96e6fea0f24ef77",
+                "reference": "a9166e1e5a30b9e6bbc9d764f96e6fea0f24ef77",
                 "shasum": ""
             },
             "require": {
@@ -808,7 +808,7 @@
                 "event sourcing",
                 "snapshot"
             ],
-            "time": "2017-11-10 11:02:05"
+            "time": "2017-11-17 12:24:59"
         },
         {
             "name": "mmasiukevich/infrastructure",
@@ -816,12 +816,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "8b678cf3b522a187c49cb66ac66c79cbe49b86c7"
+                "reference": "f4a839811f2d22c3e776aa4cab540247a452a7bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/8b678cf3b522a187c49cb66ac66c79cbe49b86c7",
-                "reference": "8b678cf3b522a187c49cb66ac66c79cbe49b86c7",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/f4a839811f2d22c3e776aa4cab540247a452a7bb",
+                "reference": "f4a839811f2d22c3e776aa4cab540247a452a7bb",
                 "shasum": ""
             },
             "require": {
@@ -869,7 +869,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-11-09 15:28:45"
+            "time": "2017-11-17 09:42:21"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -877,12 +877,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/message-serializer.git",
-                "reference": "eaf38163480688dc5d4e02a44802f4c9fe216d79"
+                "reference": "5a06b27e4e08f0c1c5d745d4c8d9d1d455e79feb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/eaf38163480688dc5d4e02a44802f4c9fe216d79",
-                "reference": "eaf38163480688dc5d4e02a44802f4c9fe216d79",
+                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/5a06b27e4e08f0c1c5d745d4c8d9d1d455e79feb",
+                "reference": "5a06b27e4e08f0c1c5d745d4c8d9d1d455e79feb",
                 "shasum": ""
             },
             "require": {
@@ -919,7 +919,7 @@
                 }
             ],
             "description": "Message serializer",
-            "time": "2017-11-10 09:46:43"
+            "time": "2017-11-17 10:58:00"
         },
         {
             "name": "mmasiukevich/saga",
@@ -927,12 +927,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "03bd701282788b2896a5a1219541caf640706dec"
+                "reference": "bd9be03dc3a9a9ce45ff6653ba827d060cb924bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/03bd701282788b2896a5a1219541caf640706dec",
-                "reference": "03bd701282788b2896a5a1219541caf640706dec",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/bd9be03dc3a9a9ce45ff6653ba827d060cb924bb",
+                "reference": "bd9be03dc3a9a9ce45ff6653ba827d060cb924bb",
                 "shasum": ""
             },
             "require": {
@@ -979,7 +979,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-11-15 09:39:10"
+            "time": "2017-11-17 15:09:06"
         },
         {
             "name": "monolog/monolog",
@@ -1853,7 +1853,7 @@
         },
         {
             "name": "symfony/dotenv",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dotenv.git",
@@ -1910,7 +1910,7 @@
         },
         {
             "name": "symfony/inflector",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/inflector.git",
@@ -2247,7 +2247,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
