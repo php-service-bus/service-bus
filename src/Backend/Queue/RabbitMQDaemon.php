@@ -190,10 +190,9 @@ class RabbitMQDaemon implements DaemonInterface
                 },
                 function(\Throwable $throwable) use ($channel, $incoming)
                 {
-                    if(false === ($throwable instanceof \LogicException))
-                    {
-                        $channel->nack($incoming);
-                    }
+                    $throwable instanceof \LogicException
+                        ? $channel->nack($incoming)
+                        : $channel->ack($incoming);
 
                     return false;
                 }
