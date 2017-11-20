@@ -702,28 +702,27 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "837652a54fcb9eef20fc157155e653c26d85cc29"
+                "reference": "ee6a7d1be7bf8433bf81b2bd770ab7514ab71a31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/837652a54fcb9eef20fc157155e653c26d85cc29",
-                "reference": "837652a54fcb9eef20fc157155e653c26d85cc29",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/ee6a7d1be7bf8433bf81b2bd770ab7514ab71a31",
+                "reference": "ee6a7d1be7bf8433bf81b2bd770ab7514ab71a31",
                 "shasum": ""
             },
             "require": {
                 "mmasiukevich/domain-common": "^0.1",
                 "mmasiukevich/event-sourcing-snapshotter": "^0.1",
+                "mmasiukevich/message-serializer": "^0.1",
                 "php": ">=7.1",
                 "react/promise": "v2.5.1"
             },
             "require-dev": {
-                "mmasiukevich/event-storage-in-memory": "^0.1",
-                "mmasiukevich/message-serializer": "^0.1",
+                "mongodb/mongodb": "1.1.2",
                 "phpunit/phpunit": "^6.2"
             },
             "suggest": {
-                "mmasiukevich/event-storage-in-memory": "Provides inMemory event storage",
-                "mmasiukevich/event-storage-pgsql": "Provides PostgreSQL event storage"
+                "mongodb/mongodb": "Provides MongoDB sagas storage"
             },
             "type": "library",
             "extra": {
@@ -752,7 +751,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-11-17 12:23:37"
+            "time": "2017-11-20 09:26:18"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -760,12 +759,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing-snapshotter.git",
-                "reference": "a9166e1e5a30b9e6bbc9d764f96e6fea0f24ef77"
+                "reference": "e9259fc3a6841394bc2d60e6b49b3fead5fef5b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-snapshotter/zipball/a9166e1e5a30b9e6bbc9d764f96e6fea0f24ef77",
-                "reference": "a9166e1e5a30b9e6bbc9d764f96e6fea0f24ef77",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-snapshotter/zipball/e9259fc3a6841394bc2d60e6b49b3fead5fef5b6",
+                "reference": "e9259fc3a6841394bc2d60e6b49b3fead5fef5b6",
                 "shasum": ""
             },
             "require": {
@@ -773,11 +772,11 @@
                 "php": ">=7.1"
             },
             "require-dev": {
+                "mongodb/mongodb": "1.1.2",
                 "phpunit/phpunit": "^6.2"
             },
             "suggest": {
-                "mmasiukevich/snapshot-storage-in-memory": "Provides InMemory snapshot storage",
-                "mmasiukevich/snapshot-storage-pgsql": "Provides PostgreSQL snapshot storage"
+                "mongodb/mongodb": "Provides MongoDB snapshot storage"
             },
             "type": "library",
             "extra": {
@@ -808,7 +807,7 @@
                 "event sourcing",
                 "snapshot"
             ],
-            "time": "2017-11-17 12:24:59"
+            "time": "2017-11-20 09:28:32"
         },
         {
             "name": "mmasiukevich/infrastructure",
@@ -816,12 +815,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "f4a839811f2d22c3e776aa4cab540247a452a7bb"
+                "reference": "126fd4a035823fc2726d8334a5e6e34d832dfae8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/f4a839811f2d22c3e776aa4cab540247a452a7bb",
-                "reference": "f4a839811f2d22c3e776aa4cab540247a452a7bb",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/126fd4a035823fc2726d8334a5e6e34d832dfae8",
+                "reference": "126fd4a035823fc2726d8334a5e6e34d832dfae8",
                 "shasum": ""
             },
             "require": {
@@ -869,7 +868,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-11-17 09:42:21"
+            "time": "2017-11-20 07:32:15"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -927,12 +926,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "bd9be03dc3a9a9ce45ff6653ba827d060cb924bb"
+                "reference": "a50fd7d4e146548b2b03865ce2f9553c435381b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/bd9be03dc3a9a9ce45ff6653ba827d060cb924bb",
-                "reference": "bd9be03dc3a9a9ce45ff6653ba827d060cb924bb",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/a50fd7d4e146548b2b03865ce2f9553c435381b6",
+                "reference": "a50fd7d4e146548b2b03865ce2f9553c435381b6",
                 "shasum": ""
             },
             "require": {
@@ -944,12 +943,11 @@
                 "react/promise": "v2.5.1"
             },
             "require-dev": {
+                "mongodb/mongodb": "1.1.2",
                 "phpunit/phpunit": "^6.2"
             },
             "suggest": {
-                "mmasiukevich/saga-storage-in-memory": "Provides inMemory event storage",
-                "mmasiukevich/saga-storage-mongodb": "Provides MongoDB event storage",
-                "mmasiukevich/saga-storage-pgsql": "Provides PostgreSQL event storage"
+                "mongodb/mongodb": "Provides MongoDB sagas storage"
             },
             "type": "library",
             "extra": {
@@ -979,7 +977,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-11-17 15:09:06"
+            "time": "2017-11-20 08:45:45"
         },
         {
             "name": "monolog/monolog",
@@ -1699,16 +1697,16 @@
         },
         {
             "name": "react/socket",
-            "version": "v0.8.5",
+            "version": "v0.8.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "d169d1ed24e39bf182781d72ddd224dbbd449aa8"
+                "reference": "2e8660111d14df908a913a058bce4a1786de489f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/d169d1ed24e39bf182781d72ddd224dbbd449aa8",
-                "reference": "d169d1ed24e39bf182781d72ddd224dbbd449aa8",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/2e8660111d14df908a913a058bce4a1786de489f",
+                "reference": "2e8660111d14df908a913a058bce4a1786de489f",
                 "shasum": ""
             },
             "require": {
@@ -1722,7 +1720,7 @@
             },
             "require-dev": {
                 "clue/block-react": "^1.2",
-                "phpunit/phpunit": "^5.0 || ^4.8"
+                "phpunit/phpunit": "^6.4 || ^5.7 || ^4.8.35"
             },
             "type": "library",
             "autoload": {
@@ -1742,7 +1740,7 @@
                 "reactphp",
                 "stream"
             ],
-            "time": "2017-10-23 21:45:58"
+            "time": "2017-11-18 16:47:56"
         },
         {
             "name": "react/stream",

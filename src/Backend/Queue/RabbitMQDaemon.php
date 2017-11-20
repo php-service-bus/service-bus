@@ -105,7 +105,7 @@ class RabbitMQDaemon implements DaemonInterface
                         {
                             $this->tasksInProgress[$incomeMessageHash] = 1;
 
-                            $callable = function() use ($channel, $incoming, $incomeMessageHash)
+                            $callable = function() use ($incomeMessageHash)
                             {
                                 unset($this->tasksInProgress[$incomeMessageHash]);
                             };
