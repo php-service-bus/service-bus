@@ -13,16 +13,11 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework;
 
-use Desperado\CQRS\Context\HttpRequestContextInterface;
 use Desperado\CQRS\MessageBus;
-use Desperado\Domain\Message\AbstractQueryMessage;
 use Desperado\Domain\Message\MessageInterface;
-use Desperado\EventSourcing\EventSourcingService;
+use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Framework\Application\AbstractApplicationContext;
-use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
 use Desperado\Saga\Service\SagaService;
-use function React\Promise\all;
-use React\Promise\FulfilledPromise;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
@@ -99,76 +94,15 @@ class MessageProcessor
             {
                 try
                 {
-                    /** Handle message */
-                    $promise = $this->messageBus->handle($message, $context);
+                    $this->messageBus->handle($message, $context);
 
-                    if(null === $promise || false === ($promise instanceof PromiseInterface))
-                    {
-                        $promise = new FulfilledPromise($promise);
-                    }
+                    $this->sagaService->commitAll($context);
+                    $this->eventSourcingService->commitAll($context);
 
-                    $promise->then(
-                        function() use ($message, $context, $resolve, $reject)
-                        {
-                            try
-                            {
-                                $promise = all([
-                                    $this->eventSourcingService->commitAll($context),
-                                    $this->sagaService->commitAll($context),
-                                ]);
-
-                                $promise
-                                    ->then(
-                                        $resolve,
-                                        function(\Throwable $throwable) use ($reject, $context, $message)
-                                        {
-                                            $context->logContextThrowable($message, $throwable);
-
-                                            $reject($throwable);
-                                        }
-                                    );
-                            }
-                            catch(\Throwable $throwable)
-                            {
-                                $context->logContextThrowable($message, $throwable);
-
-                                $reject($throwable);
-                            }
-                        },
-                        function(\Throwable $throwable) use ($message, $context, $reject)
-                        {
-                            if(
-                                $message instanceof AbstractQueryMessage &&
-                                $context instanceof HttpRequestContextInterface
-                            )
-                            {
-                                /** @var \Throwable|HttpException $throwable */
-
-                                $isHttpException = $throwable instanceof HttpException;
-                                $httpResponseCode = true === $isHttpException
-                                    ? $throwable->getHttpCode()
-                                    : 500;
-
-                                $httpExceptionMessage = true === $isHttpException
-                                    ? $throwable->getResponseMessage()
-                                    : 'Application error';
-
-
-                                $context->sendResponse(
-                                    $message,
-                                    $httpResponseCode,
-                                    $httpExceptionMessage
-                                );
-                            }
-
-                            $reject($throwable);
-                        }
-                    );
+                    $resolve();
                 }
                 catch(\Throwable $throwable)
                 {
-                    $context->logContextThrowable($message, $throwable);
-
                     $reject($throwable);
                 }
             }

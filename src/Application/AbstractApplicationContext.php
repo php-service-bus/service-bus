@@ -24,7 +24,7 @@ use Desperado\Domain\Message\CommandInterface;
 use Desperado\Domain\Message\EventInterface;
 use Desperado\Domain\Message\MessageInterface;
 use Desperado\Domain\ThrowableFormatter;
-use Desperado\EventSourcing\EventSourcingService;
+use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Saga\Service\SagaService;
 use Psr\Log\LogLevel;
 

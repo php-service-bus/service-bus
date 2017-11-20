@@ -19,7 +19,7 @@ use Desperado\Domain\CQRS\MessageBusInterface;
 use Desperado\Domain\EntryPoint\MessageRouterInterface;
 use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\Message\MessageInterface;
-use Desperado\EventSourcing\EventSourcingService;
+use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Framework\MessageProcessor;
 use Desperado\Framework\Metrics\MetricsCollectorInterface;
 use Desperado\Saga\Service\SagaService;

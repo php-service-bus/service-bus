@@ -190,6 +190,11 @@ class RabbitMQDaemon implements DaemonInterface
                 },
                 function(\Throwable $throwable) use ($channel, $incoming)
                 {
+                    if($throwable instanceof \LogicException)
+                    {
+                        ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
+                    }
+
                     $throwable instanceof \LogicException
                         ? $channel->nack($incoming)
                         : $channel->ack($incoming);

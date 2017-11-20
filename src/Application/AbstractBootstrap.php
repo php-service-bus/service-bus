@@ -23,7 +23,7 @@ use Desperado\Domain\EventStore\EventStorageInterface;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\Saga\SagaSerializer\SagaSerializerInterface;
 use Desperado\Domain\SagaStore\SagaStorageInterface;
-use Desperado\EventSourcing\EventSourcingService;
+use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\EventSourcing\Repository\AggregateRepository;
 use Desperado\EventSourcing\Store\EventStore;
 use Desperado\Framework\Exceptions\EntryPointException;
@@ -494,7 +494,8 @@ abstract class AbstractBootstrap
                     $this->getAggregateEventStorage(),
                     $this->getStoredMessageSerializer()
                 )
-            )
+            ),
+            LoggerRegistry::getLogger('aggregates')
         );
 
         foreach($this->getAggregatesList() as $aggregateNamespace => $identityNamespace)
