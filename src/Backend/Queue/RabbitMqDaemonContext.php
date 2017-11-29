@@ -18,9 +18,9 @@ use Bunny\Message;
 use Desperado\CQRS\Context\DeliveryContextInterface;
 use Desperado\CQRS\Context\DeliveryOptions;
 use Desperado\Domain\Environment\Environment;
-use Desperado\Domain\Message\CommandInterface;
-use Desperado\Domain\Message\EventInterface;
-use Desperado\Domain\Message\MessageInterface;
+use Desperado\Domain\Message\AbstractCommand;
+use Desperado\Domain\Message\AbstractEvent;
+use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\ParameterBag;
 use Desperado\Framework\Application\ApplicationLogger;
@@ -110,20 +110,20 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
     /**
      * @inheritdoc
      */
-    public function delivery(MessageInterface $message, DeliveryOptions $deliveryOptions = null): void
+    public function delivery(AbstractMessage $message, DeliveryOptions $deliveryOptions = null): void
     {
         $deliveryOptions = $deliveryOptions ?? new DeliveryOptions();
 
-        $message instanceof CommandInterface
+        $message instanceof AbstractCommand
             ? $this->send($message, $deliveryOptions)
-            /** @var EventInterface $message */
+            /** @var AbstractEvent $message */
             : $this->publish($message, $deliveryOptions);
     }
 
     /**
      * @inheritdoc
      */
-    public function send(CommandInterface $command, DeliveryOptions $deliveryOptions): void
+    public function send(AbstractCommand $command, DeliveryOptions $deliveryOptions): void
     {
         $this->publishMessage($deliveryOptions, $command);
     }
@@ -131,7 +131,7 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
     /**
      * @inheritdoc
      */
-    public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
+    public function publish(AbstractEvent $event, DeliveryOptions $deliveryOptions): void
     {
         $this->publishMessage($deliveryOptions, $event);
         $this->publishMessage(
@@ -146,11 +146,11 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
      * Send message to broker
      *
      * @param  DeliveryOptions $deliveryOptions
-     * @param MessageInterface $message
+     * @param AbstractMessage $message
      *
      * @return void
      */
-    private function publishMessage(DeliveryOptions $deliveryOptions, MessageInterface $message): void
+    private function publishMessage(DeliveryOptions $deliveryOptions, AbstractMessage $message): void
     {
         $destination = '' !== $deliveryOptions->getDestination()
             ? $deliveryOptions->getDestination()
@@ -174,7 +174,7 @@ class RabbitMqDaemonContext implements DeliveryContextInterface
                             self::LOG_CHANNEL_NAME,
                             \sprintf(
                                 '%s "%s" to "%s" exchange with routing key "%s". Message data: %s (with headers "%s")',
-                                $message instanceof CommandInterface
+                                $message instanceof AbstractCommand
                                     ? 'Send message'
                                     : 'Publish event',
                                 \get_class($message),

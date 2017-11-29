@@ -20,9 +20,9 @@ use Desperado\CQRS\Context\ExecutionOptionsContextInterface;
 use Desperado\CQRS\ExecutionContextOptions\CommandHandlerOptions;
 use Desperado\CQRS\ExecutionContextOptions\EventListenerOptions;
 use Desperado\CQRS\ExecutionContextOptions\QueryHandlerOptions;
-use Desperado\Domain\Message\CommandInterface;
-use Desperado\Domain\Message\EventInterface;
-use Desperado\Domain\Message\MessageInterface;
+use Desperado\Domain\Message\AbstractCommand;
+use Desperado\Domain\Message\AbstractEvent;
+use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Saga\Service\SagaService;
@@ -106,13 +106,13 @@ abstract class AbstractApplicationContext
      * @inheritdoc
      */
     public function logContextMessage(
-        MessageInterface $message,
+        AbstractMessage $message,
         string $logMessage,
         string $level = LogLevel::INFO,
         array $extra = []
     ): void
     {
-        $options = $message instanceof CommandInterface
+        $options = $message instanceof AbstractCommand
             ? $this->commandExecutionOptions
             : $this->eventListenerOptions;
 
@@ -132,7 +132,7 @@ abstract class AbstractApplicationContext
      * @inheritdoc
      */
     public function logContextThrowable(
-        MessageInterface $message,
+        AbstractMessage $message,
         \Throwable $throwable,
         string $level = LogLevel::ERROR,
         array $extra = []
@@ -145,7 +145,7 @@ abstract class AbstractApplicationContext
      * @inheritdoc
      */
     public function getContextThrowableCallableLogger(
-        MessageInterface $message,
+        AbstractMessage $message,
         string $level = LogLevel::ERROR
     ): callable
     {
@@ -169,7 +169,7 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
-    final public function send(CommandInterface $command, DeliveryOptions $deliveryOptions): void
+    final public function send(AbstractCommand $command, DeliveryOptions $deliveryOptions): void
     {
         $this->originContext->delivery($command, $deliveryOptions);
     }
@@ -177,7 +177,7 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
-    final public function delivery(MessageInterface $message, DeliveryOptions $deliveryOptions = null): void
+    final public function delivery(AbstractMessage $message, DeliveryOptions $deliveryOptions = null): void
     {
         $this->originContext->delivery($message, $deliveryOptions);
     }
@@ -185,7 +185,7 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
-    final public function publish(EventInterface $event, DeliveryOptions $deliveryOptions): void
+    final public function publish(AbstractEvent $event, DeliveryOptions $deliveryOptions): void
     {
         $this->originContext->publish($event, $deliveryOptions);
     }

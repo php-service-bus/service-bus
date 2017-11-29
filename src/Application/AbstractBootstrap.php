@@ -24,7 +24,6 @@ use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\Saga\SagaSerializer\SagaSerializerInterface;
 use Desperado\Domain\SagaStore\SagaStorageInterface;
 use Desperado\EventSourcing\Service\EventSourcingService;
-use Desperado\EventSourcing\Repository\AggregateRepository;
 use Desperado\EventSourcing\Store\EventStore;
 use Desperado\Framework\Exceptions\EntryPointException;
 use Desperado\Framework\MessageRouter;
@@ -40,7 +39,7 @@ use Desperado\Infrastructure\Bridge\Logger\Handlers\ColorizeStdOutHandler;
 use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
-use Desperado\MessageSerializer\StoreEventPayloadSerializer;
+use Desperado\MessageSerializer\CompressMessageSerializer;
 use Desperado\Saga\Serializer\SagaSerializer;
 use Desperado\Saga\Service\SagaService;
 use Desperado\Saga\Store\SagaStore;
@@ -161,7 +160,7 @@ abstract class AbstractBootstrap
         $this->environmentFilePath = $environmentFilePath;
         $this->messageSerializer = $messageSerializer;
         $this->annotationsReader = $annotationsReader ?? new DoctrineAnnotationsReader();
-        $this->storedMessageSerializer = $storedMessageSerializer ?? new StoreEventPayloadSerializer($messageSerializer);
+        $this->storedMessageSerializer = $storedMessageSerializer ?? new CompressMessageSerializer($messageSerializer);
 
         $this->initDotEnv();
         $this->initEnvironment();
@@ -489,12 +488,10 @@ abstract class AbstractBootstrap
     private function initEventSourcingService(): void
     {
         $this->eventSourcingService = new EventSourcingService(
-            new AggregateRepository(
                 new EventStore(
                     $this->getAggregateEventStorage(),
                     $this->getStoredMessageSerializer()
-                )
-            ),
+                ),
             LoggerRegistry::getLogger('aggregates')
         );
 

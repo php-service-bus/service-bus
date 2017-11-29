@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\Framework;
 
 use Desperado\CQRS\MessageBus;
-use Desperado\Domain\Message\MessageInterface;
+use Desperado\Domain\Message\AbstractMessage;
 use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Framework\Application\AbstractApplicationContext;
 use Desperado\Saga\Service\SagaService;
@@ -66,12 +66,12 @@ class MessageProcessor
     /**
      * Execute message
      *
-     * @param MessageInterface           $message
+     * @param AbstractMessage           $message
      * @param AbstractApplicationContext $context
      *
      * @return PromiseInterface
      */
-    public function execute(MessageInterface $message, AbstractApplicationContext $context): PromiseInterface
+    public function execute(AbstractMessage $message, AbstractApplicationContext $context): PromiseInterface
     {
         return $this->createHandleMessagePromise($message, $context);
     }
@@ -79,13 +79,13 @@ class MessageProcessor
     /**
      * Create message execution promise
      *
-     * @param MessageInterface           $message
+     * @param AbstractMessage           $message
      * @param AbstractApplicationContext $context
      *
      * @return PromiseInterface
      */
     private function createHandleMessagePromise(
-        MessageInterface $message,
+        AbstractMessage $message,
         AbstractApplicationContext $context
     ): PromiseInterface
     {

@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\Framework;
 
 use Desperado\Domain\EntryPoint\MessageRouterInterface;
-use Desperado\Domain\Message\MessageInterface;
+use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Framework\Exceptions\EntryPointException;
 
 /**
@@ -75,7 +75,7 @@ class MessageRouter implements MessageRouterInterface
     /**
      * @inheritdoc
      */
-    public function routeMessage(MessageInterface $message): array
+    public function routeMessage(AbstractMessage $message): array
     {
         $messageClass = \get_class($message);
 

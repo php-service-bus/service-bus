@@ -18,7 +18,7 @@ use Desperado\Domain\CQRS\ContextInterface;
 use Desperado\Domain\CQRS\MessageBusInterface;
 use Desperado\Domain\EntryPoint\MessageRouterInterface;
 use Desperado\Domain\Environment\Environment;
-use Desperado\Domain\Message\MessageInterface;
+use Desperado\Domain\Message\AbstractMessage;
 use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Framework\MessageProcessor;
 use Desperado\Framework\Metrics\MetricsCollectorInterface;
@@ -123,12 +123,12 @@ abstract class AbstractKernel
     /**
      * Handle message
      *
-     * @param MessageInterface $message
+     * @param AbstractMessage  $message
      * @param ContextInterface $context
      *
      * @return PromiseInterface
      */
-    final public function handle(MessageInterface $message, ContextInterface $context): PromiseInterface
+    final public function handle(AbstractMessage $message, ContextInterface $context): PromiseInterface
     {
         $context = $this->createApplicationContext($context);
 
