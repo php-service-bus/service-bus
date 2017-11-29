@@ -37,8 +37,6 @@ use Desperado\Infrastructure\Bridge\AnnotationsReader\AnnotationsReaderInterface
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
 use Desperado\Infrastructure\Bridge\Logger\Handlers\ColorizeStdOutHandler;
 use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
-use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
-use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use Desperado\MessageSerializer\CompressMessageSerializer;
 use Desperado\Saga\Serializer\SagaSerializer;
 use Desperado\Saga\Service\SagaService;
@@ -121,13 +119,6 @@ abstract class AbstractBootstrap
     private $executionMetricsCollector;
 
     /**
-     * Http requests router
-     *
-     * @var RouterInterface
-     */
-    private $httpRouter;
-
-    /**
      * Saga service
      *
      * @var SagaService
@@ -170,7 +161,6 @@ abstract class AbstractBootstrap
         $this->init();
 
         $this->initMessageRouter();
-        $this->initHttpRouter();
 
         $this->executionMetricsCollector = $this->getMetricsCollector();
     }
@@ -283,7 +273,7 @@ abstract class AbstractBootstrap
     final public function boot(): EntryPoint
     {
         $annotationsExtractor = new AnnotationsExtractor($this->annotationsReader);
-        $messageBusBuilder = new MessageBusBuilder($annotationsExtractor, $this->httpRouter);
+        $messageBusBuilder = new MessageBusBuilder($annotationsExtractor);
 
         $this->initEventSourcingService();
         $this->initModules($messageBusBuilder);
@@ -431,16 +421,6 @@ abstract class AbstractBootstrap
     }
 
     /**
-     * Get http request router
-     *
-     * @return RouterInterface
-     */
-    final protected function getHttpRouter(): RouterInterface
-    {
-        return $this->httpRouter;
-    }
-
-    /**
      * Get saga service
      *
      * @return SagaService
@@ -468,16 +448,6 @@ abstract class AbstractBootstrap
     private function initMessageRouter(): void
     {
         $this->messageRouter = new MessageRouter($this->getMessageRouterConfiguration());
-    }
-
-    /**
-     * Init http request route
-     *
-     * @return void
-     */
-    private function initHttpRouter(): void
-    {
-        $this->httpRouter = new FastRouterBridge();
     }
 
     /**

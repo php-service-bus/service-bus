@@ -19,7 +19,6 @@ use Desperado\CQRS\Context\DeliveryOptions;
 use Desperado\CQRS\Context\ExecutionOptionsContextInterface;
 use Desperado\CQRS\ExecutionContextOptions\CommandHandlerOptions;
 use Desperado\CQRS\ExecutionContextOptions\EventListenerOptions;
-use Desperado\CQRS\ExecutionContextOptions\QueryHandlerOptions;
 use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
@@ -61,13 +60,6 @@ abstract class AbstractApplicationContext
      * @var EventListenerOptions
      */
     private $eventListenerOptions;
-
-    /**
-     * Query execution options
-     *
-     * @var QueryHandlerOptions
-     */
-    private $queryHandlerOptions;
 
     /**
      * Event sourcing service
@@ -229,14 +221,6 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
-    final public function appendQueryHandlerOptions(QueryHandlerOptions $options): void
-    {
-        $this->queryHandlerOptions = $options;
-    }
-
-    /**
-     * @inheritdoc
-     */
     final public function getCommandHandlerOptions(): CommandHandlerOptions
     {
         return $this->commandExecutionOptions;
@@ -248,14 +232,6 @@ abstract class AbstractApplicationContext
     public function getEventListenerOptions(): EventListenerOptions
     {
         return $this->eventListenerOptions;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getQueryHandlerOptions(): QueryHandlerOptions
-    {
-        return $this->queryHandlerOptions;
     }
 
     /**
