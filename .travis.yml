@@ -2,6 +2,9 @@ language: php
 
 sudo: false
 
+services:
+  - mongodb
+
 matrix:
     include:
         - php: 7.1
@@ -10,9 +13,13 @@ matrix:
     fast_finish: true
 
 before_script:
+  - mongod --version
+  - pecl install -f mongodb
+  - php --ri mongodb
   - composer self-update
+  - composer install --no-interaction
 
-install: travis_retry composer update --prefer-dist
+script: ./vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml.dist --coverage-text --testdox ./tests
 
 notifications:
   email:
@@ -21,5 +28,3 @@ notifications:
 cache:
   directories:
     - $HOME/.composer/cache
-
-script: ./vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml.dist --coverage-text --testdox ./tests
