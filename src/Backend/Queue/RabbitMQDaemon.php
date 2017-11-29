@@ -23,8 +23,6 @@ use Desperado\Domain\Environment\Environment;
 use Desperado\Framework\Application\ApplicationLogger;
 use EventLoop\EventLoop;
 use Psr\Log\LogLevel;
-use React\Promise\PromiseInterface;
-use React\Promise\RejectedPromise;
 
 /**
  * RabbitMQ subscriber
@@ -38,6 +36,9 @@ class RabbitMQDaemon implements DaemonInterface
     protected const EXCHANGE_TYPE_DIRECT = 'direct';
     protected const EXCHANGE_TYPE_FANOUT = 'fanout';
     protected const EXCHANGE_TYPE_TOPIC = 'topic';
+
+    protected const QOS_DEFAULT_PRE_FETCH_SIZE = 0;
+    protected const QOS_DEFAULT_PRE_FETCH_COUNT = 5;
 
     /**
      * Subscriber client
@@ -68,10 +69,30 @@ class RabbitMQDaemon implements DaemonInterface
     private $environment;
 
     /**
+     * Broker options
+     *
+     * [
+     *    'pre_fetch_size' => 0,
+     *    'pre_fetch_count' => 5
+     * ]
+     *
+     * @var array
+     */
+    private $brokerOptions;
+
+    /**
+     * Options example:
+     *
+     * [
+     *    'pre_fetch_size' => 0,
+     *    'pre_fetch_count' => 5
+     * ]
+     *
      * @param string      $connectionDSN
      * @param Environment $environment
+     * @param array       $brokerOptions
      */
-    public function __construct(string $connectionDSN, Environment $environment)
+    public function __construct(string $connectionDSN, Environment $environment, array $brokerOptions = [])
     {
         $this->initSignals();
         $this->initFailHandler();
@@ -81,6 +102,11 @@ class RabbitMQDaemon implements DaemonInterface
             EventLoop::getLoop(),
             \parse_url($connectionDSN)
         );
+
+        $this->brokerOptions = [
+            'pre_fetch_size'  => $brokerOptions['pre_fetch_size'] ?? self::QOS_DEFAULT_PRE_FETCH_SIZE,
+            'pre_fetch_count' => $brokerOptions['pre_fetch_count'] ?? self::QOS_DEFAULT_PRE_FETCH_COUNT
+        ];
     }
 
     /**
@@ -99,21 +125,7 @@ class RabbitMQDaemon implements DaemonInterface
                 EventLoop::getLoop()->futureTick(
                     function() use ($incoming, $channel, $entryPoint)
                     {
-                        $incomeMessageHash = \hash('sha512', $incoming->content);
-
-                        if(self::MAX_TASK_IN_PROGRESS > \count($this->tasksInProgress))
-                        {
-                            $this->tasksInProgress[$incomeMessageHash] = 1;
-
-                            $callable = function() use ($incomeMessageHash)
-                            {
-                                unset($this->tasksInProgress[$incomeMessageHash]);
-                            };
-
-                            $this
-                                ->handleMessage($entryPoint, $incoming, $channel)
-                                ->then($callable, $callable);
-                        }
+                        $this->handleMessage($entryPoint, $incoming, $channel);
                     }
                 );
             },
@@ -153,9 +165,57 @@ class RabbitMQDaemon implements DaemonInterface
      * @param Message             $incoming
      * @param Channel             $channel
      *
-     * @return PromiseInterface
+     * @return void
      */
-    private function handleMessage(EntryPointInterface $entryPoint, Message $incoming, Channel $channel): PromiseInterface
+    private function handleMessage(EntryPointInterface $entryPoint, Message $incoming, Channel $channel): void
+    {
+        $incomeMessageHash = \hash('sha512', $incoming->content);
+
+        if(self::MAX_TASK_IN_PROGRESS > \count($this->tasksInProgress))
+        {
+            $this->tasksInProgress[$incomeMessageHash] = 1;
+
+            try
+            {
+                $this->logIncomeMessage($incoming);
+
+                $serializer = $entryPoint->getMessageSerializer();
+
+                $context = new RabbitMqDaemonContext(
+                    $incoming,
+                    $channel,
+                    $serializer,
+                    $this->environment
+                );
+
+                $entryPoint->handleMessage(
+                    $serializer->unserialize($incoming->content),
+                    $context
+                );
+
+                $channel->ack($incoming);
+            }
+            catch(\Throwable $throwable)
+            {
+                ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
+
+                $throwable instanceof \LogicException
+                    ? $channel->nack($incoming)
+                    : $channel->ack($incoming);
+            }
+
+            unset($this->tasksInProgress[$incomeMessageHash]);
+        }
+    }
+
+    /**
+     * Push income message to log
+     *
+     * @param Message $incoming
+     *
+     * @return void
+     */
+    private function logIncomeMessage(Message $incoming): void
     {
         if(true === $this->environment->isDebug())
         {
@@ -164,75 +224,10 @@ class RabbitMQDaemon implements DaemonInterface
                 \sprintf(
                     'Message received: "%s" with headers "%s"',
                     $incoming->content,
-                    \urldecode(http_build_query((array) $incoming->headers))
+                    \urldecode(\http_build_query((array) $incoming->headers))
                 )
             );
         }
-
-        try
-        {
-            $serializer = $entryPoint->getMessageSerializer();
-
-            $context = new RabbitMqDaemonContext($incoming, $channel, $serializer, $this->environment);
-
-            /** @var PromiseInterface $promise */
-            $promise = $entryPoint->handleMessage(
-                $serializer->unserialize($incoming->content),
-                $context
-            );
-
-            return $promise->then(
-                function() use ($channel, $incoming)
-                {
-                    $channel->ack($incoming);
-
-                    return true;
-                },
-                function(\Throwable $throwable) use ($channel, $incoming)
-                {
-                    if($throwable instanceof \LogicException)
-                    {
-                        ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable);
-                    }
-
-                    $throwable instanceof \LogicException
-                        ? $channel->nack($incoming)
-                        : $channel->ack($incoming);
-
-                    return false;
-                }
-            );
-        }
-        catch(\Throwable $throwable)
-        {
-            return new RejectedPromise($throwable);
-        }
-    }
-
-    /**
-     * Init connection fail handler
-     *
-     * @return void
-     */
-    private function initFailHandler(): void
-    {
-        $this->failPromiseResultHandler = function(\Throwable $throwable)
-        {
-            ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable, LogLevel::CRITICAL);
-        };
-    }
-
-    /**
-     * Init unix signals
-     *
-     * @return void
-     */
-    private function initSignals(): void
-    {
-        \pcntl_signal(\SIGINT, [$this, 'stop']);
-        \pcntl_signal(\SIGTERM, [$this, 'stop']);
-
-        \pcntl_async_signals(true);
     }
 
     /**
@@ -257,7 +252,7 @@ class RabbitMQDaemon implements DaemonInterface
                             function(Channel $channel)
                             {
                                 return $channel
-                                    ->qos(0, 1)
+                                    ->qos($this->brokerOptions['pre_fetch_size'], $this->brokerOptions['pre_fetch_count'])
                                     ->then(
                                         function() use ($channel)
                                         {
@@ -348,5 +343,31 @@ class RabbitMQDaemon implements DaemonInterface
                 },
                 $this->failPromiseResultHandler
             );
+    }
+
+    /**
+     * Init connection fail handler
+     *
+     * @return void
+     */
+    private function initFailHandler(): void
+    {
+        $this->failPromiseResultHandler = function(\Throwable $throwable)
+        {
+            ApplicationLogger::throwable(self::LOG_CHANNEL_NAME, $throwable, LogLevel::CRITICAL);
+        };
+    }
+
+    /**
+     * Init unix signals
+     *
+     * @return void
+     */
+    private function initSignals(): void
+    {
+        \pcntl_signal(\SIGINT, [$this, 'stop']);
+        \pcntl_signal(\SIGTERM, [$this, 'stop']);
+
+        \pcntl_async_signals(true);
     }
 }

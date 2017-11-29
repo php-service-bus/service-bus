@@ -18,8 +18,6 @@ use Desperado\Domain\Message\AbstractMessage;
 use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Framework\Application\AbstractApplicationContext;
 use Desperado\Saga\Service\SagaService;
-use React\Promise\Promise;
-use React\Promise\PromiseInterface;
 
 /**
  * Message execution processor
@@ -69,43 +67,13 @@ class MessageProcessor
      * @param AbstractMessage           $message
      * @param AbstractApplicationContext $context
      *
-     * @return PromiseInterface
+     * @return void
      */
-    public function execute(AbstractMessage $message, AbstractApplicationContext $context): PromiseInterface
+    public function execute(AbstractMessage $message, AbstractApplicationContext $context): void
     {
-        return $this->createHandleMessagePromise($message, $context);
-    }
+        $this->messageBus->handle($message, $context);
 
-    /**
-     * Create message execution promise
-     *
-     * @param AbstractMessage           $message
-     * @param AbstractApplicationContext $context
-     *
-     * @return PromiseInterface
-     */
-    private function createHandleMessagePromise(
-        AbstractMessage $message,
-        AbstractApplicationContext $context
-    ): PromiseInterface
-    {
-        return new Promise(
-            function($resolve, $reject) use ($message, $context)
-            {
-                try
-                {
-                    $this->messageBus->handle($message, $context);
-
-                    $this->sagaService->commitAll($context);
-                    $this->eventSourcingService->commitAll($context);
-
-                    $resolve();
-                }
-                catch(\Throwable $throwable)
-                {
-                    $reject($throwable);
-                }
-            }
-        );
+        $this->sagaService->commitAll($context);
+        $this->eventSourcingService->commitAll($context);
     }
 }

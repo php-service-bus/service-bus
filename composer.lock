@@ -587,12 +587,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "ea5ccb1c5d30a9ee5406112d011c60b34eb0b0b0"
+                "reference": "bef31310400787cc66d8df9d0bc71a19cca5f82c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/ea5ccb1c5d30a9ee5406112d011c60b34eb0b0b0",
-                "reference": "ea5ccb1c5d30a9ee5406112d011c60b34eb0b0b0",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/bef31310400787cc66d8df9d0bc71a19cca5f82c",
+                "reference": "bef31310400787cc66d8df9d0bc71a19cca5f82c",
                 "shasum": ""
             },
             "require": {
@@ -641,7 +641,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-11-29 08:44:50"
+            "time": "2017-11-29 13:11:03"
         },
         {
             "name": "mmasiukevich/domain-common",

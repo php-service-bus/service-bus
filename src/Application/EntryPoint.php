@@ -17,7 +17,6 @@ use Desperado\Domain\CQRS\ContextInterface;
 use Desperado\Domain\EntryPoint\EntryPointInterface;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
-use React\Promise\PromiseInterface;
 
 /**
  * Application entry point
@@ -79,11 +78,9 @@ final class EntryPoint implements EntryPointInterface
 
     /**
      * @inheritdoc
-     *
-     * @return PromiseInterface
      */
-    public function handleMessage(AbstractMessage $message, ContextInterface $context): PromiseInterface
+    public function handleMessage(AbstractMessage $message, ContextInterface $context): void
     {
-        return $this->kernel->handle($message, $context);
+        $this->kernel->handle($message, $context);
     }
 }

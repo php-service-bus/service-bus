@@ -23,7 +23,6 @@ use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Framework\MessageProcessor;
 use Desperado\Framework\Metrics\MetricsCollectorInterface;
 use Desperado\Saga\Service\SagaService;
-use React\Promise\PromiseInterface;
 
 /**
  * Application kernel
@@ -126,13 +125,13 @@ abstract class AbstractKernel
      * @param AbstractMessage  $message
      * @param ContextInterface $context
      *
-     * @return PromiseInterface
+     * @return void
      */
-    final public function handle(AbstractMessage $message, ContextInterface $context): PromiseInterface
+    final public function handle(AbstractMessage $message, ContextInterface $context): void
     {
         $context = $this->createApplicationContext($context);
 
-        return $this->messageProcessor->execute($message, $context);
+        $this->messageProcessor->execute($message, $context);
     }
 
     /**
