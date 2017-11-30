@@ -11,22 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\Framework\Tests;
+namespace Desperado\Framework\Backend;
 
-use PHPUnit\Framework\TestCase;
+use Desperado\Framework\FrameworkEventsInterface;
 
 /**
- * @deprecated
+ * 
  */
-class InitTests extends TestCase
+class InvalidDaemonConfigurationException extends \LogicException implements FrameworkEventsInterface
 {
-    /**
-     * @test
-     *
-     * @return void
-     */
-    public function someTest(): void
-    {
-        static::assertTrue(true);
-    }
+
 }

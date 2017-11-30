@@ -66,14 +66,11 @@ class MonologMetricsCollector implements MetricsCollectorInterface
             {
                 try
                 {
-                    $value = (string) $this->valueFormatter->format(['data' => $value])['data'];
-
-                    if(true === \is_numeric($value))
-                    {
-                        $value = \round($value, 4);
-                    }
-
-                    $this->logger->log($this->logLevel, \sprintf('%s: %s', $type, $value), $tags);
+                    $this->logger->log(
+                        $this->logLevel,
+                        \sprintf('%s: %s', $type, $this->formatValue($value)),
+                        $tags
+                    );
 
                     $resolve();
                 }
@@ -83,5 +80,25 @@ class MonologMetricsCollector implements MetricsCollectorInterface
                 }
             }
         );
+    }
+
+
+    /**
+     * Format specified value
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    private function formatValue($value)
+    {
+        $formatted = (string) $this->valueFormatter->format(['data' => $value])['data'];
+
+        if(true === \is_numeric($formatted))
+        {
+            $formatted = \round($value, 4);
+        }
+
+        return $formatted;
     }
 }
