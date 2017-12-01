@@ -26,6 +26,7 @@ use Desperado\Domain\ThrowableFormatter;
 use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Saga\Service\SagaService;
 use Psr\Log\LogLevel;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base application context
@@ -39,13 +40,6 @@ abstract class AbstractApplicationContext
      * @var DeliveryContextInterface
      */
     private $originContext;
-
-    /**
-     * Entry point name
-     *
-     * @var string
-     */
-    private $entryPointName;
 
     /**
      * Execute command options
@@ -62,36 +56,20 @@ abstract class AbstractApplicationContext
     private $eventListenerOptions;
 
     /**
-     * Event sourcing service
+     * Container
      *
-     * @var EventSourcingService
+     * @var ContainerInterface
      */
-    private $eventSourcingService;
-
-    /**
-     * Sagas service
-     *
-     * @var SagaService
-     */
-    private $sagaService;
+    private $container;
 
     /**
      * @param DeliveryContextInterface $originContext
-     * @param string                   $entryPointName
-     * @param EventSourcingService     $eventSourcingService
-     * @param SagaService              $sagaService
+     * @param ContainerInterface       $container
      */
-    public function __construct(
-        DeliveryContextInterface $originContext,
-        string $entryPointName,
-        EventSourcingService $eventSourcingService,
-        SagaService $sagaService
-    )
+    public function __construct(DeliveryContextInterface $originContext, ContainerInterface $container)
     {
         $this->originContext = $originContext;
-        $this->entryPointName = $entryPointName;
-        $this->eventSourcingService = $eventSourcingService;
-        $this->sagaService = $sagaService;
+        $this->container = $container;
     }
 
     /**
@@ -150,7 +128,8 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
-    public function getThrowableCallableLogger(string $level = LogLevel::ERROR): callable
+    public function getThrowableCallableLogger(string $level = LogLevel::ERROR
+    ): callable
     {
         return function(\Throwable $throwable) use ($level)
         {
@@ -183,13 +162,23 @@ abstract class AbstractApplicationContext
     }
 
     /**
+     * Get DI container
+     *
+     * @return ContainerInterface
+     */
+    final public function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
+
+    /**
      * Get event sourcing (aggregate) service
      *
      * @return EventSourcingService
      */
     final public function getAggregateService(): EventSourcingService
     {
-        return $this->eventSourcingService;
+        return $this->getContainer()->get('kernel.event_sourcing.service');
     }
 
     /**
@@ -199,7 +188,7 @@ abstract class AbstractApplicationContext
      */
     final public function getSagaService(): SagaService
     {
-        return $this->sagaService;
+        return $this->getContainer()->get('kernel.sagas.service');
     }
 
     /**
@@ -251,6 +240,6 @@ abstract class AbstractApplicationContext
      */
     final protected function getEntryPointName()
     {
-        return $this->entryPointName;
+        return $this->getContainer()->getParameter('kernel.entry_point');
     }
 }

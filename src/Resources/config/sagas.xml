@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- Saga storage instance -->
+        <service id="kernel.sagas.storage" synthetic="true"/>
+
+        <!-- Saga serializer -->
+        <service id="kernel.sagas.serializer" class="Desperado\Saga\Serializer\SagaSerializer"/>
+
+        <!-- Saga store -->
+        <service id="kernel.sagas.store" class="Desperado\Saga\Store\SagaStore" public="false">
+            <argument type="service" id="kernel.sagas.storage"/>
+            <argument type="service" id="kernel.sagas.serializer"/>
+        </service>
+
+        <!-- Configuration extractor -->
+        <service id="kernel.sagas.configuration_extractor"
+                 class="Desperado\Saga\Service\Configuration\AnnotationsSagaConfigurationExtractor"
+                 public="false">
+            <argument type="service" id="kernel.infrastructure.annotations_reader"/>
+        </service>
+
+        <!-- Saga service -->
+        <service id="kernel.sagas.service" class="Desperado\Saga\Service\SagaService" public="true">
+            <argument type="service" id="kernel.sagas.store"/>
+            <argument type="service" id="kernel.sagas.configuration_extractor"/>
+            <argument type="service" id="kernel.logger"/>
+
+            <tag name="kernel.logger" channel="sagas"/>
+        </service>
+
+    </services>
+
+</container>

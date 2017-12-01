@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- Apply service error handlers support -->
+        <service id="kernel.modules.error_handlers" class="Desperado\Framework\Modules\MessageErrorHandlerModule"
+                 public="false">
+            <tag name="kernel.module"/>
+        </service>
+
+        <!-- Apply symfony validation support -->
+        <service id="kernel.modules.validation" class="Desperado\Framework\Modules\MessageValidationModule"
+                 public="false">
+            <tag name="kernel.module"/>
+        </service>
+
+    </services>
+
+</container>

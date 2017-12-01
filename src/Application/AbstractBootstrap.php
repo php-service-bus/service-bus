@@ -13,35 +13,13 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application;
 
-use Desperado\CQRS\Configuration\AnnotationsExtractor;
-use Desperado\CQRS\MessageBusBuilder;
-use Desperado\Domain\CQRS\MessageBusInterface;
-use Desperado\Domain\CQRS\ServiceInterface;
-use Desperado\Domain\EntryPoint\MessageRouterInterface;
-use Desperado\Domain\Environment\Environment;
-use Desperado\Domain\EventStore\EventStorageInterface;
-use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
-use Desperado\Domain\Saga\SagaSerializer\SagaSerializerInterface;
-use Desperado\Domain\SagaStore\SagaStorageInterface;
-use Desperado\EventSourcing\Service\EventSourcingService;
-use Desperado\EventSourcing\Store\EventStore;
-use Desperado\Framework\Exceptions\EntryPointException;
-use Desperado\Framework\MessageRouter;
-use Desperado\Framework\Metrics\MetricsCollectorInterface;
-use Desperado\Framework\Metrics\NullMetricsCollector;
-use Desperado\Framework\Modules\MessageErrorHandlerModule;
-use Desperado\Framework\Modules\MessageValidationModule;
-use Desperado\Framework\Modules\ModuleInterface;
-use Desperado\Framework\Modules\SagaModule;
-use Desperado\Infrastructure\Bridge\AnnotationsReader\AnnotationsReaderInterface;
-use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
-use Desperado\Infrastructure\Bridge\Logger\Handlers\ColorizeStdOutHandler;
+use Desperado\Domain as DesperadoDomain;
+use Desperado\Framework as DesperadoFramework;
 use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
-use Desperado\MessageSerializer\CompressMessageSerializer;
-use Desperado\Saga\Serializer\SagaSerializer;
-use Desperado\Saga\Service\SagaService;
-use Desperado\Saga\Store\SagaStore;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection;
 use Symfony\Component\Dotenv\Dotenv;
+
 
 /**
  * Base application bootstrap
@@ -49,153 +27,72 @@ use Symfony\Component\Dotenv\Dotenv;
 abstract class AbstractBootstrap
 {
     /**
-     * Application root directory path
+     * DI container
      *
-     * @var string
+     * @var DependencyInjection\ContainerBuilder
      */
-    private $rootDirectoryPath;
+    private $container;
 
     /**
-     * DotEnv file path
+     * @param string $rootDirectoryPath
+     * @param string $environmentFilePath
      *
-     * @var string
+     * @throws DesperadoFramework\Exceptions\EntryPointException
      */
-    private $environmentFilePath;
-
-    /**
-     * Entry point name
-     *
-     * @var string
-     */
-    private $entryPointName;
-
-    /**
-     * Annotations reader
-     *
-     * @var AnnotationsReaderInterface
-     */
-    private $annotationsReader;
-
-    /**
-     * Application environment
-     *
-     * @var Environment
-     */
-    private $environment;
-
-    /**
-     * Message serializer
-     *
-     * @var MessageSerializerInterface
-     */
-    private $messageSerializer;
-
-    /**
-     * A serializer for storing events in the database
-     *
-     * @var SagaSerializerInterface
-     */
-    private $storedMessageSerializer;
-
-    /**
-     * Message router
-     *
-     * @var MessageRouterInterface
-     */
-    private $messageRouter;
-
-    /**
-     * Message bus
-     *
-     * @var MessageBusInterface
-     */
-    private $messageBus;
-
-    /**
-     * Execution metrics collector
-     *
-     * @var MetricsCollectorInterface
-     */
-    private $executionMetricsCollector;
-
-    /**
-     * Saga service
-     *
-     * @var SagaService
-     */
-    private $sagaService;
-
-    /**
-     * Event sourcing service
-     *
-     * @var EventSourcingService
-     */
-    private $eventSourcingService;
-
-    /**
-     * @param string                          $rootDirectoryPath
-     * @param string                          $environmentFilePath
-     * @param MessageSerializerInterface      $messageSerializer
-     * @param AnnotationsReaderInterface|null $annotationsReader
-     * @param MessageSerializerInterface|null $storedMessageSerializer
-     */
-    public function __construct(
-        string $rootDirectoryPath,
-        string $environmentFilePath,
-        MessageSerializerInterface $messageSerializer,
-        AnnotationsReaderInterface $annotationsReader = null,
-        MessageSerializerInterface $storedMessageSerializer = null
-    )
+    public function __construct(string $rootDirectoryPath, string $environmentFilePath)
     {
-        $this->rootDirectoryPath = \rtrim($rootDirectoryPath, '/');
-        $this->environmentFilePath = $environmentFilePath;
-        $this->messageSerializer = $messageSerializer;
-        $this->annotationsReader = $annotationsReader ?? new DoctrineAnnotationsReader();
-        $this->storedMessageSerializer = $storedMessageSerializer ?? new CompressMessageSerializer($messageSerializer);
+        $this->initDotEnv($environmentFilePath);
 
-        $this->initDotEnv();
-        $this->initEnvironment();
-        $this->initEntryPoint();
-        $this->initLoggerRegistry();
+        $environment = '' !== (string) \getenv('APP_ENVIRONMENT')
+            ? (string) \getenv('APP_ENVIRONMENT')
+            : DesperadoDomain\Environment\Environment::ENVIRONMENT_SANDBOX;
 
-        $this->init();
-
-        $this->initMessageRouter();
-
-        $this->executionMetricsCollector = $this->getMetricsCollector();
+        $this->buildContainer(
+            \rtrim($rootDirectoryPath, '/'),
+            \strtolower($environment),
+            (string) \getenv('APP_ENTRY_POINT_NAME')
+        );
     }
 
     /**
-     * Custom components initialization
+     * Boot application
      *
-     * @return void
+     * @return EntryPoint
      */
-    protected function init(): void
+    final public function boot()
     {
+        $this->configureSagas();
+        $this->configureAggregates();
+        $this->configureServices();
 
+        $messageBus = $this->container->get('kernel.cqrs.message_bus_builder')->build();
+
+
+
+        return $entryPoint;
     }
 
     /**
-     * Get execution metrics collector
-     *
-     * @return MetricsCollectorInterface
+     * @return ContainerInterface
      */
-    protected function getMetricsCollector(): MetricsCollectorInterface
+    public function getContainer(): ContainerInterface
     {
-        return new NullMetricsCollector();
+        return $this->container;
     }
 
     /**
-     * Get messages router configuration
+     * Get aggregates event storage
      *
-     * [
-     *     'someEventNamespace'   => 'someDestinationExchange',
-     *     'someCommandNamespace' => 'someDestinationExchange'
-     * ]
-     *
-     * @return array
+     * @return DesperadoDomain\EventStore\EventStorageInterface
      */
-    abstract protected function getMessageRouterConfiguration(): array;
+    abstract protected function getAggregateEventStorage(): DesperadoDomain\EventStore\EventStorageInterface;
+
+    /**
+     * Get sagas storage
+     *
+     * @return DesperadoDomain\SagaStore\SagaStorageInterface
+     */
+    abstract protected function getSagaStorage(): DesperadoDomain\SagaStore\SagaStorageInterface;
 
     /**
      * Get aggregates list
@@ -215,8 +112,8 @@ abstract class AbstractBootstrap
      * Get sagas list
      *
      * [
-     *     'someSagaNamespace' => 'someSagaIdentityClassNamespace',
-     *     'someSagaNamespace' => 'someSagaIdentityClassNamespace',
+     *     0 => 'someSagaNamespace',
+     *     1 => 'someSagaNamespace',
      *     ....
      * ]
      *
@@ -226,343 +123,77 @@ abstract class AbstractBootstrap
     abstract protected function getSagasList(): array;
 
     /**
-     * Get aggregates event storage
-     *
-     * @return EventStorageInterface
-     */
-    abstract protected function getAggregateEventStorage(): EventStorageInterface;
-
-    /**
-     * Get sagas storage
-     *
-     * @return SagaStorageInterface
-     */
-    abstract protected function getSagaStorage(): SagaStorageInterface;
-
-    /**
-     * Get logger handlers
-     *
-     * @return \Monolog\Handler\HandlerInterface[]
-     */
-    protected function getLoggerHandlers(): array
-    {
-        return [
-            new ColorizeStdOutHandler()
-        ];
-    }
-
-    /**
      * Get application services
      *
-     * @return ServiceInterface[]
+     * @return DesperadoDomain\CQRS\ServiceInterface[]
      */
     abstract protected function getServices(): array;
 
     /**
-     * Create application kernel
+     * Get dependency injection  pass collection
      *
-     * @return AbstractKernel
+     * @return DependencyInjection\Compiler\CompilerPassInterface[]
      */
-    abstract public function createKernel(): AbstractKernel;
-
-    /**
-     * Boot application
-     *
-     * @return EntryPoint
-     */
-    final public function boot(): EntryPoint
+    protected function getCompilerPassCollection(): array
     {
-        $annotationsExtractor = new AnnotationsExtractor($this->annotationsReader);
-        $messageBusBuilder = new MessageBusBuilder($annotationsExtractor);
-
-        $this->initEventSourcingService();
-        $this->initModules($messageBusBuilder);
-        $this->initServices($messageBusBuilder);
-
-        $this->messageBus = $messageBusBuilder->build();
-
-        $kernel = $this->createKernel();
-        $entryPoint = $this->createEntryPoint($kernel);
-
-        return $entryPoint;
+        return [];
     }
 
     /**
-     * Get modules list
+     * Get dependency injection extensions
      *
-     * @return ModuleInterface[]
+     * @return DependencyInjection\Extension\Extension[]
      */
-    protected function getModules(): array
+    protected function getClientExtensionsCollection(): array
     {
-        $modules = [
-            new MessageErrorHandlerModule()
-        ];
+        return [];
+    }
 
-        $this->sagaService = new SagaService(
-            new SagaStore(
-                $this->getSagaStorage(),
-                $this->getSagaSerializer()
-            ),
-            null,
-            LoggerRegistry::getLogger('sagas')
+    /**
+     * Init DI container
+     *
+     * @todo: dump it
+     *
+     * @param string $rootDirectoryPath
+     * @param string $environment
+     * @param string $entryPointName
+     *
+     * @return void
+     *
+     * @throws DesperadoFramework\Exceptions\EntryPointException
+     */
+    private function buildContainer(string $rootDirectoryPath, string $environment, string $entryPointName): void
+    {
+        BootstrapGuard::guardEnvironment($environment);
+        BootstrapGuard::guardEntryPointName($entryPointName);
+        BootstrapGuard::guardPath(
+            $rootDirectoryPath,
+            'Incorrect path of root directory specified'
         );
 
-        $modules[] = new SagaModule(
-            $this->sagaService,
-            $this->getSagasList()
-        );
-
-        if(true === \class_exists('Symfony\Component\Validator'))
-        {
-            $modules[] = new MessageValidationModule();
-        }
-
-        return $modules;
-    }
-
-    /**
-     * Get sagas serializer
-     *
-     * @return SagaSerializerInterface
-     */
-    protected function getSagaSerializer(): SagaSerializerInterface
-    {
-        return new SagaSerializer();
-    }
-
-    /**
-     * Get message bus
-     *
-     * @return MessageBusInterface
-     */
-    final protected function getMessageBus(): MessageBusInterface
-    {
-        return $this->messageBus;
-    }
-
-    /**
-     * Get root directory path
-     *
-     * @return string
-     */
-    final protected function getRootDirectoryPath(): string
-    {
-        return $this->rootDirectoryPath;
-    }
-
-    /**
-     * Get entry point name
-     *
-     * @return string
-     */
-    final protected function getEntryPointName(): string
-    {
-        return $this->entryPointName;
-    }
-
-    /**
-     * Get application environment
-     *
-     * @return Environment
-     */
-    final protected function getEnvironment(): Environment
-    {
-        return $this->environment;
-    }
-
-    /**
-     * Get annotations reader
-     *
-     * @return AnnotationsReaderInterface
-     */
-    final protected function getAnnotationsReader(): AnnotationsReaderInterface
-    {
-        return $this->annotationsReader;
-    }
-
-    /**
-     * Get message serializer
-     *
-     * @return MessageSerializerInterface
-     */
-    final protected function getMessageSerializer(): MessageSerializerInterface
-    {
-        return $this->messageSerializer;
-    }
-
-    /**
-     * Get stored message serializer
-     *
-     * @return MessageSerializerInterface
-     */
-    final protected function getStoredMessageSerializer(): MessageSerializerInterface
-    {
-        return $this->storedMessageSerializer;
-    }
-
-    /**
-     * Get message router
-     *
-     * @return MessageRouterInterface
-     */
-    final protected function getMessageRouter(): MessageRouterInterface
-    {
-        return $this->messageRouter;
-    }
-
-    /**
-     * Get execution metrics collector
-     *
-     * @return MetricsCollectorInterface
-     */
-    final protected function getExecutionMetricsCollector(): MetricsCollectorInterface
-    {
-        return $this->executionMetricsCollector;
-    }
-
-    /**
-     * Get saga service
-     *
-     * @return SagaService
-     */
-    final protected function getSagaService()
-    {
-        return $this->sagaService;
-    }
-
-    /**
-     * Get event sourcing service
-     *
-     * @return EventSourcingService
-     */
-    final protected function getEventSourcingService(): EventSourcingService
-    {
-        return $this->eventSourcingService;
-    }
-
-    /**
-     * Init message router
-     *
-     * @return void
-     */
-    private function initMessageRouter(): void
-    {
-        $this->messageRouter = new MessageRouter($this->getMessageRouterConfiguration());
-    }
-
-    /**
-     * Init event sourcing (aggregates) service
-     *
-     * @return void
-     */
-    private function initEventSourcingService(): void
-    {
-        $this->eventSourcingService = new EventSourcingService(
-                new EventStore(
-                    $this->getAggregateEventStorage(),
-                    $this->getStoredMessageSerializer()
-                ),
-            LoggerRegistry::getLogger('aggregates')
-        );
-
-        foreach($this->getAggregatesList() as $aggregateNamespace => $identityNamespace)
-        {
-            $this->eventSourcingService->configure($aggregateNamespace, $identityNamespace);
-        }
-    }
-
-    /**
-     * Create application entry point
-     *
-     * @param AbstractKernel $kernel
-     *
-     * @return EntryPoint
-     */
-    private function createEntryPoint(AbstractKernel $kernel): EntryPoint
-    {
-        return new EntryPoint(
-            $this->entryPointName,
-            $this->messageSerializer,
-            $kernel
-        );
-    }
-
-    /**
-     * Init application modules
-     *
-     * @param MessageBusBuilder $messageBusBuilder
-     *
-     * @return void
-     */
-    private function initModules(MessageBusBuilder $messageBusBuilder): void
-    {
-        foreach($this->getModules() as $module)
-        {
-            if($module instanceof ModuleInterface)
-            {
-                $module->boot($messageBusBuilder);
-            }
-        }
-    }
-
-    /**
-     * Init application services
-     *
-     * @param MessageBusBuilder $messageBusBuilder
-     *
-     * @return void
-     *
-     * @throws EntryPointException
-     */
-    private function initServices(MessageBusBuilder $messageBusBuilder): void
-    {
-        foreach($this->getServices() as $service)
-        {
-            if($service instanceof ServiceInterface)
-            {
-                $messageBusBuilder->applyService($service);
-            }
-            else
-            {
-                throw new EntryPointException(
-                    \sprintf(
-                        'Service must implement "%s" interface', ServiceInterface::class
-                    )
-                );
-            }
-        }
-    }
-
-    /**
-     * Init DotEnv
-     *
-     * @return void
-     *
-     * @throws EntryPointException
-     */
-    private function initDotEnv(): void
-    {
         try
         {
-            if(
-                '' !== (string) $this->environmentFilePath &&
-                true === \file_exists($this->environmentFilePath) &&
-                true === \is_readable($this->environmentFilePath)
-            )
-            {
-                (new Dotenv())->load($this->environmentFilePath);
-            }
-            else
-            {
-                throw new \InvalidArgumentException(
-                    \sprintf('.env file not found (specified path: %s)', $this->environmentFilePath)
-                );
-            }
+            $this->container = new DependencyInjection\ContainerBuilder(
+                new DependencyInjection\ParameterBag\ParameterBag([
+                    'kernel.root_dir'    => $rootDirectoryPath,
+                    'kernel.env'         => $environment,
+                    'kernel.entry_point' => $entryPointName
+                ])
+            );
+
+            $this->container->set('kernel.logger', LoggerRegistry::getLogger($entryPointName));
+            $this->container->set('kernel.event_sourcing.storage', $this->getAggregateEventStorage());
+            $this->container->set('kernel.sagas.storage', $this->getSagaStorage());
+
+            $this->applyContainerExtensions();
+            $this->applyContainerCompilerPass();
+
+
         }
         catch(\Throwable $throwable)
         {
-            throw new EntryPointException(
-                \sprintf('Can\'t initialize DotEnv component with error "%s"', $throwable->getMessage()),
+            throw new DesperadoFramework\Exceptions\EntryPointException(
+                \sprintf('Can\'t initialize DI container with error "%s"', $throwable->getMessage()),
                 $throwable->getCode(),
                 $throwable
             );
@@ -570,48 +201,118 @@ abstract class AbstractBootstrap
     }
 
     /**
-     * Init application environment
+     * Configure sagas
      *
      * @return void
      */
-    private function initEnvironment(): void
+    private function configureSagas(): void
     {
-        $environment = '' !== (string) \getenv('APP_ENVIRONMENT')
-            ? (string) \getenv('APP_ENVIRONMENT')
-            : Environment::ENVIRONMENT_SANDBOX;
-
-        $this->environment = new Environment($environment);
-    }
-
-    /**
-     * Init entry point name
-     *
-     * @return void
-     */
-    private function initEntryPoint(): void
-    {
-        $this->entryPointName = (string) \getenv('APP_ENTRY_POINT_NAME');
-
-        if('' === $this->entryPointName)
+        foreach($this->getSagasList() as $namespace => $identityNamespace)
         {
-            throw new EntryPointException(
-                'Entry point name must be specified (see APP_ENTRY_POINT_NAME environment variable)'
-            );
+            $this->container
+                ->get('kernel.sagas.service')
+                ->configure(
+                    $this->container->get('kernel.cqrs.message_bus_builder'),
+                    $namespace
+                );
         }
     }
 
     /**
-     * Init logger registry
-     *
-     * @todo: channel configuration support
+     * Configure application aggregates
      *
      * @return void
      */
-    private function initLoggerRegistry()
+    private function configureAggregates(): void
     {
-        ApplicationLogger::setupEnvironment($this->environment);
-        ApplicationLogger::setupEntryPointName($this->entryPointName);
+        foreach($this->getAggregatesList() as $aggregateNamespace => $aggregateIdentityNamespace)
+        {
+            $this->container
+                ->get('kernel.event_sourcing.service')
+                ->configure($aggregateNamespace, $aggregateIdentityNamespace);
+        }
+    }
 
-        LoggerRegistry::setupHandlers($this->getLoggerHandlers());
+    /**
+     * Configure services
+     *
+     * @return void
+     */
+    private function configureServices(): void
+    {
+        foreach($this->getServices() as $service)
+        {
+            $this->container->get('kernel.cqrs.message_bus_builder')->applyService($service);
+        }
+    }
+
+    /**
+     * Apply extensions
+     *
+     * @return void
+     */
+    private function applyContainerExtensions(): void
+    {
+        $extensions = \array_merge(
+            $this->getClientExtensionsCollection(),
+            [new DesperadoFramework\DependencyInjection\FrameworkExtension()]
+        );
+
+        foreach($extensions as $extension)
+        {
+            /** @var DependencyInjection\Extension\Extension $extension */
+            $extension->load([], $this->container);
+        }
+    }
+
+    /**
+     * Apply compiler pass
+     *
+     * @return void
+     */
+    private function applyContainerCompilerPass(): void
+    {
+        $compilerPassCollection = \array_merge(
+            $this->getCompilerPassCollection(),
+            [
+                new DesperadoFramework\DependencyInjection\Compiler\LoggerCompilerPass(),
+                new DesperadoFramework\DependencyInjection\Compiler\ModulesCompilerPass()
+            ]
+        );
+
+        foreach($compilerPassCollection as $compilerPass)
+        {
+            $this->container->addCompilerPass($compilerPass);
+        }
+    }
+
+    /**
+     * Init DotEnv
+     *
+     * @param string $environmentFilePath
+     *
+     * @return void
+     *
+     * @throws DesperadoFramework\Exceptions\EntryPointException
+     */
+    private function initDotEnv(string $environmentFilePath): void
+    {
+        BootstrapGuard::guardPath(
+            $environmentFilePath,
+            \sprintf('.env file not found (specified path: %s)', $environmentFilePath)
+        );
+
+        try
+        {
+            (new Dotenv())->load($environmentFilePath);
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new DesperadoFramework\Exceptions\EntryPointException(
+                \sprintf('Can\'t initialize DotEnv component with error "%s"', $throwable->getMessage()),
+                $throwable->getCode(),
+                $throwable
+            );
+        }
     }
 }

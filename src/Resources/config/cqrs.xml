@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- Annotations extractor -->
+        <service id="kernel.cqrs.annotations_extractor" class="Desperado\CQRS\Configuration\AnnotationsExtractor"
+                 public="false">
+            <argument type="service" id="kernel.infrastructure.annotations_reader"/>
+        </service>
+
+        <!-- Message bus builder -->
+        <service id="kernel.cqrs.message_bus_builder" class="Desperado\CQRS\MessageBusBuilder" public="true">
+            <argument type="service" id="kernel.cqrs.annotations_extractor"/>
+        </service>
+
+    </services>
+
+</container>

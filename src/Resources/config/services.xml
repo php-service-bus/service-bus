@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- Application environment -->
+        <service id="kernel.environment" class="Desperado\Domain\Environment\Environment" public="true">
+            <argument>%kernel.env%</argument>
+        </service>
+
+        <!-- Log handler -->
+        <service id="kernel.logger.handler.echo_handler"
+                 class="Desperado\Infrastructure\Bridge\Logger\Handlers\ColorizeStdOutHandler"
+                 public="false"/>
+
+        <!-- Process id processor -->
+        <service id="kernel.logger.processor.process_id" class="Monolog\Processor\ProcessIdProcessor" public="false"/>
+
+        <!-- Default logger instance -->
+        <service id="kernel.logger" synthetic="true"/>
+
+    </services>
+</container>

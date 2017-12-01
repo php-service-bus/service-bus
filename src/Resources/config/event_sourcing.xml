@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- Event store storage instance -->
+        <service id="kernel.event_sourcing.storage" synthetic="true"/>
+
+        <!-- Event store -->
+        <service id="kernel.event_sourcing.event_store" class="Desperado\EventSourcing\Store\EventStore" public="false">
+            <argument type="service" id="kernel.event_sourcing.storage"/>
+            <argument type="service" id="kernel.serializer.compressed_messages"/>
+        </service>
+
+        <!-- Event sourcing service -->
+        <service id="kernel.event_sourcing.service" class="Desperado\EventSourcing\Service\EventSourcingService"
+                 public="true">
+            <argument type="service" id="kernel.event_sourcing.event_store"/>
+            <argument type="service" id="kernel.logger"/>
+
+            <tag name="kernel.logger" channel="event_sourcing"/>
+        </service>
+
+    </services>
+
+</container>
