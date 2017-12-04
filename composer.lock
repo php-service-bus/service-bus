@@ -776,12 +776,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "7ca558279df65e54379a3d7babdc635fe719b4a1"
+                "reference": "9b4c4c4851b47cdc30d94f8b21c5073c86fbaa58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/7ca558279df65e54379a3d7babdc635fe719b4a1",
-                "reference": "7ca558279df65e54379a3d7babdc635fe719b4a1",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/9b4c4c4851b47cdc30d94f8b21c5073c86fbaa58",
+                "reference": "9b4c4c4851b47cdc30d94f8b21c5073c86fbaa58",
                 "shasum": ""
             },
             "require": {
@@ -828,7 +828,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2017-11-28 14:18:22"
+            "time": "2017-12-02 10:05:22"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -1003,12 +1003,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "2c01f72d8cdee8534bb347c21e7201cd7d38f658"
+                "reference": "00efe548d3e1a68fde1eccc5f2b655a68ebe4ff3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/2c01f72d8cdee8534bb347c21e7201cd7d38f658",
-                "reference": "2c01f72d8cdee8534bb347c21e7201cd7d38f658",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/00efe548d3e1a68fde1eccc5f2b655a68ebe4ff3",
+                "reference": "00efe548d3e1a68fde1eccc5f2b655a68ebe4ff3",
                 "shasum": ""
             },
             "require": {
@@ -1054,7 +1054,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-11-29 08:50:01"
+            "time": "2017-12-02 10:20:18"
         },
         {
             "name": "monolog/monolog",
@@ -3624,16 +3624,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "6.5.1",
+            "version": "6.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "8eea3cfbfe3c8363f8111e24569bdb6ead71ea6e"
+                "reference": "24b708f2fd725bcef1c8153b366043381aa324f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8eea3cfbfe3c8363f8111e24569bdb6ead71ea6e",
-                "reference": "8eea3cfbfe3c8363f8111e24569bdb6ead71ea6e",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/24b708f2fd725bcef1c8153b366043381aa324f2",
+                "reference": "24b708f2fd725bcef1c8153b366043381aa324f2",
                 "shasum": ""
             },
             "require": {
@@ -3651,7 +3651,7 @@
                 "phpunit/php-file-iterator": "^1.4.3",
                 "phpunit/php-text-template": "^1.2.1",
                 "phpunit/php-timer": "^1.0.9",
-                "phpunit/phpunit-mock-objects": "^5.0",
+                "phpunit/phpunit-mock-objects": "^5.0.4",
                 "sebastian/comparator": "^2.1",
                 "sebastian/diff": "^2.0",
                 "sebastian/environment": "^3.1",
@@ -3704,20 +3704,20 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-12-01 09:57:23"
+            "time": "2017-12-02 05:36:24"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "5.0.2",
+            "version": "5.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "b09519fb0786d369c0ae6b00c9caf25f7292b393"
+                "reference": "16b50f4167e5e85e81ca8a3dd105d0a5fd32009a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/b09519fb0786d369c0ae6b00c9caf25f7292b393",
-                "reference": "b09519fb0786d369c0ae6b00c9caf25f7292b393",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/16b50f4167e5e85e81ca8a3dd105d0a5fd32009a",
+                "reference": "16b50f4167e5e85e81ca8a3dd105d0a5fd32009a",
                 "shasum": ""
             },
             "require": {
@@ -3763,7 +3763,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2017-12-01 09:50:16"
+            "time": "2017-12-02 05:31:19"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

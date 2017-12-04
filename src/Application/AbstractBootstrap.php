@@ -13,10 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework\Application;
 
+use Desperado\CQRS\MessageBus;
 use Desperado\Domain as DesperadoDomain;
 use Desperado\Framework as DesperadoFramework;
 use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -65,20 +65,44 @@ abstract class AbstractBootstrap
         $this->configureAggregates();
         $this->configureServices();
 
-        $messageBus = $this->container->get('kernel.cqrs.message_bus_builder')->build();
+        /** @var MessageBus $messageBus */
+        $messageBus = $this->getContainer()->get('kernel.cqrs.message_bus_builder')->build();
 
+        $messageProcessor = new DesperadoFramework\MessageProcessor(
+            $messageBus,
+            $this->getContainer()->get('kernel.event_sourcing.service'),
+            $this->getContainer()->get('kernel.sagas.service')
+        );
 
+        $kernel = $this->createKernel($messageProcessor, $this->container);
 
-        return $entryPoint;
+        return new EntryPoint(
+            $this->getContainer()->getParameter('kernel.entry_point'),
+            $this->getContainer()->get('kernel.serializer.messages'),
+            $kernel
+        );
     }
 
     /**
-     * @return ContainerInterface
+     * @return DependencyInjection\ContainerInterface
      */
-    public function getContainer(): ContainerInterface
+    final public function getContainer(): DependencyInjection\ContainerInterface
     {
         return $this->container;
     }
+
+    /**
+     * Create application kernel
+     *
+     * @param DesperadoFramework\MessageProcessor    $messageProcessor
+     * @param DependencyInjection\ContainerInterface $container
+     *
+     * @return AbstractKernel
+     */
+    abstract protected function createKernel(
+        DesperadoFramework\MessageProcessor $messageProcessor,
+        DependencyInjection\ContainerInterface $container
+    ): AbstractKernel;
 
     /**
      * Get aggregates event storage
@@ -181,9 +205,9 @@ abstract class AbstractBootstrap
                 ])
             );
 
-            $this->container->set('kernel.logger', LoggerRegistry::getLogger($entryPointName));
-            $this->container->set('kernel.event_sourcing.storage', $this->getAggregateEventStorage());
-            $this->container->set('kernel.sagas.storage', $this->getSagaStorage());
+            $this->getContainer()->set('kernel.logger', LoggerRegistry::getLogger($entryPointName));
+            $this->getContainer()->set('kernel.event_sourcing.storage', $this->getAggregateEventStorage());
+            $this->getContainer()->set('kernel.sagas.storage', $this->getSagaStorage());
 
             $this->applyContainerExtensions();
             $this->applyContainerCompilerPass();
