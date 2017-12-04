@@ -12,7 +12,7 @@
         <!-- Compressed message serializer -->
         <service id="kernel.serializer.compressed_messages" class="Desperado\MessageSerializer\CompressMessageSerializer"
                  public="true">
-            <argument type="service" id="kernel.infrastructure.serializer_bridge"/>
+            <argument type="service" id="kernel.serializer.messages"/>
         </service>
 
     </services>
