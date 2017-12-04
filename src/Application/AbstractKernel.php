@@ -38,7 +38,8 @@ abstract class AbstractKernel
     private $container;
 
     /**
-     * @param MessageProcessor $messageProcessor
+     * @param MessageProcessor   $messageProcessor
+     * @param ContainerInterface $container.
      */
     public function __construct(MessageProcessor $messageProcessor, ContainerInterface $container)
     {
