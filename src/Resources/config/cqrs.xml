@@ -12,7 +12,7 @@
         </service>
 
         <!-- Message bus builder -->
-        <service id="kernel.cqrs.message_bus_builder" class="Desperado\CQRS\MessageBusBuilder" public="true">
+        <service id="kernel.cqrs.message_bus_builder" class="Desperado\CQRS\MessageBus\MessageBusBuilder" public="true">
             <argument type="service" id="kernel.cqrs.annotations_extractor"/>
         </service>
 
