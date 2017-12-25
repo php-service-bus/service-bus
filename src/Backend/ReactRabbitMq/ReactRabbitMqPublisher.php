@@ -87,26 +87,33 @@ class ReactRabbitMqPublisher
             ->then(
                 function() use ($channel, $toPublishMessage, $incomingMessage, $deliveryOptions, $destinationExchange)
                 {
-                    $serializedMessage = $this->messageSerializer->serialize($toPublishMessage);
-                    $messageHeaders = $this->prepareMessageHeaders($deliveryOptions);
+                    try
+                    {
+                        $serializedMessage = $this->messageSerializer->serialize($toPublishMessage);
+                        $messageHeaders = $this->prepareMessageHeaders($deliveryOptions);
 
-                    $this->logPublishedMessage(
-                        $toPublishMessage,
-                        $destinationExchange,
-                        $incomingMessage->routingKey,
-                        $serializedMessage,
-                        $messageHeaders
-                    );
-
-                    $channel
-                        ->publish($serializedMessage, $messageHeaders, $destinationExchange, $incomingMessage->routingKey)
-                        ->then(
-                            null,
-                            function(\Throwable $throwable)
-                            {
-                                $this->logger->critical(ThrowableFormatter::toString($throwable));
-                            }
+                        $this->logPublishedMessage(
+                            $toPublishMessage,
+                            $destinationExchange,
+                            $incomingMessage->routingKey,
+                            $serializedMessage,
+                            $messageHeaders
                         );
+
+                        $channel
+                            ->publish($serializedMessage, $messageHeaders, $destinationExchange, $incomingMessage->routingKey)
+                            ->then(
+                                null,
+                                function(\Throwable $throwable)
+                                {
+                                    $this->logger->critical(ThrowableFormatter::toString($throwable));
+                                }
+                            );
+                    }
+                    catch(\Throwable $throwable)
+                    {
+                        $this->logger->error(ThrowableFormatter::toString($throwable));
+                    }
                 }
             );
     }
