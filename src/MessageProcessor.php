@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\Framework;
 
-use Desperado\CQRS\MessageBus;
+use Desperado\CQRS\MessageBus\MessageBus;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Framework\Application\AbstractApplicationContext;

@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Modules;
 
 use Desperado\CQRS\Behaviors\ErrorHandleBehavior;
-use Desperado\CQRS\MessageBusBuilder;
+use Desperado\CQRS\MessageBus\MessageBusBuilder;
 
 /**
  * Apply service error handlers support

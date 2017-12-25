@@ -51,6 +51,8 @@ class LoggerCompilerPass implements DependencyInjection\Compiler\CompilerPassInt
                         true === ($argument instanceof DependencyInjection\Reference) &&
                         ('logger' === (string) $argument || 'kernel.logger' === (string) $argument))
                     {
+                        /** @var DependencyInjection\Reference $argument */
+
                         $serviceDefinition->replaceArgument(
                             $index,
                             new DependencyInjection\Reference($loggerServiceId, $argument->getInvalidBehavior())

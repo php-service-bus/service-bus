@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Modules;
 
 use Desperado\CQRS\Behaviors\ValidationBehavior;
-use Desperado\CQRS\MessageBusBuilder;
+use Desperado\CQRS\MessageBus\MessageBusBuilder;
 
 /**
  * Provide message validation

@@ -65,7 +65,7 @@ abstract class AbstractBootstrap
         $this->configureAggregates();
         $this->configureServices();
 
-        /** @var MessageBus $messageBus */
+        /** @var MessageBus\MessageBus $messageBus */
         $messageBus = $this->getContainer()->get('kernel.cqrs.message_bus_builder')->build();
 
         $messageProcessor = new DesperadoFramework\MessageProcessor(
