@@ -14,6 +14,9 @@
         <!-- Message bus builder -->
         <service id="kernel.cqrs.message_bus_builder" class="Desperado\CQRS\MessageBus\MessageBusBuilder" public="true">
             <argument type="service" id="kernel.cqrs.annotations_extractor"/>
+            <argument type="service" id="kernel.logger"/>
+
+            <tag name="kernel.logger" channel="cqrs"/>
         </service>
 
     </services>
