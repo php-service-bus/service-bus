@@ -538,12 +538,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "4236fff367db15313a219e949322477f97311c8f"
+                "reference": "ba5a982456766333bf13ffa1fe9d393b58bfc5cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/4236fff367db15313a219e949322477f97311c8f",
-                "reference": "4236fff367db15313a219e949322477f97311c8f",
+                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/ba5a982456766333bf13ffa1fe9d393b58bfc5cd",
+                "reference": "ba5a982456766333bf13ffa1fe9d393b58bfc5cd",
                 "shasum": ""
             },
             "require": {
@@ -593,7 +593,7 @@
                 "command query responsibility segregation",
                 "cqrs"
             ],
-            "time": "2017-12-28T07:03:17+00:00"
+            "time": "2017-12-28T07:13:18+00:00"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -881,12 +881,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "993cced77028472091b6c55a1d561d9649116037"
+                "reference": "770264de46e93921054f38e0aaa29a7a80b74dd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/993cced77028472091b6c55a1d561d9649116037",
-                "reference": "993cced77028472091b6c55a1d561d9649116037",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/770264de46e93921054f38e0aaa29a7a80b74dd8",
+                "reference": "770264de46e93921054f38e0aaa29a7a80b74dd8",
                 "shasum": ""
             },
             "require": {
@@ -933,7 +933,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-12-27T11:44:00+00:00"
+            "time": "2017-12-28T08:19:36+00:00"
         },
         {
             "name": "monolog/monolog",
