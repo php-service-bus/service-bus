@@ -128,8 +128,7 @@ abstract class AbstractApplicationContext
     /**
      * @inheritdoc
      */
-    public function getThrowableCallableLogger(string $level = LogLevel::ERROR
-    ): callable
+    public function getThrowableCallableLogger(string $level = LogLevel::ERROR): callable
     {
         return function(\Throwable $throwable) use ($level)
         {
@@ -175,6 +174,8 @@ abstract class AbstractApplicationContext
      * Get event sourcing (aggregate) service
      *
      * @return EventSourcingService
+     *
+     * @throws \Exception
      */
     final public function getAggregateService(): EventSourcingService
     {
@@ -185,6 +186,8 @@ abstract class AbstractApplicationContext
      * Get saga service
      *
      * @return SagaService
+     *
+     * @throws \Exception
      */
     final public function getSagaService(): SagaService
     {
@@ -240,6 +243,8 @@ abstract class AbstractApplicationContext
      */
     final protected function getEntryPointName()
     {
-        return $this->getContainer()->getParameter('kernel.entry_point');
+        return $this
+            ->getContainer()
+            ->getParameter('kernel.entry_point');
     }
 }

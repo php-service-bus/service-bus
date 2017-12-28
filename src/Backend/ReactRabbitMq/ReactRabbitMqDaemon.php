@@ -244,7 +244,7 @@ class ReactRabbitMqDaemon implements DaemonInterface
                 \sprintf(
                     'Message received: "%s" with headers "%s"',
                     $incoming->content,
-                    \urldecode(\http_build_query((array) $incoming->headers))
+                    \urldecode(\http_build_query($incoming->headers))
                 )
             );
         }

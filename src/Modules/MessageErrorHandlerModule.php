@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\Framework\Modules;
 
 use Desperado\CQRS\Behaviors\ErrorHandleBehavior;
+use Desperado\CQRS\Handlers\ExceptionHandlersCollection;
 use Desperado\CQRS\MessageBus\MessageBusBuilder;
 
 /**
@@ -26,6 +27,10 @@ class MessageErrorHandlerModule implements ModuleInterface
      */
     public function boot(MessageBusBuilder $messageBusBuilder): void
     {
-        $messageBusBuilder->pushBehavior(new ErrorHandleBehavior());
+        $messageBusBuilder->pushBehavior(
+            ErrorHandleBehavior::create(
+                ExceptionHandlersCollection::create()
+            )
+        );
     }
 }

@@ -26,6 +26,6 @@ class MessageValidationModule implements ModuleInterface
      */
     public function boot(MessageBusBuilder $messageBusBuilder): void
     {
-        $messageBusBuilder->pushBehavior(new ValidationBehavior());
+        $messageBusBuilder->pushBehavior(ValidationBehavior::create());
     }
 }

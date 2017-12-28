@@ -58,6 +58,9 @@ abstract class AbstractBootstrap
      * Boot application
      *
      * @return EntryPoint
+     *
+     * @throws \Exception
+     * @throws \Desperado\CQRS\Configuration\Exceptions\ConfigurationExceptionInterface
      */
     final public function boot()
     {
@@ -66,7 +69,10 @@ abstract class AbstractBootstrap
         $this->configureServices();
 
         /** @var MessageBus\MessageBus $messageBus */
-        $messageBus = $this->getContainer()->get('kernel.cqrs.message_bus_builder')->build();
+        $messageBus =  $this
+            ->getContainer()
+            ->get('kernel.cqrs.message_bus_builder')
+            ->build();
 
         $messageProcessor = new DesperadoFramework\MessageProcessor(
             $messageBus,
@@ -211,8 +217,6 @@ abstract class AbstractBootstrap
 
             $this->applyContainerExtensions();
             $this->applyContainerCompilerPass();
-
-
         }
         catch(\Throwable $throwable)
         {
@@ -228,6 +232,8 @@ abstract class AbstractBootstrap
      * Configure sagas
      *
      * @return void
+     *
+     * @throws \Exception
      */
     private function configureSagas(): void
     {
@@ -246,6 +252,8 @@ abstract class AbstractBootstrap
      * Configure application aggregates
      *
      * @return void
+     *
+     * @throws \Exception
      */
     private function configureAggregates(): void
     {
@@ -261,12 +269,17 @@ abstract class AbstractBootstrap
      * Configure services
      *
      * @return void
+     *
+     * @throws \Exception
+     * @throws \Desperado\CQRS\Configuration\Exceptions\ConfigurationExceptionInterface
      */
     private function configureServices(): void
     {
         foreach($this->getServices() as $service)
         {
-            $this->container->get('kernel.cqrs.message_bus_builder')->applyService($service);
+            $this->container
+                ->get('kernel.cqrs.message_bus_builder')
+                ->applyService($service);
         }
     }
 

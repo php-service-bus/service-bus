@@ -46,7 +46,8 @@
     "doctrine/cache": "v1.7.1"
   },
   "require-dev": {
-    "phpunit/phpunit": "^6.2"
+    "phpunit/phpunit": "^6.2",
+    "phpstan/phpstan": "^0.9.1"
   },
   "config": {
     "bin-dir": "bin",

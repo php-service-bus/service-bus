@@ -26,6 +26,7 @@ class ModulesCompilerPass implements DependencyInjection\Compiler\CompilerPassIn
      */
     public function process(DependencyInjection\ContainerBuilder $container)
     {
+        /** @var \Desperado\CQRS\MessageBus\MessageBusBuilder $messageBusBuilder */
         $messageBusBuilder = $container->get('kernel.cqrs.message_bus_builder');
 
         foreach($container->findTaggedServiceIds('kernel.module') as $id => $tags)

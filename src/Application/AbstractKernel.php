@@ -39,7 +39,7 @@ abstract class AbstractKernel
 
     /**
      * @param MessageProcessor   $messageProcessor
-     * @param ContainerInterface $container.
+     * @param ContainerInterface $container .
      */
     public function __construct(MessageProcessor $messageProcessor, ContainerInterface $container)
     {
@@ -57,6 +57,7 @@ abstract class AbstractKernel
      */
     final public function handle(AbstractMessage $message, ContextInterface $context): void
     {
+        /** @var AbstractApplicationContext $context */
         $context = $this->createApplicationContext($context);
 
         $this->messageProcessor->execute($message, $context);
