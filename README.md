@@ -1,8 +1,10 @@
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/a83d22ef-036e-4ed0-97c9-a5b1d4025201/mini.png)](https://insight.sensiolabs.com/projects/a83d22ef-036e-4ed0-97c9-a5b1d4025201)
-[![Total Downloads](https://poser.pugx.org/mmasiukevich/framework/downloads)](https://packagist.org/packages/mmasiukevich/framework)
-[![Monthly Downloads](https://poser.pugx.org/mmasiukevich/framework/d/monthly)](https://packagist.org/packages/mmasiukevich/framework)
-[![License](https://poser.pugx.org/mmasiukevich/framework/license)](https://packagist.org/packages/mmasiukevich/framework)
-[![Latest Stable Version](https://poser.pugx.org/mmasiukevich/framework/v/stable)](https://packagist.org/packages/mmasiukevich/framework)
-[![Latest Unstable Version](https://poser.pugx.org/mmasiukevich/framework/v/unstable)](https://packagist.org/packages/mmasiukevich/framework)
+[![Build Status](https://travis-ci.org/mmasiukevich/service-bus.svg?branch=master)](https://travis-ci.org/mmasiukevich/service-bus)
+[![Code Coverage](https://scrutinizer-ci.com/g/mmasiukevich/service-bus/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/mmasiukevich/service-bus/?branch=master)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/c0573b1e-9338-4fb6-a434-05600057e4d8/mini.png)](https://insight.sensiolabs.com/projects/c0573b1e-9338-4fb6-a434-05600057e4d8)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mmasiukevich/service-bus/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mmasiukevich/service-bus/?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/mmasiukevich/service-bus/v/stable)](https://packagist.org/packages/mmasiukevich/service-bus)
+[![Latest Unstable Version](https://poser.pugx.org/mmasiukevich/service-bus/v/unstable)](https://packagist.org/packages/mmasiukevich/service-bus)
+[![Total Downloads](https://poser.pugx.org/mmasiukevich/service-bus/downloads)](https://packagist.org/packages/mmasiukevich/service-bus)
+[![License](https://poser.pugx.org/mmasiukevich/service-bus/license)](https://packagist.org/packages/mmasiukevich/service-bus)
 
 ### Still in development. Currently not suitable for use
