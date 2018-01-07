@@ -1,19 +1,18 @@
 <?php
 
 /**
- * CQRS/Event Sourcing framework
+ * PHP Service Bus (CQS implementation)
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
- * @url     https://github.com/mmasiukevich
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\Framework\DependencyInjection\Compiler;
+namespace Desperado\ServiceBus\DependencyInjection\Compiler;
 
-use Desperado\Framework\Modules\ModuleInterface;
+use Desperado\ServiceBus\Modules\ModuleInterface;
 use Symfony\Component\DependencyInjection;
 
 /**
@@ -26,10 +25,9 @@ class ModulesCompilerPass implements DependencyInjection\Compiler\CompilerPassIn
      */
     public function process(DependencyInjection\ContainerBuilder $container)
     {
-        /** @var \Desperado\CQRS\MessageBus\MessageBusBuilder $messageBusBuilder */
-        $messageBusBuilder = $container->get('kernel.cqrs.message_bus_builder');
+        $messageBusBuilder = $container->get('service_bus.message_bus.builder');
 
-        foreach($container->findTaggedServiceIds('kernel.module') as $id => $tags)
+        foreach($container->findTaggedServiceIds('service_bus.module') as $id => $tags)
         {
             /** @var ModuleInterface $module */
             $module = $container->get($id);

@@ -22,7 +22,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * Message bus factory
+ *
  */
 class MessageBusBuilder
 {

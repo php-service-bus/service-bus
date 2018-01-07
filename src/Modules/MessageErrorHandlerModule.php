@@ -1,21 +1,20 @@
 <?php
 
 /**
- * CQRS/Event Sourcing framework
+ * PHP Service Bus (CQS implementation)
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
- * @url     https://github.com/mmasiukevich
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\Framework\Modules;
+namespace Desperado\ServiceBus\Modules;
 
-use Desperado\CQRS\Behaviors\ErrorHandleBehavior;
-use Desperado\CQRS\Handlers\ExceptionHandlersCollection;
-use Desperado\CQRS\MessageBus\MessageBusBuilder;
+use Desperado\ServiceBus\Services\Handlers;
+use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
+use Desperado\ServiceBus\Task\Behaviors\ErrorHandleBehavior;
 
 /**
  * Apply service error handlers support
@@ -29,7 +28,7 @@ class MessageErrorHandlerModule implements ModuleInterface
     {
         $messageBusBuilder->pushBehavior(
             ErrorHandleBehavior::create(
-                ExceptionHandlersCollection::create()
+                Handlers\Exceptions\ExceptionHandlersCollection::create()
             )
         );
     }

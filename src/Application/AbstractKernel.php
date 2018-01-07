@@ -1,94 +1,117 @@
 <?php
 
 /**
- * CQRS/Event Sourcing framework
+ * PHP Service Bus (CQS implementation)
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
- * @url     https://github.com/mmasiukevich
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\Framework\Application;
+namespace Desperado\ServiceBus\Application;
 
-use Desperado\Domain\CQRS\ContextInterface;
-use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Framework\MessageProcessor;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Desperado\Saga\Service\SagaService;
+use Desperado\ServiceBus\EntryPoint\EntryPointContext;
+use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
+use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
+use Desperado\ServiceBus\Services;
 
 /**
- * Application kernel
+ * Base application kernel
  */
 abstract class AbstractKernel
 {
     /**
-     * Message execution processor
+     * Message bus factory
      *
-     * @var MessageProcessor
+     * @var MessageBusBuilder
      */
-    private $messageProcessor;
+    private $messageBusBuilder;
 
     /**
-     * Container instance
+     * Sagas service
      *
-     * @var ContainerInterface
+     * @var SagaService
      */
-    private $container;
+    private $sagaService;
 
-    /**
-     * @param MessageProcessor   $messageProcessor
-     * @param ContainerInterface $container .
-     */
-    public function __construct(MessageProcessor $messageProcessor, ContainerInterface $container)
+
+    final public function __construct(
+        MessageBusBuilder $messageBusBuilder,
+        SagaService $sagaService
+    )
     {
-        $this->messageProcessor = $messageProcessor;
-        $this->container = $container;
+        $this->messageBusBuilder = $messageBusBuilder;
+        $this->sagaService = $sagaService;
+
+        $this->configureSagas();
+        $this->buildMessageBus();
+    }
+
+    /**
+     * Get sagas list
+     *
+     * [
+     *     0 => 'someSagaNamespace',
+     *     1 => 'someSagaNamespace',
+     *     ....
+     * ]
+     *
+     *
+     * @return array
+     */
+    protected function getSagasList(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get application services
+     *
+     * @return Services\ServiceInterface[]
+     */
+    protected function getServices(): array
+    {
+        return [];
     }
 
     /**
      * Handle message
      *
-     * @param AbstractMessage  $message
-     * @param ContextInterface $context
+     * @param EntryPointContext        $entryPointContext
+     * @param AbstractExecutionContext $executionContext
      *
      * @return void
+     *
+     * @throws \Throwable
      */
-    final public function handle(AbstractMessage $message, ContextInterface $context): void
+    final public function handle(EntryPointContext $entryPointContext, AbstractExecutionContext $executionContext): void
     {
-        /** @var AbstractApplicationContext $context */
-        $context = $this->createApplicationContext($context);
 
-        $this->messageProcessor->execute($message, $context);
     }
 
     /**
-     * Create application-level context
+     * Get message bus builder
      *
-     * @param ContextInterface $parentContext
-     *
-     * @return ContextInterface
+     * @return MessageBusBuilder
      */
-    abstract protected function createApplicationContext(ContextInterface $parentContext): ContextInterface;
-
-    /**
-     * Get message execution processor
-     *
-     * @return MessageProcessor
-     */
-    final protected function getMessageProcessor(): MessageProcessor
+    final protected function getMessageBusBuilder(): MessageBusBuilder
     {
-        return $this->messageProcessor;
+        return $this->messageBusBuilder;
     }
 
-    /**
-     * Get DI container
-     *
-     * @return ContainerInterface
-     */
-    final protected function getContainer(): ContainerInterface
+    private function configureSagas(): void
     {
-        return $this->container;
+        foreach($this->sagaService as $saga)
+        {
+            
+        }
+    }
+
+    private function buildMessageBus(): void
+    {
+
     }
 }

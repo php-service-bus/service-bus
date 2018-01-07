@@ -5,11 +5,12 @@
 
     <services>
         <!-- Symfony Serializer bridge -->
-        <service id="kernel.infrastructure.serializer_bridge" class="Desperado\MessageSerializer\Bridge\SymfonySerializerBridge"
+        <service id="service_bus.infrastructure.serializer_bridge"
+                 class="Desperado\ServiceBus\Serializer\Bridge\SymfonySerializerBridge"
                  public="false"/>
 
         <!-- Annotations reader bridge -->
-        <service id="kernel.infrastructure.annotations_reader"
+        <service id="service_bus.infrastructure.annotations_reader"
                  class="Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader"
                  public="false"/>
     </services>

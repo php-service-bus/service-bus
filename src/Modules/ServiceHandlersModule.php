@@ -24,7 +24,11 @@ class ServiceHandlersModule implements ModuleInterface
      */
     public function boot(MessageBusBuilder $messageBusBuilder): void
     {
+        $self = new self();
 
+
+
+        return $self;
     }
 
 }

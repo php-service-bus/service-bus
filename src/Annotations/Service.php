@@ -27,16 +27,18 @@ class Service extends AbstractAnnotation
     /**
      * Logger channel
      *
-     * @var string
+     * The context of the message must implement the interface "ContextLoggerInterface"
+     *
+     * @var string|null
      */
-    protected $loggerChannel = self::DEFAULT_LOGGER_CHANNEL;
+    protected $loggerChannel;
 
     /**
      * Get service logger channel
      *
      * @return string
      */
-    public function getLoggerChannel(): string
+    public function getLoggerChannel(): ?string
     {
         return $this->loggerChannel ?? self::DEFAULT_LOGGER_CHANNEL;
     }

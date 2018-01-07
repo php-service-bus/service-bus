@@ -5,14 +5,17 @@
     <services>
 
         <!-- Message serializer -->
-        <service id="kernel.serializer.messages" class="Desperado\MessageSerializer\MessageSerializer" public="true">
-            <argument type="service" id="kernel.infrastructure.serializer_bridge"/>
+        <service id="service_bus.serializer.messages"
+                 class="Desperado\ServiceBus\Serializer\MessageSerializer"
+                 public="true">
+            <argument type="service" id="service_bus.infrastructure.serializer_bridge"/>
         </service>
 
         <!-- Compressed message serializer -->
-        <service id="kernel.serializer.compressed_messages" class="Desperado\MessageSerializer\CompressMessageSerializer"
+        <service id="service_bus.serializer.compressed_messages"
+                 class="Desperado\ServiceBus\Serializer\CompressMessageSerializer"
                  public="true">
-            <argument type="service" id="kernel.serializer.messages"/>
+            <argument type="service" id="service_bus.serializer.messages"/>
         </service>
 
     </services>

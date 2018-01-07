@@ -1,355 +1,341 @@
 <?php
 
 /**
- * CQRS/Event Sourcing framework
+ * PHP Service Bus (CQS implementation)
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
- * @url     https://github.com/mmasiukevich
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\Framework\Application;
+namespace Desperado\ServiceBus\Application;
 
-use Desperado\CQRS\MessageBus;
-use Desperado\Domain as DesperadoDomain;
-use Desperado\Framework as DesperadoFramework;
-use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
+use Desperado\Domain\ParameterBag;
+use Desperado\ServiceBus\Application\Exceptions as ApplicationExceptions;
+use Desperado\ServiceBus\DependencyInjection\Compiler\EntryPointCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\LoggerChannelsCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\ModulesCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\SagaStorageCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\ServiceBusExtension;
+use Desperado\ServiceBus\EntryPoint\EntryPoint;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Symfony\Component\Config;
 use Symfony\Component\DependencyInjection;
-use Symfony\Component\Dotenv\Dotenv;
-
+use Symfony\Component\Validator;
 
 /**
- * Base application bootstrap
+ * Base class initial initialization of the application
  */
 abstract class AbstractBootstrap
 {
     /**
-     * DI container
+     * Absolute path to the root of the application
      *
-     * @var DependencyInjection\ContainerBuilder
+     * @var string
+     */
+    private $rootDirectoryPath;
+
+    /**
+     * Absolute path to the cache directory
+     *
+     * @var string
+     */
+    private $cacheDirectoryPath;
+
+    /**
+     * Absolute path to the ".env" configuration file
+     *
+     * @var string
+     */
+    private $environmentFilePath;
+
+    /**
+     * Service bus configuration
+     *
+     * @var Configuration
+     */
+    private $configuration;
+
+    /**
+     * Dependency injection container
+     *
+     * @var DependencyInjection\Container
      */
     private $container;
 
     /**
-     * @param string $rootDirectoryPath
-     * @param string $environmentFilePath
+     * Initializing components
      *
-     * @throws DesperadoFramework\Exceptions\EntryPointException
-     */
-    public function __construct(string $rootDirectoryPath, string $environmentFilePath)
-    {
-        $this->initDotEnv($environmentFilePath);
-
-        $environment = '' !== (string) \getenv('APP_ENVIRONMENT')
-            ? (string) \getenv('APP_ENVIRONMENT')
-            : DesperadoDomain\Environment\Environment::ENVIRONMENT_SANDBOX;
-
-        $this->buildContainer(
-            \rtrim($rootDirectoryPath, '/'),
-            \strtolower($environment),
-            (string) \getenv('APP_ENTRY_POINT_NAME')
-        );
-    }
-
-    /**
-     * Boot application
+     * @param string $rootDirectoryPath   Absolute path to the root of the application
+     * @param string $environmentFilePath Absolute path to the ".env" configuration file
+     * @param string $cacheDirectoryPath  Absolute path to the cache directory
      *
      * @return EntryPoint
      *
-     * @throws \Exception
-     * @throws \Desperado\CQRS\Configuration\Exceptions\ConfigurationExceptionInterface
+     * @throws ApplicationExceptions\IncorrectRootDirectoryPathException
+     * @throws ApplicationExceptions\IncorrectDotEnvFilePathException
+     * @throws ApplicationExceptions\IncorrectCacheDirectoryFilePathException
+     * @throws ApplicationExceptions\ServiceBusConfigurationException
+     *
+     * @throws \Exception                        if an exception has been thrown when the service has been resolved
      */
-    final public function boot()
+    public static function boot(
+        string $rootDirectoryPath,
+        string $cacheDirectoryPath,
+        string $environmentFilePath
+    ): EntryPoint
     {
-        $this->configureSagas();
-        $this->configureAggregates();
-        $this->configureServices();
+        $self = new static($rootDirectoryPath, $cacheDirectoryPath, $environmentFilePath);
 
-        /** @var MessageBus\MessageBus $messageBus */
-        $messageBus =  $this
-            ->getContainer()
-            ->get('kernel.cqrs.message_bus_builder')
-            ->build();
+        $self->loadConfiguration();
+        $self->initializeContainer();
 
-        $messageProcessor = new DesperadoFramework\MessageProcessor(
-            $messageBus,
-            $this->getContainer()->get('kernel.event_sourcing.service'),
-            $this->getContainer()->get('kernel.sagas.service')
-        );
+        $self->init();
 
-        $kernel = $this->createKernel($messageProcessor, $this->container);
+        /** @var EntryPoint $entryPoint */
+        $entryPoint = $self->getContainer()->get('service_bus.entry_point');
 
-        return new EntryPoint(
-            $this->getContainer()->getParameter('kernel.entry_point'),
-            $this->getContainer()->get('kernel.serializer.messages'),
-            $kernel
-        );
+        return $entryPoint;
     }
 
     /**
-     * @return DependencyInjection\ContainerInterface
+     * Get customer-configurable services
+     *
+     * @return BootstrapServicesDefinitions
      */
-    final public function getContainer(): DependencyInjection\ContainerInterface
+    abstract protected function getBootstrapServicesDefinitions(): BootstrapServicesDefinitions;
+
+    /**
+     * Get customer-configurable container parameters
+     *
+     * @return BootstrapContainerConfiguration
+     */
+    abstract protected function getBootstrapContainerConfiguration(): BootstrapContainerConfiguration;
+
+    /**
+     * Custom component initialization (container already compiled)
+     *
+     * @return void
+     */
+    protected function init(): void
+    {
+
+    }
+
+    /**
+     * Get dependency injection container
+     *
+     * @return DependencyInjection\Container
+     */
+    final protected function getContainer(): DependencyInjection\Container
     {
         return $this->container;
     }
 
     /**
-     * Create application kernel
-     *
-     * @param DesperadoFramework\MessageProcessor    $messageProcessor
-     * @param DependencyInjection\ContainerInterface $container
-     *
-     * @return AbstractKernel
-     */
-    abstract protected function createKernel(
-        DesperadoFramework\MessageProcessor $messageProcessor,
-        DependencyInjection\ContainerInterface $container
-    ): AbstractKernel;
-
-    /**
-     * Get aggregates event storage
-     *
-     * @return DesperadoDomain\EventStore\EventStorageInterface
-     */
-    abstract protected function getAggregateEventStorage(): DesperadoDomain\EventStore\EventStorageInterface;
-
-    /**
-     * Get sagas storage
-     *
-     * @return DesperadoDomain\SagaStore\SagaStorageInterface
-     */
-    abstract protected function getSagaStorage(): DesperadoDomain\SagaStore\SagaStorageInterface;
-
-    /**
-     * Get aggregates list
-     *
-     * [
-     *     'someAggregateNamespace' => 'someAggregateIdentityClassNamespace',
-     *     'someAggregateNamespace' => 'someAggregateIdentityClassNamespace',
-     *     ....
-     * ]
-     *
-     *
-     * @return array
-     */
-    abstract protected function getAggregatesList(): array;
-
-    /**
-     * Get sagas list
-     *
-     * [
-     *     0 => 'someSagaNamespace',
-     *     1 => 'someSagaNamespace',
-     *     ....
-     * ]
-     *
-     *
-     * @return array
-     */
-    abstract protected function getSagasList(): array;
-
-    /**
-     * Get application services
-     *
-     * @return DesperadoDomain\CQRS\ServiceInterface[]
-     */
-    abstract protected function getServices(): array;
-
-    /**
-     * Get dependency injection  pass collection
-     *
-     * @return DependencyInjection\Compiler\CompilerPassInterface[]
-     */
-    protected function getCompilerPassCollection(): array
-    {
-        return [];
-    }
-
-    /**
-     * Get dependency injection extensions
-     *
-     * @return DependencyInjection\Extension\Extension[]
-     */
-    protected function getClientExtensionsCollection(): array
-    {
-        return [];
-    }
-
-    /**
-     * Init DI container
-     *
-     * @todo: dump it
-     *
-     * @param string $rootDirectoryPath
-     * @param string $environment
-     * @param string $entryPointName
+     * Load configuration
      *
      * @return void
      *
-     * @throws DesperadoFramework\Exceptions\EntryPointException
+     * @throws ApplicationExceptions\ServiceBusConfigurationException
      */
-    private function buildContainer(string $rootDirectoryPath, string $environment, string $entryPointName): void
+    private function loadConfiguration(): void
     {
-        BootstrapGuard::guardEnvironment($environment);
-        BootstrapGuard::guardEntryPointName($entryPointName);
-        BootstrapGuard::guardPath(
-            $rootDirectoryPath,
-            'Incorrect path of root directory specified'
+        $validator = (new Validator\ValidatorBuilder())
+            ->enableAnnotationMapping()
+            ->getValidator();
+
+        $this->configuration = Configuration::loadDotEnv($this->environmentFilePath);
+
+        $violations = $validator->validate($this->configuration);
+
+        foreach($violations as $violation)
+        {
+            /** @var Validator\ConstraintViolationInterface $violation */
+
+            throw new ApplicationExceptions\ServiceBusConfigurationException($violation->getMessage());
+        }
+    }
+
+    /**
+     * Initialize dependency injection container
+     *
+     * @return void
+     */
+    private function initializeContainer(): void
+    {
+        $containerClassName = \sprintf(
+            'serviceBus%sProjectContainer',
+            \ucfirst((string) $this->configuration->getEnvironment())
         );
 
-        try
-        {
-            $this->container = new DependencyInjection\ContainerBuilder(
-                new DependencyInjection\ParameterBag\ParameterBag([
-                    'kernel.root_dir'    => $rootDirectoryPath,
-                    'kernel.env'         => $environment,
-                    'kernel.entry_point' => $entryPointName
-                ])
-            );
+        $containerClassPath = \sprintf('%s/%s.php', $this->cacheDirectoryPath, $containerClassName);
 
-            $this->getContainer()->set('kernel.logger', LoggerRegistry::getLogger($entryPointName));
-            $this->getContainer()->set('kernel.event_sourcing.storage', $this->getAggregateEventStorage());
-            $this->getContainer()->set('kernel.sagas.storage', $this->getSagaStorage());
-
-            $this->applyContainerExtensions();
-            $this->applyContainerCompilerPass();
-        }
-        catch(\Throwable $throwable)
-        {
-            throw new DesperadoFramework\Exceptions\EntryPointException(
-                \sprintf('Can\'t initialize DI container with error "%s"', $throwable->getMessage()),
-                $throwable->getCode(),
-                $throwable
-            );
-        }
-    }
-
-    /**
-     * Configure sagas
-     *
-     * @return void
-     *
-     * @throws \Exception
-     */
-    private function configureSagas(): void
-    {
-        foreach($this->getSagasList() as $namespace => $identityNamespace)
-        {
-            $this->container
-                ->get('kernel.sagas.service')
-                ->configure(
-                    $this->container->get('kernel.cqrs.message_bus_builder'),
-                    $namespace
-                );
-        }
-    }
-
-    /**
-     * Configure application aggregates
-     *
-     * @return void
-     *
-     * @throws \Exception
-     */
-    private function configureAggregates(): void
-    {
-        foreach($this->getAggregatesList() as $aggregateNamespace => $aggregateIdentityNamespace)
-        {
-            $this->container
-                ->get('kernel.event_sourcing.service')
-                ->configure($aggregateNamespace, $aggregateIdentityNamespace);
-        }
-    }
-
-    /**
-     * Configure services
-     *
-     * @return void
-     *
-     * @throws \Exception
-     * @throws \Desperado\CQRS\Configuration\Exceptions\ConfigurationExceptionInterface
-     */
-    private function configureServices(): void
-    {
-        foreach($this->getServices() as $service)
-        {
-            $this->container
-                ->get('kernel.cqrs.message_bus_builder')
-                ->applyService($service);
-        }
-    }
-
-    /**
-     * Apply extensions
-     *
-     * @return void
-     */
-    private function applyContainerExtensions(): void
-    {
-        $extensions = \array_merge(
-            $this->getClientExtensionsCollection(),
-            [new DesperadoFramework\DependencyInjection\FrameworkExtension()]
+        $configCache = new Config\ConfigCache(
+            \sprintf('%s/%s.php', $this->cacheDirectoryPath, $containerClassName),
+            $this->configuration->getEnvironment()->isDebug()
         );
 
-        foreach($extensions as $extension)
+        if(false === $configCache->isFresh() || true === $this->configuration->getEnvironment()->isDebug())
+        {
+            $container = $this->buildContainer();
+            $container->compile();
+
+            $this->dumpContainer($configCache, $container, $containerClassName);
+        }
+
+        /** @noinspection PhpIncludeInspection */
+        include $containerClassPath;
+
+        $this->container = new $containerClassName();
+    }
+
+    /**
+     * Build dependency injection container
+     *
+     * @return DependencyInjection\ContainerBuilder
+     */
+    private function buildContainer(): DependencyInjection\ContainerBuilder
+    {
+        $bootstrapContainerConfiguration = $this->getBootstrapContainerConfiguration();
+        $bootstrapServicesDefinitions = $this->getBootstrapServicesDefinitions();
+
+        $configData = $this->configuration->toArray();
+
+        $applicationCompilerPass = [
+            'logger_channel' => new LoggerChannelsCompilerPass(),
+            'modules'        => new ModulesCompilerPass(),
+            'saga_storage'   => new SagaStorageCompilerPass($bootstrapServicesDefinitions->getSagaStorageKey()),
+            'entry_point'    => new EntryPointCompilerPass(
+                $bootstrapServicesDefinitions->getMessageTransportKey(),
+                $bootstrapServicesDefinitions->getKernelKey(),
+                $bootstrapServicesDefinitions->getApplicationContextKey()
+            )
+        ];
+
+        $containerParameters = new DependencyInjection\ParameterBag\ParameterBag([
+            'service_bus.root_dir'  => $this->rootDirectoryPath,
+            'service_bus.cache_dir' => $this->cacheDirectoryPath
+        ]);
+        $containerExtensions = new ParameterBag();
+        $containerCompilerPass = new ParameterBag();
+
+        $containerCompilerPass->add($bootstrapContainerConfiguration->getCompilerPassCollection());
+        $containerCompilerPass->add($applicationCompilerPass);
+
+        $containerExtensions->add($bootstrapContainerConfiguration->getExtensionsCollection());
+        $containerExtensions->add(['service_bus' => new ServiceBusExtension()]);
+
+        $containerParameters->add($configData);
+        $containerParameters->add($bootstrapContainerConfiguration->getCustomerParameters());
+
+        $containerBuilder = new DependencyInjection\ContainerBuilder($containerParameters);
+
+        foreach($containerExtensions as $extension)
         {
             /** @var DependencyInjection\Extension\Extension $extension */
-            $extension->load([], $this->container);
+            $extension->load($configData, $containerBuilder);
         }
+
+        foreach($containerCompilerPass as $compilerPass)
+        {
+            $containerBuilder->addCompilerPass($compilerPass);
+        }
+
+        return $containerBuilder;
     }
 
     /**
-     * Apply compiler pass
+     * Dumps the service container to PHP code in the cache
+     *
+     * @param Config\ConfigCache                   $cache
+     * @param DependencyInjection\ContainerBuilder $container
+     * @param string                               $class
      *
      * @return void
      */
-    private function applyContainerCompilerPass(): void
+    private function dumpContainer(Config\ConfigCache $cache, DependencyInjection\ContainerBuilder $container, string $class)
     {
-        $compilerPassCollection = \array_merge(
-            $this->getCompilerPassCollection(),
-            [
-                new DesperadoFramework\DependencyInjection\Compiler\LoggerCompilerPass(),
-                new DesperadoFramework\DependencyInjection\Compiler\ModulesCompilerPass()
+        $dumper = new DependencyInjection\Dumper\PhpDumper($container);
+        $content = (string) $dumper->dump([
+                'class'      => $class,
+                'base_class' => 'Container',
+                'file'       => $cache->getPath()
             ]
         );
 
-        foreach($compilerPassCollection as $compilerPass)
-        {
-            $this->container->addCompilerPass($compilerPass);
-        }
+        $cache->write($content, $container->getResources());
     }
 
     /**
-     * Init DotEnv
-     *
+     * @param string $rootDirectoryPath
+     * @param string $cacheDirectoryPath
      * @param string $environmentFilePath
      *
-     * @return void
-     *
-     * @throws DesperadoFramework\Exceptions\EntryPointException
+     * @throws ApplicationExceptions\IncorrectRootDirectoryPathException
+     * @throws ApplicationExceptions\IncorrectDotEnvFilePathException
+     * @throws ApplicationExceptions\IncorrectCacheDirectoryFilePathException
      */
-    private function initDotEnv(string $environmentFilePath): void
+    final protected function __construct(
+        string $rootDirectoryPath,
+        string $cacheDirectoryPath,
+        string $environmentFilePath
+    )
     {
-        BootstrapGuard::guardPath(
-            $environmentFilePath,
-            \sprintf('.env file not found (specified path: %s)', $environmentFilePath)
-        );
+        $isValidFilePath = function(string $filePath)
+        {
+            return true === \file_exists($filePath) && true === \is_readable($filePath);
+        };
 
-        try
+        $this->rootDirectoryPath = \rtrim($rootDirectoryPath, '/');
+        $this->cacheDirectoryPath = \rtrim($cacheDirectoryPath, '/');
+        $this->environmentFilePath = $environmentFilePath;
+
+        if(false === $isValidFilePath($this->rootDirectoryPath))
         {
-            (new Dotenv())->load($environmentFilePath);
+            throw new ApplicationExceptions\IncorrectRootDirectoryPathException($this->rootDirectoryPath);
         }
-        catch(\Throwable $throwable)
+
+        if(false === $isValidFilePath($this->environmentFilePath))
         {
-            throw new DesperadoFramework\Exceptions\EntryPointException(
-                \sprintf('Can\'t initialize DotEnv component with error "%s"', $throwable->getMessage()),
-                $throwable->getCode(),
-                $throwable
-            );
+            throw new ApplicationExceptions\IncorrectDotEnvFilePathException($environmentFilePath);
+        }
+
+        if(false === $isValidFilePath($this->cacheDirectoryPath) || false === \is_writable($this->cacheDirectoryPath))
+        {
+            throw new ApplicationExceptions\IncorrectCacheDirectoryFilePathException($environmentFilePath);
+        }
+
+        $this->configureAnnotationsLoader();
+    }
+
+    /**
+     * Configure doctrine2 annotations loader
+     *
+     * @return void
+     */
+    private function configureAnnotationsLoader(): void
+    {
+        /** Configure doctrine annotations autoloader */
+        foreach(\spl_autoload_functions() as $autoLoader)
+        {
+            if(isset($autoLoader[0]) && \is_object($autoLoader[0]))
+            {
+                /** @var \Composer\Autoload\ClassLoader $classLoader */
+                $classLoader = $autoLoader[0];
+
+                /** @noinspection PhpDeprecationInspection */
+                AnnotationRegistry::registerLoader(
+                    function(string $className) use ($classLoader)
+                    {
+                        return $classLoader->loadClass($className);
+                    }
+                );
+
+                break;
+            }
         }
     }
 }

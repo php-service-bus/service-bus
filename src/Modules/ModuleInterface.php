@@ -1,19 +1,18 @@
 <?php
 
 /**
- * CQRS/Event Sourcing framework
+ * PHP Service Bus (CQS implementation)
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
- * @url     https://github.com/mmasiukevich
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\Framework\Modules;
+namespace Desperado\ServiceBus\Modules;
 
-use Desperado\CQRS\MessageBus\MessageBusBuilder;
+use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 
 /**
  * Module interface

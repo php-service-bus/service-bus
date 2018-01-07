@@ -22,20 +22,5 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  */
 class CommandHandler extends AbstractAnnotation
 {
-    /**
-     * Logger channel
-     *
-     * @var string|null
-     */
-    protected $loggerChannel;
 
-    /**
-     * Get command-specific logger channel
-     *
-     * @return string|null
-     */
-    public function getLoggerChannel(): ?string
-    {
-        return $this->loggerChannel;
-    }
 }
