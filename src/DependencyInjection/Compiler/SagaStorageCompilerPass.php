@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * PHP Service Bus (CQS implementation)
+ *
+ * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @license MIT
+ * @license https://opensource.org/licenses/MIT
+ */
+
+declare(strict_types = 1);
+
+namespace Desperado\ServiceBus\DependencyInjection\Compiler;
+
+use Symfony\Component\DependencyInjection;
+
+/**
+ * Saga storage configuration
+ */
+class SagaStorageCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
+{
+    /**
+     * Key under which the saga storage service is described in the container
+     *
+     * @var string
+     */
+    private $sagaStorageContainerKey;
+
+    /**
+     * @param string $sagaStorageContainerKey
+     */
+    public function __construct(string $sagaStorageContainerKey)
+    {
+        $this->sagaStorageContainerKey = $sagaStorageContainerKey;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function process(DependencyInjection\ContainerBuilder $container): void
+    {
+        $definition = $container->getDefinition('service_bus.sagas.store');
+        $definition->setArgument(0, new DependencyInjection\Reference($this->sagaStorageContainerKey));
+    }
+}

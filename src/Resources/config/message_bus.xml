@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- Service handlers extractor -->
+        <service id="service_bus.services.annotations_extractor"
+                 class="Desperado\ServiceBus\Services\AnnotationsExtractor"
+                 public="false">
+            <argument type="service" id="service_bus.infrastructure.annotations_reader"/>
+        </service>
+
+        <!-- Message bus builder -->
+        <service id="service_bus.message_bus.builder"
+                 class="Desperado\ServiceBus\MessageBus\MessageBusBuilder"
+                 public="false">
+            <argument type="service" id="service_bus.services.annotations_extractor"/>
+            <argument type="service" id="service_bus.logger"/>
+
+            <tag name="service_bus.logger" channel="message_bus"/>
+
+        </service>
+
+    </services>
+</container>
