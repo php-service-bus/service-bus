@@ -6,7 +6,7 @@
     <services>
         <!-- Symfony Serializer bridge -->
         <service id="service_bus.infrastructure.serializer_bridge"
-                 class="Desperado\ServiceBus\Serializer\Bridge\SymfonySerializerBridge"
+                 class="Desperado\MessageSerializer\Bridge\SymfonySerializerBridge"
                  public="false"/>
 
         <!-- Annotations reader bridge -->

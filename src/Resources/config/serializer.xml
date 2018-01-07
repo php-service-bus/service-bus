@@ -6,14 +6,14 @@
 
         <!-- Message serializer -->
         <service id="service_bus.serializer.messages"
-                 class="Desperado\ServiceBus\Serializer\MessageSerializer"
+                 class="Desperado\MessageSerializer\MessageSerializer"
                  public="true">
             <argument type="service" id="service_bus.infrastructure.serializer_bridge"/>
         </service>
 
         <!-- Compressed message serializer -->
         <service id="service_bus.serializer.compressed_messages"
-                 class="Desperado\ServiceBus\Serializer\CompressMessageSerializer"
+                 class="Desperado\MessageSerializer\CompressMessageSerializer"
                  public="true">
             <argument type="service" id="service_bus.serializer.messages"/>
         </service>

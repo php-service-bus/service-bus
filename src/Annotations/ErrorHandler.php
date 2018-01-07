@@ -22,5 +22,20 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  */
 class ErrorHandler extends AbstractAnnotation
 {
+    /**
+     * Logger channel
+     *
+     * @var string|null
+     */
+    protected $loggerChannel;
 
+    /**
+     * Get exception-specific logger channel
+     *
+     * @return string|null
+     */
+    public function getLoggerChannel(): ?string
+    {
+        return $this->loggerChannel;
+    }
 }

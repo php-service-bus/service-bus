@@ -51,7 +51,7 @@ class BootstrapServicesDefinitions
      * @param string $sagaStorageKey
      * @param string $applicationContextKey
      *
-     * @return BootstrapServiceDefinitions
+     * @return BootstrapServicesDefinitions
      */
     final public static function create(
         string $messageTransportKey,

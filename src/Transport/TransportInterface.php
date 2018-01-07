@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport;
 
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
-use Desperado\ServiceBus\Transport\Message\Message;
+use Desperado\Domain\Transport\Message\Message;
 use React\Promise\PromiseInterface;
 
 /**

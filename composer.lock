@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "cba01b86273563363edefaf47e529a1d",
-    "content-hash": "aa20d0c113697df2d2ae9045edf83d9f",
+    "hash": "eec2cd7c63ca6bc8b4afabf86596aa89",
+    "content-hash": "7b4822a54d60e1773e745efd044cbb56",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -534,82 +534,17 @@
             "time": "2017-11-30 22:02:29"
         },
         {
-            "name": "mmasiukevich/cqrs",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mmasiukevich/cqrs.git",
-                "reference": "57eb8f56c1069c7236ec46b906429a2ddbd56c86"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/cqrs/zipball/57eb8f56c1069c7236ec46b906429a2ddbd56c86",
-                "reference": "57eb8f56c1069c7236ec46b906429a2ddbd56c86",
-                "shasum": ""
-            },
-            "require": {
-                "mmasiukevich/domain-common": "^0.1",
-                "mmasiukevich/infrastructure": "^0.1",
-                "php": ">=7.1",
-                "psr/log": "~1.0"
-            },
-            "require-dev": {
-                "doctrine/annotations": "v1.5.0",
-                "doctrine/cache": "v1.7.1",
-                "phpstan/phpstan": "^0.9.1",
-                "phpunit/phpunit": "^6.2",
-                "symfony/debug": "v3.3.10",
-                "symfony/validator": "v3.3.10"
-            },
-            "suggest": {
-                "doctrine/annotations": "Enabling annotation based constraint mapping",
-                "doctrine/cache": "Enabling annotation based constraint mapping",
-                "monolog/monolog": "Logger implementation",
-                "symfony/debug": "Provides error handler",
-                "symfony/validator": "Provides message payload validation behavior"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Desperado\\CQRS\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Masiukevich Maksim",
-                    "email": "desperado@minsk-info.ru",
-                    "homepage": "https://github.com/mmasiukevich",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Command Query Responsibility Segregation implementation",
-            "keywords": [
-                "command query responsibility segregation",
-                "cqrs"
-            ],
-            "time": "2017-12-28 13:00:46"
-        },
-        {
             "name": "mmasiukevich/domain-common",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "6a2db4357c5cf947cda5d149a4a4ef5c94a900e0"
+                "reference": "e42c521cbfa3e4f58f27a09f406f6eac36d676d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/6a2db4357c5cf947cda5d149a4a4ef5c94a900e0",
-                "reference": "6a2db4357c5cf947cda5d149a4a4ef5c94a900e0",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/e42c521cbfa3e4f58f27a09f406f6eac36d676d8",
+                "reference": "e42c521cbfa3e4f58f27a09f406f6eac36d676d8",
                 "shasum": ""
             },
             "require": {
@@ -650,7 +585,7 @@
                 "cqrs",
                 "event sourcing"
             ],
-            "time": "2017-12-29 09:25:58"
+            "time": "2018-01-07 13:45:36"
         },
         {
             "name": "mmasiukevich/infrastructure",
@@ -710,22 +645,72 @@
             "time": "2017-12-27 14:24:49"
         },
         {
+            "name": "mmasiukevich/message-serializer",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mmasiukevich/message-serializer.git",
+                "reference": "d3b8d0990258b26e69f03b64390ca6f8b0738a49"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/d3b8d0990258b26e69f03b64390ca6f8b0738a49",
+                "reference": "d3b8d0990258b26e69f03b64390ca6f8b0738a49",
+                "shasum": ""
+            },
+            "require": {
+                "mmasiukevich/domain-common": "^0.1",
+                "php": ">=7.1",
+                "symfony/property-access": "^4.0",
+                "symfony/property-info": "^4.0",
+                "symfony/serializer": "^4.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.9.1",
+                "phpunit/phpunit": "^6.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Desperado\\MessageSerializer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "desperado@minsk-info.ru",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Message serializer",
+            "time": "2017-12-27 12:23:48"
+        },
+        {
             "name": "mmasiukevich/saga",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "770264de46e93921054f38e0aaa29a7a80b74dd8"
+                "reference": "ffea2b1706b762b0eac4d1dae1d41c43dfe53c24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/770264de46e93921054f38e0aaa29a7a80b74dd8",
-                "reference": "770264de46e93921054f38e0aaa29a7a80b74dd8",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/ffea2b1706b762b0eac4d1dae1d41c43dfe53c24",
+                "reference": "ffea2b1706b762b0eac4d1dae1d41c43dfe53c24",
                 "shasum": ""
             },
             "require": {
                 "doctrine/annotations": "v1.5.0",
-                "mmasiukevich/cqrs": "^0.1",
                 "mmasiukevich/domain-common": "^0.1",
                 "mmasiukevich/infrastructure": "^0.1",
                 "php": ">=7.1",
@@ -767,7 +752,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2017-12-28 08:19:36"
+            "time": "2018-01-07 14:21:26"
         },
         {
             "name": "monolog/monolog",

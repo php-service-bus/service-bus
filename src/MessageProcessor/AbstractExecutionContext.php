@@ -19,7 +19,7 @@ use Desperado\Domain\ThrowableFormatter;
 use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\Application\Exceptions\OutboundContextNotAppliedException;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
-use Desperado\ServiceBus\Transport\Message\MessageDeliveryOptions;
+use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Psr\Log\LogLevel;
 
 /**

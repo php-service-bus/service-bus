@@ -16,13 +16,15 @@ use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
-use Desperado\ServiceBus\Transport\Message\Message;
-use Desperado\ServiceBus\Transport\Message\MessageDeliveryOptions;
+use Desperado\Domain\Transport\Context\IncomingMessageContextInterface;
+use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
+use Desperado\Domain\Transport\Message\Message;
+use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 
 /**
  * Outbound message context
  */
-class OutboundMessageContext
+class OutboundMessageContext implements OutboundMessageContextInterface
 {
     /**
      * The context of the incoming message
@@ -46,10 +48,7 @@ class OutboundMessageContext
     private $toPublishMessages;
 
     /**
-     * @param IncomingMessageContextInterface $incomingMessageContext
-     * @param MessageSerializerInterface      $messageSerializer
-     *
-     * @return OutboundMessageContext
+     * @inheritdoc
      */
     public static function fromIncoming(
         IncomingMessageContextInterface $incomingMessageContext,
@@ -66,12 +65,7 @@ class OutboundMessageContext
     }
 
     /**
-     * Publish event
-     *
-     * @param AbstractEvent          $event
-     * @param MessageDeliveryOptions $messageDeliveryOptions
-     *
-     * @return void
+     * @inheritdoc
      */
     public function publish(AbstractEvent $event, MessageDeliveryOptions $messageDeliveryOptions): void
     {
@@ -79,12 +73,7 @@ class OutboundMessageContext
     }
 
     /**
-     * Send command
-     *
-     * @param AbstractCommand        $command
-     * @param MessageDeliveryOptions $messageDeliveryOptions
-     *
-     * @return void
+     * @inheritdoc
      */
     public function send(AbstractCommand $command, MessageDeliveryOptions $messageDeliveryOptions): void
     {
@@ -92,9 +81,7 @@ class OutboundMessageContext
     }
 
     /**
-     * Get messages to be sent to the transport bus
-     *
-     * @return \SplObjectStorage
+     * @inheritdoc
      */
     public function getToPublishMessages(): \SplObjectStorage
     {

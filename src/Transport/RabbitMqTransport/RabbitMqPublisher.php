@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Transport\RabbitMqTransport;
 use Bunny\Channel;
 use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\ThrowableFormatter;
-use Desperado\ServiceBus\Transport\Message\Message;
+use Desperado\Domain\Transport\Message\Message;
 use Psr\Log\LoggerInterface;
 use React\Promise\PromiseInterface;
 

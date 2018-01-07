@@ -27,6 +27,7 @@
     "php": ">=7.1",
     "mmasiukevich/infrastructure": "^0.1",
     "mmasiukevich/saga": "^0.1",
+    "mmasiukevich/message-serializer": "^0.1",
     "bunny/bunny": "^0.2.4",
     "symfony/dotenv": "^4.0",
     "symfony/dependency-injection": "^4.0",
