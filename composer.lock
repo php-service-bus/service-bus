@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4217f033af9bcec2b98ca6034651cf6f",
-    "content-hash": "8b9c4dd504f7fab9b25e17766e70a86a",
+    "hash": "58430232129868faca6ab578c1a2460e",
+    "content-hash": "05d955c394217aff6a65a7dd90b29304",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -657,12 +657,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "609e4cb0ffeccbd5e98288fc271d5d028c10c309"
+                "reference": "aa2170072c0ffa5f01b752212cf84f29323700e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/609e4cb0ffeccbd5e98288fc271d5d028c10c309",
-                "reference": "609e4cb0ffeccbd5e98288fc271d5d028c10c309",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/aa2170072c0ffa5f01b752212cf84f29323700e3",
+                "reference": "aa2170072c0ffa5f01b752212cf84f29323700e3",
                 "shasum": ""
             },
             "require": {
@@ -707,7 +707,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2018-01-07 14:51:58"
+            "time": "2018-01-08 13:01:15"
         },
         {
             "name": "monolog/monolog",
@@ -2467,6 +2467,122 @@
                 "instantiate"
             ],
             "time": "2017-07-22 11:58:36"
+        },
+        {
+            "name": "mmasiukevich/event-sourcing",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mmasiukevich/event-sourcing.git",
+                "reference": "fd175c4226caf85db71b624c774f91e80f64ecc2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/fd175c4226caf85db71b624c774f91e80f64ecc2",
+                "reference": "fd175c4226caf85db71b624c774f91e80f64ecc2",
+                "shasum": ""
+            },
+            "require": {
+                "mmasiukevich/domain-common": "^0.1",
+                "mmasiukevich/event-sourcing-snapshotter": "^0.1",
+                "mmasiukevich/message-serializer": "^0.1",
+                "php": ">=7.1",
+                "psr/log": "~1.0",
+                "react/promise": "v2.5.1",
+                "voryx/event-loop": "^2.0"
+            },
+            "require-dev": {
+                "mongodb/mongodb": "1.1.2",
+                "phpunit/phpunit": "^6.2"
+            },
+            "suggest": {
+                "mmasiukevich/cqrs": "Allows you to interact with the message bus",
+                "mongodb/mongodb": "Provides MongoDB sagas storage"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Desperado\\EventSourcing\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "desperado@minsk-info.ru",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Event Sourcing implementation",
+            "keywords": [
+                "event sourcing"
+            ],
+            "time": "2018-01-07 14:54:11"
+        },
+        {
+            "name": "mmasiukevich/event-sourcing-snapshotter",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mmasiukevich/event-sourcing-snapshotter.git",
+                "reference": "76ac72a09864683614571d8eca9cbf8334b117a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing-snapshotter/zipball/76ac72a09864683614571d8eca9cbf8334b117a7",
+                "reference": "76ac72a09864683614571d8eca9cbf8334b117a7",
+                "shasum": ""
+            },
+            "require": {
+                "mmasiukevich/domain-common": "^0.1",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "mongodb/mongodb": "1.1.2",
+                "phpunit/phpunit": "^6.2"
+            },
+            "suggest": {
+                "mongodb/mongodb": "Provides MongoDB snapshot storage"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Desperado\\EventSourcing\\Snapshot\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "desperado@minsk-info.ru",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Event Sourcing snapshotter implementation",
+            "keywords": [
+                "Snapshotter",
+                "event sourcing",
+                "snapshot"
+            ],
+            "time": "2017-11-20 14:58:49"
         },
         {
             "name": "myclabs/deep-copy",

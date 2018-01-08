@@ -18,7 +18,7 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  * Annotation indicating to the command handler
  *
  * @Annotation
- * @Target("CLASS")
+ * @Target("METHOD")
  */
 class CommandHandler extends AbstractAnnotation
 {

@@ -13,13 +13,13 @@ declare(strict_types = 1);
 use Bunny\Client;
 use Symfony\Component\Dotenv\Dotenv;
 use Desperado\Domain\Uuid;
-use Desperado\ServiceBus\Serializer\Bridge\SymfonySerializerBridge;
-use Desperado\ServiceBus\Serializer\MessageSerializer;
+use Desperado\MessageSerializer\Bridge\SymfonySerializerBridge;
+use Desperado\MessageSerializer\MessageSerializer;
 use Desperado\ServiceBus\Demo\Command\TestCommand;
 
 include_once __DIR__ . '/../../vendor/autoload.php';
 
-(new Dotenv())->load(__DIR__ . '/../../.env');
+(new Dotenv())->load(__DIR__ . '/../.env');
 
 $dsnParts = \parse_url(\getenv('TRANSPORT_CONNECTION_DSN'));
 

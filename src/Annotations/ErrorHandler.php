@@ -18,7 +18,7 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  * Annotation indicating to the exceptions handler
  *
  * @Annotation
- * @Target("CLASS")
+ * @Target("METHOD")
  */
 class ErrorHandler extends AbstractAnnotation
 {

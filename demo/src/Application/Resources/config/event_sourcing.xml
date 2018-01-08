@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- Event sourcing storage -->
+        <service
+                id="event_sourcing.storage"
+                class="Desperado\EventSourcing\Storage\InMemory\EventSourcingInMemoryStorage"
+                public="false"/>
+
+        <!-- Event store -->
+        <service
+                id="event_sourcing.event_store"
+                class="Desperado\EventSourcing\Store\EventStore"
+                public="false">
+            <argument type="service" id="event_sourcing.storage"/>
+            <argument type="service" id="service_bus.serializer.compressed_messages"/>
+        </service>
+
+        <!-- Event sourcing service -->
+        <service
+                id="event_sourcing.service"
+                class="Desperado\EventSourcing\Service\EventSourcingService"
+                public="false">
+            <argument type="service" id="event_sourcing.event_store"/>
+            <argument type="service" id="service_bus.logger"/>
+
+            <tag name="service_bus.logger" channel="event_sourcing"/>
+        </service>
+    </services>
+</container>

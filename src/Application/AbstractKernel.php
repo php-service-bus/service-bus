@@ -12,8 +12,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
+use Desperado\Saga\Service\Exceptions as SagaServiceExceptions;
 use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\EntryPoint\EntryPointContext;
+use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Services;
@@ -37,7 +39,21 @@ abstract class AbstractKernel
      */
     private $sagaService;
 
+    /**
+     * Message bus
+     *
+     * @var MessageBus
+     */
+    private $messageBus;
 
+    /**
+     * @param MessageBusBuilder $messageBusBuilder
+     * @param SagaService       $sagaService
+     *
+     * @throws Services\Exceptions\ServiceConfigurationExceptionInterface
+     * @throws SagaServiceExceptions\ClosedMessageBusException
+     * @throws SagaServiceExceptions\SagaClassWasNotFoundException
+     */
     final public function __construct(
         MessageBusBuilder $messageBusBuilder,
         SagaService $sagaService
@@ -47,7 +63,9 @@ abstract class AbstractKernel
         $this->sagaService = $sagaService;
 
         $this->configureSagas();
-        $this->buildMessageBus();
+        $this->configureServices();
+
+        $this->messageBus = $messageBusBuilder->build();
     }
 
     /**
@@ -89,7 +107,10 @@ abstract class AbstractKernel
      */
     final public function handle(EntryPointContext $entryPointContext, AbstractExecutionContext $executionContext): void
     {
-
+            $this->messageBus->handle(
+                $entryPointContext->getMessage(),
+                $executionContext
+            );
     }
 
     /**
@@ -102,16 +123,47 @@ abstract class AbstractKernel
         return $this->messageBusBuilder;
     }
 
+    /**
+     * Process saga configuration
+     *
+     * @return void
+     *
+     * @throws SagaServiceExceptions\ClosedMessageBusException
+     * @throws SagaServiceExceptions\SagaClassWasNotFoundException
+     */
     private function configureSagas(): void
     {
-        foreach($this->sagaService as $saga)
+        foreach($this->getSagasList() as $saga)
         {
-            
+            $this->sagaService->configure($saga);
+
+            /** Add saga listeners to message bus */
+
+            foreach($this->sagaService->getSagaListeners($saga) as $listener)
+            {
+                $this->messageBusBuilder->pushMessageHandler(
+                    Services\Handlers\Messages\MessageHandlerData::new(
+                        $listener->getEventNamespace(),
+                        $listener->getHandler(),
+                        new Services\Handlers\Messages\EventExecutionParameters('sagas')
+                    )
+                );
+            }
         }
     }
 
-    private function buildMessageBus(): void
+    /**
+     * Process services configuration
+     *
+     * @return void
+     *
+     * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
+     */
+    private function configureServices(): void
     {
-
+        foreach($this->getServices() as $service)
+        {
+            $this->messageBusBuilder->applyService($service);
+        }
     }
 }

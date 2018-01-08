@@ -41,6 +41,7 @@
     "doctrine/cache": "v1.7.1"
   },
   "require-dev": {
+    "mmasiukevich/event-sourcing": "^0.1",
     "phpunit/phpunit": "^6.2",
     "symfony/debug": "^4.0"
   },

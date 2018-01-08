@@ -31,12 +31,18 @@
                  class="Desperado\ServiceBus\Demo\Application\ApplicationContext"
                  public="false">
             <argument type="service" id="service_bus.sagas.service"/>
+            <argument type="service" id="event_sourcing.service"/>
         </service>
 
         <!-- Application kernel -->
         <service id="application_kernel" class="Desperado\ServiceBus\Demo\Application\Kernel" public="true">
             <argument type="service" id="service_bus.message_bus.builder"/>
             <argument type="service" id="service_bus.sagas.service"/>
+
+            <call method="configureEventSourcing">
+                <argument type="service" id="event_sourcing.service"/>
+            </call>
+
         </service>
     </services>
 </container>

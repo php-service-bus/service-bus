@@ -18,7 +18,7 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  * Annotation indicating to the event handler (listener)
  *
  * @Annotation
- * @Target("CLASS")
+ * @Target("METHOD")
  */
 class EventHandler extends AbstractAnnotation
 {

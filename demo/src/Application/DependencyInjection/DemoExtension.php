@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Demo\DependencyInjection;
+namespace Desperado\ServiceBus\Demo\Application\DependencyInjection;
 
 use Desperado\ServiceBus\DependencyInjection\Traits\LoadServicesTrait;
 use Symfony\Component\DependencyInjection;

@@ -76,9 +76,9 @@ class MessageBus
 
         foreach($taskCollection as $task)
         {
-            $handler = $task->getTask();
+            $task = $task->getTask();
 
-            $handler($message, $context);
+            $task($message, $context);
         }
     }
 

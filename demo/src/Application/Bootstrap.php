@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Demo\Application;
 use Desperado\ServiceBus\Application\AbstractBootstrap;
 use Desperado\ServiceBus\Application\BootstrapContainerConfiguration;
 use Desperado\ServiceBus\Application\BootstrapServicesDefinitions;
-use Desperado\ServiceBus\Demo\DependencyInjection\DemoExtension;
+use Desperado\ServiceBus\Demo\Application\DependencyInjection\DemoExtension;
 
 /**
  *
