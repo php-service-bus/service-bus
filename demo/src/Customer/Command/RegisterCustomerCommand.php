@@ -80,15 +80,21 @@ class RegisterCustomerCommand extends AbstractCommand
     protected $email;
 
     /**
-     * Hashed password
+     * Password
      *
      * @Assert\NotBlank(
-     *     message="customer hashed password must be specified"
+     *     message="customer password must be specified"
+     * )
+     * @Assert\Length(
+     *      min = 5,
+     *      max = 15,
+     *      minMessage = "customer password must be at least {{ limit }} characters long",
+     *      maxMessage = "customer password cannot be longer than {{ limit }} characters"
      * )
      *
      * @var string
      */
-    protected $passwordHash;
+    protected $password;
 
     /**
      * Get operation identifier
@@ -131,12 +137,12 @@ class RegisterCustomerCommand extends AbstractCommand
     }
 
     /**
-     * Get hashed password
+     * Get password
      *
      * @return string
      */
-    public function getPasswordHash(): string
+    public function getPassword(): string
     {
-        return $this->passwordHash;
+        return $this->password;
     }
 }

@@ -18,7 +18,7 @@ use Desperado\Saga\Annotations;
 
 /**
  * @Annotations\Saga(
- *     identityNamespace="Desperado\ServiceBus\Demo\Customer\Identity\CustomerRegistrationSagaIdentity",
+ *     identityNamespace="Desperado\ServiceBus\Demo\Customer\Identity\CustomerRegistrationSagaIdentifier",
  *     containingIdentityProperty="requestId",
  *     expireDateModifier="+2 days"
  * )

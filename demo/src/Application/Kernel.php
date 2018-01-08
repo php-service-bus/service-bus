@@ -71,8 +71,8 @@ class Kernel extends AbstractKernel
     protected function getAggregates(): array
     {
         return [
-            Customer\CustomerAggregate::class  => Customer\Identity\CustomerAggregateIdentity::class,
-            Customer\CustomerEmailIndex::class => Customer\Identity\CustomerEmailIndexIdentity::class
+            Customer\CustomerAggregate::class  => Customer\Identity\CustomerAggregateIdentifier::class,
+            Customer\CustomerEmailIndex::class => Customer\Identity\CustomerEmailIndexIdentifier::class
         ];
     }
 }

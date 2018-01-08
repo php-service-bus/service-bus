@@ -15,7 +15,7 @@ use Symfony\Component\Dotenv\Dotenv;
 use Desperado\Domain\Uuid;
 use Desperado\MessageSerializer\Bridge\SymfonySerializerBridge;
 use Desperado\MessageSerializer\MessageSerializer;
-use Desperado\ServiceBus\Demo\Command\TestCommand;
+use Desperado\ServiceBus\Demo\Customer\Command\RegisterCustomerCommand;
 
 include_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -23,8 +23,12 @@ include_once __DIR__ . '/../../vendor/autoload.php';
 
 $dsnParts = \parse_url(\getenv('TRANSPORT_CONNECTION_DSN'));
 
-$command = TestCommand::create([
-    'requestId' => Uuid::new()
+$command = RegisterCustomerCommand::create([
+    'requestId'   => Uuid::new(),
+    'userName'    => 'someCustomerUserName',
+    'displayName' => 'someCustomerDisplayName',
+    'email'       => 'desperado@minsk-info.ru',
+    'password'    => 'qwerty'
 ]);
 
 $client = (new Client($dsnParts))->connect();

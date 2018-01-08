@@ -194,6 +194,14 @@ class RabbitMqTransport implements TransportInterface
                         $outboundContext
                     );
 
+                    if(true === $this->environment->isDebug())
+                    {
+                        ServiceBusLogger::debug(
+                            'income',
+                            \sprintf('Received the message: %s', $incoming->content)
+                        );
+                    }
+
                     $this->handleMessage(
                         $applicationHandler,
                         $receivedMessageContainer,
