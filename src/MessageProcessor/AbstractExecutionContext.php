@@ -19,6 +19,7 @@ use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\Application\Exceptions\OutboundContextNotAppliedException;
+use Desperado\ServiceBus\Extensions\Logger\ServiceBusLogger;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Psr\Log\LogLevel;
@@ -111,59 +112,51 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      *
      * @todo: fix me
      *
-     * @param AbstractMessage $message
-     * @param string          $logMessage
-     * @param string          $level
-     * @param array           $extra
+     * @param string $logMessage
+     * @param string $level
+     * @param array  $extra
      *
      * @return void
      */
     final public function logContextMessage(
-        AbstractMessage $message,
         string $logMessage,
         string $level = LogLevel::INFO,
         array $extra = []
     ): void
     {
-
+        ServiceBusLogger::log('execution', $logMessage, $level, $extra);
     }
 
     /**
      * Log Throwable in execution context
      *
-     * @param AbstractMessage $message
-     * @param \Throwable      $throwable ,
-     * @param string          $level
-     * @param array           $extra
+     * @param \Throwable $throwable
+     * @param string     $level
+     * @param array      $extra
      *
      * @return void
      */
     public function logContextThrowable(
-        AbstractMessage $message,
         \Throwable $throwable,
         string $level = LogLevel::ERROR,
         array $extra = []
     ): void
     {
-        $this->logContextMessage($message, ThrowableFormatter::toString($throwable), $level, $extra);
+        $this->logContextMessage(ThrowableFormatter::toString($throwable), $level, $extra);
     }
 
     /**
      * Get logger callable for execution context
      *
-     * @param AbstractMessage $message
-     * @param string          $level
+     * @param string $level
      *
      * @return callable
      */
-    public function getContextThrowableCallableLogger(
-        AbstractMessage $message,
-        string $level = LogLevel::ERROR
-    ): callable
+    public function getContextThrowableCallableLogger(string $level = LogLevel::ERROR): callable
     {
-        return function(\Throwable $throwable) use ($message, $level)
+        return function(\Throwable $throwable) use ($level)
         {
-            $this->logContextMessage($message, ThrowableFormatter::toString($throwable), $level);
+            $this->logContextMessage(ThrowableFormatter::toString($throwable), $level);
         };
     }
 

@@ -104,7 +104,7 @@ class ErrorHandlerMiddleware implements TaskInterface
                 : '. The error handler was not found'
         );
 
-        $context->logContextMessage($message, $logMessage);
+        $context->logContextMessage($logMessage);
 
         if(null !== $handler)
         {
