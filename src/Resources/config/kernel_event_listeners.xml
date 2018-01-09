@@ -6,16 +6,9 @@
     <services>
 
         <!--Event dispatcher -->
-        <service id="service_bus.base_event_dispatcher"
+        <service id="service_bus.event_dispatcher"
                  class="Symfony\Component\EventDispatcher\EventDispatcher"
                  public="false"/>
-
-        <!-- Immutable event dispatcher -->
-        <service id="service_bus.event_dispatcher"
-                 class="Symfony\Component\EventDispatcher\ImmutableEventDispatcher"
-                 public="false">
-            <argument type="service" id="service_bus.base_event_dispatcher"/>
-        </service>
 
         <!-- Listener event for message completion -->
         <service id="service_bus.kernel_event_listeners.after_message_execution"
