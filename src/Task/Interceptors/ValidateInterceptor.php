@@ -18,6 +18,7 @@ use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Task\Interceptors\Contract\MessageValidationFailedEvent;
 use Desperado\ServiceBus\Task\TaskInterface;
 use Psr\Log\LogLevel;
+use React\Promise\PromiseInterface;
 use Symfony\Component\Validator;
 
 /**
@@ -60,7 +61,7 @@ class ValidateInterceptor implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): ?TaskInterface
+    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): PromiseInterface
     {
         $violations = new Validator\ConstraintViolationList();
 

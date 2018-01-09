@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Task;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\ServiceBus\Services\Handlers\Messages\AbstractMessageExecutionParameters;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
+use React\Promise\PromiseInterface;
 
 /**
  * The task to be executed
@@ -64,7 +65,7 @@ class Task implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): ?TaskInterface
+    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): PromiseInterface
     {
         return \call_user_func_array($this->executionHandler, [$message, $context]);
     }

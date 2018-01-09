@@ -19,6 +19,7 @@ use Desperado\ServiceBus\Services\Handlers;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Task\TaskInterface;
 use Psr\Log\LogLevel;
+use React\Promise\PromiseInterface;
 
 /**
  * Handling of non-intercepted exceptions
@@ -63,7 +64,7 @@ class ErrorHandlerMiddleware implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): ?TaskInterface
+    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): PromiseInterface
     {
         try
         {

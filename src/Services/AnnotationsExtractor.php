@@ -84,6 +84,8 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         {
             /** @var Bridge\AnnotationsReader\MethodAnnotation $annotationData */
 
+            ConfigurationGuard::guardHandlerReturnDeclaration($annotationData->getMethod());
+
             switch(\get_class($annotationData->getAnnotation()))
             {
                 case Annotations\CommandHandler::class:

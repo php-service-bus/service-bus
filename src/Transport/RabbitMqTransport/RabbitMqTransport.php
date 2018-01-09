@@ -16,6 +16,7 @@ use Bunny\Async\Client;
 use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
 use Desperado\Domain\Environment\Environment;
+use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
 use Desperado\Domain\Transport\Message\Message;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\ParameterBag;
@@ -205,7 +206,6 @@ class RabbitMqTransport implements TransportInterface
                     $this->handleMessage(
                         $applicationHandler,
                         $receivedMessageContainer,
-                        $outboundContext,
                         $incoming,
                         $channel
                     );
@@ -219,7 +219,6 @@ class RabbitMqTransport implements TransportInterface
      *
      * @param callable                 $applicationHandler
      * @param IncomingMessageContainer $receivedMessageContainer
-     * @param OutboundMessageContext   $outboundMessageContext
      * @param BunnyMessage             $incoming
      * @param Channel                  $channel
      *
@@ -228,42 +227,57 @@ class RabbitMqTransport implements TransportInterface
     private function handleMessage(
         callable $applicationHandler,
         IncomingMessageContainer $receivedMessageContainer,
-        OutboundMessageContext $outboundMessageContext,
         BunnyMessage $incoming,
         Channel $channel
     ): void
     {
-        try
-        {
-            /** @noinspection PhpParamsInspection */
-            $applicationHandler($receivedMessageContainer);
-
-            $channel->ack($incoming);
-
-            $promises = \array_map(
-                function(Message $message) use ($channel)
-                {
-                    return $this->getPublisher()->publish($channel, $message);
-                },
-                \iterator_to_array($outboundMessageContext->getToPublishMessages())
-            );
-
-            all($promises)
-                ->then(
-                    null,
-                    function(\Throwable $throwable)
-                    {
-                        ServiceBusLogger::throwable('throwable', $throwable, LogLevel::EMERGENCY);
-                    }
-                );
-        }
-        catch(\Throwable $throwable)
+        $failedHandler = function(\Throwable $throwable) use ($channel, $incoming)
         {
             ServiceBusLogger::throwable('throwable', $throwable);
 
             $throwable instanceof \LogicException
                 ? $channel->nack($incoming)
                 : $channel->ack($incoming);
+        };
+
+        try
+        {
+            /** @noinspection PhpParamsInspection */
+            $promise = $applicationHandler($receivedMessageContainer);
+
+            /** @var PromiseInterface $promise */
+
+            $channel->ack($incoming);
+
+            $promise->then(
+                function(OutboundMessageContextInterface $outboundMessageContext) use ($channel)
+                {
+                    $promises = \array_map(
+                        function(Message $message) use ($channel)
+                        {
+                            return $this->getPublisher()->publish($channel, $message);
+                        },
+                        \iterator_to_array($outboundMessageContext->getToPublishMessages())
+                    );
+
+                    all($promises)
+                        ->then(
+                            null,
+                            function(\Throwable $throwable)
+                            {
+                                ServiceBusLogger::throwable('throwable', $throwable, LogLevel::EMERGENCY);
+                            }
+                        );
+                },
+                function(\Throwable $throwable) use ($failedHandler)
+                {
+                    $failedHandler($throwable);
+                }
+            );
+        }
+        catch(\Throwable $throwable)
+        {
+            $failedHandler($throwable);
         }
     }
 

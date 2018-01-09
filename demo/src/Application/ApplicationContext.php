@@ -73,7 +73,7 @@ class ApplicationContext extends AbstractExecutionContext
     /**
      * @inheritdoc
      */
-    protected function getOutboundMessageContext(): ?OutboundMessageContext
+    public function getOutboundMessageContext(): ?OutboundMessageContext
     {
         return $this->outboundMessageContext;
     }

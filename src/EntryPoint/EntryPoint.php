@@ -99,7 +99,7 @@ class EntryPoint
 
                 $executionContext = $this->prepareApplicationContext($incomingMessageContainer->getOutboundContext());
 
-                $this->kernel->handle($entryPointContext, $executionContext);
+                return $this->kernel->handle($entryPointContext, $executionContext);
             },
             $clients
         );

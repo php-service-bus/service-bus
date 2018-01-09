@@ -15,6 +15,9 @@ namespace Desperado\ServiceBus\MessageBus;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Psr\Log\LoggerInterface;
+use function React\Promise\all;
+use React\Promise\FulfilledPromise;
+use React\Promise\PromiseInterface;
 
 /**
  * Message bus
@@ -57,11 +60,9 @@ class MessageBus
      * @param AbstractMessage          $message
      * @param AbstractExecutionContext $context
      *
-     * @return void
-     *
-     * @throws \Throwable
+     * @return PromiseInterface
      */
-    public function handle(AbstractMessage $message, AbstractExecutionContext $context): void
+    public function handle(AbstractMessage $message, AbstractExecutionContext $context): PromiseInterface
     {
         $messageNamespace = \get_class($message);
 
@@ -69,19 +70,24 @@ class MessageBus
 
         if(0 === \count($taskCollection))
         {
-            $this->logger->notice(
+            $this->logger->debug(
                 \sprintf('No handlers found for the message with the namespace "%s', $messageNamespace)
             );
 
-            return;
+            return new FulfilledPromise();
         }
 
-        foreach($taskCollection as $task)
-        {
-            $task = $task->getTask();
+        $promises = \array_map(
+            function(MessageBusTask $task) use ($message, $context)
+            {
+                $task = $task->getTask();
 
-            $task($message, $context);
-        }
+                return $task($message, $context);
+            },
+            $taskCollection
+        );
+
+        return all($promises);
     }
 
     /**

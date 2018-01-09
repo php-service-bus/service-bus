@@ -79,7 +79,20 @@ class RabbitMqPublisher
                             (string) $message->getRoutingKey()
                         )
                         ->then(
-                            null,
+                            function() use ($message)
+                            {
+                                if(true === $this->environment->isDebug())
+                                {
+                                    $this->logger->debug(
+                                        \sprintf(
+                                            'The message with the contents of "%s" was sent to the exchange "%s" with the routing key "%s"',
+                                            $message->getBody(),
+                                            $message->getExchange(),
+                                            $message->getRoutingKey()
+                                        )
+                                    );
+                                }
+                            },
                             function(\Throwable $throwable)
                             {
                                 $this->logger->critical(ThrowableFormatter::toString($throwable));

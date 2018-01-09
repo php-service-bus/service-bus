@@ -23,10 +23,10 @@ use Desperado\Saga\Annotations;
  *     expireDateModifier="+2 days"
  * )
  */
-class CustomerRegistrationSaga extends AbstractSaga
+class CustomerVerificationSaga extends AbstractSaga
 {
     /**
-     * Start registration saga
+     * Start verification saga
      *
      * @param AbstractCommand $command
      *

@@ -42,7 +42,7 @@ class Kernel extends AbstractKernel
     protected function getSagasList(): array
     {
         return [
-            Customer\CustomerRegistrationSaga::class
+            Customer\CustomerVerificationSaga::class
         ];
     }
 

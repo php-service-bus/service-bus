@@ -29,13 +29,6 @@ use Psr\Log\LogLevel;
 abstract class AbstractExecutionContext implements ExecutionContextInterface
 {
     /**
-     * Outbound context
-     *
-     * @var OutboundMessageContext|null
-     */
-    private $outboundMessageContext;
-
-    /**
      * Sagas service
      *
      * @var SagaService
@@ -55,7 +48,7 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      *
      * @return OutboundMessageContext|null
      */
-    abstract protected function getOutboundMessageContext(): ?OutboundMessageContext;
+    abstract public function getOutboundMessageContext(): ?OutboundMessageContext;
 
     /**
      * @inheritdoc
@@ -81,7 +74,10 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
     {
         $this->guardOutboundContext();
 
-        $this->outboundMessageContext->publish($event, $messageDeliveryOptions);
+        $this
+            ->getOutboundMessageContext()
+            ->publish($event, $messageDeliveryOptions);
+
     }
 
     /**
@@ -93,7 +89,9 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
     {
         $this->guardOutboundContext();
 
-        $this->outboundMessageContext->send($command, $messageDeliveryOptions);
+        $this
+            ->getOutboundMessageContext()
+            ->send($command, $messageDeliveryOptions);
     }
 
     /**

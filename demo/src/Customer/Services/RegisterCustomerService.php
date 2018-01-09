@@ -13,14 +13,15 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Demo\Customer\Services;
 
 use Desperado\Domain\Uuid;
-use Desperado\EventSourcing\Examples\CustomerIndexIdentity;
 use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\Demo\Application\ApplicationContext;
 use Desperado\ServiceBus\Demo\Customer\Command as CustomerCommands;
 use Desperado\ServiceBus\Demo\Customer\CustomerAggregate;
 use Desperado\ServiceBus\Demo\Customer\CustomerEmailIndex;
+use Desperado\ServiceBus\Demo\Customer\Event as CustomerEvents;
 use Desperado\ServiceBus\Demo\Customer\Identity\CustomerAggregateIdentifier;
 use Desperado\ServiceBus\Services\ServiceInterface;
+use React\Promise\PromiseInterface;
 
 /**
  * @Annotations\Service()
@@ -33,14 +34,14 @@ class RegisterCustomerService implements ServiceInterface
      * @param CustomerCommands\RegisterCustomerCommand $command
      * @param ApplicationContext                       $context
      *
-     * @return void
+     * @return PromiseInterface
      */
     public function executeRegisterCustomerCommand(
         CustomerCommands\RegisterCustomerCommand $command,
         ApplicationContext $context
-    ): void
+    ): PromiseInterface
     {
-        $context
+        return $context
             ->getEventSourcingService()
             ->obtainIndex(CustomerEmailIndex::class)
             ->then(
@@ -67,5 +68,21 @@ class RegisterCustomerService implements ServiceInterface
                 },
                 $context->getContextThrowableCallableLogger($command)
             );
+    }
+
+    /**
+     * @Annotations\EventHandler()
+     *
+     * @param CustomerEvents\CustomerRegisteredEvent $event
+     * @param ApplicationContext                     $context
+     *
+     * @return PromiseInterface
+     */
+    public function whenCustomerRegisteredEvent(
+        CustomerEvents\CustomerRegisteredEvent $event,
+        ApplicationContext $context
+    ): PromiseInterface
+    {
+        die('11');
     }
 }

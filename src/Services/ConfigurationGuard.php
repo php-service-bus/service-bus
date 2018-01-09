@@ -15,12 +15,40 @@ namespace Desperado\ServiceBus\Services\Configuration;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Services\Exceptions as ServicesExceptions;
+use React\Promise\Promise;
+use React\Promise\PromiseInterface;
 
 /**
  * The helper for validating the handlers
  */
 class ConfigurationGuard
 {
+    /**
+     * Assert handlers return declaration type is correct
+     *
+     * @param \ReflectionMethod $method
+     *
+     * @return void
+     *
+     * @throws ServicesExceptions\NoReturnTypeDeclarationException
+     * @throws ServicesExceptions\IncorrectReturnTypeDeclarationException
+     */
+    public static function guardHandlerReturnDeclaration(\ReflectionMethod $method): void
+    {
+        if(false === $method->hasReturnType())
+        {
+            throw new ServicesExceptions\NoReturnTypeDeclarationException($method);
+        }
+
+        $returnDeclarationType = $method->getReturnType()->getName();
+
+        if(PromiseInterface::class !== $returnDeclarationType && Promise::class !== $returnDeclarationType)
+        {
+            throw new ServicesExceptions\IncorrectReturnTypeDeclarationException($method);
+        }
+    }
+
+
     /**
      * Assert arguments count valid
      *

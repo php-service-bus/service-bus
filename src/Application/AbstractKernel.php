@@ -15,11 +15,13 @@ namespace Desperado\ServiceBus\Application;
 use Desperado\Saga\Service\Exceptions as SagaServiceExceptions;
 use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\EntryPoint\EntryPointContext;
+use Desperado\ServiceBus\Extensions\Logger\ServiceBusLogger;
 use Desperado\ServiceBus\KernelEvents;
 use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Services;
+use React\Promise\PromiseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -86,36 +88,45 @@ abstract class AbstractKernel
      * @param EntryPointContext        $entryPointContext
      * @param AbstractExecutionContext $executionContext
      *
-     * @return void
+     * @return PromiseInterface
      *
      * @throws \Throwable
      */
-    final public function handle(EntryPointContext $entryPointContext, AbstractExecutionContext $executionContext): void
+    final public function handle(EntryPointContext $entryPointContext, AbstractExecutionContext $executionContext): PromiseInterface
     {
         $this->eventDispatcher->dispatch(
             KernelEvents\MessageIsReadyForProcessingEvent::EVENT_NAME,
             new KernelEvents\MessageIsReadyForProcessingEvent($entryPointContext, $executionContext)
         );
 
-        try
-        {
-            $this->messageBus->handle(
-                $entryPointContext->getMessage(),
-                $executionContext
-            );
+        $promise = $this->messageBus->handle(
+            $entryPointContext->getMessage(),
+            $executionContext
+        );
 
-            $this->eventDispatcher->dispatch(
-                KernelEvents\MessageProcessingCompletedEvent::EVENT_NAME,
-                new KernelEvents\MessageProcessingCompletedEvent($entryPointContext, $executionContext)
+        return $promise
+            ->then(
+                function() use ($entryPointContext, $executionContext)
+                {
+                    $this->eventDispatcher->dispatch(
+                        KernelEvents\MessageProcessingCompletedEvent::EVENT_NAME,
+                        new KernelEvents\MessageProcessingCompletedEvent($entryPointContext, $executionContext)
+                    );
+
+                    return $executionContext->getOutboundMessageContext();
+                },
+                function(\Throwable $throwable) use ($entryPointContext, $executionContext)
+                {
+                    ServiceBusLogger::throwable('kernel', $throwable);
+
+                    $this->eventDispatcher->dispatch(
+                        KernelEvents\MessageProcessingFailedEvent::EVENT_NAME,
+                        new KernelEvents\MessageProcessingFailedEvent($throwable, $entryPointContext, $executionContext)
+                    );
+
+                    return $throwable;
+                }
             );
-        }
-        catch(\Throwable $throwable)
-        {
-            $this->eventDispatcher->dispatch(
-                KernelEvents\MessageProcessingFailedEvent::EVENT_NAME,
-                new KernelEvents\MessageProcessingFailedEvent($throwable, $entryPointContext, $executionContext)
-            );
-        }
     }
 
     /**
