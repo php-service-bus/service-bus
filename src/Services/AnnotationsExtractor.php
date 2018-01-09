@@ -100,7 +100,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
                 case Annotations\ErrorHandler::class:
 
                     /** @var Handlers\Exceptions\ExceptionHandlerData $originErrorHandlerData */
-                    $originErrorHandlerData = $this->extractErrorHandlers($service, $annotationData->getMethod());
+                    $originErrorHandlerData = $this->extractErrorHandlers($service, $annotationData);
 
                     $exceptionHandlers->add($originErrorHandlerData);
 
@@ -130,8 +130,8 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
     /**
      * Extract error handler
      *
-     * @param ServiceInterface  $service
-     * @param \ReflectionMethod $reflectionMethod
+     * @param ServiceInterface                          $service
+     * @param Bridge\AnnotationsReader\MethodAnnotation $errorHandlerAnnotationData
      *
      * @return Handlers\Exceptions\ExceptionHandlerData
      *
@@ -139,25 +139,24 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
      */
     private function extractErrorHandlers(
         ServiceInterface $service,
-        \ReflectionMethod $reflectionMethod
+        Bridge\AnnotationsReader\MethodAnnotation $errorHandlerAnnotationData
     ): Handlers\Exceptions\ExceptionHandlerData
     {
-        ConfigurationGuard::guardNumberOfParametersValid($reflectionMethod, 3);
+        /** @var Annotations\ErrorHandler $errorHandlerAnnotation */
+        $errorHandlerAnnotation = $errorHandlerAnnotationData->getAnnotation();
+        $reflectionMethod = $errorHandlerAnnotationData->getMethod();
+
+        ConfigurationGuard::guardNumberOfParametersValid($reflectionMethod, 1);
 
         /** @var \ReflectionParameter[] $parameters */
         $parameters = $reflectionMethod->getParameters();
 
-        ConfigurationGuard::guardValidThrowableArgument(
-            $reflectionMethod,
-            $reflectionMethod->getParameters()[0]
-        );
-
-        ConfigurationGuard::guardValidMessageArgument($reflectionMethod, $parameters[1], 1);
-        ConfigurationGuard::guardContextValidArgument($reflectionMethod, $parameters[2]);
+        ConfigurationGuard::guardUnfulfilledPromiseArgument($reflectionMethod, $parameters[0]);
+        ConfigurationGuard::guardErrorHandlerAnnotationData($errorHandlerAnnotation, $reflectionMethod);
 
         return Handlers\Exceptions\ExceptionHandlerData::new(
-            $parameters[0]->getClass()->getName(),
-            $parameters[1]->getClass()->getName(),
+            $errorHandlerAnnotation->getThrowableType(),
+            $errorHandlerAnnotation->getMessageClass(),
             $reflectionMethod->getClosure($service),
             new Handlers\Exceptions\ExceptionHandlingParameters()
         );

@@ -73,13 +73,16 @@ class ExceptionHandlersCollection implements \IteratorAggregate
      */
     public function searchHandler(string $messageNamespace, string $exceptionNamespace): ?\Closure
     {
+        $messageNamespace = \ltrim($messageNamespace, '\\');
+        $exceptionNamespace = \ltrim($exceptionNamespace, '\\');
+
         foreach($this as $item)
         {
             /** @var ExceptionHandlerData $item */
 
             if(
                 $messageNamespace === $item->getMessageClassNamespace() &&
-                $exceptionNamespace === $item->getExceptionHandler()
+                $exceptionNamespace === $item->getExceptionClassNamespace()
             )
             {
                 return $item->getExceptionHandler();

@@ -20,7 +20,9 @@ use Desperado\ServiceBus\Demo\Customer\CustomerAggregate;
 use Desperado\ServiceBus\Demo\Customer\CustomerEmailIndex;
 use Desperado\ServiceBus\Demo\Customer\Event as CustomerEvents;
 use Desperado\ServiceBus\Demo\Customer\Identity\CustomerAggregateIdentifier;
+use Desperado\ServiceBus\Services\Handlers\Exceptions\UnfulfilledPromiseData;
 use Desperado\ServiceBus\Services\ServiceInterface;
+use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
 /**
@@ -41,6 +43,8 @@ class RegisterCustomerService implements ServiceInterface
         ApplicationContext $context
     ): PromiseInterface
     {
+        throw new \Exception('aaaaaa');
+
         return $context
             ->getEventSourcingService()
             ->obtainIndex(CustomerEmailIndex::class)
@@ -56,18 +60,51 @@ class RegisterCustomerService implements ServiceInterface
                             ->getEventSourcingService()
                             ->createAggregate($customerIdentifier)
                             ->then(
-                                function(CustomerAggregate $aggregate) use ($customerEmailIndex, $customerIdentifier, $command)
+                                function(CustomerAggregate $aggregate) use (
+                                    $customerEmailIndex,
+                                    $customerIdentifier,
+                                    $command
+                                )
                                 {
                                     $aggregate->registerCustomer($command);
 
                                     $customerEmailIndex->store($command->getEmail(), $customerIdentifier);
-                                },
-                                $context->getContextThrowableCallableLogger($command)
+                                }
                             );
                     }
-                },
-                $context->getContextThrowableCallableLogger($command)
+                }
             );
+    }
+
+    /**
+     * @Annotations\ErrorHandler(
+     *     message="Desperado\ServiceBus\Demo\Customer\Command\RegisterCustomerCommand",
+     *     type="Exception",
+     *     loggerChannel="registrationFail"
+     * )
+     *
+     * @param UnfulfilledPromiseData $unfulfilledPromiseData
+     *
+     * @return PromiseInterface
+     */
+    public function failedRegisterCustomerCommand(UnfulfilledPromiseData $unfulfilledPromiseData): PromiseInterface
+    {
+        return new Promise(
+            function() use ($unfulfilledPromiseData)
+            {
+                /** @var CustomerCommands\RegisterCustomerCommand $registerCommand */
+                $registerCommand = $unfulfilledPromiseData->getMessage();
+
+                $unfulfilledPromiseData
+                    ->getContext()
+                    ->delivery(
+                        CustomerEvents\FailedRegistrationEvent::create([
+                            'requestId' => $registerCommand->getRequestId(),
+                            'reason'    => $unfulfilledPromiseData->getThrowable()->getMessage()
+                        ])
+                    );
+            }
+        );
     }
 
     /**
@@ -83,6 +120,6 @@ class RegisterCustomerService implements ServiceInterface
         ApplicationContext $context
     ): PromiseInterface
     {
-        die('11');
+
     }
 }

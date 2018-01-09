@@ -30,6 +30,20 @@ class ErrorHandler extends AbstractAnnotation
     protected $loggerChannel;
 
     /**
+     * Message namespace
+     *
+     * @var string|null
+     */
+    protected $message;
+
+    /**
+     * Type of exception to be processed
+     *
+     * @var string|null
+     */
+    protected $type;
+
+    /**
      * Get exception-specific logger channel
      *
      * @return string|null
@@ -37,5 +51,25 @@ class ErrorHandler extends AbstractAnnotation
     public function getLoggerChannel(): ?string
     {
         return $this->loggerChannel;
+    }
+
+    /**
+     * Get message namespace
+     *
+     * @return string|null
+     */
+    public function getMessageClass(): ?string
+    {
+        return $this->message;
+    }
+
+    /**
+     * Get type of exception to be processed
+     *
+     * @return string
+     */
+    public function getThrowableType(): string
+    {
+        return $this->type ?? \Throwable::class;
     }
 }

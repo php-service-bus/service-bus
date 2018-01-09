@@ -13,13 +13,11 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Task\Middleware;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Domain\ThrowableFormatter;
-use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
 use Desperado\ServiceBus\Services\Handlers;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Task\TaskInterface;
-use Psr\Log\LogLevel;
 use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
 
 /**
  * Handling of non-intercepted exceptions
@@ -70,20 +68,10 @@ class ErrorHandlerMiddleware implements TaskInterface
         {
             return \call_user_func_array($this->task, [$message, $context]);
         }
-        catch(HttpException $httpException)
-        {
-            throw $httpException;
-        }
         catch(\Exception $exception)
         {
-            $this->handleException($exception, $message, $context);
+            return $this->handleException($exception, $message, $context);
         }
-        catch(\Throwable $throwable)
-        {
-            throw $throwable;
-        }
-
-        return null;
     }
 
     /**
@@ -93,7 +81,7 @@ class ErrorHandlerMiddleware implements TaskInterface
      * @param AbstractMessage          $message
      * @param AbstractExecutionContext $context
      *
-     * @return void
+     * @return PromiseInterface
      *
      * @throws \Throwable
      */
@@ -101,11 +89,12 @@ class ErrorHandlerMiddleware implements TaskInterface
         \Exception $exception,
         AbstractMessage $message,
         AbstractExecutionContext $context
-    ): void
+    ): PromiseInterface
     {
         $exceptionClass = \get_class($exception);
         $messageClass = \get_class($message);
-        $handler = $this->exceptionHandlersCollection->searchHandler($exceptionClass, $messageClass);
+
+        $handler = $this->exceptionHandlersCollection->searchHandler($messageClass, $exceptionClass);
 
         $logMessage = \sprintf(
             'An exception "%s" (%s %s:%d) was thrown during execution of the "%s" message%s',
@@ -115,40 +104,17 @@ class ErrorHandlerMiddleware implements TaskInterface
                 : '. The error handler was not found'
         );
 
-        null !== $handler
-            ? $context->logContextMessage($message, $logMessage, LogLevel::INFO)
-            : $context->logContextMessage($message, $logMessage, LogLevel::ERROR);
+        $context->logContextMessage($message, $logMessage);
 
         if(null !== $handler)
         {
-            try
-            {
-                $handler($exception, $message, $context);
+            return $handler(
+                Handlers\Exceptions\UnfulfilledPromiseData::create(
+                    $exception, $message, $context
+                )
+            );
+        }
 
-                $context->logContextMessage(
-                    $message,
-                    \sprintf(
-                        'Exception "%s" for message "%s" successful intercepted',
-                        $exceptionClass, $messageClass
-                    ),
-                    LogLevel::INFO
-                );
-            }
-            catch(\Throwable $throwable)
-            {
-                $context->logContextMessage(
-                    $message,
-                    \sprintf(
-                        'The error handler can\'t throw an exception. Intercepted: %s',
-                        ThrowableFormatter::toString($throwable)
-                    ),
-                    LogLevel::ALERT
-                );
-            }
-        }
-        else
-        {
-            throw $exception;
-        }
+        return new RejectedPromise($exception);
     }
 }

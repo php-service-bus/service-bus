@@ -177,7 +177,7 @@ class MessageBusBuilder
             throw new MessageBusAlreadyCreatedException();
         }
 
-        if(true === \array_key_exists(Behaviors\ErrorHandleBehavior::class, $this->behaviors))
+        if(false === \array_key_exists(Behaviors\ErrorHandleBehavior::class, $this->behaviors))
         {
             $this->behaviors[Behaviors\ErrorHandleBehavior::class] = Behaviors\ErrorHandleBehavior::create(
                 $this->errorHandlers

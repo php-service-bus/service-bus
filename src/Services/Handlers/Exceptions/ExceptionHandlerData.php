@@ -62,8 +62,8 @@ class ExceptionHandlerData
     {
         $self = new self();
 
-        $self->exceptionClassNamespace = $exceptionClassNamespace;
-        $self->messageClassNamespace = $messageClassNamespace;
+        $self->exceptionClassNamespace = \ltrim($exceptionClassNamespace, '\\');
+        $self->messageClassNamespace = \ltrim($messageClassNamespace, '\\');
         $self->exceptionHandler = $exceptionHandler;
         $self->exceptionHandlingParameters = $exceptionHandlingParameters;
 

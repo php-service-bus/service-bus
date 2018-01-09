@@ -17,6 +17,8 @@ use Desperado\Domain\Message\AbstractCommand;
 
 /**
  * Start customer registration
+ *
+ * @see FailedRegistrationEvent
  */
 class RegisterCustomerCommand extends AbstractCommand
 {
