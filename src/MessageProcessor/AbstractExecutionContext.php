@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\MessageProcessor;
 use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
+use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\Application\Exceptions\OutboundContextNotAppliedException;
@@ -25,7 +26,7 @@ use Psr\Log\LogLevel;
 /**
  * Base class of the context of message processing
  */
-abstract class AbstractExecutionContext
+abstract class AbstractExecutionContext implements ExecutionContextInterface
 {
     /**
      * Outbound context
@@ -50,21 +51,50 @@ abstract class AbstractExecutionContext
     }
 
     /**
-     * Apply a context to send the message to the transport layer
-     * Must return a NEW instance of the class (immutable object)
-     *
-     * @param OutboundMessageContext $outboundMessageContext
-     *
-     * @return $this
-     */
-    abstract public function applyOutboundMessageContext(OutboundMessageContext $outboundMessageContext);
-
-    /**
      * Get outbound context
      *
      * @return OutboundMessageContext|null
      */
     abstract protected function getOutboundMessageContext(): ?OutboundMessageContext;
+
+    /**
+     * @inheritdoc
+     *
+     * @throws OutboundContextNotAppliedException
+     */
+    final public function delivery(AbstractMessage $message, MessageDeliveryOptions $messageDeliveryOptions = null): void
+    {
+        $messageDeliveryOptions = $messageDeliveryOptions ?? MessageDeliveryOptions::create();
+
+        $message instanceof AbstractCommand
+            ? $this->send($message, $messageDeliveryOptions)
+            /** @var AbstractEvent $message */
+            : $this->publish($message, $messageDeliveryOptions);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @throws OutboundContextNotAppliedException
+     */
+    final public function publish(AbstractEvent $event, MessageDeliveryOptions $messageDeliveryOptions): void
+    {
+        $this->guardOutboundContext();
+
+        $this->outboundMessageContext->publish($event, $messageDeliveryOptions);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @throws OutboundContextNotAppliedException
+     */
+    final public function send(AbstractCommand $command, MessageDeliveryOptions $messageDeliveryOptions): void
+    {
+        $this->guardOutboundContext();
+
+        $this->outboundMessageContext->send($command, $messageDeliveryOptions);
+    }
 
     /**
      * Get saga service
@@ -137,60 +167,6 @@ abstract class AbstractExecutionContext
         {
             $this->logContextMessage($message, ThrowableFormatter::toString($throwable), $level);
         };
-    }
-
-    /**
-     * Send command/publish message
-     *
-     * @param AbstractMessage             $message
-     * @param MessageDeliveryOptions|null $messageDeliveryOptions
-     *
-     * @return void
-     *
-     * @throws OutboundContextNotAppliedException
-     */
-    final public function delivery(AbstractMessage $message, MessageDeliveryOptions $messageDeliveryOptions = null): void
-    {
-        $messageDeliveryOptions = $messageDeliveryOptions ?? MessageDeliveryOptions::create();
-
-        $message instanceof AbstractCommand
-            ? $this->send($message, $messageDeliveryOptions)
-            /** @var AbstractEvent $message */
-            : $this->publish($message, $messageDeliveryOptions);
-    }
-
-    /**
-     * Publish event
-     *
-     * @param AbstractEvent          $event
-     * @param MessageDeliveryOptions $messageDeliveryOptions
-     *
-     * @return void
-     *
-     * @throws OutboundContextNotAppliedException
-     */
-    final public function publish(AbstractEvent $event, MessageDeliveryOptions $messageDeliveryOptions): void
-    {
-        $this->guardOutboundContext();
-
-        $this->outboundMessageContext->publish($event, $messageDeliveryOptions);
-    }
-
-    /**
-     * Send command
-     *
-     * @param AbstractCommand        $command
-     * @param MessageDeliveryOptions $messageDeliveryOptions
-     *
-     * @return void
-     *
-     * @throws OutboundContextNotAppliedException
-     */
-    final public function send(AbstractCommand $command, MessageDeliveryOptions $messageDeliveryOptions): void
-    {
-        $this->guardOutboundContext();
-
-        $this->outboundMessageContext->send($command, $messageDeliveryOptions);
     }
 
     /**

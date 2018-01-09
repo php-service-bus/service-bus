@@ -58,6 +58,8 @@ class MessageBus
      * @param AbstractExecutionContext $context
      *
      * @return void
+     *
+     * @throws \Throwable
      */
     public function handle(AbstractMessage $message, AbstractExecutionContext $context): void
     {

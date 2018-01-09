@@ -38,7 +38,7 @@ class Task implements TaskInterface
     /**
      * Create a new task
      *
-     * @param \Closure    $executionHandler
+     * @param \Closure                           $executionHandler
      * @param AbstractMessageExecutionParameters $options
      *
      * @return Task

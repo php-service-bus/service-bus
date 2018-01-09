@@ -15,10 +15,12 @@ namespace Desperado\ServiceBus\Application;
 use Desperado\Saga\Service\Exceptions as SagaServiceExceptions;
 use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\EntryPoint\EntryPointContext;
+use Desperado\ServiceBus\KernelEvents;
 use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Services;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Base application kernel
@@ -47,8 +49,16 @@ abstract class AbstractKernel
     private $messageBus;
 
     /**
+     * Event dispatcher
+     *
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+
+    /**
      * @param MessageBusBuilder $messageBusBuilder
      * @param SagaService       $sagaService
+     * @param EventDispatcher   $dispatcher
      *
      * @throws Services\Exceptions\ServiceConfigurationExceptionInterface
      * @throws SagaServiceExceptions\ClosedMessageBusException
@@ -56,16 +66,56 @@ abstract class AbstractKernel
      */
     final public function __construct(
         MessageBusBuilder $messageBusBuilder,
-        SagaService $sagaService
+        SagaService $sagaService,
+        EventDispatcher $dispatcher
     )
     {
         $this->messageBusBuilder = $messageBusBuilder;
+        $this->eventDispatcher = $dispatcher;
         $this->sagaService = $sagaService;
 
         $this->configureSagas();
         $this->configureServices();
 
         $this->messageBus = $messageBusBuilder->build();
+    }
+
+    /**
+     * Handle message
+     *
+     * @param EntryPointContext        $entryPointContext
+     * @param AbstractExecutionContext $executionContext
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    final public function handle(EntryPointContext $entryPointContext, AbstractExecutionContext $executionContext): void
+    {
+        $this->eventDispatcher->dispatch(
+            KernelEvents\MessageIsReadyForProcessingEvent::EVENT_NAME,
+            new KernelEvents\MessageIsReadyForProcessingEvent($entryPointContext, $executionContext)
+        );
+
+        try
+        {
+            $this->messageBus->handle(
+                $entryPointContext->getMessage(),
+                $executionContext
+            );
+
+            $this->eventDispatcher->dispatch(
+                KernelEvents\MessageProcessingCompletedEvent::EVENT_NAME,
+                new KernelEvents\MessageProcessingCompletedEvent($entryPointContext, $executionContext)
+            );
+        }
+        catch(\Throwable $throwable)
+        {
+            $this->eventDispatcher->dispatch(
+                KernelEvents\MessageProcessingFailedEvent::EVENT_NAME,
+                new KernelEvents\MessageProcessingFailedEvent($throwable, $entryPointContext, $executionContext)
+            );
+        }
     }
 
     /**
@@ -93,24 +143,6 @@ abstract class AbstractKernel
     protected function getServices(): array
     {
         return [];
-    }
-
-    /**
-     * Handle message
-     *
-     * @param EntryPointContext        $entryPointContext
-     * @param AbstractExecutionContext $executionContext
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    final public function handle(EntryPointContext $entryPointContext, AbstractExecutionContext $executionContext): void
-    {
-            $this->messageBus->handle(
-                $entryPointContext->getMessage(),
-                $executionContext
-            );
     }
 
     /**

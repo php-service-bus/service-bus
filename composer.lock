@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "58430232129868faca6ab578c1a2460e",
-    "content-hash": "05d955c394217aff6a65a7dd90b29304",
+    "content-hash": "39dbc93a54a62defd64fb4a6f88296c7",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -68,7 +67,7 @@
                 "react-php",
                 "reactphp"
             ],
-            "time": "2016-09-13 18:57:54"
+            "time": "2016-09-13T18:57:54+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -136,7 +135,7 @@
                 "docblock",
                 "parser"
             ],
-            "time": "2017-07-22 10:58:02"
+            "time": "2017-07-22T10:58:02+00:00"
         },
         {
             "name": "doctrine/cache",
@@ -210,7 +209,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2017-08-25 07:02:50"
+            "time": "2017-08-25T07:02:50+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -264,7 +263,7 @@
                 "lexer",
                 "parser"
             ],
-            "time": "2014-09-09 13:34:57"
+            "time": "2014-09-09T13:34:57+00:00"
         },
         {
             "name": "evenement/evenement",
@@ -307,7 +306,7 @@
                 "event-dispatcher",
                 "event-emitter"
             ],
-            "time": "2017-07-23 21:35:13"
+            "time": "2017-07-23T21:35:13+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -372,7 +371,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-06-22 18:50:49"
+            "time": "2017-06-22T18:50:49+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -423,7 +422,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2016-12-20 10:07:11"
+            "time": "2016-12-20T10:07:11+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -488,7 +487,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-03-20 17:10:46"
+            "time": "2017-03-20T17:10:46+00:00"
         },
         {
             "name": "mmasiukevich/domain-common",
@@ -542,7 +541,7 @@
                 "cqrs",
                 "event sourcing"
             ],
-            "time": "2018-01-07 13:45:36"
+            "time": "2018-01-07T13:45:36+00:00"
         },
         {
             "name": "mmasiukevich/infrastructure",
@@ -599,7 +598,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2017-12-27 14:24:49"
+            "time": "2017-12-27T14:24:49+00:00"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -649,7 +648,7 @@
                 }
             ],
             "description": "Message serializer",
-            "time": "2018-01-07 14:53:31"
+            "time": "2018-01-07T14:53:31+00:00"
         },
         {
             "name": "mmasiukevich/saga",
@@ -707,7 +706,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2018-01-08 13:01:15"
+            "time": "2018-01-08T13:01:15+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -785,7 +784,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2017-06-19 01:22:40"
+            "time": "2017-06-19T01:22:40+00:00"
         },
         {
             "name": "nikic/fast-route",
@@ -828,7 +827,7 @@
                 "router",
                 "routing"
             ],
-            "time": "2017-01-19 11:35:12"
+            "time": "2017-01-19T11:35:12+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -876,7 +875,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2017-09-27 21:40:39"
+            "time": "2017-09-27T21:40:39+00:00"
         },
         {
             "name": "psr/container",
@@ -925,7 +924,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-02-14 16:28:37"
+            "time": "2017-02-14T16:28:37+00:00"
         },
         {
             "name": "psr/http-message",
@@ -975,7 +974,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06 14:39:51"
+            "time": "2016-08-06T14:39:51+00:00"
         },
         {
             "name": "psr/log",
@@ -1022,7 +1021,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -1104,7 +1103,7 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2017-08-04 13:39:04"
+            "time": "2017-08-04T13:39:04+00:00"
         },
         {
             "name": "react/cache",
@@ -1144,7 +1143,7 @@
                 "promise",
                 "reactphp"
             ],
-            "time": "2017-12-20 16:47:13"
+            "time": "2017-12-20T16:47:13+00:00"
         },
         {
             "name": "react/dns",
@@ -1190,7 +1189,7 @@
                 "dns-resolver",
                 "reactphp"
             ],
-            "time": "2017-08-25 08:22:48"
+            "time": "2017-08-25T08:22:48+00:00"
         },
         {
             "name": "react/event-loop",
@@ -1232,7 +1231,7 @@
                 "asynchronous",
                 "event-loop"
             ],
-            "time": "2017-04-27 10:56:23"
+            "time": "2017-04-27T10:56:23+00:00"
         },
         {
             "name": "react/http",
@@ -1281,7 +1280,7 @@
                 "server",
                 "streaming"
             ],
-            "time": "2017-08-16 15:24:39"
+            "time": "2017-08-16T15:24:39+00:00"
         },
         {
             "name": "react/http-client",
@@ -1323,7 +1322,7 @@
             "keywords": [
                 "http"
             ],
-            "time": "2017-09-17 14:41:00"
+            "time": "2017-09-17T14:41:00+00:00"
         },
         {
             "name": "react/promise",
@@ -1369,7 +1368,7 @@
                 "promise",
                 "promises"
             ],
-            "time": "2017-03-25 12:08:31"
+            "time": "2017-03-25T12:08:31+00:00"
         },
         {
             "name": "react/promise-timer",
@@ -1422,7 +1421,7 @@
                 "timeout",
                 "timer"
             ],
-            "time": "2017-12-22 15:41:41"
+            "time": "2017-12-22T15:41:41+00:00"
         },
         {
             "name": "react/socket",
@@ -1469,7 +1468,7 @@
                 "reactphp",
                 "stream"
             ],
-            "time": "2018-01-06 12:13:20"
+            "time": "2018-01-06T12:13:20+00:00"
         },
         {
             "name": "react/stream",
@@ -1515,7 +1514,7 @@
                 "stream",
                 "writable"
             ],
-            "time": "2017-12-21 14:12:01"
+            "time": "2017-12-21T14:12:01+00:00"
         },
         {
             "name": "ringcentral/psr7",
@@ -1573,7 +1572,7 @@
                 "stream",
                 "uri"
             ],
-            "time": "2016-03-25 17:36:49"
+            "time": "2016-03-25T17:36:49+00:00"
         },
         {
             "name": "symfony/config",
@@ -1633,7 +1632,7 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-03 07:38:00"
+            "time": "2018-01-03T07:38:00+00:00"
         },
         {
             "name": "symfony/dependency-injection",
@@ -1704,7 +1703,7 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-04 15:52:56"
+            "time": "2018-01-04T15:52:56+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -1761,7 +1760,70 @@
                 "env",
                 "environment"
             ],
-            "time": "2018-01-03 17:15:19"
+            "time": "2018-01-03T17:15:19+00:00"
+        },
+        {
+            "name": "symfony/event-dispatcher",
+            "version": "v4.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/event-dispatcher.git",
+                "reference": "74d33aac36208c4d6757807d9f598f0133a3a4eb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/74d33aac36208c4d6757807d9f598f0133a3a4eb",
+                "reference": "74d33aac36208c4d6757807d9f598f0133a3a4eb",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "conflict": {
+                "symfony/dependency-injection": "<3.4"
+            },
+            "require-dev": {
+                "psr/log": "~1.0",
+                "symfony/config": "~3.4|~4.0",
+                "symfony/dependency-injection": "~3.4|~4.0",
+                "symfony/expression-language": "~3.4|~4.0",
+                "symfony/stopwatch": "~3.4|~4.0"
+            },
+            "suggest": {
+                "symfony/dependency-injection": "",
+                "symfony/http-kernel": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\EventDispatcher\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony EventDispatcher Component",
+            "homepage": "https://symfony.com",
+            "time": "2018-01-03T07:38:00+00:00"
         },
         {
             "name": "symfony/filesystem",
@@ -1810,7 +1872,7 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-03 07:38:00"
+            "time": "2018-01-03T07:38:00+00:00"
         },
         {
             "name": "symfony/inflector",
@@ -1867,7 +1929,7 @@
                 "symfony",
                 "words"
             ],
-            "time": "2018-01-03 17:15:19"
+            "time": "2018-01-03T17:15:19+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1926,7 +1988,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2017-10-11 12:05:26"
+            "time": "2017-10-11T12:05:26+00:00"
         },
         {
             "name": "symfony/property-access",
@@ -1993,7 +2055,7 @@
                 "property path",
                 "reflection"
             ],
-            "time": "2018-01-03 07:38:00"
+            "time": "2018-01-03T07:38:00+00:00"
         },
         {
             "name": "symfony/property-info",
@@ -2069,7 +2131,7 @@
                 "type",
                 "validator"
             ],
-            "time": "2018-01-03 17:15:19"
+            "time": "2018-01-03T17:15:19+00:00"
         },
         {
             "name": "symfony/serializer",
@@ -2147,7 +2209,7 @@
             ],
             "description": "Symfony Serializer Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-03 07:38:00"
+            "time": "2018-01-03T07:38:00+00:00"
         },
         {
             "name": "symfony/translation",
@@ -2215,7 +2277,7 @@
             ],
             "description": "Symfony Translation Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-03 07:38:00"
+            "time": "2018-01-03T07:38:00+00:00"
         },
         {
             "name": "symfony/validator",
@@ -2299,7 +2361,7 @@
             ],
             "description": "Symfony Validator Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-03 17:15:19"
+            "time": "2018-01-03T17:15:19+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -2357,7 +2419,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-03 07:37:34"
+            "time": "2018-01-03T07:37:34+00:00"
         },
         {
             "name": "voryx/event-loop",
@@ -2410,7 +2472,7 @@
                 "static",
                 "timer"
             ],
-            "time": "2017-03-14 01:10:32"
+            "time": "2017-03-14T01:10:32+00:00"
         }
     ],
     "packages-dev": [
@@ -2466,7 +2528,7 @@
                 "constructor",
                 "instantiate"
             ],
-            "time": "2017-07-22 11:58:36"
+            "time": "2017-07-22T11:58:36+00:00"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -2474,12 +2536,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "fd175c4226caf85db71b624c774f91e80f64ecc2"
+                "reference": "916ea077ccaa22315c3186037631c29304d68d1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/fd175c4226caf85db71b624c774f91e80f64ecc2",
-                "reference": "fd175c4226caf85db71b624c774f91e80f64ecc2",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/916ea077ccaa22315c3186037631c29304d68d1b",
+                "reference": "916ea077ccaa22315c3186037631c29304d68d1b",
                 "shasum": ""
             },
             "require": {
@@ -2526,7 +2588,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2018-01-07 14:54:11"
+            "time": "2018-01-09T11:26:12+00:00"
         },
         {
             "name": "mmasiukevich/event-sourcing-snapshotter",
@@ -2582,7 +2644,7 @@
                 "event sourcing",
                 "snapshot"
             ],
-            "time": "2017-11-20 14:58:49"
+            "time": "2017-11-20T14:58:49+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -2627,7 +2689,7 @@
                 "object",
                 "object graph"
             ],
-            "time": "2017-10-19 19:58:43"
+            "time": "2017-10-19T19:58:43+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -2682,7 +2744,7 @@
                 }
             ],
             "description": "Component for reading phar.io manifest information from a PHP Archive (PHAR)",
-            "time": "2017-03-05 18:14:27"
+            "time": "2017-03-05T18:14:27+00:00"
         },
         {
             "name": "phar-io/version",
@@ -2729,7 +2791,7 @@
                 }
             ],
             "description": "Library for handling version information and constraints",
-            "time": "2017-03-05 17:38:23"
+            "time": "2017-03-05T17:38:23+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -2783,7 +2845,7 @@
                 "reflection",
                 "static analysis"
             ],
-            "time": "2017-09-11 18:02:19"
+            "time": "2017-09-11T18:02:19+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -2834,7 +2896,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2017-11-27 17:38:31"
+            "time": "2017-11-27T17:38:31+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -2881,7 +2943,7 @@
                     "email": "me@mikevanriel.com"
                 }
             ],
-            "time": "2017-07-14 14:27:02"
+            "time": "2017-07-14T14:27:02+00:00"
         },
         {
             "name": "phpspec/prophecy",
@@ -2944,7 +3006,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2017-11-24 13:59:53"
+            "time": "2017-11-24T13:59:53+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -3007,7 +3069,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-12-06 09:29:45"
+            "time": "2017-12-06T09:29:45+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -3054,7 +3116,7 @@
                 "filesystem",
                 "iterator"
             ],
-            "time": "2017-11-27 13:52:08"
+            "time": "2017-11-27T13:52:08+00:00"
         },
         {
             "name": "phpunit/php-text-template",
@@ -3095,7 +3157,7 @@
             "keywords": [
                 "template"
             ],
-            "time": "2015-06-21 13:50:34"
+            "time": "2015-06-21T13:50:34+00:00"
         },
         {
             "name": "phpunit/php-timer",
@@ -3144,7 +3206,7 @@
             "keywords": [
                 "timer"
             ],
-            "time": "2017-02-26 11:10:40"
+            "time": "2017-02-26T11:10:40+00:00"
         },
         {
             "name": "phpunit/php-token-stream",
@@ -3193,7 +3255,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2017-11-27 05:48:46"
+            "time": "2017-11-27T05:48:46+00:00"
         },
         {
             "name": "phpunit/phpunit",
@@ -3277,7 +3339,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-12-17 06:31:19"
+            "time": "2017-12-17T06:31:19+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -3336,7 +3398,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2018-01-06 05:45:45"
+            "time": "2018-01-06T05:45:45+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -3381,7 +3443,7 @@
             ],
             "description": "Looks up which function or method a line of code belongs to",
             "homepage": "https://github.com/sebastianbergmann/code-unit-reverse-lookup/",
-            "time": "2017-03-04 06:30:41"
+            "time": "2017-03-04T06:30:41+00:00"
         },
         {
             "name": "sebastian/comparator",
@@ -3445,7 +3507,7 @@
                 "compare",
                 "equality"
             ],
-            "time": "2017-12-22 14:50:35"
+            "time": "2017-12-22T14:50:35+00:00"
         },
         {
             "name": "sebastian/diff",
@@ -3497,7 +3559,7 @@
             "keywords": [
                 "diff"
             ],
-            "time": "2017-08-03 08:09:46"
+            "time": "2017-08-03T08:09:46+00:00"
         },
         {
             "name": "sebastian/environment",
@@ -3547,7 +3609,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2017-07-01 08:51:00"
+            "time": "2017-07-01T08:51:00+00:00"
         },
         {
             "name": "sebastian/exporter",
@@ -3614,7 +3676,7 @@
                 "export",
                 "exporter"
             ],
-            "time": "2017-04-03 13:19:02"
+            "time": "2017-04-03T13:19:02+00:00"
         },
         {
             "name": "sebastian/global-state",
@@ -3665,7 +3727,7 @@
             "keywords": [
                 "global state"
             ],
-            "time": "2017-04-27 15:39:26"
+            "time": "2017-04-27T15:39:26+00:00"
         },
         {
             "name": "sebastian/object-enumerator",
@@ -3712,7 +3774,7 @@
             ],
             "description": "Traverses array structures and object graphs to enumerate all referenced objects",
             "homepage": "https://github.com/sebastianbergmann/object-enumerator/",
-            "time": "2017-08-03 12:35:26"
+            "time": "2017-08-03T12:35:26+00:00"
         },
         {
             "name": "sebastian/object-reflector",
@@ -3757,7 +3819,7 @@
             ],
             "description": "Allows reflection of object attributes, including inherited and non-public ones",
             "homepage": "https://github.com/sebastianbergmann/object-reflector/",
-            "time": "2017-03-29 09:07:27"
+            "time": "2017-03-29T09:07:27+00:00"
         },
         {
             "name": "sebastian/recursion-context",
@@ -3810,7 +3872,7 @@
             ],
             "description": "Provides functionality to recursively process PHP variables",
             "homepage": "http://www.github.com/sebastianbergmann/recursion-context",
-            "time": "2017-03-03 06:23:57"
+            "time": "2017-03-03T06:23:57+00:00"
         },
         {
             "name": "sebastian/resource-operations",
@@ -3852,7 +3914,7 @@
             ],
             "description": "Provides a list of PHP built-in functions that operate on resources",
             "homepage": "https://www.github.com/sebastianbergmann/resource-operations",
-            "time": "2015-07-28 20:34:47"
+            "time": "2015-07-28T20:34:47+00:00"
         },
         {
             "name": "sebastian/version",
@@ -3895,7 +3957,7 @@
             ],
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
-            "time": "2016-10-03 07:35:21"
+            "time": "2016-10-03T07:35:21+00:00"
         },
         {
             "name": "symfony/debug",
@@ -3951,7 +4013,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-03 17:15:19"
+            "time": "2018-01-03T17:15:19+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -3991,7 +4053,7 @@
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
-            "time": "2017-04-07 12:08:54"
+            "time": "2017-04-07T12:08:54+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -4041,7 +4103,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2016-11-23 20:04:58"
+            "time": "2016-11-23T20:04:58+00:00"
         }
     ],
     "aliases": [],

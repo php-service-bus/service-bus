@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!--Event dispatcher -->
+        <service id="service_bus.base_event_dispatcher"
+                 class="Symfony\Component\EventDispatcher\EventDispatcher"
+                 public="false"/>
+
+        <!-- Immutable event dispatcher -->
+        <service id="service_bus.event_dispatcher"
+                 class="Symfony\Component\EventDispatcher\ImmutableEventDispatcher"
+                 public="false">
+            <argument type="service" id="service_bus.base_event_dispatcher"/>
+        </service>
+
+        <!-- Listener event for message completion -->
+        <service id="service_bus.kernel_event_listeners.after_message_execution"
+                 class="Desperado\ServiceBus\KernelEventListeners\AfterMessageExecutionListener"
+                 public="false">
+            <argument type="service" id="service_bus.sagas.service"/>
+
+            <tag name="service_bus.event_listener"
+                 event="service_bus.kernel_events.after_execution"
+                 method="onComplete"/>
+
+        </service>
+
+    </services>
+
+</container>

@@ -27,7 +27,6 @@ class ServiceHandlersModule implements ModuleInterface
         $self = new self();
 
 
-
         return $self;
     }
 

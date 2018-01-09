@@ -40,7 +40,7 @@ class ErrorHandlerMiddleware implements TaskInterface
     private $exceptionHandlersCollection;
 
     /**
-     * @param TaskInterface               $task
+     * @param TaskInterface                                   $task
      * @param Handlers\Exceptions\ExceptionHandlersCollection $exceptionHandlersCollection
      */
     public function __construct(
@@ -116,7 +116,7 @@ class ErrorHandlerMiddleware implements TaskInterface
 
         null !== $handler
             ? $context->logContextMessage($message, $logMessage, LogLevel::INFO)
-            : $context->logContextMessage($message, $logMessage,  LogLevel::ERROR);
+            : $context->logContextMessage($message, $logMessage, LogLevel::ERROR);
 
         if(null !== $handler)
         {

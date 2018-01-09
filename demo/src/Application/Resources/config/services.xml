@@ -38,6 +38,7 @@
         <service id="application_kernel" class="Desperado\ServiceBus\Demo\Application\Kernel" public="true">
             <argument type="service" id="service_bus.message_bus.builder"/>
             <argument type="service" id="service_bus.sagas.service"/>
+            <argument type="service" id="service_bus.event_dispatcher"/>
 
             <call method="configureEventSourcing">
                 <argument type="service" id="event_sourcing.service"/>

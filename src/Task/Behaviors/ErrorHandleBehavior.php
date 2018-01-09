@@ -51,7 +51,7 @@ class ErrorHandleBehavior implements BehaviorInterface
      *
      * @return void
      */
-    public function append(Handlers\Exceptions\ExceptionHandlerData$exceptionHandlerData): void
+    public function append(Handlers\Exceptions\ExceptionHandlerData $exceptionHandlerData): void
     {
         $this->exceptionHandlersCollection->add($exceptionHandlerData);
     }

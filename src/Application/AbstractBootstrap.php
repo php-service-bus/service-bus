@@ -23,6 +23,7 @@ use Desperado\ServiceBus\EntryPoint\EntryPoint;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\Config;
 use Symfony\Component\DependencyInjection;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\Validator;
 
 /**
@@ -205,13 +206,18 @@ abstract class AbstractBootstrap
         $configData = $this->configuration->toArray();
 
         $applicationCompilerPass = [
-            'logger_channel' => new LoggerChannelsCompilerPass(),
-            'modules'        => new ModulesCompilerPass(),
-            'saga_storage'   => new SagaStorageCompilerPass($bootstrapServicesDefinitions->getSagaStorageKey()),
-            'entry_point'    => new EntryPointCompilerPass(
+            'logger_channel'  => new LoggerChannelsCompilerPass(),
+            'modules'         => new ModulesCompilerPass(),
+            'saga_storage'    => new SagaStorageCompilerPass($bootstrapServicesDefinitions->getSagaStorageKey()),
+            'entry_point'     => new EntryPointCompilerPass(
                 $bootstrapServicesDefinitions->getMessageTransportKey(),
                 $bootstrapServicesDefinitions->getKernelKey(),
                 $bootstrapServicesDefinitions->getApplicationContextKey()
+            ),
+            'event_listeners' => new RegisterListenersPass(
+                'service_bus.event_dispatcher',
+                'service_bus.event_listener',
+                'service_bus.event_subscriber'
             )
         ];
 

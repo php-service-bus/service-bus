@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Demo\Application;
 
+use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
 use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
@@ -50,7 +51,7 @@ class ApplicationContext extends AbstractExecutionContext
     /**
      * @inheritdoc
      */
-    public function applyOutboundMessageContext(OutboundMessageContext $outboundMessageContext): self
+    public function applyOutboundMessageContext(OutboundMessageContextInterface $outboundMessageContext): self
     {
         $self = new self($this->getSagaService(), $this->getEventSourcingService());
 
