@@ -25,7 +25,7 @@ class LoggerChannelsCompilerPass implements DependencyInjection\Compiler\Compile
      */
     public function process(DependencyInjection\ContainerBuilder $container): void
     {
-        foreach($container->findTaggedServiceIds('kernel.logger') as $id => $tags)
+        foreach($container->findTaggedServiceIds('service_bus.logger') as $id => $tags)
         {
             foreach($tags as $tag)
             {
