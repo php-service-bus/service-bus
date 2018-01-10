@@ -111,24 +111,36 @@ abstract class AbstractKernel
                 {
                     if(null !== $promisesResult)
                     {
-                        foreach($promisesResult as $result)
+                        foreach($promisesResult as $completedTask)
                         {
-                            /** @var CompletedTask $result */
+                            /** @var CompletedTask $completedTask */
 
-                            $this->eventDispatcher->dispatch(
-                                KernelEvents\MessageProcessingCompletedEvent::EVENT_NAME,
-                                new KernelEvents\MessageProcessingCompletedEvent($entryPointContext, $executionContext)
-                            );
-
-                            return $result->getContext()->getOutboundMessageContext();
+                            $completedTask
+                                ->getTaskResult()
+                                ->then(
+                                    function() use ($completedTask, $entryPointContext, $executionContext)
+                                    {
+                                        return $completedTask->getContext()->getOutboundMessageContext();
+                                    },
+                                    function(\Throwable $throwable)
+                                    {
+                                        /** @todo: fix me */
+                                        ServiceBusLogger::throwable('rejectedPromise', $throwable);
+                                    }
+                                );
                         }
                     }
+
+                    $this->eventDispatcher->dispatch(
+                        KernelEvents\MessageProcessingCompletedEvent::EVENT_NAME,
+                        new KernelEvents\MessageProcessingCompletedEvent($entryPointContext, $executionContext)
+                    );
 
                     return $executionContext->getOutboundMessageContext();
                 },
                 function(\Throwable $throwable) use ($entryPointContext, $executionContext)
                 {
-                    ServiceBusLogger::throwable('kernel', $throwable);
+                    ServiceBusLogger::throwable('rejectedPromise', $throwable);
 
                     $this->eventDispatcher->dispatch(
                         KernelEvents\MessageProcessingFailedEvent::EVENT_NAME,

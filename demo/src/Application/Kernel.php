@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Demo\Application;
 use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\ServiceBus\Application\AbstractKernel;
 use Desperado\ServiceBus\Demo\Customer;
+use Desperado\ServiceBus\Demo\EmailNotifications;
 
 /**
  * Application kernel
@@ -52,7 +53,10 @@ class Kernel extends AbstractKernel
     protected function getServices(): array
     {
         return [
-            new Customer\Services\RegisterCustomerService()
+            new Customer\Services\RegisterCustomerService(),
+            new Customer\Services\CustomerVerificationService(),
+            new Customer\Services\ManageCustomerService(),
+            new EmailNotifications\Services\EmailNotificationsService()
         ];
     }
 

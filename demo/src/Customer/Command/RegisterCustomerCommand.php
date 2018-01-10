@@ -18,7 +18,9 @@ use Desperado\Domain\Message\AbstractCommand;
 /**
  * Start customer registration
  *
+ * @see CustomerRegistrationCompleteEvent
  * @see FailedRegistrationEvent
+ * @see CustomerAlreadyExistsEvent
  */
 class RegisterCustomerCommand extends AbstractCommand
 {
@@ -54,7 +56,7 @@ class RegisterCustomerCommand extends AbstractCommand
      * Display name
      *
      * @Assert\NotBlank(
-     *     message="customer display name hash must be specified"
+     *     message="customer display name must be specified"
      * )
      * @Assert\Length(
      *      min = 5,

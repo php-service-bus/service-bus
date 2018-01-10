@@ -12,14 +12,13 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Demo\Customer\Services;
 
-use Desperado\Domain\Uuid;
 use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\Demo\Application\ApplicationContext;
 use Desperado\ServiceBus\Demo\Customer\Command as CustomerCommands;
 use Desperado\ServiceBus\Demo\Customer\CustomerAggregate;
 use Desperado\ServiceBus\Demo\Customer\CustomerEmailIndex;
 use Desperado\ServiceBus\Demo\Customer\Event as CustomerEvents;
-use Desperado\ServiceBus\Demo\Customer\Identity\CustomerAggregateIdentifier;
+use Desperado\ServiceBus\Demo\Customer\Identity as CustomerIdentities;
 use Desperado\ServiceBus\Services\Handlers\Exceptions\UnfulfilledPromiseData;
 use Desperado\ServiceBus\Services\ServiceInterface;
 use React\Promise\Promise;
@@ -52,7 +51,8 @@ class RegisterCustomerService implements ServiceInterface
                     /** new customer */
                     if(false === $customerEmailIndex->hasIdentifier($command->getEmail()))
                     {
-                        $customerIdentifier = new CustomerAggregateIdentifier(Uuid::new());
+                        /** @var CustomerIdentities\CustomerAggregateIdentifier $customerIdentifier */
+                        $customerIdentifier = CustomerIdentities\CustomerAggregateIdentifier::newUuid();
 
                         $context
                             ->getEventSourcingService()
@@ -69,6 +69,15 @@ class RegisterCustomerService implements ServiceInterface
                                     $customerEmailIndex->store($command->getEmail(), $customerIdentifier);
                                 }
                             );
+                    }
+                    else
+                    {
+                        $context->delivery(
+                            CustomerEvents\CustomerAlreadyExistsEvent::create([
+                                'requestId'  => $command->getRequestId(),
+                                'identifier' => $customerEmailIndex->getIdentifier($command->getEmail())->toString()
+                            ])
+                        );
                     }
                 }
             );
@@ -112,12 +121,19 @@ class RegisterCustomerService implements ServiceInterface
      * @param ApplicationContext                     $context
      *
      * @return PromiseInterface
+     *
+     * @throws \Throwable
      */
     public function whenCustomerRegisteredEvent(
         CustomerEvents\CustomerRegisteredEvent $event,
         ApplicationContext $context
     ): PromiseInterface
     {
-
+        return $context
+            ->getSagaService()
+            ->startSaga(
+                new CustomerIdentities\CustomerVerificationSagaIdentifier($event->getRequestId()),
+                CustomerCommands\StartVerificationSagaCommand::create(['customerIdentifier' => $event->getIdentifier()])
+            );
     }
 }

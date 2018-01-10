@@ -30,6 +30,15 @@ class CustomerAggregate extends AbstractAggregateRoot
     private $profile;
 
     /**
+     * Confirmed customer
+     *
+     * @see CustomerVerificationSaga
+     *
+     * @var bool
+     */
+    private $active = false;
+
+    /**
      * Register customer
      *
      * @param CustomerCommands\RegisterCustomerCommand $command
@@ -53,6 +62,40 @@ class CustomerAggregate extends AbstractAggregateRoot
     }
 
     /**
+     * Activate customer
+     *
+     * @param Command\ActivateCustomerCommand $command
+     *
+     * @return void
+     */
+    public function activate(CustomerCommands\ActivateCustomerCommand $command): void
+    {
+        $this->raiseEvent(
+            CustomerEvents\CustomerActivatedEvent::create(['requestId' => $command->getRequestId()])
+        );
+    }
+
+    /**
+     * Get customer profile data
+     *
+     * @return Customer
+     */
+    public function getProfile(): Customer
+    {
+        return $this->profile;
+    }
+
+    /**
+     * Get active status
+     *
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
      * @param Event\CustomerRegisteredEvent $event
      *
      * @return void
@@ -71,5 +114,19 @@ class CustomerAggregate extends AbstractAggregateRoot
                 $event->getEmail()
             )
         );
+    }
+
+    /**
+     * Customer activated
+     *
+     * @param Event\CustomerActivatedEvent $event
+     *
+     * @return void
+     */
+    final protected function onCustomerActivatedEvent(CustomerEvents\CustomerActivatedEvent $event): void
+    {
+        unset($event);
+
+        $this->active = true;
     }
 }

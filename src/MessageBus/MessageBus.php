@@ -71,7 +71,7 @@ class MessageBus
 
         if(0 === \count($taskCollection))
         {
-            $this->logger->debug(
+            $this->logger->info(
                 \sprintf('No handlers found for the message with the namespace "%s', $messageNamespace)
             );
 

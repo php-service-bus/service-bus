@@ -656,12 +656,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "aa2170072c0ffa5f01b752212cf84f29323700e3"
+                "reference": "d32ad5af85a272131f6c6628374be9154e36d3a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/aa2170072c0ffa5f01b752212cf84f29323700e3",
-                "reference": "aa2170072c0ffa5f01b752212cf84f29323700e3",
+                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/d32ad5af85a272131f6c6628374be9154e36d3a1",
+                "reference": "d32ad5af85a272131f6c6628374be9154e36d3a1",
                 "shasum": ""
             },
             "require": {
@@ -706,7 +706,7 @@
                 "event sourcing",
                 "saga"
             ],
-            "time": "2018-01-08T13:01:15+00:00"
+            "time": "2018-01-10T14:30:43+00:00"
         },
         {
             "name": "monolog/monolog",

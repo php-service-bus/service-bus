@@ -17,7 +17,7 @@ use Desperado\Domain\Identity\AbstractIdentity;
 /**
  *
  */
-class CustomerRegistrationSagaIdentifier extends AbstractIdentity
+class CustomerVerificationSagaIdentifier extends AbstractIdentity
 {
 
 }
