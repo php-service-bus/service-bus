@@ -43,8 +43,6 @@ class RegisterCustomerService implements ServiceInterface
         ApplicationContext $context
     ): PromiseInterface
     {
-        throw new \Exception('aaaaaa');
-
         return $context
             ->getEventSourcingService()
             ->obtainIndex(CustomerEmailIndex::class)

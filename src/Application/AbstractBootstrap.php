@@ -24,6 +24,8 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\Config;
 use Symfony\Component\DependencyInjection;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Validator;
 
 /**
@@ -283,6 +285,7 @@ abstract class AbstractBootstrap
      * @throws ApplicationExceptions\IncorrectRootDirectoryPathException
      * @throws ApplicationExceptions\IncorrectDotEnvFilePathException
      * @throws ApplicationExceptions\IncorrectCacheDirectoryFilePathException
+     * @throws IOException
      */
     final protected function __construct(
         string $rootDirectoryPath,
@@ -290,31 +293,67 @@ abstract class AbstractBootstrap
         string $environmentFilePath
     )
     {
-        $isValidFilePath = function(string $filePath)
-        {
-            return true === \file_exists($filePath) && true === \is_readable($filePath);
-        };
-
-        $this->rootDirectoryPath = \rtrim($rootDirectoryPath, '/');
-        $this->cacheDirectoryPath = \rtrim($cacheDirectoryPath, '/');
         $this->environmentFilePath = $environmentFilePath;
+        $this->cacheDirectoryPath = $this->prepareCacheDirectoryPath($cacheDirectoryPath);
+        $this->rootDirectoryPath = $this->prepareRootDirectoryPath($rootDirectoryPath);
 
-        if(false === $isValidFilePath($this->rootDirectoryPath))
-        {
-            throw new ApplicationExceptions\IncorrectRootDirectoryPathException($this->rootDirectoryPath);
-        }
-
-        if(false === $isValidFilePath($this->environmentFilePath))
+        if(false === \file_exists($this->environmentFilePath) || false === \is_readable($this->environmentFilePath))
         {
             throw new ApplicationExceptions\IncorrectDotEnvFilePathException($environmentFilePath);
         }
 
-        if(false === $isValidFilePath($this->cacheDirectoryPath) || false === \is_writable($this->cacheDirectoryPath))
+        $this->configureAnnotationsLoader();
+    }
+
+    /**
+     * Prepare root directory path
+     *
+     * @param string $rootDirectoryPath
+     *
+     * @return string
+     *
+     * @throws ApplicationExceptions\IncorrectRootDirectoryPathException
+     */
+    private function prepareRootDirectoryPath(string $rootDirectoryPath): string
+    {
+        $rootDirectoryPath = \rtrim($rootDirectoryPath, '/');
+
+        if('' === $rootDirectoryPath || false === \is_dir($rootDirectoryPath) || false === \is_readable($rootDirectoryPath))
         {
-            throw new ApplicationExceptions\IncorrectCacheDirectoryFilePathException($environmentFilePath);
+            throw new ApplicationExceptions\IncorrectRootDirectoryPathException($this->rootDirectoryPath);
         }
 
-        $this->configureAnnotationsLoader();
+        return $rootDirectoryPath;
+    }
+
+    /**
+     * Prepare cache directory
+     *
+     * @param string $cacheDirectoryPath
+     *
+     * @return string
+     *
+     * @throws IOException
+     */
+    private function prepareCacheDirectoryPath(string $cacheDirectoryPath): string
+    {
+        $cacheDirectoryPath = \rtrim($cacheDirectoryPath, '/');
+
+        if('' === $cacheDirectoryPath)
+        {
+            throw new ApplicationExceptions\IncorrectCacheDirectoryFilePathException($cacheDirectoryPath);
+        }
+
+        $filesystem = new Filesystem();
+
+        if(false === $filesystem->exists($cacheDirectoryPath))
+        {
+            $filesystem->mkdir($cacheDirectoryPath);
+        }
+
+        $filesystem->chmod($cacheDirectoryPath, 0775, \umask());
+
+        return $cacheDirectoryPath;
     }
 
     /**

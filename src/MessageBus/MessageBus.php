@@ -14,6 +14,7 @@ namespace Desperado\ServiceBus\MessageBus;
 
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
+use Desperado\ServiceBus\Task\CompletedTask;
 use Psr\Log\LoggerInterface;
 use function React\Promise\all;
 use React\Promise\FulfilledPromise;
@@ -82,7 +83,11 @@ class MessageBus
             {
                 $task = $task->getTask();
 
-                return $task($message, $context);
+                return CompletedTask::create(
+                    $message,
+                    $context,
+                    $task($message, $context)
+                );
             },
             $taskCollection
         );

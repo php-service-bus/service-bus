@@ -21,6 +21,7 @@ use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Services;
+use Desperado\ServiceBus\Task\CompletedTask;
 use React\Promise\PromiseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -106,12 +107,22 @@ abstract class AbstractKernel
 
         return $promise
             ->then(
-                function() use ($entryPointContext, $executionContext)
+                function(array $promisesResult = null) use ($entryPointContext, $executionContext)
                 {
-                    $this->eventDispatcher->dispatch(
-                        KernelEvents\MessageProcessingCompletedEvent::EVENT_NAME,
-                        new KernelEvents\MessageProcessingCompletedEvent($entryPointContext, $executionContext)
-                    );
+                    if(null !== $promisesResult)
+                    {
+                        foreach($promisesResult as $result)
+                        {
+                            /** @var CompletedTask $result */
+
+                            $this->eventDispatcher->dispatch(
+                                KernelEvents\MessageProcessingCompletedEvent::EVENT_NAME,
+                                new KernelEvents\MessageProcessingCompletedEvent($entryPointContext, $executionContext)
+                            );
+
+                            return $result->getContext()->getOutboundMessageContext();
+                        }
+                    }
 
                     return $executionContext->getOutboundMessageContext();
                 },

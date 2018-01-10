@@ -19,7 +19,7 @@ try
 {
     $entryPoint = Bootstrap::boot(
         __DIR__ . '/..',
-        __DIR__ . '/../cache',
+        __DIR__ . '/cache',
         __DIR__ . '/.env'
     );
 
