@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
+use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\ParameterBag;
 use Desperado\ServiceBus\Application\Exceptions as ApplicationExceptions;
 use Desperado\ServiceBus\DependencyInjection\Compiler\EntryPointCompilerPass;
@@ -224,8 +225,9 @@ abstract class AbstractBootstrap
         ];
 
         $containerParameters = new DependencyInjection\ParameterBag\ParameterBag([
-            'service_bus.root_dir'  => $this->rootDirectoryPath,
-            'service_bus.cache_dir' => $this->cacheDirectoryPath
+            'service_bus.root_dir'     => $this->rootDirectoryPath,
+            'service_bus.cache_dir'    => $this->cacheDirectoryPath,
+            'service_bus.is_debug_env' => $this->configuration->getEnvironment()->isDebug()
         ]);
         $containerExtensions = new ParameterBag();
         $containerCompilerPass = new ParameterBag();
