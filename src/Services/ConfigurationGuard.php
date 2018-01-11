@@ -50,28 +50,37 @@ class ConfigurationGuard
         }
     }
 
-
     /**
-     * Assert arguments count valid
+     * Checking the number of arguments of the message handler
      *
      * @param \ReflectionMethod $reflectionMethod
-     * @param int               $expectedParametersCount
      *
      * @return void
      *
      * @throws ServicesExceptions\InvalidHandlerArgumentsCountException
      */
-    public static function guardNumberOfParametersValid(
-        \ReflectionMethod $reflectionMethod,
-        int $expectedParametersCount
-    ): void
+    public static function guardMessageHandlerNumberOfParametersValid(\ReflectionMethod $reflectionMethod): void
     {
-        if($expectedParametersCount !== $reflectionMethod->getNumberOfRequiredParameters())
+        if(2 > $reflectionMethod->getNumberOfRequiredParameters())
         {
-            throw new ServicesExceptions\InvalidHandlerArgumentsCountException(
-                $reflectionMethod,
-                $expectedParametersCount
-            );
+            throw ServicesExceptions\InvalidHandlerArgumentsCountException::createForMessageHandler($reflectionMethod);
+        }
+    }
+
+    /**
+     * Checking the number of arguments of the error handler
+     *
+     * @param \ReflectionMethod $reflectionMethod
+     *
+     * @return void
+     *
+     * @throws ServicesExceptions\InvalidHandlerArgumentsCountException
+     */
+    public static function guardErrorHandlerNumberOfParametersValid(\ReflectionMethod $reflectionMethod): void
+    {
+        if(1 > $reflectionMethod->getNumberOfRequiredParameters())
+        {
+            throw ServicesExceptions\InvalidHandlerArgumentsCountException::createForErrorHandler($reflectionMethod);
         }
     }
 

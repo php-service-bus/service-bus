@@ -22,6 +22,19 @@
 
         </service>
 
+        <!-- Listener event for message completion -->
+        <service id="service_bus.kernel_event_listeners.message_bus_configured"
+                 class="Desperado\ServiceBus\KernelEventListeners\MessageBusCompiledListener"
+                 public="false">
+            <argument type="service" id="service_bus.logger"/>
+
+            <tag name="service_bus.logger" channel="bootstrap"/>
+
+            <tag name="service_bus.event_listener"
+                 event="service_bus.kernel_events.message_bus_compiled"
+                 method="onCompiled"/>
+        </service>
+
     </services>
 
 </container>

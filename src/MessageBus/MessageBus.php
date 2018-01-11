@@ -14,6 +14,7 @@ namespace Desperado\ServiceBus\MessageBus;
 
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
+use Desperado\ServiceBus\Services\AutowiringServiceLocator;
 use Desperado\ServiceBus\Task\CompletedTask;
 use Psr\Log\LoggerInterface;
 use function React\Promise\all;
@@ -45,7 +46,10 @@ class MessageBus
      *
      * @return MessageBus
      */
-    public static function build(MessageBusTaskCollection $collection, LoggerInterface $logger): self
+    public static function build(
+        MessageBusTaskCollection $collection,
+        LoggerInterface $logger
+    ): self
     {
         $self = new self();
 
@@ -79,14 +83,14 @@ class MessageBus
         }
 
         $promises = \array_map(
-            function(MessageBusTask $task) use ($message, $context)
+            function(MessageBusTask $messageBusTask) use ($message, $context)
             {
-                $task = $task->getTask();
+                $task = $messageBusTask->getTask();
 
                 return CompletedTask::create(
                     $message,
                     $context,
-                    $task($message, $context)
+                    $task($message, $context, $messageBusTask->getAutowiringServices())
                 );
             },
             $taskCollection

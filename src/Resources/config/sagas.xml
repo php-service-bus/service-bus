@@ -23,7 +23,7 @@
         </service>
 
         <!-- Saga service -->
-        <service id="service_bus.sagas.service" class="Desperado\Saga\Service\SagaService" public="false">
+        <service id="service_bus.sagas.service" class="Desperado\Saga\Service\SagaService" public="true">
             <argument type="service" id="service_bus.sagas.store"/>
             <argument type="service" id="service_bus.sagas.configuration_extractor"/>
             <argument type="service" id="service_bus.logger"/>

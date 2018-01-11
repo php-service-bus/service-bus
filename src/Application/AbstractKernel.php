@@ -78,7 +78,6 @@ abstract class AbstractKernel
         $this->sagaService = $sagaService;
 
         $this->configureSagas();
-        $this->configureServices();
 
         $this->messageBus = $messageBusBuilder->build();
     }
@@ -170,16 +169,6 @@ abstract class AbstractKernel
     }
 
     /**
-     * Get application services
-     *
-     * @return Services\ServiceInterface[]
-     */
-    protected function getServices(): array
-    {
-        return [];
-    }
-
-    /**
      * Get message bus builder
      *
      * @return MessageBusBuilder
@@ -211,25 +200,11 @@ abstract class AbstractKernel
                     Services\Handlers\Messages\MessageHandlerData::new(
                         $listener->getEventNamespace(),
                         $listener->getHandler(),
+                        [],
                         new Services\Handlers\Messages\EventExecutionParameters('sagas')
                     )
                 );
             }
-        }
-    }
-
-    /**
-     * Process services configuration
-     *
-     * @return void
-     *
-     * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
-     */
-    private function configureServices(): void
-    {
-        foreach($this->getServices() as $service)
-        {
-            $this->messageBusBuilder->applyService($service);
         }
     }
 }

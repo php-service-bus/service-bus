@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\MessageBus;
 
+use Desperado\ServiceBus\KernelEvents\MessageBusCompiledEvent;
 use Desperado\ServiceBus\Task\Behaviors;
 use Desperado\ServiceBus\Services\Handlers;
 use Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException;
@@ -20,9 +21,10 @@ use Desperado\ServiceBus\Services\ServiceInterface;
 use Desperado\ServiceBus\Task\Task;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- *
+ * Build message bus
  */
 class MessageBusBuilder
 {
@@ -55,6 +57,13 @@ class MessageBusBuilder
     private $serviceHandlersExtractor;
 
     /**
+     * Event dispatcher
+     *
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+
+    /**
      * Is message bus created
      *
      * @var bool
@@ -70,14 +79,17 @@ class MessageBusBuilder
 
     /**
      * @param ServiceHandlersExtractorInterface $serviceHandlersExtractor
+     * @param EventDispatcher                   $eventDispatcher
      * @param LoggerInterface|null              $logger
      */
     public function __construct(
         ServiceHandlersExtractorInterface $serviceHandlersExtractor,
+        EventDispatcher $eventDispatcher,
         LoggerInterface $logger = null
     )
     {
         $this->serviceHandlersExtractor = $serviceHandlersExtractor;
+        $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger ?? new NullLogger();
 
         $this->messageHandlers = Handlers\Messages\MessageHandlersCollection::create();
@@ -184,12 +196,19 @@ class MessageBusBuilder
             );
         }
 
+        $taskCollection = $this->prepareTaskCollection();
+
         $messageBus = MessageBus::build(
-            $this->prepareTaskCollection(),
+            $taskCollection,
             $this->logger
         );
 
         $this->isCompiled = true;
+
+        $this->eventDispatcher->dispatch(
+            MessageBusCompiledEvent::EVENT_NAME,
+            new MessageBusCompiledEvent($taskCollection->count())
+        );
 
         return $messageBus;
     }
@@ -225,7 +244,11 @@ class MessageBusBuilder
                 }
 
                 $collection->add(
-                    MessageBusTask::create($handlerData->getMessageClassNamespace(), $task)
+                    MessageBusTask::create(
+                        $handlerData->getMessageClassNamespace(),
+                        $task,
+                        $handlerData->getAutowiringServices()
+                    )
                 );
             }
         }

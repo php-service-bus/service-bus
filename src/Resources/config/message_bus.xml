@@ -5,11 +5,20 @@
 
     <services>
 
+        <!--  Search for services to be substituted as arguments to the handler -->
+        <service id="service_bus.services.autowiring_service_locator"
+                 class="Desperado\ServiceBus\Services\AutowiringServiceLocator"
+                 public="false">
+            <argument type="service" id="service_container"/>
+            <argument>%service_bus.services_relations%</argument>
+        </service>
+
         <!-- Service handlers extractor -->
         <service id="service_bus.services.annotations_extractor"
                  class="Desperado\ServiceBus\Services\AnnotationsExtractor"
                  public="false">
             <argument type="service" id="service_bus.infrastructure.annotations_reader"/>
+            <argument type="service" id="service_bus.services.autowiring_service_locator"/>
         </service>
 
         <!-- Message bus builder -->
@@ -17,10 +26,21 @@
                  class="Desperado\ServiceBus\MessageBus\MessageBusBuilder"
                  public="false">
             <argument type="service" id="service_bus.services.annotations_extractor"/>
+            <argument type="service" id="service_bus.event_dispatcher"/>
             <argument type="service" id="service_bus.logger"/>
 
-            <tag name="service_bus.logger" channel="message_bus"/>
+            <configurator service="service_bus.message_bus.configurator" method="configure"/>
 
+            <tag name="service_bus.logger" channel="message_bus"/>
+        </service>
+
+        <!-- Message bus builder configurator -->
+        <service id="service_bus.message_bus.configurator"
+                 class="Desperado\ServiceBus\DependencyInjection\Configurator\MessageBusConfigurator"
+                 public="false">
+            <argument type="service" id="service_bus.message_bus.builder"/>
+            <argument type="service" id="service_container"/>
+            <argument type="collection"/>
         </service>
 
     </services>

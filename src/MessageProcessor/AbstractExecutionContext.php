@@ -17,7 +17,6 @@ use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
-use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\Application\Exceptions\OutboundContextNotAppliedException;
 use Desperado\ServiceBus\Extensions\Logger\ServiceBusLogger;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
@@ -29,21 +28,6 @@ use Psr\Log\LogLevel;
  */
 abstract class AbstractExecutionContext implements ExecutionContextInterface
 {
-    /**
-     * Sagas service
-     *
-     * @var SagaService
-     */
-    private $sagaService;
-
-    /**
-     * @param SagaService $sagaService
-     */
-    public function __construct(SagaService $sagaService)
-    {
-        $this->sagaService = $sagaService;
-    }
-
     /**
      * Get outbound context
      *
@@ -93,18 +77,6 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
         $this
             ->getOutboundMessageContext()
             ->send($command, $messageDeliveryOptions);
-    }
-
-    /**
-     * Get saga service
-     *
-     * @return SagaService
-     *
-     * @throws \Exception
-     */
-    final public function getSagaService(): SagaService
-    {
-        return $this->sagaService;
     }
 
     /**

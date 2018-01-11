@@ -27,7 +27,7 @@ use Desperado\ServiceBus\Demo\EmailNotifications\Event as EmailNotificationsEven
  *     expireDateModifier="+2 days"
  * )
  */
-class CustomerVerificationSaga extends AbstractSaga
+final class CustomerVerificationSaga extends AbstractSaga
 {
     /**
      * Start verification saga

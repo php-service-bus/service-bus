@@ -61,7 +61,11 @@ class ValidateInterceptor implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): PromiseInterface
+    public function __invoke(
+        AbstractMessage $message,
+        AbstractExecutionContext $context,
+        array $additionalArguments = []
+    ): PromiseInterface
     {
         $violations = new Validator\ConstraintViolationList();
 
@@ -70,7 +74,7 @@ class ValidateInterceptor implements TaskInterface
         /** All constraints passed */
         if(0 === $violations->count())
         {
-            return \call_user_func_array($this->task, [$message, $context]);
+            return \call_user_func_array($this->task, [$message, $context, $additionalArguments]);
         }
 
         $this->processViolations($message, $violations, $context);

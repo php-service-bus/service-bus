@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Demo\Customer\Services;
 
+use Desperado\EventSourcing\Service\EventSourcingService;
 use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\Demo\Application\ApplicationContext;
 use Desperado\ServiceBus\Demo\Customer\Command as CustomerCommands;
@@ -33,16 +34,17 @@ class CustomerVerificationService implements ServiceInterface
      *
      * @param CustomerCommands\SendCustomerVerificationMessageCommand $command
      * @param ApplicationContext                                      $context
+     * @param EventSourcingService                                    $eventSourcingService
      *
      * @return PromiseInterface
      */
     public function executeSendCustomerVerificationMessageCommand(
         CustomerCommands\SendCustomerVerificationMessageCommand $command,
-        ApplicationContext $context
+        ApplicationContext $context,
+        EventSourcingService $eventSourcingService
     ): PromiseInterface
     {
-        return $context
-            ->getEventSourcingService()
+        return $eventSourcingService
             ->obtainAggregate(new CustomerAggregateIdentifier($command->getCustomerIdentifier()))
             ->then(
                 function(CustomerAggregate $aggregate = null) use ($command, $context)

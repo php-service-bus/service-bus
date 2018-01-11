@@ -39,6 +39,13 @@ class ExceptionHandlerData
     private $exceptionHandler;
 
     /**
+     * Autowiring services
+     *
+     * @var object[]
+     */
+    private $autowiringServices;
+
+    /**
      * Exception handling options
      *
      * @var ExceptionHandlingParameters
@@ -49,6 +56,7 @@ class ExceptionHandlerData
      * @param string                      $exceptionClassNamespace
      * @param string                      $messageClassNamespace
      * @param \Closure                    $exceptionHandler
+     * @param array $autowiringServices
      * @param ExceptionHandlingParameters $exceptionHandlingParameters
      *
      * @return ExceptionHandlerData
@@ -57,6 +65,7 @@ class ExceptionHandlerData
         string $exceptionClassNamespace,
         string $messageClassNamespace,
         \Closure $exceptionHandler,
+        array $autowiringServices,
         ExceptionHandlingParameters $exceptionHandlingParameters
     ): self
     {
@@ -65,9 +74,20 @@ class ExceptionHandlerData
         $self->exceptionClassNamespace = \ltrim($exceptionClassNamespace, '\\');
         $self->messageClassNamespace = \ltrim($messageClassNamespace, '\\');
         $self->exceptionHandler = $exceptionHandler;
+        $self->autowiringServices = $autowiringServices;
         $self->exceptionHandlingParameters = $exceptionHandlingParameters;
 
         return $self;
+    }
+
+    /**
+     * Get a list of services that will be prepended to the arguments of the handler
+     *
+     * @return object[]
+     */
+    public function getAutowiringServices(): array
+    {
+        return $this->autowiringServices;
     }
 
     /**

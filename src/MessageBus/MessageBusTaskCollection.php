@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\MessageBus;
 /**
  * Collection of tasks
  */
-class MessageBusTaskCollection
+class MessageBusTaskCollection implements \Countable
 {
     /**
      * Collection of tasks
@@ -95,6 +95,14 @@ class MessageBusTaskCollection
                 $this->collection
             )
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function count(): int
+    {
+        return \count($this->collection);
     }
 
     /**

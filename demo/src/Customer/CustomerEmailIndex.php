@@ -22,7 +22,7 @@ use Desperado\ServiceBus\Demo\Customer\Identity\CustomerEmailIndexIdentifier;
 /**
  * Index stores the relationship email address of the user and his identity
  */
-class CustomerEmailIndex extends AbstractAggregateRoot implements IndexInterface
+final class CustomerEmailIndex extends AbstractAggregateRoot implements IndexInterface
 {
     /**
      * Relationship email address of the user and his identity
@@ -81,5 +81,15 @@ class CustomerEmailIndex extends AbstractAggregateRoot implements IndexInterface
         return true === $this->hasIdentifier($email)
             ? new CustomerAggregateIdentifier($this->collection[$email])
             : null;
+    }
+
+    /**
+     * @param CustomerEmailAddedToIndexEvent $event
+     *
+     * @return void
+     */
+    protected function onCustomerEmailAddedToIndexEvent(CustomerEmailAddedToIndexEvent $event): void
+    {
+        $this->collection[$event->getEmail()] = $event->getIdentifier();
     }
 }

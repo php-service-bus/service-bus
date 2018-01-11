@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- Message transport configuration -->
+        <service id="message_transport.config.rabbit_mq"
+                 class="Desperado\ServiceBus\Transport\RabbitMqTransport\RabbitMqTransportConfig"
+                 public="false">
+            <factory class="Desperado\ServiceBus\Transport\RabbitMqTransport\RabbitMqTransportConfig"
+                     method="createFromDSN"/>
+            <argument>%transport_connection_dsn%</argument>
+        </service>
+
+        <!-- Sagas storage -->
+        <service id="sagas_storage" class="Desperado\Saga\Storage\InMemory\SagaInMemoryStorage"/>
+
+        <!-- Message transport -->
+        <service id="message_transport.rabbit_mq"
+                 class="Desperado\ServiceBus\Transport\RabbitMqTransport\RabbitMqTransport"
+                 public="true">
+            <argument type="service" id="message_transport.config.rabbit_mq"/>
+            <argument type="service" id="service_bus.environment"/>
+            <argument type="service" id="service_bus.serializer.messages"/>
+        </service>
+
+        <!-- Application-level execution context -->
+        <service id="application_context"
+                 class="Desperado\ServiceBus\Demo\Application\ApplicationContext"
+                 public="false"/>
+
+        <!-- Application kernel -->
+        <service id="application_kernel" class="Desperado\ServiceBus\Demo\Application\Kernel" public="true">
+            <argument type="service" id="service_bus.message_bus.builder"/>
+            <argument type="service" id="service_bus.sagas.service"/>
+            <argument type="service" id="service_bus.event_dispatcher"/>
+
+            <call method="configureEventSourcing">
+                <argument type="service" id="event_sourcing.service"/>
+            </call>
+
+        </service>
+    </services>
+</container>

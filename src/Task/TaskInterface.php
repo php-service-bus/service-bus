@@ -34,8 +34,13 @@ interface TaskInterface
      *
      * @param AbstractMessage          $message
      * @param AbstractExecutionContext $context
+     * @param array                    $additionalArguments
      *
      * @return PromiseInterface
      */
-    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): PromiseInterface;
+    public function __invoke(
+        AbstractMessage $message,
+        AbstractExecutionContext $context,
+        array $additionalArguments = []
+    ): PromiseInterface;
 }

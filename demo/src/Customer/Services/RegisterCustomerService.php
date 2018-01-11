@@ -12,6 +12,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Demo\Customer\Services;
 
+use Desperado\EventSourcing\Service\EventSourcingService;
+use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\Demo\Application\ApplicationContext;
 use Desperado\ServiceBus\Demo\Customer\Command as CustomerCommands;
@@ -34,19 +36,20 @@ class RegisterCustomerService implements ServiceInterface
      *
      * @param CustomerCommands\RegisterCustomerCommand $command
      * @param ApplicationContext                       $context
+     * @param EventSourcingService                     $eventSourcingService
      *
      * @return PromiseInterface
      */
     public function executeRegisterCustomerCommand(
         CustomerCommands\RegisterCustomerCommand $command,
-        ApplicationContext $context
+        ApplicationContext $context,
+        EventSourcingService $eventSourcingService
     ): PromiseInterface
     {
-        return $context
-            ->getEventSourcingService()
+        return $eventSourcingService
             ->obtainIndex(CustomerEmailIndex::class)
             ->then(
-                function(CustomerEmailIndex $customerEmailIndex) use ($command, $context)
+                function(CustomerEmailIndex $customerEmailIndex) use ($command, $context, $eventSourcingService)
                 {
                     /** new customer */
                     if(false === $customerEmailIndex->hasIdentifier($command->getEmail()))
@@ -54,8 +57,7 @@ class RegisterCustomerService implements ServiceInterface
                         /** @var CustomerIdentities\CustomerAggregateIdentifier $customerIdentifier */
                         $customerIdentifier = CustomerIdentities\CustomerAggregateIdentifier::newUuid();
 
-                        $context
-                            ->getEventSourcingService()
+                        $eventSourcingService
                             ->createAggregate($customerIdentifier)
                             ->then(
                                 function(CustomerAggregate $aggregate) use (
@@ -119,6 +121,7 @@ class RegisterCustomerService implements ServiceInterface
      *
      * @param CustomerEvents\CustomerRegisteredEvent $event
      * @param ApplicationContext                     $context
+     * @param SagaService                            $sagaService
      *
      * @return PromiseInterface
      *
@@ -126,14 +129,13 @@ class RegisterCustomerService implements ServiceInterface
      */
     public function whenCustomerRegisteredEvent(
         CustomerEvents\CustomerRegisteredEvent $event,
-        ApplicationContext $context
+        ApplicationContext $context,
+        SagaService $sagaService
     ): PromiseInterface
     {
-        return $context
-            ->getSagaService()
-            ->startSaga(
-                new CustomerIdentities\CustomerVerificationSagaIdentifier($event->getRequestId()),
-                CustomerCommands\StartVerificationSagaCommand::create(['customerIdentifier' => $event->getIdentifier()])
-            );
+        return $sagaService->startSaga(
+            new CustomerIdentities\CustomerVerificationSagaIdentifier($event->getRequestId()),
+            CustomerCommands\StartVerificationSagaCommand::create(['customerIdentifier' => $event->getIdentifier()])
+        );
     }
 }

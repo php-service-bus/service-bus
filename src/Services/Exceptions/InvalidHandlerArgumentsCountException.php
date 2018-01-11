@@ -18,17 +18,40 @@ namespace Desperado\ServiceBus\Services\Exceptions;
 class InvalidHandlerArgumentsCountException extends \LogicException implements ServiceConfigurationExceptionInterface
 {
     /**
+     * Create for message handlers
+     *
      * @param \ReflectionMethod $reflectionMethod
-     * @param int               $expectedParametersCount
+     *
+     * @return InvalidHandlerArgumentsCountException
      */
-    public function __construct(\ReflectionMethod $reflectionMethod, int $expectedParametersCount)
+    public static function createForMessageHandler(\ReflectionMethod $reflectionMethod): self
     {
-        parent::__construct(
+        return new self(
             \sprintf(
-                'The "%s:%s" handler contains an incorrect number of arguments. Maximum quantity: %d',
+                'The "%s:%s" handler contains an incorrect number of arguments. Minimum quantity: 2 '
+                . '(AbstractCommand $command (or AbstractEvent $event), ApplicationExecutionContext $context '
+                . '(extends AbstractExecutionContext))',
                 $reflectionMethod->getDeclaringClass()->getName(),
-                $reflectionMethod->getName(),
-                $expectedParametersCount
+                $reflectionMethod->getName()
+            )
+        );
+    }
+
+    /**
+     * Create for error handlers
+     *
+     * @param \ReflectionMethod $reflectionMethod
+     *
+     * @return InvalidHandlerArgumentsCountException
+     */
+    public static function createForErrorHandler(\ReflectionMethod $reflectionMethod): self
+    {
+        return new self(
+            \sprintf(
+                'The "%s:%s" handler contains an incorrect number of arguments. Minimum quantity: 1 '
+                . '(UnfulfilledPromiseData $unfulfilledPromiseData)',
+                $reflectionMethod->getDeclaringClass()->getName(),
+                $reflectionMethod->getName()
             )
         );
     }

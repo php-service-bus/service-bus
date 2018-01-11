@@ -18,6 +18,7 @@ use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\Services\Handlers;
 use Desperado\ServiceBus\Services\Configuration\ConfigurationGuard;
 use Desperado\ServiceBus\Services\Exceptions as ServicesExceptions;
+use Psr\Container\ContainerExceptionInterface;
 
 /**
  * Annotation-based handlers extractor
@@ -32,11 +33,23 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
     private $annotationReader;
 
     /**
-     * @param Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader
+     * Search for services to be substituted as arguments to the handler
+     *
+     * @var AutowiringServiceLocator
      */
-    public function __construct(Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader)
+    private $autowiringServiceLocator;
+
+    /**
+     * @param Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader
+     * @param AutowiringServiceLocator                            $autowiringServiceLocator
+     */
+    public function __construct(
+        Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader,
+        AutowiringServiceLocator $autowiringServiceLocator
+    )
     {
         $this->annotationReader = $annotationReader;
+        $this->autowiringServiceLocator = $autowiringServiceLocator;
     }
 
     /**
@@ -112,6 +125,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
                                 $parentException,
                                 $originErrorHandlerData->getMessageClassNamespace(),
                                 $originErrorHandlerData->getExceptionHandler(),
+                                $originErrorHandlerData->getAutowiringServices(),
                                 $originErrorHandlerData->getExceptionHandlingParameters()
                             )
                         );
@@ -146,7 +160,9 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         $errorHandlerAnnotation = $errorHandlerAnnotationData->getAnnotation();
         $reflectionMethod = $errorHandlerAnnotationData->getMethod();
 
-        ConfigurationGuard::guardNumberOfParametersValid($reflectionMethod, 1);
+        ConfigurationGuard::guardErrorHandlerNumberOfParametersValid($reflectionMethod);
+
+        $autowiringServices = $this->collectAutowiringServices($reflectionMethod, 1);
 
         /** @var \ReflectionParameter[] $parameters */
         $parameters = $reflectionMethod->getParameters();
@@ -158,6 +174,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
             $errorHandlerAnnotation->getThrowableType(),
             $errorHandlerAnnotation->getMessageClass(),
             $reflectionMethod->getClosure($service),
+            $autowiringServices,
             new Handlers\Exceptions\ExceptionHandlingParameters()
         );
     }
@@ -179,20 +196,16 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         string $defaultServiceLoggerChannel = null
     ): Handlers\Messages\MessageHandlerData
     {
-        ConfigurationGuard::guardNumberOfParametersValid($methodAnnotation->getMethod(), 2);
+        $reflectionMethod = $methodAnnotation->getMethod();
+        $methodArguments = $methodAnnotation->getArguments();
 
-        ConfigurationGuard::guardValidMessageArgument(
-            $methodAnnotation->getMethod(),
-            $methodAnnotation->getArguments()[0],
-            0
-        );
+        ConfigurationGuard::guardMessageHandlerNumberOfParametersValid($reflectionMethod);
+        ConfigurationGuard::guardValidMessageArgument($reflectionMethod, $methodArguments[0], 0);
+        ConfigurationGuard::guardContextValidArgument($reflectionMethod, $methodArguments[1]);
 
-        ConfigurationGuard::guardContextValidArgument(
-            $methodAnnotation->getMethod(),
-            $methodAnnotation->getArguments()[1]
-        );
+        $autowiringServices = $this->collectAutowiringServices($reflectionMethod, 2);
 
-        $isEvent = $methodAnnotation->getArguments()[0]
+        $isEvent = $methodArguments[0]
             ->getClass()
             ->isSubclassOf(AbstractEvent::class);
 
@@ -210,7 +223,94 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         return Handlers\Messages\MessageHandlerData::new(
             $methodAnnotation->getArguments()[0]->getClass()->getName(),
             $methodAnnotation->getMethod()->getClosure($service),
+            $autowiringServices,
             $options
         );
+    }
+
+    /**
+     * Collecting additional automatically substituted arguments
+     *
+     * @param \ReflectionMethod $reflectionMethod
+     * @param int               $fromArgIndex
+     *
+     * @return array
+     *
+     * @throws ServicesExceptions\InvalidHandlerArgumentException
+     */
+    private function collectAutowiringServices(\ReflectionMethod $reflectionMethod, int $fromArgIndex): array
+    {
+        $result = [];
+
+        foreach($reflectionMethod->getParameters() as $index => $reflectionParameter)
+        {
+            if($fromArgIndex <= $index)
+            {
+                $result[] = $this->extractAutowiringService(
+                    $reflectionMethod,
+                    $reflectionParameter,
+                    $index
+                );
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get the object of the automatically provided service
+     *
+     * @param \ReflectionMethod    $reflectionMethod
+     * @param \ReflectionParameter $reflectionParameter
+     * @param int                  $index
+     *
+     * @return object
+     *
+     * @throws ServicesExceptions\InvalidHandlerArgumentException
+     */
+    private function extractAutowiringService(
+        \ReflectionMethod $reflectionMethod,
+        \ReflectionParameter $reflectionParameter,
+        int $index
+    )
+    {
+        $reflectionClass = $reflectionParameter->getClass();
+
+        $baseMessagePart = \sprintf(
+            'The %d argument to the handler "%s:%s"',
+            $index,
+            $reflectionMethod->getDeclaringClass()->getName(),
+            $reflectionMethod->getName()
+        );
+
+        if(null !== $reflectionClass)
+        {
+            if(false === $this->autowiringServiceLocator->has($reflectionClass->getName()))
+            {
+                throw new ServicesExceptions\InvalidHandlerArgumentException(
+                    \sprintf(
+                        '%s not specified correctly. The service for the specified class ("%s") was not '
+                        . 'described in the dependency container',
+                        $baseMessagePart,
+                        $reflectionClass->getName()
+                    )
+                );
+            }
+
+            try
+            {
+                return $this->autowiringServiceLocator->get($reflectionClass->getName());
+            }
+            catch(ContainerExceptionInterface $exception)
+            {
+                throw new ServicesExceptions\InvalidHandlerArgumentException($exception->getMessage());
+            }
+        }
+        else
+        {
+            throw new ServicesExceptions\InvalidHandlerArgumentException(
+                \sprintf('%s should be of the type "object"', $baseMessagePart)
+            );
+        }
     }
 }

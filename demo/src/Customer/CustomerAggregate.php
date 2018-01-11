@@ -15,19 +15,39 @@ namespace Desperado\ServiceBus\Demo\Customer;
 use Desperado\EventSourcing\AbstractAggregateRoot;
 use Desperado\ServiceBus\Demo\Customer\Command as CustomerCommands;
 use Desperado\ServiceBus\Demo\Customer\Event as CustomerEvents;
-use Desperado\ServiceBus\Demo\Customer\Identity\CustomerAggregateIdentifier;
 
 /**
  * Customer aggregate
  */
-class CustomerAggregate extends AbstractAggregateRoot
+final class CustomerAggregate extends AbstractAggregateRoot
 {
     /**
-     * Customer profile data
+     * User name
      *
-     * @var Customer
+     * @var string
      */
-    private $profile;
+    private $userName;
+
+    /**
+     * Display name
+     *
+     * @var string
+     */
+    private $displayName;
+
+    /**
+     * Hashed password
+     *
+     * @var string
+     */
+    private $passwordHash;
+
+    /**
+     * Email
+     *
+     * @var string
+     */
+    private $email;
 
     /**
      * Confirmed customer
@@ -76,44 +96,16 @@ class CustomerAggregate extends AbstractAggregateRoot
     }
 
     /**
-     * Get customer profile data
-     *
-     * @return Customer
-     */
-    public function getProfile(): Customer
-    {
-        return $this->profile;
-    }
-
-    /**
-     * Get active status
-     *
-     * @return bool
-     */
-    public function isActive(): bool
-    {
-        return $this->active;
-    }
-
-    /**
      * @param Event\CustomerRegisteredEvent $event
      *
      * @return void
      */
-    final protected function onCustomerRegisteredEvent(CustomerEvents\CustomerRegisteredEvent $event): void
+    protected function onCustomerRegisteredEvent(CustomerEvents\CustomerRegisteredEvent $event): void
     {
-        /** @var CustomerAggregateIdentifier $identifier */
-        $identifier = $this->getId();
-
-        $this->profile = Customer::create(
-            $identifier,
-            $event->getUserName(),
-            $event->getDisplayName(),
-            $event->getPasswordHash(),
-            CustomerContacts::create(
-                $event->getEmail()
-            )
-        );
+        $this->userName = $event->getUserName();
+        $this->displayName = $event->getDisplayName();
+        $this->passwordHash = $event->getPasswordHash();
+        $this->email = $event->getEmail();
     }
 
     /**
@@ -123,7 +115,7 @@ class CustomerAggregate extends AbstractAggregateRoot
      *
      * @return void
      */
-    final protected function onCustomerActivatedEvent(CustomerEvents\CustomerActivatedEvent $event): void
+    protected function onCustomerActivatedEvent(CustomerEvents\CustomerActivatedEvent $event): void
     {
         unset($event);
 

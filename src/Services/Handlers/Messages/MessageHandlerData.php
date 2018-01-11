@@ -32,6 +32,13 @@ class MessageHandlerData
     private $messageHandler;
 
     /**
+     * Autowiring services
+     *
+     * @var object[]
+     */
+    private $autowiringServices;
+
+    /**
      * Execution options
      *
      * @var AbstractMessageExecutionParameters
@@ -41,6 +48,7 @@ class MessageHandlerData
     /**
      * @param string                             $messageClassNamespace
      * @param \Closure                           $messageHandler
+     * @param array                              $autowiringServices
      * @param AbstractMessageExecutionParameters $executionOptions
      *
      * @return MessageHandlerData
@@ -48,6 +56,7 @@ class MessageHandlerData
     public static function new(
         string $messageClassNamespace,
         \Closure $messageHandler,
+        array $autowiringServices,
         AbstractMessageExecutionParameters $executionOptions
     ): self
     {
@@ -55,6 +64,7 @@ class MessageHandlerData
 
         $self->messageClassNamespace = $messageClassNamespace;
         $self->messageHandler = $messageHandler;
+        $self->autowiringServices = $autowiringServices;
         $self->executionOptions = $executionOptions;
 
         return $self;
@@ -68,6 +78,16 @@ class MessageHandlerData
     public function getMessageClassNamespace(): string
     {
         return $this->messageClassNamespace;
+    }
+
+    /**
+     * Get a list of services that will be prepended to the arguments of the handler
+     *
+     * @return object[]
+     */
+    public function getAutowiringServices(): array
+    {
+        return $this->autowiringServices;
     }
 
     /**

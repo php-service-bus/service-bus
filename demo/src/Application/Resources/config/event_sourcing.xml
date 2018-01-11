@@ -24,7 +24,7 @@
         <service
                 id="event_sourcing.service"
                 class="Desperado\EventSourcing\Service\EventSourcingService"
-                public="false">
+                public="true">
             <argument type="service" id="event_sourcing.event_store"/>
             <argument type="service" id="service_bus.logger"/>
 

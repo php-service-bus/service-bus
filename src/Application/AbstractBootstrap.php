@@ -19,8 +19,10 @@ use Desperado\ServiceBus\DependencyInjection\Compiler\EntryPointCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\Compiler\LoggerChannelsCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\Compiler\ModulesCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\Compiler\SagaStorageCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\ServicesCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\ServiceBusExtension;
 use Desperado\ServiceBus\EntryPoint\EntryPoint;
+use Desperado\ServiceBus\Extensions\Logger\ServiceBusLogger;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\Config;
 use Symfony\Component\DependencyInjection;
@@ -82,8 +84,7 @@ abstract class AbstractBootstrap
      * @throws ApplicationExceptions\IncorrectDotEnvFilePathException
      * @throws ApplicationExceptions\IncorrectCacheDirectoryFilePathException
      * @throws ApplicationExceptions\ServiceBusConfigurationException
-     *
-     * @throws \Exception                        if an exception has been thrown when the service has been resolved
+     * @throws \Exception
      */
     public static function boot(
         string $rootDirectoryPath,
@@ -91,15 +92,25 @@ abstract class AbstractBootstrap
         string $environmentFilePath
     ): EntryPoint
     {
+        $startTimer = \microtime(true);
+
         $self = new static($rootDirectoryPath, $cacheDirectoryPath, $environmentFilePath);
 
         $self->loadConfiguration();
         $self->initializeContainer();
 
+        ServiceBusLogger::setupEntryPointName($self->configuration->getEntryPointName());
+        ServiceBusLogger::setupEnvironment($self->configuration->getEnvironment());
+
         $self->init();
 
         /** @var EntryPoint $entryPoint */
         $entryPoint = $self->getContainer()->get('service_bus.entry_point');
+
+        ServiceBusLogger::info(
+            'bootstrap',
+            \sprintf('Application initialization time: %g', \microtime(true) - $startTimer)
+        );
 
         return $entryPoint;
     }
@@ -185,8 +196,12 @@ abstract class AbstractBootstrap
         if(false === $configCache->isFresh() || true === $this->configuration->getEnvironment()->isDebug())
         {
             $container = $this->buildContainer();
-            $container->compile();
+            $container->setParameter(
+                'service_bus.services_relations',
+                $this->extractServicesClassRelation($container)
+            );
 
+            $container->compile();
             $this->dumpContainer($configCache, $container, $containerClassName);
         }
 
@@ -221,7 +236,8 @@ abstract class AbstractBootstrap
                 'service_bus.event_dispatcher',
                 'service_bus.event_listener',
                 'service_bus.event_subscriber'
-            )
+            ),
+            'services'        => new ServicesCompilerPass()
         ];
 
         $containerParameters = new DependencyInjection\ParameterBag\ParameterBag([
@@ -255,6 +271,40 @@ abstract class AbstractBootstrap
         }
 
         return $containerBuilder;
+    }
+
+    /**
+     * Getting the relation of the class with the service identifier
+     *
+     * @param DependencyInjection\ContainerBuilder $builder
+     *
+     * @return array
+     */
+    private function extractServicesClassRelation(DependencyInjection\ContainerBuilder $builder): array
+    {
+        $relations = \array_filter(
+            \array_map(
+                function(string $eachService) use ($builder)
+                {
+                    if(true === $builder->hasDefinition($eachService))
+                    {
+                        return ['class' => $builder->getDefinition($eachService)->getClass(), 'id' => $eachService];
+                    }
+
+                    return null;
+                },
+                $builder->getServiceIds()
+            )
+        );
+
+        $result = [];
+
+        foreach($relations as $relation)
+        {
+            $result[$relation['class']] = $relation['id'];
+        }
+
+        return $result;
     }
 
     /**

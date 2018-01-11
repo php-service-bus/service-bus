@@ -65,9 +65,20 @@ class Task implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): PromiseInterface
+    public function __invoke(
+        AbstractMessage $message,
+        AbstractExecutionContext $context,
+        array $additionalArguments = []
+    ): PromiseInterface
     {
-        return \call_user_func_array($this->executionHandler, [$message, $context]);
+        $parameters = [$message, $context];
+
+        foreach($additionalArguments as $argument)
+        {
+            $parameters[] = $argument;
+        }
+
+        return \call_user_func_array($this->executionHandler, $parameters);
     }
 
     /**

@@ -62,11 +62,15 @@ class ErrorHandlerMiddleware implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function __invoke(AbstractMessage $message, AbstractExecutionContext $context): PromiseInterface
+    public function __invoke(
+        AbstractMessage $message,
+        AbstractExecutionContext $context,
+        array $additionalArguments = []
+    ): PromiseInterface
     {
         try
         {
-            return \call_user_func_array($this->task, [$message, $context]);
+            return \call_user_func_array($this->task, [$message, $context, $additionalArguments]);
         }
         catch(\Exception $exception)
         {

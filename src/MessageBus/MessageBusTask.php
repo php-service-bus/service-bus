@@ -34,21 +34,40 @@ class MessageBusTask
     private $task;
 
     /**
+     * Autowiring services
+     *
+     * @var object[]
+     */
+    private $autowiringServices;
+
+    /**
      * Create task container
      *
      * @param string        $messageNamespace
      * @param TaskInterface $task
+     * @param array         $autowiringServices
      *
      * @return MessageBusTask
      */
-    public static function create(string $messageNamespace, TaskInterface $task): self
+    public static function create(string $messageNamespace, TaskInterface $task, array $autowiringServices): self
     {
         $self = new self();
 
         $self->messageNamespace = $messageNamespace;
         $self->task = $task;
+        $self->autowiringServices = $autowiringServices;
 
         return $self;
+    }
+
+    /**
+     * Get a list of services that will be prepended to the arguments of the handler
+     *
+     * @return object[]
+     */
+    public function getAutowiringServices(): array
+    {
+        return $this->autowiringServices;
     }
 
     /**

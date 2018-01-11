@@ -48,19 +48,6 @@ class Kernel extends AbstractKernel
     }
 
     /**
-     * @inheritdoc
-     */
-    protected function getServices(): array
-    {
-        return [
-            new Customer\Services\RegisterCustomerService(),
-            new Customer\Services\CustomerVerificationService(),
-            new Customer\Services\ManageCustomerService(),
-            new EmailNotifications\Services\EmailNotificationsService()
-        ];
-    }
-
-    /**
      * Get aggregates list
      *
      * [
