@@ -39,7 +39,8 @@
     "symfony/event-dispatcher": "^4.0",
     "react/http": "v0.7.4",
     "doctrine/annotations": "v1.5.0",
-    "doctrine/cache": "v1.7.1"
+    "doctrine/cache": "v1.7.1",
+    "phpdocumentor/reflection-docblock": "4.2.0"
   },
   "require-dev": {
     "mmasiukevich/event-sourcing": "^0.1",
