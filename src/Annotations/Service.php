@@ -38,7 +38,7 @@ class Service extends AbstractAnnotation
      *
      * @return string
      */
-    public function getLoggerChannel(): ?string
+    public function getLoggerChannel(): string
     {
         return $this->loggerChannel ?? self::DEFAULT_LOGGER_CHANNEL;
     }
