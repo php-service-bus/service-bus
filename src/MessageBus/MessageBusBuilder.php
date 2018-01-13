@@ -240,6 +240,7 @@ class MessageBusBuilder
 
                 foreach($this->behaviors as $behavior)
                 {
+                    /** The task is an immutable object */
                     $task = $behavior->apply($task);
                 }
 
