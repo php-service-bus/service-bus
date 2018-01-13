@@ -14,7 +14,6 @@ namespace Desperado\ServiceBus\MessageBus;
 
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
-use Desperado\ServiceBus\Services\AutowiringServiceLocator;
 use Desperado\ServiceBus\Task\CompletedTask;
 use Psr\Log\LoggerInterface;
 use function React\Promise\all;
