@@ -222,13 +222,8 @@ class MessageBusBuilder
     {
         $collection = MessageBusTaskCollection::createEmpty();
 
-        foreach($this->messageHandlers as $messageNamespace => $handlers)
+        foreach($this->messageHandlers as $handlers)
         {
-            if(false === \is_array($handlers))
-            {
-                $handlers = [$handlers];
-            }
-
             foreach($handlers as $handlerData)
             {
                 /** @var Handlers\Messages\MessageHandlerData $handlerData */
