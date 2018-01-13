@@ -80,7 +80,7 @@ class MessageBusBuilder
     /**
      * @param ServiceHandlersExtractorInterface $serviceHandlersExtractor
      * @param EventDispatcher                   $eventDispatcher
-     * @param LoggerInterface|null              $logger
+     * @param LoggerInterface                   $logger
      */
     public function __construct(
         ServiceHandlersExtractorInterface $serviceHandlersExtractor,
@@ -90,7 +90,7 @@ class MessageBusBuilder
     {
         $this->serviceHandlersExtractor = $serviceHandlersExtractor;
         $this->eventDispatcher = $eventDispatcher;
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger = $logger;
 
         $this->messageHandlers = Handlers\Messages\MessageHandlersCollection::create();
         $this->errorHandlers = Handlers\Exceptions\ExceptionHandlersCollection::create();
