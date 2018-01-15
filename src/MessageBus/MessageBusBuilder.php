@@ -222,31 +222,28 @@ class MessageBusBuilder
     {
         $collection = MessageBusTaskCollection::createEmpty();
 
-        foreach($this->messageHandlers as $handlers)
+        foreach($this->messageHandlers as $handlerData)
         {
-            foreach($handlers as $handlerData)
+            /** @var Handlers\Messages\MessageHandlerData $handlerData */
+
+            $task = Task::new(
+                $handlerData->getMessageHandler(),
+                $handlerData->getExecutionOptions()
+            );
+
+            foreach($this->behaviors as $behavior)
             {
-                /** @var Handlers\Messages\MessageHandlerData $handlerData */
-
-                $task = Task::new(
-                    $handlerData->getMessageHandler(),
-                    $handlerData->getExecutionOptions()
-                );
-
-                foreach($this->behaviors as $behavior)
-                {
-                    /** The task is an immutable object */
-                    $task = $behavior->apply($task);
-                }
-
-                $collection->add(
-                    MessageBusTask::create(
-                        $handlerData->getMessageClassNamespace(),
-                        $task,
-                        $handlerData->getAutowiringServices()
-                    )
-                );
+                /** The task is an immutable object */
+                $task = $behavior->apply($task);
             }
+
+            $collection->add(
+                MessageBusTask::create(
+                    $handlerData->getMessageClassNamespace(),
+                    $task,
+                    $handlerData->getAutowiringServices()
+                )
+            );
         }
 
         return $collection;
