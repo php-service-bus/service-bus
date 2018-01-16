@@ -78,7 +78,7 @@ abstract class AbstractBootstrap
      * @param string $environmentFilePath Absolute path to the ".env" configuration file
      * @param string $cacheDirectoryPath  Absolute path to the cache directory
      *
-     * @return EntryPoint
+     * @return self
      *
      * @throws ApplicationExceptions\IncorrectRootDirectoryPathException
      * @throws ApplicationExceptions\IncorrectDotEnvFilePathException
@@ -90,7 +90,7 @@ abstract class AbstractBootstrap
         string $rootDirectoryPath,
         string $cacheDirectoryPath,
         string $environmentFilePath
-    ): EntryPoint
+    ): self
     {
         $startTimer = \microtime(true);
 
@@ -104,13 +104,25 @@ abstract class AbstractBootstrap
 
         $self->init();
 
-        /** @var EntryPoint $entryPoint */
-        $entryPoint = $self->getContainer()->get('service_bus.entry_point');
-
         ServiceBusLogger::info(
             'bootstrap',
             \sprintf('Application initialization time: %g', \microtime(true) - $startTimer)
         );
+
+        return $self;
+    }
+
+    /**
+     * Get application entry point
+     *
+     * @return EntryPoint
+     *
+     * @throws \Exception
+     */
+    public function getEntryPoint(): EntryPoint
+    {
+        /** @var EntryPoint $entryPoint */
+        $entryPoint = $this->getContainer()->get('service_bus.entry_point');
 
         return $entryPoint;
     }
