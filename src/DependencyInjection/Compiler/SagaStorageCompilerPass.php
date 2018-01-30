@@ -36,9 +36,21 @@ class SagaStorageCompilerPass implements DependencyInjection\Compiler\CompilerPa
 
     /**
      * @inheritdoc
+     *
+     * @throws \LogicException
      */
     public function process(DependencyInjection\ContainerBuilder $container): void
     {
+        if(false === $container->has($this->sagaStorageContainerKey))
+        {
+            throw new \LogicException(
+                \sprintf(
+                    'Can not find service "%s" in the dependency container. The saga store must be configured',
+                    $this->sagaStorageContainerKey
+                )
+            );
+        }
+
         $definition = $container->getDefinition('service_bus.sagas.store');
         $definition->setArgument(0, new DependencyInjection\Reference($this->sagaStorageContainerKey));
     }
