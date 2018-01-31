@@ -58,9 +58,33 @@ class EntryPointCompilerPass implements DependencyInjection\Compiler\CompilerPas
      */
     public function process(DependencyInjection\ContainerBuilder $container): void
     {
+        $this->guardReferenceService($this->kernelContainerKey, $container);
+        $this->guardReferenceService($this->executionContextContainerKey, $container);
+        $this->guardReferenceService($this->transportContainerKey, $container);
+
         $definition = $container->getDefinition('service_bus.entry_point');
         $definition->setArgument(1, new DependencyInjection\Reference($this->kernelContainerKey));
         $definition->setArgument(2, new DependencyInjection\Reference($this->executionContextContainerKey));
         $definition->setArgument(3, new DependencyInjection\Reference($this->transportContainerKey));
+    }
+
+    /**
+     * @param string                               $serviceKey
+     * @param DependencyInjection\ContainerBuilder $container
+     *
+     * @return string
+     */
+    private function guardReferenceService(string $serviceKey, DependencyInjection\ContainerBuilder $container): string
+    {
+        if(false === $container->has($serviceKey))
+        {
+            throw new \LogicException(
+                \sprintf(
+                    'Can not find service "%s" in the dependency container', $serviceKey
+                )
+            );
+        }
+
+        return $serviceKey;
     }
 }
