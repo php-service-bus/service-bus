@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use function React\Promise\all;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
 
 /**
  * Message bus
@@ -86,10 +87,24 @@ class MessageBus
             {
                 $task = $messageBusTask->getTask();
 
+                try
+                {
+                    $result = $task($message, $context, $messageBusTask->getAutowiringServices());
+
+                    if(false === ($result instanceof PromiseInterface))
+                    {
+                        $result = new FulfilledPromise();
+                    }
+                }
+                catch(\Throwable $throwable)
+                {
+                    $result = new RejectedPromise($throwable);
+                }
+
                 return CompletedTask::create(
                     $message,
                     $context,
-                    $task($message, $context, $messageBusTask->getAutowiringServices())
+                    $result
                 );
             },
             $taskCollection

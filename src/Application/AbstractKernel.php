@@ -100,22 +100,10 @@ abstract class AbstractKernel
             new KernelEvents\MessageIsReadyForProcessingEvent($entryPointContext, $executionContext)
         );
 
-        try
-        {
-            $promise = $this->messageBus->handle(
-                $entryPointContext->getMessage(),
-                $executionContext
-            );
-
-            if(false === ($promise instanceof PromiseInterface))
-            {
-                $promise = new  FulfilledPromise();
-            }
-        }
-        catch(\Throwable $throwable)
-        {
-            $promise = new RejectedPromise($throwable);
-        }
+        $promise = $this->messageBus->handle(
+            $entryPointContext->getMessage(),
+            $executionContext
+        );
 
         return $promise
             ->then(

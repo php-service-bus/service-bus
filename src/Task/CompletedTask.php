@@ -38,18 +38,18 @@ class CompletedTask
     /**
      * Operation result
      *
-     * @var PromiseInterface
+     * @var PromiseInterface|null
      */
     private $taskResult;
 
     /**
      * @param AbstractMessage          $message
      * @param AbstractExecutionContext $context
-     * @param PromiseInterface         $taskResult
+     * @param PromiseInterface|null    $taskResult
      *
      * @return CompletedTask
      */
-    public static function create(AbstractMessage $message, AbstractExecutionContext $context, PromiseInterface $taskResult): self
+    public static function create(AbstractMessage $message, AbstractExecutionContext $context, ?PromiseInterface $taskResult = null): self
     {
         $self = new self();
 
@@ -83,9 +83,9 @@ class CompletedTask
     /**
      * Get task execution result
      *
-     * @return PromiseInterface
+     * @return PromiseInterface|null
      */
-    public function getTaskResult(): PromiseInterface
+    public function getTaskResult(): ?PromiseInterface
     {
         return $this->taskResult;
     }
