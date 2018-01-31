@@ -44,6 +44,6 @@ class AfterMessageExecutionListener
      */
     public final function onComplete(MessageProcessingCompletedEvent $event): void
     {
-        $this->sagaService->commitAll($event->getExecutionContext());
+        $this->sagaService->flush($event->getExecutionContext());
     }
 }

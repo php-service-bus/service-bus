@@ -20,7 +20,6 @@ use Desperado\ServiceBus\Services\ServiceHandlersExtractorInterface;
 use Desperado\ServiceBus\Services\ServiceInterface;
 use Desperado\ServiceBus\Task\Task;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**

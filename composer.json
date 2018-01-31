@@ -18,9 +18,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Desperado\\ServiceBus\\Demo\\": "demo/src/",
-      "Desperado\\ServiceBus\\Tests\\": "tests/",
-      "Desperado\\Domain\\Tests\\": "vendor/mmasiukevich/domain-common/tests"
+      "Desperado\\ServiceBus\\Tests\\": "tests/"
     }
   },
   "require": {
@@ -51,7 +49,6 @@
     "optimize-autoloader": true
   },
   "minimum-stability": "dev",
-  "bin-dir": "bin",
   "prefer-stable": true,
   "extra": {
     "branch-alias": {

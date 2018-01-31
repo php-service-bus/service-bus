@@ -65,7 +65,6 @@ abstract class AbstractKernel
      *
      * @throws Services\Exceptions\ServiceConfigurationExceptionInterface
      * @throws SagaServiceExceptions\ClosedMessageBusException
-     * @throws SagaServiceExceptions\SagaClassWasNotFoundException
      */
     final public function __construct(
         MessageBusBuilder $messageBusBuilder,
@@ -184,7 +183,6 @@ abstract class AbstractKernel
      * @return void
      *
      * @throws SagaServiceExceptions\ClosedMessageBusException
-     * @throws SagaServiceExceptions\SagaClassWasNotFoundException
      */
     private function configureSagas(): void
     {

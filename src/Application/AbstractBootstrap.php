@@ -12,7 +12,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
-use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\ParameterBag;
 use Desperado\ServiceBus\Application\Exceptions as ApplicationExceptions;
 use Desperado\ServiceBus\DependencyInjection\Compiler\EntryPointCompilerPass;
