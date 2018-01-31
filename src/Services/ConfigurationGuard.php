@@ -44,6 +44,11 @@ class ConfigurationGuard
 
         $returnDeclarationType = $method->getReturnType()->getName();
 
+        if('void' === $returnDeclarationType)
+        {
+            return;
+        }
+
         if(PromiseInterface::class !== $returnDeclarationType && Promise::class !== $returnDeclarationType)
         {
             throw new ServicesExceptions\IncorrectReturnTypeDeclarationException($method);

@@ -65,7 +65,7 @@ class ValidateInterceptor implements TaskInterface
         AbstractMessage $message,
         AbstractExecutionContext $context,
         array $additionalArguments = []
-    ): PromiseInterface
+    ): ?PromiseInterface
     {
         $violations = new Validator\ConstraintViolationList();
 

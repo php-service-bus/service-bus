@@ -69,7 +69,7 @@ class Task implements TaskInterface
         AbstractMessage $message,
         AbstractExecutionContext $context,
         array $additionalArguments = []
-    ): PromiseInterface
+    ): ?PromiseInterface
     {
         $parameters = [$message, $context];
 

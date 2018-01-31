@@ -66,7 +66,7 @@ class ErrorHandlerMiddleware implements TaskInterface
         AbstractMessage $message,
         AbstractExecutionContext $context,
         array $additionalArguments = []
-    ): PromiseInterface
+    ): ?PromiseInterface
     {
         try
         {
