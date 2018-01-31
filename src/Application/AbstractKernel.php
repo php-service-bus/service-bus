@@ -22,7 +22,9 @@ use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Services;
 use Desperado\ServiceBus\Task\CompletedTask;
+use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -98,10 +100,22 @@ abstract class AbstractKernel
             new KernelEvents\MessageIsReadyForProcessingEvent($entryPointContext, $executionContext)
         );
 
-        $promise = $this->messageBus->handle(
-            $entryPointContext->getMessage(),
-            $executionContext
-        );
+        try
+        {
+            $promise = $this->messageBus->handle(
+                $entryPointContext->getMessage(),
+                $executionContext
+            );
+
+            if(false === ($promise instanceof PromiseInterface))
+            {
+                $promise = new  FulfilledPromise();
+            }
+        }
+        catch(\Throwable $throwable)
+        {
+            $promise = new RejectedPromise($throwable);
+        }
 
         return $promise
             ->then(

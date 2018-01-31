@@ -39,7 +39,7 @@ class ConfigurationGuard
     {
         if(false === $method->hasReturnType())
         {
-            throw new ServicesExceptions\NoReturnTypeDeclarationException($method);
+            return;
         }
 
         $returnDeclarationType = $method->getReturnType()->getName();

@@ -26,7 +26,7 @@ class IncorrectReturnTypeDeclarationException extends \LogicException implements
     {
         parent::__construct(
             \sprintf(
-                'The "%s" method of the "%s" service must have a return value declaration "%s"',
+                'The "%s" method of the "%s" service must have a return value declaration "%s" or "void"',
                 $method->getName(),
                 $method->getDeclaringClass()->getName(),
                 PromiseInterface::class
