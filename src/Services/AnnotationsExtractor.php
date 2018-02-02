@@ -88,8 +88,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         string $defaultServiceLoggerChannel = null
     ): array
     {
-        $messageHandlers = Handlers\Messages\MessageHandlersCollection::create();
-        $exceptionHandlers = Handlers\Exceptions\ExceptionHandlersCollection::create();
+        $messageHandlers = Handlers\MessageHandlersCollection::create();
 
         $messageHandlerAnnotations = $this->annotationReader->loadClassMethodsAnnotation($service);
 
@@ -109,74 +108,12 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
                     );
 
                     break;
-
-                case Annotations\ErrorHandler::class:
-
-                    /** @var Handlers\Exceptions\ExceptionHandlerData $originErrorHandlerData */
-                    $originErrorHandlerData = $this->extractErrorHandlers($service, $annotationData);
-
-                    $exceptionHandlers->add($originErrorHandlerData);
-
-                    /** Add parent exception classes */
-                    foreach(\class_parents($originErrorHandlerData->getExceptionClassNamespace()) as $parentException)
-                    {
-                        $exceptionHandlers->add(
-                            Handlers\Exceptions\ExceptionHandlerData::new(
-                                $parentException,
-                                $originErrorHandlerData->getMessageClassNamespace(),
-                                $originErrorHandlerData->getExceptionHandler(),
-                                $originErrorHandlerData->getAutowiringServices(),
-                                $originErrorHandlerData->getExceptionHandlingParameters()
-                            )
-                        );
-                    }
-
-                    break;
             }
         }
 
         return [
-            self::HANDLER_TYPE_MESSAGES => $messageHandlers,
-            self::HANDLER_TYPE_ERRORS   => $exceptionHandlers
+            self::HANDLER_TYPE_MESSAGES => $messageHandlers
         ];
-    }
-
-    /**
-     * Extract error handler
-     *
-     * @param ServiceInterface                          $service
-     * @param Bridge\AnnotationsReader\MethodAnnotation $errorHandlerAnnotationData
-     *
-     * @return Handlers\Exceptions\ExceptionHandlerData
-     *
-     * @throws ServicesExceptions\ServiceConfigurationExceptionInterface
-     */
-    private function extractErrorHandlers(
-        ServiceInterface $service,
-        Bridge\AnnotationsReader\MethodAnnotation $errorHandlerAnnotationData
-    ): Handlers\Exceptions\ExceptionHandlerData
-    {
-        /** @var Annotations\ErrorHandler $errorHandlerAnnotation */
-        $errorHandlerAnnotation = $errorHandlerAnnotationData->getAnnotation();
-        $reflectionMethod = $errorHandlerAnnotationData->getMethod();
-
-        ConfigurationGuard::guardErrorHandlerNumberOfParametersValid($reflectionMethod);
-
-        $autowiringServices = $this->collectAutowiringServices($reflectionMethod, 1);
-
-        /** @var \ReflectionParameter[] $parameters */
-        $parameters = $reflectionMethod->getParameters();
-
-        ConfigurationGuard::guardUnfulfilledPromiseArgument($reflectionMethod, $parameters[0]);
-        ConfigurationGuard::guardErrorHandlerAnnotationData($errorHandlerAnnotation, $reflectionMethod);
-
-        return Handlers\Exceptions\ExceptionHandlerData::new(
-            $errorHandlerAnnotation->getThrowableType(),
-            $errorHandlerAnnotation->getMessageClass(),
-            $reflectionMethod->getClosure($service),
-            $autowiringServices,
-            new Handlers\Exceptions\ExceptionHandlingParameters()
-        );
     }
 
     /**
@@ -186,7 +123,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
      * @param Bridge\AnnotationsReader\MethodAnnotation $methodAnnotation
      * @param string|null                               $defaultServiceLoggerChannel
      *
-     * @return Handlers\Messages\MessageHandlerData
+     * @return Handlers\MessageHandlerData
      *
      * @throws ServicesExceptions\ServiceConfigurationExceptionInterface
      */
@@ -194,7 +131,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         ServiceInterface $service,
         Bridge\AnnotationsReader\MethodAnnotation $methodAnnotation,
         string $defaultServiceLoggerChannel = null
-    ): Handlers\Messages\MessageHandlerData
+    ): Handlers\MessageHandlerData
     {
         $reflectionMethod = $methodAnnotation->getMethod();
         $methodArguments = $methodAnnotation->getArguments();
@@ -217,10 +154,10 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
             : $defaultServiceLoggerChannel;
 
         $options = true === $isEvent
-            ? new Handlers\Messages\EventExecutionParameters((string) $loggerChannel)
-            : new Handlers\Messages\CommandExecutionParameters((string) $loggerChannel);
+            ? new Handlers\EventExecutionParameters((string) $loggerChannel)
+            : new Handlers\CommandExecutionParameters((string) $loggerChannel);
 
-        return Handlers\Messages\MessageHandlerData::new(
+        return Handlers\MessageHandlerData::new(
             $methodAnnotation->getArguments()[0]->getClass()->getName(),
             $methodAnnotation->getMethod()->getClosure($service),
             $autowiringServices,

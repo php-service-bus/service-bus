@@ -17,7 +17,6 @@ namespace Desperado\ServiceBus\Services;
  */
 interface ServiceHandlersExtractorInterface
 {
-    public const HANDLER_TYPE_ERRORS = 'errors';
     public const HANDLER_TYPE_MESSAGES = 'messages';
 
     /**
@@ -25,7 +24,6 @@ interface ServiceHandlersExtractorInterface
      *
      * [
      *      self::HANDLER_TYPE_MESSAGES => object of Desperado\CQRS\Handlers\MessageHandlersCollection,
-     *      self::HANDLER_TYPE_ERRORS   => object of Desperado\CQRS\Handlers\ExceptionHandlersCollection
      * ]
      *
      * @param ServiceInterface $service
@@ -38,7 +36,7 @@ interface ServiceHandlersExtractorInterface
     public function extractHandlers(
         ServiceInterface $service,
         string $defaultServiceLoggerChannel = null
-    ): array;
+    ): array ;
 
     /**
      * Extract service logger channel

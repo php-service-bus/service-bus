@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Services\Handlers\Messages;
+namespace Desperado\ServiceBus\Services\Handlers;
 
 /**
  * Information about the message handler

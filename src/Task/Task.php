@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Task;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\ServiceBus\Services\Handlers\Messages\AbstractMessageExecutionParameters;
+use Desperado\ServiceBus\Services\Handlers\AbstractMessageExecutionParameters;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use React\Promise\PromiseInterface;
 

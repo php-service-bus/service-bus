@@ -36,23 +36,4 @@ class InvalidHandlerArgumentsCountException extends \LogicException implements S
             )
         );
     }
-
-    /**
-     * Create for error handlers
-     *
-     * @param \ReflectionMethod $reflectionMethod
-     *
-     * @return InvalidHandlerArgumentsCountException
-     */
-    public static function createForErrorHandler(\ReflectionMethod $reflectionMethod): self
-    {
-        return new self(
-            \sprintf(
-                'The "%s:%s" handler contains an incorrect number of arguments. Minimum quantity: 1 '
-                . '(UnfulfilledPromiseData $unfulfilledPromiseData)',
-                $reflectionMethod->getDeclaringClass()->getName(),
-                $reflectionMethod->getName()
-            )
-        );
-    }
 }

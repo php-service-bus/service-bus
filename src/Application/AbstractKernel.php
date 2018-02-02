@@ -22,9 +22,7 @@ use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Services;
 use Desperado\ServiceBus\Task\CompletedTask;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
-use React\Promise\RejectedPromise;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -197,11 +195,11 @@ abstract class AbstractKernel
             foreach($this->sagaService->getSagaListeners($saga) as $listener)
             {
                 $this->messageBusBuilder->pushMessageHandler(
-                    Services\Handlers\Messages\MessageHandlerData::new(
+                    Services\Handlers\MessageHandlerData::new(
                         $listener->getEventNamespace(),
                         $listener->getHandler(),
                         [],
-                        new Services\Handlers\Messages\EventExecutionParameters('sagas')
+                        new Services\Handlers\EventExecutionParameters('sagas')
                     )
                 );
             }

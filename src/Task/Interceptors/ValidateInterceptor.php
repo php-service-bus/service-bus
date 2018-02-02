@@ -53,7 +53,7 @@ class ValidateInterceptor implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function getOptions(): Handlers\Messages\AbstractMessageExecutionParameters
+    public function getOptions(): Handlers\AbstractMessageExecutionParameters
     {
         return $this->task->getOptions();
     }

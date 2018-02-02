@@ -13,10 +13,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Services\Configuration;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\ServiceBus\Annotations\ErrorHandler;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Services\Exceptions as ServicesExceptions;
-use Desperado\ServiceBus\Services\Handlers\Exceptions\UnfulfilledPromiseData;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
@@ -69,23 +67,6 @@ class ConfigurationGuard
         if(2 > $reflectionMethod->getNumberOfRequiredParameters())
         {
             throw ServicesExceptions\InvalidHandlerArgumentsCountException::createForMessageHandler($reflectionMethod);
-        }
-    }
-
-    /**
-     * Checking the number of arguments of the error handler
-     *
-     * @param \ReflectionMethod $reflectionMethod
-     *
-     * @return void
-     *
-     * @throws ServicesExceptions\InvalidHandlerArgumentsCountException
-     */
-    public static function guardErrorHandlerNumberOfParametersValid(\ReflectionMethod $reflectionMethod): void
-    {
-        if(1 > $reflectionMethod->getNumberOfRequiredParameters())
-        {
-            throw ServicesExceptions\InvalidHandlerArgumentsCountException::createForErrorHandler($reflectionMethod);
         }
     }
 
@@ -152,96 +133,6 @@ class ConfigurationGuard
                     null !== $parameter->getClass()
                         ? $parameter->getClass()->getName()
                         : 'n/a'
-                )
-            );
-        }
-    }
-
-    /**
-     * Checking the correctness of the arguments of the error handler
-     *
-     * @param \ReflectionMethod    $reflectionMethod
-     * @param \ReflectionParameter $parameter
-     *
-     * @return void
-     *
-     * @throws ServicesExceptions\InvalidHandlerArgumentException
-     */
-    public static function guardUnfulfilledPromiseArgument(
-        \ReflectionMethod $reflectionMethod,
-        \ReflectionParameter $parameter
-    ): void
-    {
-        if(
-            null === $parameter->getClass() ||
-            UnfulfilledPromiseData::class !== $parameter->getClass()->getName()
-        )
-        {
-            throw new ServicesExceptions\InvalidHandlerArgumentException(
-                \sprintf(
-                    'The first argument to the handler "%s:%s" must be instanceof the "%s"',
-                    $reflectionMethod->getDeclaringClass()->getName(),
-                    $reflectionMethod->getName(),
-                    UnfulfilledPromiseData::class
-                )
-            );
-        }
-    }
-
-    /**
-     * Checking the correctness of the annotation parameters of the error handler
-     *
-     * @param ErrorHandler      $errorHandlerAnnotation
-     * @param \ReflectionMethod $reflectionMethod
-     *
-     * @return void
-     *
-     * @throws ServicesExceptions\IncorrectAnnotationDataException
-     */
-    public static function guardErrorHandlerAnnotationData(
-        ErrorHandler $errorHandlerAnnotation,
-        \ReflectionMethod $reflectionMethod
-    ): void
-    {
-        if('' === (string) $errorHandlerAnnotation->getMessageClass())
-        {
-            throw new ServicesExceptions\IncorrectAnnotationDataException(
-                \sprintf(
-                    'Message for which an exception will be caught not specified (%s:%s). Configure "%s::$message" parameter',
-                    $reflectionMethod->getDeclaringClass()->getName(),
-                    $reflectionMethod->getName(),
-                    ErrorHandler::class
-                )
-            );
-        }
-
-        if(false === \class_exists($errorHandlerAnnotation->getMessageClass()))
-        {
-            throw new ServicesExceptions\IncorrectAnnotationDataException(
-                \sprintf(
-                    'The class of the message ("%s") for which the exceptions will not be caught is not found. (%s:%s). '
-                    . 'Configure "%s::$message" parameter',
-                    $errorHandlerAnnotation->getMessageClass(),
-                    $reflectionMethod->getDeclaringClass()->getName(),
-                    $reflectionMethod->getName(),
-                    ErrorHandler::class
-                )
-            );
-        }
-
-        if(
-            false === \class_exists($errorHandlerAnnotation->getThrowableType()) &&
-            false === \interface_exists($errorHandlerAnnotation->getThrowableType())
-        )
-        {
-            throw new ServicesExceptions\IncorrectAnnotationDataException(
-                \sprintf(
-                    'An incorrect type of intercepting exceptions is indicated. "%s" not found. (%s:%s). '
-                    . 'Configure "%s::$type" parameter',
-                    $errorHandlerAnnotation->getThrowableType(),
-                    $reflectionMethod->getDeclaringClass()->getName(),
-                    $reflectionMethod->getName(),
-                    ErrorHandler::class
                 )
             );
         }

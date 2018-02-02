@@ -30,16 +30,9 @@ class MessageBusBuilder
     /**
      * Message handlers
      *
-     * @var Handlers\Messages\MessageHandlersCollection
+     * @var Handlers\MessageHandlersCollection
      */
     private $messageHandlers;
-
-    /**
-     * Error handlers
-     *
-     * @var Handlers\Exceptions\ExceptionHandlersCollection
-     */
-    private $errorHandlers;
 
     /**
      * Behaviors collection
@@ -91,8 +84,7 @@ class MessageBusBuilder
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
 
-        $this->messageHandlers = Handlers\Messages\MessageHandlersCollection::create();
-        $this->errorHandlers = Handlers\Exceptions\ExceptionHandlersCollection::create();
+        $this->messageHandlers = Handlers\MessageHandlersCollection::create();
     }
 
     /**
@@ -110,25 +102,13 @@ class MessageBusBuilder
     /**
      * Push message handler
      *
-     * @param Handlers\Messages\MessageHandlerData $messageHandlerData
+     * @param Handlers\MessageHandlerData $messageHandlerData
      *
      * @return void
      */
-    public function pushMessageHandler(Handlers\Messages\MessageHandlerData $messageHandlerData): void
+    public function pushMessageHandler(Handlers\MessageHandlerData $messageHandlerData): void
     {
         $this->messageHandlers->add($messageHandlerData);
-    }
-
-    /**
-     * Push service error handler
-     *
-     * @param Handlers\Exceptions\ExceptionHandlerData $exceptionHandlerData
-     *
-     * @return void
-     */
-    public function pushServiceErrorHandler(Handlers\Exceptions\ExceptionHandlerData $exceptionHandlerData): void
-    {
-        $this->errorHandlers->add($exceptionHandlerData);
     }
 
     /**
@@ -152,10 +132,6 @@ class MessageBusBuilder
             {
                 switch($type)
                 {
-                    case ServiceHandlersExtractorInterface::HANDLER_TYPE_ERRORS:
-                        $this->pushServiceErrorHandler($handlerData);
-                        break;
-
                     case ServiceHandlersExtractorInterface::HANDLER_TYPE_MESSAGES:
                         $this->pushMessageHandler($handlerData);
                         break;
@@ -188,13 +164,6 @@ class MessageBusBuilder
             throw new MessageBusAlreadyCreatedException();
         }
 
-        if(false === \array_key_exists(Behaviors\ErrorHandleBehavior::class, $this->behaviors))
-        {
-            $this->behaviors[Behaviors\ErrorHandleBehavior::class] = Behaviors\ErrorHandleBehavior::create(
-                $this->errorHandlers
-            );
-        }
-
         $taskCollection = $this->prepareTaskCollection();
 
         $messageBus = MessageBus::build(
@@ -223,7 +192,7 @@ class MessageBusBuilder
 
         foreach($this->messageHandlers as $handlerData)
         {
-            /** @var Handlers\Messages\MessageHandlerData $handlerData */
+            /** @var Handlers\MessageHandlerData $handlerData */
 
             $task = Task::new(
                 $handlerData->getMessageHandler(),

@@ -10,12 +10,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Services\Handlers\Messages;
+namespace Desperado\ServiceBus\Services\Handlers;
 
 /**
- * Command processing parameters
+ * Event processing parameters
  */
-class CommandExecutionParameters extends AbstractMessageExecutionParameters
+class EventExecutionParameters extends AbstractMessageExecutionParameters
 {
 
 }
