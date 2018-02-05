@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Tests\Task\Interceptors;
 use Desperado\ServiceBus\Services\Handlers\CommandExecutionParameters;
 use Desperado\ServiceBus\Task\Interceptors\ValidateInterceptor;
 use Desperado\ServiceBus\Task\Task;
-use Desperado\ServiceBus\Tests\Services\Stabs\SomeAutoWiringProvider;
 use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceCommand;
 use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceEvent;
 use Desperado\ServiceBus\Tests\TestApplicationContext;

@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
+use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
 use Desperado\Saga\Service\Exceptions as SagaServiceExceptions;
 use Desperado\Saga\Service\SagaService;
 use Desperado\ServiceBus\EntryPoint\EntryPointContext;
@@ -23,6 +24,7 @@ use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Services;
 use Desperado\ServiceBus\Task\CompletedTask;
 use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -77,6 +79,7 @@ abstract class AbstractKernel
         $this->sagaService = $sagaService;
 
         $this->configureSagas();
+        $this->init();
 
         $this->messageBus = $messageBusBuilder->build();
     }
@@ -91,7 +94,10 @@ abstract class AbstractKernel
      *
      * @throws \Throwable
      */
-    final public function handle(EntryPointContext $entryPointContext, AbstractExecutionContext $executionContext): PromiseInterface
+    final public function handle(
+        EntryPointContext $entryPointContext,
+        AbstractExecutionContext $executionContext
+    ): PromiseInterface
     {
         $this->eventDispatcher->dispatch(
             KernelEvents\MessageIsReadyForProcessingEvent::EVENT_NAME,
@@ -103,51 +109,43 @@ abstract class AbstractKernel
             $executionContext
         );
 
-        return $promise
-            ->then(
-                function(array $promisesResult = null) use ($entryPointContext, $executionContext)
+        return $promise->then(
+            function(array $results) use ($executionContext, $entryPointContext)
+            {
+                /** No handlers found */
+                if(0 === \count($results))
                 {
-                    if(null !== $promisesResult)
-                    {
-                        foreach($promisesResult as $completedTask)
-                        {
-                            /** @var CompletedTask $completedTask */
-
-                            $completedTask
-                                ->getTaskResult()
-                                ->then(
-                                    function() use ($completedTask, $entryPointContext, $executionContext)
-                                    {
-                                        return $completedTask->getContext()->getOutboundMessageContext();
-                                    },
-                                    function(\Throwable $throwable)
-                                    {
-                                        /** @todo: fix me */
-                                        ServiceBusLogger::throwable('rejectedPromise', $throwable);
-                                    }
-                                );
-                        }
-                    }
-
-                    $this->eventDispatcher->dispatch(
-                        KernelEvents\MessageProcessingCompletedEvent::EVENT_NAME,
-                        new KernelEvents\MessageProcessingCompletedEvent($entryPointContext, $executionContext)
-                    );
-
-                    return $executionContext->getOutboundMessageContext();
-                },
-                function(\Throwable $throwable) use ($entryPointContext, $executionContext)
-                {
-                    ServiceBusLogger::throwable('rejectedPromise', $throwable);
-
-                    $this->eventDispatcher->dispatch(
-                        KernelEvents\MessageProcessingFailedEvent::EVENT_NAME,
-                        new KernelEvents\MessageProcessingFailedEvent($throwable, $entryPointContext, $executionContext)
-                    );
-
-                    return $throwable;
+                    return null;
                 }
-            );
+
+                $rejectedTasks = $this->collectRejectedTasks($results);
+
+                if(0 !== \count($rejectedTasks))
+                {
+                    $this->processRejectedTasks($rejectedTasks, $entryPointContext, $executionContext);
+
+                    return null;
+                }
+
+                return $this->processSuccessTasks($results, $entryPointContext, $executionContext);
+            },
+            function(\Throwable $throwable) use ($entryPointContext, $executionContext)
+            {
+                ServiceBusLogger::throwable('rejectedPromise', $throwable);
+
+                return $throwable;
+            }
+        );
+    }
+
+    /**
+     * Custom initialization (before message bust compilation)
+     *
+     * @return void
+     */
+    protected function init(): void
+    {
+
     }
 
     /**
@@ -203,6 +201,97 @@ abstract class AbstractKernel
                     )
                 );
             }
+        }
+    }
+
+    /**
+     * Process success tasks
+     *
+     * @param array                    $completedTasks
+     * @param EntryPointContext        $entryPointContext
+     * @param AbstractExecutionContext $executionContext
+     *
+     * @return OutboundMessageContextInterface[]
+     */
+    private function processSuccessTasks(
+        array $completedTasks,
+        EntryPointContext $entryPointContext,
+        AbstractExecutionContext $executionContext
+
+    ): array
+    {
+        $resultContexts = \array_filter(
+            \array_map(
+                function(CompletedTask $completedTask)
+                {
+                    return $completedTask->getContext()->getOutboundMessageContext();
+                },
+                $completedTasks
+            )
+        );
+
+        $this->eventDispatcher->dispatch(
+            KernelEvents\MessageProcessingCompletedEvent::EVENT_NAME,
+            new KernelEvents\MessageProcessingCompletedEvent($entryPointContext, $executionContext)
+        );
+
+        return $resultContexts;
+    }
+
+    /**
+     * Collecting tasks that resulted in an error
+     *
+     * @param array $completedTasks
+     *
+     * @return CompletedTask[]
+     */
+    private function collectRejectedTasks(array $completedTasks): array
+    {
+        return \array_filter(
+            \array_map(
+                function(CompletedTask $completedTask)
+                {
+                    return $completedTask->getTaskResult() instanceof RejectedPromise
+                        ? $completedTask
+                        : null;
+                },
+                $completedTasks
+            )
+        );
+    }
+
+    /**
+     * Processing completed with error messages
+     *
+     * @param CompletedTask[]          $rejectedTasks
+     * @param EntryPointContext        $entryPointContext
+     * @param AbstractExecutionContext $executionContext
+     *
+     * @return void
+     */
+    private function processRejectedTasks(
+        array $rejectedTasks,
+        EntryPointContext $entryPointContext,
+        AbstractExecutionContext $executionContext
+    ): void
+    {
+        foreach($rejectedTasks as $rejectedTask)
+        {
+            $rejectedTask->getTaskResult()
+                ->then(
+                    null,
+                    function(\Throwable $throwable) use ($entryPointContext, $executionContext)
+                    {
+                        $this->eventDispatcher->dispatch(
+                            KernelEvents\MessageProcessingFailedEvent::EVENT_NAME,
+                            new KernelEvents\MessageProcessingFailedEvent(
+                                $throwable,
+                                $entryPointContext,
+                                $executionContext
+                            )
+                        );
+                    }
+                );
         }
     }
 }

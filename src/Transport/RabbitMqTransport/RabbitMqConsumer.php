@@ -85,104 +85,35 @@ class RabbitMqConsumer
      */
     public function subscribe(string $entryPointName, array $clients): PromiseInterface
     {
-        return $this->client
-            ->connect()
+        return $this
+            ->doConnect($entryPointName, $clients)
             ->then(
-                function(Client $client) use ($entryPointName, $clients)
+                function(Channel $channel)
                 {
-                    return $client
-                        ->channel()
-                        ->then(
-                            function(Channel $channel)
-                            {
-                                return $channel
-                                    ->qos(
-                                        $this->configuration->getQosConfig()->get('pre_fetch_size'),
-                                        $this->configuration->getQosConfig()->get('pre_fetch_count'),
-                                        $this->configuration->getQosConfig()->get('global')
-                                    )
-                                    ->then(
-                                        function() use ($channel)
-                                        {
-                                            return $channel;
-                                        },
-                                        $this->onFailedCallable
-                                    );
-                            },
-                            $this->onFailedCallable
-                        )
-                        ->then(
-                            function(Channel $channel) use ($entryPointName, $clients)
-                            {
-                                return $channel
-                                    /** Application main exchange */
-                                    ->exchangeDeclare($entryPointName, self::EXCHANGE_TYPE_DIRECT)
-                                    /** Events exchanges */
-                                    ->then(
-                                        function() use ($channel, $entryPointName)
-                                        {
-                                            return $channel
-                                                ->exchangeDeclare(
-                                                    \sprintf('%s.events', $entryPointName),
-                                                    self::EXCHANGE_TYPE_DIRECT
-                                                );
-                                        },
-                                        $this->onFailedCallable
-                                    )
-                                    /** Messages (internal usage) queue */
-                                    ->then(
-                                        function() use ($channel, $entryPointName)
-                                        {
-                                            return $channel->queueDeclare(
-                                                \sprintf('%s.messages', $entryPointName),
-                                                false, true
-                                            );
-                                        },
-                                        $this->onFailedCallable
-                                    )
-                                    /** Configure routing keys for clients */
-                                    ->then(
-                                        function(MethodQueueDeclareOkFrame $frame) use (
-                                            $channel, $clients, $entryPointName
-                                        )
-                                        {
-                                            $promises = \array_map(
-                                                function($routingKey) use ($frame, $channel, $entryPointName)
-                                                {
-                                                    return $channel->queueBind(
-                                                        $frame->queue,
-                                                        $entryPointName,
-                                                        $routingKey
-                                                    );
-                                                },
-                                                $clients
-                                            );
+                    return $this->doConfigureChannel($channel);
+                }
+            )
+            ->then(
+                function(Channel $channel) use ($entryPointName, $clients)
+                {
+                    return $this->doConfigureExchanges($channel, $entryPointName, $clients);
+                }
+            )
+            ->then(
+                function(array $arguments)
+                {
+                    /** @var MethodQueueDeclareOkFrame $frame */
+                    $frame = $arguments[0];
+                    /** @var Channel $channel */
+                    $channel = $arguments[1];
 
-                                            return \React\Promise\all($promises)
-                                                ->then(
-                                                    function() use ($frame)
-                                                    {
-                                                        return $frame;
-                                                    }
-                                                );
-                                        },
-                                        $this->onFailedCallable
-                                    )
-                                    ->then(
-                                        function(MethodQueueDeclareOkFrame $frame) use ($channel)
-                                        {
-                                            $this->logger->info('RabbitMQ subscription started');
+                    $this->logger->info('RabbitMQ subscription started');
 
-                                            return RabbitMqChannelData::create($channel, $frame->queue);
-                                        },
-                                        $this->onFailedCallable
-                                    );
-                            },
-                            $this->onFailedCallable
-                        );
+                    return RabbitMqChannelData::create($channel, $frame->queue);
                 },
                 $this->onFailedCallable
             );
+
     }
 
     /**
@@ -222,5 +153,111 @@ class RabbitMqConsumer
 
             return new RejectedPromise($throwable);
         };
+    }
+
+    /**
+     * Connects to AMQP server
+     *
+     * @param string $entryPointName
+     * @param array  $clients
+     *
+     * @return PromiseInterface
+     */
+    private function doConnect(string $entryPointName, array $clients): PromiseInterface
+    {
+        return $this->client
+            ->connect()
+            ->then(
+                function(Client $client) use ($entryPointName, $clients)
+                {
+                    return $client->channel();
+                }
+            );
+    }
+
+    /**
+     * Calls basic.qos AMQP method
+     *
+     * @param Channel $channel
+     *
+     * @return PromiseInterface
+     */
+    private function doConfigureChannel(Channel $channel): PromiseInterface
+    {
+        return $channel
+            ->qos(
+                $this->configuration->getQosConfig()->get('pre_fetch_size'),
+                $this->configuration->getQosConfig()->get('pre_fetch_count'),
+                $this->configuration->getQosConfig()->get('global')
+            )
+            ->then(
+                function() use ($channel)
+                {
+                    return $channel;
+                }
+            );
+    }
+
+    /**
+     * Calls exchange.declare AMQP method
+     * Calls queue.declare AMQP method
+     *
+     * @param Channel $channel
+     * @param string  $entryPointName
+     * @param array   $clients
+     *
+     * @return PromiseInterface
+     */
+    private function doConfigureExchanges(Channel $channel, string $entryPointName, array $clients): PromiseInterface
+    {
+        return $channel
+            /** Application main exchange */
+            ->exchangeDeclare($entryPointName, self::EXCHANGE_TYPE_DIRECT)
+            /** Events exchanges */
+            ->then(
+                function() use ($channel, $entryPointName)
+                {
+                    return $channel
+                        ->exchangeDeclare(
+                            \sprintf('%s.events', $entryPointName),
+                            self::EXCHANGE_TYPE_DIRECT
+                        );
+                }
+            )
+            /** Messages (internal usage) queue */
+            ->then(
+                function() use ($channel, $entryPointName)
+                {
+                    return $channel->queueDeclare(
+                        \sprintf('%s.messages', $entryPointName),
+                        false, true
+                    );
+                }
+            )
+            /** Configure routing keys for clients */
+            ->then(
+                function(MethodQueueDeclareOkFrame $frame) use ($channel, $clients, $entryPointName)
+                {
+                    $promises = \array_map(
+                        function($routingKey) use ($frame, $channel, $entryPointName)
+                        {
+                            return $channel->queueBind(
+                                $frame->queue,
+                                $entryPointName,
+                                $routingKey
+                            );
+                        },
+                        $clients
+                    );
+
+                    return \React\Promise\all($promises)
+                        ->then(
+                            function() use ($frame, $channel)
+                            {
+                                return [$frame, $channel];
+                            }
+                        );
+                }
+            );
     }
 }

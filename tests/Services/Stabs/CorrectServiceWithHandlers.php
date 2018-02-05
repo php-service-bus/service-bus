@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Tests\Services\Stabs;
 use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\Services\ServiceInterface;
 use Desperado\ServiceBus\Tests\TestApplicationContext;
+use React\Promise\FulfilledPromise;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
@@ -36,7 +37,8 @@ class CorrectServiceWithHandlers implements ServiceInterface
         TestApplicationContext $context
     )
     {
-
+        /** /tmp/executeTestServiceCommand.lock */
+        \file_put_contents(\sys_get_temp_dir() . '/executeTestServiceCommand.lock', '1');
     }
 
     /**
@@ -54,7 +56,7 @@ class CorrectServiceWithHandlers implements ServiceInterface
         TestApplicationContext $context
     ): PromiseInterface
     {
-
+        return new FulfilledPromise();
     }
 
     /**
@@ -90,6 +92,6 @@ class CorrectServiceWithHandlers implements ServiceInterface
         TestApplicationContext $context
     ): Promise
     {
-
+        return new FulfilledPromise();
     }
 }
