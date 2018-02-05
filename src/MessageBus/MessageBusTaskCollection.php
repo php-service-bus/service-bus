@@ -60,7 +60,10 @@ class MessageBusTaskCollection implements \Countable
      */
     public function add(MessageBusTask $task): void
     {
-        $this->collection[\spl_object_hash($task)] = $task;
+        if(false === $this->has($task))
+        {
+            $this->collection[\spl_object_hash($task)] = $task;
+        }
     }
 
     /**

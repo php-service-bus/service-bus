@@ -14,6 +14,7 @@ namespace Desperado\ServiceBus\Task;
 
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
+use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
 /**
@@ -38,7 +39,7 @@ class CompletedTask
     /**
      * Operation result
      *
-     * @var PromiseInterface|null
+     * @var PromiseInterface
      */
     private $taskResult;
 
@@ -55,7 +56,7 @@ class CompletedTask
 
         $self->message = $message;
         $self->context = $context;
-        $self->taskResult = $taskResult;
+        $self->taskResult = $taskResult ?? new FulfilledPromise();
 
         return $self;
     }
@@ -83,9 +84,9 @@ class CompletedTask
     /**
      * Get task execution result
      *
-     * @return PromiseInterface|null
+     * @return PromiseInterface
      */
-    public function getTaskResult(): ?PromiseInterface
+    public function getTaskResult(): PromiseInterface
     {
         return $this->taskResult;
     }

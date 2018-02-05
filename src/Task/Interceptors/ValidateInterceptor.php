@@ -155,8 +155,6 @@ class ValidateInterceptor implements TaskInterface
     /**
      * Validate message
      *
-     * @todo: recursive?
-     *
      * @param AbstractMessage                            $message
      * @param Validator\ConstraintViolationListInterface $violations
      *
@@ -168,12 +166,6 @@ class ValidateInterceptor implements TaskInterface
             $this->validator->validate($message)
         );
 
-        foreach(\get_object_vars($message) as $key => $dto)
-        {
-            if(true === \is_object($message))
-            {
-                $violations->addAll($this->validator->validate([$key => $dto]));
-            }
-        }
+        /** @todo: recursive? */
     }
 }

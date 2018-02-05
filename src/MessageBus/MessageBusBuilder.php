@@ -93,9 +93,13 @@ class MessageBusBuilder
      * @param Behaviors\BehaviorInterface $behavior
      *
      * @return void
+     *
+     * @throws MessageBusAlreadyCreatedException
      */
     public function pushBehavior(Behaviors\BehaviorInterface $behavior): void
     {
+        $this->guardIsCompiled();
+
         $this->behaviors[\get_class($behavior)] = $behavior;
     }
 
@@ -105,9 +109,13 @@ class MessageBusBuilder
      * @param Handlers\MessageHandlerData $messageHandlerData
      *
      * @return void
+     *
+     * @throws MessageBusAlreadyCreatedException
      */
     public function pushMessageHandler(Handlers\MessageHandlerData $messageHandlerData): void
     {
+        $this->guardIsCompiled();
+
         $this->messageHandlers->add($messageHandlerData);
     }
 
@@ -119,24 +127,19 @@ class MessageBusBuilder
      *
      * @return void
      *
+     * @throws MessageBusAlreadyCreatedException
      * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
      */
     public function applyService(ServiceInterface $service): void
     {
+        $this->guardIsCompiled();
+
         $defaultServiceLoggerChannel = $this->serviceHandlersExtractor->extractServiceLoggerChannel($service);
         $handlers = $this->serviceHandlersExtractor->extractHandlers($service, $defaultServiceLoggerChannel);
 
-        foreach($handlers as $type => $collection)
+        foreach($handlers as $handlerData)
         {
-            foreach($collection as $handlerData)
-            {
-                switch($type)
-                {
-                    case ServiceHandlersExtractorInterface::HANDLER_TYPE_MESSAGES:
-                        $this->pushMessageHandler($handlerData);
-                        break;
-                }
-            }
+            $this->pushMessageHandler($handlerData);
         }
     }
 
@@ -159,10 +162,7 @@ class MessageBusBuilder
      */
     public function build(): MessageBus
     {
-        if(true === $this->isCompiled)
-        {
-            throw new MessageBusAlreadyCreatedException();
-        }
+        $this->guardIsCompiled();
 
         $taskCollection = $this->prepareTaskCollection();
 
@@ -215,5 +215,20 @@ class MessageBusBuilder
         }
 
         return $collection;
+    }
+
+    /**
+     * Make sure that the bus is not yet configured
+     *
+     * @return void
+     *
+     * @throws MessageBusAlreadyCreatedException
+     */
+    private function guardIsCompiled(): void
+    {
+        if(true === $this->isCompiled)
+        {
+            throw new MessageBusAlreadyCreatedException();
+        }
     }
 }

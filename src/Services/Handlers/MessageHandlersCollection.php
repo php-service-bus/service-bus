@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Services\Handlers;
 /**
  * Collection of message handlers
  */
-class MessageHandlersCollection implements \IteratorAggregate
+class MessageHandlersCollection implements \IteratorAggregate, \Countable
 {
     /**
      * Collection of message handlers
@@ -27,20 +27,11 @@ class MessageHandlersCollection implements \IteratorAggregate
     /**
      * Create collection
      *
-     * @param MessageHandlerData[] $handlers
-     *
      * @return MessageHandlersCollection
      */
-    public static function create(array $handlers = []): self
+    public static function create(): self
     {
-        $self = new self();
-
-        foreach($handlers as $handler)
-        {
-            $self->add($handler);
-        }
-
-        return $self;
+        return new self();
     }
 
     /**
@@ -49,6 +40,14 @@ class MessageHandlersCollection implements \IteratorAggregate
     public function getIterator(): \Generator
     {
         return yield from $this->collection;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function count(): int
+    {
+        return \count($this->collection);
     }
 
     /**

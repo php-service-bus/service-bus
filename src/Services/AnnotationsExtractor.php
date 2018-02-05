@@ -86,10 +86,9 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
     public function extractHandlers(
         ServiceInterface $service,
         string $defaultServiceLoggerChannel = null
-    ): array
+    ): Handlers\MessageHandlersCollection
     {
         $messageHandlers = Handlers\MessageHandlersCollection::create();
-
         $messageHandlerAnnotations = $this->annotationReader->loadClassMethodsAnnotation($service);
 
         foreach($messageHandlerAnnotations as $annotationData)
@@ -97,6 +96,8 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
             /** @var Bridge\AnnotationsReader\MethodAnnotation $annotationData */
 
             ConfigurationGuard::guardHandlerReturnDeclaration($annotationData->getMethod());
+
+            /** @todo: query handlers */
 
             switch(\get_class($annotationData->getAnnotation()))
             {
@@ -111,9 +112,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
             }
         }
 
-        return [
-            self::HANDLER_TYPE_MESSAGES => $messageHandlers
-        ];
+        return $messageHandlers;
     }
 
     /**

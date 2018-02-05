@@ -17,10 +17,11 @@ use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
+use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
 use Desperado\ServiceBus\Application\Exceptions\OutboundContextNotAppliedException;
-use Desperado\ServiceBus\Extensions\Logger\ServiceBusLogger;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
@@ -33,7 +34,16 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      *
      * @return OutboundMessageContext|null
      */
-    abstract public function getOutboundMessageContext(): ?OutboundMessageContext;
+    abstract public function getOutboundMessageContext(): ?OutboundMessageContextInterface;
+
+    /**
+     * Get logger instance
+     *
+     * @param string $channelName
+     *
+     * @return LoggerInterface
+     */
+    abstract public function getLogger(string $channelName): LoggerInterface;
 
     /**
      * @inheritdoc
@@ -96,7 +106,7 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
         array $extra = []
     ): void
     {
-        ServiceBusLogger::log('execution', $logMessage, $level, $extra);
+        $this->getLogger('execution')->log($level, $logMessage, $extra);
     }
 
     /**

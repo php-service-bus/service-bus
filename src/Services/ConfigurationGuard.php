@@ -30,7 +30,6 @@ class ConfigurationGuard
      *
      * @return void
      *
-     * @throws ServicesExceptions\NoReturnTypeDeclarationException
      * @throws ServicesExceptions\IncorrectReturnTypeDeclarationException
      */
     public static function guardHandlerReturnDeclaration(\ReflectionMethod $method): void
@@ -140,6 +139,8 @@ class ConfigurationGuard
 
     /**
      * Close constructor
+     *
+     * @codeCoverageIgnore
      */
     private function __construct()
     {

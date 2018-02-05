@@ -17,7 +17,6 @@ use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Task\CompletedTask;
 use Psr\Log\LoggerInterface;
 use function React\Promise\all;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 
@@ -71,46 +70,48 @@ class MessageBus
     {
         $messageNamespace = \get_class($message);
 
-        $taskCollection = $this->taskCollection->mapByMessageNamespace($messageNamespace);
-
-        if(0 === \count($taskCollection))
-        {
-            $this->logger->info(
-                \sprintf('No handlers found for the message with the namespace "%s', $messageNamespace)
-            );
-
-            return new FulfilledPromise();
-        }
-
         $promises = \array_map(
             function(MessageBusTask $messageBusTask) use ($message, $context)
             {
-                $task = $messageBusTask->getTask();
-
-                try
-                {
-                    $result = $task($message, $context, $messageBusTask->getAutowiringServices());
-
-                    if(false === ($result instanceof PromiseInterface))
-                    {
-                        $result = new FulfilledPromise();
-                    }
-                }
-                catch(\Throwable $throwable)
-                {
-                    $result = new RejectedPromise($throwable);
-                }
-
-                return CompletedTask::create(
-                    $message,
-                    $context,
-                    $result
-                );
+                return $this->executeTask($messageBusTask, $message, $context);
             },
-            $taskCollection
+            $this->taskCollection->mapByMessageNamespace($messageNamespace)
         );
 
         return all($promises);
+    }
+
+    /**
+     * Process task
+     *
+     * @param MessageBusTask           $messageBusTask
+     * @param AbstractMessage          $message
+     * @param AbstractExecutionContext $context
+     *
+     * @return CompletedTask
+     */
+    private function executeTask(
+        MessageBusTask $messageBusTask,
+        AbstractMessage $message,
+        AbstractExecutionContext $context
+    ): CompletedTask
+    {
+        $task = $messageBusTask->getTask();
+
+        try
+        {
+            $result = $task($message, $context, $messageBusTask->getAutowiringServices());
+        }
+        catch(\Throwable $throwable)
+        {
+            $result = new RejectedPromise($throwable);
+        }
+
+        return CompletedTask::create(
+            $message,
+            $context,
+            $result
+        );
     }
 
     /**
