@@ -30,7 +30,7 @@ class InvalidHandlerArgumentsCountException extends \LogicException implements S
             \sprintf(
                 'The "%s:%s" handler contains an incorrect number of arguments. Minimum quantity: 2 '
                 . '(AbstractCommand $command (or AbstractEvent $event), ApplicationExecutionContext $context '
-                . '(extends AbstractExecutionContext))',
+                . '(implements ExecutionContextInterface))',
                 $reflectionMethod->getDeclaringClass()->getName(),
                 $reflectionMethod->getName()
             )

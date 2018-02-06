@@ -16,17 +16,16 @@ use Bunny\Async\Client;
 use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
 use Desperado\Domain\Environment\Environment;
+use Desperado\Domain\ThrowableFormatter;
 use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
 use Desperado\Domain\Transport\Message\Message;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\ParameterBag;
-use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
-use Desperado\ServiceBus\Extensions\Logger\ServiceBusLogger;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
 use Desperado\ServiceBus\Transport\IncomingMessageContainer;
 use Desperado\ServiceBus\Transport\TransportInterface;
 use EventLoop\EventLoop;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use function React\Promise\all;
 use React\Promise\PromiseInterface;
 
@@ -78,19 +77,29 @@ class RabbitMqTransport implements TransportInterface
     private $messageSerializer;
 
     /**
+     * Logger instance
+     *
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param RabbitMqTransportConfig    $configuration
      * @param Environment                $environment
      * @param MessageSerializerInterface $messageSerializer
+     * @param LoggerInterface            $logger
      */
     public function __construct(
         RabbitMqTransportConfig $configuration,
         Environment $environment,
-        MessageSerializerInterface $messageSerializer
+        MessageSerializerInterface $messageSerializer,
+        LoggerInterface $logger
     )
     {
         $this->configuration = $configuration;
         $this->environment = $environment;
         $this->messageSerializer = $messageSerializer;
+        $this->logger = $logger;
 
         \pcntl_async_signals(true);
 
@@ -114,7 +123,7 @@ class RabbitMqTransport implements TransportInterface
         $this->subscriber = RabbitMqConsumer::create(
             $this->getClient(),
             $this->configuration,
-            LoggerRegistry::getLogger('consumer')
+            $this->logger
         );
 
         $consumeCallable = $this->createSubscribeCallable($messageHandler);
@@ -197,10 +206,7 @@ class RabbitMqTransport implements TransportInterface
 
                     if(true === $this->environment->isDebug())
                     {
-                        ServiceBusLogger::debug(
-                            'income',
-                            \sprintf('Received the message: %s', $incoming->content)
-                        );
+                        $this->logger->debug(\sprintf('Received the message: %s', $incoming->content));
                     }
 
                     $this->handleMessage(
@@ -233,7 +239,7 @@ class RabbitMqTransport implements TransportInterface
     {
         $failedHandler = function(\Throwable $throwable) use ($channel, $incoming)
         {
-            ServiceBusLogger::throwable('throwable', $throwable);
+            $this->logger->error(ThrowableFormatter::toString($throwable));
 
             $throwable instanceof \LogicException
                 ? $channel->nack($incoming)
@@ -265,7 +271,7 @@ class RabbitMqTransport implements TransportInterface
                             null,
                             function(\Throwable $throwable)
                             {
-                                ServiceBusLogger::throwable('throwable', $throwable, LogLevel::EMERGENCY);
+                                $this->logger->error(ThrowableFormatter::toString($throwable));
                             }
                         );
                 },
@@ -292,7 +298,7 @@ class RabbitMqTransport implements TransportInterface
         {
             $this->publisher = RabbitMqPublisher::create(
                 $this->environment,
-                LoggerRegistry::getLogger('publisher')
+                $this->logger
             );
         }
 

@@ -26,24 +26,18 @@
     "mmasiukevich/infrastructure": "^0.1",
     "mmasiukevich/saga": "^0.1",
     "mmasiukevich/message-serializer": "^0.1",
-    "bunny/bunny": "^0.2.4",
-    "symfony/dotenv": "^4.0",
-    "symfony/dependency-injection": "^4.0",
-    "symfony/config": "^4.0",
-    "symfony/validator": "^4.0",
-    "symfony/serializer": "^4.0",
-    "symfony/property-info": "^4.0",
-    "symfony/property-access": "^4.0",
-    "symfony/event-dispatcher": "^4.0",
-    "react/http": "v0.7.4",
-    "doctrine/annotations": "v1.5.0",
+    "mmasiukevich/event-sourcing": "^0.1",
+    "symfony/dotenv": "v4.0.4",
+    "symfony/dependency-injection": "v4.0.4",
+    "symfony/config": "v4.0.4",
+    "symfony/validator": "v4.0.4",
+    "symfony/event-dispatcher": "v4.0.4",
     "doctrine/cache": "v1.7.1",
     "phpdocumentor/reflection-docblock": "4.2.0"
   },
   "require-dev": {
-    "mmasiukevich/event-sourcing": "^0.1",
-    "phpunit/phpunit": "^6.2",
-    "symfony/debug": "^4.0"
+    "phpunit/phpunit": "^7.0",
+    "symfony/debug": "v4.0.4"
   },
   "config": {
     "optimize-autoloader": true

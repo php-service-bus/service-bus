@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Task;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
+use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
@@ -32,7 +32,7 @@ class CompletedTask
     /**
      * Context
      *
-     * @var AbstractExecutionContext
+     * @var ExecutionContextInterface
      */
     private $context;
 
@@ -45,12 +45,16 @@ class CompletedTask
 
     /**
      * @param AbstractMessage          $message
-     * @param AbstractExecutionContext $context
+     * @param ExecutionContextInterface $context
      * @param PromiseInterface|null    $taskResult
      *
      * @return CompletedTask
      */
-    public static function create(AbstractMessage $message, AbstractExecutionContext $context, ?PromiseInterface $taskResult = null): self
+    public static function create(
+        AbstractMessage $message,
+        ExecutionContextInterface $context,
+        ?PromiseInterface $taskResult = null
+    ): self
     {
         $self = new self();
 
@@ -74,9 +78,9 @@ class CompletedTask
     /**
      * Get execution context
      *
-     * @return AbstractExecutionContext
+     * @return ExecutionContextInterface
      */
-    public function getContext(): AbstractExecutionContext
+    public function getContext(): ExecutionContextInterface
     {
         return $this->context;
     }

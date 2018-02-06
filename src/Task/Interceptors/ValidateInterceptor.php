@@ -13,8 +13,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Task\Interceptors;
 
 use Desperado\Domain\Message\AbstractMessage;
+use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\ServiceBus\Services\Handlers;
-use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
 use Desperado\ServiceBus\Task\Interceptors\Contract\MessageValidationFailedEvent;
 use Desperado\ServiceBus\Task\TaskInterface;
 use Psr\Log\LogLevel;
@@ -63,7 +63,7 @@ class ValidateInterceptor implements TaskInterface
      */
     public function __invoke(
         AbstractMessage $message,
-        AbstractExecutionContext $context,
+        ExecutionContextInterface $context,
         array $additionalArguments = []
     ): ?PromiseInterface
     {
@@ -87,14 +87,14 @@ class ValidateInterceptor implements TaskInterface
      *
      * @param AbstractMessage                            $message
      * @param Validator\ConstraintViolationListInterface $violations
-     * @param AbstractExecutionContext                   $context
+     * @param ExecutionContextInterface                  $context
      *
      * @return void
      */
     private function processViolations(
         AbstractMessage $message,
         Validator\ConstraintViolationListInterface $violations,
-        AbstractExecutionContext $context
+        ExecutionContextInterface $context
     ): void
     {
         $errors = [];
@@ -112,13 +112,13 @@ class ValidateInterceptor implements TaskInterface
     /**
      * Publish events with violations
      *
-     * @param AbstractMessage          $message
-     * @param array                    $errors
-     * @param AbstractExecutionContext $context
+     * @param AbstractMessage           $message
+     * @param array                     $errors
+     * @param ExecutionContextInterface $context
      *
      * @return void
      */
-    protected function deliveryErrors(AbstractMessage $message, array $errors, AbstractExecutionContext $context): void
+    protected function deliveryErrors(AbstractMessage $message, array $errors, ExecutionContextInterface $context): void
     {
         $event = MessageValidationFailedEvent::create([
             'messageNamespace' => \get_class($message),
@@ -133,14 +133,14 @@ class ValidateInterceptor implements TaskInterface
      *
      * @param AbstractMessage                        $message
      * @param Validator\ConstraintViolationInterface $constraintViolation
-     * @param AbstractExecutionContext               $context
+     * @param ExecutionContextInterface              $context
      *
      * @return void
      */
     private function logViolation(
         AbstractMessage $message,
         Validator\ConstraintViolationInterface $constraintViolation,
-        AbstractExecutionContext $context
+        ExecutionContextInterface $context
     ): void
     {
         $context->logContextMessage(

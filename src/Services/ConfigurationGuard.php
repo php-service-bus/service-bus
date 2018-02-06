@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Services\Configuration;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
+use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\ServiceBus\Services\Exceptions as ServicesExceptions;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
@@ -86,7 +86,7 @@ class ConfigurationGuard
     {
         if(
             null === $parameter->getClass() ||
-            false === $parameter->getClass()->isSubclassOf(AbstractExecutionContext::class)
+            false === $parameter->getClass()->isSubclassOf(ExecutionContextInterface::class)
         )
         {
             throw new ServicesExceptions\InvalidHandlerArgumentException(
@@ -94,7 +94,7 @@ class ConfigurationGuard
                     'The second argument to the handler "%s:%s" must be instanceof the "%s"',
                     $reflectionMethod->getDeclaringClass()->getName(),
                     $reflectionMethod->getName(),
-                    AbstractExecutionContext::class
+                    ExecutionContextInterface::class
                 )
             );
         }

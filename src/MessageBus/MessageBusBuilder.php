@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\MessageBus;
 
-use Desperado\ServiceBus\KernelEvents\MessageBusCompiledEvent;
+use Desperado\ServiceBus\Application\Kernel\Events\MessageBusCompiledEvent;
 use Desperado\ServiceBus\Task\Behaviors;
 use Desperado\ServiceBus\Services\Handlers;
 use Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException;

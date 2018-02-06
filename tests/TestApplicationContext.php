@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests;
 
 use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
-use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
+use Desperado\ServiceBus\Application\Context\AbstractExecutionContext;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 

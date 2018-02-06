@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\MessageBus;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\ServiceBus\MessageProcessor\AbstractExecutionContext;
+use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\ServiceBus\Task\CompletedTask;
 use Psr\Log\LoggerInterface;
 use function React\Promise\all;
@@ -62,11 +62,11 @@ class MessageBus
      * Handle message
      *
      * @param AbstractMessage          $message
-     * @param AbstractExecutionContext $context
+     * @param ExecutionContextInterface $context
      *
      * @return PromiseInterface
      */
-    public function handle(AbstractMessage $message, AbstractExecutionContext $context): PromiseInterface
+    public function handle(AbstractMessage $message, ExecutionContextInterface $context): PromiseInterface
     {
         $messageNamespace = \get_class($message);
 
@@ -86,14 +86,14 @@ class MessageBus
      *
      * @param MessageBusTask           $messageBusTask
      * @param AbstractMessage          $message
-     * @param AbstractExecutionContext $context
+     * @param ExecutionContextInterface $context
      *
      * @return CompletedTask
      */
     private function executeTask(
         MessageBusTask $messageBusTask,
         AbstractMessage $message,
-        AbstractExecutionContext $context
+        ExecutionContextInterface $context
     ): CompletedTask
     {
         $task = $messageBusTask->getTask();
