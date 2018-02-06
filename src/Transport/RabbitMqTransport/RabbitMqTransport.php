@@ -246,6 +246,8 @@ class RabbitMqTransport implements TransportInterface
                 : $channel->ack($incoming);
         };
 
+        $channel->ack($incoming);
+
         try
         {
             /** @noinspection PhpParamsInspection */
@@ -258,8 +260,6 @@ class RabbitMqTransport implements TransportInterface
                 {
                     if(null === $outboundMessageContext)
                     {
-                        $channel->ack($incoming);
-
                         return;
                     }
 
@@ -279,8 +279,6 @@ class RabbitMqTransport implements TransportInterface
                                 $this->logger->error(ThrowableFormatter::toString($throwable));
                             }
                         );
-
-                    $channel->ack($incoming);
                 },
                 function(\Throwable $throwable) use ($failedHandler)
                 {
