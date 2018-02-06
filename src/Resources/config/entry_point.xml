@@ -6,7 +6,9 @@
     <services>
 
         <!-- Application entry point -->
-        <service id="service_bus.entry_point" class="Desperado\ServiceBus\EntryPoint\EntryPoint" public="true">
+        <service id="service_bus.entry_point"
+                 class="Desperado\ServiceBus\Application\EntryPoint\EntryPoint"
+                 public="true">
             <argument>%service_bus.entry_point_name%</argument>
             <argument/>
             <argument/>

@@ -253,11 +253,16 @@ class RabbitMqTransport implements TransportInterface
 
             /** @var PromiseInterface $promise */
 
-            $channel->ack($incoming);
-
             $promise->then(
-                function(OutboundMessageContextInterface $outboundMessageContext) use ($channel)
+                function(OutboundMessageContextInterface $outboundMessageContext = null) use ($channel, $incoming)
                 {
+                    if(null === $outboundMessageContext)
+                    {
+                        $channel->ack($incoming);
+
+                        return;
+                    }
+
                     $promises = \array_map(
                         function(Message $message) use ($channel)
                         {
@@ -274,6 +279,8 @@ class RabbitMqTransport implements TransportInterface
                                 $this->logger->error(ThrowableFormatter::toString($throwable));
                             }
                         );
+
+                    $channel->ack($incoming);
                 },
                 function(\Throwable $throwable) use ($failedHandler)
                 {

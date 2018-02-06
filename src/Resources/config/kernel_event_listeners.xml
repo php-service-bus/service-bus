@@ -12,7 +12,7 @@
 
         <!-- Listener event for message completion -->
         <service id="service_bus.kernel_event_listeners.after_message_execution"
-                 class="Desperado\ServiceBus\KernelEventListeners\AfterMessageExecutionListener"
+                 class="Desperado\ServiceBus\Application\Kernel\EventListeners\AfterMessageExecutionListener"
                  public="false">
             <argument type="service" id="service_bus.sagas.service"/>
 
@@ -24,7 +24,7 @@
 
         <!-- Listener event for message completion -->
         <service id="service_bus.kernel_event_listeners.message_bus_configured"
-                 class="Desperado\ServiceBus\KernelEventListeners\MessageBusCompiledListener"
+                 class="Desperado\ServiceBus\Application\Kernel\EventListeners\MessageBusCompiledListener"
                  public="false">
             <argument type="service" id="service_bus.logger"/>
 

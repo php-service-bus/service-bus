@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\KernelEventListeners;
+namespace Desperado\ServiceBus\Application\Kernel\EventListeners;
 
 use Desperado\ServiceBus\Application\Kernel\Events\MessageBusCompiledEvent;
 use Psr\Log\LoggerInterface;
