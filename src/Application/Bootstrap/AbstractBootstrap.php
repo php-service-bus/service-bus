@@ -109,12 +109,22 @@ abstract class AbstractBootstrap
      *
      * @throws \Exception
      */
-    public function getEntryPoint(): EntryPoint
+    final public function getEntryPoint(): EntryPoint
     {
         /** @var EntryPoint $entryPoint */
         $entryPoint = $this->getContainer()->get('service_bus.entry_point');
 
         return $entryPoint;
+    }
+
+    /**
+     * Get dependency injection container
+     *
+     * @return SymfonyDependencyInjection\Container
+     */
+    final public function getContainer(): SymfonyDependencyInjection\Container
+    {
+        return $this->container;
     }
 
     /**
@@ -139,16 +149,6 @@ abstract class AbstractBootstrap
     protected function init(): void
     {
 
-    }
-
-    /**
-     * Get dependency injection container
-     *
-     * @return SymfonyDependencyInjection\Container
-     */
-    final protected function getContainer(): SymfonyDependencyInjection\Container
-    {
-        return $this->container;
     }
 
     /**
