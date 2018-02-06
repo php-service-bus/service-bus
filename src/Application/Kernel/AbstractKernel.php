@@ -301,6 +301,8 @@ abstract class AbstractKernel
                                 $executionContext
                             )
                         );
+
+                        $this->logger->error(ThrowableFormatter::toString($throwable));
                     }
                 );
         }
