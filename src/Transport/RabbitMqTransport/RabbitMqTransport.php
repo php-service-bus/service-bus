@@ -256,20 +256,30 @@ class RabbitMqTransport implements TransportInterface
             /** @var PromiseInterface $promise */
 
             $promise->then(
-                function(OutboundMessageContextInterface $outboundMessageContext = null) use ($channel, $incoming)
+                function(array $contexts = null) use ($channel, $incoming)
                 {
-                    if(null === $outboundMessageContext)
+                    if(false === \is_array($contexts) || 0 === \count($contexts))
                     {
                         return;
                     }
 
-                    $promises = \array_map(
-                        function(Message $message) use ($channel)
-                        {
-                            return $this->getPublisher()->publish($channel, $message);
-                        },
-                        \iterator_to_array($outboundMessageContext->getToPublishMessages())
-                    );
+                    $promises = [];
+
+                    foreach($contexts as $context)
+                    {
+                        /** @var OutboundMessageContextInterface $context */
+
+                        $promises = \array_merge(
+                            \array_map(
+                                function(Message $message) use ($channel)
+                                {
+                                    return $this->getPublisher()->publish($channel, $message);
+                                },
+                                \iterator_to_array($context->getToPublishMessages())
+                            ),
+                            $promises
+                        );
+                    }
 
                     all($promises)
                         ->then(
