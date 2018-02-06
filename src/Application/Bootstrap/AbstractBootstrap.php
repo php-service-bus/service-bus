@@ -333,7 +333,7 @@ abstract class AbstractBootstrap
         Config\ConfigCache $cache,
         SymfonyDependencyInjection\ContainerBuilder $container,
         string $class
-    )
+    ): void
     {
         $dumper = new SymfonyDependencyInjection\Dumper\PhpDumper($container);
         $content = (string) $dumper->dump([
