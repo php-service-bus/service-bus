@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Application\Kernel;
 
+use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ParameterBag;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
 use Desperado\ServiceBus\SagaProvider;
@@ -38,6 +39,11 @@ class AbstractKernelTest extends TestCase
      * @var AbstractKernel
      */
     private $kernel;
+
+    /**
+     * @var ExecutionContextInterface
+     */
+    private $context;
 
     /**
      * @inheritdoc
@@ -69,6 +75,10 @@ class AbstractKernelTest extends TestCase
             $eventDispatcher,
             new NullLogger()
         );
+
+        $this->context = static::getMockBuilder(TestApplicationContext::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
@@ -83,7 +93,8 @@ class AbstractKernelTest extends TestCase
             $this->container,
             $this->autowiringServiceLocator,
             $this->annotationsReader,
-            $this->serviceHandlersExtractor
+            $this->serviceHandlersExtractor,
+            $this->context
         );
     }
 
@@ -96,13 +107,12 @@ class AbstractKernelTest extends TestCase
      */
     public function handleSuccessMessage(): void
     {
-        $executionContext = new TestApplicationContext();
         $entryPointContext = EntryPointContext::create(
             TestServiceCommand::create([]),
             new ParameterBag()
         );
 
-        $result = $this->kernel->handle($entryPointContext, $executionContext);
+        $result = $this->kernel->handle($entryPointContext, $this->context);
 
         static::assertInstanceOf(
             FulfilledPromise::class,
@@ -133,13 +143,12 @@ class AbstractKernelTest extends TestCase
      */
     public function testSuccessAndFailedMessage(): void
     {
-        $executionContext = new TestApplicationContext();
         $entryPointContext = EntryPointContext::create(
             TestServiceEvent::create([]),
             new ParameterBag()
         );
 
-        $result = $this->kernel->handle($entryPointContext, $executionContext);
+        $result = $this->kernel->handle($entryPointContext, $this->context);
 
         static::assertInstanceOf(
             FulfilledPromise::class,

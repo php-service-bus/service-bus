@@ -40,8 +40,10 @@ class SchedulerCompilerPass implements DependencyInjection\Compiler\CompilerPass
         if(false === $container->has($this->schedulerStorageKey))
         {
             throw new \LogicException(
-                'Can not find service "%s" in the dependency container. The scheduler storage must be configured',
-                $schedulerStorageKey
+                \sprintf(
+                    'Can not find service "%s" in the dependency container. The scheduler storage must be configured',
+                    $this->schedulerStorageKey
+                )
             );
         }
 
