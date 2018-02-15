@@ -17,6 +17,7 @@ use Bunny\Channel;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use Desperado\Domain\ThrowableFormatter;
 use Psr\Log\LoggerInterface;
+use function React\Promise\all;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 
@@ -25,9 +26,18 @@ use React\Promise\RejectedPromise;
  */
 class RabbitMqConsumer
 {
+    public const HEADER_DELIVERY_MODE_KEY = 'delivery-mode';
+    public const HEADER_DELAY_KEY = 'x-delay';
+
+    public const NON_PERSISTED_DELIVERY_MODE = 1;
+    public const PERSISTED_DELIVERY_MODE = 2;
+
     protected const EXCHANGE_TYPE_DIRECT = 'direct';
     protected const EXCHANGE_TYPE_FANOUT = 'fanout';
     protected const EXCHANGE_TYPE_TOPIC = 'topic';
+
+    /** Plugin rabbitmq_delayed_message_exchange must be enabled */
+    protected const EXCHANGE_TYPE_DELAYED = 'x-delayed-message';
 
     /**
      * Rabbit mq configuration
@@ -224,6 +234,35 @@ class RabbitMqConsumer
                         );
                 }
             )
+            /** Scheduler exchange */
+            ->then(
+                function() use ($channel, $entryPointName)
+                {
+                    return $channel->exchangeDeclare(
+                        \sprintf('%s.timeout', $entryPointName),
+                        self::EXCHANGE_TYPE_DELAYED,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        ['x-delayed-type' => self::EXCHANGE_TYPE_FANOUT]
+                    );
+                }
+            )
+            /** x-dead-letter-exchange queue */
+            ->then(
+                function() use ($channel, $entryPointName)
+                {
+                    return $channel->queueDeclare(
+                        \sprintf('%s.timeout', $entryPointName),
+                        false,
+                        true,
+                        false,
+                        false,
+                        false, ['x-dead-letter-exchange' => $entryPointName]);
+                }
+            )
             /** Messages (internal usage) queue */
             ->then(
                 function() use ($channel, $entryPointName)
@@ -234,29 +273,62 @@ class RabbitMqConsumer
                     );
                 }
             )
+            ->then(
+                function(MethodQueueDeclareOkFrame $frame) use ($channel, $entryPointName)
+                {
+                    return $channel
+                        ->queueBind($frame->queue, \sprintf('%s.timeout', $entryPointName))
+                        ->then(
+                            function() use ($channel, $frame)
+                            {
+                                return $frame;
+                            }
+                        );
+                }
+            )
             /** Configure routing keys for clients */
             ->then(
                 function(MethodQueueDeclareOkFrame $frame) use ($channel, $clients, $entryPointName)
                 {
-                    $promises = \array_map(
-                        function($routingKey) use ($frame, $channel, $entryPointName)
-                        {
-                            return $channel->queueBind(
-                                $frame->queue,
-                                $entryPointName,
-                                $routingKey
-                            );
-                        },
-                        $clients
-                    );
+                    return $this->doConfigureRoutingKeys($frame, $channel, $clients, $entryPointName);
+                }
+            );
+    }
 
-                    return \React\Promise\all($promises)
-                        ->then(
-                            function() use ($frame, $channel)
-                            {
-                                return [$frame, $channel];
-                            }
-                        );
+    /**
+     * Configure clients routing keys
+     *
+     * @param MethodQueueDeclareOkFrame $frame
+     * @param Channel                   $channel
+     * @param array                     $clients
+     * @param string                    $entryPointName
+     *
+     * @return PromiseInterface
+     */
+    private function doConfigureRoutingKeys(
+        MethodQueueDeclareOkFrame $frame,
+        Channel $channel,
+        array $clients,
+        string $entryPointName
+    ): PromiseInterface
+    {
+        $promises = \array_map(
+            function($routingKey) use ($frame, $channel, $entryPointName)
+            {
+                return $channel->queueBind(
+                    $frame->queue,
+                    $entryPointName,
+                    $routingKey
+                );
+            },
+            $clients
+        );
+
+        return all($promises)
+            ->then(
+                function() use ($frame, $channel)
+                {
+                    return [$frame, $channel];
                 }
             );
     }

@@ -45,14 +45,17 @@ class EntryPointCompilerPass implements DependencyInjection\Compiler\CompilerPas
      * @param string $kernelContainerKey
      * @param string $executionContextContainerKey
      */
-    public function __construct(string $transportContainerKey, string $kernelContainerKey, string $executionContextContainerKey)
+    public function __construct(
+        string $transportContainerKey,
+        string $kernelContainerKey,
+        string $executionContextContainerKey
+    )
     {
         $this->transportContainerKey = $transportContainerKey;
         $this->kernelContainerKey = $kernelContainerKey;
         $this->executionContextContainerKey = $executionContextContainerKey;
     }
-
-
+    
     /**
      * @inheritdoc
      */

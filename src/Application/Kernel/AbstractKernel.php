@@ -15,12 +15,12 @@ namespace Desperado\ServiceBus\Application\Kernel;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
-use Desperado\Saga\Service\Exceptions as SagaServiceExceptions;
-use Desperado\Saga\Service\SagaService;
+use Desperado\ServiceBus\Saga\Exceptions as SagaProviderExceptions;
 use Desperado\ServiceBus\Application\EntryPoint\EntryPointContext;
 use Desperado\ServiceBus\Application\Kernel\Events as KernelEvents;
 use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
+use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Services;
 use Desperado\ServiceBus\Task\CompletedTask;
 use Psr\Log\LoggerInterface;
@@ -43,9 +43,9 @@ abstract class AbstractKernel
     /**
      * Sagas service
      *
-     * @var SagaService
+     * @var SagaProvider
      */
-    private $sagaService;
+    private $sagaProvider;
 
     /**
      * Message bus
@@ -70,23 +70,23 @@ abstract class AbstractKernel
 
     /**
      * @param MessageBusBuilder $messageBusBuilder
-     * @param SagaService       $sagaService
+     * @param SagaProvider      $sagaProvider
      * @param EventDispatcher   $dispatcher
      * @param LoggerInterface   $logger
      *
      * @throws Services\Exceptions\ServiceConfigurationExceptionInterface
-     * @throws SagaServiceExceptions\ClosedMessageBusException
+     * @throws SagaProviderExceptions\ClosedMessageBusException
      */
     final public function __construct(
         MessageBusBuilder $messageBusBuilder,
-        SagaService $sagaService,
+        SagaProvider $sagaProvider,
         EventDispatcher $dispatcher,
         LoggerInterface $logger
     )
     {
         $this->messageBusBuilder = $messageBusBuilder;
         $this->eventDispatcher = $dispatcher;
-        $this->sagaService = $sagaService;
+        $this->sagaProvider = $sagaProvider;
         $this->logger = $logger;
 
         $this->configureSagas();
@@ -191,17 +191,17 @@ abstract class AbstractKernel
      *
      * @return void
      *
-     * @throws SagaServiceExceptions\ClosedMessageBusException
+     * @throws SagaProviderExceptions\ClosedMessageBusException
      */
     private function configureSagas(): void
     {
         foreach($this->getSagasList() as $saga)
         {
-            $this->sagaService->configure($saga);
+            $this->sagaProvider->configure($saga);
 
             /** Add saga listeners to message bus */
 
-            foreach($this->sagaService->getSagaListeners($saga) as $listener)
+            foreach($this->sagaProvider->getSagaListeners($saga) as $listener)
             {
                 $this->messageBusBuilder->pushMessageHandler(
                     Services\Handlers\MessageHandlerData::new(

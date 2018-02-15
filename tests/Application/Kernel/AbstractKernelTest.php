@@ -14,7 +14,7 @@ namespace Desperado\ServiceBus\Tests\Application\Kernel;
 
 use Desperado\Domain\ParameterBag;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
-use Desperado\Saga\Service\SagaService;
+use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Application\EntryPoint\EntryPointContext;
 use Desperado\ServiceBus\Application\Kernel\AbstractKernel;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
@@ -58,14 +58,14 @@ class AbstractKernelTest extends TestCase
         $logger = new NullLogger();
         $builder = new MessageBusBuilder($serviceHandlersExtractor, $eventDispatcher, $logger);
 
-        /** @var SagaService $sagaService */
-        $sagaService = self::getMockBuilder(SagaService::class)
+        /** @var SagaProvider $sagaProvider */
+        $sagaProvider = self::getMockBuilder(SagaProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->kernel = new TestKernel(
             $builder,
-            $sagaService,
+            $sagaProvider,
             $eventDispatcher,
             new NullLogger()
         );

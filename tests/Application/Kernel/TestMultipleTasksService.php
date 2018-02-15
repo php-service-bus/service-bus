@@ -13,19 +13,19 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Application\Kernel;
 
 use Desperado\ServiceBus\Annotations;
-use Desperado\ServiceBus\Services\ServiceInterface;
+use Desperado\ServiceBus\ServiceInterface;
 use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceEvent;
 use Desperado\ServiceBus\Tests\TestApplicationContext;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
 /**
- * @Annotations\Service()
+ * @Annotations\Services\Service()
  */
 class TestMultipleTasksService implements ServiceInterface
 {
     /**
-     * @Annotations\EventHandler()
+     * @Annotations\Services\EventHandler()
      *
      * @param TestServiceEvent       $event
      * @param TestApplicationContext $context
@@ -41,7 +41,7 @@ class TestMultipleTasksService implements ServiceInterface
     }
 
     /**
-     * @Annotations\EventHandler()
+     * @Annotations\Services\EventHandler()
      *
      * @param TestServiceEvent       $event
      * @param TestApplicationContext $context

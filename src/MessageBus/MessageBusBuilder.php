@@ -17,7 +17,7 @@ use Desperado\ServiceBus\Task\Behaviors;
 use Desperado\ServiceBus\Services\Handlers;
 use Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException;
 use Desperado\ServiceBus\Services\ServiceHandlersExtractorInterface;
-use Desperado\ServiceBus\Services\ServiceInterface;
+use Desperado\ServiceBus\ServiceInterface;
 use Desperado\ServiceBus\Task\Task;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;

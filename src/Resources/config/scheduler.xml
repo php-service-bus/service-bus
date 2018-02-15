@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <!-- Scheduler provider -->
+        <service
+                id="service_bus.scheduler.provider"
+                class="Desperado\ServiceBus\Scheduler\SchedulerProvider"
+                public="false">
+            <argument/>
+        </service>
+
+        <!-- Scheduler listener -->
+        <service
+                id="service_bus.scheduler.listener_service"
+                class="Desperado\ServiceBus\Scheduler\SchedulerListenerService">
+            <argument>%service_bus.entry_point%</argument>
+            <argument type="service" id="service_bus.scheduler.provider"/>
+
+            <tag name="service_bus.service"/>
+        </service>
+    </services>
+</container>

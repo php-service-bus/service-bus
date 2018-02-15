@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\Kernel\EventListeners;
 
-use Desperado\Saga\Service\SagaService;
+use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Application\Kernel\Events\MessageProcessingCompletedEvent;
 
 /**
@@ -23,16 +23,16 @@ class AfterMessageExecutionListener
     /**
      * Sagas service
      *
-     * @var SagaService
+     * @var SagaProvider
      */
-    private $sagaService;
+    private $sagaProvider;
 
     /**
-     * @param SagaService $sagaService
+     * @param SagaProvider $sagaProvider
      */
-    public function __construct(SagaService $sagaService)
+    public function __construct(SagaProvider $sagaProvider)
     {
-        $this->sagaService = $sagaService;
+        $this->sagaProvider = $sagaProvider;
     }
 
     /**
@@ -44,6 +44,6 @@ class AfterMessageExecutionListener
      */
     public final function onComplete(MessageProcessingCompletedEvent $event): void
     {
-        $this->sagaService->flush($event->getExecutionContext());
+        $this->sagaProvider->flush($event->getExecutionContext());
     }
 }

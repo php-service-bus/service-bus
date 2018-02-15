@@ -17,7 +17,7 @@ use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
 use Desperado\ServiceBus\Services\AnnotationsExtractor;
 use Desperado\ServiceBus\Services\AutowiringServiceLocator;
 use Desperado\ServiceBus\Services\Handlers\MessageHandlerData;
-use Desperado\ServiceBus\Services\ServiceInterface;
+use Desperado\ServiceBus\ServiceInterface;
 use Desperado\ServiceBus\Tests\Services\Stabs;
 use Desperado\ServiceBus\Tests\TestApplicationContext;
 use Desperado\ServiceBus\Tests\TestContainer;
@@ -140,7 +140,7 @@ class AnnotationsExtractorTest extends TestCase
             new class() implements ServiceInterface
             {
                 /**
-                 * @Annotations\CommandHandler()
+                 * @Annotations\Services\CommandHandler()
                  *
                  * @param Stabs\TestServiceCommand     $command
                  * @param TestApplicationContext $context
@@ -187,7 +187,7 @@ class AnnotationsExtractorTest extends TestCase
             new class() implements ServiceInterface
             {
                 /**
-                 * @Annotations\CommandHandler()
+                 * @Annotations\Services\CommandHandler()
                  *
                  * @param Stabs\TestServiceCommand     $command
                  * @param TestApplicationContext       $context
@@ -227,7 +227,7 @@ class AnnotationsExtractorTest extends TestCase
             new class() implements ServiceInterface
             {
                 /**
-                 * @Annotations\CommandHandler()
+                 * @Annotations\Services\CommandHandler()
                  *
                  * @param Stabs\TestServiceCommand     $command
                  * @param TestApplicationContext       $context
@@ -262,7 +262,7 @@ class AnnotationsExtractorTest extends TestCase
             new class() implements ServiceInterface
             {
                 /**
-                 * @Annotations\CommandHandler()
+                 * @Annotations\Services\CommandHandler()
                  *
                  * @param Stabs\TestServiceCommand $command
                  * @param TestApplicationContext   $context
@@ -294,7 +294,7 @@ class AnnotationsExtractorTest extends TestCase
             new class() implements ServiceInterface
             {
                 /**
-                 * @Annotations\CommandHandler()
+                 * @Annotations\Services\CommandHandler()
                  *
                  * @return void
                  */
@@ -318,7 +318,7 @@ class AnnotationsExtractorTest extends TestCase
             new class() implements ServiceInterface
             {
                 /**
-                 * @Annotations\CommandHandler()
+                 * @Annotations\Services\CommandHandler()
                  *
                  * @param TestApplicationContext   $context
                  * @param Stabs\TestServiceCommand $command
@@ -348,7 +348,7 @@ class AnnotationsExtractorTest extends TestCase
             new class() implements ServiceInterface
             {
                 /**
-                 * @Annotations\CommandHandler()
+                 * @Annotations\Services\CommandHandler()
                  *
                  * @param Stabs\TestServiceCommand $command
                  * @param \stdClass                $class
@@ -375,7 +375,7 @@ class AnnotationsExtractorTest extends TestCase
             new class() implements ServiceInterface
             {
                 /**
-                 * @Annotations\CommandHandler()
+                 * @Annotations\Services\CommandHandler()
                  *
                  * @param Stabs\TestServiceCommand $command
                  * @param TestApplicationContext   $context

@@ -12,13 +12,18 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\Context;
 
+use Desperado\Domain\DateTime;
 use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
+use Desperado\ServiceBus\Application\Context\Exceptions\CancelScheduledCommandFailedException;
 use Desperado\ServiceBus\Application\Context\Exceptions\OutboundContextNotAppliedException;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
+use Desperado\ServiceBus\Application\Context\Exceptions\ScheduleCommandFailedException;
+use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
+use Desperado\ServiceBus\Scheduler\SchedulerProvider;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -27,6 +32,74 @@ use Psr\Log\LogLevel;
  */
 abstract class AbstractExecutionContext implements ExecutionContextInterface
 {
+    /**
+     * Scheduler provider
+     *
+     * @var SchedulerProvider
+     */
+    private $schedulerProvider;
+
+    /**
+     * @param SchedulerProvider $schedulerProvider
+     */
+    public function __construct(SchedulerProvider $schedulerProvider)
+    {
+        $this->schedulerProvider = $schedulerProvider;
+    }
+
+    /**
+     * Schedule the task at the specified time
+     *
+     * @param ScheduledCommandIdentifier $id
+     * @param AbstractCommand            $command
+     * @param DateTime                   $delay
+     *
+     * @return void
+     *
+     * @throws ScheduleCommandFailedException
+     */
+    public function scheduleCommand(ScheduledCommandIdentifier $id, AbstractCommand $command, DateTime $delay): void
+    {
+        try
+        {
+            $this->schedulerProvider->scheduleCommand($id, $command, $delay, $this);
+
+            $this
+                ->getLogger('scheduler')
+                ->debug(
+                    \sprintf('The execution of the command "%s" is postponed until "%s"',
+                        \get_class($command), $delay->toString()
+                    )
+                );
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new ScheduleCommandFailedException($throwable->getMessage(), 0, $throwable);
+        }
+    }
+
+    /**
+     * Cancel scheduled task execution
+     *
+     * @param ScheduledCommandIdentifier $id
+     * @param string|null                $reason
+     *
+     * @return void
+     *
+     * @throws CancelScheduledCommandFailedException
+     */
+    public function cancelScheduledCommand(ScheduledCommandIdentifier $id, ?string $reason = null): void
+    {
+        try
+        {
+            $this->schedulerProvider->cancelScheduledCommand($id, $this, $reason);
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new CancelScheduledCommandFailedException($throwable->getMessage(), 0, $throwable);
+        }
+    }
+
     /**
      * @inheritdoc
      *
@@ -132,6 +205,16 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      * @return LoggerInterface
      */
     abstract protected function getLogger(string $channelName): LoggerInterface;
+
+    /**
+     * Get scheduler provider
+     *
+     * @return SchedulerProvider
+     */
+    final protected function getSchedulerProvider(): SchedulerProvider
+    {
+        return $this->schedulerProvider;
+    }
 
     /**
      * @return void
