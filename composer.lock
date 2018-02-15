@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e80ec3bef6866909fe472f867c7a324e",
+    "content-hash": "2333dc10eeb77d1d238b42e1341cb2c0",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -870,16 +870,16 @@
         },
         {
             "name": "mmasiukevich/infrastructure",
-            "version": "v0.0.1",
+            "version": "v0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "5d4feb4867c534c8167d04a66bd1ca40e11c73bd"
+                "reference": "9d15b00aca182175cb94f0c8af0595552338d3b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/5d4feb4867c534c8167d04a66bd1ca40e11c73bd",
-                "reference": "5d4feb4867c534c8167d04a66bd1ca40e11c73bd",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/9d15b00aca182175cb94f0c8af0595552338d3b6",
+                "reference": "9d15b00aca182175cb94f0c8af0595552338d3b6",
                 "shasum": ""
             },
             "require": {
@@ -923,7 +923,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2018-02-08T08:34:07+00:00"
+            "time": "2018-02-15T15:18:41+00:00"
         },
         {
             "name": "mmasiukevich/message-serializer",
@@ -3431,16 +3431,16 @@
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "6.0.0",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "e495e5d3660321b62c294d8c0e954d02d6ce2573"
+                "reference": "e3249dedc2d99259ccae6affbc2684eac37c2e53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/e495e5d3660321b62c294d8c0e954d02d6ce2573",
-                "reference": "e495e5d3660321b62c294d8c0e954d02d6ce2573",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/e3249dedc2d99259ccae6affbc2684eac37c2e53",
+                "reference": "e3249dedc2d99259ccae6affbc2684eac37c2e53",
                 "shasum": ""
             },
             "require": {
@@ -3483,7 +3483,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2018-02-01T13:11:13+00:00"
+            "time": "2018-02-15T05:27:38+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

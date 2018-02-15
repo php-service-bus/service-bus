@@ -23,7 +23,7 @@
   },
   "require": {
     "php": ">=7.1",
-    "mmasiukevich/infrastructure": "v0.0.1",
+    "mmasiukevich/infrastructure": "v0.0.2",
     "mmasiukevich/message-serializer": "v0.0.1",
     "mmasiukevich/event-sourcing": "v0.0.1",
     "symfony/dotenv": "v4.0.4",
