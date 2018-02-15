@@ -16,6 +16,8 @@ use Desperado\Domain\DomainExceptionInterface;
 
 /**
  * The service bus component exception marker
+ *
+ * @api
  */
 interface ServiceBusExceptionInterface extends DomainExceptionInterface
 {

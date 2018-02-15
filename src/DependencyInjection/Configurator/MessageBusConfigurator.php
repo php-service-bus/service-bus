@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\DependencyInjection\Configurator;
 
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
-use Desperado\ServiceBus\Services\ServiceInterface;
+use Desperado\ServiceBus\ServiceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

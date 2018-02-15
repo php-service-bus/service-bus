@@ -10,12 +10,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Services;
+namespace Desperado\ServiceBus\Tests\Saga\Processor\Negative;
+
+use Desperado\Domain\Message\AbstractEvent;
 
 /**
- * Service marker interface
+ *
  */
-interface ServiceInterface
+class NotContainsIdentityKeyEvent extends AbstractEvent
 {
 
 }

@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Services;
 
+use Desperado\ServiceBus\ServiceInterface;
 use Desperado\ServiceBus\Services\Handlers\MessageHandlersCollection;
 
 /**

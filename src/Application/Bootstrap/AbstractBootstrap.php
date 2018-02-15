@@ -254,6 +254,7 @@ abstract class AbstractBootstrap
         ];
 
         $containerParameters = new SymfonyDependencyInjection\ParameterBag\ParameterBag([
+            'service_bus.entry_point'  => $this->configuration->getEntryPointName(),
             'service_bus.root_dir'     => $this->rootDirectoryPath,
             'service_bus.cache_dir'    => $this->cacheDirectoryPath,
             'service_bus.is_debug_env' => $this->configuration->getEnvironment()->isDebug()

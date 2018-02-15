@@ -2,9 +2,7 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-
     <services>
-
         <!-- Application entry point -->
         <service id="service_bus.entry_point"
                  class="Desperado\ServiceBus\Application\EntryPoint\EntryPoint"
@@ -14,7 +12,5 @@
             <argument/>
             <argument/>
         </service>
-
     </services>
-
 </container>

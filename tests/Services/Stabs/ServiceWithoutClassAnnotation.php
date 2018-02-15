@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Services\Stabs;
 
-use Desperado\ServiceBus\Services\ServiceInterface;
+use Desperado\ServiceBus\ServiceInterface;
 
 /**
  *

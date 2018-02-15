@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Services\Exceptions;
 
-use Desperado\ServiceBus\Annotations\Service;
+use Desperado\ServiceBus\Annotations\Services\Service;
 
 /**
  * The class level annotation is not found in the service

@@ -2,35 +2,30 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-
     <services>
-
-
         <!-- Saga serializer -->
-        <service id="service_bus.sagas.serializer" class="Desperado\Saga\Serializer\SagaSerializer"/>
+        <service id="service_bus.sagas.serializer" class="Desperado\ServiceBus\Saga\Serializer\SagaSerializer"/>
 
         <!-- Saga store -->
-        <service id="service_bus.sagas.store" class="Desperado\Saga\Store\SagaStore" public="false">
+        <service id="service_bus.sagas.store" class="Desperado\ServiceBus\Saga\Store\SagaStore" public="false">
             <argument/>
             <argument type="service" id="service_bus.sagas.serializer"/>
         </service>
 
         <!-- Configuration extractor -->
         <service id="service_bus.sagas.configuration_extractor"
-                 class="Desperado\Saga\Service\Configuration\AnnotationsSagaConfigurationExtractor"
+                 class="Desperado\ServiceBus\Saga\Configuration\AnnotationsSagaConfigurationExtractor"
                  public="false">
             <argument type="service" id="service_bus.infrastructure.annotations_reader"/>
         </service>
 
         <!-- Saga service -->
-        <service id="service_bus.sagas.service" class="Desperado\Saga\Service\SagaService" public="true">
+        <service id="service_bus.sagas.provider" class="Desperado\ServiceBus\SagaProvider" public="true">
             <argument type="service" id="service_bus.sagas.store"/>
             <argument type="service" id="service_bus.sagas.configuration_extractor"/>
             <argument type="service" id="service_bus.logger"/>
 
             <tag name="service_bus.logger" channel="sagas"/>
         </service>
-
     </services>
-
 </container>

@@ -16,6 +16,8 @@ use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 
 /**
  * Module interface
+ *
+ * @api
  */
 interface ModuleInterface
 {
