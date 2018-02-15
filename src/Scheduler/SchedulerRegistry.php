@@ -86,10 +86,7 @@ class SchedulerRegistry implements \Serializable
         SchedulerGuard::guardOperationExecutionDate($scheduledOperation->getDate());
 
         $this->operations[$id] = $scheduledOperation;
-        $this->timetable[$id] = (int) \bcmul(
-            $scheduledOperation->getDate()->toString('U.u'),
-            '1000'
-        );
+        $this->timetable[$id] = (int) $scheduledOperation->getDate()->toString('U.u') * 1000;
     }
 
     /**

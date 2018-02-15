@@ -63,6 +63,14 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
         try
         {
             $this->schedulerProvider->scheduleCommand($id, $command, $delay, $this);
+
+            $this
+                ->getLogger('scheduler')
+                ->debug(
+                    \sprintf('The execution of the command "%s" is postponed until "%s"',
+                        \get_class($command), $delay->toString()
+                    )
+                );
         }
         catch(\Throwable $throwable)
         {
@@ -197,6 +205,16 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      * @return LoggerInterface
      */
     abstract protected function getLogger(string $channelName): LoggerInterface;
+
+    /**
+     * Get scheduler provider
+     *
+     * @return SchedulerProvider
+     */
+    final protected function getSchedulerProvider(): SchedulerProvider
+    {
+        return $this->schedulerProvider;
+    }
 
     /**
      * @return void

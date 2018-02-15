@@ -23,7 +23,7 @@ use Desperado\ServiceBus\Scheduler\Contract;
 use Desperado\ServiceBus\Transport\RabbitMqTransport\RabbitMqConsumer;
 
 /**
- * @Annotations\Service(
+ * @Annotations\Services\Service(
  *     loggerChannel="scheduler"
  * )
  */
@@ -54,7 +54,7 @@ class SchedulerListenerService implements ServiceInterface
     }
 
     /**
-     * @Annotations\CommandHandler()
+     * @Annotations\Services\CommandHandler()
      *
      * @param Contract\Command\EmitSchedulerOperationCommand $command
      * @param ExecutionContextInterface                      $context
@@ -73,7 +73,7 @@ class SchedulerListenerService implements ServiceInterface
     }
 
     /**
-     * @Annotations\CommandHandler()
+     * @Annotations\Services\CommandHandler()
      *
      * @param Contract\Command\CancelSchedulerOperationCommand $command
      * @param ExecutionContextInterface                        $context
@@ -93,7 +93,7 @@ class SchedulerListenerService implements ServiceInterface
     }
 
     /**
-     * @Annotations\EventHandler()
+     * @Annotations\Services\EventHandler()
      *
      * @param Contract\Event\SchedulerOperationEmittedEvent $event
      * @param ExecutionContextInterface                     $context
@@ -109,7 +109,7 @@ class SchedulerListenerService implements ServiceInterface
     }
 
     /**
-     * @Annotations\EventHandler()
+     * @Annotations\Services\EventHandler()
      *
      * @param Contract\Event\SchedulerOperationCanceledEvent $event
      * @param ExecutionContextInterface                      $context
@@ -118,6 +118,22 @@ class SchedulerListenerService implements ServiceInterface
      */
     public function whenSchedulerOperationCanceledEvent(
         Contract\Event\SchedulerOperationCanceledEvent $event,
+        ExecutionContextInterface $context
+    ): void
+    {
+        $this->processNextOperationEmit($event, $context);
+    }
+
+    /**
+     * @Annotations\Services\EventHandler()
+     *
+     * @param Contract\Event\OperationScheduledEvent $event
+     * @param ExecutionContextInterface              $context
+     *
+     * @return void
+     */
+    public function whenOperationScheduledEvent(
+        Contract\Event\OperationScheduledEvent $event,
         ExecutionContextInterface $context
     ): void
     {
@@ -148,6 +164,7 @@ class SchedulerListenerService implements ServiceInterface
                     \sprintf('%s.timeout', $this->entryPointName),
                     null,
                     new ParameterBag([
+                        'expiration' => 0,
                         RabbitMqConsumer::HEADER_DELIVERY_MODE_KEY => RabbitMqConsumer::PERSISTED_DELIVERY_MODE,
                         RabbitMqConsumer::HEADER_DELAY_KEY         => $this->calculateExecutionDelay($nextOperation)
                     ])

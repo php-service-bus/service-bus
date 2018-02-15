@@ -112,10 +112,11 @@ class RabbitMqPublisher
         {
             $this->logger->debug(
                 \sprintf(
-                    'The message with the contents of "%s" was sent to the exchange "%s" with the routing key "%s"',
+                    'The message with the contents of "%s" was sent to the exchange "%s" with the routing key "%s" and headers "%s"',
                     $message->getBody(),
                     $message->getExchange(),
-                    $message->getRoutingKey()
+                    $message->getRoutingKey(),
+                    \urldecode(\http_build_query($message->getHeaders()->all()))
                 )
             );
         }

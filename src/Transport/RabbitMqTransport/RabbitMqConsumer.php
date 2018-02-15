@@ -273,6 +273,19 @@ class RabbitMqConsumer
                     );
                 }
             )
+            ->then(
+                function(MethodQueueDeclareOkFrame $frame) use ($channel, $entryPointName)
+                {
+                    return $channel
+                        ->queueBind($frame->queue, \sprintf('%s.timeout', $entryPointName))
+                        ->then(
+                            function() use ($channel, $frame)
+                            {
+                                return $frame;
+                            }
+                        );
+                }
+            )
             /** Configure routing keys for clients */
             ->then(
                 function(MethodQueueDeclareOkFrame $frame) use ($channel, $clients, $entryPointName)

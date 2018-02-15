@@ -44,7 +44,7 @@ class DoctrineSchedulerStorage implements SchedulerStorageInterface
         {
             $result = $this->connection
                 ->createQueryBuilder()
-                ->select()
+                ->select('*')
                 ->from(SchemaBuilder::TABLE_NAME_SCHEDULER)
                 ->where('id = ?')
                 ->setParameters([$id])

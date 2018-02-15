@@ -235,22 +235,25 @@ abstract class AbstractBootstrap
         $configData = $this->configuration->toArray();
 
         $applicationCompilerPass = [
-            'logger_channel'  => new ServiceBusDependencyInjection\Compiler\LoggerChannelsCompilerPass(),
-            'modules'         => new ServiceBusDependencyInjection\Compiler\ModulesCompilerPass(),
-            'saga_storage'    => new ServiceBusDependencyInjection\Compiler\SagaStorageCompilerPass(
+            'logger_channel'    => new ServiceBusDependencyInjection\Compiler\LoggerChannelsCompilerPass(),
+            'modules'           => new ServiceBusDependencyInjection\Compiler\ModulesCompilerPass(),
+            'scheduler_storage' => new ServiceBusDependencyInjection\Compiler\SchedulerCompilerPass(
+                $bootstrapServicesDefinitions->getSchedulerStorageKey()
+            ),
+            'saga_storage'      => new ServiceBusDependencyInjection\Compiler\SagaStorageCompilerPass(
                 $bootstrapServicesDefinitions->getSagaStorageKey()
             ),
-            'entry_point'     => new ServiceBusDependencyInjection\Compiler\EntryPointCompilerPass(
+            'entry_point'       => new ServiceBusDependencyInjection\Compiler\EntryPointCompilerPass(
                 $bootstrapServicesDefinitions->getMessageTransportKey(),
                 $bootstrapServicesDefinitions->getKernelKey(),
                 $bootstrapServicesDefinitions->getApplicationContextKey()
             ),
-            'event_listeners' => new RegisterListenersPass(
+            'event_listeners'   => new RegisterListenersPass(
                 'service_bus.event_dispatcher',
                 'service_bus.event_listener',
                 'service_bus.event_subscriber'
             ),
-            'services'        => new ServiceBusDependencyInjection\Compiler\ServicesCompilerPass()
+            'services'          => new ServiceBusDependencyInjection\Compiler\ServicesCompilerPass()
         ];
 
         $containerParameters = new SymfonyDependencyInjection\ParameterBag\ParameterBag([

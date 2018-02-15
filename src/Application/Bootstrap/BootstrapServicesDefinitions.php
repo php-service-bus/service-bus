@@ -39,6 +39,13 @@ class BootstrapServicesDefinitions
     private $sagaStorageKey;
 
     /**
+     * The key under which the container stores a description of the storage service of the scheduler
+     *
+     * @var string
+     */
+    private $schedulerStorageKey;
+
+    /**
      * The key under which the container contains the description of the context for executing the application layer
      *
      * @var string
@@ -49,6 +56,7 @@ class BootstrapServicesDefinitions
      * @param string $messageTransportKey
      * @param string $kernelKey
      * @param string $sagaStorageKey
+     * @param string $schedulerStorageKey
      * @param string $applicationContextKey
      *
      * @return BootstrapServicesDefinitions
@@ -57,6 +65,7 @@ class BootstrapServicesDefinitions
         string $messageTransportKey,
         string $kernelKey,
         string $sagaStorageKey,
+        string $schedulerStorageKey,
         string $applicationContextKey
     ): self
     {
@@ -65,6 +74,7 @@ class BootstrapServicesDefinitions
         $self->messageTransportKey = $messageTransportKey;
         $self->kernelKey = $kernelKey;
         $self->sagaStorageKey = $sagaStorageKey;
+        $self->schedulerStorageKey = $schedulerStorageKey;
         $self->applicationContextKey = $applicationContextKey;
 
         return $self;
@@ -98,6 +108,16 @@ class BootstrapServicesDefinitions
     public function getSagaStorageKey(): string
     {
         return $this->sagaStorageKey;
+    }
+
+    /**
+     * Get key under which the container stores a description of the storage service of the scheduler
+     *
+     * @return string
+     */
+    public function getSchedulerStorageKey(): string
+    {
+        return $this->schedulerStorageKey;
     }
 
     /**

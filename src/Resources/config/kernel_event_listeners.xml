@@ -12,7 +12,7 @@
         <service id="service_bus.kernel_event_listeners.after_message_execution"
                  class="Desperado\ServiceBus\Application\Kernel\EventListeners\AfterMessageExecutionListener"
                  public="false">
-            <argument type="service" id="service_bus.sagas.service"/>
+            <argument type="service" id="service_bus.sagas.provider"/>
 
             <tag name="service_bus.event_listener"
                  event="service_bus.kernel_events.after_execution"

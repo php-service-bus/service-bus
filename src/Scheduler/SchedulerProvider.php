@@ -71,14 +71,14 @@ class SchedulerProvider
     {
         $scheduledOperation = ScheduledOperation::new($id, $command, $executionDate);
 
+        $registry = $this->addToRegistry($scheduledOperation);
+
         $context->delivery(
             OperationScheduledEvent::create([
-                'id'               => $id,
+                'id'               => $id->toString(),
                 'commandNamespace' => \get_class($scheduledOperation->getCommand()),
                 'executionDate'    => (string) $scheduledOperation->getDate(),
-                'nextOperation'    => $this
-                    ->addToRegistry($scheduledOperation)
-                    ->fetchNextOperation()
+                'nextOperation'    => $registry->fetchNextOperation()
             ])
         );
     }
@@ -100,8 +100,13 @@ class SchedulerProvider
         if(null !== $operation)
         {
             $registry = $this->removeFromRegistry($id);
+            $command = $operation->getCommand();
 
-            $context->delivery($operation->getCommand());
+            $context->delivery($command);
+
+            $context->logContextMessage(
+                \sprintf('The delayed "%s" command has been sent to the queue', \get_class($command))
+            );
         }
 
         $context->delivery(
@@ -151,7 +156,7 @@ class SchedulerProvider
         $registry = $this->obtainSchedulerRegistry();
         $registry->remove($id);
 
-        $this->storage->update($id->toString(), \serialize($registry));
+        $this->storage->update($this->registryIdentifier, \serialize($registry));
 
         return $registry;
     }
@@ -168,7 +173,7 @@ class SchedulerProvider
         $registry = $this->obtainSchedulerRegistry();
         $registry->add($operation);
 
-        $this->storage->update($operation->getId()->toString(), \serialize($registry));
+        $this->storage->update($this->registryIdentifier, \serialize($registry));
 
         return $registry;
     }
