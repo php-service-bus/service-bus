@@ -14,7 +14,6 @@ namespace Desperado\ServiceBus\Scheduler;
 
 use Desperado\Domain\DateTime;
 use Desperado\Domain\Message\AbstractCommand;
-use Desperado\Domain\ParameterBag;
 use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 
 /**
@@ -51,28 +50,19 @@ class ScheduledOperation
     private $isSent = false;
 
     /**
-     * Headers
-     *
-     * @var ParameterBag
-     */
-    private $headersBag;
-
-    /**
      * @param ScheduledCommandIdentifier $id
      * @param AbstractCommand            $command
      * @param DateTime                   $dateTime
-     * @param ParameterBag|null          $headersBag
      *
      * @return ScheduledOperation
      */
     public static function new(
         ScheduledCommandIdentifier $id,
         AbstractCommand $command,
-        DateTime $dateTime,
-        ParameterBag $headersBag = null
+        DateTime $dateTime
     ): self
     {
-        $self = new self($id, $command, $dateTime, $headersBag ?? new ParameterBag());
+        $self = new self($id, $command, $dateTime);
         $self->isSent = false;
 
         return $self;
@@ -85,7 +75,7 @@ class ScheduledOperation
      */
     public function sent(): self
     {
-        $self = new self($this->id, $this->command, $this->date, $this->headersBag);
+        $self = new self($this->id, $this->command, $this->date);
         $self->isSent = true;
 
         return $self;
@@ -122,16 +112,6 @@ class ScheduledOperation
     }
 
     /**
-     * Get headers
-     *
-     * @return ParameterBag
-     */
-    public function getHeadersBag(): ParameterBag
-    {
-        return $this->headersBag;
-    }
-
-    /**
      * Get sent flag
      *
      * @return bool
@@ -145,18 +125,15 @@ class ScheduledOperation
      * @param ScheduledCommandIdentifier $id
      * @param AbstractCommand            $command
      * @param DateTime                   $dateTime
-     * @param ParameterBag               $headersBag
      */
     private function __construct(
         ScheduledCommandIdentifier $id,
         AbstractCommand $command,
-        DateTime $dateTime,
-        ParameterBag $headersBag
+        DateTime $dateTime
     )
     {
         $this->id = $id;
         $this->command = $command;
         $this->date = $dateTime;
-        $this->headersBag = $headersBag;
     }
 }

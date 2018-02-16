@@ -10,36 +10,24 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Scheduler\Contract\Event;
+namespace Desperado\ServiceBus\Scheduler\Events;
 
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\ServiceBus\Scheduler\NextScheduledOperation;
 
 /**
+ * Scheduler operation completed
  *
+ * @see EmitSchedulerOperationCommand
  */
-final class OperationScheduledEvent extends AbstractEvent
+final class SchedulerOperationEmittedEvent extends AbstractEvent
 {
     /**
-     * Operation identifier
+     * Scheduled operation identifier
      *
      * @var string
      */
     protected $id;
-
-    /**
-     * Command namespace
-     *
-     * @var string
-     */
-    protected $commandNamespace;
-
-    /**
-     * Execution date
-     *
-     * @var string
-     */
-    protected $executionDate;
 
     /**
      * Next operation data
@@ -49,33 +37,13 @@ final class OperationScheduledEvent extends AbstractEvent
     protected $nextOperation;
 
     /**
-     * Get identifier
+     * Get scheduled operation identifier
      *
      * @return string
      */
     public function getId(): string
     {
         return $this->id;
-    }
-
-    /**
-     * Get command namespace
-     *
-     * @return string
-     */
-    public function getCommandNamespace(): string
-    {
-        return $this->commandNamespace;
-    }
-
-    /**
-     * Get execution date
-     *
-     * @return string
-     */
-    public function getExecutionDate(): string
-    {
-        return $this->executionDate;
     }
 
     /**

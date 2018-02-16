@@ -17,9 +17,7 @@ use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ParameterBag;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\Annotations;
-use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 use Desperado\ServiceBus\ServiceInterface;
-use Desperado\ServiceBus\Scheduler\Contract;
 use Desperado\ServiceBus\Transport\RabbitMqTransport\RabbitMqConsumer;
 
 /**
@@ -54,54 +52,15 @@ class SchedulerListenerService implements ServiceInterface
     }
 
     /**
-     * @Annotations\Services\CommandHandler()
-     *
-     * @param Contract\Command\EmitSchedulerOperationCommand $command
-     * @param ExecutionContextInterface                      $context
-     *
-     * @return void
-     */
-    public function executeEmitOperation(
-        Contract\Command\EmitSchedulerOperationCommand $command,
-        ExecutionContextInterface $context
-    ): void
-    {
-        $this->schedulerProvider->emitCommand(
-            new ScheduledCommandIdentifier($command->getId()),
-            $context
-        );
-    }
-
-    /**
-     * @Annotations\Services\CommandHandler()
-     *
-     * @param Contract\Command\CancelSchedulerOperationCommand $command
-     * @param ExecutionContextInterface                        $context
-     *
-     * @return void
-     */
-    public function executeCancelSchedulerOperationCommand(
-        Contract\Command\CancelSchedulerOperationCommand $command,
-        ExecutionContextInterface $context
-    ): void
-    {
-        $this->schedulerProvider->cancelScheduledCommand(
-            new ScheduledCommandIdentifier($command->getId()),
-            $context,
-            $command->getReason()
-        );
-    }
-
-    /**
      * @Annotations\Services\EventHandler()
      *
-     * @param Contract\Event\SchedulerOperationEmittedEvent $event
-     * @param ExecutionContextInterface                     $context
+     * @param Events\SchedulerOperationEmittedEvent $event
+     * @param ExecutionContextInterface             $context
      *
      * @return void
      */
     public function whenSchedulerOperationEmittedEvent(
-        Contract\Event\SchedulerOperationEmittedEvent $event,
+        Events\SchedulerOperationEmittedEvent $event,
         ExecutionContextInterface $context
     ): void
     {
@@ -111,29 +70,29 @@ class SchedulerListenerService implements ServiceInterface
     /**
      * @Annotations\Services\EventHandler()
      *
-     * @param Contract\Event\SchedulerOperationCanceledEvent $event
-     * @param ExecutionContextInterface                      $context
-     *
-     * @return void
-     */
-    public function whenSchedulerOperationCanceledEvent(
-        Contract\Event\SchedulerOperationCanceledEvent $event,
-        ExecutionContextInterface $context
-    ): void
-    {
-        $this->processNextOperationEmit($event, $context);
-    }
-
-    /**
-     * @Annotations\Services\EventHandler()
-     *
-     * @param Contract\Event\OperationScheduledEvent $event
+     * @param Events\SchedulerOperationCanceledEvent $event
      * @param ExecutionContextInterface              $context
      *
      * @return void
      */
+    public function whenSchedulerOperationCanceledEvent(
+        Events\SchedulerOperationCanceledEvent $event,
+        ExecutionContextInterface $context
+    ): void
+    {
+        $this->processNextOperationEmit($event, $context);
+    }
+
+    /**
+     * @Annotations\Services\EventHandler()
+     *
+     * @param Events\OperationScheduledEvent $event
+     * @param ExecutionContextInterface      $context
+     *
+     * @return void
+     */
     public function whenOperationScheduledEvent(
-        Contract\Event\OperationScheduledEvent $event,
+        Events\OperationScheduledEvent $event,
         ExecutionContextInterface $context
     ): void
     {
@@ -150,21 +109,21 @@ class SchedulerListenerService implements ServiceInterface
      */
     private function processNextOperationEmit(AbstractEvent $event, ExecutionContextInterface $context): void
     {
-        /** @var Contract\Event\SchedulerOperationEmittedEvent|Contract\Event\SchedulerOperationCanceledEvent $event */
+        /** @var Events\SchedulerOperationEmittedEvent|Events\SchedulerOperationCanceledEvent $event */
 
         $nextOperation = $event->getNextOperation();
 
         if(null !== $nextOperation)
         {
             $context->send(
-                Contract\Command\EmitSchedulerOperationCommand::create([
-                    'id' => $event->getId()
+                Commands\EmitSchedulerOperationCommand::create([
+                    'id' => $nextOperation->getId()
                 ]),
                 MessageDeliveryOptions::create(
                     \sprintf('%s.timeout', $this->entryPointName),
                     null,
                     new ParameterBag([
-                        'expiration' => 0,
+                        'expiration'                               => 0,
                         RabbitMqConsumer::HEADER_DELIVERY_MODE_KEY => RabbitMqConsumer::PERSISTED_DELIVERY_MODE,
                         RabbitMqConsumer::HEADER_DELAY_KEY         => $this->calculateExecutionDelay($nextOperation)
                     ])

@@ -10,17 +10,17 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Scheduler\Contract\Event;
+namespace Desperado\ServiceBus\Scheduler\Events;
 
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\ServiceBus\Scheduler\NextScheduledOperation;
 
 /**
- * Scheduler operation completed
+ * Scheduler operation canceled
  *
- * @see EmitSchedulerOperationCommand
+ * @see CancelSchedulerOperationCommand
  */
-final class SchedulerOperationEmittedEvent extends AbstractEvent
+final class SchedulerOperationCanceledEvent extends AbstractEvent
 {
     /**
      * Scheduled operation identifier
@@ -28,6 +28,13 @@ final class SchedulerOperationEmittedEvent extends AbstractEvent
      * @var string
      */
     protected $id;
+
+    /**
+     * Reason for canceling the scheduler job
+     *
+     * @var string|null
+     */
+    protected $reason;
 
     /**
      * Next operation data
@@ -44,6 +51,16 @@ final class SchedulerOperationEmittedEvent extends AbstractEvent
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * Get reason for canceling the scheduler job
+     *
+     * @return string|null
+     */
+    public function getReason(): ?string
+    {
+        return $this->reason;
     }
 
     /**

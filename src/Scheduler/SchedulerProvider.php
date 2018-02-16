@@ -16,9 +16,7 @@ use Desperado\Domain\DateTime;
 use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\Uuid;
-use Desperado\ServiceBus\Scheduler\Contract\Event\OperationScheduledEvent;
-use Desperado\ServiceBus\Scheduler\Contract\Event\SchedulerOperationCanceledEvent;
-use Desperado\ServiceBus\Scheduler\Contract\Event\SchedulerOperationEmittedEvent;
+use Desperado\ServiceBus\Scheduler\Exceptions\InvalidScheduledOperationExecutionDateException;
 use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 use Desperado\ServiceBus\Scheduler\Storage\SchedulerStorageInterface;
 
@@ -61,6 +59,8 @@ class SchedulerProvider
      * @param ExecutionContextInterface  $context
      *
      * @return void
+     *
+     * @throws InvalidScheduledOperationExecutionDateException
      */
     public function scheduleCommand(
         ScheduledCommandIdentifier $id,
@@ -69,12 +69,14 @@ class SchedulerProvider
         ExecutionContextInterface $context
     ): void
     {
+        $this->guardOperationExecutionDate($executionDate);
+
         $scheduledOperation = ScheduledOperation::new($id, $command, $executionDate);
 
         $registry = $this->addToRegistry($scheduledOperation);
 
         $context->delivery(
-            OperationScheduledEvent::create([
+            Events\OperationScheduledEvent::create([
                 'id'               => $id->toString(),
                 'commandNamespace' => \get_class($scheduledOperation->getCommand()),
                 'executionDate'    => (string) $scheduledOperation->getDate(),
@@ -110,7 +112,7 @@ class SchedulerProvider
         }
 
         $context->delivery(
-            SchedulerOperationEmittedEvent::create([
+            Events\SchedulerOperationEmittedEvent::create([
                 'id'            => $id->toString(),
                 'nextOperation' => $registry->fetchNextOperation()
             ])
@@ -133,13 +135,13 @@ class SchedulerProvider
 
     ): void
     {
+        $registry = $this->removeFromRegistry($id);
+
         $context->delivery(
-            SchedulerOperationCanceledEvent::create([
-                'id'            => $id,
+            Events\SchedulerOperationCanceledEvent::create([
+                'id'            => $id->toString(),
                 'reason'        => $reason,
-                'nextOperation' => $this
-                    ->removeFromRegistry($id)
-                    ->fetchNextOperation()
+                'nextOperation' => $registry->fetchNextOperation()
             ])
         );
     }
@@ -196,5 +198,27 @@ class SchedulerProvider
         }
 
         return $registry;
+    }
+
+    /**
+     * Make sure that the specific date of the operation is specified
+     *
+     * @param DateTime $dateTime
+     *
+     * @return void
+     *
+     * @throws InvalidScheduledOperationExecutionDateException
+     */
+    private function guardOperationExecutionDate(DateTime $dateTime): void
+    {
+        $currentDate = DateTime::now();
+
+        if($currentDate->toTimestamp() > $dateTime->toTimestamp())
+        {
+            throw new InvalidScheduledOperationExecutionDateException(
+                'Scheduled operation date must be greater then now'
+            );
+
+        }
     }
 }

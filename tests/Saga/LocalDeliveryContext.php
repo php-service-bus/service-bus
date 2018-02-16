@@ -111,6 +111,6 @@ class LocalDeliveryContext implements ExecutionContextInterface
         array $extra = []
     ): void
     {
-        throw new \LogicException('Not implemented');
+
     }
 }

@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Scheduler\Contract\Command;
+namespace Desperado\ServiceBus\Scheduler\Commands;
 
 use Desperado\Domain\Message\AbstractCommand;
 

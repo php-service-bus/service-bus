@@ -12,7 +12,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Scheduler;
 
-use Desperado\ServiceBus\Scheduler\Guard\SchedulerGuard;
 use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 
 /**
@@ -80,10 +79,7 @@ class SchedulerRegistry implements \Serializable
      */
     public function add(ScheduledOperation $scheduledOperation): void
     {
-        $id = $scheduledOperation->getId()->toCompositeIndexHash();
-
-        SchedulerGuard::guardOperationId($id);
-        SchedulerGuard::guardOperationExecutionDate($scheduledOperation->getDate());
+        $id = $scheduledOperation->getId()->toString();
 
         $this->operations[$id] = $scheduledOperation;
         $this->timetable[$id] = (int) $scheduledOperation->getDate()->toString('U.u') * 1000;
@@ -99,7 +95,7 @@ class SchedulerRegistry implements \Serializable
     public function get(ScheduledCommandIdentifier $id): ?ScheduledOperation
     {
         return true === $this->has($id)
-            ? $this->operations[$id->toCompositeIndexHash()]
+            ? $this->operations[$id->toString()]
             : null;
     }
 
@@ -112,7 +108,7 @@ class SchedulerRegistry implements \Serializable
      */
     public function remove(ScheduledCommandIdentifier $id): void
     {
-        $identifier = $id->toCompositeIndexHash();
+        $identifier = $id->toString();
 
         unset($this->timetable[$identifier], $this->operations[$identifier]);
     }
@@ -126,7 +122,7 @@ class SchedulerRegistry implements \Serializable
      */
     public function has(ScheduledCommandIdentifier $id): bool
     {
-        $identifier = $id->toCompositeIndexHash();
+        $identifier = $id->toString();
 
         return true === isset($this->timetable[$identifier]) && true === isset($this->operations[$identifier]);
     }

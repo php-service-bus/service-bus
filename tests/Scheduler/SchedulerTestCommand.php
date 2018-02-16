@@ -10,14 +10,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Scheduler\Exceptions;
+namespace Desperado\ServiceBus\Tests\Scheduler;
 
-use Desperado\ServiceBus\ServiceBusExceptionInterface;
+use Desperado\Domain\Message\AbstractCommand;
 
 /**
- * Scheduler exceptions marker
+ *
  */
-interface SchedulerExceptionInterface extends ServiceBusExceptionInterface
+class SchedulerTestCommand extends AbstractCommand
 {
 
 }
