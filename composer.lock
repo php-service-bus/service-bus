@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2333dc10eeb77d1d238b42e1341cb2c0",
+    "content-hash": "86b7b2e7d54d93e1584b125644f0f0f4",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -764,16 +764,16 @@
         },
         {
             "name": "mmasiukevich/domain-common",
-            "version": "v0.0.1",
+            "version": "v0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "21f49b36d897d0d196b576c6aca6383fc62fb135"
+                "reference": "b7a7dfa31533c7b23b168ae480393bb00f651fff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/21f49b36d897d0d196b576c6aca6383fc62fb135",
-                "reference": "21f49b36d897d0d196b576c6aca6383fc62fb135",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/b7a7dfa31533c7b23b168ae480393bb00f651fff",
+                "reference": "b7a7dfa31533c7b23b168ae480393bb00f651fff",
                 "shasum": ""
             },
             "require": {
@@ -813,26 +813,26 @@
                 "cqrs",
                 "event sourcing"
             ],
-            "time": "2018-02-06T09:42:23+00:00"
+            "time": "2018-02-16T09:56:53+00:00"
         },
         {
             "name": "mmasiukevich/event-sourcing",
-            "version": "v0.0.1",
+            "version": "v0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "8f4ec231122b3e1025f78ab6ed297550159c1ea4"
+                "reference": "c4e7fff7daa157d6feacc3400c56226804460a13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/8f4ec231122b3e1025f78ab6ed297550159c1ea4",
-                "reference": "8f4ec231122b3e1025f78ab6ed297550159c1ea4",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/c4e7fff7daa157d6feacc3400c56226804460a13",
+                "reference": "c4e7fff7daa157d6feacc3400c56226804460a13",
                 "shasum": ""
             },
             "require": {
                 "doctrine/dbal": "v2.6.3",
-                "mmasiukevich/domain-common": "v0.0.1",
-                "mmasiukevich/message-serializer": "v0.0.1",
+                "mmasiukevich/domain-common": "v0.0.2",
+                "mmasiukevich/message-serializer": "v0.0.2",
                 "php": ">=7.1"
             },
             "require-dev": {
@@ -866,7 +866,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2018-02-08T08:39:19+00:00"
+            "time": "2018-02-16T10:07:44+00:00"
         },
         {
             "name": "mmasiukevich/infrastructure",
@@ -874,12 +874,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "9d15b00aca182175cb94f0c8af0595552338d3b6"
+                "reference": "5a980614e65183b60114ce7145357bef3066e899"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/9d15b00aca182175cb94f0c8af0595552338d3b6",
-                "reference": "9d15b00aca182175cb94f0c8af0595552338d3b6",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/5a980614e65183b60114ce7145357bef3066e899",
+                "reference": "5a980614e65183b60114ce7145357bef3066e899",
                 "shasum": ""
             },
             "require": {
@@ -887,7 +887,7 @@
                 "doctrine/annotations": "v1.6.0",
                 "guzzlehttp/guzzle": "^6.3",
                 "guzzlehttp/psr7": "1.4.2",
-                "mmasiukevich/domain-common": "v0.0.1",
+                "mmasiukevich/domain-common": "v0.0.2",
                 "monolog/monolog": "1.23.0",
                 "nikic/fast-route": "v1.2.0",
                 "php": ">=7.1",
@@ -923,24 +923,24 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2018-02-15T15:18:41+00:00"
+            "time": "2018-02-16T09:59:07+00:00"
         },
         {
             "name": "mmasiukevich/message-serializer",
-            "version": "v0.0.1",
+            "version": "v0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/message-serializer.git",
-                "reference": "b13699b82062f6827b599c81dc7e403e738d4eb5"
+                "reference": "31f93bf409ac12d27619d21ca9de397fdbbf8393"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/b13699b82062f6827b599c81dc7e403e738d4eb5",
-                "reference": "b13699b82062f6827b599c81dc7e403e738d4eb5",
+                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/31f93bf409ac12d27619d21ca9de397fdbbf8393",
+                "reference": "31f93bf409ac12d27619d21ca9de397fdbbf8393",
                 "shasum": ""
             },
             "require": {
-                "mmasiukevich/domain-common": "v0.0.1",
+                "mmasiukevich/domain-common": "v0.0.2",
                 "php": ">=7.1",
                 "symfony/property-access": "v4.0.4",
                 "symfony/property-info": "v4.0.4",
@@ -973,7 +973,7 @@
                 }
             ],
             "description": "Message serializer",
-            "time": "2018-02-08T08:36:02+00:00"
+            "time": "2018-02-16T10:03:31+00:00"
         },
         {
             "name": "monolog/monolog",
