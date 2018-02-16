@@ -12,12 +12,14 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Task\Interceptors;
 
+use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\ServiceBus\Services\Handlers\CommandExecutionParameters;
 use Desperado\ServiceBus\Task\Interceptors\ValidateInterceptor;
 use Desperado\ServiceBus\Task\Task;
 use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceCommand;
 use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceEvent;
 use Desperado\ServiceBus\Tests\TestApplicationContext;
+use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ValidatorBuilder;
@@ -34,11 +36,28 @@ class ValidateInterceptorTest extends TestCase
     private $validator;
 
     /**
+     * @var ExecutionContextInterface
+     */
+    private $context;
+
+    /**
      * @inheritdoc
      */
     protected function setUp(): void
     {
         parent::setUp();
+
+        /** @var OutboundMessageContext $outboundContext */
+        $outboundContext = static::getMockBuilder(OutboundMessageContext::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->context = static::getMockBuilder(TestApplicationContext::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['applyOutboundMessageContext'])
+            ->getMock();
+
+        $this->context->applyOutboundMessageContext($outboundContext);
 
         $this->validator = (new ValidatorBuilder())
             ->enableAnnotationMapping()
@@ -72,7 +91,7 @@ class ValidateInterceptorTest extends TestCase
     {
         parent::tearDown();
 
-        unset($this->validator);
+        unset($this->validator, $this->context);
     }
 
     /**
@@ -96,7 +115,7 @@ class ValidateInterceptorTest extends TestCase
 
         static::assertEquals($options, $task->getOptions());
 
-        $task(new TestServiceCommand(), new TestApplicationContext());
+        $task(new TestServiceCommand(), $this->context);
     }
 
     /**
@@ -120,6 +139,6 @@ class ValidateInterceptorTest extends TestCase
 
         static::assertEquals($options, $task->getOptions());
 
-        $task(TestServiceEvent::create([]), new TestApplicationContext());
+        $task(TestServiceEvent::create([]), $this->context);
     }
 }

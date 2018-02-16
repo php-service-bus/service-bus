@@ -119,7 +119,7 @@ class ValidationFailedBootstrapTest extends TestCase
                 \sys_get_temp_dir() . '/cache',
                 __DIR__ . '/valid.env',
                 Exceptions\ServiceBusConfigurationException::class,
-                'Can not find service "sagaStorageKey" in the dependency container. The saga store must be configured'
+                'Can not find service "schedulerStorageKey" in the dependency container. The scheduler storage must be configured'
             ]
         ];
     }

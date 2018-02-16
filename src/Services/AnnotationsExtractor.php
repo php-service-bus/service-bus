@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Services;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Infrastructure\Bridge;
 use Desperado\ServiceBus\Annotations;
+use Desperado\ServiceBus\ServiceInterface;
 use Desperado\ServiceBus\Services\Handlers;
 use Desperado\ServiceBus\Services\Configuration\ConfigurationGuard;
 use Desperado\ServiceBus\Services\Exceptions as ServicesExceptions;
@@ -57,7 +58,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
      */
     public function extractServiceLoggerChannel(ServiceInterface $service): string
     {
-        $supportedList = [Annotations\Service::class];
+        $supportedList = [Annotations\Services\Service::class];
         $annotations = \array_filter(
             \array_map(
                 function(Bridge\AnnotationsReader\ClassAnnotation $annotation) use ($supportedList)
@@ -72,7 +73,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
         $annotation = \end($annotations);
 
-        if(true === \is_object($annotation) && $annotation instanceof Annotations\Service)
+        if(true === \is_object($annotation) && $annotation instanceof Annotations\Services\Service)
         {
             return $annotation->getLoggerChannel();
         }
@@ -101,8 +102,8 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
             switch(\get_class($annotationData->getAnnotation()))
             {
-                case Annotations\CommandHandler::class:
-                case Annotations\EventHandler::class:
+                case Annotations\Services\CommandHandler::class:
+                case Annotations\Services\EventHandler::class:
 
                     $messageHandlers->add(
                         $this->extractMessageHandler($service, $annotationData, $defaultServiceLoggerChannel)
@@ -145,7 +146,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
             ->getClass()
             ->isSubclassOf(AbstractEvent::class);
 
-        /** @var Annotations\CommandHandler|Annotations\EventHandler $annotation */
+        /** @var Annotations\Services\CommandHandler|Annotations\Services\EventHandler $annotation */
         $annotation = $methodAnnotation->getAnnotation();
 
         $loggerChannel = '' !== (string) $annotation->getLoggerChannel()

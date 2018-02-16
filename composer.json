@@ -23,10 +23,9 @@
   },
   "require": {
     "php": ">=7.1",
-    "mmasiukevich/infrastructure": "v0.0.1",
-    "mmasiukevich/saga": "v0.0.1",
-    "mmasiukevich/message-serializer": "v0.0.1",
-    "mmasiukevich/event-sourcing": "v0.0.1",
+    "mmasiukevich/infrastructure": "v0.0.2",
+    "mmasiukevich/message-serializer": "v0.0.2",
+    "mmasiukevich/event-sourcing": "v0.0.2",
     "symfony/dotenv": "v4.0.4",
     "symfony/dependency-injection": "v4.0.4",
     "symfony/config": "v4.0.4",
@@ -42,11 +41,13 @@
   "config": {
     "optimize-autoloader": true
   },
-  "minimum-stability": "dev",
   "prefer-stable": true,
   "extra": {
     "branch-alias": {
-      "dev-master": "0.1-dev"
+      "dev-master": "v0.0.1-dev"
     }
+  },
+  "scripts": {
+    "post-autoload-dump": "curl -s -H \"Accept: text/plain\" https://security.sensiolabs.org/check_lock -F lock=@composer.lock"
   }
 }

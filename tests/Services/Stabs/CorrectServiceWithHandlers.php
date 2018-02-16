@@ -13,19 +13,19 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Services\Stabs;
 
 use Desperado\ServiceBus\Annotations;
-use Desperado\ServiceBus\Services\ServiceInterface;
+use Desperado\ServiceBus\ServiceInterface;
 use Desperado\ServiceBus\Tests\TestApplicationContext;
 use React\Promise\FulfilledPromise;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
 /**
- * @Annotations\Service(loggerChannel="test")
+ * @Annotations\Services\Service(loggerChannel="test")
  */
 class CorrectServiceWithHandlers implements ServiceInterface
 {
     /**
-     * @Annotations\CommandHandler()
+     * @Annotations\Services\CommandHandler()
      *
      * @param TestServiceCommand     $command
      * @param TestApplicationContext $context
@@ -42,7 +42,7 @@ class CorrectServiceWithHandlers implements ServiceInterface
     }
 
     /**
-     * @Annotations\EventHandler(
+     * @Annotations\Services\EventHandler(
      *     loggerChannel="eventLogChannel"
      * )
      *
@@ -60,7 +60,7 @@ class CorrectServiceWithHandlers implements ServiceInterface
     }
 
     /**
-     * @Annotations\EventHandler(
+     * @Annotations\Services\EventHandler(
      *     loggerChannel="eventLogChannel"
      * )
      *
@@ -78,7 +78,7 @@ class CorrectServiceWithHandlers implements ServiceInterface
     }
 
     /**
-     * @Annotations\EventHandler(
+     * @Annotations\Services\EventHandler(
      *     loggerChannel="eventLogChannel"
      * )
      *

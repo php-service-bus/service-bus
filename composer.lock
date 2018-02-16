@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "5fef9a322061ad879f155acc847a6830",
+    "content-hash": "86b7b2e7d54d93e1584b125644f0f0f4",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -764,16 +764,16 @@
         },
         {
             "name": "mmasiukevich/domain-common",
-            "version": "v0.0.1",
+            "version": "v0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "21f49b36d897d0d196b576c6aca6383fc62fb135"
+                "reference": "b7a7dfa31533c7b23b168ae480393bb00f651fff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/21f49b36d897d0d196b576c6aca6383fc62fb135",
-                "reference": "21f49b36d897d0d196b576c6aca6383fc62fb135",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/b7a7dfa31533c7b23b168ae480393bb00f651fff",
+                "reference": "b7a7dfa31533c7b23b168ae480393bb00f651fff",
                 "shasum": ""
             },
             "require": {
@@ -813,26 +813,26 @@
                 "cqrs",
                 "event sourcing"
             ],
-            "time": "2018-02-06T09:42:23+00:00"
+            "time": "2018-02-16T09:56:53+00:00"
         },
         {
             "name": "mmasiukevich/event-sourcing",
-            "version": "v0.0.1",
+            "version": "v0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "8f4ec231122b3e1025f78ab6ed297550159c1ea4"
+                "reference": "c4e7fff7daa157d6feacc3400c56226804460a13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/8f4ec231122b3e1025f78ab6ed297550159c1ea4",
-                "reference": "8f4ec231122b3e1025f78ab6ed297550159c1ea4",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/c4e7fff7daa157d6feacc3400c56226804460a13",
+                "reference": "c4e7fff7daa157d6feacc3400c56226804460a13",
                 "shasum": ""
             },
             "require": {
                 "doctrine/dbal": "v2.6.3",
-                "mmasiukevich/domain-common": "v0.0.1",
-                "mmasiukevich/message-serializer": "v0.0.1",
+                "mmasiukevich/domain-common": "v0.0.2",
+                "mmasiukevich/message-serializer": "v0.0.2",
                 "php": ">=7.1"
             },
             "require-dev": {
@@ -866,20 +866,20 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2018-02-08T08:39:19+00:00"
+            "time": "2018-02-16T10:07:44+00:00"
         },
         {
             "name": "mmasiukevich/infrastructure",
-            "version": "v0.0.1",
+            "version": "v0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "5d4feb4867c534c8167d04a66bd1ca40e11c73bd"
+                "reference": "5a980614e65183b60114ce7145357bef3066e899"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/5d4feb4867c534c8167d04a66bd1ca40e11c73bd",
-                "reference": "5d4feb4867c534c8167d04a66bd1ca40e11c73bd",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/5a980614e65183b60114ce7145357bef3066e899",
+                "reference": "5a980614e65183b60114ce7145357bef3066e899",
                 "shasum": ""
             },
             "require": {
@@ -887,7 +887,7 @@
                 "doctrine/annotations": "v1.6.0",
                 "guzzlehttp/guzzle": "^6.3",
                 "guzzlehttp/psr7": "1.4.2",
-                "mmasiukevich/domain-common": "v0.0.1",
+                "mmasiukevich/domain-common": "v0.0.2",
                 "monolog/monolog": "1.23.0",
                 "nikic/fast-route": "v1.2.0",
                 "php": ">=7.1",
@@ -923,24 +923,24 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2018-02-08T08:34:07+00:00"
+            "time": "2018-02-16T09:59:07+00:00"
         },
         {
             "name": "mmasiukevich/message-serializer",
-            "version": "v0.0.1",
+            "version": "v0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/message-serializer.git",
-                "reference": "b13699b82062f6827b599c81dc7e403e738d4eb5"
+                "reference": "31f93bf409ac12d27619d21ca9de397fdbbf8393"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/b13699b82062f6827b599c81dc7e403e738d4eb5",
-                "reference": "b13699b82062f6827b599c81dc7e403e738d4eb5",
+                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/31f93bf409ac12d27619d21ca9de397fdbbf8393",
+                "reference": "31f93bf409ac12d27619d21ca9de397fdbbf8393",
                 "shasum": ""
             },
             "require": {
-                "mmasiukevich/domain-common": "v0.0.1",
+                "mmasiukevich/domain-common": "v0.0.2",
                 "php": ">=7.1",
                 "symfony/property-access": "v4.0.4",
                 "symfony/property-info": "v4.0.4",
@@ -973,61 +973,7 @@
                 }
             ],
             "description": "Message serializer",
-            "time": "2018-02-08T08:36:02+00:00"
-        },
-        {
-            "name": "mmasiukevich/saga",
-            "version": "v0.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mmasiukevich/saga.git",
-                "reference": "b706604e96df3a433d1eba9dd571fcdcf49ede33"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/saga/zipball/b706604e96df3a433d1eba9dd571fcdcf49ede33",
-                "reference": "b706604e96df3a433d1eba9dd571fcdcf49ede33",
-                "shasum": ""
-            },
-            "require": {
-                "doctrine/annotations": "v1.6.0",
-                "doctrine/dbal": "v2.6.3",
-                "mmasiukevich/domain-common": "v0.0.1",
-                "mmasiukevich/infrastructure": "v0.0.1",
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^7.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Desperado\\Saga\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Masiukevich Maksim",
-                    "email": "desperado@minsk-info.ru",
-                    "homepage": "https://github.com/mmasiukevich",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Sagas implementation",
-            "keywords": [
-                "event sourcing",
-                "saga"
-            ],
-            "time": "2018-02-08T08:40:24+00:00"
+            "time": "2018-02-16T10:03:31+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -3093,16 +3039,16 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.7.3",
+            "version": "1.7.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "e4ed002c67da8eceb0eb8ddb8b3847bb53c5c2bf"
+                "reference": "9f901e29c93dae4aa77c0bb161df4276f9c9a1be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/e4ed002c67da8eceb0eb8ddb8b3847bb53c5c2bf",
-                "reference": "e4ed002c67da8eceb0eb8ddb8b3847bb53c5c2bf",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/9f901e29c93dae4aa77c0bb161df4276f9c9a1be",
+                "reference": "9f901e29c93dae4aa77c0bb161df4276f9c9a1be",
                 "shasum": ""
             },
             "require": {
@@ -3114,7 +3060,7 @@
             },
             "require-dev": {
                 "phpspec/phpspec": "^2.5|^3.2",
-                "phpunit/phpunit": "^4.8.35 || ^5.7"
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5"
             },
             "type": "library",
             "extra": {
@@ -3152,7 +3098,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2017-11-24T13:59:53+00:00"
+            "time": "2018-02-11T18:49:29+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -3405,16 +3351,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.0.0",
+            "version": "7.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "9b3373439fdf2f3e9d1578f5e408a3a0d161c3bc"
+                "reference": "316555dbd0ed4097bbdd17c65ab416bf27a472e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/9b3373439fdf2f3e9d1578f5e408a3a0d161c3bc",
-                "reference": "9b3373439fdf2f3e9d1578f5e408a3a0d161c3bc",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/316555dbd0ed4097bbdd17c65ab416bf27a472e9",
+                "reference": "316555dbd0ed4097bbdd17c65ab416bf27a472e9",
                 "shasum": ""
             },
             "require": {
@@ -3481,20 +3427,20 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-02-02T05:04:08+00:00"
+            "time": "2018-02-13T06:08:08+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "6.0.0",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "e495e5d3660321b62c294d8c0e954d02d6ce2573"
+                "reference": "e3249dedc2d99259ccae6affbc2684eac37c2e53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/e495e5d3660321b62c294d8c0e954d02d6ce2573",
-                "reference": "e495e5d3660321b62c294d8c0e954d02d6ce2573",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/e3249dedc2d99259ccae6affbc2684eac37c2e53",
+                "reference": "e3249dedc2d99259ccae6affbc2684eac37c2e53",
                 "shasum": ""
             },
             "require": {
@@ -3537,7 +3483,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2018-02-01T13:11:13+00:00"
+            "time": "2018-02-15T05:27:38+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -4200,7 +4146,7 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,

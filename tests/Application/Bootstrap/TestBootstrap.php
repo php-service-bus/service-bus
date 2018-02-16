@@ -38,6 +38,7 @@ class TestBootstrap extends AbstractBootstrap
             'messageTransportKey',
             'kernelKey',
             'sagaStorageKey',
+            'schedulerStorageKey',
             'applicationContextKey'
         );
     }

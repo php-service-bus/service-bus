@@ -86,7 +86,7 @@ class ConfigurationGuard
     {
         if(
             null === $parameter->getClass() ||
-            false === $parameter->getClass()->isSubclassOf(ExecutionContextInterface::class)
+            false === \is_a($parameter->getClass()->name, ExecutionContextInterface::class, true)
         )
         {
             throw new ServicesExceptions\InvalidHandlerArgumentException(

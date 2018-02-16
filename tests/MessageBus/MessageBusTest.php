@@ -13,6 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\MessageBus;
 
 use Desperado\Domain\Message\AbstractMessage;
+use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusTask;
 use Desperado\ServiceBus\MessageBus\MessageBusTaskCollection;
@@ -33,6 +34,11 @@ use React\Promise\RejectedPromise;
 class MessageBusTest extends TestCase
 {
     /**
+     * @var ExecutionContextInterface
+     */
+    private $context;
+
+    /**
      * @inheritdoc
      */
     protected function setUp(): void
@@ -40,6 +46,10 @@ class MessageBusTest extends TestCase
         parent::setUp();
 
         EventLoop::getLoop()->run();
+
+        $this->context = static::getMockBuilder(TestApplicationContext::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
@@ -50,6 +60,8 @@ class MessageBusTest extends TestCase
         parent::tearDown();
 
         EventLoop::getLoop()->stop();
+
+        unset($this->context);
     }
 
     /**
@@ -78,7 +90,7 @@ class MessageBusTest extends TestCase
 
         $messageBus = MessageBus::build($taskCollection, new NullLogger());
 
-        $result = $messageBus->handle(new TestServiceCommand(), new TestApplicationContext());
+        $result = $messageBus->handle(new TestServiceCommand(), $this->context);
 
         $result->then(
             function(array $results) use ($resultValue)
@@ -111,7 +123,7 @@ class MessageBusTest extends TestCase
     {
         $messageBus = MessageBus::build(MessageBusTaskCollection::createEmpty(), new NullLogger());
 
-        $result = $messageBus->handle(new TestServiceCommand(), new TestApplicationContext());
+        $result = $messageBus->handle(new TestServiceCommand(), $this->context);
         $result->then(
             function(array $results)
             {
@@ -148,7 +160,7 @@ class MessageBusTest extends TestCase
 
         $messageBus = MessageBus::build($taskCollection, new NullLogger());
 
-        $result = $messageBus->handle(new TestServiceCommand(), new TestApplicationContext());
+        $result = $messageBus->handle(new TestServiceCommand(), $this->context);
 
         $result->then(
             function(array $results)

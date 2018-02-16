@@ -71,6 +71,13 @@ class RabbitMqPublisher
             ->then(
                 function() use ($channel, $message)
                 {
+                    $headers = $message->getHeaders()->all();
+
+                    if(false === isset($headers[RabbitMqConsumer::HEADER_DELIVERY_MODE_KEY]))
+                    {
+                        $headers[RabbitMqConsumer::HEADER_DELIVERY_MODE_KEY] = RabbitMqConsumer::PERSISTED_DELIVERY_MODE;
+                    }
+
                     $channel
                         ->publish(
                             $message->getBody(),
@@ -81,21 +88,7 @@ class RabbitMqPublisher
                         ->then(
                             function() use ($message)
                             {
-                                if(true === $this->environment->isDebug())
-                                {
-                                    $this->logger->debug(
-                                        \sprintf(
-                                            'The message with the contents of "%s" was sent to the exchange "%s" with the routing key "%s"',
-                                            $message->getBody(),
-                                            $message->getExchange(),
-                                            $message->getRoutingKey()
-                                        )
-                                    );
-                                }
-                            },
-                            function(\Throwable $throwable)
-                            {
-                                $this->logger->critical(ThrowableFormatter::toString($throwable));
+                                $this->logOutboundMessage($message);
                             }
                         );
                 },
@@ -104,6 +97,29 @@ class RabbitMqPublisher
                     $this->logger->critical(ThrowableFormatter::toString($throwable));
                 }
             );
+    }
+
+    /**
+     * Log outbound message in dev environment only
+     *
+     * @param Message $message
+     *
+     * @return void
+     */
+    private function logOutboundMessage(Message $message): void
+    {
+        if(true === $this->environment->isDebug())
+        {
+            $this->logger->debug(
+                \sprintf(
+                    'The message with the contents of "%s" was sent to the exchange "%s" with the routing key "%s" and headers "%s"',
+                    $message->getBody(),
+                    $message->getExchange(),
+                    $message->getRoutingKey(),
+                    \urldecode(\http_build_query($message->getHeaders()->all()))
+                )
+            );
+        }
     }
 
     /**
