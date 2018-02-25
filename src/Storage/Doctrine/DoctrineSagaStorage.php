@@ -123,7 +123,7 @@ class DoctrineSagaStorage implements SagaStorageInterface
                 ->from(SchemaBuilder::TABLE_NAME_SAGAS, 's')
                 ->where('s.id = ?')
                 ->andWhere('s.identifier_class = ?')
-                ->setParameters([$id->toString(), $id->getIdentityClassNamespace()])
+                ->setParameters([$id->toString(), $id->getIdentityClass()])
                 ->execute()
                 ->fetch();
 
@@ -162,7 +162,7 @@ class DoctrineSagaStorage implements SagaStorageInterface
                 ->delete(SchemaBuilder::TABLE_NAME_SAGAS)
                 ->where('id = ?')
                 ->andWhere('identifier_class = ?')
-                ->setParameters([$id->toString(), $id->getIdentityClassNamespace()])
+                ->setParameters([$id->toString(), $id->getIdentityClass()])
                 ->execute();
         }
         catch(\Throwable $throwable)

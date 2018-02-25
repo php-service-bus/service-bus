@@ -100,7 +100,7 @@ class DoctrineSagaStorageTest extends TestCase
         static::assertNotNull($loadedStoredSaga);
 
         static::assertEquals($identifier->toString(), $loadedStoredSaga->getIdentifier());
-        static::assertEquals($identifier->getIdentityClassNamespace(), $loadedStoredSaga->getIdentifierNamespace());
+        static::assertEquals($identifier->getIdentityClass(), $loadedStoredSaga->getIdentifierNamespace());
         static::assertEquals($identifier->getSagaNamespace(), $loadedStoredSaga->getSagaNamespace());
 
         static::assertEquals($sagaPayload, $loadedStoredSaga->getPayload());
