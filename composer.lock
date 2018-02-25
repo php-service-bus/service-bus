@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "26aff391cf65665593a503764bac5184",
-    "content-hash": "7f8af481d66631110367ca92a0844bb0",
+    "hash": "d44f96cd38d4fd151d9108027e014931",
+    "content-hash": "90db9a3a7b102fb685eebfa8f203e7ce",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -1007,16 +1007,16 @@
         },
         {
             "name": "mmasiukevich/infrastructure",
-            "version": "v0.0.3",
+            "version": "v0.0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "9c11bba9a0c53a55cfa170a2d6403dcd80984075"
+                "reference": "1be238070aea1cc497e6c7b857503f271129544f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/9c11bba9a0c53a55cfa170a2d6403dcd80984075",
-                "reference": "9c11bba9a0c53a55cfa170a2d6403dcd80984075",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/1be238070aea1cc497e6c7b857503f271129544f",
+                "reference": "1be238070aea1cc497e6c7b857503f271129544f",
                 "shasum": ""
             },
             "require": {
@@ -1025,7 +1025,7 @@
                 "doctrine/orm": "v2.6.0",
                 "guzzlehttp/guzzle": "^6.3",
                 "guzzlehttp/psr7": "1.4.2",
-                "mmasiukevich/domain-common": "v0.0.3.*",
+                "mmasiukevich/domain-common": "^v0.0.3",
                 "monolog/monolog": "1.23.0",
                 "nikic/fast-route": "v1.2.0",
                 "php": ">=7.1",
@@ -1045,7 +1045,10 @@
             "autoload": {
                 "psr-4": {
                     "Desperado\\Infrastructure\\": "src/"
-                }
+                },
+                "files": [
+                    "src/Bridge/AnnotationsReader/functions.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1060,7 +1063,7 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2018-02-25 11:32:23"
+            "time": "2018-02-25 15:25:12"
         },
         {
             "name": "mmasiukevich/message-serializer",

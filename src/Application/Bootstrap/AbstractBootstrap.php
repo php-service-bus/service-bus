@@ -16,7 +16,6 @@ use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\ServiceBus\Application\Bootstrap\Exceptions as BootstrapExceptions;
 use Desperado\ServiceBus\DependencyInjection as ServiceBusDependencyInjection;
 use Desperado\ServiceBus\Application\EntryPoint\EntryPoint;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection as SymfonyDependencyInjection;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
@@ -166,7 +165,7 @@ abstract class AbstractBootstrap
         $this->cacheDirectoryPath = $this->prepareCacheDirectoryPath($cacheDirectoryPath);
         $this->rootDirectoryPath = $this->prepareRootDirectoryPath($rootDirectoryPath);
 
-        $this->configureAnnotationsLoader();
+        configureAnnotationsLoader();
     }
 
     /**
@@ -302,34 +301,6 @@ abstract class AbstractBootstrap
         catch(\Throwable $throwable)
         {
             throw new BootstrapExceptions\IncorrectCacheDirectoryFilePathException($cacheDirectoryPath, $throwable);
-        }
-    }
-
-    /**
-     * Configure doctrine2 annotations loader
-     *
-     * @return void
-     */
-    private function configureAnnotationsLoader(): void
-    {
-        /** Configure doctrine annotations autoloader */
-        foreach(\spl_autoload_functions() as $autoLoader)
-        {
-            if(isset($autoLoader[0]) && \is_object($autoLoader[0]))
-            {
-                /** @var \Composer\Autoload\ClassLoader $classLoader */
-                $classLoader = $autoLoader[0];
-
-                /** @noinspection PhpDeprecationInspection */
-                AnnotationRegistry::registerLoader(
-                    function(string $className) use ($classLoader)
-                    {
-                        return $classLoader->loadClass($className);
-                    }
-                );
-
-                break;
-            }
         }
     }
 }

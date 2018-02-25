@@ -25,9 +25,7 @@ use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceCommand;
 use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceEvent;
 use Desperado\ServiceBus\Tests\TestApplicationContext;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
-use Desperado\ServiceBus\Transport\IncomingMessageContainer;
 use Desperado\ServiceBus\Transport\RabbitMqTransport\RabbitMqIncomingContext;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Validator;
@@ -82,25 +80,7 @@ class ValidateInterceptorTest extends TestCase
             ->enableAnnotationMapping()
             ->getValidator();
 
-        /** Configure doctrine annotations autoloader */
-        foreach(\spl_autoload_functions() as $autoLoader)
-        {
-            if(isset($autoLoader[0]) && \is_object($autoLoader[0]))
-            {
-                /** @var \Composer\Autoload\ClassLoader $classLoader */
-                $classLoader = $autoLoader[0];
-
-                /** @noinspection PhpDeprecationInspection */
-                AnnotationRegistry::registerLoader(
-                    function(string $className) use ($classLoader)
-                    {
-                        return $classLoader->loadClass($className);
-                    }
-                );
-
-                break;
-            }
-        }
+        configureAnnotationsLoader();
     }
 
     /**
