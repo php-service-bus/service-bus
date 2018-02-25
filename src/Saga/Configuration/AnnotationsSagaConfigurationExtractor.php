@@ -83,7 +83,7 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
                 \array_map(
                     function(ClassAnnotation $classAnnotation) use ($supportedAnnotations)
                     {
-                        $annotationClass = \get_class($classAnnotation->getAnnotation());
+                        $annotationClass = $classAnnotation->getAnnotation()->getClass();
 
                         return true === \in_array($annotationClass, $supportedAnnotations, true)
                             ? $classAnnotation->getAnnotation()

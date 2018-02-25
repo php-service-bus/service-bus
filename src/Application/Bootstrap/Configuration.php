@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Application\Bootstrap;
 use Desperado\Domain\Environment\Environment;
 use Desperado\ServiceBus\Application\Bootstrap\Exceptions\ServiceBusConfigurationException;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
@@ -86,6 +87,8 @@ final class Configuration
         $self->environment = (string) \getenv(self::DOTENV_ENV_KEY);
         $self->entryPointName = (string) \getenv(self::DOTENV_ENTRY_POINT_NAME_KEY);
 
+        $self->validate();
+
         return $self;
     }
 
@@ -120,6 +123,27 @@ final class Configuration
     public function getEntryPointName(): string
     {
         return $this->entryPointName;
+    }
+
+    /**
+     * Process validate parameters
+     *
+     * @return void
+     */
+    private function validate(): void
+    {
+        $validator = (new Validator\ValidatorBuilder())
+            ->enableAnnotationMapping()
+            ->getValidator();
+
+        $violations = $validator->validate($this);
+
+        foreach($violations as $violation)
+        {
+            /** @var Validator\ConstraintViolationInterface $violation */
+
+            throw new ServiceBusConfigurationException($violation->getMessage());
+        }
     }
 
     /**

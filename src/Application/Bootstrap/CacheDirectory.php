@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\Bootstrap;
 
+use Desperado\ServiceBus\Application\Bootstrap\Exceptions\IncorrectCacheDirectoryFilePathException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -35,20 +36,11 @@ final class CacheDirectory
 
     /**
      * @param string $cacheDirectoryPath
-     *
-     * @throws \InvalidArgumentException
      */
     public function __construct(string $cacheDirectoryPath)
     {
-        $cacheDirectoryPath = \rtrim($cacheDirectoryPath, '/');
-
-        if('' === $cacheDirectoryPath)
-        {
-            throw new \InvalidArgumentException($cacheDirectoryPath);
-        }
-
         $this->filesystem = new Filesystem();
-        $this->cacheDirectoryPath = $cacheDirectoryPath;
+        $this->cacheDirectoryPath = \rtrim($cacheDirectoryPath, '/');
     }
 
     /**
@@ -66,15 +58,27 @@ final class CacheDirectory
      *
      * @return void
      *
-     * @throws \Symfony\Component\Filesystem\Exception\IOException
+     * @throws IncorrectCacheDirectoryFilePathException
      */
     public function prepare(): void
     {
-        if(false === $this->filesystem->exists($this->cacheDirectoryPath))
+        try
         {
-            $this->filesystem->mkdir($this->cacheDirectoryPath);
-        }
+            if('' === $this->cacheDirectoryPath)
+            {
+                throw new \InvalidArgumentException('Empty cache directory path');
+            }
 
-        $this->filesystem->chmod($this->cacheDirectoryPath, 0775, \umask());
+            if(false === $this->filesystem->exists($this->cacheDirectoryPath))
+            {
+                $this->filesystem->mkdir($this->cacheDirectoryPath);
+            }
+
+            $this->filesystem->chmod($this->cacheDirectoryPath, 0775, \umask());
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new IncorrectCacheDirectoryFilePathException($this->cacheDirectoryPath, $throwable);
+        }
     }
 }

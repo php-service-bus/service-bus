@@ -43,7 +43,7 @@ final class GuardIdentifier
             throw new InvalidSagaIdentifierException(
                 \sprintf(
                     'Event "%s" must be contains "%s" accessor that contains the saga ID',
-                    \get_class($event), $identifierAccessorName
+                    $event->getMessageClass(), $identifierAccessorName
                 )
             );
         }

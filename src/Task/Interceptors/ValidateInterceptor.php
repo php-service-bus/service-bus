@@ -121,7 +121,7 @@ class ValidateInterceptor implements TaskInterface
     protected function deliveryErrors(AbstractMessage $message, array $errors, ExecutionContextInterface $context): void
     {
         $event = MessageValidationFailedEvent::create([
-            'messageNamespace' => \get_class($message),
+            'messageNamespace' => $message->getMessageClass(),
             'violations'       => $errors
         ]);
 

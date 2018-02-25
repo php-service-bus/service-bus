@@ -100,7 +100,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
             /** @todo: query handlers */
 
-            switch(\get_class($annotationData->getAnnotation()))
+            switch($annotationData->getAnnotation()->getClass())
             {
                 case Annotations\Services\CommandHandler::class:
                 case Annotations\Services\EventHandler::class:

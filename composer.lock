@@ -901,16 +901,16 @@
         },
         {
             "name": "mmasiukevich/domain-common",
-            "version": "v0.0.3.1",
+            "version": "v0.0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "54c2f27efef8b4bf4a19d17edd1d2a71ecaa87de"
+                "reference": "338257ddf15b86ed6e2225ba81f3938165b66e90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/54c2f27efef8b4bf4a19d17edd1d2a71ecaa87de",
-                "reference": "54c2f27efef8b4bf4a19d17edd1d2a71ecaa87de",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/338257ddf15b86ed6e2225ba81f3938165b66e90",
+                "reference": "338257ddf15b86ed6e2225ba81f3938165b66e90",
                 "shasum": ""
             },
             "require": {
@@ -950,26 +950,26 @@
                 "cqs",
                 "event sourcing"
             ],
-            "time": "2018-02-22 10:44:56"
+            "time": "2018-02-25 15:22:19"
         },
         {
             "name": "mmasiukevich/event-sourcing",
-            "version": "v0.0.3",
+            "version": "v0.0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "fd06be04df49292beae5090b93762f33e6da2b60"
+                "reference": "76eaf7141f3be95d5a07990aa910c95592e054ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/fd06be04df49292beae5090b93762f33e6da2b60",
-                "reference": "fd06be04df49292beae5090b93762f33e6da2b60",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/76eaf7141f3be95d5a07990aa910c95592e054ba",
+                "reference": "76eaf7141f3be95d5a07990aa910c95592e054ba",
                 "shasum": ""
             },
             "require": {
                 "doctrine/dbal": "v2.6.3",
-                "mmasiukevich/domain-common": "v0.0.3.*",
-                "mmasiukevich/message-serializer": "v0.0.3",
+                "mmasiukevich/domain-common": "^v0.0.3",
+                "mmasiukevich/message-serializer": "^v0.0.3",
                 "php": ">=7.1"
             },
             "require-dev": {
@@ -1003,7 +1003,7 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2018-02-25 11:45:15"
+            "time": "2018-02-25 15:33:52"
         },
         {
             "name": "mmasiukevich/infrastructure",
@@ -1067,20 +1067,20 @@
         },
         {
             "name": "mmasiukevich/message-serializer",
-            "version": "v0.0.3",
+            "version": "v0.0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/message-serializer.git",
-                "reference": "b542a683b5150f4fb741a0682a2ff4aecae67745"
+                "reference": "01358d98877c05e2eb0aab16e3977e24eeaf7999"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/b542a683b5150f4fb741a0682a2ff4aecae67745",
-                "reference": "b542a683b5150f4fb741a0682a2ff4aecae67745",
+                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/01358d98877c05e2eb0aab16e3977e24eeaf7999",
+                "reference": "01358d98877c05e2eb0aab16e3977e24eeaf7999",
                 "shasum": ""
             },
             "require": {
-                "mmasiukevich/domain-common": "v0.0.3.1",
+                "mmasiukevich/domain-common": "^v0.0.3",
                 "php": ">=7.1",
                 "symfony/property-access": "v4.0.4",
                 "symfony/property-info": "v4.0.4",
@@ -1092,7 +1092,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.1-dev"
+                    "dev-develop": "v0.0.*-dev"
                 }
             },
             "autoload": {
@@ -1113,7 +1113,7 @@
                 }
             ],
             "description": "Message serializer",
-            "time": "2018-02-22 14:37:13"
+            "time": "2018-02-25 15:28:36"
         },
         {
             "name": "monolog/monolog",

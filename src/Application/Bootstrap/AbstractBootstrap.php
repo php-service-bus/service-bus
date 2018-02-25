@@ -19,7 +19,7 @@ use Desperado\ServiceBus\Application\EntryPoint\EntryPoint;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection as SymfonyDependencyInjection;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
-use Symfony\Component\Validator;
+
 
 /**
  * Base class initial initialization of the application
@@ -39,13 +39,6 @@ abstract class AbstractBootstrap
      * @var string
      */
     private $cacheDirectoryPath;
-
-    /**
-     * Absolute path to the ".env" configuration file
-     *
-     * @var string
-     */
-    private $environmentFilePath;
 
     /**
      * Service bus configuration
@@ -83,9 +76,9 @@ abstract class AbstractBootstrap
     {
         $startTimer = \microtime(true);
 
-        $self = new static($rootDirectoryPath, $cacheDirectoryPath, $environmentFilePath);
+        $self = new static($rootDirectoryPath, $cacheDirectoryPath);
 
-        $self->loadConfiguration();
+        $self->configuration = Configuration::loadDotEnv($environmentFilePath);
         $self->container = $self->initializeContainer();
 
         $self->init();
@@ -150,47 +143,16 @@ abstract class AbstractBootstrap
     /**
      * @param string $rootDirectoryPath
      * @param string $cacheDirectoryPath
-     * @param string $environmentFilePath
      *
      * @throws BootstrapExceptions\IncorrectRootDirectoryPathException
      * @throws BootstrapExceptions\IncorrectCacheDirectoryFilePathException
      */
-    final protected function __construct(
-        string $rootDirectoryPath,
-        string $cacheDirectoryPath,
-        string $environmentFilePath
-    )
+    final protected function __construct(string $rootDirectoryPath, string $cacheDirectoryPath)
     {
-        $this->environmentFilePath = $environmentFilePath;
         $this->cacheDirectoryPath = $this->prepareCacheDirectoryPath($cacheDirectoryPath);
         $this->rootDirectoryPath = $this->prepareRootDirectoryPath($rootDirectoryPath);
 
         configureAnnotationsLoader();
-    }
-
-    /**
-     * Load configuration
-     *
-     * @return void
-     *
-     * @throws BootstrapExceptions\ServiceBusConfigurationException
-     */
-    private function loadConfiguration(): void
-    {
-        $validator = (new Validator\ValidatorBuilder())
-            ->enableAnnotationMapping()
-            ->getValidator();
-
-        $this->configuration = Configuration::loadDotEnv($this->environmentFilePath);
-
-        $violations = $validator->validate($this->configuration);
-
-        foreach($violations as $violation)
-        {
-            /** @var Validator\ConstraintViolationInterface $violation */
-
-            throw new BootstrapExceptions\ServiceBusConfigurationException($violation->getMessage());
-        }
     }
 
     /**
@@ -291,16 +253,9 @@ abstract class AbstractBootstrap
      */
     private function prepareCacheDirectoryPath(string $cacheDirectoryPath): string
     {
-        try
-        {
-            $cacheDirectory = new CacheDirectory($cacheDirectoryPath);
-            $cacheDirectory->prepare();
+        $cacheDirectory = new CacheDirectory($cacheDirectoryPath);
+        $cacheDirectory->prepare();
 
-            return (string) $cacheDirectory;
-        }
-        catch(\Throwable $throwable)
-        {
-            throw new BootstrapExceptions\IncorrectCacheDirectoryFilePathException($cacheDirectoryPath, $throwable);
-        }
+        return (string) $cacheDirectory;
     }
 }
