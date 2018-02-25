@@ -20,31 +20,20 @@ interface SagaConfigurationExtractorInterface
     /**
      * Extract saga configuration
      *
-     * [
-     *     0 => 'SomeExpireDateModifier',
-     *     1 => 'SomeIdentifierClassNamespace',
-     *     2 => 'SomeContainingIdentifierProperty'
-     * ]
-     *
      * @param string $sagaNamespace
      *
-     * @return array
+     * @return SagaConfiguration
      *
      * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\SagaConfigurationException
      */
-    public function extractSagaConfiguration(string $sagaNamespace): array;
+    public function extractSagaConfiguration(string $sagaNamespace): SagaConfiguration;
 
     /**
      * Extract saga event listeners
      *
-     * [
-     *     0 => 'SomeEventNamespace',
-     *     1 => 'SomeCustomContainingIdentifierProperty'
-     * ]
-     *
      * @param string $sagaNamespace
      *
-     * @return array
+     * @return SagaListenerConfiguration[]
      *
      * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\SagaConfigurationException
      */

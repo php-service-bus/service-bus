@@ -14,8 +14,10 @@ namespace Desperado\ServiceBus;
 
 use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Saga\Configuration\SagaConfiguration;
 use Desperado\ServiceBus\Saga\Configuration\Exceptions\SagaConfigurationException;
 use Desperado\ServiceBus\Saga\Configuration\SagaConfigurationExtractorInterface;
+use Desperado\ServiceBus\Saga\Configuration\SagaListenerConfiguration;
 use Desperado\ServiceBus\Saga\Exceptions;
 use Desperado\ServiceBus\Saga\Identifier\AbstractSagaIdentifier;
 use Desperado\ServiceBus\Saga\Metadata;
@@ -181,42 +183,72 @@ final class SagaProvider
      */
     public function configure(string $sagaNamespace): void
     {
-        if(false === \class_exists($sagaNamespace))
-        {
-            throw new Exceptions\SagaClassNotFoundException($sagaNamespace);
-        }
+        $this->assertSagaExists($sagaNamespace);
 
         if(false === $this->sagasMetadataCollection->has($sagaNamespace))
         {
-            $eventListeners = $this->configurationExtractor->extractSagaListeners($sagaNamespace);
-            $baseConfiguration = $this->configurationExtractor->extractSagaConfiguration($sagaNamespace);
+            $this->sagasMetadataCollection->add(
+                $this->configureSagaMetadata(
+                    $this->configurationExtractor->extractSagaConfiguration($sagaNamespace),
+                    $this->configurationExtractor->extractSagaListeners($sagaNamespace)
+                )
+            );
+        }
+    }
 
-            $sagaMetadata = Metadata\SagaMetadata::create(
-                $sagaNamespace,
-                $baseConfiguration[0],
-                $baseConfiguration[1],
-                $baseConfiguration[2]
+    /**
+     * Collect saga metadata
+     *
+     * @param SagaConfiguration           $sagaConfiguration
+     * @param SagaListenerConfiguration[] $listenersConfiguration
+     *
+     * @return Metadata\SagaMetadata
+     */
+    private function configureSagaMetadata(
+        SagaConfiguration $sagaConfiguration,
+        array $listenersConfiguration
+    ): Metadata\SagaMetadata
+    {
+        $sagaMetadata = Metadata\SagaMetadata::fromBaseConfiguration($sagaConfiguration);
+
+        foreach($listenersConfiguration as $listenerConfiguration)
+        {
+            $identifierField = true === $listenerConfiguration->hasCustomIdentifierProperty()
+                ? $listenerConfiguration->getContainingIdentifierProperty()
+                : $sagaConfiguration->getContainingIdentifierProperty();
+
+            $eventHandler = new SagaEventProcessor(
+                $sagaConfiguration->getSagaNamespace(),
+                $sagaConfiguration->getIdentifierNamespace(),
+                $identifierField,
+                $this
             );
 
-            foreach($eventListeners as $listenerData)
-            {
-                $identifierField = !empty($listenerData[1]) ? $listenerData[1] : $baseConfiguration[2];
+            $sagaMetadata->appendListener(
+                Metadata\SagaListener::new(
+                    $listenerConfiguration->getEventClass(),
+                    \Closure::fromCallable($eventHandler)
+                )
+            );
+        }
 
-                $eventHandler = new SagaEventProcessor(
-                    $sagaNamespace,
-                    $baseConfiguration[1],
-                    $identifierField,
-                    $this
-                );
+        return $sagaMetadata;
+    }
 
-                $sagaMetadata->appendListener(
-                    Metadata\SagaListener::new(
-                        $listenerData[0], \Closure::fromCallable($eventHandler)
-                    )
-                );
-            }
-
-            $this->sagasMetadataCollection->add($sagaMetadata);
+    /**
+     * Check the existence of a class of sagas
+     *
+     * @param string $sagaNamespace
+     *
+     * @return void
+     *
+     * @throws Exceptions\SagaClassNotFoundException
+     */
+    private function assertSagaExists(string $sagaNamespace): void
+    {
+        if(false === \class_exists($sagaNamespace))
+        {
+            throw new Exceptions\SagaClassNotFoundException($sagaNamespace);
         }
     }
 }

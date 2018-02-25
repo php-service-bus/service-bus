@@ -73,7 +73,7 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
     /**
      * @inheritdoc
      */
-    public function extractSagaConfiguration(string $sagaNamespace): array
+    public function extractSagaConfiguration(string $sagaNamespace): SagaConfiguration
     {
         if(false === isset($this->sagasConfiguration[$sagaNamespace]))
         {
@@ -104,11 +104,12 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
                     (string) $annotation->containingIdentifierProperty
                 );
 
-                $this->sagasConfiguration[$sagaNamespace] = [
+                $this->sagasConfiguration[$sagaNamespace] = SagaConfiguration::create(
+                    $sagaNamespace,
                     $annotation->expireDateModifier,
                     $annotation->identifierNamespace,
                     $annotation->containingIdentifierProperty
-                ];
+                );
             }
             else
             {
@@ -136,15 +137,19 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
 
                 if($annotationData->getAnnotation() instanceof SagaEventListener)
                 {
+                    /** @var SagaEventListener $sagaEventListenerAnnotation */
+                    $sagaEventListenerAnnotation = $annotationData->getAnnotation();
+
                     SagaConfigurationGuard::guardFirstEventListenerArgumentIsEvent(
                         $sagaNamespace,
                         $annotationData->getArguments()
                     );
 
-                    $this->sagasListeners[$sagaNamespace][] = [
+                    $this->sagasListeners[$sagaNamespace][] = SagaListenerConfiguration::create(
+                        $sagaNamespace,
                         $annotationData->getArguments()[0]->getClass()->getName(),
-                        $annotationData->getAnnotation()->containingIdentifierProperty
-                    ];
+                        (string) $sagaEventListenerAnnotation->containingIdentifierProperty
+                    );
                 }
             }
         }
