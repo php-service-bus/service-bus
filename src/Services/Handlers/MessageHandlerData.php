@@ -51,7 +51,7 @@ class MessageHandlerData
      * @param array                              $autowiringServices
      * @param AbstractMessageExecutionParameters $executionOptions
      *
-     * @return MessageHandlerData
+     * @return self
      */
     public static function new(
         string $messageClassNamespace,

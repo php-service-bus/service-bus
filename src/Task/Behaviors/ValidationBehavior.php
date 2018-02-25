@@ -31,7 +31,7 @@ class ValidationBehavior implements BehaviorInterface
     /**
      * Create behavior
      *
-     * @return ValidationBehavior
+     * @return self
      */
     public static function create(): self
     {

@@ -36,7 +36,7 @@ class SchedulerRegistry implements \Serializable
     private $timetable;
 
     /**
-     * @return SchedulerRegistry
+     * @return self
      */
     public static function create(): self
     {

@@ -47,7 +47,7 @@ class IncomingMessageContainer
      * @param IncomingMessageContextInterface $incomingMessageContext
      * @param OutboundMessageContext          $outboundContext
      *
-     * @return IncomingMessageContainer
+     * @return self
      */
     public static function new(
         Message $message,

@@ -39,7 +39,7 @@ class RabbitMqChannelData
      * @param Channel $channel
      * @param string  $queue
      *
-     * @return RabbitMqChannelData
+     * @return self
      */
     public static function create(Channel $channel, string $queue): self
     {

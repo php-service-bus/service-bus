@@ -59,7 +59,7 @@ class BootstrapServicesDefinitions
      * @param string $schedulerStorageKey
      * @param string $applicationContextKey
      *
-     * @return BootstrapServicesDefinitions
+     * @return self
      */
     final public static function create(
         string $messageTransportKey,

@@ -23,7 +23,7 @@ class ScheduledCommandIdentifier extends AbstractIdentity
     /**
      * Create new identifier
      *
-     * @return ScheduledCommandIdentifier
+     * @return self
      */
     public static function new(): self
     {

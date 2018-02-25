@@ -48,7 +48,7 @@ class CompletedTask
      * @param ExecutionContextInterface $context
      * @param PromiseInterface|null    $taskResult
      *
-     * @return CompletedTask
+     * @return self
      */
     public static function create(
         AbstractMessage $message,

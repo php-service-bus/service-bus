@@ -43,7 +43,7 @@ class MessageBus
      * @param MessageBusTaskCollection $collection
      * @param LoggerInterface          $logger
      *
-     * @return MessageBus
+     * @return self
      */
     public static function build(
         MessageBusTaskCollection $collection,

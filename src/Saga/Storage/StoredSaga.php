@@ -76,7 +76,7 @@ final class StoredSaga
      * @param DateTime               $createdAt
      * @param DateTime|null          $closedAt
      *
-     * @return StoredSaga
+     * @return self
      */
     public static function create(
         AbstractSagaIdentifier $id,

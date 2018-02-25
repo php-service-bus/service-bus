@@ -22,7 +22,7 @@ class InvalidHandlerArgumentsCountException extends \LogicException implements S
      *
      * @param \ReflectionMethod $reflectionMethod
      *
-     * @return InvalidHandlerArgumentsCountException
+     * @return self
      */
     public static function createForMessageHandler(\ReflectionMethod $reflectionMethod): self
     {

@@ -62,7 +62,7 @@ class Configuration
      *
      * @param string $environmentFilePath
      *
-     * @return Configuration
+     * @return self
      *
      * @throws ServiceBusConfigurationException
      */

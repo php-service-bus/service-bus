@@ -27,7 +27,7 @@ class MessageHandlersCollection implements \IteratorAggregate, \Countable
     /**
      * Create collection
      *
-     * @return MessageHandlersCollection
+     * @return self
      */
     public static function create(): self
     {

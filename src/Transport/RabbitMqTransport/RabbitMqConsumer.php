@@ -74,7 +74,7 @@ class RabbitMqConsumer
      * @param RabbitMqTransportConfig $configuration
      * @param LoggerInterface         $logger
      *
-     * @return RabbitMqConsumer
+     * @return self
      */
     public static function create(
         Client $client,

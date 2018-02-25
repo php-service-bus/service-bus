@@ -31,7 +31,7 @@ class SagasMetadataCollection
     /**
      * @param array $sagasMetadata
      *
-     * @return SagasMetadataCollection
+     * @return self
      */
     public static function create(array $sagasMetadata = []): self
     {

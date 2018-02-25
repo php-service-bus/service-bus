@@ -62,7 +62,7 @@ class SagaMetadata
      * @param string $identifierClass
      * @param string $containingIdentifierProperty
      *
-     * @return SagaMetadata
+     * @return self
      */
     public static function create(
         string $sagaNamespace,

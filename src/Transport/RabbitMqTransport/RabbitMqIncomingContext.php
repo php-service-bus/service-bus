@@ -41,7 +41,7 @@ class RabbitMqIncomingContext implements IncomingMessageContextInterface
      * @param Message $message
      * @param Channel $channel
      *
-     * @return RabbitMqIncomingContext
+     * @return self
      */
     public static function create(Message $message, Channel $channel): self
     {

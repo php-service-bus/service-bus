@@ -35,7 +35,7 @@ class SagaListener
      * @param string   $eventNamespace
      * @param \Closure $closure
      *
-     * @return SagaListener
+     * @return self
      */
     public static function new(string $eventNamespace, \Closure $closure): self
     {

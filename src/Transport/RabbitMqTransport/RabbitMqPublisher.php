@@ -44,7 +44,7 @@ class RabbitMqPublisher
      * @param Environment     $environment
      * @param LoggerInterface $logger
      *
-     * @return RabbitMqPublisher
+     * @return self
      */
     public static function create(Environment $environment, LoggerInterface $logger)
     {

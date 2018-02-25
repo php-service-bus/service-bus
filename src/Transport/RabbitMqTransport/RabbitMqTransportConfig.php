@@ -85,7 +85,7 @@ class RabbitMqTransportConfig
      * @param string $password by default 'guest'
      * @param array  $qosSettings
      *
-     * @return RabbitMqTransportConfig
+     * @return self
      *
      * @throws TransportExceptions\IncorrectTransportConfigurationException
      */
@@ -117,7 +117,7 @@ class RabbitMqTransportConfig
      * @param string $connectionDSN
      * @param array  $qosSettings
      *
-     * @return RabbitMqTransportConfig
+     * @return self
      *
      * @throws TransportExceptions\IncorrectTransportConfigurationException
      */
