@@ -68,14 +68,12 @@ final class MessageBus
      */
     public function handle(AbstractMessage $message, ExecutionContextInterface $context): PromiseInterface
     {
-        $messageNamespace = \get_class($message);
-
         $promises = \array_map(
             function(MessageBusTask $messageBusTask) use ($message, $context)
             {
                 return $this->executeTask($messageBusTask, $message, $context);
             },
-            $this->taskCollection->mapByMessageNamespace($messageNamespace)
+            $this->taskCollection->mapByMessageNamespace($message->getMessageClass())
         );
 
         return all($promises);

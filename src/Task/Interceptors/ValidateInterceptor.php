@@ -146,7 +146,9 @@ class ValidateInterceptor implements TaskInterface
         $context->logContextMessage(
             \sprintf(
                 'Validation error for message "%s". Property: "%s"; Error message: "%s"',
-                \get_class($message), $constraintViolation->getPropertyPath(), $constraintViolation->getMessage()
+                $message->getMessageClass(),
+                $constraintViolation->getPropertyPath(),
+                $constraintViolation->getMessage()
             ),
             LogLevel::ERROR
         );

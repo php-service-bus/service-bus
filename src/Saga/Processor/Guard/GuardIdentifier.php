@@ -64,7 +64,7 @@ final class GuardIdentifier
         if('' === $identifierValue)
         {
             throw new InvalidSagaIdentifierException(
-                \sprintf('Identifier value for event "%s" is empty', \get_class($event))
+                \sprintf('Identifier value for event "%s" is empty', $event->getMessageClass())
             );
         }
     }

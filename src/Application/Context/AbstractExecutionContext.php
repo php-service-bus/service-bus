@@ -68,7 +68,7 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
                 ->getLogger('scheduler')
                 ->debug(
                     \sprintf('The execution of the command "%s" is postponed until "%s"',
-                        \get_class($command), $delay->toString()
+                        $command->getMessageClass(), $delay->toString()
                     )
                 );
         }
