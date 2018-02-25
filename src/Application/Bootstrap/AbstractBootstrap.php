@@ -79,6 +79,8 @@ abstract class AbstractBootstrap
         $self = new static($rootDirectoryPath, $cacheDirectoryPath);
 
         $self->configuration = Configuration::loadDotEnv($environmentFilePath);
+        $self->configuration->validate();
+
         $self->container = $self->initializeContainer();
 
         $self->init();

@@ -87,9 +87,30 @@ final class Configuration
         $self->environment = (string) \getenv(self::DOTENV_ENV_KEY);
         $self->entryPointName = (string) \getenv(self::DOTENV_ENTRY_POINT_NAME_KEY);
 
-        $self->validate();
-
         return $self;
+    }
+
+    /**
+     * Process validate parameters
+     *
+     * @return void
+     *
+     * @throws ServiceBusConfigurationException
+     */
+    public function validate(): void
+    {
+        $validator = (new Validator\ValidatorBuilder())
+            ->enableAnnotationMapping()
+            ->getValidator();
+
+        $violations = $validator->validate($this);
+
+        foreach($violations as $violation)
+        {
+            /** @var Validator\ConstraintViolationInterface $violation */
+
+            throw new ServiceBusConfigurationException($violation->getMessage());
+        }
     }
 
     /**
@@ -123,27 +144,6 @@ final class Configuration
     public function getEntryPointName(): string
     {
         return $this->entryPointName;
-    }
-
-    /**
-     * Process validate parameters
-     *
-     * @return void
-     */
-    private function validate(): void
-    {
-        $validator = (new Validator\ValidatorBuilder())
-            ->enableAnnotationMapping()
-            ->getValidator();
-
-        $violations = $validator->validate($this);
-
-        foreach($violations as $violation)
-        {
-            /** @var Validator\ConstraintViolationInterface $violation */
-
-            throw new ServiceBusConfigurationException($violation->getMessage());
-        }
     }
 
     /**

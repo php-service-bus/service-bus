@@ -55,8 +55,6 @@ checks:
         code_rating: true
 
 build:
-    environment:
-        mongodb: true
     dependencies:
         before:
             - composer self-update

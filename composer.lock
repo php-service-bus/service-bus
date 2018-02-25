@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d44f96cd38d4fd151d9108027e014931",
-    "content-hash": "90db9a3a7b102fb685eebfa8f203e7ce",
+    "hash": "99e0725666216d0657e8856ba0eb1a5a",
+    "content-hash": "26fa5bef5f158685976afda381cba97a",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -901,16 +901,16 @@
         },
         {
             "name": "mmasiukevich/domain-common",
-            "version": "v0.0.3.2",
+            "version": "v0.0.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "338257ddf15b86ed6e2225ba81f3938165b66e90"
+                "reference": "d3082a084029e4fdd241350f28c204e0fb8da232"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/338257ddf15b86ed6e2225ba81f3938165b66e90",
-                "reference": "338257ddf15b86ed6e2225ba81f3938165b66e90",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/d3082a084029e4fdd241350f28c204e0fb8da232",
+                "reference": "d3082a084029e4fdd241350f28c204e0fb8da232",
                 "shasum": ""
             },
             "require": {
@@ -950,20 +950,20 @@
                 "cqs",
                 "event sourcing"
             ],
-            "time": "2018-02-25 15:22:19"
+            "time": "2018-02-25 16:05:40"
         },
         {
             "name": "mmasiukevich/event-sourcing",
-            "version": "v0.0.3.1",
+            "version": "v0.0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/event-sourcing.git",
-                "reference": "76eaf7141f3be95d5a07990aa910c95592e054ba"
+                "reference": "cc6428d1af7a3ef34212e9bf5b50880d3821b3ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/76eaf7141f3be95d5a07990aa910c95592e054ba",
-                "reference": "76eaf7141f3be95d5a07990aa910c95592e054ba",
+                "url": "https://api.github.com/repos/mmasiukevich/event-sourcing/zipball/cc6428d1af7a3ef34212e9bf5b50880d3821b3ad",
+                "reference": "cc6428d1af7a3ef34212e9bf5b50880d3821b3ad",
                 "shasum": ""
             },
             "require": {
@@ -1003,20 +1003,20 @@
             "keywords": [
                 "event sourcing"
             ],
-            "time": "2018-02-25 15:33:52"
+            "time": "2018-02-25 16:13:02"
         },
         {
             "name": "mmasiukevich/infrastructure",
-            "version": "v0.0.3.1",
+            "version": "v0.0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "1be238070aea1cc497e6c7b857503f271129544f"
+                "reference": "bd0e6c5267bbb1e1a6abf23d0cd804d3140f85d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/1be238070aea1cc497e6c7b857503f271129544f",
-                "reference": "1be238070aea1cc497e6c7b857503f271129544f",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/bd0e6c5267bbb1e1a6abf23d0cd804d3140f85d6",
+                "reference": "bd0e6c5267bbb1e1a6abf23d0cd804d3140f85d6",
                 "shasum": ""
             },
             "require": {
@@ -1063,20 +1063,20 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2018-02-25 15:25:12"
+            "time": "2018-02-25 16:08:37"
         },
         {
             "name": "mmasiukevich/message-serializer",
-            "version": "v0.0.3.1",
+            "version": "v0.0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/message-serializer.git",
-                "reference": "01358d98877c05e2eb0aab16e3977e24eeaf7999"
+                "reference": "e0f42b2051ae4818378d9b607164a588c219011e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/01358d98877c05e2eb0aab16e3977e24eeaf7999",
-                "reference": "01358d98877c05e2eb0aab16e3977e24eeaf7999",
+                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/e0f42b2051ae4818378d9b607164a588c219011e",
+                "reference": "e0f42b2051ae4818378d9b607164a588c219011e",
                 "shasum": ""
             },
             "require": {
@@ -1113,7 +1113,7 @@
                 }
             ],
             "description": "Message serializer",
-            "time": "2018-02-25 15:28:36"
+            "time": "2018-02-25 16:11:28"
         },
         {
             "name": "monolog/monolog",
