@@ -10,8 +10,6 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\KernelEvents;
-
 namespace Desperado\ServiceBus\Application\Kernel\Events;
 
 use Symfony\Component\EventDispatcher\Event;
