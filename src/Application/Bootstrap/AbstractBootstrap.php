@@ -12,16 +12,14 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\Bootstrap;
 
-use Desperado\Domain\ParameterBag;
 use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\ServiceBus\Application\Bootstrap\Exceptions as BootstrapExceptions;
 use Desperado\ServiceBus\DependencyInjection as ServiceBusDependencyInjection;
 use Desperado\ServiceBus\Application\EntryPoint\EntryPoint;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Symfony\Component\Config;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection as SymfonyDependencyInjection;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Validator;
 
 /**
@@ -74,7 +72,6 @@ abstract class AbstractBootstrap
      * @return self
      *
      * @throws BootstrapExceptions\IncorrectRootDirectoryPathException
-     * @throws BootstrapExceptions\IncorrectDotEnvFilePathException
      * @throws BootstrapExceptions\IncorrectCacheDirectoryFilePathException
      * @throws BootstrapExceptions\ServiceBusConfigurationException
      * @throws \Exception
@@ -90,7 +87,7 @@ abstract class AbstractBootstrap
         $self = new static($rootDirectoryPath, $cacheDirectoryPath, $environmentFilePath);
 
         $self->loadConfiguration();
-        $self->initializeContainer();
+        $self->container = $self->initializeContainer();
 
         $self->init();
 
@@ -152,6 +149,27 @@ abstract class AbstractBootstrap
     }
 
     /**
+     * @param string $rootDirectoryPath
+     * @param string $cacheDirectoryPath
+     * @param string $environmentFilePath
+     *
+     * @throws BootstrapExceptions\IncorrectRootDirectoryPathException
+     * @throws BootstrapExceptions\IncorrectCacheDirectoryFilePathException
+     */
+    final protected function __construct(
+        string $rootDirectoryPath,
+        string $cacheDirectoryPath,
+        string $environmentFilePath
+    )
+    {
+        $this->environmentFilePath = $environmentFilePath;
+        $this->cacheDirectoryPath = $this->prepareCacheDirectoryPath($cacheDirectoryPath);
+        $this->rootDirectoryPath = $this->prepareRootDirectoryPath($rootDirectoryPath);
+
+        $this->configureAnnotationsLoader();
+    }
+
+    /**
      * Load configuration
      *
      * @return void
@@ -177,204 +195,69 @@ abstract class AbstractBootstrap
     }
 
     /**
-     * Initialize dependency injection container
+     * Build dependency injection container
      *
-     * @return void
+     * @return ContainerInterface
      *
      * @throws BootstrapExceptions\ServiceBusConfigurationException
      */
-    private function initializeContainer(): void
+    private function initializeContainer(): ContainerInterface
     {
         try
         {
-            $containerClassName = \sprintf(
-                'serviceBus%sProjectContainer',
-                \ucfirst((string) $this->configuration->getEnvironment())
-            );
+            $builder = new ContainerBuilder($this->configuration, $this->rootDirectoryPath, $this->cacheDirectoryPath);
 
-            $containerClassPath = \sprintf('%s/%s.php', $this->cacheDirectoryPath, $containerClassName);
-
-            $configCache = new Config\ConfigCache(
-                \sprintf('%s/%s.php', $this->cacheDirectoryPath, $containerClassName),
-                $this->configuration->getEnvironment()->isDebug()
-            );
-
-            if(false === $configCache->isFresh() || true === $this->configuration->getEnvironment()->isDebug())
+            /** If the container does not need to be re-created, just get it */
+            if(
+                true === $this->configuration->getEnvironment()->isProduction() &&
+                true === $builder->isCacheActual()
+            )
             {
-                $container = $this->buildContainer();
-                $container->setParameter(
-                    'service_bus.services_relations',
-                    $this->extractServicesClassRelation($container)
-                );
-
-                $container->compile();
-                $this->dumpContainer($configCache, $container, $containerClassName);
+                return $builder->getContainer();
             }
 
-            /** @noinspection PhpIncludeInspection */
-            include $containerClassPath;
+            /** Assemble a new container */
 
-            $this->container = new $containerClassName();
+            $bootstrapContainerConfiguration = $this->getBootstrapContainerConfiguration();
+            $bootstrapServicesDefinitions = $this->getBootstrapServicesDefinitions();
+
+            $builder->addCompilationPasses([
+                    new ServiceBusDependencyInjection\Compiler\LoggerChannelsCompilerPass(),
+                    new ServiceBusDependencyInjection\Compiler\ModulesCompilerPass(),
+                    new ServiceBusDependencyInjection\Compiler\ServicesCompilerPass(),
+                    new ServiceBusDependencyInjection\Compiler\SchedulerCompilerPass(
+                        $bootstrapServicesDefinitions->getSchedulerStorageKey()
+                    ),
+                    new ServiceBusDependencyInjection\Compiler\SagaStorageCompilerPass(
+                        $bootstrapServicesDefinitions->getSagaStorageKey()
+                    ),
+                    new ServiceBusDependencyInjection\Compiler\EntryPointCompilerPass(
+                        $bootstrapServicesDefinitions->getMessageTransportKey(),
+                        $bootstrapServicesDefinitions->getKernelKey(),
+                        $bootstrapServicesDefinitions->getApplicationContextKey()
+                    ),
+                    new RegisterListenersPass(
+                        'service_bus.event_dispatcher',
+                        'service_bus.event_listener',
+                        'service_bus.event_subscriber'
+                    )
+                ]
+            );
+
+            $builder->addCompilationPasses($bootstrapContainerConfiguration->getCompilerPassCollection());
+
+            $builder->addExtension(new ServiceBusDependencyInjection\ServiceBusExtension());
+            $builder->addExtensions($bootstrapContainerConfiguration->getExtensionsCollection());
+
+            $builder->addContainerParameters($bootstrapContainerConfiguration->getCustomerParameters());
+
+            return $builder->rebuild();
+
         }
         catch(\Throwable $throwable)
         {
             throw new BootstrapExceptions\ServiceBusConfigurationException($throwable->getMessage(), 0, $throwable);
         }
-    }
-
-    /**
-     * Build dependency injection container
-     *
-     * @return SymfonyDependencyInjection\ContainerBuilder
-     */
-    private function buildContainer(): SymfonyDependencyInjection\ContainerBuilder
-    {
-        $bootstrapContainerConfiguration = $this->getBootstrapContainerConfiguration();
-        $bootstrapServicesDefinitions = $this->getBootstrapServicesDefinitions();
-
-        $configData = $this->configuration->toArray();
-
-        $applicationCompilerPass = [
-            'logger_channel'    => new ServiceBusDependencyInjection\Compiler\LoggerChannelsCompilerPass(),
-            'modules'           => new ServiceBusDependencyInjection\Compiler\ModulesCompilerPass(),
-            'scheduler_storage' => new ServiceBusDependencyInjection\Compiler\SchedulerCompilerPass(
-                $bootstrapServicesDefinitions->getSchedulerStorageKey()
-            ),
-            'saga_storage'      => new ServiceBusDependencyInjection\Compiler\SagaStorageCompilerPass(
-                $bootstrapServicesDefinitions->getSagaStorageKey()
-            ),
-            'entry_point'       => new ServiceBusDependencyInjection\Compiler\EntryPointCompilerPass(
-                $bootstrapServicesDefinitions->getMessageTransportKey(),
-                $bootstrapServicesDefinitions->getKernelKey(),
-                $bootstrapServicesDefinitions->getApplicationContextKey()
-            ),
-            'event_listeners'   => new RegisterListenersPass(
-                'service_bus.event_dispatcher',
-                'service_bus.event_listener',
-                'service_bus.event_subscriber'
-            ),
-            'services'          => new ServiceBusDependencyInjection\Compiler\ServicesCompilerPass()
-        ];
-
-        $containerParameters = new SymfonyDependencyInjection\ParameterBag\ParameterBag([
-            'service_bus.entry_point'  => $this->configuration->getEntryPointName(),
-            'service_bus.root_dir'     => $this->rootDirectoryPath,
-            'service_bus.cache_dir'    => $this->cacheDirectoryPath,
-            'service_bus.is_debug_env' => $this->configuration->getEnvironment()->isDebug()
-        ]);
-        $containerExtensions = new ParameterBag();
-        $containerCompilerPass = new ParameterBag();
-
-        $containerCompilerPass->add($bootstrapContainerConfiguration->getCompilerPassCollection());
-        $containerCompilerPass->add($applicationCompilerPass);
-
-        $containerExtensions->add($bootstrapContainerConfiguration->getExtensionsCollection());
-        $containerExtensions->add(['service_bus' => new ServiceBusDependencyInjection\ServiceBusExtension()]);
-
-        $containerParameters->add($configData);
-        $containerParameters->add($bootstrapContainerConfiguration->getCustomerParameters());
-
-        $containerBuilder = new SymfonyDependencyInjection\ContainerBuilder($containerParameters);
-
-        foreach($containerExtensions as $extension)
-        {
-            /** @var SymfonyDependencyInjection\Extension\Extension $extension */
-            $extension->load($configData, $containerBuilder);
-        }
-
-        foreach($containerCompilerPass as $compilerPass)
-        {
-            $containerBuilder->addCompilerPass($compilerPass);
-        }
-
-        return $containerBuilder;
-    }
-
-    /**
-     * Getting the relation of the class with the service identifier
-     *
-     * @param SymfonyDependencyInjection\ContainerBuilder $builder
-     *
-     * @return array
-     */
-    private function extractServicesClassRelation(SymfonyDependencyInjection\ContainerBuilder $builder): array
-    {
-        $relations = \array_filter(
-            \array_map(
-                function(string $eachService) use ($builder)
-                {
-                    if(true === $builder->hasDefinition($eachService))
-                    {
-                        return ['class' => $builder->getDefinition($eachService)->getClass(), 'id' => $eachService];
-                    }
-
-                    return null;
-                },
-                $builder->getServiceIds()
-            )
-        );
-
-        $result = [];
-
-        foreach($relations as $relation)
-        {
-            $result[$relation['class']] = $relation['id'];
-        }
-
-        return $result;
-    }
-
-    /**
-     * Dumps the service container to PHP code in the cache
-     *
-     * @param Config\ConfigCache                          $cache
-     * @param SymfonyDependencyInjection\ContainerBuilder $container
-     * @param string                                      $class
-     *
-     * @return void
-     */
-    private function dumpContainer(
-        Config\ConfigCache $cache,
-        SymfonyDependencyInjection\ContainerBuilder $container,
-        string $class
-    ): void
-    {
-        $dumper = new SymfonyDependencyInjection\Dumper\PhpDumper($container);
-        $content = (string) $dumper->dump([
-                'class'      => $class,
-                'base_class' => 'Container',
-                'file'       => $cache->getPath()
-            ]
-        );
-
-        $cache->write($content, $container->getResources());
-    }
-
-    /**
-     * @param string $rootDirectoryPath
-     * @param string $cacheDirectoryPath
-     * @param string $environmentFilePath
-     *
-     * @throws BootstrapExceptions\IncorrectRootDirectoryPathException
-     * @throws BootstrapExceptions\IncorrectDotEnvFilePathException
-     * @throws BootstrapExceptions\IncorrectCacheDirectoryFilePathException
-     */
-    final protected function __construct(
-        string $rootDirectoryPath,
-        string $cacheDirectoryPath,
-        string $environmentFilePath
-    )
-    {
-        $this->environmentFilePath = $environmentFilePath;
-        $this->cacheDirectoryPath = $this->prepareCacheDirectoryPath($cacheDirectoryPath);
-        $this->rootDirectoryPath = $this->prepareRootDirectoryPath($rootDirectoryPath);
-
-        if(false === \file_exists($this->environmentFilePath) || false === \is_readable($this->environmentFilePath))
-        {
-            throw new BootstrapExceptions\IncorrectDotEnvFilePathException($environmentFilePath);
-        }
-
-        $this->configureAnnotationsLoader();
     }
 
     /**
@@ -409,30 +292,17 @@ abstract class AbstractBootstrap
      */
     private function prepareCacheDirectoryPath(string $cacheDirectoryPath): string
     {
-        $cacheDirectoryPath = \rtrim($cacheDirectoryPath, '/');
-
         try
         {
-            if('' === $cacheDirectoryPath)
-            {
-                throw new \InvalidArgumentException($cacheDirectoryPath);
-            }
+            $cacheDirectory = new CacheDirectory($cacheDirectoryPath);
+            $cacheDirectory->prepare();
 
-            $filesystem = new Filesystem();
-
-            if(false === $filesystem->exists($cacheDirectoryPath))
-            {
-                $filesystem->mkdir($cacheDirectoryPath);
-            }
-
-            $filesystem->chmod($cacheDirectoryPath, 0775, \umask());
+            return (string) $cacheDirectory;
         }
         catch(\Throwable $throwable)
         {
             throw new BootstrapExceptions\IncorrectCacheDirectoryFilePathException($cacheDirectoryPath, $throwable);
         }
-
-        return $cacheDirectoryPath;
     }
 
     /**

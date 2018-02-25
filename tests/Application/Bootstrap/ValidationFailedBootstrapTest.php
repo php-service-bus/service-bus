@@ -82,13 +82,6 @@ class ValidationFailedBootstrapTest extends TestCase
             [
                 __DIR__ . '/../../../src',
                 \sys_get_temp_dir() . '/cache',
-                '/failed_dontenv/nonExists.env',
-                Exceptions\IncorrectDotEnvFilePathException::class,
-                'An incorrect path to the ".env" configuration file was specified ("/failed_dontenv/nonExists.env")'
-            ],
-            [
-                __DIR__ . '/../../../src',
-                \sys_get_temp_dir() . '/cache',
                 __FILE__,
                 Exceptions\ServiceBusConfigurationException::class,
                 ''
