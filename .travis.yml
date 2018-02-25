@@ -2,9 +2,6 @@ language: php
 
 sudo: false
 
-services:
-  - mongodb
-
 matrix:
     include:
         - php: 7.1
@@ -13,9 +10,6 @@ matrix:
     fast_finish: true
 
 before_script:
-  - mongod --version
-  - pecl install -f mongodb
-  - php --ri mongodb
   - composer self-update
   - composer install --no-interaction
 
