@@ -17,7 +17,7 @@ use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 /**
  * Scheduled tasks list
  */
-class SchedulerRegistry implements \Serializable
+final class SchedulerRegistry implements \Serializable
 {
     public const GZIP_LEVEL = 6;
 

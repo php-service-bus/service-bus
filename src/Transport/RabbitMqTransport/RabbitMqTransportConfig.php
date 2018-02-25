@@ -18,7 +18,7 @@ use Desperado\ServiceBus\Transport\Exceptions as TransportExceptions;
 /**
  * Configuration of RabbitMQ transport
  */
-class RabbitMqTransportConfig
+final class RabbitMqTransportConfig
 {
     private const DEFAULT_SCHEMA = 'amqp';
     private const DEFAULT_HOST = 'localhost';

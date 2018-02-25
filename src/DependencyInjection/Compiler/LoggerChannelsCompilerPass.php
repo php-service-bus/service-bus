@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection;
 /**
  * Logger channels support
  */
-class LoggerChannelsCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
+final class LoggerChannelsCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
 {
     /**
      * @inheritdoc

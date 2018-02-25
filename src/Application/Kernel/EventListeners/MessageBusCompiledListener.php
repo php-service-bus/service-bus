@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Message bus successful compiled
  */
-class MessageBusCompiledListener
+final class MessageBusCompiledListener
 {
     /**
      * Logger instance

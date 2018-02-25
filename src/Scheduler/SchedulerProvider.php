@@ -23,7 +23,7 @@ use Desperado\ServiceBus\Scheduler\Storage\SchedulerStorageInterface;
 /**
  * Scheduler provider
  */
-class SchedulerProvider
+final class SchedulerProvider
 {
     /**
      * Storage

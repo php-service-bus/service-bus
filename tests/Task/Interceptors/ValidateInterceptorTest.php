@@ -12,7 +12,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Task\Interceptors;
 
+use Bunny\Channel;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\Domain\ParameterBag;
+use Desperado\Domain\Transport\Message\Message;
+use Desperado\MessageSerializer\Bridge\SymfonySerializerBridge;
+use Desperado\MessageSerializer\MessageSerializer;
 use Desperado\ServiceBus\Services\Handlers\CommandExecutionParameters;
 use Desperado\ServiceBus\Task\Interceptors\ValidateInterceptor;
 use Desperado\ServiceBus\Task\Task;
@@ -20,6 +25,8 @@ use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceCommand;
 use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceEvent;
 use Desperado\ServiceBus\Tests\TestApplicationContext;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
+use Desperado\ServiceBus\Transport\IncomingMessageContainer;
+use Desperado\ServiceBus\Transport\RabbitMqTransport\RabbitMqIncomingContext;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ValidatorBuilder;
@@ -47,10 +54,22 @@ class ValidateInterceptorTest extends TestCase
     {
         parent::setUp();
 
-        /** @var OutboundMessageContext $outboundContext */
-        $outboundContext = static::getMockBuilder(OutboundMessageContext::class)
+        /** @var Channel $channel */
+        $channel = static::getMockBuilder(Channel::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $incomingContext = RabbitMqIncomingContext::create(
+            Message::create('',new ParameterBag(),'', ''),
+            $channel
+        );
+
+        $serializer = new MessageSerializer(
+            new SymfonySerializerBridge()
+        );
+
+        /** @var OutboundMessageContext $outboundContext */
+        $outboundContext = OutboundMessageContext::fromIncoming($incomingContext, $serializer);
 
         $this->context = static::getMockBuilder(TestApplicationContext::class)
             ->disableOriginalConstructor()

@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Application\Bootstrap;
 /**
  * Customer-configurable services
  */
-class BootstrapServicesDefinitions
+final class BootstrapServicesDefinitions
 {
     /**
      * The key under which the container stores the description of the transport service

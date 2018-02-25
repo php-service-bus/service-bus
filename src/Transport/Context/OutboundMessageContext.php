@@ -24,7 +24,7 @@ use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 /**
  * Outbound message context
  */
-class OutboundMessageContext implements OutboundMessageContextInterface
+final class OutboundMessageContext implements OutboundMessageContextInterface
 {
     /**
      * The context of the incoming message

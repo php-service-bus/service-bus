@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection as DependencyInjection;
 /**
  * Dependency injection container builder
  */
-class ContainerBuilder
+final class ContainerBuilder
 {
     private const CONTAINER_NAME_TEMPLATE = 'serviceBus%sProjectContainer';
 

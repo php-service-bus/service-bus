@@ -24,7 +24,7 @@ use Psr\Container\ContainerExceptionInterface;
 /**
  * Annotation-based handlers extractor
  */
-class AnnotationsExtractor implements ServiceHandlersExtractorInterface
+final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 {
     /**
      * Annotation reader

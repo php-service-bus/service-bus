@@ -17,7 +17,7 @@ use Desperado\Domain\Message\AbstractEvent;
 /**
  * The status of the saga was changed
  */
-class SagaStatusWasChangedEvent extends AbstractEvent
+final class SagaStatusWasChangedEvent extends AbstractEvent
 {
     /**
      * Saga identifier

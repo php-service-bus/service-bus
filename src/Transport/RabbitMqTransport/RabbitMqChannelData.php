@@ -17,7 +17,7 @@ use Bunny\Channel;
 /**
  * Created channel data
  */
-class RabbitMqChannelData
+final class RabbitMqChannelData
 {
     /**
      * Channel

@@ -17,7 +17,7 @@ use Psr\Container\ContainerInterface;
 /**
  * Search for services to be substituted as arguments to the handler
  */
-class AutowiringServiceLocator
+final class AutowiringServiceLocator
 {
     /**
      * Dependency Injection container

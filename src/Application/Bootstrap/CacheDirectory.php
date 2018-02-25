@@ -17,7 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Cache directory instance
  */
-class CacheDirectory
+final class CacheDirectory
 {
     /**
      * Basic utility to manipulate the file system

@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Saga\Metadata;
 /**
  * Saga metadata
  */
-class SagaMetadata
+final class SagaMetadata
 {
     /**
      * Saga namespace

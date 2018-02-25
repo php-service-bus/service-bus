@@ -29,7 +29,7 @@ use Psr\Log\LoggerInterface;
  *
  * @api
  */
-class SagaProvider
+final class SagaProvider
 {
     /**
      * Saga store

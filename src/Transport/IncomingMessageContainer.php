@@ -19,7 +19,7 @@ use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
 /**
  * Inbound message packet
  */
-class IncomingMessageContainer
+final class IncomingMessageContainer
 {
     /**
      * Incoming message

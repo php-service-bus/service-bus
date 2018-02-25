@@ -17,7 +17,7 @@ use Desperado\ServiceBus\Task\TaskInterface;
 /**
  * Information about the task in the bus
  */
-class MessageBusTask
+final class MessageBusTask
 {
     /**
      * Namespace of the message being processed

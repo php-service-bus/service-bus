@@ -22,7 +22,7 @@ use React\Promise\PromiseInterface;
 /**
  * RabbitMQ publisher
  */
-class RabbitMqPublisher
+final class RabbitMqPublisher
 {
     /**
      * Application environment

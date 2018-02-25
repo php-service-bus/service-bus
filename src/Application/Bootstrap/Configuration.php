@@ -20,7 +20,7 @@ use Symfony\Component\Dotenv\Dotenv;
 /**
  * Application configuration
  */
-class Configuration
+final class Configuration
 {
     protected const DOTENV_ENV_KEY = 'APP_ENVIRONMENT';
     protected const DOTENV_ENTRY_POINT_NAME_KEY = 'APP_ENTRY_POINT_NAME';

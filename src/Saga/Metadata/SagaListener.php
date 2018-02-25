@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Saga\Metadata;
 /**
  * Saga event listener data
  */
-class SagaListener
+final class SagaListener
 {
     /**
      * The event on which the saga is signed

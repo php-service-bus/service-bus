@@ -21,7 +21,7 @@ use React\Promise\PromiseInterface;
 /**
  * The helper for validating the handlers
  */
-class ConfigurationGuard
+final class ConfigurationGuard
 {
     /**
      * Assert handlers return declaration type is correct

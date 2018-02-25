@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Build message bus
  */
-class MessageBusBuilder
+final class MessageBusBuilder
 {
     /**
      * Message handlers

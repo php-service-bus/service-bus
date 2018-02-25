@@ -18,7 +18,7 @@ use Desperado\Domain\Uuid;
 /**
  * Scheduled command identifier
  */
-class ScheduledCommandIdentifier extends AbstractIdentity
+final class ScheduledCommandIdentifier extends AbstractIdentity
 {
     /**
      * Create new identifier

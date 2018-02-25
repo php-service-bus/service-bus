@@ -17,7 +17,7 @@ use Desperado\Domain\DateTime;
 /**
  * Saga state
  */
-class SagaState
+final class SagaState
 {
     public const STATUS_IN_PROGRESS = 1;
     public const STATUS_COMPLETED = 2;

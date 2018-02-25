@@ -18,7 +18,7 @@ use Desperado\ServiceBus\Task\Behaviors\ValidationBehavior;
 /**
  * Provide message validation
  */
-class MessageValidationModule implements ModuleInterface
+final class MessageValidationModule implements ModuleInterface
 {
     /**
      * @inheritdoc

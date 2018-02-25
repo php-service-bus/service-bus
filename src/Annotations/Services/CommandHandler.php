@@ -20,7 +20,7 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  * @Annotation
  * @Target("METHOD")
  */
-class CommandHandler extends AbstractAnnotation
+final class CommandHandler extends AbstractAnnotation
 {
     /**
      * Logger channel

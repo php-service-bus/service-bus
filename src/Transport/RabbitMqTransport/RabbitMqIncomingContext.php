@@ -19,7 +19,7 @@ use Desperado\Domain\Transport\Message\Message;
 /**
  * RabbitMQ incoming message context
  */
-class RabbitMqIncomingContext implements IncomingMessageContextInterface
+final class RabbitMqIncomingContext implements IncomingMessageContextInterface
 {
     /**
      * Received message

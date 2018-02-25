@@ -15,12 +15,17 @@ namespace Desperado\ServiceBus\Tests\Application\Kernel;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ParameterBag;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
+use Desperado\ServiceBus\Saga\Configuration\AnnotationsSagaConfigurationExtractor;
+use Desperado\ServiceBus\Saga\Serializer\SagaSerializer;
+use Desperado\ServiceBus\Saga\Store\SagaStore;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Application\EntryPoint\EntryPointContext;
 use Desperado\ServiceBus\Application\Kernel\AbstractKernel;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\Services\AnnotationsExtractor;
 use Desperado\ServiceBus\Services\AutowiringServiceLocator;
+use Desperado\ServiceBus\Storage\Doctrine\DoctrineConnectionFactory;
+use Desperado\ServiceBus\Storage\Doctrine\DoctrineSagaStorage;
 use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceCommand;
 use Desperado\ServiceBus\Tests\Services\Stabs\TestServiceEvent;
 use Desperado\ServiceBus\Tests\TestApplicationContext;
@@ -65,9 +70,16 @@ class AbstractKernelTest extends TestCase
         $builder = new MessageBusBuilder($serviceHandlersExtractor, $eventDispatcher, $logger);
 
         /** @var SagaProvider $sagaProvider */
-        $sagaProvider = self::getMockBuilder(SagaProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $sagaProvider = new SagaProvider(
+            new SagaStore(
+                new DoctrineSagaStorage(
+                    DoctrineConnectionFactory::create('sqlite:///:memory:')
+                ),
+                new SagaSerializer()
+            ),
+            new AnnotationsSagaConfigurationExtractor(),
+            new NullLogger()
+        );
 
         $this->kernel = new TestKernel(
             $builder,

@@ -23,7 +23,7 @@ use React\Promise\RejectedPromise;
 /**
  * Message bus
  */
-class MessageBus
+final class MessageBus
 {
     /**
      * Tasks

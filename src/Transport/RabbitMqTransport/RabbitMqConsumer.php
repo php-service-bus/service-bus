@@ -24,7 +24,7 @@ use React\Promise\RejectedPromise;
 /**
  * RabbitMQ subscriber
  */
-class RabbitMqConsumer
+final class RabbitMqConsumer
 {
     public const HEADER_DELIVERY_MODE_KEY = 'delivery-mode';
     public const HEADER_DELAY_KEY = 'x-delay';

@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Services\Handlers;
 /**
  * Information about the message handler
  */
-class MessageHandlerData
+final class MessageHandlerData
 {
     /**
      * Message class namespace

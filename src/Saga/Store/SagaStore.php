@@ -23,7 +23,7 @@ use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException;
 /**
  * Saga store
  */
-class SagaStore
+final class SagaStore
 {
     /**
      * Saga storage backend

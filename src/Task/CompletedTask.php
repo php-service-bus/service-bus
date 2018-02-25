@@ -20,7 +20,7 @@ use React\Promise\PromiseInterface;
 /**
  * Completed task
  */
-class CompletedTask
+final class CompletedTask
 {
     /**
      * Message

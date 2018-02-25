@@ -19,7 +19,7 @@ use Desperado\ServiceBus\Saga\Processor\Exceptions\InvalidSagaIdentifierExceptio
 /**
  *
  */
-class GuardIdentifier
+final class GuardIdentifier
 {
     /**
      * Check the accessor for the saga ID

@@ -24,7 +24,7 @@ use Desperado\ServiceBus\Saga\Configuration\Guard\SagaConfigurationGuard;
 /**
  * Saga configuration (annotation-based) reader
  */
-class AnnotationsSagaConfigurationExtractor implements SagaConfigurationExtractorInterface
+final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationExtractorInterface
 {
     /**
      * Annotation reader

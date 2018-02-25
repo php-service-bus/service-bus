@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\MessageBus;
 /**
  * Collection of tasks
  */
-class MessageBusTaskCollection implements \Countable
+final class MessageBusTaskCollection implements \Countable
 {
     /**
      * Collection of tasks

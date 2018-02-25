@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Services\Handlers;
 /**
  * Event processing parameters
  */
-class EventExecutionParameters extends AbstractMessageExecutionParameters
+final class EventExecutionParameters extends AbstractMessageExecutionParameters
 {
 
 }

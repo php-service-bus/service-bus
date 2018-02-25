@@ -19,7 +19,7 @@ use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 /**
  * Scheduled job data
  */
-class ScheduledOperation
+final class ScheduledOperation
 {
     /**
      * Identifier

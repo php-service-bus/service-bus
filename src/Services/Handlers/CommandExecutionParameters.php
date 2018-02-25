@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Services\Handlers;
 /**
  * Command processing parameters
  */
-class CommandExecutionParameters extends AbstractMessageExecutionParameters
+final class CommandExecutionParameters extends AbstractMessageExecutionParameters
 {
 
 }

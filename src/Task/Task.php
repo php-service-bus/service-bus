@@ -20,7 +20,7 @@ use React\Promise\PromiseInterface;
 /**
  * The task to be executed
  */
-class Task implements TaskInterface
+final class Task implements TaskInterface
 {
     /**
      * Message handler

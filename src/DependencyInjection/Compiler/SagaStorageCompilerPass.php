@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection;
 /**
  * Saga storage configuration
  */
-class SagaStorageCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
+final class SagaStorageCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
 {
     /**
      * Key under which the saga storage service is described in the container

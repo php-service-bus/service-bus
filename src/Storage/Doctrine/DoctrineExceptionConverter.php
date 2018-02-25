@@ -18,7 +18,7 @@ use Desperado\ServiceBus\Storage\Exceptions as StorageExceptions;
 /**
  * Convert Doctrine exceptions to application-level
  */
-class DoctrineExceptionConverter
+final class DoctrineExceptionConverter
 {
     /**
      * Convert Doctrine DBAL exceptions

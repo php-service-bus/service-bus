@@ -23,7 +23,7 @@ use Desperado\ServiceBus\SagaProvider;
 /**
  * The saga event processor
  */
-class SagaEventProcessor
+final class SagaEventProcessor
 {
     /**
      * Saga namespace

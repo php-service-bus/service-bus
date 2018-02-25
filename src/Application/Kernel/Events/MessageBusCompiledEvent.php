@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * The message bus has been successfully configured
  */
-class MessageBusCompiledEvent extends Event
+final class MessageBusCompiledEvent extends Event
 {
     public const EVENT_NAME = 'service_bus.kernel_events.message_bus_compiled';
 

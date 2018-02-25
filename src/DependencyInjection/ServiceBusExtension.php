@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection;
 /**
  * Share extensions
  */
-class ServiceBusExtension extends DependencyInjection\Extension\Extension
+final class ServiceBusExtension extends DependencyInjection\Extension\Extension
 {
     use LoadServicesTrait;
 

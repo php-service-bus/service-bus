@@ -20,7 +20,7 @@ use Doctrine\DBAL\Connection;
 /**
  * Doctrine2 saga storage
  */
-class DoctrineSagaStorage implements SagaStorageInterface
+final class DoctrineSagaStorage implements SagaStorageInterface
 {
     /**
      * Doctrine2 connection
