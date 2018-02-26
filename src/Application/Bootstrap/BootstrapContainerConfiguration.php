@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection;
 /**
  * Customer-configurable container parameters
  */
-class BootstrapContainerConfiguration
+final class BootstrapContainerConfiguration
 {
     /**
      * Compiler passes give you an opportunity to manipulate other service definitions that have been registered with

@@ -20,7 +20,7 @@ use React\Promise\PromiseInterface;
 /**
  * The task to be executed
  */
-class Task implements TaskInterface
+final class Task implements TaskInterface
 {
     /**
      * Message handler
@@ -42,7 +42,7 @@ class Task implements TaskInterface
      * @param \Closure                           $executionHandler
      * @param AbstractMessageExecutionParameters $options
      *
-     * @return Task
+     * @return self
      */
     public static function new(\Closure $executionHandler, AbstractMessageExecutionParameters $options): self
     {

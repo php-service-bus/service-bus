@@ -22,7 +22,7 @@ use Psr\Log\NullLogger;
 /**
  * Create doctrine2 connection
  */
-class DoctrineConnectionFactory
+final class DoctrineConnectionFactory
 {
     /**
      * @param string               $connectionDSN

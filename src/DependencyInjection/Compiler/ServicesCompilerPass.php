@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection;
 /**
  * Init service handlers
  */
-class ServicesCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
+final class ServicesCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
 {
     /**
      * @inheritdoc

@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection;
 /**
  * Entry point configuration
  */
-class EntryPointCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
+final class EntryPointCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
 {
     /**
      * Key under which the message transport service is described in the container

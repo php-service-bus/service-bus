@@ -19,7 +19,7 @@ use Symfony\Component\Validator;
 /**
  * Applies validation to messages (Symfony validator)
  */
-class ValidationBehavior implements BehaviorInterface
+final class ValidationBehavior implements BehaviorInterface
 {
     /**
      * Validation handler
@@ -31,7 +31,7 @@ class ValidationBehavior implements BehaviorInterface
     /**
      * Create behavior
      *
-     * @return ValidationBehavior
+     * @return self
      */
     public static function create(): self
     {

@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Application\Kernel\Events;
 /**
  * Message processed
  */
-class MessageProcessingCompletedEvent extends AbstractMessageFlowEvent
+final class MessageProcessingCompletedEvent extends AbstractMessageFlowEvent
 {
     public const EVENT_NAME = 'service_bus.kernel_events.after_execution';
 }

@@ -24,7 +24,7 @@ use Desperado\ServiceBus\Saga\Configuration\Guard\SagaConfigurationGuard;
 /**
  * Saga configuration (annotation-based) reader
  */
-class AnnotationsSagaConfigurationExtractor implements SagaConfigurationExtractorInterface
+final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationExtractorInterface
 {
     /**
      * Annotation reader
@@ -73,7 +73,7 @@ class AnnotationsSagaConfigurationExtractor implements SagaConfigurationExtracto
     /**
      * @inheritdoc
      */
-    public function extractSagaConfiguration(string $sagaNamespace): array
+    public function extractSagaConfiguration(string $sagaNamespace): SagaConfiguration
     {
         if(false === isset($this->sagasConfiguration[$sagaNamespace]))
         {
@@ -83,7 +83,7 @@ class AnnotationsSagaConfigurationExtractor implements SagaConfigurationExtracto
                 \array_map(
                     function(ClassAnnotation $classAnnotation) use ($supportedAnnotations)
                     {
-                        $annotationClass = \get_class($classAnnotation->getAnnotation());
+                        $annotationClass = $classAnnotation->getAnnotation()->getClass();
 
                         return true === \in_array($annotationClass, $supportedAnnotations, true)
                             ? $classAnnotation->getAnnotation()
@@ -104,11 +104,12 @@ class AnnotationsSagaConfigurationExtractor implements SagaConfigurationExtracto
                     (string) $annotation->containingIdentifierProperty
                 );
 
-                $this->sagasConfiguration[$sagaNamespace] = [
+                $this->sagasConfiguration[$sagaNamespace] = SagaConfiguration::create(
+                    $sagaNamespace,
                     $annotation->expireDateModifier,
                     $annotation->identifierNamespace,
                     $annotation->containingIdentifierProperty
-                ];
+                );
             }
             else
             {
@@ -136,15 +137,19 @@ class AnnotationsSagaConfigurationExtractor implements SagaConfigurationExtracto
 
                 if($annotationData->getAnnotation() instanceof SagaEventListener)
                 {
+                    /** @var SagaEventListener $sagaEventListenerAnnotation */
+                    $sagaEventListenerAnnotation = $annotationData->getAnnotation();
+
                     SagaConfigurationGuard::guardFirstEventListenerArgumentIsEvent(
                         $sagaNamespace,
                         $annotationData->getArguments()
                     );
 
-                    $this->sagasListeners[$sagaNamespace][] = [
+                    $this->sagasListeners[$sagaNamespace][] = SagaListenerConfiguration::create(
+                        $sagaNamespace,
                         $annotationData->getArguments()[0]->getClass()->getName(),
-                        $annotationData->getAnnotation()->containingIdentifierProperty
-                    ];
+                        (string) $sagaEventListenerAnnotation->containingIdentifierProperty
+                    );
                 }
             }
         }

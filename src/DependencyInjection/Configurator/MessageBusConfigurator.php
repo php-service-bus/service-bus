@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Message bus configurator
  */
-class MessageBusConfigurator
+final class MessageBusConfigurator
 {
     /**
      * Message bus builder

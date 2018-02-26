@@ -25,7 +25,7 @@ use Desperado\ServiceBus\Transport\RabbitMqTransport\RabbitMqConsumer;
  *     loggerChannel="scheduler"
  * )
  */
-class SchedulerListenerService implements ServiceInterface
+final class SchedulerListenerService implements ServiceInterface
 {
     /**
      * Entry point name

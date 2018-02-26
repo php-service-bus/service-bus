@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection;
 /**
  * Setup scheduler storage
  */
-class SchedulerCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
+final class SchedulerCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
 {
     /**
      * @var string

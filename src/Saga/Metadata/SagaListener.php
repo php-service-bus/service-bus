@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Saga\Metadata;
 /**
  * Saga event listener data
  */
-class SagaListener
+final class SagaListener
 {
     /**
      * The event on which the saga is signed
@@ -35,7 +35,7 @@ class SagaListener
      * @param string   $eventNamespace
      * @param \Closure $closure
      *
-     * @return SagaListener
+     * @return self
      */
     public static function new(string $eventNamespace, \Closure $closure): self
     {

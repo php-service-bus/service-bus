@@ -23,9 +23,9 @@
   },
   "require": {
     "php": ">=7.1",
-    "mmasiukevich/infrastructure": "v0.0.2",
-    "mmasiukevich/message-serializer": "v0.0.2",
-    "mmasiukevich/event-sourcing": "v0.0.2",
+    "mmasiukevich/infrastructure": "^v0.0.3",
+    "mmasiukevich/message-serializer": "^v0.0.3",
+    "mmasiukevich/event-sourcing": "^v0.0.3",
     "symfony/dotenv": "v4.0.4",
     "symfony/dependency-injection": "v4.0.4",
     "symfony/config": "v4.0.4",
@@ -44,7 +44,7 @@
   "prefer-stable": true,
   "extra": {
     "branch-alias": {
-      "dev-master": "v0.0.1-dev"
+      "dev-master": "v0.0.3-dev"
     }
   },
   "scripts": {

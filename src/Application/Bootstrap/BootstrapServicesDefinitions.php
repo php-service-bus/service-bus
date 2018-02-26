@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Application\Bootstrap;
 /**
  * Customer-configurable services
  */
-class BootstrapServicesDefinitions
+final class BootstrapServicesDefinitions
 {
     /**
      * The key under which the container stores the description of the transport service
@@ -59,7 +59,7 @@ class BootstrapServicesDefinitions
      * @param string $schedulerStorageKey
      * @param string $applicationContextKey
      *
-     * @return BootstrapServicesDefinitions
+     * @return self
      */
     final public static function create(
         string $messageTransportKey,

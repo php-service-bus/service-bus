@@ -17,7 +17,7 @@ use Desperado\Domain\DateTime;
 /**
  * Saga state
  */
-class SagaState
+final class SagaState
 {
     public const STATUS_IN_PROGRESS = 1;
     public const STATUS_COMPLETED = 2;
@@ -72,7 +72,7 @@ class SagaState
      * @param DateTime $createdAt
      * @param DateTime $expireDate
      *
-     * @return SagaState
+     * @return self
      */
     public static function create(DateTime $createdAt, DateTime $expireDate): SagaState
     {
@@ -89,7 +89,7 @@ class SagaState
      *
      * @param DateTime $expiredAt
      *
-     * @return SagaState
+     * @return self
      */
     public function expire(DateTime $expiredAt): SagaState
     {
@@ -111,7 +111,7 @@ class SagaState
      * @param string   $reason
      * @param DateTime $closedAt
      *
-     * @return SagaState
+     * @return self
      */
     public function fail(string $reason, DateTime $closedAt): SagaState
     {
@@ -131,7 +131,7 @@ class SagaState
      * @param DateTime $closedAt
      * @param string   $reason
      *
-     * @return SagaState
+     * @return self
      */
     public function complete(DateTime $closedAt, string $reason): self
     {

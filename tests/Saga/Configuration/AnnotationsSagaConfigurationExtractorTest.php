@@ -13,6 +13,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Saga\Configuration;
 
 use Desperado\ServiceBus\Saga\Configuration\AnnotationsSagaConfigurationExtractor;
+use Desperado\ServiceBus\Saga\Configuration\SagaConfiguration;
+use Desperado\ServiceBus\Saga\Configuration\SagaListenerConfiguration;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,33 +31,34 @@ class AnnotationsSagaConfigurationExtractorTest extends TestCase
     {
         $extractor = new AnnotationsSagaConfigurationExtractor();
 
+        /** @var SagaConfiguration $baseConfiguration */
         $baseConfiguration = $extractor->extractSagaConfiguration(Positive\TestConfigurationSaga::class);
 
-        static::assertArrayHasKey(0, $baseConfiguration);
-        static::assertArrayHasKey(1, $baseConfiguration);
-        static::assertArrayHasKey(2, $baseConfiguration);
+        static::assertInstanceOf(SagaConfiguration::class, $baseConfiguration);
 
-        static::assertEquals('+10 days', $baseConfiguration[0]);
-        static::assertEquals(Positive\TestConfigurationSagaIdentity::class, $baseConfiguration[1]);
-        static::assertEquals('operationId', $baseConfiguration[2]);
+        static::assertEquals('+10 days', $baseConfiguration->getExpireDateModifier());
+        static::assertEquals(Positive\TestConfigurationSagaIdentity::class, $baseConfiguration->getIdentifierNamespace());
+        static::assertEquals('operationId', $baseConfiguration->getContainingIdentifierProperty());
+        static::assertEquals(Positive\TestConfigurationSaga::class, $baseConfiguration->getSagaNamespace());
 
         $eventListeners = $extractor->extractSagaListeners(Positive\TestConfigurationSaga::class);
 
         static::assertCount(2, $eventListeners);
 
-        foreach($eventListeners as $listener)
+        foreach($eventListeners as $listenerConfig)
         {
-            static::assertArrayHasKey(0, $listener);
-            static::assertArrayHasKey(1, $listener);
+            /** @var SagaListenerConfiguration $listenerConfig */
 
-            if(Positive\TestConfigurationSagaEvent::class === $listener[0])
+            static::assertEquals(Positive\TestConfigurationSaga::class, $listenerConfig->getSagaClass());
+
+            if(Positive\TestConfigurationSagaEvent::class === $listenerConfig->getEventClass())
             {
-                static::assertNull($listener[1]);
+                static::assertFalse($listenerConfig->hasCustomIdentifierProperty());
             }
             else
             {
-                static::assertNotNull($listener[1]);
-                static::assertEquals('customIdentifierField', $listener[1]);
+                static::assertTrue($listenerConfig->hasCustomIdentifierProperty());
+                static::assertEquals('customIdentifierField', $listenerConfig->getContainingIdentifierProperty());
             }
         }
     }

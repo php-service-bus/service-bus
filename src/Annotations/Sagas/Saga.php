@@ -18,7 +18,7 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  * @Annotation
  * @Target("CLASS")
  */
-class Saga extends AbstractAnnotation
+final class Saga extends AbstractAnnotation
 {
     /**
      * Saga identifier class namespace

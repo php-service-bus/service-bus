@@ -18,12 +18,12 @@ use Desperado\Domain\Uuid;
 /**
  * Scheduled command identifier
  */
-class ScheduledCommandIdentifier extends AbstractIdentity
+final class ScheduledCommandIdentifier extends AbstractIdentity
 {
     /**
      * Create new identifier
      *
-     * @return ScheduledCommandIdentifier
+     * @return self
      */
     public static function new(): self
     {

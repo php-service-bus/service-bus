@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\MessageBus;
 /**
  * Collection of tasks
  */
-class MessageBusTaskCollection implements \Countable
+final class MessageBusTaskCollection implements \Countable
 {
     /**
      * Collection of tasks
@@ -27,7 +27,7 @@ class MessageBusTaskCollection implements \Countable
     /**
      * Create empty collection instance
      *
-     * @return MessageBusTaskCollection
+     * @return self
      */
     public static function createEmpty(): self
     {
@@ -37,7 +37,7 @@ class MessageBusTaskCollection implements \Countable
     /**
      * @param MessageBusTask[] $collectionData
      *
-     * @return MessageBusTaskCollection
+     * @return self
      */
     public static function createFromArray(array $collectionData): self
     {

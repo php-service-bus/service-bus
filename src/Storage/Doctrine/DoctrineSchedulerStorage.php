@@ -18,7 +18,7 @@ use Doctrine\DBAL\Connection;
 /**
  *
  */
-class DoctrineSchedulerStorage implements SchedulerStorageInterface
+final class DoctrineSchedulerStorage implements SchedulerStorageInterface
 {
     /**
      * Doctrine2 connection

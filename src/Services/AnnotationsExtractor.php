@@ -24,7 +24,7 @@ use Psr\Container\ContainerExceptionInterface;
 /**
  * Annotation-based handlers extractor
  */
-class AnnotationsExtractor implements ServiceHandlersExtractorInterface
+final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 {
     /**
      * Annotation reader
@@ -100,7 +100,7 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
             /** @todo: query handlers */
 
-            switch(\get_class($annotationData->getAnnotation()))
+            switch($annotationData->getAnnotation()->getClass())
             {
                 case Annotations\Services\CommandHandler::class:
                 case Annotations\Services\EventHandler::class:

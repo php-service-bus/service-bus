@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Log sql queries
  */
-class DoctrineQueryLogger implements SQLLogger
+final class DoctrineQueryLogger implements SQLLogger
 {
     /**
      * Logger instance

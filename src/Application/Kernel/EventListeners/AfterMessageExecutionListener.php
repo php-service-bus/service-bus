@@ -18,7 +18,7 @@ use Desperado\ServiceBus\Application\Kernel\Events\MessageProcessingCompletedEve
 /**
  * Called after message is executed
  */
-class AfterMessageExecutionListener
+final class AfterMessageExecutionListener
 {
     /**
      * Sagas service
@@ -42,7 +42,7 @@ class AfterMessageExecutionListener
      *
      * @return void
      */
-    public final function onComplete(MessageProcessingCompletedEvent $event): void
+    public function onComplete(MessageProcessingCompletedEvent $event): void
     {
         $this->sagaProvider->flush($event->getExecutionContext());
     }

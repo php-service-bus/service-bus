@@ -36,7 +36,7 @@ class ObservedSaga
     /**
      * @param AbstractSaga $saga
      *
-     * @return ObservedSaga
+     * @return self
      */
     public static function new(AbstractSaga $saga): self
     {
@@ -51,7 +51,7 @@ class ObservedSaga
     /**
      * @param AbstractSaga $saga
      *
-     * @return ObservedSaga
+     * @return self
      */
     public static function saved(AbstractSaga $saga): self
     {

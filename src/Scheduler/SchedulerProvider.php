@@ -23,7 +23,7 @@ use Desperado\ServiceBus\Scheduler\Storage\SchedulerStorageInterface;
 /**
  * Scheduler provider
  */
-class SchedulerProvider
+final class SchedulerProvider
 {
     /**
      * Storage
@@ -78,7 +78,7 @@ class SchedulerProvider
         $context->delivery(
             Events\OperationScheduledEvent::create([
                 'id'               => $id->toString(),
-                'commandNamespace' => \get_class($scheduledOperation->getCommand()),
+                'commandNamespace' => $scheduledOperation->getCommand()->getMessageClass(),
                 'executionDate'    => (string) $scheduledOperation->getDate(),
                 'nextOperation'    => $registry->fetchNextOperation()
             ])
@@ -107,7 +107,7 @@ class SchedulerProvider
             $context->delivery($command);
 
             $context->logContextMessage(
-                \sprintf('The delayed "%s" command has been sent to the queue', \get_class($command))
+                \sprintf('The delayed "%s" command has been sent to the queue', $command->getMessageClass())
             );
         }
 

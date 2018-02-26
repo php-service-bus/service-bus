@@ -19,7 +19,7 @@ use Desperado\ServiceBus\Saga\Processor\Exceptions\InvalidSagaIdentifierExceptio
 /**
  *
  */
-class GuardIdentifier
+final class GuardIdentifier
 {
     /**
      * Check the accessor for the saga ID
@@ -43,7 +43,7 @@ class GuardIdentifier
             throw new InvalidSagaIdentifierException(
                 \sprintf(
                     'Event "%s" must be contains "%s" accessor that contains the saga ID',
-                    \get_class($event), $identifierAccessorName
+                    $event->getMessageClass(), $identifierAccessorName
                 )
             );
         }
@@ -64,7 +64,7 @@ class GuardIdentifier
         if('' === $identifierValue)
         {
             throw new InvalidSagaIdentifierException(
-                \sprintf('Identifier value for event "%s" is empty', \get_class($event))
+                \sprintf('Identifier value for event "%s" is empty', $event->getMessageClass())
             );
         }
     }

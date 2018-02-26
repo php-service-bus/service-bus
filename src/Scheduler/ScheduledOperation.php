@@ -19,7 +19,7 @@ use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 /**
  * Scheduled job data
  */
-class ScheduledOperation
+final class ScheduledOperation
 {
     /**
      * Identifier
@@ -54,7 +54,7 @@ class ScheduledOperation
      * @param AbstractCommand            $command
      * @param DateTime                   $dateTime
      *
-     * @return ScheduledOperation
+     * @return self
      */
     public static function new(
         ScheduledCommandIdentifier $id,
@@ -71,7 +71,7 @@ class ScheduledOperation
     /**
      * Sent job
      *
-     * @return ScheduledOperation
+     * @return self
      */
     public function sent(): self
     {
