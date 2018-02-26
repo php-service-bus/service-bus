@@ -10,12 +10,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Services\Handlers;
+namespace Desperado\ServiceBus\Tests\Task;
+
+use Desperado\Domain\Message\AbstractCommand;
 
 /**
- * Event processing parameters
+ *
  */
-final class EventExecutionParameters extends AbstractMessageExecutionParameters
+class TaskTestCommand extends AbstractCommand
 {
 
 }

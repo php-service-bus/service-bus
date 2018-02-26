@@ -20,7 +20,7 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  * @Annotation
  * @Target("METHOD")
  */
-class SagaEventListener extends AbstractAnnotation
+final class SagaEventListener extends AbstractAnnotation
 {
     /**
      * The event property that contains the saga ID

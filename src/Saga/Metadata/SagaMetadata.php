@@ -12,10 +12,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Saga\Metadata;
 
+use Desperado\ServiceBus\Saga\Configuration\SagaConfiguration;
+
 /**
  * Saga metadata
  */
-class SagaMetadata
+final class SagaMetadata
 {
     /**
      * Saga namespace
@@ -62,7 +64,7 @@ class SagaMetadata
      * @param string $identifierClass
      * @param string $containingIdentifierProperty
      *
-     * @return SagaMetadata
+     * @return self
      */
     public static function create(
         string $sagaNamespace,
@@ -79,6 +81,21 @@ class SagaMetadata
         $self->containingIdentifierProperty = $containingIdentifierProperty;
 
         return $self;
+    }
+
+    /**
+     * @param SagaConfiguration $sagaConfiguration
+     *
+     * @return SagaMetadata
+     */
+    public static function fromBaseConfiguration(SagaConfiguration $sagaConfiguration): self
+    {
+        return self::create(
+            $sagaConfiguration->getSagaNamespace(),
+            $sagaConfiguration->getExpireDateModifier(),
+            $sagaConfiguration->getIdentifierNamespace(),
+            $sagaConfiguration->getContainingIdentifierProperty()
+        );
     }
 
     /**

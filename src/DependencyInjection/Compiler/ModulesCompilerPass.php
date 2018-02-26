@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection;
 /**
  * Boot modules
  */
-class ModulesCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
+final class ModulesCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
 {
     /**
      * @inheritdoc

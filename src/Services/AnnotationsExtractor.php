@@ -12,7 +12,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Services;
 
-use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Infrastructure\Bridge;
 use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\ServiceInterface;
@@ -20,12 +19,23 @@ use Desperado\ServiceBus\Services\Handlers;
 use Desperado\ServiceBus\Services\Configuration\ConfigurationGuard;
 use Desperado\ServiceBus\Services\Exceptions as ServicesExceptions;
 use Psr\Container\ContainerExceptionInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Annotation-based handlers extractor
  */
-class AnnotationsExtractor implements ServiceHandlersExtractorInterface
+final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 {
+    private const SUPPORTED_CLASS_ANNOTATIONS = [
+        Annotations\Services\Service::class
+    ];
+
+    private const SUPPORTED_METHOD_ANNOTATIOS = [
+        Annotations\Services\CommandHandler::class,
+        Annotations\Services\EventHandler::class,
+        Annotations\Services\QueryHandler::class
+    ];
+
     /**
      * Annotation reader
      *
@@ -41,16 +51,26 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
     private $autowiringServiceLocator;
 
     /**
+     * Logger instance
+     *
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader
      * @param AutowiringServiceLocator                            $autowiringServiceLocator
+     * @param LoggerInterface                                     $logger
      */
     public function __construct(
         Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader,
-        AutowiringServiceLocator $autowiringServiceLocator
+        AutowiringServiceLocator $autowiringServiceLocator,
+        LoggerInterface $logger
     )
     {
         $this->annotationReader = $annotationReader;
         $this->autowiringServiceLocator = $autowiringServiceLocator;
+        $this->logger = $logger;
     }
 
     /**
@@ -58,12 +78,11 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
      */
     public function extractServiceLoggerChannel(ServiceInterface $service): string
     {
-        $supportedList = [Annotations\Services\Service::class];
         $annotations = \array_filter(
             \array_map(
-                function(Bridge\AnnotationsReader\ClassAnnotation $annotation) use ($supportedList)
+                function(Bridge\AnnotationsReader\ClassAnnotation $annotation)
                 {
-                    return true === \in_array($annotation->getClass(), $supportedList, true)
+                    return true === \in_array($annotation->getClass(), self::SUPPORTED_CLASS_ANNOTATIONS, true)
                         ? $annotation->getAnnotation()
                         : null;
                 },
@@ -98,19 +117,27 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
             ConfigurationGuard::guardHandlerReturnDeclaration($annotationData->getMethod());
 
-            /** @todo: query handlers */
+            $annotationClass = $annotationData->getAnnotation()->getClass();
 
-            switch(\get_class($annotationData->getAnnotation()))
+            if(false === \in_array($annotationClass, self::SUPPORTED_METHOD_ANNOTATIOS, true))
             {
-                case Annotations\Services\CommandHandler::class:
-                case Annotations\Services\EventHandler::class:
+                /** Most likely this is some kind of user annotation. We will not throw an error */
 
-                    $messageHandlers->add(
-                        $this->extractMessageHandler($service, $annotationData, $defaultServiceLoggerChannel)
-                    );
+                $this->logger->debug(
+                    \sprintf(
+                        'An unsupported annotation ("%s") was found in method "%s:%s"',
+                        $annotationClass,
+                        $annotationData->getMethod()->getDeclaringClass()->getName(),
+                        $annotationData->getMethod()->getName()
+                    )
+                );
 
-                    break;
+                continue;
             }
+
+            $messageHandlers->add(
+                $this->extractMessageHandler($service, $annotationData, $defaultServiceLoggerChannel)
+            );
         }
 
         return $messageHandlers;
@@ -141,28 +168,56 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         ConfigurationGuard::guardContextValidArgument($reflectionMethod, $methodArguments[1]);
 
         $autowiringServices = $this->collectAutowiringServices($reflectionMethod, 2);
-
-        $isEvent = $methodArguments[0]
-            ->getClass()
-            ->isSubclassOf(AbstractEvent::class);
-
-        /** @var Annotations\Services\CommandHandler|Annotations\Services\EventHandler $annotation */
+        /** @var Annotations\Services\MessageHandlerAnnotationInterface $annotation */
         $annotation = $methodAnnotation->getAnnotation();
-
-        $loggerChannel = '' !== (string) $annotation->getLoggerChannel()
-            ? $annotation->getLoggerChannel()
-            : $defaultServiceLoggerChannel;
-
-        $options = true === $isEvent
-            ? new Handlers\EventExecutionParameters((string) $loggerChannel)
-            : new Handlers\CommandExecutionParameters((string) $loggerChannel);
 
         return Handlers\MessageHandlerData::new(
             $methodAnnotation->getArguments()[0]->getClass()->getName(),
             $methodAnnotation->getMethod()->getClosure($service),
             $autowiringServices,
-            $options
+            $this->createMessageOptions($annotation, (string) $defaultServiceLoggerChannel)
         );
+    }
+
+    /**
+     * Create execution options object for message
+     *
+     * @param Annotations\Services\MessageHandlerAnnotationInterface $annotation
+     * @param string                                                 $defaultServiceLoggerChannel
+     *
+     * @return Handlers\AbstractMessageExecutionParameters
+     *
+     * @throws \LogicException
+     */
+    private function createMessageOptions(
+        Annotations\Services\MessageHandlerAnnotationInterface $annotation,
+        string $defaultServiceLoggerChannel
+    ): Handlers\AbstractMessageExecutionParameters
+    {
+        $annotationClass = \get_class($annotation);
+        $loggerChannel = '' !== (string) $annotation->getLoggerChannel()
+            ? (string) $annotation->getLoggerChannel()
+            : (string) $defaultServiceLoggerChannel;
+
+        switch($annotationClass)
+        {
+            /** @var Annotations\Services\CommandHandler $annotation */
+            case Annotations\Services\CommandHandler::class:
+                return new Handlers\CommandExecutionParameters($loggerChannel);
+
+            case Annotations\Services\EventHandler::class:
+                /** @var Annotations\Services\EventHandler $annotation */
+                return new Handlers\EventExecutionParameters($loggerChannel);
+
+            case Annotations\Services\QueryHandler::class:
+                /** @var Annotations\Services\QueryHandler $annotation */
+                return new Handlers\QueryExecutionParameters($loggerChannel, $annotation->getResponseEventClass());
+
+            default:
+                throw new \LogicException(
+                    \sprintf('Unsupported annotation type ("%s")', $annotationClass)
+                );
+        }
     }
 
     /**
@@ -211,42 +266,61 @@ class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         int $index
     )
     {
-        $reflectionClass = $reflectionParameter->getClass();
-
-        $baseMessagePart = \sprintf(
-            'The %d argument to the handler "%s:%s"',
-            $index,
-            $reflectionMethod->getDeclaringClass()->getName(),
-            $reflectionMethod->getName()
-        );
-
-        if(null !== $reflectionClass)
+        if(null !== $reflectionParameter->getClass())
         {
-            if(false === $this->autowiringServiceLocator->has($reflectionClass->getName()))
-            {
-                throw new ServicesExceptions\InvalidHandlerArgumentException(
-                    \sprintf(
-                        '%s not specified correctly. The service for the specified class ("%s") was not '
-                        . 'described in the dependency container',
-                        $baseMessagePart,
-                        $reflectionClass->getName()
-                    )
-                );
-            }
-
-            try
-            {
-                return $this->autowiringServiceLocator->get($reflectionClass->getName());
-            }
-            catch(ContainerExceptionInterface $exception)
-            {
-                throw new ServicesExceptions\InvalidHandlerArgumentException($exception->getMessage());
-            }
+            return $this->locateService($reflectionParameter->getClass()->getName());
         }
-        else
+
+        throw new ServicesExceptions\InvalidHandlerArgumentException(
+            \sprintf('The %d argument to the handler "%s:%s" should be of the type "object"',
+                $index,
+                $reflectionMethod->getDeclaringClass()->getName(),
+                $reflectionMethod->getName()
+
+            )
+        );
+    }
+
+    /**
+     * Locate service in container by it class
+     *
+     * @param string $serviceClass
+     *
+     * @return object
+     *
+     * @throws ServicesExceptions\InvalidHandlerArgumentException
+     */
+    private function locateService(string $serviceClass)
+    {
+        try
+        {
+            $this->assertServiceExists($serviceClass);
+
+            return $this->autowiringServiceLocator->get($serviceClass);
+        }
+        catch(ContainerExceptionInterface $exception)
+        {
+            throw new ServicesExceptions\InvalidHandlerArgumentException($exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * Checking the existence of the service in the container
+     *
+     * @param string $serviceClass
+     *
+     * @return void
+     *
+     * @throws ServicesExceptions\InvalidHandlerArgumentException
+     */
+    private function assertServiceExists(string $serviceClass)
+    {
+        if(false === $this->autowiringServiceLocator->has($serviceClass))
         {
             throw new ServicesExceptions\InvalidHandlerArgumentException(
-                \sprintf('%s should be of the type "object"', $baseMessagePart)
+                \sprintf('The service for the specified class ("%s") was not described in the dependency container',
+                    $serviceClass
+                )
             );
         }
     }

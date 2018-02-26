@@ -10,8 +10,6 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\KernelEvents;
-
 namespace Desperado\ServiceBus\Application\Kernel\Events;
 
 use Symfony\Component\EventDispatcher\Event;
@@ -19,7 +17,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * The message bus has been successfully configured
  */
-class MessageBusCompiledEvent extends Event
+final class MessageBusCompiledEvent extends Event
 {
     public const EVENT_NAME = 'service_bus.kernel_events.message_bus_compiled';
 

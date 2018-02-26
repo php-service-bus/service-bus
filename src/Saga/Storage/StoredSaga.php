@@ -76,7 +76,7 @@ final class StoredSaga
      * @param DateTime               $createdAt
      * @param DateTime|null          $closedAt
      *
-     * @return StoredSaga
+     * @return self
      */
     public static function create(
         AbstractSagaIdentifier $id,
@@ -88,7 +88,7 @@ final class StoredSaga
     {
         $self = new self();
         $self->identifier = $id->toString();
-        $self->identifierNamespace = $id->getIdentityClassNamespace();
+        $self->identifierNamespace = $id->getIdentityClass();
         $self->sagaNamespace = $id->getSagaNamespace();
         $self->payload = $payload;
         $self->state = $state;

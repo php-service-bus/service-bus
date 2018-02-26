@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Services\Handlers;
 /**
  * Information about the message handler
  */
-class MessageHandlerData
+final class MessageHandlerData
 {
     /**
      * Message class namespace
@@ -51,7 +51,7 @@ class MessageHandlerData
      * @param array                              $autowiringServices
      * @param AbstractMessageExecutionParameters $executionOptions
      *
-     * @return MessageHandlerData
+     * @return self
      */
     public static function new(
         string $messageClassNamespace,

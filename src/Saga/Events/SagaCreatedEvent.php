@@ -17,7 +17,7 @@ use Desperado\Domain\Message\AbstractEvent;
 /**
  * A new saga was created
  */
-class SagaCreatedEvent extends AbstractEvent
+final class SagaCreatedEvent extends AbstractEvent
 {
     /**
      * Saga identifier

@@ -19,7 +19,7 @@ use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
 /**
  * Inbound message packet
  */
-class IncomingMessageContainer
+final class IncomingMessageContainer
 {
     /**
      * Incoming message
@@ -47,7 +47,7 @@ class IncomingMessageContainer
      * @param IncomingMessageContextInterface $incomingMessageContext
      * @param OutboundMessageContext          $outboundContext
      *
-     * @return IncomingMessageContainer
+     * @return self
      */
     public static function new(
         Message $message,

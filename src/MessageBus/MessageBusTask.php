@@ -17,7 +17,7 @@ use Desperado\ServiceBus\Task\TaskInterface;
 /**
  * Information about the task in the bus
  */
-class MessageBusTask
+final class MessageBusTask
 {
     /**
      * Namespace of the message being processed
@@ -47,7 +47,7 @@ class MessageBusTask
      * @param TaskInterface $task
      * @param array         $autowiringServices
      *
-     * @return MessageBusTask
+     * @return self
      */
     public static function create(string $messageNamespace, TaskInterface $task, array $autowiringServices): self
     {

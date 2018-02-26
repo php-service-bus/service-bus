@@ -17,7 +17,7 @@ use Psr\Container\ContainerInterface;
 /**
  * Search for services to be substituted as arguments to the handler
  */
-class AutowiringServiceLocator
+final class AutowiringServiceLocator
 {
     /**
      * Dependency Injection container
@@ -60,15 +60,13 @@ class AutowiringServiceLocator
      *
      * @param string $className
      *
-     * @return object|null
+     * @return object
      *
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function get(string $className)
     {
-        return true === $this->has($className)
-            ? $this->container->get($this->servicesRelation[$className])
-            : null;
+        return $this->container->get($this->servicesRelation[$className]);
     }
 }

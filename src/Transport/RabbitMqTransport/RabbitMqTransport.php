@@ -32,7 +32,7 @@ use React\Promise\PromiseInterface;
 /**
  * RabbitMQ transport implementation
  */
-class RabbitMqTransport implements TransportInterface
+final class RabbitMqTransport implements TransportInterface
 {
     /**
      * Transport configuration

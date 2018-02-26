@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Services\Handlers;
 /**
  * Collection of message handlers
  */
-class MessageHandlersCollection implements \IteratorAggregate, \Countable
+final class MessageHandlersCollection implements \IteratorAggregate, \Countable
 {
     /**
      * Collection of message handlers
@@ -27,7 +27,7 @@ class MessageHandlersCollection implements \IteratorAggregate, \Countable
     /**
      * Create collection
      *
-     * @return MessageHandlersCollection
+     * @return self
      */
     public static function create(): self
     {

@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Saga\Metadata;
 /**
  * Configured sagas collection
  */
-class SagasMetadataCollection
+final class SagasMetadataCollection
 {
     /**
      * Sagas metadata
@@ -31,7 +31,7 @@ class SagasMetadataCollection
     /**
      * @param array $sagasMetadata
      *
-     * @return SagasMetadataCollection
+     * @return self
      */
     public static function create(array $sagasMetadata = []): self
     {

@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Application\Kernel\Events;
 /**
  * The message is ready to be processed
  */
-class MessageIsReadyForProcessingEvent extends AbstractMessageFlowEvent
+final class MessageIsReadyForProcessingEvent extends AbstractMessageFlowEvent
 {
     public const EVENT_NAME = 'service_bus.kernel_events.before_execution';
 }

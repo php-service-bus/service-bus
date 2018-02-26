@@ -20,7 +20,7 @@ use Doctrine\DBAL\Types\Type;
 /**
  * Creating tables
  */
-class SchemaBuilder
+final class SchemaBuilder
 {
     public const TABLE_NAME_SAGAS = 'sagas_store';
     public const TABLE_NAME_SCHEDULER = 'scheduler_store';

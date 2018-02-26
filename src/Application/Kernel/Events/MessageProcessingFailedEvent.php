@@ -18,7 +18,7 @@ use Desperado\ServiceBus\Application\EntryPoint\EntryPointContext;
 /**
  * Error while executing the message
  */
-class MessageProcessingFailedEvent extends AbstractMessageFlowEvent
+final class MessageProcessingFailedEvent extends AbstractMessageFlowEvent
 {
     public const EVENT_NAME = 'service_bus.kernel_events.failed_execution';
 
@@ -50,7 +50,7 @@ class MessageProcessingFailedEvent extends AbstractMessageFlowEvent
      *
      * @return \Throwable
      */
-    final public function getThrowable(): \Throwable
+    public function getThrowable(): \Throwable
     {
         return $this->throwable;
     }

@@ -17,7 +17,7 @@ use Desperado\ServiceBus\AbstractSaga;
 /**
  * Saga serializer
  */
-class SagaSerializer implements SagaSerializerInterface
+final class SagaSerializer implements SagaSerializerInterface
 {
     private const DEFAULT_GZIP_LEVEL = 7;
 

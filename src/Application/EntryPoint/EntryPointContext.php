@@ -38,7 +38,7 @@ class EntryPointContext
      * @param AbstractMessage $message
      * @param ParameterBag    $headers
      *
-     * @return EntryPointContext
+     * @return self
      */
     public static function create(AbstractMessage $message, ParameterBag $headers): self
     {

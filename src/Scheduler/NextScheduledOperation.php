@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Scheduler;
 /**
  * Scheduled job data (for next job)
  */
-class NextScheduledOperation
+final class NextScheduledOperation
 {
     /**
      * Job identifier

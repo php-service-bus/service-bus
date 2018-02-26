@@ -18,7 +18,7 @@ use Desperado\ServiceBus\Transport\Exceptions as TransportExceptions;
 /**
  * Configuration of RabbitMQ transport
  */
-class RabbitMqTransportConfig
+final class RabbitMqTransportConfig
 {
     private const DEFAULT_SCHEMA = 'amqp';
     private const DEFAULT_HOST = 'localhost';
@@ -85,7 +85,7 @@ class RabbitMqTransportConfig
      * @param string $password by default 'guest'
      * @param array  $qosSettings
      *
-     * @return RabbitMqTransportConfig
+     * @return self
      *
      * @throws TransportExceptions\IncorrectTransportConfigurationException
      */
@@ -117,7 +117,7 @@ class RabbitMqTransportConfig
      * @param string $connectionDSN
      * @param array  $qosSettings
      *
-     * @return RabbitMqTransportConfig
+     * @return self
      *
      * @throws TransportExceptions\IncorrectTransportConfigurationException
      */

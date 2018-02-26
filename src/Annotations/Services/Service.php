@@ -20,7 +20,7 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  * @Annotation
  * @Target("CLASS")
  */
-class Service extends AbstractAnnotation
+final class Service extends AbstractAnnotation
 {
     private const DEFAULT_LOGGER_CHANNEL = 'default';
 

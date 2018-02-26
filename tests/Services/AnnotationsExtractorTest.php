@@ -23,6 +23,7 @@ use Desperado\ServiceBus\Tests\TestApplicationContext;
 use Desperado\ServiceBus\Tests\TestContainer;
 use PHPUnit\Framework\TestCase;
 use Desperado\ServiceBus\Annotations;
+use Psr\Log\NullLogger;
 
 /**
  *
@@ -53,7 +54,11 @@ class AnnotationsExtractorTest extends TestCase
 
         $this->autowiringServiceLocator = new AutowiringServiceLocator(new TestContainer(), []);
         $this->annotationsReader = new DoctrineAnnotationsReader();
-        $this->extractor = new AnnotationsExtractor($this->annotationsReader, $this->autowiringServiceLocator);
+        $this->extractor = new AnnotationsExtractor(
+            $this->annotationsReader,
+            $this->autowiringServiceLocator,
+            new NullLogger()
+        );
     }
 
     /**
@@ -134,7 +139,7 @@ class AnnotationsExtractorTest extends TestCase
             $container, [Stabs\SomeAutoWiringProvider::class => 'some_service_key']
         );
 
-        $extractor = new AnnotationsExtractor($this->annotationsReader, $autowiringServiceLocator);
+        $extractor = new AnnotationsExtractor($this->annotationsReader, $autowiringServiceLocator, new NullLogger());
 
         $handlers = $extractor->extractHandlers(
             new class() implements ServiceInterface
@@ -143,7 +148,7 @@ class AnnotationsExtractorTest extends TestCase
                  * @Annotations\Services\CommandHandler()
                  *
                  * @param Stabs\TestServiceCommand     $command
-                 * @param TestApplicationContext $context
+                 * @param TestApplicationContext       $context
                  * @param Stabs\SomeAutoWiringProvider $autoWiringProvider
                  *
                  * @return void
@@ -173,9 +178,7 @@ class AnnotationsExtractorTest extends TestCase
     /**
      * @test
      * @expectedException \Desperado\ServiceBus\Services\Exceptions\InvalidHandlerArgumentException
-     * @expectedExceptionMessage The 2 argument to the handler
-     *                           "Desperado\ServiceBus\Tests\Services\Stabs\TestServiceWithAutowiring:executeTestServiceCommand"
-     *                           not specified correctly. The service for the specified class
+     * @expectedExceptionMessage The service for the specified class
      *                           ("Desperado\ServiceBus\Tests\Services\Stabs\SomeAutoWiringProvider") was not described
      *                           in the dependency container
      *
@@ -221,7 +224,7 @@ class AnnotationsExtractorTest extends TestCase
             $container, [Stabs\SomeAutoWiringProvider::class => 'some_service_key']
         );
 
-        $extractor = new AnnotationsExtractor($this->annotationsReader, $autowiringServiceLocator);
+        $extractor = new AnnotationsExtractor($this->annotationsReader, $autowiringServiceLocator, new NullLogger());
 
         $extractor->extractHandlers(
             new class() implements ServiceInterface

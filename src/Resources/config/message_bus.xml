@@ -18,6 +18,9 @@
                  public="false">
             <argument type="service" id="service_bus.infrastructure.annotations_reader"/>
             <argument type="service" id="service_bus.services.autowiring_service_locator"/>
+            <argument type="service" id="service_bus.logger"/>
+
+            <tag name="service_bus.logger" channel="configuration"/>
         </service>
 
         <!-- Message bus builder -->

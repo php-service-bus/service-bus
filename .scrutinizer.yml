@@ -55,12 +55,8 @@ checks:
         code_rating: true
 
 build:
-    environment:
-        mongodb: true
     dependencies:
         before:
-            - pecl install -f mongodb
-            - php --ri mongodb
             - composer self-update
     tests:
         override:
@@ -69,3 +65,11 @@ build:
                 coverage:
                     file: 'coverage-report'
                     format: 'clover'
+    nodes:
+        analysis:
+            project_setup:
+                override: true
+            tests:
+                override:
+                    - php-scrutinizer-run --enable-security-analysis
+

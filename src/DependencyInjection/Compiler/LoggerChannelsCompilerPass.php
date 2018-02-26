@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection;
 /**
  * Logger channels support
  */
-class LoggerChannelsCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
+final class LoggerChannelsCompilerPass implements DependencyInjection\Compiler\CompilerPassInterface
 {
     /**
      * @inheritdoc
@@ -29,35 +29,62 @@ class LoggerChannelsCompilerPass implements DependencyInjection\Compiler\Compile
         {
             foreach($tags as $tag)
             {
-                if(empty($tag['channel']))
+                if(true === isset($tag['channel']) && '' !== $tag['channel'])
                 {
-                    continue;
+                    $serviceDefinition = $container->getDefinition($id);
+                    $loggerServiceId = $this->prepareLoggerService(
+                        $container,
+                        $container->getParameterBag()->resolveValue($tag['channel'])
+                    );
+
+                    $this->processReplaceArgument($serviceDefinition, $loggerServiceId);
                 }
+            }
+        }
+    }
 
-                $resolvedChannel = $container->getParameterBag()->resolveValue($tag['channel']);
+    /**
+     * Prepare logger service for specified channel
+     *
+     * @param DependencyInjection\ContainerBuilder $container
+     * @param string                               $channel
+     *
+     * @return string
+     */
+    private function prepareLoggerService(DependencyInjection\ContainerBuilder $container, string $channel): string
+    {
+        $loggerServiceId = \sprintf('kernel.logger.%s', $channel);
 
-                $serviceDefinition = $container->getDefinition($id);
-                $loggerServiceId = \sprintf('kernel.logger.%s', $resolvedChannel);
+        if(false === $container->hasDefinition($loggerServiceId))
+        {
+            $container->set($loggerServiceId, LoggerRegistry::getLogger($channel));
+        }
 
-                if(false === $container->hasDefinition($loggerServiceId))
-                {
-                    $container->set($loggerServiceId, LoggerRegistry::getLogger($resolvedChannel));
-                }
+        return $loggerServiceId;
+    }
 
-                foreach($serviceDefinition->getArguments() as $index => $argument)
-                {
-                    if(
-                        true === ($argument instanceof DependencyInjection\Reference) &&
-                        ('logger' === (string) $argument || 'kernel.logger' === (string) $argument))
-                    {
-                        /** @var DependencyInjection\Reference $argument */
+    /**
+     * Replace service argument to specified logger
+     *
+     * @param DependencyInjection\Definition $serviceDefinition
+     * @param string                         $loggerServiceId
+     *
+     * @return void
+     */
+    private function processReplaceArgument(DependencyInjection\Definition $serviceDefinition, string $loggerServiceId): void
+    {
+        foreach($serviceDefinition->getArguments() as $index => $argument)
+        {
+            if(
+                true === ($argument instanceof DependencyInjection\Reference) &&
+                ('logger' === (string) $argument || 'kernel.logger' === (string) $argument))
+            {
+                /** @var DependencyInjection\Reference $argument */
 
-                        $serviceDefinition->replaceArgument(
-                            $index,
-                            new DependencyInjection\Reference($loggerServiceId, $argument->getInvalidBehavior())
-                        );
-                    }
-                }
+                $serviceDefinition->replaceArgument(
+                    $index,
+                    new DependencyInjection\Reference($loggerServiceId, $argument->getInvalidBehavior())
+                );
             }
         }
     }

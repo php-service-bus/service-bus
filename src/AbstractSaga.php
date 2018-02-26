@@ -79,7 +79,7 @@ abstract class AbstractSaga
 
         $sagaInitialized = SagaCreatedEvent::create([
                 'id'                  => $identity->toString(),
-                'identifierNamespace' => $identity->getIdentityClassNamespace(),
+                'identifierNamespace' => $identity->getIdentityClass(),
                 'sagaNamespace'       => \get_class($this),
                 'createdAt'           => DateTime::nowToString(),
                 'expireDate'          => DateTime::fromString($this->getExpirePeriod())->toString()
@@ -256,7 +256,7 @@ abstract class AbstractSaga
 
         $changedStatusEvent = SagaStatusWasChangedEvent::create([
             'id'                  => $this->getIdentityAsString(),
-            'identifierNamespace' => $this->getId()->getIdentityClassNamespace(),
+            'identifierNamespace' => $this->getId()->getIdentityClass(),
             'sagaNamespace'       => \get_class($this),
             'previousStatusId'    => $this->getState()->getStatusCode(),
             'newStatusId'         => SagaState::STATUS_EXPIRED,
@@ -281,7 +281,7 @@ abstract class AbstractSaga
 
         $changedStatusEvent = SagaStatusWasChangedEvent::create([
             'id'                  => $this->getIdentityAsString(),
-            'identifierNamespace' => $this->getId()->getIdentityClassNamespace(),
+            'identifierNamespace' => $this->getId()->getIdentityClass(),
             'sagaNamespace'       => \get_class($this),
             'previousStatusId'    => $this->getState()->getStatusCode(),
             'newStatusId'         => SagaState::STATUS_COMPLETED,
@@ -307,7 +307,7 @@ abstract class AbstractSaga
 
         $changedStatusEvent = SagaStatusWasChangedEvent::create([
             'id'                  => $this->getIdentityAsString(),
-            'identifierNamespace' => $this->getId()->getIdentityClassNamespace(),
+            'identifierNamespace' => $this->getId()->getIdentityClass(),
             'sagaNamespace'       => \get_class($this),
             'previousStatusId'    => $this->getState()->getStatusCode(),
             'newStatusId'         => SagaState::STATUS_FAILED,
