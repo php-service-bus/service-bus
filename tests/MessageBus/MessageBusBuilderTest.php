@@ -75,7 +75,8 @@ class MessageBusBuilderTest extends TestCase
         $this->annotationsReader = new DoctrineAnnotationsReader();
         $this->serviceHandlersExtractor = new AnnotationsExtractor(
             $this->annotationsReader,
-            $this->autowiringServiceLocator
+            $this->autowiringServiceLocator,
+            new NullLogger()
         );
     }
 
@@ -186,7 +187,7 @@ class MessageBusBuilderTest extends TestCase
         {
             /** @var MessageBusTask $messageHandler */
 
-           static::assertInstanceOf(ValidateInterceptor::class, $messageHandler->getTask());
+            static::assertInstanceOf(ValidateInterceptor::class, $messageHandler->getTask());
         }
     }
 }

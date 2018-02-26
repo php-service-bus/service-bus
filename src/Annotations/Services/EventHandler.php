@@ -20,7 +20,7 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  * @Annotation
  * @Target("METHOD")
  */
-final class EventHandler extends AbstractAnnotation
+final class EventHandler extends AbstractAnnotation implements MessageHandlerAnnotationInterface
 {
     /**
      * Logger channel
@@ -30,9 +30,7 @@ final class EventHandler extends AbstractAnnotation
     protected $loggerChannel;
 
     /**
-     * Get event-specific logger channel
-     *
-     * @return string|null
+     * @inheritdoc
      */
     public function getLoggerChannel(): ?string
     {

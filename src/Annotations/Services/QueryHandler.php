@@ -15,13 +15,21 @@ namespace Desperado\ServiceBus\Annotations\Services;
 use Desperado\Domain\Annotations\AbstractAnnotation;
 
 /**
- * Annotation indicating to the command handler
+ * Annotation indicating to the query handler
  *
  * @Annotation
  * @Target("METHOD")
  */
-final class CommandHandler extends AbstractAnnotation implements MessageHandlerAnnotationInterface
+class QueryHandler extends AbstractAnnotation implements MessageHandlerAnnotationInterface
 {
+    /**
+     * The namespace of the response to the query.
+     * It (event payload) serves as transport for the execution results
+     *
+     * @var string
+     */
+    protected $responseEventClass;
+
     /**
      * Logger channel
      *
@@ -35,5 +43,15 @@ final class CommandHandler extends AbstractAnnotation implements MessageHandlerA
     public function getLoggerChannel(): ?string
     {
         return $this->loggerChannel;
+    }
+
+    /**
+     * Get response event class
+     *
+     * @return string
+     */
+    public function getResponseEventClass(): string
+    {
+        return $this->responseEventClass;
     }
 }

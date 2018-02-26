@@ -63,7 +63,8 @@ class AbstractKernelTest extends TestCase
         $annotationsReader = new DoctrineAnnotationsReader();
         $serviceHandlersExtractor = new AnnotationsExtractor(
             $annotationsReader,
-            $autowiringServiceLocator
+            $autowiringServiceLocator,
+            new NullLogger()
         );
 
         $logger = new NullLogger();
