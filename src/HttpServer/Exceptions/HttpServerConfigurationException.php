@@ -10,12 +10,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Services\Handlers;
+namespace Desperado\ServiceBus\HttpServer\Exceptions;
+
+use Desperado\ServiceBus\ServiceBusExceptionInterface;
 
 /**
- * Query handler options
+ *
  */
-final class QueryExecutionParameters extends AbstractMessageExecutionParameters
+class HttpServerConfigurationException extends \LogicException implements ServiceBusExceptionInterface
 {
 
 }

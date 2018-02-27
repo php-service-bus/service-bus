@@ -58,18 +58,28 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
     private $logger;
 
     /**
+     * Http requests router
+     *
+     * @var Bridge\Router\RouterInterface
+     */
+    private $router;
+
+    /**
      * @param Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader
      * @param AutowiringServiceLocator                            $autowiringServiceLocator
+     * @param Bridge\Router\RouterInterface                       $router
      * @param LoggerInterface                                     $logger
      */
     public function __construct(
         Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader,
         AutowiringServiceLocator $autowiringServiceLocator,
+        Bridge\Router\RouterInterface $router,
         LoggerInterface $logger
     )
     {
         $this->annotationReader = $annotationReader;
         $this->autowiringServiceLocator = $autowiringServiceLocator;
+        $this->router = $router;
         $this->logger = $logger;
     }
 
@@ -171,12 +181,44 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         /** @var Annotations\Services\MessageHandlerAnnotationInterface $annotation */
         $annotation = $methodAnnotation->getAnnotation();
 
-        return Handlers\MessageHandlerData::new(
+        $options = $this->createMessageOptions($annotation, (string) $defaultServiceLoggerChannel);
+        $handler = Handlers\MessageHandlerData::new(
             $methodAnnotation->getArguments()[0]->getClass()->getName(),
             $methodAnnotation->getMethod()->getClosure($service),
             $autowiringServices,
-            $this->createMessageOptions($annotation, (string) $defaultServiceLoggerChannel)
+            $options
         );
+
+        if($annotation instanceof Annotations\Services\HttpHandlerAnnotationInterface)
+        {
+            $this->configureRouter($handler, $options, $annotation);
+        }
+
+        return $handler;
+    }
+
+    /**
+     * Configure http routes
+     *
+     * @param Handlers\MessageHandlerData                         $handler
+     * @param Handlers\AbstractMessageExecutionParameters         $options
+     * @param Annotations\Services\HttpHandlerAnnotationInterface $annotation
+     *
+     * @return void
+     */
+    private function configureRouter(
+        Handlers\MessageHandlerData $handler,
+        Handlers\AbstractMessageExecutionParameters $options,
+        Annotations\Services\HttpHandlerAnnotationInterface $annotation
+    ): void
+    {
+        /** not required */
+        if('' === (string) $annotation->getRoute() || '' === (string) $annotation->getMethod())
+        {
+            return;
+        }
+
+        
     }
 
     /**
@@ -211,7 +253,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
             case Annotations\Services\QueryHandler::class:
                 /** @var Annotations\Services\QueryHandler $annotation */
-                return new Handlers\QueryExecutionParameters($loggerChannel, $annotation->getResponseEventClass());
+                return new Handlers\QueryExecutionParameters($loggerChannel);
 
             default:
                 throw new \LogicException(

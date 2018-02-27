@@ -10,12 +10,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Services\Handlers;
+namespace Desperado\ServiceBus\HttpServer\Exceptions;
 
 /**
- * Query handler options
+ *
  */
-final class QueryExecutionParameters extends AbstractMessageExecutionParameters
+class IncorrectHttpServerHostException extends HttpServerConfigurationException
 {
 
 }
