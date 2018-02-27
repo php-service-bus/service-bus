@@ -16,9 +16,9 @@ use Desperado\ServiceBus\DependencyInjection\Traits\LoadServicesTrait;
 use Symfony\Component\DependencyInjection;
 
 /**
- * Share extensions
+ * Share http server extensions
  */
-final class ServiceBusExtension extends DependencyInjection\Extension\Extension
+class HttpServerExtension extends DependencyInjection\Extension\Extension
 {
     use LoadServicesTrait;
 
@@ -27,6 +27,6 @@ final class ServiceBusExtension extends DependencyInjection\Extension\Extension
      */
     public function load(array $configs, DependencyInjection\ContainerBuilder $container)
     {
-        self::loadFromDirectory(__DIR__ . '/../Resources/config/base', $container);
+        self::loadFromDirectory(__DIR__ . '/../Resources/config/extensions/http_server', $container);
     }
 }
