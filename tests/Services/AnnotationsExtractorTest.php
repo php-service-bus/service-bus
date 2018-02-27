@@ -14,6 +14,7 @@ namespace Desperado\ServiceBus\Tests\Services;
 
 use Desperado\Infrastructure\Bridge\AnnotationsReader\AnnotationsReaderInterface;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
+use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
 use Desperado\ServiceBus\Services\AnnotationsExtractor;
 use Desperado\ServiceBus\Services\AutowiringServiceLocator;
 use Desperado\ServiceBus\Services\Handlers\MessageHandlerData;
@@ -57,6 +58,7 @@ class AnnotationsExtractorTest extends TestCase
         $this->extractor = new AnnotationsExtractor(
             $this->annotationsReader,
             $this->autowiringServiceLocator,
+            new FastRouterBridge(),
             new NullLogger()
         );
     }
@@ -139,7 +141,12 @@ class AnnotationsExtractorTest extends TestCase
             $container, [Stabs\SomeAutoWiringProvider::class => 'some_service_key']
         );
 
-        $extractor = new AnnotationsExtractor($this->annotationsReader, $autowiringServiceLocator, new NullLogger());
+        $extractor = new AnnotationsExtractor(
+            $this->annotationsReader,
+            $autowiringServiceLocator,
+            new FastRouterBridge(),
+            new NullLogger()
+        );
 
         $handlers = $extractor->extractHandlers(
             new class() implements ServiceInterface
@@ -224,7 +231,12 @@ class AnnotationsExtractorTest extends TestCase
             $container, [Stabs\SomeAutoWiringProvider::class => 'some_service_key']
         );
 
-        $extractor = new AnnotationsExtractor($this->annotationsReader, $autowiringServiceLocator, new NullLogger());
+        $extractor = new AnnotationsExtractor(
+            $this->annotationsReader,
+            $autowiringServiceLocator,
+            new FastRouterBridge(),
+            new NullLogger()
+        );
 
         $extractor->extractHandlers(
             new class() implements ServiceInterface
