@@ -30,6 +30,8 @@ interface HttpMessageInterface
      * @param RequestInterface $request
      *
      * @return AbstractCommand|AbstractQuery
+     *
+     * @throws \Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException
      */
     public static function fromRequest(RequestInterface $request): AbstractMessage;
 }

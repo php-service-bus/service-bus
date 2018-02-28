@@ -123,7 +123,7 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
                                     $stream = new BufferStream($contentLength);
                                     $stream->write($contentBody);
 
-                                    $resolve(
+                                    return $resolve(
                                         $requestHandler(
                                             $request->withBody($stream)
                                         )
@@ -131,7 +131,7 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
                                 }
                                 catch(\Throwable $throwable)
                                 {
-                                    $resolve(
+                                    return $resolve(
                                         $throwableHandler($throwable)
                                     );
                                 }

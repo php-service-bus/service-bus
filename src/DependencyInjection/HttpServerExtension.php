@@ -12,6 +12,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\DependencyInjection;
 
+use Desperado\ServiceBus\Application\Bootstrap\BootstrapServicesDefinitions;
+use Desperado\ServiceBus\DependencyInjection\Compiler\Extensions\HttpServerEntryPointCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\Traits\LoadServicesTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection;
@@ -19,9 +21,22 @@ use Symfony\Component\DependencyInjection;
 /**
  * Share http server extensions
  */
-class HttpServerExtension extends DependencyInjection\Extension\Extension
+final class HttpServerExtension extends DependencyInjection\Extension\Extension
 {
     use LoadServicesTrait;
+
+    /**
+     * @var BootstrapServicesDefinitions
+     */
+    private $bootstrapServicesDefinitions;
+
+    /**
+     * @param BootstrapServicesDefinitions $bootstrapServicesDefinitions
+     */
+    public function __construct(BootstrapServicesDefinitions $bootstrapServicesDefinitions)
+    {
+        $this->bootstrapServicesDefinitions = $bootstrapServicesDefinitions;
+    }
 
     /**
      * @inheritDoc
@@ -30,5 +45,12 @@ class HttpServerExtension extends DependencyInjection\Extension\Extension
     {
         $loader = new DependencyInjection\Loader\XmlFileLoader($container, new FileLocator());
         $loader->load(__DIR__ . '/../Resources/config/extensions/react_http_server.xml');
+
+        $container->addCompilerPass(
+            new HttpServerEntryPointCompilerPass(
+                $this->bootstrapServicesDefinitions->getKernelKey(),
+                $this->bootstrapServicesDefinitions->getHttpServerContextKey()
+            )
+        );
     }
 }

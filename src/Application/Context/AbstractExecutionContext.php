@@ -58,7 +58,7 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      *
      * @throws ScheduleCommandFailedException
      */
-    public function scheduleCommand(ScheduledCommandIdentifier $id, AbstractCommand $command, DateTime $delay): void
+    final public function scheduleCommand(ScheduledCommandIdentifier $id, AbstractCommand $command, DateTime $delay): void
     {
         try
         {
@@ -88,7 +88,7 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      *
      * @throws CancelScheduledCommandFailedException
      */
-    public function cancelScheduledCommand(ScheduledCommandIdentifier $id, ?string $reason = null): void
+    final public function cancelScheduledCommand(ScheduledCommandIdentifier $id, ?string $reason = null): void
     {
         try
         {

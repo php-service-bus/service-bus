@@ -30,7 +30,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         Annotations\Services\Service::class
     ];
 
-    private const SUPPORTED_METHOD_ANNOTATIOS = [
+    private const SUPPORTED_METHOD_ANNOTATIONS = [
         Annotations\Services\CommandHandler::class,
         Annotations\Services\EventHandler::class,
         Annotations\Services\QueryHandler::class
@@ -129,7 +129,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
             $annotationClass = $annotationData->getAnnotation()->getClass();
 
-            if(false === \in_array($annotationClass, self::SUPPORTED_METHOD_ANNOTATIOS, true))
+            if(false === \in_array($annotationClass, self::SUPPORTED_METHOD_ANNOTATIONS, true))
             {
                 /** Most likely this is some kind of user annotation. We will not throw an error */
 
@@ -181,17 +181,16 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         /** @var Annotations\Services\MessageHandlerAnnotationInterface $annotation */
         $annotation = $methodAnnotation->getAnnotation();
 
-        $options = $this->createMessageOptions($annotation, (string) $defaultServiceLoggerChannel);
         $handler = Handlers\MessageHandlerData::new(
             $methodAnnotation->getArguments()[0]->getClass()->getName(),
             $methodAnnotation->getMethod()->getClosure($service),
             $autowiringServices,
-            $options
+            $this->createMessageOptions($annotation, (string) $defaultServiceLoggerChannel)
         );
 
         if($annotation instanceof Annotations\Services\HttpHandlerAnnotationInterface)
         {
-            $this->configureRouter($handler, $options, $annotation);
+            $this->configureRouter($handler, $annotation);
         }
 
         return $handler;
@@ -201,14 +200,12 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
      * Configure http routes
      *
      * @param Handlers\MessageHandlerData                         $handler
-     * @param Handlers\AbstractMessageExecutionParameters         $options
      * @param Annotations\Services\HttpHandlerAnnotationInterface $annotation
      *
      * @return void
      */
     private function configureRouter(
         Handlers\MessageHandlerData $handler,
-        Handlers\AbstractMessageExecutionParameters $options,
         Annotations\Services\HttpHandlerAnnotationInterface $annotation
     ): void
     {
@@ -218,7 +215,20 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
             return;
         }
 
-        
+        $this->logger->debug(
+            \sprintf('Added http route "[%s] %s"', $annotation->getMethod(), $annotation->getRoute())
+        );
+
+        $this->router->addRoute(
+            $annotation->getRoute(),
+            $annotation->getMethod(),
+            \Closure::fromCallable(
+                function() use ($handler)
+                {
+                    return $handler;
+                }
+            )
+        );
     }
 
     /**

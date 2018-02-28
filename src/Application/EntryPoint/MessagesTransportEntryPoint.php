@@ -20,9 +20,9 @@ use Desperado\ServiceBus\Transport\IncomingMessageContainer;
 use Desperado\ServiceBus\Transport\TransportInterface;
 
 /**
- * Application entry point
+ * Messages transport entry point
  */
-class EntryPoint
+class MessagesTransportEntryPoint implements EntryPointInterface
 {
     /**
      * Entry point name
@@ -53,10 +53,10 @@ class EntryPoint
     private $transport;
 
     /**
-     * @param string                   $name
-     * @param AbstractKernel           $kernel
+     * @param string                    $name
+     * @param AbstractKernel            $kernel
      * @param ExecutionContextInterface $executionContext
-     * @param TransportInterface       $transport
+     * @param TransportInterface        $transport
      */
     public function __construct(
         string $name,
@@ -72,13 +72,9 @@ class EntryPoint
     }
 
     /**
-     * Run application
-     *
-     * @param array $clients
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function run(array $clients): void
+    public function run(array $clients = []): void
     {
         $this->transport->listen(
             $this->name,
@@ -106,9 +102,7 @@ class EntryPoint
     }
 
     /**
-     * Stop application
-     *
-     * @return void
+     * @inheritdoc
      */
     public function stop(): void
     {

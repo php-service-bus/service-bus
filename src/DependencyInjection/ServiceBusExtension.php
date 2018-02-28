@@ -85,7 +85,7 @@ final class ServiceBusExtension extends DependencyInjection\Extension\Extension
             new ServiceBusDependencyInjection\Compiler\Base\EntryPointCompilerPass(
                 $this->bootstrapServicesDefinitions->getMessageTransportKey(),
                 $this->bootstrapServicesDefinitions->getKernelKey(),
-                $this->bootstrapServicesDefinitions->getApplicationContextKey()
+                $this->bootstrapServicesDefinitions->getMessageBusContextKey()
             ),
             new RegisterListenersPass(
                 'service_bus.event_dispatcher',

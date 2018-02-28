@@ -46,18 +46,26 @@ final class BootstrapServicesDefinitions
     private $schedulerStorageKey;
 
     /**
-     * The key under which the container contains the description of the context for executing the application layer
+     * The key under which the context is stored in the container for executing messages received from the bus
      *
      * @var string
      */
-    private $applicationContextKey;
+    private $messageBusContextKey;
 
     /**
-     * @param string $messageTransportKey
-     * @param string $kernelKey
-     * @param string $sagaStorageKey
-     * @param string $schedulerStorageKey
-     * @param string $applicationContextKey
+     * The key under which the context is stored in the container for executing messages received via http
+     *
+     * @var string|null
+     */
+    private $httpServerContextKey;
+
+    /**
+     * @param string      $messageTransportKey
+     * @param string      $kernelKey
+     * @param string      $sagaStorageKey
+     * @param string      $schedulerStorageKey
+     * @param string      $messageBusContextKey
+     * @param string|null $httpServerContextKey
      *
      * @return self
      */
@@ -66,7 +74,8 @@ final class BootstrapServicesDefinitions
         string $kernelKey,
         string $sagaStorageKey,
         string $schedulerStorageKey,
-        string $applicationContextKey
+        string $messageBusContextKey,
+        ?string $httpServerContextKey = null
     ): self
     {
         $self = new self();
@@ -75,7 +84,8 @@ final class BootstrapServicesDefinitions
         $self->kernelKey = $kernelKey;
         $self->sagaStorageKey = $sagaStorageKey;
         $self->schedulerStorageKey = $schedulerStorageKey;
-        $self->applicationContextKey = $applicationContextKey;
+        $self->messageBusContextKey = $messageBusContextKey;
+        $self->httpServerContextKey = $httpServerContextKey;
 
         return $self;
     }
@@ -121,13 +131,23 @@ final class BootstrapServicesDefinitions
     }
 
     /**
-     * Get key under which the container contains the description of the context for executing the application layer
+     * Get key under which the context is stored in the container for executing messages received from the bus
      *
      * @return string
      */
-    public function getApplicationContextKey(): string
+    public function getMessageBusContextKey(): string
     {
-        return $this->applicationContextKey;
+        return $this->messageBusContextKey;
+    }
+
+    /**
+     * Get key under which the context is stored in the container for executing messages received via http
+     *
+     * @return string|null
+     */
+    public function getHttpServerContextKey(): ?string
+    {
+        return $this->httpServerContextKey;
     }
 
     /**
