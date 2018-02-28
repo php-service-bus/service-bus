@@ -12,7 +12,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\HttpServer;
 
-use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 
 /**
