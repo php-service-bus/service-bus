@@ -65,7 +65,7 @@ final class EntryPointCompilerPass implements DependencyInjection\Compiler\Compi
         $this->guardReferenceService($this->executionContextContainerKey, $container);
         $this->guardReferenceService($this->transportContainerKey, $container);
 
-        $definition = $container->getDefinition('service_bus.entry_point');
+        $definition = $container->getDefinition('service_bus.bus_entry_point');
         $definition->setArgument(1, new DependencyInjection\Reference($this->kernelContainerKey));
         $definition->setArgument(2, new DependencyInjection\Reference($this->executionContextContainerKey));
         $definition->setArgument(3, new DependencyInjection\Reference($this->transportContainerKey));
