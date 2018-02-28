@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\DependencyInjection\Compiler;
+namespace Desperado\ServiceBus\DependencyInjection\Compiler\Base;
 
 use Symfony\Component\DependencyInjection;
 

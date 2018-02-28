@@ -4,11 +4,31 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
 
+        <!-- ReactHttp backend configuration -->
+        <service id="service_bus.http_server.config"
+                 class="Desperado\ServiceBus\HttpServer\HttpServerConfiguration"
+                 public="false">
+            <factory class="Desperado\ServiceBus\HttpServer\HttpServerConfiguration" method="create"/>
+            <argument on-invalid="ignore">%http_backend_config_host%</argument>
+            <argument on-invalid="ignore">%http_backend_config_port%</argument>
+            <argument on-invalid="ignore">%http_backend_config_secured%</argument>
+            <argument on-invalid="ignore">%http_backend_config_certificate_path%</argument>
+        </service>
         <!-- Http server react php backend -->
         <service id="service_bus.http_server.backend.react"
                  class="Desperado\ServiceBus\HttpServer\ReactHttpServerBackend"
                  public="false">
             <argument/>
+            <argument type="service" id="service_bus.logger"/>
+
+            <tag name="service_bus.logger" channel="http"/>
+        </service>
+        <!-- Http server -->
+        <service id="service_bus.http_server"
+                 class="Desperado\ServiceBus\HttpServer\HttpServer"
+                 public="false">
+            <argument type="service" id="service_bus.http_server.backend.react"/>
+            <argument type="service" id="service_bus.http_server.router"/>
             <argument type="service" id="service_bus.logger"/>
 
             <tag name="service_bus.logger" channel="http"/>

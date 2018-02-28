@@ -42,17 +42,47 @@ final class ServiceBusExtension extends DependencyInjection\Extension\Extension
      */
     public function load(array $configs, DependencyInjection\ContainerBuilder $container)
     {
-        $compilationPasses = [
-            new ServiceBusDependencyInjection\Compiler\LoggerChannelsCompilerPass(),
-            new ServiceBusDependencyInjection\Compiler\ModulesCompilerPass(),
-            new ServiceBusDependencyInjection\Compiler\ServicesCompilerPass(),
-            new ServiceBusDependencyInjection\Compiler\SchedulerCompilerPass(
+        self::loadFromDirectory(__DIR__ . '/../Resources/config/base', $container);
+
+        $this->loadCompilationPasses(
+            $this->getCompilationPasses(), $container
+        );
+    }
+
+    /**
+     * Load application compilation passes
+     *
+     * @param array                                $compilationPasses
+     * @param DependencyInjection\ContainerBuilder $container
+     *
+     * @return void
+     */
+    private function loadCompilationPasses(array $compilationPasses, DependencyInjection\ContainerBuilder $container): void
+    {
+        foreach($compilationPasses as $compilationPass)
+        {
+            $container->addCompilerPass($compilationPass);
+        }
+    }
+
+    /**
+     * Get compiler passes
+     *
+     * @return DependencyInjection\Compiler\CompilerPassInterface[]
+     */
+    private function getCompilationPasses(): array
+    {
+        return [
+            new ServiceBusDependencyInjection\Compiler\Base\LoggerChannelsCompilerPass(),
+            new ServiceBusDependencyInjection\Compiler\Base\ModulesCompilerPass(),
+            new ServiceBusDependencyInjection\Compiler\Base\ServicesCompilerPass(),
+            new ServiceBusDependencyInjection\Compiler\Base\SchedulerCompilerPass(
                 $this->bootstrapServicesDefinitions->getSchedulerStorageKey()
             ),
-            new ServiceBusDependencyInjection\Compiler\SagaStorageCompilerPass(
+            new ServiceBusDependencyInjection\Compiler\Base\SagaStorageCompilerPass(
                 $this->bootstrapServicesDefinitions->getSagaStorageKey()
             ),
-            new ServiceBusDependencyInjection\Compiler\EntryPointCompilerPass(
+            new ServiceBusDependencyInjection\Compiler\Base\EntryPointCompilerPass(
                 $this->bootstrapServicesDefinitions->getMessageTransportKey(),
                 $this->bootstrapServicesDefinitions->getKernelKey(),
                 $this->bootstrapServicesDefinitions->getApplicationContextKey()
@@ -63,12 +93,5 @@ final class ServiceBusExtension extends DependencyInjection\Extension\Extension
                 'service_bus.event_subscriber'
             )
         ];
-
-        self::loadFromDirectory(__DIR__ . '/../Resources/config/base', $container);
-
-        foreach($compilationPasses as $compilationPass)
-        {
-            $container->addCompilerPass($compilationPass);
-        }
     }
 }

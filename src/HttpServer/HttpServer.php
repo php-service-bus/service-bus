@@ -13,6 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\HttpServer;
 
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Http server
@@ -34,13 +35,22 @@ class HttpServer
     private $router;
 
     /**
+     * Logger instance
+     *
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param HttpServerBackendInterface $backend
      * @param RouterInterface            $router
+     * @param LoggerInterface            $logger
      */
-    public function __construct(HttpServerBackendInterface $backend, RouterInterface $router)
+    public function __construct(HttpServerBackendInterface $backend, RouterInterface $router, LoggerInterface $logger)
     {
         $this->backend = $backend;
         $this->router = $router;
+        $this->logger = $logger;
 
         \pcntl_async_signals(true);
 
