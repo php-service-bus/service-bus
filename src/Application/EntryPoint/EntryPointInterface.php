@@ -20,11 +20,9 @@ interface EntryPointInterface
     /**
      * Run application
      *
-     * @param array $clients
-     *
      * @return void
      */
-    public function run(array $clients = []): void;
+    public function run(): void;
 
     /**
      * Stop application

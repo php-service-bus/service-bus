@@ -102,8 +102,6 @@ abstract class AbstractKernel
      * @param ExecutionContextInterface $executionContext
      *
      * @return PromiseInterface
-     *
-     * @throws \Throwable
      */
     final public function handle(
         EntryPointContext $entryPointContext,

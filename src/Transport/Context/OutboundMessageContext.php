@@ -21,6 +21,7 @@ use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
 use Desperado\Domain\Transport\Message\Message;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\HttpServer\Context\HttpIncomingContext;
+use Desperado\ServiceBus\HttpServer\HttpResponse;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -55,6 +56,13 @@ final class OutboundMessageContext implements OutboundMessageContextInterface
      * @var RequestInterface|null
      */
     private $request;
+
+    /**
+     * Response DTO
+     *
+     * @var HttpResponse
+     */
+    private $response;
 
     /**
      * @inheritdoc
@@ -92,6 +100,42 @@ final class OutboundMessageContext implements OutboundMessageContextInterface
         $self->messageSerializer = $messageSerializer;
 
         return $self;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function httpSessionStarted(): bool
+    {
+        return null !== $this->request;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function bindResponse(HttpResponse $response): void
+    {
+        $this->response = $response;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function responseBind(): bool
+    {
+        return null !== $this->response;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseData(): ?HttpResponse
+    {
+        $response = $this->response;
+
+        unset($this->response);
+
+        return $response;
     }
 
     /**

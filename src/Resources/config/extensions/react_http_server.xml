@@ -22,17 +22,6 @@
 
             <tag name="service_bus.logger" channel="http"/>
         </service>
-        <!-- Http server -->
-        <service id="service_bus.http_server"
-                 class="Desperado\ServiceBus\HttpServer\HttpServer"
-                 public="false">
-            <argument type="service" id="service_bus.http_server.backend.react"/>
-            <argument type="service" id="service_bus.http_server.router"/>
-            <argument type="service" id="service_bus.serializer.messages"/>
-            <argument type="service" id="service_bus.logger"/>
-
-            <tag name="service_bus.logger" channel="http"/>
-        </service>
         <!-- RabbitMq Publisher -->
         <service id="service_bus.http_server.publisher"
                  class="Desperado\Infrastructure\Bridge\Publisher\BunnyPublisherBridge"
@@ -45,13 +34,18 @@
 
         <!-- Http server entry point -->
         <service id="service_bus.http_server.entry_point"
-                 class="Desperado\ServiceBus\Application\EntryPoint\HttpServerEntryPoint"
+                 class="Desperado\ServiceBus\HttpServer\EntryPoint\HttpServerEntryPoint"
                  public="true">
             <argument>%service_bus.entry_point_name%</argument>
             <argument/>
             <argument/>
             <argument type="service" id="service_bus.http_server.publisher"/>
-            <argument type="service" id="service_bus.http_server"/>
+            <argument type="service" id="service_bus.http_server.backend.react"/>
+            <argument type="service" id="service_bus.http_server.router"/>
+            <argument type="service" id="service_bus.serializer.messages"/>
+            <argument type="service" id="service_bus.logger"/>
+
+            <tag name="service_bus.logger" channel="http"/>
         </service>
     </services>
 </container>

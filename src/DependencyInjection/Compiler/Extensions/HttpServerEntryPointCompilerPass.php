@@ -27,23 +27,23 @@ class HttpServerEntryPointCompilerPass implements DependencyInjection\Compiler\C
     private $kernelContainerKey;
 
     /**
-     * Key under which the context is stored in the container for executing messages received via http
+     * Key under which the context service is described in the container
      *
      * @var string
      */
-    private $httpContextContainerKey;
+    private $executionContextContainerKey;
 
     /**
      * @param string $kernelContainerKey
-     * @param string $httpContextContainerKey
+     * @param string $executionContextContainerKey
      */
     public function __construct(
         string $kernelContainerKey,
-        string $httpContextContainerKey
+        string $executionContextContainerKey
     )
     {
         $this->kernelContainerKey = $kernelContainerKey;
-        $this->httpContextContainerKey = $httpContextContainerKey;
+        $this->executionContextContainerKey = $executionContextContainerKey;
     }
 
     /**
@@ -53,6 +53,6 @@ class HttpServerEntryPointCompilerPass implements DependencyInjection\Compiler\C
     {
         $definition = $container->getDefinition('service_bus.http_server.entry_point');
         $definition->setArgument(1, new DependencyInjection\Reference($this->kernelContainerKey));
-        $definition->setArgument(2, new DependencyInjection\Reference($this->httpContextContainerKey));
+        $definition->setArgument(2, new DependencyInjection\Reference($this->executionContextContainerKey));
     }
 }

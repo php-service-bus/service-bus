@@ -18,14 +18,14 @@ namespace Desperado\ServiceBus\HttpServer;
 interface HttpServerBackendInterface
 {
     /**
-     * @param callable $requestHandler   function(ServerRequestInterface $request)
+     * @param callable $requestHandler   function(callable $resolve, ServerRequestInterface $request)
      *                                   {
-     *                                   return $response; // RingCentral\Psr7\Response
+     *                                   return $response; // Psr\Http\Message\ResponseInterface
      *                                   }
      *
-     * @param callable $throwableHandler function(\Throwable $throwable)
+     * @param callable $throwableHandler function(callable $resolve, \Throwable $throwable)
      *                                   {
-     *                                   return $response; // RingCentral\Psr7\Response
+     *                                   return $response; // Psr\Http\Message\ResponseInterface
      *                                   }
      *
      *

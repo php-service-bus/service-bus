@@ -53,19 +53,11 @@ final class BootstrapServicesDefinitions
     private $messageBusContextKey;
 
     /**
-     * The key under which the context is stored in the container for executing messages received via http
-     *
-     * @var string|null
-     */
-    private $httpServerContextKey;
-
-    /**
      * @param string      $messageTransportKey
      * @param string      $kernelKey
      * @param string      $sagaStorageKey
      * @param string      $schedulerStorageKey
      * @param string      $messageBusContextKey
-     * @param string|null $httpServerContextKey
      *
      * @return self
      */
@@ -74,8 +66,7 @@ final class BootstrapServicesDefinitions
         string $kernelKey,
         string $sagaStorageKey,
         string $schedulerStorageKey,
-        string $messageBusContextKey,
-        ?string $httpServerContextKey = null
+        string $messageBusContextKey
     ): self
     {
         $self = new self();
@@ -85,7 +76,6 @@ final class BootstrapServicesDefinitions
         $self->sagaStorageKey = $sagaStorageKey;
         $self->schedulerStorageKey = $schedulerStorageKey;
         $self->messageBusContextKey = $messageBusContextKey;
-        $self->httpServerContextKey = $httpServerContextKey;
 
         return $self;
     }
@@ -138,16 +128,6 @@ final class BootstrapServicesDefinitions
     public function getMessageBusContextKey(): string
     {
         return $this->messageBusContextKey;
-    }
-
-    /**
-     * Get key under which the context is stored in the container for executing messages received via http
-     *
-     * @return string|null
-     */
-    public function getHttpServerContextKey(): ?string
-    {
-        return $this->httpServerContextKey;
     }
 
     /**

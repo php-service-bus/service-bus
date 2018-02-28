@@ -49,7 +49,7 @@ final class HttpServerExtension extends DependencyInjection\Extension\Extension
         $container->addCompilerPass(
             new HttpServerEntryPointCompilerPass(
                 $this->bootstrapServicesDefinitions->getKernelKey(),
-                $this->bootstrapServicesDefinitions->getHttpServerContextKey()
+                $this->bootstrapServicesDefinitions->getMessageBusContextKey()
             )
         );
     }

@@ -10,12 +10,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Application\Context;
+namespace Desperado\ServiceBus\Application\Context\Exceptions;
+
+use Desperado\ServiceBus\ServiceBusExceptionInterface;
 
 /**
  *
  */
-interface HttpEntryPointInterface
+class OutboundContextException extends \LogicException implements ServiceBusExceptionInterface
 {
 
 }

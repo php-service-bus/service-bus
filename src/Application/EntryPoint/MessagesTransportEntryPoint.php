@@ -74,7 +74,7 @@ class MessagesTransportEntryPoint implements EntryPointInterface
     /**
      * @inheritdoc
      */
-    public function run(array $clients = []): void
+    public function run(): void
     {
         $this->transport->listen(
             $this->name,
@@ -96,8 +96,7 @@ class MessagesTransportEntryPoint implements EntryPointInterface
                 $executionContext = $this->prepareApplicationContext($incomingMessageContainer->getOutboundContext());
 
                 return $this->kernel->handle($entryPointContext, $executionContext);
-            },
-            $clients
+            }
         );
     }
 

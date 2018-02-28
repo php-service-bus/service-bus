@@ -19,9 +19,11 @@ use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\ServiceBus\Application\Context\Exceptions\CancelScheduledCommandFailedException;
+use Desperado\ServiceBus\Application\Context\Exceptions\OutboundContextException;
 use Desperado\ServiceBus\Application\Context\Exceptions\OutboundContextNotAppliedException;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\Application\Context\Exceptions\ScheduleCommandFailedException;
+use Desperado\ServiceBus\HttpServer\HttpResponse;
 use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 use Desperado\ServiceBus\Scheduler\SchedulerProvider;
 use Psr\Log\LoggerInterface;
@@ -45,6 +47,25 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
     public function __construct(SchedulerProvider $schedulerProvider)
     {
         $this->schedulerProvider = $schedulerProvider;
+    }
+
+    /**
+     * Bind http response
+     *
+     * @param HttpResponse $response
+     *
+     * @return void
+     *
+     * @throws OutboundContextException
+     */
+    final public function bindResponse(HttpResponse $response): void
+    {
+        if(true === $this->getOutboundMessageContext()->httpSessionStarted())
+        {
+            $this->getOutboundMessageContext()->bindResponse($response);
+        }
+
+        throw new OutboundContextException('Http session not started');
     }
 
     /**
@@ -127,7 +148,6 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
         $this
             ->getOutboundMessageContext()
             ->publish($event, $messageDeliveryOptions);
-
     }
 
     /**
