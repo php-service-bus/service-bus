@@ -19,7 +19,6 @@ use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\ServiceBus\Application\Context\Exceptions\CancelScheduledCommandFailedException;
-use Desperado\ServiceBus\Application\Context\Exceptions\OutboundContextException;
 use Desperado\ServiceBus\Application\Context\Exceptions\OutboundContextNotAppliedException;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\Application\Context\Exceptions\ScheduleCommandFailedException;
@@ -55,8 +54,6 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      * @param HttpResponse $response
      *
      * @return void
-     *
-     * @throws OutboundContextException
      */
     final public function bindResponse(HttpResponse $response): void
     {
@@ -64,8 +61,6 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
         {
             $this->getOutboundMessageContext()->bindResponse($response);
         }
-
-        throw new OutboundContextException('Http session not started');
     }
 
     /**
