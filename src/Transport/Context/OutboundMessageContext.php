@@ -131,7 +131,7 @@ final class OutboundMessageContext implements OutboundMessageContextInterface
      */
     public function getResponseData(): ?HttpResponse
     {
-        $response = $this->response;
+        $response = clone $this->response;
 
         unset($this->response);
 
@@ -159,7 +159,11 @@ final class OutboundMessageContext implements OutboundMessageContextInterface
      */
     public function getToPublishMessages(): \SplObjectStorage
     {
-        return $this->toPublishMessages;
+        $toPublishMessages = clone $this->toPublishMessages;
+
+        $this->toPublishMessages = new \SplObjectStorage();
+
+        return $toPublishMessages;
     }
 
     /**
