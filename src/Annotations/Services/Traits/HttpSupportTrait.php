@@ -32,13 +32,6 @@ trait HttpSupportTrait
     protected $method;
 
     /**
-     * Http response content-type
-     *
-     * @var string
-     */
-    protected $responseContentType = 'text/plain';
-
-    /**
      * Get http request route
      *
      * @return string|null
@@ -58,15 +51,5 @@ trait HttpSupportTrait
     public function getMethod(): ?string
     {
         return null !== $this->method ? \strtoupper($this->method) : null;
-    }
-
-    /**
-     * Get response content-type
-     *
-     * @return string
-     */
-    public function getResponseContentType(): string
-    {
-        return $this->responseContentType;
     }
 }
