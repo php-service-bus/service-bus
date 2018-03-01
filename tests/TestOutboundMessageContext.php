@@ -19,6 +19,9 @@ use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\Transport\Context\IncomingMessageContextInterface;
 use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
+use Desperado\ServiceBus\HttpServer\Context\HttpIncomingContext;
+use Desperado\ServiceBus\HttpServer\HttpResponse;
+use Psr\Http\Message\RequestInterface;
 
 /**
  *
@@ -44,6 +47,50 @@ class TestOutboundMessageContext implements OutboundMessageContextInterface
     public function __construct()
     {
         $this->storage = new \SplObjectStorage();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function responseBind(): bool
+    {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function fromHttpRequest(
+        RequestInterface $request,
+        HttpIncomingContext $incomingMessageContext,
+        MessageSerializerInterface $messageSerializer
+    )
+    {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function bindResponse(HttpResponse $response): void
+    {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseData(): ?HttpResponse
+    {
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function httpSessionStarted(): bool
+    {
+
     }
 
     /**

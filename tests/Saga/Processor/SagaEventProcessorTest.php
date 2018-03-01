@@ -91,30 +91,6 @@ class SagaEventProcessorTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Desperado\ServiceBus\Saga\Processor\Exceptions\SagaNotFoundException
-     * @expectedExceptionMessage Saga with identifier
-     *                           "Desperado\ServiceBus\Tests\Saga\Processor\Positive\TestEventProcessorSagaIdentifier:qwerty" not
-     *                           found
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function sagaNotFound(): void
-    {
-        $processor = $this->createProcessorInstance(
-            Positive\TestEventProcessorSaga::class,
-            Positive\TestEventProcessorSagaIdentifier::class,
-            'identifierField'
-        );
-
-        $event = Positive\TestEventProcessorSagaEvent::create(['identifierField' => 'qwerty']);
-
-        $processor($event, new LocalDeliveryContext());
-    }
-
-    /**
-     * @test
      * @expectedException \Desperado\ServiceBus\Saga\Processor\Exceptions\InvalidSagaIdentifierException
      * @expectedExceptionMessage Event "Desperado\ServiceBus\Tests\Saga\Processor\Negative\NotContainsIdentityKeyEvent" must be
      *                           contains "getIdentifierField" accessor that contains the saga ID
