@@ -98,17 +98,17 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
 
             if($annotation instanceof Saga)
             {
-                SagaConfigurationGuard::assertExpireDateIsValid($annotation->expireDateModifier);
-                SagaConfigurationGuard::assertIdentifierClassNamespaceIsValid((string) $annotation->identifierNamespace);
+                SagaConfigurationGuard::assertExpireDateIsValid($annotation->getExpireDateModifier());
+                SagaConfigurationGuard::assertIdentifierClassNamespaceIsValid((string) $annotation->getIdentifierNamespace());
                 SagaConfigurationGuard::assertContainingIdentifierPropertySpecified(
-                    (string) $annotation->containingIdentifierProperty
+                    (string) $annotation->getContainingIdentifierProperty()
                 );
 
                 $this->sagasConfiguration[$sagaNamespace] = SagaConfiguration::create(
                     $sagaNamespace,
-                    $annotation->expireDateModifier,
-                    $annotation->identifierNamespace,
-                    $annotation->containingIdentifierProperty
+                    $annotation->getExpireDateModifier(),
+                    $annotation->getIdentifierNamespace(),
+                    $annotation->getContainingIdentifierProperty()
                 );
             }
             else
@@ -148,7 +148,7 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
                     $this->sagasListeners[$sagaNamespace][] = SagaListenerConfiguration::create(
                         $sagaNamespace,
                         $annotationData->getArguments()[0]->getClass()->getName(),
-                        (string) $sagaEventListenerAnnotation->containingIdentifierProperty
+                        (string) $sagaEventListenerAnnotation->getContainingIdentifierProperty()
                     );
                 }
             }
