@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Application\Kernel;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
-use Desperado\ServiceBus\Saga\Exceptions as SagaProviderExceptions;
 use Desperado\ServiceBus\Application\EntryPoint\EntryPointContext;
 use Desperado\ServiceBus\Application\Kernel\Events as KernelEvents;
 use Desperado\ServiceBus\MessageBus\MessageBus;
@@ -75,7 +74,6 @@ abstract class AbstractKernel
      * @param LoggerInterface   $logger
      *
      * @throws Services\Exceptions\ServiceConfigurationExceptionInterface
-     * @throws SagaProviderExceptions\ClosedMessageBusException
      */
     final public function __construct(
         MessageBusBuilder $messageBusBuilder,
@@ -188,8 +186,6 @@ abstract class AbstractKernel
      * Process saga configuration
      *
      * @return void
-     *
-     * @throws SagaProviderExceptions\ClosedMessageBusException
      */
     private function configureSagas(): void
     {

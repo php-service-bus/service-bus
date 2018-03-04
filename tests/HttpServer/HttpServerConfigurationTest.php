@@ -37,6 +37,36 @@ class HttpServerConfigurationTest extends TestCase
 
     /**
      * @test
+     *
+     * @return void
+     */
+    public function createLocalhost(): void
+    {
+        $config = HttpServerConfiguration::createLocalhost(100);
+
+        static::assertEquals('0.0.0.0', $config->getHots());
+        static::assertEquals(100, $config->getPort());
+        static::assertFalse($config->isSecured());
+        static::assertNull($config->getCertificateFilePath());
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function createSecuredLocalhost(): void
+    {
+        $config = HttpServerConfiguration::createSecuredLocalhost(__FILE__, 100);
+
+        static::assertEquals('0.0.0.0', $config->getHots());
+        static::assertEquals(100, $config->getPort());
+        static::assertTrue($config->isSecured());
+        static::assertEquals(__FILE__, $config->getCertificateFilePath());
+    }
+
+    /**
+     * @test
      * @expectedException \Desperado\ServiceBus\HttpServer\Exceptions\IncorrectHttpServerHostException
      * @expectedExceptionMessage Empty listen host
      *

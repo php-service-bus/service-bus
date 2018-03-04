@@ -25,6 +25,7 @@ use Desperado\ServiceBus\Application\EntryPoint\EntryPointContext;
 use Desperado\ServiceBus\Application\EntryPoint\EntryPointInterface;
 use Desperado\ServiceBus\Application\Kernel\AbstractKernel;
 use Desperado\ServiceBus\HttpServer\Context\HttpIncomingContext;
+use Desperado\ServiceBus\HttpServer\Context\OutboundHttpContextInterface;
 use Desperado\ServiceBus\HttpServer\HttpServerBackendInterface;
 use Desperado\ServiceBus\Services\Handlers\MessageHandlerData;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
@@ -207,7 +208,7 @@ class HttpServerEntryPoint implements EntryPointInterface
                                 $promises
                             );
 
-                            if(true === $context->responseBind())
+                            if($context instanceof OutboundHttpContextInterface && true === $context->responseBind())
                             {
                                 $responseData = $context->getResponseData();
 

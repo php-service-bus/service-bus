@@ -22,6 +22,7 @@ use Desperado\ServiceBus\Application\Context\Exceptions\CancelScheduledCommandFa
 use Desperado\ServiceBus\Application\Context\Exceptions\OutboundContextNotAppliedException;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\Application\Context\Exceptions\ScheduleCommandFailedException;
+use Desperado\ServiceBus\HttpServer\Context\OutboundHttpContextInterface;
 use Desperado\ServiceBus\HttpServer\HttpResponse;
 use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 use Desperado\ServiceBus\Scheduler\SchedulerProvider;
@@ -57,9 +58,14 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      */
     final public function bindResponse(HttpResponse $response): void
     {
-        if(true === $this->getOutboundMessageContext()->httpSessionStarted())
+        $outboundMessageContext = $this->getOutboundMessageContext();
+
+        if(
+            $outboundMessageContext instanceof OutboundHttpContextInterface &&
+            true === $outboundMessageContext->httpSessionStarted()
+        )
         {
-            $this->getOutboundMessageContext()->bindResponse($response);
+            $outboundMessageContext->bindResponse($response);
         }
     }
 

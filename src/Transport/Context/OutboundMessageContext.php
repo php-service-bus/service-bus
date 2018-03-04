@@ -21,13 +21,14 @@ use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
 use Desperado\Domain\Transport\Message\Message;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\HttpServer\Context\HttpIncomingContext;
+use Desperado\ServiceBus\HttpServer\Context\OutboundHttpContextInterface;
 use Desperado\ServiceBus\HttpServer\HttpResponse;
 use Psr\Http\Message\RequestInterface;
 
 /**
  * Outbound message context
  */
-final class OutboundMessageContext implements OutboundMessageContextInterface
+final class OutboundMessageContext implements OutboundMessageContextInterface, OutboundHttpContextInterface
 {
     /**
      * The context of the incoming message

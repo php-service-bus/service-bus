@@ -16,7 +16,6 @@ use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\ServiceBus\Saga\Identifier\AbstractSagaIdentifier;
 use Desperado\ServiceBus\Saga\Processor\Exceptions\InvalidSagaIdentifierException;
-use Desperado\ServiceBus\Saga\Processor\Exceptions\SagaNotFoundException;
 use Desperado\ServiceBus\Saga\Processor\Guard\GuardIdentifier;
 use Desperado\ServiceBus\SagaProvider;
 use Psr\Log\LoggerInterface;

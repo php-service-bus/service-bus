@@ -12,7 +12,9 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Events;
 
+use Desperado\Domain\DateTime;
 use Desperado\Domain\Message\AbstractEvent;
+use Desperado\ServiceBus\AbstractSaga;
 
 /**
  * A new saga was created
@@ -53,6 +55,23 @@ final class SagaCreatedEvent extends AbstractEvent
      * @var string
      */
     protected $expireDate;
+
+    /**
+     * @param AbstractSaga $saga
+     * @param string       $expirePeriod
+     *
+     * @return self
+     */
+    public static function new(AbstractSaga $saga, string $expirePeriod): self
+    {
+        return self::create([
+            'id'                  => $saga->getId()->toString(),
+            'identifierNamespace' => $saga->getId()->getIdentityClass(),
+            'sagaNamespace'       => \get_class($saga),
+            'createdAt'           => DateTime::nowToString(),
+            'expireDate'          => DateTime::fromString($expirePeriod)->toString()
+        ]);
+    }
 
     /**
      * Get saga identifier
