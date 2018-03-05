@@ -83,6 +83,8 @@ final class ConfigurationGuard
 
     /**
      * Close constructor
+     *
+     * @codeCoverageIgnore
      */
     private function __construct()
     {
