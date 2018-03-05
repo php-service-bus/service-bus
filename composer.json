@@ -22,7 +22,7 @@
     }
   },
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.2",
     "mmasiukevich/infrastructure": "^v0.0.3",
     "mmasiukevich/message-serializer": "^v0.0.3",
     "mmasiukevich/event-sourcing": "^v0.0.3",

@@ -12,9 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Messages;
 
-use Desperado\Domain\Message\AbstractCommand;
-use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Domain\Message\AbstractQuery;
+use Desperado\Domain\Message;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -29,9 +27,9 @@ interface HttpMessageInterface
      *
      * @param RequestInterface $request
      *
-     * @return AbstractCommand|AbstractQuery
+     * @return Message\AbstractCommand|Message\AbstractQuery
      *
      * @throws \Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException
      */
-    public static function fromRequest(RequestInterface $request): AbstractMessage;
+    public static function fromRequest(RequestInterface $request): Message\AbstractMessage;
 }

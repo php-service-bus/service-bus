@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Tests\Services;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\AnnotationsReaderInterface;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
 use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
+use Desperado\Infrastructure\Bridge\Router\RouterInterface;
 use Desperado\ServiceBus\Services\AnnotationsExtractor;
 use Desperado\ServiceBus\Services\AutowiringServiceLocator;
 use Desperado\ServiceBus\Services\Handlers\MessageHandlerData;
@@ -47,6 +48,11 @@ class AnnotationsExtractorTest extends TestCase
     private $extractor;
 
     /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
      * @inheritdoc
      */
     protected function setUp(): void
@@ -55,10 +61,11 @@ class AnnotationsExtractorTest extends TestCase
 
         $this->autowiringServiceLocator = new AutowiringServiceLocator(new TestContainer(), []);
         $this->annotationsReader = new DoctrineAnnotationsReader();
+        $this->router = new FastRouterBridge();
         $this->extractor = new AnnotationsExtractor(
             $this->annotationsReader,
             $this->autowiringServiceLocator,
-            new FastRouterBridge(),
+            $this->router,
             new NullLogger()
         );
     }
@@ -401,6 +408,174 @@ class AnnotationsExtractorTest extends TestCase
                     Stabs\TestServiceCommand $command,
                     TestApplicationContext $context
                 ): string
+                {
+                    return '';
+                }
+            }
+        );
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Services\Exceptions\IncorrectMessageTypeException
+     *
+     * @return void
+     */
+    public function extractHttpMessageWithWrongMessageType(): void
+    {
+        $this->extractor->extractHandlers(
+            new class() implements ServiceInterface
+            {
+                /**
+                 * @Annotations\Services\CommandHandler(
+                 *     route="/test",
+                 *     method="POST"
+                 * )
+                 *
+                 * @param Stabs\TestServiceCommand $command
+                 * @param TestApplicationContext   $context
+                 *
+                 * @return void
+                 */
+                public function executeTestServiceCommand(
+                    Stabs\TestServiceCommand $command,
+                    TestApplicationContext $context
+                ): void
+                {
+
+                }
+            }
+        );
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Services\Exceptions\IncorrectHttpMethodException
+     *
+     * @return void
+     */
+    public function extractHttpMessageWithWrongRequestType(): void
+    {
+        $this->extractor->extractHandlers(
+            new class() implements ServiceInterface
+            {
+                /**
+                 * @Annotations\Services\CommandHandler(
+                 *     route="/test",
+                 *     method="qwerty"
+                 * )
+                 *
+                 * @param Stabs\TestServiceHttpCommand $command
+                 * @param TestApplicationContext       $context
+                 *
+                 * @return void
+                 */
+                public function executeTestServiceCommand(
+                    Stabs\TestServiceHttpCommand $command,
+                    TestApplicationContext $context
+                ): void
+                {
+
+                }
+            }
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function successExtractHttpMessage(): void
+    {
+        $this->extractor->extractHandlers(
+            new class() implements ServiceInterface
+            {
+                /**
+                 * @Annotations\Services\CommandHandler(
+                 *     route="/test/",
+                 *     method="post"
+                 * )
+                 *
+                 * @param Stabs\TestServiceHttpCommand $command
+                 * @param TestApplicationContext       $context
+                 *
+                 * @return void
+                 */
+                public function executeTestServiceCommand(
+                    Stabs\TestServiceHttpCommand $command,
+                    TestApplicationContext $context
+                ): void
+                {
+
+                }
+            }
+        );
+
+        $routes = static::readAttribute($this->router, 'routes');
+
+        static::assertCount(1, $routes);
+        static::assertArrayHasKey(0, $routes);
+        static::assertEquals('POST', $routes[0][0]);
+        static::assertEquals('/test', $routes[0][1]);
+        static::assertInstanceOf(\Closure::class, $routes[0][2]);
+
+        $closure = $routes[0][2];
+
+        static::assertInstanceOf(MessageHandlerData::class, $closure());
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function extractQueryHandler(): void
+    {
+        $this->extractor->extractHandlers(
+            new class() implements ServiceInterface
+            {
+                /**
+                 * @Annotations\Services\QueryHandler()
+                 *
+                 * @param Stabs\TestQuery        $query
+                 * @param TestApplicationContext $context
+                 *
+                 * @return void
+                 */
+                public function handleTestQuery(
+                    Stabs\TestQuery $query,
+                    TestApplicationContext $context
+                ): void
+                {
+
+                }
+            }
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function extractWithAnotherAnnotation(): void
+    {
+        $this->extractor->extractHandlers(
+            new class() implements ServiceInterface
+            {
+                /**
+                 * @Doctrine\ORM\Mapping\PrePersist
+                 *
+                 * @param Stabs\TestQuery        $query
+                 * @param TestApplicationContext $context
+                 *
+                 * @return void
+                 */
+                public function handleTestQuery(
+                    Stabs\TestQuery $query,
+                    TestApplicationContext $context
+                ): void
                 {
 
                 }
