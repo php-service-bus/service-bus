@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Tests\Application\Kernel;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ParameterBag;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
+use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
 use Desperado\ServiceBus\Saga\Configuration\AnnotationsSagaConfigurationExtractor;
 use Desperado\ServiceBus\Saga\Serializer\SagaSerializer;
 use Desperado\ServiceBus\Saga\Store\SagaStore;
@@ -64,6 +65,7 @@ class AbstractKernelTest extends TestCase
         $serviceHandlersExtractor = new AnnotationsExtractor(
             $annotationsReader,
             $autowiringServiceLocator,
+            new FastRouterBridge(),
             new NullLogger()
         );
 

@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <!-- ReactHttp backend configuration -->
+        <service id="service_bus.http_server.config"
+                 class="Desperado\ServiceBus\HttpServer\HttpServerConfiguration"
+                 public="false">
+            <factory class="Desperado\ServiceBus\HttpServer\HttpServerConfiguration" method="create"/>
+            <argument>%http_backend_config_host%</argument>
+            <argument>%http_backend_config_port%</argument>
+            <argument>%http_backend_config_secured%</argument>
+            <argument>%http_backend_config_certificate_path%</argument>
+        </service>
+        <!-- Http server react php backend -->
+        <service id="service_bus.http_server.backend.react"
+                 class="Desperado\ServiceBus\HttpServer\ReactHttpServerBackend"
+                 public="false">
+            <argument type="service" id="service_bus.http_server.config"/>
+            <argument type="service" id="service_bus.logger"/>
+
+            <tag name="service_bus.logger" channel="http"/>
+        </service>
+        <!-- RabbitMq Publisher -->
+        <service id="service_bus.http_server.publisher"
+                 class="Desperado\Infrastructure\Bridge\Publisher\BunnyPublisherBridge"
+                 public="false">
+            <argument>%transport_connection_dsn%</argument>
+            <argument type="service" id="service_bus.logger"/>
+
+            <tag name="service_bus.logger" channel="publisher"/>
+        </service>
+
+        <!-- Http server entry point -->
+        <service id="service_bus.http_server.entry_point"
+                 class="Desperado\ServiceBus\HttpServer\EntryPoint\HttpServerEntryPoint"
+                 public="true">
+            <argument>%service_bus.entry_point_name%</argument>
+            <argument/>
+            <argument/>
+            <argument type="service" id="service_bus.http_server.publisher"/>
+            <argument type="service" id="service_bus.http_server.backend.react"/>
+            <argument type="service" id="service_bus.http_server.router"/>
+            <argument type="service" id="service_bus.serializer.messages"/>
+            <argument type="service" id="service_bus.logger"/>
+
+            <tag name="service_bus.logger" channel="http"/>
+        </service>
+    </services>
+</container>

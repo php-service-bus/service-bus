@@ -14,6 +14,7 @@ namespace Desperado\ServiceBus\Tests\MessageBus;
 
 use Desperado\Infrastructure\Bridge\AnnotationsReader\AnnotationsReaderInterface;
 use Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader;
+use Desperado\Infrastructure\Bridge\Router\FastRouterBridge;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\MessageBus\MessageBusTask;
 use Desperado\ServiceBus\MessageBus\MessageBusTaskCollection;
@@ -76,6 +77,7 @@ class MessageBusBuilderTest extends TestCase
         $this->serviceHandlersExtractor = new AnnotationsExtractor(
             $this->annotationsReader,
             $this->autowiringServiceLocator,
+            new FastRouterBridge(),
             new NullLogger()
         );
     }

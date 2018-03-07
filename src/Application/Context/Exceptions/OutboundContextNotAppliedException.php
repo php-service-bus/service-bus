@@ -12,12 +12,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\Context\Exceptions;
 
-use Desperado\ServiceBus\ServiceBusExceptionInterface;
-
 /**
  * The context of sending messages is not set
  */
-class OutboundContextNotAppliedException extends \LogicException implements ServiceBusExceptionInterface
+class OutboundContextNotAppliedException extends OutboundContextException
 {
     public function __construct()
     {

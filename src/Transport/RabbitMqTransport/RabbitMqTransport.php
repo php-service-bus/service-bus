@@ -118,7 +118,7 @@ final class RabbitMqTransport implements TransportInterface
     /**
      * @inheritdoc
      */
-    public function listen(string $entryPointName, callable $messageHandler, array $clients = []): void
+    public function listen(string $entryPointName, callable $messageHandler): void
     {
         $this->subscriber = RabbitMqConsumer::create(
             $this->getClient(),
@@ -129,7 +129,7 @@ final class RabbitMqTransport implements TransportInterface
         $consumeCallable = $this->createSubscribeCallable($messageHandler);
 
         $this->subscriber
-            ->subscribe($entryPointName, $clients)
+            ->subscribe($entryPointName)
             ->then(
                 function(RabbitMqChannelData $channelData) use ($consumeCallable)
                 {

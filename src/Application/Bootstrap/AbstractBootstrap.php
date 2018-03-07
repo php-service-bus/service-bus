@@ -14,12 +14,9 @@ namespace Desperado\ServiceBus\Application\Bootstrap;
 
 use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\ServiceBus\Application\Bootstrap\Exceptions as BootstrapExceptions;
-use Desperado\ServiceBus\DependencyInjection as ServiceBusDependencyInjection;
-use Desperado\ServiceBus\Application\EntryPoint\EntryPoint;
+use Desperado\ServiceBus\DependencyInjection\ServiceBusExtension;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection as SymfonyDependencyInjection;
-use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
-
 
 /**
  * Base class initial initialization of the application
@@ -91,21 +88,6 @@ abstract class AbstractBootstrap
             );
 
         return $self;
-    }
-
-    /**
-     * Get application entry point
-     *
-     * @return EntryPoint
-     *
-     * @throws \Exception
-     */
-    final public function getEntryPoint(): EntryPoint
-    {
-        /** @var EntryPoint $entryPoint */
-        $entryPoint = $this->getContainer()->get('service_bus.entry_point');
-
-        return $entryPoint;
     }
 
     /**
@@ -182,36 +164,11 @@ abstract class AbstractBootstrap
             /** Assemble a new container */
 
             $bootstrapContainerConfiguration = $this->getBootstrapContainerConfiguration();
-            $bootstrapServicesDefinitions = $this->getBootstrapServicesDefinitions();
 
-            $builder->addCompilationPasses([
-                    new ServiceBusDependencyInjection\Compiler\LoggerChannelsCompilerPass(),
-                    new ServiceBusDependencyInjection\Compiler\ModulesCompilerPass(),
-                    new ServiceBusDependencyInjection\Compiler\ServicesCompilerPass(),
-                    new ServiceBusDependencyInjection\Compiler\SchedulerCompilerPass(
-                        $bootstrapServicesDefinitions->getSchedulerStorageKey()
-                    ),
-                    new ServiceBusDependencyInjection\Compiler\SagaStorageCompilerPass(
-                        $bootstrapServicesDefinitions->getSagaStorageKey()
-                    ),
-                    new ServiceBusDependencyInjection\Compiler\EntryPointCompilerPass(
-                        $bootstrapServicesDefinitions->getMessageTransportKey(),
-                        $bootstrapServicesDefinitions->getKernelKey(),
-                        $bootstrapServicesDefinitions->getApplicationContextKey()
-                    ),
-                    new RegisterListenersPass(
-                        'service_bus.event_dispatcher',
-                        'service_bus.event_listener',
-                        'service_bus.event_subscriber'
-                    )
-                ]
-            );
-
-            $builder->addCompilationPasses($bootstrapContainerConfiguration->getCompilerPassCollection());
-
-            $builder->addExtension(new ServiceBusDependencyInjection\ServiceBusExtension());
+            $builder->addExtension(new ServiceBusExtension($this->getBootstrapServicesDefinitions()));
             $builder->addExtensions($bootstrapContainerConfiguration->getExtensionsCollection());
 
+            $builder->addCompilationPasses($bootstrapContainerConfiguration->getCompilerPassCollection());
             $builder->addContainerParameters($bootstrapContainerConfiguration->getCustomerParameters());
 
             return $builder->rebuild();

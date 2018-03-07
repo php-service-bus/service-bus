@@ -7,10 +7,13 @@
         <service id="service_bus.infrastructure.serializer_bridge"
                  class="Desperado\MessageSerializer\Bridge\SymfonySerializerBridge"
                  public="false"/>
-
         <!-- Annotations reader bridge -->
         <service id="service_bus.infrastructure.annotations_reader"
                  class="Desperado\Infrastructure\Bridge\AnnotationsReader\DoctrineAnnotationsReader"
+                 public="false"/>
+        <!-- Http queries router -->
+        <service id="service_bus.http_server.router"
+                 class="Desperado\Infrastructure\Bridge\Router\FastRouterBridge"
                  public="false"/>
     </services>
 </container>

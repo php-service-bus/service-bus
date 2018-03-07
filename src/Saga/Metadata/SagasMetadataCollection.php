@@ -29,23 +29,11 @@ final class SagasMetadataCollection
     private $collection;
 
     /**
-     * @param array $sagasMetadata
-     *
      * @return self
      */
-    public static function create(array $sagasMetadata = []): self
+    public static function create(): self
     {
-        $self = new self();
-
-        if(0 !== \count($sagasMetadata))
-        {
-            foreach($sagasMetadata as $sagaMetadata)
-            {
-                $self->add($sagaMetadata);
-            }
-        }
-
-        return $self;
+        return new self();
     }
 
     /**

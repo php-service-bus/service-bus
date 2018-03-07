@@ -14,6 +14,7 @@ namespace Desperado\ServiceBus\Services\Configuration;
 
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Messages\HttpMessageInterface;
 use Desperado\ServiceBus\Services\Exceptions as ServicesExceptions;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
@@ -23,6 +24,51 @@ use React\Promise\PromiseInterface;
  */
 final class ConfigurationGuard
 {
+    /**
+     * Validating the type of the http message
+     *
+     * @param string $handlerPath
+     * @param string $messageClass
+     *
+     * @return void
+     *
+     * @throws ServicesExceptions\IncorrectMessageTypeException
+     */
+    public static function guardHttpMessageType(string $handlerPath, string $messageClass): void
+    {
+        if(false === \is_a($messageClass, HttpMessageInterface::class, true))
+        {
+            throw new ServicesExceptions\IncorrectMessageTypeException(
+                \sprintf(
+                    'The message "%s" must implement the interface "%s". ("%s" handler)',
+                    $handlerPath, $messageClass, HttpMessageInterface::class
+                )
+            );
+        }
+    }
+
+
+    /**
+     * @param string $handlerPath
+     * @param string $httpMethod
+     *
+     * @return void
+     *
+     * @throws ServicesExceptions\IncorrectHttpMethodException
+     */
+    public static function guardHttpMethod(string $handlerPath, string $httpMethod): void
+    {
+        $httpMethod = \strtoupper($httpMethod);
+        $supportedMethods = ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'];
+
+        if(false === \in_array($httpMethod, $supportedMethods, true))
+        {
+            throw new ServicesExceptions\IncorrectHttpMethodException(
+                $handlerPath, $httpMethod, $supportedMethods
+            );
+        }
+    }
+
     /**
      * Assert handlers return declaration type is correct
      *

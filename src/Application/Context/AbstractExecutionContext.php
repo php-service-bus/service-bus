@@ -22,6 +22,8 @@ use Desperado\ServiceBus\Application\Context\Exceptions\CancelScheduledCommandFa
 use Desperado\ServiceBus\Application\Context\Exceptions\OutboundContextNotAppliedException;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\Application\Context\Exceptions\ScheduleCommandFailedException;
+use Desperado\ServiceBus\HttpServer\Context\OutboundHttpContextInterface;
+use Desperado\ServiceBus\HttpServer\HttpResponse;
 use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
 use Desperado\ServiceBus\Scheduler\SchedulerProvider;
 use Psr\Log\LoggerInterface;
@@ -48,6 +50,26 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
     }
 
     /**
+     * Bind http response
+     *
+     * @param HttpResponse $response
+     *
+     * @return void
+     */
+    final public function bindResponse(HttpResponse $response): void
+    {
+        $outboundMessageContext = $this->getOutboundMessageContext();
+
+        if(
+            $outboundMessageContext instanceof OutboundHttpContextInterface &&
+            true === $outboundMessageContext->httpSessionStarted()
+        )
+        {
+            $outboundMessageContext->bindResponse($response);
+        }
+    }
+
+    /**
      * Schedule the task at the specified time
      *
      * @param ScheduledCommandIdentifier $id
@@ -58,7 +80,7 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      *
      * @throws ScheduleCommandFailedException
      */
-    public function scheduleCommand(ScheduledCommandIdentifier $id, AbstractCommand $command, DateTime $delay): void
+    final public function scheduleCommand(ScheduledCommandIdentifier $id, AbstractCommand $command, DateTime $delay): void
     {
         try
         {
@@ -88,7 +110,7 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
      *
      * @throws CancelScheduledCommandFailedException
      */
-    public function cancelScheduledCommand(ScheduledCommandIdentifier $id, ?string $reason = null): void
+    final public function cancelScheduledCommand(ScheduledCommandIdentifier $id, ?string $reason = null): void
     {
         try
         {
@@ -127,7 +149,6 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
         $this
             ->getOutboundMessageContext()
             ->publish($event, $messageDeliveryOptions);
-
     }
 
     /**

@@ -25,14 +25,14 @@ final class Saga extends AbstractAnnotation
      *
      * @var string|null
      */
-    public $identifierNamespace;
+    protected $identifierNamespace;
 
     /**
      * The event property that contains the saga ID
      *
      * @var string|null
      */
-    public $containingIdentifierProperty;
+    protected $containingIdentifierProperty;
 
     /**
      * Saga expire date modifier
@@ -41,5 +41,35 @@ final class Saga extends AbstractAnnotation
      *
      * @var string
      */
-    public $expireDateModifier = '+1 hour';
+    protected $expireDateModifier = '+1 hour';
+
+    /**
+     * Get saga identifier class namespace
+     *
+     * @return string|null
+     */
+    public function getIdentifierNamespace(): ?string
+    {
+        return $this->identifierNamespace;
+    }
+
+    /**
+     * Get the event property that contains the saga ID
+     *
+     * @return string|null
+     */
+    public function getContainingIdentifierProperty(): ?string
+    {
+        return $this->containingIdentifierProperty;
+    }
+
+    /**
+     * Get expire date modifier
+     *
+     * @return string
+     */
+    public function getExpireDateModifier(): string
+    {
+        return (string) $this->expireDateModifier;
+    }
 }
