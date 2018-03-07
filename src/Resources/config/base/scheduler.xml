@@ -15,7 +15,7 @@
         <service
                 id="service_bus.scheduler.listener_service"
                 class="Desperado\ServiceBus\Scheduler\SchedulerListenerService">
-            <argument>%service_bus.entry_point%</argument>
+            <argument>%service_bus.entry_point_name%</argument>
             <argument type="service" id="service_bus.scheduler.provider"/>
 
             <tag name="service_bus.service"/>

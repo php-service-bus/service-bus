@@ -12,7 +12,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Events;
 
+use Desperado\Domain\DateTime;
 use Desperado\Domain\Message\AbstractEvent;
+use Desperado\ServiceBus\AbstractSaga;
+use Desperado\ServiceBus\Saga\SagaState;
 
 /**
  * The status of the saga was changed
@@ -67,6 +70,62 @@ final class SagaStatusWasChangedEvent extends AbstractEvent
      * @var string|null
      */
     protected $description;
+
+    /**
+     * @param AbstractSaga $abstractSaga
+     * @param null|string  $description
+     *
+     * @return self
+     */
+    public static function completed(AbstractSaga $abstractSaga, ?string $description = null): self
+    {
+        return self::create([
+            'id'                  => $abstractSaga->getIdentityAsString(),
+            'identifierNamespace' => $abstractSaga->getId()->getIdentityClass(),
+            'sagaNamespace'       => \get_class($abstractSaga),
+            'previousStatusId'    => $abstractSaga->getState()->getStatusCode(),
+            'newStatusId'         => SagaState::STATUS_COMPLETED,
+            'datetime'            => DateTime::nowToString(),
+            'description'         => $description
+        ]);
+    }
+
+    /**
+     * @param AbstractSaga $abstractSaga
+     *
+     * @return self
+     */
+    public static function expired(AbstractSaga $abstractSaga): self
+    {
+        return self::create([
+            'id'                  => $abstractSaga->getIdentityAsString(),
+            'identifierNamespace' => $abstractSaga->getId()->getIdentityClass(),
+            'sagaNamespace'       => \get_class($abstractSaga),
+            'previousStatusId'    => $abstractSaga->getState()->getStatusCode(),
+            'newStatusId'         => SagaState::STATUS_EXPIRED,
+            'datetime'            => DateTime::nowToString()
+        ]);
+    }
+
+    /**
+     * @param AbstractSaga $abstractSaga
+     * @param null|string  $description
+     *
+     * @return self
+     */
+    public static function failed(AbstractSaga $abstractSaga, ?string $description = null): self
+    {
+        return self::create([
+                'id'                  => $abstractSaga->getIdentityAsString(),
+                'identifierNamespace' => $abstractSaga->getId()->getIdentityClass(),
+                'sagaNamespace'       => \get_class($abstractSaga),
+                'previousStatusId'    => $abstractSaga->getState()->getStatusCode(),
+                'newStatusId'         => SagaState::STATUS_FAILED,
+                'datetime'            => DateTime::nowToString(),
+                'description'         => $description
+            ]
+        );
+    }
 
     /**
      * Get saga identifier

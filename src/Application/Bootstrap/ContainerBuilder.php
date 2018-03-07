@@ -199,8 +199,8 @@ final class ContainerBuilder
     /**
      * Add container parameter
      *
-     * @param string $key
-     * @param mixed  $value
+     * @param string                   $key
+     * @param array|null|string|object $value
      *
      * @return void
      */

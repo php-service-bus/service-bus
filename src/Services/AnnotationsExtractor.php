@@ -30,7 +30,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         Annotations\Services\Service::class
     ];
 
-    private const SUPPORTED_METHOD_ANNOTATIOS = [
+    private const SUPPORTED_METHOD_ANNOTATIONS = [
         Annotations\Services\CommandHandler::class,
         Annotations\Services\EventHandler::class,
         Annotations\Services\QueryHandler::class
@@ -58,18 +58,28 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
     private $logger;
 
     /**
+     * Http requests router
+     *
+     * @var Bridge\Router\RouterInterface
+     */
+    private $router;
+
+    /**
      * @param Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader
      * @param AutowiringServiceLocator                            $autowiringServiceLocator
+     * @param Bridge\Router\RouterInterface                       $router
      * @param LoggerInterface                                     $logger
      */
     public function __construct(
         Bridge\AnnotationsReader\AnnotationsReaderInterface $annotationReader,
         AutowiringServiceLocator $autowiringServiceLocator,
+        Bridge\Router\RouterInterface $router,
         LoggerInterface $logger
     )
     {
         $this->annotationReader = $annotationReader;
         $this->autowiringServiceLocator = $autowiringServiceLocator;
+        $this->router = $router;
         $this->logger = $logger;
     }
 
@@ -117,9 +127,9 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
             ConfigurationGuard::guardHandlerReturnDeclaration($annotationData->getMethod());
 
-            $annotationClass = $annotationData->getAnnotation()->getClass();
+            $annotationClass = \get_class($annotationData->getAnnotation());
 
-            if(false === \in_array($annotationClass, self::SUPPORTED_METHOD_ANNOTATIOS, true))
+            if(false === \in_array($annotationClass, self::SUPPORTED_METHOD_ANNOTATIONS, true))
             {
                 /** Most likely this is some kind of user annotation. We will not throw an error */
 
@@ -171,11 +181,68 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         /** @var Annotations\Services\MessageHandlerAnnotationInterface $annotation */
         $annotation = $methodAnnotation->getAnnotation();
 
-        return Handlers\MessageHandlerData::new(
+        $handler = Handlers\MessageHandlerData::new(
             $methodAnnotation->getArguments()[0]->getClass()->getName(),
             $methodAnnotation->getMethod()->getClosure($service),
             $autowiringServices,
             $this->createMessageOptions($annotation, (string) $defaultServiceLoggerChannel)
+        );
+
+        if($annotation instanceof Annotations\Services\HttpHandlerAnnotationInterface)
+        {
+            $this->configureRouter($handler, $methodAnnotation);
+        }
+
+        return $handler;
+    }
+
+    /**
+     * Configure http routes
+     *
+     * @param Handlers\MessageHandlerData               $handler
+     * @param Bridge\AnnotationsReader\MethodAnnotation $methodAnnotation
+     *
+     * @return void
+     *
+     * @throws ServicesExceptions\IncorrectMessageTypeException
+     * @throws ServicesExceptions\IncorrectHttpMethodException
+     */
+    private function configureRouter(
+        Handlers\MessageHandlerData $handler,
+        Bridge\AnnotationsReader\MethodAnnotation $methodAnnotation
+    ): void
+    {
+        /** @var Annotations\Services\HttpHandlerAnnotationInterface $annotation */
+        $annotation = $methodAnnotation->getAnnotation();
+
+        /** not required */
+        if('' === (string) $annotation->getRoute() || '' === (string) $annotation->getMethod())
+        {
+            return;
+        }
+
+        $handlerPath = \sprintf(
+            '%s:%s',
+            $methodAnnotation->getMethod()->getDeclaringClass()->getName(),
+            $methodAnnotation->getMethod()->getName()
+        );
+
+        ConfigurationGuard::guardHttpMethod($handlerPath, $annotation->getMethod());
+        ConfigurationGuard::guardHttpMessageType($handlerPath, $handler->getMessageClassNamespace());
+
+        $this->logger->debug(
+            \sprintf('Added http route "[%s] %s"', $annotation->getMethod(), $annotation->getRoute())
+        );
+
+        $this->router->addRoute(
+            $annotation->getRoute(),
+            $annotation->getMethod(),
+            \Closure::fromCallable(
+                function() use ($handler)
+                {
+                    return $handler;
+                }
+            )
         );
     }
 
@@ -211,12 +278,14 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
             case Annotations\Services\QueryHandler::class:
                 /** @var Annotations\Services\QueryHandler $annotation */
-                return new Handlers\QueryExecutionParameters($loggerChannel, $annotation->getResponseEventClass());
+                return new Handlers\QueryExecutionParameters($loggerChannel);
 
+            // @codeCoverageIgnoreStart
             default:
                 throw new \LogicException(
                     \sprintf('Unsupported annotation type ("%s")', $annotationClass)
                 );
+            // @codeCoverageIgnoreEnd
         }
     }
 

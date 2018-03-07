@@ -13,6 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Annotations\Services;
 
 use Desperado\Domain\Annotations\AbstractAnnotation;
+use Desperado\ServiceBus\Annotations\Services\Traits\LoggerChannelTrait;
 
 /**
  * Annotation indicating to the event handler (listener)
@@ -22,18 +23,5 @@ use Desperado\Domain\Annotations\AbstractAnnotation;
  */
 final class EventHandler extends AbstractAnnotation implements MessageHandlerAnnotationInterface
 {
-    /**
-     * Logger channel
-     *
-     * @var string|null
-     */
-    protected $loggerChannel;
-
-    /**
-     * @inheritdoc
-     */
-    public function getLoggerChannel(): ?string
-    {
-        return $this->loggerChannel;
-    }
+    use LoggerChannelTrait;
 }

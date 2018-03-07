@@ -25,7 +25,17 @@ final class SagaEventListener extends AbstractAnnotation
     /**
      * The event property that contains the saga ID
      *
-     * @var string
+     * @var string|null
      */
-    public $containingIdentifierProperty;
+    protected $containingIdentifierProperty;
+
+    /**
+     * Get the event property that contains the saga ID
+     *
+     * @return string|null
+     */
+    public function getContainingIdentifierProperty(): ?string
+    {
+        return $this->containingIdentifierProperty;
+    }
 }

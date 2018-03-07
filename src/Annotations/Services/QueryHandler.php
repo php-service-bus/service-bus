@@ -13,45 +13,26 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Annotations\Services;
 
 use Desperado\Domain\Annotations\AbstractAnnotation;
+use Desperado\ServiceBus\Annotations\Services\Traits;
 
 /**
  * Annotation indicating to the query handler
  *
+ * Handler can be called via the http request (and not only from the transport bus, for example, a rabbitMq. The
+ * query can still be called using the transport bus).
+ *
+ * The query should implement the interface "\Desperado\ServiceBus\Messages\HttpMessageInterface"
+ *
+ * To support working with the http entry point, you must specify the `$route` and `$method`
+ *
+ * @see HttpSupportTrait
+ *
  * @Annotation
  * @Target("METHOD")
  */
-class QueryHandler extends AbstractAnnotation implements MessageHandlerAnnotationInterface
+class QueryHandler extends AbstractAnnotation
+    implements MessageHandlerAnnotationInterface, HttpHandlerAnnotationInterface
 {
-    /**
-     * The namespace of the response to the query.
-     * It (event payload) serves as transport for the execution results
-     *
-     * @var string
-     */
-    protected $responseEventClass;
-
-    /**
-     * Logger channel
-     *
-     * @var string|null
-     */
-    protected $loggerChannel;
-
-    /**
-     * @inheritdoc
-     */
-    public function getLoggerChannel(): ?string
-    {
-        return $this->loggerChannel;
-    }
-
-    /**
-     * Get response event class
-     *
-     * @return string
-     */
-    public function getResponseEventClass(): string
-    {
-        return $this->responseEventClass;
-    }
+    use Traits\LoggerChannelTrait;
+    use Traits\HttpSupportTrait;
 }

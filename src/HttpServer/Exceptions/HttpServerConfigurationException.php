@@ -10,17 +10,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Saga\Exceptions;
+namespace Desperado\ServiceBus\HttpServer\Exceptions;
 
 use Desperado\ServiceBus\ServiceBusExceptionInterface;
 
 /**
  *
  */
-class ClosedMessageBusException extends \LogicException implements ServiceBusExceptionInterface
+class HttpServerConfigurationException extends \LogicException implements ServiceBusExceptionInterface
 {
-    public function __construct()
-    {
-        parent::__construct('Message bus already configured');
-    }
+
 }

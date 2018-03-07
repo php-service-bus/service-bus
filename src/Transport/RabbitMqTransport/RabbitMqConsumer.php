@@ -89,14 +89,13 @@ final class RabbitMqConsumer
      * Configure queue and start subscribe
      *
      * @param string $entryPointName
-     * @param array  $clients
      *
      * @return PromiseInterface
      */
-    public function subscribe(string $entryPointName, array $clients): PromiseInterface
+    public function subscribe(string $entryPointName): PromiseInterface
     {
         return $this
-            ->doConnect($entryPointName, $clients)
+            ->doConnect($entryPointName)
             ->then(
                 function(Channel $channel)
                 {
@@ -104,9 +103,9 @@ final class RabbitMqConsumer
                 }
             )
             ->then(
-                function(Channel $channel) use ($entryPointName, $clients)
+                function(Channel $channel) use ($entryPointName)
                 {
-                    return $this->doConfigureExchanges($channel, $entryPointName, $clients);
+                    return $this->doConfigureExchanges($channel, $entryPointName);
                 }
             )
             ->then(
@@ -169,16 +168,15 @@ final class RabbitMqConsumer
      * Connects to AMQP server
      *
      * @param string $entryPointName
-     * @param array  $clients
      *
      * @return PromiseInterface
      */
-    private function doConnect(string $entryPointName, array $clients): PromiseInterface
+    private function doConnect(string $entryPointName): PromiseInterface
     {
         return $this->client
             ->connect()
             ->then(
-                function(Client $client) use ($entryPointName, $clients)
+                function(Client $client) use ($entryPointName)
                 {
                     return $client->channel();
                 }
@@ -214,11 +212,10 @@ final class RabbitMqConsumer
      *
      * @param Channel $channel
      * @param string  $entryPointName
-     * @param array   $clients
      *
      * @return PromiseInterface
      */
-    private function doConfigureExchanges(Channel $channel, string $entryPointName, array $clients): PromiseInterface
+    private function doConfigureExchanges(Channel $channel, string $entryPointName): PromiseInterface
     {
         return $channel
             /** Application main exchange */
@@ -288,9 +285,9 @@ final class RabbitMqConsumer
             )
             /** Configure routing keys for clients */
             ->then(
-                function(MethodQueueDeclareOkFrame $frame) use ($channel, $clients, $entryPointName)
+                function(MethodQueueDeclareOkFrame $frame) use ($channel, $entryPointName)
                 {
-                    return $this->doConfigureRoutingKeys($frame, $channel, $clients, $entryPointName);
+                    return $this->doConfigureRoutingKeys($frame, $channel, $entryPointName);
                 }
             );
     }
@@ -300,7 +297,6 @@ final class RabbitMqConsumer
      *
      * @param MethodQueueDeclareOkFrame $frame
      * @param Channel                   $channel
-     * @param array                     $clients
      * @param string                    $entryPointName
      *
      * @return PromiseInterface
@@ -308,7 +304,6 @@ final class RabbitMqConsumer
     private function doConfigureRoutingKeys(
         MethodQueueDeclareOkFrame $frame,
         Channel $channel,
-        array $clients,
         string $entryPointName
     ): PromiseInterface
     {
@@ -321,7 +316,7 @@ final class RabbitMqConsumer
                     $routingKey
                 );
             },
-            $clients
+            [$entryPointName]
         );
 
         return all($promises)

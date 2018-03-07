@@ -26,11 +26,10 @@ interface TransportInterface
      *
      * @param string   $entryPointName
      * @param callable $messageHandler function(IncomingMessageContainer $incomingMessageContainer) {}
-     * @param array    $clients
      *
      * @return void
      */
-    public function listen(string $entryPointName, callable $messageHandler, array $clients = []): void;
+    public function listen(string $entryPointName, callable $messageHandler): void;
 
     /**
      * Unsubscribe from messages

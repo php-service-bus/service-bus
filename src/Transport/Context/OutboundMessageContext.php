@@ -20,11 +20,15 @@ use Desperado\Domain\Transport\Context\IncomingMessageContextInterface;
 use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
 use Desperado\Domain\Transport\Message\Message;
 use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
+use Desperado\ServiceBus\HttpServer\Context\HttpIncomingContext;
+use Desperado\ServiceBus\HttpServer\Context\OutboundHttpContextInterface;
+use Desperado\ServiceBus\HttpServer\HttpResponse;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Outbound message context
  */
-final class OutboundMessageContext implements OutboundMessageContextInterface
+final class OutboundMessageContext implements OutboundMessageContextInterface, OutboundHttpContextInterface
 {
     /**
      * The context of the incoming message
@@ -48,6 +52,20 @@ final class OutboundMessageContext implements OutboundMessageContextInterface
     private $toPublishMessages;
 
     /**
+     * Http request instance
+     *
+     * @var RequestInterface|null
+     */
+    private $request;
+
+    /**
+     * Response DTO
+     *
+     * @var HttpResponse
+     */
+    private $response;
+
+    /**
      * @inheritdoc
      */
     public static function fromIncoming(
@@ -59,9 +77,66 @@ final class OutboundMessageContext implements OutboundMessageContextInterface
 
         $self->incomingMessageContext = $incomingMessageContext;
         $self->messageSerializer = $messageSerializer;
-        $self->toPublishMessages = new \SplObjectStorage();
 
         return $self;
+    }
+
+    /**
+     * @param RequestInterface           $request
+     * @param HttpIncomingContext        $incomingMessageContext
+     * @param MessageSerializerInterface $messageSerializer
+     *
+     * @return OutboundMessageContext
+     */
+    public static function fromHttpRequest(
+        RequestInterface $request,
+        HttpIncomingContext $incomingMessageContext,
+        MessageSerializerInterface $messageSerializer
+    ): self
+    {
+        $self = new self();
+
+        $self->request = $request;
+        $self->incomingMessageContext = $incomingMessageContext;
+        $self->messageSerializer = $messageSerializer;
+
+        return $self;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function httpSessionStarted(): bool
+    {
+        return null !== $this->request;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function bindResponse(HttpResponse $response): void
+    {
+        $this->response = $response;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function responseBind(): bool
+    {
+        return null !== $this->response;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getResponseData(): ?HttpResponse
+    {
+        $response = clone $this->response;
+
+        unset($this->response);
+
+        return $response;
     }
 
     /**
@@ -85,7 +160,11 @@ final class OutboundMessageContext implements OutboundMessageContextInterface
      */
     public function getToPublishMessages(): \SplObjectStorage
     {
-        return $this->toPublishMessages;
+        $toPublishMessages = clone $this->toPublishMessages;
+
+        $this->toPublishMessages = new \SplObjectStorage();
+
+        return $toPublishMessages;
     }
 
     /**
@@ -121,6 +200,6 @@ final class OutboundMessageContext implements OutboundMessageContextInterface
      */
     private function __construct()
     {
-
+        $this->toPublishMessages = new \SplObjectStorage();
     }
 }

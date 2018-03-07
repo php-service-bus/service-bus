@@ -16,9 +16,10 @@ use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\ServiceBus\Saga\Identifier\AbstractSagaIdentifier;
 use Desperado\ServiceBus\Saga\Processor\Exceptions\InvalidSagaIdentifierException;
-use Desperado\ServiceBus\Saga\Processor\Exceptions\SagaNotFoundException;
 use Desperado\ServiceBus\Saga\Processor\Guard\GuardIdentifier;
 use Desperado\ServiceBus\SagaProvider;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * The saga event processor
@@ -54,22 +55,32 @@ final class SagaEventProcessor
     private $sagaProvider;
 
     /**
-     * @param string       $sagaNamespace
-     * @param string       $identifierNamespace
-     * @param string       $containingIdentifierProperty
-     * @param SagaProvider $sagaProvider
+     * Logger
+     *
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param string               $sagaNamespace
+     * @param string               $identifierNamespace
+     * @param string               $containingIdentifierProperty
+     * @param SagaProvider         $sagaProvider
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         string $sagaNamespace,
         string $identifierNamespace,
         string $containingIdentifierProperty,
-        SagaProvider $sagaProvider
+        SagaProvider $sagaProvider,
+        LoggerInterface $logger = null
     )
     {
         $this->sagaNamespace = $sagaNamespace;
         $this->identifierNamespace = $identifierNamespace;
         $this->containingIdentifierProperty = $containingIdentifierProperty;
         $this->sagaProvider = $sagaProvider;
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
@@ -94,7 +105,7 @@ final class SagaEventProcessor
             return;
         }
 
-        throw new SagaNotFoundException($identifier);
+        $this->logger->info(\sprintf('Saga with identifier "%s" not found', $identifier->toCompositeIndex()));
     }
 
     /**

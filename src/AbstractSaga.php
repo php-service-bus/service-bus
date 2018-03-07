@@ -73,20 +73,14 @@ abstract class AbstractSaga
      */
     final public function __construct(AbstractSagaIdentifier $identity, SagaMetadata $metadata)
     {
+        $this->id = $identity;
         $this->expireDateModifier = $metadata->getExpireDateModifier();
         $this->events = [];
         $this->commands = [];
 
-        $sagaInitialized = SagaCreatedEvent::create([
-                'id'                  => $identity->toString(),
-                'identifierNamespace' => $identity->getIdentityClass(),
-                'sagaNamespace'       => \get_class($this),
-                'createdAt'           => DateTime::nowToString(),
-                'expireDate'          => DateTime::fromString($this->getExpirePeriod())->toString()
-            ]
+        $this->raiseEvent(
+            SagaCreatedEvent::new($this, $this->getExpirePeriod())
         );
-
-        $this->raiseEvent($sagaInitialized);
     }
 
     /**
@@ -252,18 +246,11 @@ abstract class AbstractSaga
      */
     final protected function expire(): void
     {
-        $this->assertIsProcessing();
-
-        $changedStatusEvent = SagaStatusWasChangedEvent::create([
-            'id'                  => $this->getIdentityAsString(),
-            'identifierNamespace' => $this->getId()->getIdentityClass(),
-            'sagaNamespace'       => \get_class($this),
-            'previousStatusId'    => $this->getState()->getStatusCode(),
-            'newStatusId'         => SagaState::STATUS_EXPIRED,
-            'datetime'            => DateTime::nowToString()
-        ]);
-
-        $this->raiseEvent($changedStatusEvent);
+        $this
+            ->assertIsProcessing()
+            ->raiseEvent(
+                SagaStatusWasChangedEvent::expired($this)
+            );
     }
 
     /**
@@ -277,19 +264,11 @@ abstract class AbstractSaga
      */
     final protected function complete(?string $message = null): void
     {
-        $this->assertIsProcessing();
-
-        $changedStatusEvent = SagaStatusWasChangedEvent::create([
-            'id'                  => $this->getIdentityAsString(),
-            'identifierNamespace' => $this->getId()->getIdentityClass(),
-            'sagaNamespace'       => \get_class($this),
-            'previousStatusId'    => $this->getState()->getStatusCode(),
-            'newStatusId'         => SagaState::STATUS_COMPLETED,
-            'datetime'            => DateTime::nowToString(),
-            'description'         => $message
-        ]);
-
-        $this->raiseEvent($changedStatusEvent);
+        $this
+            ->assertIsProcessing()
+            ->raiseEvent(
+                SagaStatusWasChangedEvent::completed($this, $message)
+            );
     }
 
     /**
@@ -303,20 +282,11 @@ abstract class AbstractSaga
      */
     final protected function fail(string $message): void
     {
-        $this->assertIsProcessing();
-
-        $changedStatusEvent = SagaStatusWasChangedEvent::create([
-            'id'                  => $this->getIdentityAsString(),
-            'identifierNamespace' => $this->getId()->getIdentityClass(),
-            'sagaNamespace'       => \get_class($this),
-            'previousStatusId'    => $this->getState()->getStatusCode(),
-            'newStatusId'         => SagaState::STATUS_FAILED,
-            'datetime'            => DateTime::nowToString(),
-            'description'         => $message
-        ]);
-
-
-        $this->raiseEvent($changedStatusEvent);
+        $this
+            ->assertIsProcessing()
+            ->raiseEvent(
+                SagaStatusWasChangedEvent::failed($this, $message)
+            );
     }
 
     /**
@@ -328,9 +298,6 @@ abstract class AbstractSaga
      */
     final protected function onSagaCreatedEvent(SagaCreatedEvent $event): void
     {
-        $identifierNamespace = $event->getIdentifierNamespace();
-
-        $this->id = new $identifierNamespace($event->getId(), \get_class($this));
         $this->state = SagaState::create(
             DateTime::fromString($event->getCreatedAt()),
             DateTime::fromString($event->getExpireDate())
@@ -412,11 +379,11 @@ abstract class AbstractSaga
     /**
      * Make sure that the saga is not closed
      *
-     * @return void
+     * @return self
      *
      * @throws SagaIsClosedException
      */
-    private function assertIsProcessing(): void
+    private function assertIsProcessing(): self
     {
         if(true === $this->getState()->isClosed())
         {
@@ -425,5 +392,7 @@ abstract class AbstractSaga
                 $this->getState()->getStatusCode()
             );
         }
+
+        return $this;
     }
 }
