@@ -62,56 +62,56 @@ class ValidationFailedBootstrapTest extends TestCase
                 '/sss',
                 \sys_get_temp_dir() . '/cache',
                 __DIR__ . '/failed_dontenv/.empty.env',
-                Exceptions\IncorrectRootDirectoryPathException::class,
+                Exceptions\ApplicationBootFailedException::class,
                 'The path to the root of the application is not correct ("/sss")'
             ],
             [
                 __DIR__ . '/../../../src',
                 '/root',
                 __DIR__ . '/failed_dontenv/.empty.env',
-                Exceptions\IncorrectCacheDirectoryFilePathException::class,
+                Exceptions\ApplicationBootFailedException::class,
                 'The path to the cache directory is not correct ("/root"). The directory must exist and be writable'
             ],
             [
                 __DIR__ . '/../../../src',
                 '',
                 __DIR__ . '/failed_dontenv/.empty.env',
-                Exceptions\IncorrectCacheDirectoryFilePathException::class,
+                Exceptions\ApplicationBootFailedException::class,
                 'The path to the cache directory is not correct (""). The directory must exist and be writable'
             ],
             [
                 __DIR__ . '/../../../src',
                 \sys_get_temp_dir() . '/cache',
                 __FILE__,
-                Exceptions\ServiceBusConfigurationException::class,
+                Exceptions\ApplicationBootFailedException::class,
                 ''
             ],
             [
                 __DIR__ . '/../../../src',
                 \sys_get_temp_dir() . '/cache',
                 __DIR__ . '/failed_dontenv/.empty.env',
-                Exceptions\ServiceBusConfigurationException::class,
+                Exceptions\ApplicationBootFailedException::class,
                 'Application environment must be specified'
             ],
             [
                 __DIR__ . '/../../../src',
                 \sys_get_temp_dir() . '/cache',
                 __DIR__ . '/failed_dontenv/.with_incorrect_env.env',
-                Exceptions\ServiceBusConfigurationException::class,
+                Exceptions\ApplicationBootFailedException::class,
                 'This environment is incorrect. Acceptable variations: prod, dev, test'
             ],
             [
                 __DIR__ . '/../../../src',
                 \sys_get_temp_dir() . '/cache',
                 __DIR__ . '/failed_dontenv/.without_entry_point_name.env',
-                Exceptions\ServiceBusConfigurationException::class,
+                Exceptions\ApplicationBootFailedException::class,
                 'Entry point name must be specified'
             ],
             [
                 __DIR__ . '/../../../src',
                 \sys_get_temp_dir() . '/cache',
                 __DIR__ . '/valid.env',
-                Exceptions\ServiceBusConfigurationException::class,
+                Exceptions\ApplicationBootFailedException::class,
                 'Can not find service "schedulerStorageKey" in the dependency container. The scheduler storage must be configured'
             ]
         ];

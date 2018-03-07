@@ -86,18 +86,22 @@ final class ContainerBuilder
     private $containerClassPath;
 
     /**
-     * @param Configuration $configuration
-     * @param string        $rootDirectoryPath
-     * @param string        $cacheDirectoryPath
+     * @param Configuration  $configuration
+     * @param RootDirectory  $rootDirectory
+     * @param CacheDirectory $cacheDirectory
      *
      * @throws \Desperado\Domain\Environment\Exceptions\InvalidEnvironmentException
      * @throws \Desperado\Domain\Environment\Exceptions\EmptyEnvironmentException
      */
-    public function __construct(Configuration $configuration, string $rootDirectoryPath, string $cacheDirectoryPath)
+    public function __construct(
+        Configuration $configuration,
+        RootDirectory $rootDirectory,
+        CacheDirectory $cacheDirectory
+    )
     {
         $this->configuration      = $configuration;
-        $this->rootDirectoryPath  = $rootDirectoryPath;
-        $this->cacheDirectoryPath = $cacheDirectoryPath;
+        $this->rootDirectoryPath  = (string) $rootDirectory;
+        $this->cacheDirectoryPath = (string) $cacheDirectory;
 
         $this->containerParametersBag = $this->getDefaultContainerParameters();
         $this->containerClassName     = $this->getContainerClassName();
