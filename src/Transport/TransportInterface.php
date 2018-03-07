@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport;
 
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
-use Desperado\Domain\Transport\Message\Message;
+use Desperado\ServiceBus\Transport\Message\Message;
 use React\Promise\PromiseInterface;
 
 /**
@@ -28,6 +28,8 @@ interface TransportInterface
      * @param callable $messageHandler function(IncomingMessageContainer $incomingMessageContainer) {}
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function listen(string $entryPointName, callable $messageHandler): void;
 
@@ -35,6 +37,8 @@ interface TransportInterface
      * Unsubscribe from messages
      *
      * @return PromiseInterface
+     *
+     * @throws \Exception
      */
     public function disconnect(): PromiseInterface;
 
@@ -44,6 +48,8 @@ interface TransportInterface
      * @param Message $message
      *
      * @return PromiseInterface
+     *
+     * @throws \Exception
      */
     public function send(Message $message): PromiseInterface;
 

@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 use Desperado\Domain\Message\AbstractCommand;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\ServiceBus\Saga\Configuration\SagaConfiguration;
 use Desperado\ServiceBus\Saga\Configuration\Exceptions\SagaConfigurationException;
 use Desperado\ServiceBus\Saga\Configuration\SagaConfigurationExtractorInterface;
@@ -24,7 +24,6 @@ use Desperado\ServiceBus\Saga\Metadata;
 use Desperado\ServiceBus\Saga\Processor\SagaEventProcessor;
 use Desperado\ServiceBus\Saga\Store\SagaStore;
 use Desperado\ServiceBus\Saga\UoW;
-use Psr\Log\LoggerInterface;
 
 /**
  * Sagas provider
@@ -55,13 +54,6 @@ final class SagaProvider
     private $sagasMetadataCollection;
 
     /**
-     * Logger instance
-     *
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * Unit of Work
      *
      * @var UoW\UnitOfWork
@@ -71,20 +63,17 @@ final class SagaProvider
     /**
      * @param SagaStore                           $sagaStore
      * @param SagaConfigurationExtractorInterface $configurationExtractor
-     * @param LoggerInterface                     $logger
      */
     public function __construct(
         SagaStore $sagaStore,
-        SagaConfigurationExtractorInterface $configurationExtractor,
-        LoggerInterface $logger
+        SagaConfigurationExtractorInterface $configurationExtractor
     )
     {
-        $this->sagaStore = $sagaStore;
+        $this->sagaStore              = $sagaStore;
         $this->configurationExtractor = $configurationExtractor;
-        $this->logger = $logger;
 
         $this->sagasMetadataCollection = Metadata\SagasMetadataCollection::create();
-        $this->unitOfWork = new UoW\UnitOfWork($sagaStore);
+        $this->unitOfWork              = new UoW\UnitOfWork($sagaStore);
     }
 
     /**
@@ -152,8 +141,10 @@ final class SagaProvider
      */
     public function getSagaListeners(string $sagaNamespace): array
     {
-        return $this->sagasMetadataCollection->has($sagaNamespace)
-            ? $this->sagasMetadataCollection->get($sagaNamespace)->getListeners()
+        $metadata = $this->sagasMetadataCollection->get($sagaNamespace);
+
+        return null !== $metadata
+            ? $metadata->getListeners()
             : [];
     }
 

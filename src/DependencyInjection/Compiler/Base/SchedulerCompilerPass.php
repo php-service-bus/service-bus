@@ -34,6 +34,8 @@ final class SchedulerCompilerPass implements DependencyInjection\Compiler\Compil
 
     /**
      * @inheritdoc
+     *
+     * @throws \LogicException
      */
     public function process(DependencyInjection\ContainerBuilder $container): void
     {

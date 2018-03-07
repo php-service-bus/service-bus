@@ -41,7 +41,7 @@ final class SagaConfigurationGuard
         $currentDateTimestamp = DateTime::now()->toTimestamp();
         $expireDateTimestamp = DateTime::fromString($datetimeModifier)->toTimestamp();
 
-        if(null == $expireDateTimestamp || $currentDateTimestamp >= $expireDateTimestamp)
+        if(null === $expireDateTimestamp || $currentDateTimestamp >= $expireDateTimestamp)
         {
             throw new ConfigurationExceptions\IncorrectExpirationDateModifierException();
         }
@@ -55,6 +55,7 @@ final class SagaConfigurationGuard
      * @return void
      *
      * @throws ConfigurationExceptions\EmptyIdentifierNamespaceException
+     * @throws ConfigurationExceptions\IdentifierClassNotFoundException
      */
     public static function assertIdentifierClassNamespaceIsValid(string $sagaIdentityClassNamespace): void
     {
@@ -119,7 +120,7 @@ final class SagaConfigurationGuard
      *
      * @codeCoverageIgnore
      */
-    protected function __construct()
+    private function __construct()
     {
 
     }

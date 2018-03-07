@@ -13,9 +13,9 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Scheduler;
 
 use Desperado\Domain\Message\AbstractEvent;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\Domain\ParameterBag;
-use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
+use Desperado\ServiceBus\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\ServiceInterface;
 use Desperado\ServiceBus\Transport\RabbitMqTransport\RabbitMqConsumer;
@@ -35,20 +35,12 @@ final class SchedulerListenerService implements ServiceInterface
     private $entryPointName;
 
     /**
-     * Scheduler provider
-     *
-     * @var SchedulerProvider
-     */
-    private $schedulerProvider;
-
-    /**
      * @param string            $entryPointName
      * @param SchedulerProvider $schedulerProvider
      */
     public function __construct(string $entryPointName, SchedulerProvider $schedulerProvider)
     {
         $this->entryPointName = $entryPointName;
-        $this->schedulerProvider = $schedulerProvider;
     }
 
     /**
@@ -58,6 +50,8 @@ final class SchedulerListenerService implements ServiceInterface
      * @param ExecutionContextInterface             $context
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public function whenSchedulerOperationEmittedEvent(
         Events\SchedulerOperationEmittedEvent $event,
@@ -74,6 +68,8 @@ final class SchedulerListenerService implements ServiceInterface
      * @param ExecutionContextInterface              $context
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public function whenSchedulerOperationCanceledEvent(
         Events\SchedulerOperationCanceledEvent $event,
@@ -90,6 +86,8 @@ final class SchedulerListenerService implements ServiceInterface
      * @param ExecutionContextInterface      $context
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public function whenOperationScheduledEvent(
         Events\OperationScheduledEvent $event,
@@ -106,6 +104,8 @@ final class SchedulerListenerService implements ServiceInterface
      * @param ExecutionContextInterface $context
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     private function processNextOperationEmit(AbstractEvent $event, ExecutionContextInterface $context): void
     {

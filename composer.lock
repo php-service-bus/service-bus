@@ -901,16 +901,16 @@
         },
         {
             "name": "mmasiukevich/domain-common",
-            "version": "v0.0.3.3",
+            "version": "v0.0.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/domain-common.git",
-                "reference": "d3082a084029e4fdd241350f28c204e0fb8da232"
+                "reference": "4ccffc97611feb6dff8930a008dd5869984e0079"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/d3082a084029e4fdd241350f28c204e0fb8da232",
-                "reference": "d3082a084029e4fdd241350f28c204e0fb8da232",
+                "url": "https://api.github.com/repos/mmasiukevich/domain-common/zipball/4ccffc97611feb6dff8930a008dd5869984e0079",
+                "reference": "4ccffc97611feb6dff8930a008dd5869984e0079",
                 "shasum": ""
             },
             "require": {
@@ -950,7 +950,7 @@
                 "cqs",
                 "event sourcing"
             ],
-            "time": "2018-02-25 16:05:40"
+            "time": "2018-03-07 13:16:56"
         },
         {
             "name": "mmasiukevich/event-sourcing",
@@ -1007,16 +1007,16 @@
         },
         {
             "name": "mmasiukevich/infrastructure",
-            "version": "v0.0.3.5",
+            "version": "v0.0.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/infrastructure.git",
-                "reference": "b3bb4a25c53d2ad9893f67d6549277c65a48ea72"
+                "reference": "e6cfe122904abbd66675707f5c486d583bdbd87d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/b3bb4a25c53d2ad9893f67d6549277c65a48ea72",
-                "reference": "b3bb4a25c53d2ad9893f67d6549277c65a48ea72",
+                "url": "https://api.github.com/repos/mmasiukevich/infrastructure/zipball/e6cfe122904abbd66675707f5c486d583bdbd87d",
+                "reference": "e6cfe122904abbd66675707f5c486d583bdbd87d",
                 "shasum": ""
             },
             "require": {
@@ -1063,20 +1063,20 @@
                 }
             ],
             "description": "Command Query Responsibility Segregation/Event Sourcing infrastructure",
-            "time": "2018-03-05 09:07:38"
+            "time": "2018-03-07 12:46:05"
         },
         {
             "name": "mmasiukevich/message-serializer",
-            "version": "v0.0.3.2",
+            "version": "v0.0.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmasiukevich/message-serializer.git",
-                "reference": "e0f42b2051ae4818378d9b607164a588c219011e"
+                "reference": "5f42958fcb7a712d731c1171597f408e14a0c3f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/e0f42b2051ae4818378d9b607164a588c219011e",
-                "reference": "e0f42b2051ae4818378d9b607164a588c219011e",
+                "url": "https://api.github.com/repos/mmasiukevich/message-serializer/zipball/5f42958fcb7a712d731c1171597f408e14a0c3f7",
+                "reference": "5f42958fcb7a712d731c1171597f408e14a0c3f7",
                 "shasum": ""
             },
             "require": {
@@ -1113,7 +1113,7 @@
                 }
             ],
             "description": "Message serializer",
-            "time": "2018-02-25 16:11:28"
+            "time": "2018-03-07 13:45:30"
         },
         {
             "name": "monolog/monolog",

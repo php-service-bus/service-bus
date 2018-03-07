@@ -70,6 +70,8 @@ abstract class AbstractSaga
     /**
      * @param AbstractSagaIdentifier $identity
      * @param SagaMetadata           $metadata
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     final public function __construct(AbstractSagaIdentifier $identity, SagaMetadata $metadata)
     {
@@ -94,6 +96,8 @@ abstract class AbstractSaga
 
     /**
      * @inheritdoc
+     *
+     * @throws \Desperado\ServiceBus\Saga\Exceptions\SagaIsClosedException
      */
     final public function transition(AbstractEvent $event): void
     {
@@ -231,6 +235,8 @@ abstract class AbstractSaga
      * @param AbstractCommand $command
      *
      * @return void
+     *
+     * @throws \Desperado\ServiceBus\Saga\Exceptions\SagaIsClosedException
      */
     final protected function fire(AbstractCommand $command): void
     {
@@ -243,6 +249,9 @@ abstract class AbstractSaga
      * Change the status of the expiry of the life
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
+     * @throws \Desperado\ServiceBus\Saga\Exceptions\SagaIsClosedException
      */
     final protected function expire(): void
     {
@@ -260,6 +269,7 @@ abstract class AbstractSaga
      *
      * @return void
      *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      * @throws SagaIsClosedException
      */
     final protected function complete(?string $message = null): void
@@ -278,6 +288,7 @@ abstract class AbstractSaga
      *
      * @return void
      *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      * @throws SagaIsClosedException
      */
     final protected function fail(string $message): void

@@ -22,17 +22,25 @@ final class LoggerChannelsCompilerPass implements DependencyInjection\Compiler\C
 {
     /**
      * @inheritdoc
+     *
+     * @throws \Symfony\Component\DependencyInjection\Exception\OutOfBoundsException
+     * @throws \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
+     * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
     public function process(DependencyInjection\ContainerBuilder $container): void
     {
         foreach($container->findTaggedServiceIds('service_bus.logger') as $id => $tags)
         {
+            /** @var array $tags */
+
             foreach($tags as $tag)
             {
                 if(true === isset($tag['channel']) && '' !== $tag['channel'])
                 {
                     $serviceDefinition = $container->getDefinition($id);
-                    $loggerServiceId = $this->prepareLoggerService(
+                    $loggerServiceId   = $this->prepareLoggerService(
                         $container,
                         $container->getParameterBag()->resolveValue($tag['channel'])
                     );
@@ -50,6 +58,9 @@ final class LoggerChannelsCompilerPass implements DependencyInjection\Compiler\C
      * @param string                               $channel
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
      */
     private function prepareLoggerService(DependencyInjection\ContainerBuilder $container, string $channel): string
     {
@@ -70,6 +81,8 @@ final class LoggerChannelsCompilerPass implements DependencyInjection\Compiler\C
      * @param string                         $loggerServiceId
      *
      * @return void
+     *
+     * @throws \Symfony\Component\DependencyInjection\Exception\OutOfBoundsException
      */
     private function processReplaceArgument(DependencyInjection\Definition $serviceDefinition, string $loggerServiceId): void
     {

@@ -12,8 +12,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport;
 
-use Desperado\Domain\Transport\Context\IncomingMessageContextInterface;
-use Desperado\Domain\Transport\Message\Message;
+use Desperado\ServiceBus\Transport\Context\IncomingMessageContextInterface;
+use Desperado\ServiceBus\Transport\Message\Message;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
 
 /**

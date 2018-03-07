@@ -43,13 +43,13 @@ class TestContainer implements ContainerInterface
             throw new ServiceNotFoundException($id);
         }
 
-        return isset($this->storage[$id]) ? $this->storage[$id] : null;
+        return $this->storage[$id] ?? null;
     }
 
     /**
      * @inheritdoc
      */
-    public function has($id)
+    public function has($id): bool
     {
         return isset($this->storage[$id]);
     }

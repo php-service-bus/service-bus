@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Saga\UoW;
 
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\ServiceBus\Saga\Exceptions\CommitSagaFailedException;
 use Desperado\ServiceBus\Saga\Store\Exceptions\DuplicateSagaException;
 use Desperado\ServiceBus\Saga\Store\SagaStore;
@@ -142,11 +142,11 @@ class UnitOfWork
      * Publish all events
      *
      * @param \Iterator                      $events
-     * @param ExecutionContextInterface|null $context
+     * @param ExecutionContextInterface $context
      *
      * @return void
      */
-    private function publishEvents(\Iterator $events, ExecutionContextInterface $context = null): void
+    private function publishEvents(\Iterator $events, ExecutionContextInterface $context): void
     {
         foreach($events as $event)
         {
@@ -160,11 +160,11 @@ class UnitOfWork
      * Send all commands
      *
      * @param \Iterator                      $commands
-     * @param ExecutionContextInterface|null $context
+     * @param ExecutionContextInterface $context
      *
      * @return void
      */
-    private function sendEvents(\Iterator $commands, ExecutionContextInterface $context = null): void
+    private function sendEvents(\Iterator $commands, ExecutionContextInterface $context): void
     {
         foreach($commands as $command)
         {

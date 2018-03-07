@@ -60,6 +60,7 @@ abstract class AbstractBootstrap
      *
      * @return self
      *
+     * @throws \InvalidArgumentException
      * @throws BootstrapExceptions\IncorrectRootDirectoryPathException
      * @throws BootstrapExceptions\IncorrectCacheDirectoryFilePathException
      * @throws BootstrapExceptions\ServiceBusConfigurationException
@@ -154,8 +155,8 @@ abstract class AbstractBootstrap
 
             /** If the container does not need to be re-created, just get it */
             if(
-                true === $this->configuration->getEnvironment()->isProduction() &&
-                true === $builder->isCacheActual()
+                true === $builder->isCacheActual() &&
+                true === $this->configuration->getEnvironment()->isProduction()
             )
             {
                 return $builder->getContainer();

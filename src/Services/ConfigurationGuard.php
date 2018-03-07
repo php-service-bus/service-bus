@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Services\Configuration;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\ServiceBus\Messages\HttpMessageInterface;
 use Desperado\ServiceBus\Services\Exceptions as ServicesExceptions;
 use React\Promise\Promise;
@@ -36,6 +36,7 @@ final class ConfigurationGuard
      */
     public static function guardHttpMessageType(string $handlerPath, string $messageClass): void
     {
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         if(false === \is_a($messageClass, HttpMessageInterface::class, true))
         {
             throw new ServicesExceptions\IncorrectMessageTypeException(
@@ -58,7 +59,7 @@ final class ConfigurationGuard
      */
     public static function guardHttpMethod(string $handlerPath, string $httpMethod): void
     {
-        $httpMethod = \strtoupper($httpMethod);
+        $httpMethod       = \strtoupper($httpMethod);
         $supportedMethods = ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'];
 
         if(false === \in_array($httpMethod, $supportedMethods, true))
@@ -80,7 +81,8 @@ final class ConfigurationGuard
      */
     public static function guardHandlerReturnDeclaration(\ReflectionMethod $method): void
     {
-        if(false === $method->hasReturnType())
+        /** Non specified (void) */
+        if(false === $method->hasReturnType() || null === $method->getReturnType())
         {
             return;
         }
@@ -128,7 +130,7 @@ final class ConfigurationGuard
     public static function guardContextValidArgument(
         \ReflectionMethod $reflectionMethod,
         \ReflectionParameter $parameter
-    )
+    ): void
     {
         if(
             null === $parameter->getClass() ||

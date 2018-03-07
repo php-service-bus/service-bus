@@ -13,8 +13,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport\RabbitMqTransport;
 
 use Bunny\Channel;
-use Desperado\Domain\Transport\Context\IncomingMessageContextInterface;
-use Desperado\Domain\Transport\Message\Message;
+use Desperado\ServiceBus\Transport\Context\IncomingMessageContextInterface;
+use Desperado\ServiceBus\Transport\Message\Message;
 
 /**
  * RabbitMQ incoming message context
@@ -59,6 +59,16 @@ final class RabbitMqIncomingContext implements IncomingMessageContextInterface
     public function getReceivedMessage(): Message
     {
         return $this->message;
+    }
+
+    /**
+     * Get channel
+     *
+     * @return Channel
+     */
+    public function getChannel(): Channel
+    {
+        return $this->channel;
     }
 
     /**

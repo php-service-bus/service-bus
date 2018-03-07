@@ -69,8 +69,8 @@ class AbstractKernelTest extends TestCase
             new NullLogger()
         );
 
-        $logger = new NullLogger();
-        $builder = new MessageBusBuilder($serviceHandlersExtractor, $eventDispatcher, $logger);
+
+        $builder = new MessageBusBuilder($serviceHandlersExtractor, $eventDispatcher);
 
         /** @var SagaProvider $sagaProvider */
         $sagaProvider = new SagaProvider(
@@ -80,8 +80,7 @@ class AbstractKernelTest extends TestCase
                 ),
                 new SagaSerializer()
             ),
-            new AnnotationsSagaConfigurationExtractor(),
-            new NullLogger()
+            new AnnotationsSagaConfigurationExtractor()
         );
 
         $this->kernel = new TestKernel(
@@ -91,7 +90,7 @@ class AbstractKernelTest extends TestCase
             new NullLogger()
         );
 
-        $this->context = static::getMockBuilder(TestApplicationContext::class)
+        $this->context = $this->getMockBuilder(TestApplicationContext::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -156,7 +155,7 @@ class AbstractKernelTest extends TestCase
      *
      * @throws \Throwable
      */
-    public function testSuccessAndFailedMessage(): void
+    public function successAndFailedMessage(): void
     {
         $entryPointContext = EntryPointContext::create(
             TestServiceEvent::create([]),

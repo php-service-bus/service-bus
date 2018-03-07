@@ -40,8 +40,12 @@ final class HttpServerExtension extends DependencyInjection\Extension\Extension
 
     /**
      * @inheritDoc
+     *
+     * @return void
+     *
+     * @throws \Exception
      */
-    public function load(array $configs, DependencyInjection\ContainerBuilder $container)
+    public function load(array $configs, DependencyInjection\ContainerBuilder $container): void
     {
         $loader = new DependencyInjection\Loader\XmlFileLoader($container, new FileLocator());
         $loader->load(__DIR__ . '/../Resources/config/extensions/react_http_server.xml');

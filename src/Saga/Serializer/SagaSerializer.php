@@ -57,7 +57,8 @@ final class SagaSerializer implements SagaSerializerInterface
         return \unserialize(
             \gzdecode(
                 \base64_decode($serializedSaga)
-            )
+            ),
+            ['allowed_classes' => true]
         );
     }
 }

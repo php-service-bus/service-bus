@@ -16,11 +16,10 @@ use Desperado\Domain\DateTime;
 use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\ServiceBus\Application\Context\Exceptions\CancelScheduledCommandFailedException;
 use Desperado\ServiceBus\Application\Context\Exceptions\OutboundContextNotAppliedException;
-use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
+use Desperado\ServiceBus\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\Application\Context\Exceptions\ScheduleCommandFailedException;
 use Desperado\ServiceBus\HttpServer\Context\OutboundHttpContextInterface;
 use Desperado\ServiceBus\HttpServer\HttpResponse;
@@ -140,29 +139,37 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
     /**
      * @inheritdoc
      *
+     * @throws \Desperado\Domain\MessageSerializer\Exceptions\MessageSerializationFailException
      * @throws OutboundContextNotAppliedException
      */
     final public function publish(AbstractEvent $event, MessageDeliveryOptions $messageDeliveryOptions): void
     {
         $this->guardOutboundContext();
 
-        $this
-            ->getOutboundMessageContext()
-            ->publish($event, $messageDeliveryOptions);
+        $context = $this->getOutboundMessageContext();
+
+        if(null !== $context)
+        {
+            $context->publish($event, $messageDeliveryOptions);
+        }
     }
 
     /**
      * @inheritdoc
      *
+     * @throws \Desperado\Domain\MessageSerializer\Exceptions\MessageSerializationFailException
      * @throws OutboundContextNotAppliedException
      */
     final public function send(AbstractCommand $command, MessageDeliveryOptions $messageDeliveryOptions): void
     {
         $this->guardOutboundContext();
 
-        $this
-            ->getOutboundMessageContext()
-            ->send($command, $messageDeliveryOptions);
+        $context = $this->getOutboundMessageContext();
+
+        if(null !== $context)
+        {
+            $context->send($command, $messageDeliveryOptions);
+        }
     }
 
     /**

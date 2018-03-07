@@ -13,11 +13,11 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\HttpServer\EntryPoint;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\ThrowableFormatter;
-use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
-use Desperado\Domain\Transport\Message\Message;
+use Desperado\ServiceBus\Transport\Context\OutboundMessageContextInterface;
+use Desperado\ServiceBus\Transport\Message\Message;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
 use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
 use Desperado\Infrastructure\Bridge\Router\RouterInterface;
@@ -118,14 +118,14 @@ class HttpServerEntryPoint implements EntryPointInterface
         LoggerInterface $logger
     )
     {
-        $this->name = $name;
-        $this->kernel = $kernel;
-        $this->executionContext = $executionContext;
-        $this->publisher = $publisher;
-        $this->backend = $backend;
-        $this->router = $router;
+        $this->name              = $name;
+        $this->kernel            = $kernel;
+        $this->executionContext  = $executionContext;
+        $this->publisher         = $publisher;
+        $this->backend           = $backend;
+        $this->router            = $router;
         $this->messageSerializer = $messageSerializer;
-        $this->logger = $logger;
+        $this->logger            = $logger;
 
         \pcntl_async_signals(true);
 
@@ -136,6 +136,8 @@ class HttpServerEntryPoint implements EntryPointInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws \Exception
      */
     public function run(): void
     {
@@ -178,6 +180,8 @@ class HttpServerEntryPoint implements EntryPointInterface
      * @param callable         $resolve
      *
      * @return PromiseInterface
+     *
+     * @throws \Desperado\Domain\MessageSerializer\Exceptions\MessageSerializationFailException
      */
     private function processPromises(PromiseInterface $promise, callable $resolve): PromiseInterface
     {
@@ -208,10 +212,12 @@ class HttpServerEntryPoint implements EntryPointInterface
                                 $promises
                             );
 
-                            if($context instanceof OutboundHttpContextInterface && true === $context->responseBind())
+                            if(
+                                $context instanceof OutboundHttpContextInterface &&
+                                true === $context->responseBind() &&
+                                !$responseData = $context->getResponseData()
+                            )
                             {
-                                $responseData = $context->getResponseData();
-
                                 $resolve(
                                     $this->createResponse(
                                         $responseData->getCode(),
@@ -242,6 +248,7 @@ class HttpServerEntryPoint implements EntryPointInterface
      * @param AbstractMessage        $message
      *
      * @return PromiseInterface
+     * @throws \InvalidArgumentException
      */
     private function handleRequest(ServerRequestInterface $request, AbstractMessage $message): PromiseInterface
     {
@@ -253,7 +260,7 @@ class HttpServerEntryPoint implements EntryPointInterface
             $httpIncomingContext->getUnpackedMessage(),
             $httpIncomingContext->getReceivedMessage()->getHeaders()
         );
-        $outboundContext = OutboundMessageContext::fromHttpRequest(
+        $outboundContext   = OutboundMessageContext::fromHttpRequest(
             $request,
             $httpIncomingContext,
             $this->messageSerializer
@@ -303,6 +310,8 @@ class HttpServerEntryPoint implements EntryPointInterface
      * @param ServerRequestInterface $request
      *
      * @return AbstractMessage
+     *
+     * @throws \Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException
      */
     private function matchRequest(ServerRequestInterface $request): AbstractMessage
     {

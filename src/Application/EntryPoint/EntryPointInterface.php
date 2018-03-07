@@ -21,6 +21,9 @@ interface EntryPointInterface
      * Run application
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\MessageSerializer\Exceptions\MessageSerializationFailException
+     * @throws \Desperado\ServiceBus\Application\Context\Exceptions\ApplicationContextMustBeImmutableException
      */
     public function run(): void;
 

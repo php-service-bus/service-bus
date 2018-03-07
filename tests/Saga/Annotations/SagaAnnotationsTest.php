@@ -29,6 +29,7 @@ class SagaAnnotationsTest extends TestCase
      * @param array  $expectedProperties
      *
      * @return void
+     * @throws \ReflectionException
      */
     public function checkProperties(string $sagaNamespace, array $expectedProperties): void
     {

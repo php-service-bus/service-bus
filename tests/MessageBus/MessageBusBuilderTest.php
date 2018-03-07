@@ -104,11 +104,12 @@ class MessageBusBuilderTest extends TestCase
      * @return void
      *
      * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
+     * @throws \Exception
      */
     public function successBuild(): void
     {
         $logger = new NullLogger();
-        $builder = new MessageBusBuilder($this->serviceHandlersExtractor, $this->eventDispatcher, $logger);
+        $builder = new MessageBusBuilder($this->serviceHandlersExtractor, $this->eventDispatcher);
         $builder->applyService(new CorrectServiceWithHandlers());
 
         static::assertFalse($builder->isCompiled());
@@ -121,7 +122,6 @@ class MessageBusBuilderTest extends TestCase
         $messageBusTaskCollection = static::readAttribute($messageBus, 'taskCollection');
 
         static::assertCount(4, $messageBusTaskCollection);
-        static::assertEquals($logger, static::readAttribute($messageBus, 'logger'));
 
         $expectedMessageNamespaces = [
             TestServiceCommand::class => 1,
@@ -140,8 +140,8 @@ class MessageBusBuilderTest extends TestCase
                 static::assertInstanceOf(MessageBusTask::class, $task);
                 static::assertEquals($messageNamespace, $task->getMessageNamespace());
                 static::assertEmpty($task->getAutowiringServices());
-                static::assertInstanceOf(TaskInterface::class, $task->getTask());
-                static::assertInstanceOf(Task::class, $task->getTask());
+
+                $task->getTask();
             }
         }
     }
@@ -154,11 +154,11 @@ class MessageBusBuilderTest extends TestCase
      * @return void
      *
      * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
+     * @throws \Exception
      */
     public function configureClosedBuilder(): void
     {
-        $logger = new NullLogger();
-        $builder = new MessageBusBuilder($this->serviceHandlersExtractor, $this->eventDispatcher, $logger);
+        $builder = new MessageBusBuilder($this->serviceHandlersExtractor, $this->eventDispatcher);
         $builder->build();
 
         $builder->applyService(new CorrectServiceWithHandlers());
@@ -170,11 +170,11 @@ class MessageBusBuilderTest extends TestCase
      * @return void
      *
      * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
+     * @throws \Exception
      */
     public function configureBehavior(): void
     {
-        $logger = new NullLogger();
-        $builder = new MessageBusBuilder($this->serviceHandlersExtractor, $this->eventDispatcher, $logger);
+        $builder = new MessageBusBuilder($this->serviceHandlersExtractor, $this->eventDispatcher);
 
         $builder->applyService(new CorrectServiceWithHandlers());
         $builder->pushBehavior(ValidationBehavior::create());
@@ -189,6 +189,7 @@ class MessageBusBuilderTest extends TestCase
         {
             /** @var MessageBusTask $messageHandler */
 
+            /** @noinspection UnnecessaryAssertionInspection */
             static::assertInstanceOf(ValidateInterceptor::class, $messageHandler->getTask());
         }
     }

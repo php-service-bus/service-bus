@@ -39,8 +39,10 @@ final class ServiceBusExtension extends DependencyInjection\Extension\Extension
 
     /**
      * @inheritDoc
+     *
+     * @throws \Exception
      */
-    public function load(array $configs, DependencyInjection\ContainerBuilder $container)
+    public function load(array $configs, DependencyInjection\ContainerBuilder $container): void
     {
         self::loadFromDirectory(__DIR__ . '/../Resources/config/base', $container);
 

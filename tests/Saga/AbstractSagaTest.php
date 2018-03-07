@@ -173,7 +173,7 @@ class AbstractSagaTest extends TestCase
      */
     public function transitionEventOnClosedSaga(): void
     {
-        static::expectExceptionMessage(
+        $this->expectExceptionMessage(
             \sprintf('Saga "%s" is closed with status "4"', $this->sagaIdentifier->toString())
         );
 

@@ -26,7 +26,7 @@ final class SchedulerRegistry implements \Serializable
      *
      * @var ScheduledOperation
      */
-    private $operations = [];
+    private $operations;
 
     /**
      * Time table of operations in milliseconds
@@ -63,11 +63,11 @@ final class SchedulerRegistry implements \Serializable
     /**
      * @inheritdoc
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $serialized = \gzdecode(\base64_decode($serialized));
 
-        [$this->operations, $this->timetable] = \unserialize($serialized);
+        [$this->operations, $this->timetable] = \unserialize($serialized, ['allowed_classes' => true]);
     }
 
     /**
@@ -82,7 +82,7 @@ final class SchedulerRegistry implements \Serializable
         $id = $scheduledOperation->getId()->toString();
 
         $this->operations[$id] = $scheduledOperation;
-        $this->timetable[$id] = (int) $scheduledOperation->getDate()->toString('U.u') * 1000;
+        $this->timetable[$id]  = (int) $scheduledOperation->getDate()->toString('U.u') * 1000;
     }
 
     /**
@@ -137,7 +137,7 @@ final class SchedulerRegistry implements \Serializable
         if(0 !== \count($this->timetable))
         {
             $minTime = \min($this->timetable);
-            $id = \array_search($minTime, $this->timetable, true);
+            $id      = \array_search($minTime, $this->timetable, true);
 
             /** @var ScheduledOperation $operation */
             $operation = $this->operations[$id];
@@ -159,6 +159,6 @@ final class SchedulerRegistry implements \Serializable
     private function __construct()
     {
         $this->operations = [];
-        $this->timetable = [];
+        $this->timetable  = [];
     }
 }

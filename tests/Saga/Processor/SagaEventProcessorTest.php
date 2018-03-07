@@ -72,8 +72,7 @@ class SagaEventProcessorTest extends TestCase
         $this->store = new SagaStore($this->storage, $this->serializer);
         $this->sagaProvider = new SagaProvider(
             $this->store,
-            new AnnotationsSagaConfigurationExtractor(),
-            new NullLogger()
+            new AnnotationsSagaConfigurationExtractor()
         );
     }
 

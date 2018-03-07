@@ -87,6 +87,7 @@ final class GuardIdentifier
             );
         }
 
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         if(false === \is_a($identifierNamespace, AbstractSagaIdentifier::class, true))
         {
             throw new InvalidSagaIdentifierException(

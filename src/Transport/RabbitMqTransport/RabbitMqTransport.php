@@ -17,16 +17,17 @@ use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
 use Desperado\Domain\Environment\Environment;
 use Desperado\Domain\ThrowableFormatter;
-use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
-use Desperado\Domain\Transport\Message\Message;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\ParameterBag;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
+use Desperado\ServiceBus\Transport\Context\OutboundMessageContextInterface;
 use Desperado\ServiceBus\Transport\IncomingMessageContainer;
+use Desperado\ServiceBus\Transport\Message\Message;
 use Desperado\ServiceBus\Transport\TransportInterface;
 use EventLoop\EventLoop;
 use Psr\Log\LoggerInterface;
 use function React\Promise\all;
+use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
 /**
@@ -109,6 +110,8 @@ final class RabbitMqTransport implements TransportInterface
 
     /**
      * Close connections
+     *
+     * @throws \Exception
      */
     public function __destruct()
     {
@@ -163,7 +166,7 @@ final class RabbitMqTransport implements TransportInterface
 
         EventLoop::getLoop()->stop();
 
-        exit(0);
+        return new FulfilledPromise();
     }
 
     /**
@@ -256,7 +259,7 @@ final class RabbitMqTransport implements TransportInterface
             /** @var PromiseInterface $promise */
 
             $promise->then(
-                function(array $contexts = null) use ($channel, $incoming)
+                function(array $contexts = null) use ($channel)
                 {
                     if(false === \is_array($contexts) || 0 === \count($contexts))
                     {

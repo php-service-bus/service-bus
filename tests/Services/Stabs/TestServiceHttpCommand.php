@@ -26,6 +26,6 @@ class TestServiceHttpCommand extends TestServiceCommand implements HttpMessageIn
      */
     public static function fromRequest(RequestInterface $request): AbstractMessage
     {
-
+        return self::create();
     }
 }

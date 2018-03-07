@@ -71,8 +71,7 @@ class SagaProviderTest extends TestCase
         $this->store = new SagaStore($this->storage, $this->serializer);
         $this->sagaProvider = new SagaProvider(
             $this->store,
-            new AnnotationsSagaConfigurationExtractor(),
-            new NullLogger()
+            new AnnotationsSagaConfigurationExtractor()
         );
     }
 
@@ -117,7 +116,8 @@ class SagaProviderTest extends TestCase
         $sagaEventListener = \end($messageHandlers);
 
         static::assertEquals(SagaServiceTestEvent::class, $sagaEventListener->getEventNamespace());
-        static::assertInstanceOf(\Closure::class, $sagaEventListener->getHandler());
+
+        $sagaEventListener->getHandler();
     }
 
     /**

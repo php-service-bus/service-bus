@@ -14,7 +14,7 @@ namespace Desperado\ServiceBus\Application\Bootstrap;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\DependencyInjection as DependencyInjection;
+use Symfony\Component\DependencyInjection;
 
 /**
  * Dependency injection container builder
@@ -23,10 +23,10 @@ final class ContainerBuilder
 {
     private const CONTAINER_NAME_TEMPLATE = 'serviceBus%sProjectContainer';
 
-    private const CONTAINER_PARAMETER_ENTRY_POINT_NAME = 'service_bus.entry_point';
-    private const CONTAINER_PARAMETER_ROOT_DIR_NAME = 'service_bus.root_dir';
-    private const CONTAINER_PARAMETER_CACHE_DIR_NAME = 'service_bus.cache_dir';
-    private const CONTAINER_PARAMETER_DEBUG_FLAG_NAME = 'service_bus.is_debug_env';
+    private const CONTAINER_PARAMETER_ENTRY_POINT_NAME       = 'service_bus.entry_point';
+    private const CONTAINER_PARAMETER_ROOT_DIR_NAME          = 'service_bus.root_dir';
+    private const CONTAINER_PARAMETER_CACHE_DIR_NAME         = 'service_bus.cache_dir';
+    private const CONTAINER_PARAMETER_DEBUG_FLAG_NAME        = 'service_bus.is_debug_env';
     private const CONTAINER_PARAMETER_SERVICES_RELATION_NAME = 'service_bus.services_relations';
 
     /**
@@ -89,25 +89,31 @@ final class ContainerBuilder
      * @param Configuration $configuration
      * @param string        $rootDirectoryPath
      * @param string        $cacheDirectoryPath
+     *
+     * @throws \Desperado\Domain\Environment\Exceptions\InvalidEnvironmentException
+     * @throws \Desperado\Domain\Environment\Exceptions\EmptyEnvironmentException
      */
     public function __construct(Configuration $configuration, string $rootDirectoryPath, string $cacheDirectoryPath)
     {
-        $this->configuration = $configuration;
-        $this->rootDirectoryPath = $rootDirectoryPath;
+        $this->configuration      = $configuration;
+        $this->rootDirectoryPath  = $rootDirectoryPath;
         $this->cacheDirectoryPath = $cacheDirectoryPath;
 
         $this->containerParametersBag = $this->getDefaultContainerParameters();
-        $this->containerClassName = $this->getContainerClassName();
-        $this->containerClassPath = $this->getContainerClassPath();
+        $this->containerClassName     = $this->getContainerClassName();
+        $this->containerClassPath     = $this->getContainerClassPath();
 
         $this->compilerPassCollection = [];
-        $this->extensionCollection = [];
+        $this->extensionCollection    = [];
     }
 
     /**
      * Checks if the cache is still fresh
      *
      * @return bool
+     *
+     * @throws \Desperado\Domain\Environment\Exceptions\InvalidEnvironmentException
+     * @throws \Desperado\Domain\Environment\Exceptions\EmptyEnvironmentException
      */
     public function isCacheActual(): bool
     {
@@ -129,14 +135,18 @@ final class ContainerBuilder
      *
      * @return ContainerInterface
      *
+     * @throws \Desperado\Domain\Environment\Exceptions\InvalidEnvironmentException
+     * @throws \Desperado\Domain\Environment\Exceptions\EmptyEnvironmentException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Throwable
      */
     public function rebuild(): ContainerInterface
     {
         $configCache = $this->createConfigCache();
-        $configData = $this->configuration->toArray();
+        $configData  = $this->configuration->toArray();
 
         $this->addContainerParameters($configData);
 
@@ -269,6 +279,8 @@ final class ContainerBuilder
      * @param DependencyInjection\ContainerBuilder $builder
      *
      * @return array
+     *
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
     private function extractServicesClassRelation(DependencyInjection\ContainerBuilder $builder): array
     {
@@ -315,7 +327,7 @@ final class ContainerBuilder
         string $class
     ): void
     {
-        $dumper = new DependencyInjection\Dumper\PhpDumper($container);
+        $dumper  = new DependencyInjection\Dumper\PhpDumper($container);
         $content = (string) $dumper->dump([
                 'class'      => $class,
                 'base_class' => 'Container',
@@ -330,6 +342,9 @@ final class ContainerBuilder
      * Create configCache caches arbitrary content in files on disk
      *
      * @return ConfigCache
+     *
+     * @throws \Desperado\Domain\Environment\Exceptions\InvalidEnvironmentException
+     * @throws \Desperado\Domain\Environment\Exceptions\EmptyEnvironmentException
      */
     private function createConfigCache(): ConfigCache
     {
@@ -353,6 +368,9 @@ final class ContainerBuilder
      * Get container class name
      *
      * @return string
+     *
+     * @throws \Desperado\Domain\Environment\Exceptions\InvalidEnvironmentException
+     * @throws \Desperado\Domain\Environment\Exceptions\EmptyEnvironmentException
      */
     private function getContainerClassName(): string
     {
@@ -366,6 +384,9 @@ final class ContainerBuilder
      * Get base application container parameters
      *
      * @return DependencyInjection\ParameterBag\ParameterBag
+     *
+     * @throws \Desperado\Domain\Environment\Exceptions\InvalidEnvironmentException
+     * @throws \Desperado\Domain\Environment\Exceptions\EmptyEnvironmentException
      */
     private function getDefaultContainerParameters(): DependencyInjection\ParameterBag\ParameterBag
     {

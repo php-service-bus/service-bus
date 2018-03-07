@@ -55,9 +55,12 @@ final class EntryPointCompilerPass implements DependencyInjection\Compiler\Compi
         $this->kernelContainerKey = $kernelContainerKey;
         $this->executionContextContainerKey = $executionContextContainerKey;
     }
-    
+
     /**
      * @inheritdoc
+     *
+     * @throws \LogicException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
     public function process(DependencyInjection\ContainerBuilder $container): void
     {
@@ -76,6 +79,8 @@ final class EntryPointCompilerPass implements DependencyInjection\Compiler\Compi
      * @param DependencyInjection\ContainerBuilder $container
      *
      * @return string
+     *
+     * @throws \LogicException
      */
     private function guardReferenceService(string $serviceKey, DependencyInjection\ContainerBuilder $container): string
     {

@@ -207,7 +207,7 @@ final class StoredSaga
      *
      * @return DateTime|null
      */
-    public function getClosedAt()
+    public function getClosedAt(): ?DateTime
     {
         return $this->closedAt;
     }

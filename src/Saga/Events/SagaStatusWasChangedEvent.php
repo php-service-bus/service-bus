@@ -76,6 +76,8 @@ final class SagaStatusWasChangedEvent extends AbstractEvent
      * @param null|string  $description
      *
      * @return self
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public static function completed(AbstractSaga $abstractSaga, ?string $description = null): self
     {
@@ -94,6 +96,8 @@ final class SagaStatusWasChangedEvent extends AbstractEvent
      * @param AbstractSaga $abstractSaga
      *
      * @return self
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public static function expired(AbstractSaga $abstractSaga): self
     {
@@ -112,6 +116,8 @@ final class SagaStatusWasChangedEvent extends AbstractEvent
      * @param null|string  $description
      *
      * @return self
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public static function failed(AbstractSaga $abstractSaga, ?string $description = null): self
     {

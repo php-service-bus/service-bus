@@ -42,11 +42,11 @@ class ValidationFailedBootstrapTest extends TestCase
         string $expectedExceptionMessage
     ): void
     {
-        static::expectException($expectedException);
+        $this->expectException($expectedException);
 
         if('' !== $expectedExceptionMessage)
         {
-            static::expectExceptionMessage($expectedExceptionMessage);
+            $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
         TestBootstrap::boot($rootDirectoryPath, $cacheDirectoryPath, $environmentFilePath);

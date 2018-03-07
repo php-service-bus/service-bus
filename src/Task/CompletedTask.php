@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Task;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
@@ -44,11 +44,13 @@ final class CompletedTask
     private $taskResult;
 
     /**
-     * @param AbstractMessage          $message
+     * @param AbstractMessage           $message
      * @param ExecutionContextInterface $context
-     * @param PromiseInterface|null    $taskResult
+     * @param PromiseInterface|null     $taskResult
      *
      * @return self
+     *
+     * @throws \InvalidArgumentException
      */
     public static function create(
         AbstractMessage $message,

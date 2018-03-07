@@ -45,7 +45,7 @@ class SagaEventsTest extends TestCase
     {
         parent::setUp();
 
-        $this->id = new TestSagaIdentifier(Uuid::v4(), TestSaga::class);
+        $this->id   = new TestSagaIdentifier(Uuid::v4(), TestSaga::class);
         $this->saga = new TestSaga(
             $this->id,
             SagaMetadata::create(
@@ -75,10 +75,13 @@ class SagaEventsTest extends TestCase
      * @param array  $expectedProperties
      *
      * @return void
+     *
+     * @throws \ReflectionException
      */
     public function inspectProperties(string $eventNamespace, array $expectedProperties): void
     {
-        $reflectionClass = new \ReflectionClass($eventNamespace);
+        $reflectionClass      = new \ReflectionClass($eventNamespace);
+        /** @var array $reflectionProperties */
         $reflectionProperties = $reflectionClass->getProperties();
 
         static::assertCount(\count($expectedProperties), $reflectionProperties);
@@ -88,9 +91,9 @@ class SagaEventsTest extends TestCase
             static::assertArrayHasKey($reflectionProperty->getName(), $expectedProperties);
 
             $propertyDocument = $reflectionProperty->getDocComment();
-            $expectedVarHint = \sprintf('@var %s', $expectedProperties[$reflectionProperty->getName()]);
+            $expectedVarHint  = \sprintf('@var %s', $expectedProperties[$reflectionProperty->getName()]);
 
-            static::assertTrue(false !== \strpos($propertyDocument, $expectedVarHint));
+            static::assertNotSame(false, \strpos($propertyDocument, $expectedVarHint));
 
             $accessorName = \sprintf('get%s', \ucfirst($reflectionProperty->getName()));
 
@@ -114,7 +117,8 @@ class SagaEventsTest extends TestCase
         static::assertEquals(SagaState::STATUS_COMPLETED, $event->getNewStatusId());
         static::assertEquals(__CLASS__, $event->getDescription());
         static::assertNotEmpty($event->getDatetime());
-        static::assertInstanceOf(DateTime::class, DateTime::fromString($event->getDatetime()));
+
+        DateTime::fromString($event->getDatetime());
     }
 
     /**
@@ -133,7 +137,8 @@ class SagaEventsTest extends TestCase
         static::assertEquals(SagaState::STATUS_FAILED, $event->getNewStatusId());
         static::assertEquals(__CLASS__, $event->getDescription());
         static::assertNotEmpty($event->getDatetime());
-        static::assertInstanceOf(DateTime::class, DateTime::fromString($event->getDatetime()));
+
+        DateTime::fromString($event->getDatetime());
     }
 
     /**
@@ -151,7 +156,8 @@ class SagaEventsTest extends TestCase
         static::assertEquals($this->saga->getState()->getStatusCode(), $event->getPreviousStatusId());
         static::assertEquals(SagaState::STATUS_EXPIRED, $event->getNewStatusId());
         static::assertNotEmpty($event->getDatetime());
-        static::assertInstanceOf(DateTime::class, DateTime::fromString($event->getDatetime()));
+
+        DateTime::fromString($event->getDatetime());
     }
 
     /**
@@ -167,8 +173,9 @@ class SagaEventsTest extends TestCase
         static::assertEquals($this->id->getIdentityClass(), $event->getIdentifierNamespace());
         static::assertEquals($this->id->getSagaNamespace(), $event->getSagaNamespace());
         static::assertEquals(\get_class($this->saga), $event->getSagaNamespace());
-        static::assertInstanceOf(DateTime::class, DateTime::fromString($event->getCreatedAt()));
-        static::assertInstanceOf(DateTime::class, DateTime::fromString($event->getExpireDate()));
+
+        DateTime::fromString($event->getCreatedAt());
+        DateTime::fromString($event->getExpireDate());
     }
 
     /**

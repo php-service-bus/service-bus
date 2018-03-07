@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Annotations\Services;
 
-use Desperado\Domain\Annotations\AbstractAnnotation;
+use Desperado\ServiceBus\Annotations\AbstractAnnotation;
 
 /**
  * Annotation pointing to a service
@@ -31,7 +31,7 @@ final class Service extends AbstractAnnotation
      *
      * @var string|null
      */
-    protected $loggerChannel;
+    private $loggerChannel;
 
     /**
      * Get service logger channel

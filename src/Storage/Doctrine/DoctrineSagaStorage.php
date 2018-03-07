@@ -64,7 +64,7 @@ final class DoctrineSagaStorage implements SagaStorageInterface
                     $storedSaga->getPayload(),
                     $storedSaga->getState(),
                     $storedSaga->getCreatedAt()->toString('Y-m-d H:i:s'),
-                    true === $storedSaga->isClosed()
+                    null !== $storedSaga->getClosedAt()
                         ? $storedSaga->getClosedAt()->toString('Y-m-d H:i:s')
                         : null
                 ])
@@ -96,7 +96,7 @@ final class DoctrineSagaStorage implements SagaStorageInterface
                     $storedSaga->getPayload(),
                     $storedSaga->getState(),
                     $storedSaga->getCreatedAt()->toString('Y-m-d H:i:s'),
-                    true === $storedSaga->isClosed()
+                    null !== $storedSaga->getClosedAt()
                         ? $storedSaga->getClosedAt()->toString('Y-m-d H:i:s')
                         : null,
                     $storedSaga->getIdentifier(),

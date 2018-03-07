@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Annotations\Sagas;
 
-use Desperado\Domain\Annotations\AbstractAnnotation;
+use Desperado\ServiceBus\Annotations\AbstractAnnotation;
 
 /**
  * Saga listener marker
@@ -27,7 +27,7 @@ final class SagaEventListener extends AbstractAnnotation
      *
      * @var string|null
      */
-    protected $containingIdentifierProperty;
+    private $containingIdentifierProperty;
 
     /**
      * Get the event property that contains the saga ID

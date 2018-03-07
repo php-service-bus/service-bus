@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Annotations\Services;
 
-use Desperado\Domain\Annotations\AbstractAnnotation;
+use Desperado\ServiceBus\Annotations\AbstractAnnotation;
 use Desperado\ServiceBus\Annotations\Services\Traits;
 
 /**
