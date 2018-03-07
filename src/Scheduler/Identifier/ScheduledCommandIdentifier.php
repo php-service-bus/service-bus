@@ -24,6 +24,8 @@ final class ScheduledCommandIdentifier extends AbstractIdentity
      * Create new identifier
      *
      * @return self
+     *
+     * @throws \Desperado\Domain\Identity\Exceptions\EmptyIdentifierException
      */
     public static function new(): self
     {

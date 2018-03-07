@@ -48,7 +48,7 @@ final class SchedulerProvider
         string $registryNamespace = SchedulerRegistry::class
     )
     {
-        $this->storage = $storage;
+        $this->storage            = $storage;
         $this->registryIdentifier = Uuid::v5($registryNamespace);
     }
 
@@ -60,6 +60,7 @@ final class SchedulerProvider
      *
      * @return void
      *
+     * @throws \Desperado\Domain\DateTimeException
      * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageException
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageConnectionException
@@ -111,7 +112,7 @@ final class SchedulerProvider
         if(null !== $operation)
         {
             $registry = $this->removeFromRegistry($id);
-            $command = $operation->getCommand();
+            $command  = $operation->getCommand();
 
             $context->delivery($command);
 
@@ -214,7 +215,7 @@ final class SchedulerProvider
     private function obtainSchedulerRegistry(): SchedulerRegistry
     {
         $registryData = $this->storage->load($this->registryIdentifier);
-        $registry = '' !== (string) $registryData ? \unserialize($registryData) : null;
+        $registry     = '' !== (string) $registryData ? \unserialize($registryData, ['allow_classes' => true]) : null;
 
         if(null === $registry)
         {

@@ -29,6 +29,8 @@ abstract class AbstractSagaIdentifier extends AbstractIdentity
     /**
      * @param string $identifier
      * @param string $sagaNamespace
+     *
+     * @throws \Desperado\Domain\Identity\Exceptions\EmptyIdentifierException
      */
     final public function __construct(string $identifier, string $sagaNamespace)
     {

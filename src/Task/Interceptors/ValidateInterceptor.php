@@ -122,6 +122,7 @@ class ValidateInterceptor implements TaskInterface
      *
      * @return void
      *
+     * @throws \Desperado\Domain\DateTimeException
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     protected function deliveryErrors(AbstractMessage $message, array $errors, ExecutionContextInterface $context): void

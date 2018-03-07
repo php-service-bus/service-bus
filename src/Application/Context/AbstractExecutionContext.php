@@ -124,6 +124,7 @@ abstract class AbstractExecutionContext implements ExecutionContextInterface
     /**
      * @inheritdoc
      *
+     * @throws \Desperado\Domain\MessageSerializer\Exceptions\MessageSerializationFailException
      * @throws OutboundContextNotAppliedException
      */
     final public function delivery(AbstractMessage $message, MessageDeliveryOptions $messageDeliveryOptions = null): void

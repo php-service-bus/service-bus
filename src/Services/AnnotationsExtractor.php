@@ -85,6 +85,8 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws \Exception
      */
     public function extractServiceLoggerChannel(ServiceInterface $service): string
     {

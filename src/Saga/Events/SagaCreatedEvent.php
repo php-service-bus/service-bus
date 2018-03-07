@@ -62,6 +62,7 @@ final class SagaCreatedEvent extends AbstractEvent
      *
      * @return self
      *
+     * @throws \Desperado\Domain\DateTimeException
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public static function new(AbstractSaga $saga, string $expirePeriod): self

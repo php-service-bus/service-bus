@@ -28,6 +28,7 @@ final class SagaConfigurationGuard
      *
      * @return void
      *
+     * @throws \Desperado\Domain\DateTimeException
      * @throws ConfigurationExceptions\EmptyExpirationDateModifierException
      * @throws ConfigurationExceptions\IncorrectExpirationDateModifierException
      */
