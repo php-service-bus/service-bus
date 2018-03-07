@@ -71,6 +71,7 @@ abstract class AbstractSaga
      * @param AbstractSagaIdentifier $identity
      * @param SagaMetadata           $metadata
      *
+     * @throws \Desperado\Domain\DateTimeException
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     final public function __construct(AbstractSagaIdentifier $identity, SagaMetadata $metadata)

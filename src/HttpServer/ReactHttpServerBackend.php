@@ -164,7 +164,7 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
             function($data) use (&$contentLength, &$contentBody)
             {
                 $contentBody .= $data;
-                $contentLength += strlen($data);
+                $contentLength += \strlen($data);
             }
         );
     }

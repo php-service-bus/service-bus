@@ -93,6 +93,7 @@ class ValidateInterceptor implements TaskInterface
      *
      * @return void
      *
+     * @throws \Desperado\Domain\DateTimeException
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     private function processViolations(

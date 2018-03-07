@@ -77,6 +77,7 @@ final class SagaStatusWasChangedEvent extends AbstractEvent
      *
      * @return self
      *
+     * @throws \Desperado\Domain\DateTimeException
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public static function completed(AbstractSaga $abstractSaga, ?string $description = null): self

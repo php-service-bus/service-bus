@@ -75,6 +75,15 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
 
     /**
      * @inheritdoc
+     *
+     * @throws SagaAnnotationNotAppliedException
+     * @throws \Desperado\Domain\DateTimeException
+     * @throws \Desperado\Domain\DateTimeException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\EmptyExpirationDateModifierException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\IncorrectExpirationDateModifierException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\EmptyIdentifierNamespaceException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\IdentifierClassNotFoundException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\EmptyIdentifierFieldValueException
      */
     public function extractSagaConfiguration(string $sagaNamespace): SagaConfiguration
     {

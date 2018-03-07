@@ -98,6 +98,7 @@ final class SchedulerProvider
      *
      * @return void
      *
+     * @throws \Desperado\Domain\DateTimeException
      * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageException
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageConnectionException
