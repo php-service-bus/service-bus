@@ -48,6 +48,8 @@ class HttpServerEntryPointCompilerPass implements DependencyInjection\Compiler\C
 
     /**
      * @inheritdoc
+     *
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
     public function process(DependencyInjection\ContainerBuilder $container): void
     {

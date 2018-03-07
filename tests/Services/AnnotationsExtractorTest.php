@@ -60,9 +60,9 @@ class AnnotationsExtractorTest extends TestCase
         parent::setUp();
 
         $this->autowiringServiceLocator = new AutowiringServiceLocator(new TestContainer(), []);
-        $this->annotationsReader = new DoctrineAnnotationsReader();
-        $this->router = new FastRouterBridge();
-        $this->extractor = new AnnotationsExtractor(
+        $this->annotationsReader        = new DoctrineAnnotationsReader();
+        $this->router                   = new FastRouterBridge();
+        $this->extractor                = new AnnotationsExtractor(
             $this->annotationsReader,
             $this->autowiringServiceLocator,
             $this->router,
@@ -110,7 +110,8 @@ class AnnotationsExtractorTest extends TestCase
         static::assertEquals(Stabs\TestServiceCommand::class, $commandHandler->getMessageClassNamespace());
         static::assertEmpty($commandHandler->getAutowiringServices());
         static::assertEmpty($commandHandler->getExecutionOptions()->getLoggerChannel());
-        static::assertInstanceOf(\Closure::class, $commandHandler->getMessageHandler());
+
+        $commandHandler->getMessageHandler();
 
         /** @var MessageHandlerData $eventHandler */
         $eventHandler = \iterator_to_array($handlers->getIterator())[1];
@@ -118,7 +119,8 @@ class AnnotationsExtractorTest extends TestCase
         static::assertEquals(Stabs\TestServiceEvent::class, $eventHandler->getMessageClassNamespace());
         static::assertEmpty($eventHandler->getAutowiringServices());
         static::assertEquals('eventLogChannel', $eventHandler->getExecutionOptions()->getLoggerChannel());
-        static::assertInstanceOf(\Closure::class, $eventHandler->getMessageHandler());
+
+        $eventHandler->getMessageHandler();
     }
 
     /**
@@ -185,8 +187,9 @@ class AnnotationsExtractorTest extends TestCase
         static::assertNotEmpty($commandHandler->getAutowiringServices());
         static::assertCount(1, $commandHandler->getAutowiringServices());
         static::assertEmpty($commandHandler->getExecutionOptions()->getLoggerChannel());
-        static::assertInstanceOf(\Closure::class, $commandHandler->getMessageHandler());
         static::assertInstanceOf(Stabs\SomeAutoWiringProvider::class, $commandHandler->getAutowiringServices()[0]);
+
+        $commandHandler->getMessageHandler();
     }
 
     /**
@@ -233,7 +236,7 @@ class AnnotationsExtractorTest extends TestCase
      */
     public function failedExtractWithIncorrectRegisteredAutoWiringService(): void
     {
-        $container = new TestContainer();
+        $container                = new TestContainer();
         $autowiringServiceLocator = new AutowiringServiceLocator(
             $container, [Stabs\SomeAutoWiringProvider::class => 'some_service_key']
         );

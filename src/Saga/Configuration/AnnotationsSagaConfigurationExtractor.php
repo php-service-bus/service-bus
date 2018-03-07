@@ -64,6 +64,9 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
 
     /**
      * @param AnnotationsReaderInterface $annotationReader
+     *
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \Doctrine\Common\Annotations\AnnotationException
      */
     public function __construct(AnnotationsReaderInterface $annotationReader = null)
     {
@@ -72,6 +75,15 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
 
     /**
      * @inheritdoc
+     *
+     * @throws SagaAnnotationNotAppliedException
+     * @throws \Desperado\Domain\DateTimeException
+     * @throws \Desperado\Domain\DateTimeException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\EmptyExpirationDateModifierException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\IncorrectExpirationDateModifierException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\EmptyIdentifierNamespaceException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\IdentifierClassNotFoundException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\EmptyIdentifierFieldValueException
      */
     public function extractSagaConfiguration(string $sagaNamespace): SagaConfiguration
     {
@@ -83,7 +95,7 @@ final class AnnotationsSagaConfigurationExtractor implements SagaConfigurationEx
                 \array_map(
                     function(ClassAnnotation $classAnnotation) use ($supportedAnnotations)
                     {
-                        $annotationClass = $classAnnotation->getAnnotation()->getClass();
+                        $annotationClass = \get_class($classAnnotation->getAnnotation());
 
                         return true === \in_array($annotationClass, $supportedAnnotations, true)
                             ? $classAnnotation->getAnnotation()

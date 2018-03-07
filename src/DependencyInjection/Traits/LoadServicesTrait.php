@@ -27,6 +27,8 @@ trait LoadServicesTrait
      * @param DependencyInjection\ContainerBuilder $container
      *
      * @return void
+     *
+     * @throws \Exception
      */
     protected static function loadFromDirectory(string $resourceDirectory, DependencyInjection\ContainerBuilder $container): void
     {

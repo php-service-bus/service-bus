@@ -60,6 +60,9 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws \InvalidArgumentException
+     * @throws \BadMethodCallException
      */
     public function listen(callable $requestHandler, callable $throwableHandler): void
     {
@@ -94,6 +97,8 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
      * @param callable $throwableHandler
      *
      * @return StreamingServer
+     *
+     * @throws \InvalidArgumentException
      */
     private function initHttpServer(callable $requestHandler, callable $throwableHandler): StreamingServer
     {
@@ -149,6 +154,8 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
      * @param string       $contentBody
      *
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     private function readStream(EventEmitter $eventEmitter, int &$contentLength, string &$contentBody): void
     {
@@ -157,7 +164,7 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
             function($data) use (&$contentLength, &$contentBody)
             {
                 $contentBody .= $data;
-                $contentLength += strlen($data);
+                $contentLength += \strlen($data);
             }
         );
     }
@@ -170,6 +177,8 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
      * @param callable     $resolve
      *
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     private function onReadingStreamError(EventEmitter $eventEmitter, callable $throwableHandler, callable $resolve): void
     {
@@ -188,6 +197,8 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
      * Init socket server
      *
      * @return $this
+     *
+     * @throws \BadMethodCallException
      */
     private function initSocketServer(): self
     {

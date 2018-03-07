@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\EntryPoint;
 
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\ServiceBus\Application\Context\Exceptions\ApplicationContextMustBeImmutableException;
 use Desperado\ServiceBus\Application\Kernel\AbstractKernel;
 use Desperado\ServiceBus\Transport\Context\OutboundMessageContext;
@@ -73,6 +73,9 @@ class MessagesTransportEntryPoint implements EntryPointInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function run(): void
     {
@@ -102,6 +105,8 @@ class MessagesTransportEntryPoint implements EntryPointInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws \Exception
      */
     public function stop(): void
     {

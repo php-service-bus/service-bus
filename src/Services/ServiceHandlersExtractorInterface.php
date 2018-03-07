@@ -29,6 +29,7 @@ interface ServiceHandlersExtractorInterface
      * @return MessageHandlersCollection
      *
      * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
+     * @throws \Exception
      */
     public function extractHandlers(
         ServiceInterface $service,

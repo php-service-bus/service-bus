@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Saga\Configuration\Negative;
 
-use Desperado\Domain\Annotations\AbstractAnnotation;
+use Desperado\ServiceBus\Annotations\AbstractAnnotation;
 
 /**
  * @Annotation

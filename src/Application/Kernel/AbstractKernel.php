@@ -12,9 +12,9 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\Kernel;
 
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\Domain\ThrowableFormatter;
-use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
+use Desperado\ServiceBus\Transport\Context\OutboundMessageContextInterface;
 use Desperado\ServiceBus\Application\EntryPoint\EntryPointContext;
 use Desperado\ServiceBus\Application\Kernel\Events as KernelEvents;
 use Desperado\ServiceBus\MessageBus\MessageBus;
@@ -73,6 +73,9 @@ abstract class AbstractKernel
      * @param EventDispatcher   $dispatcher
      * @param LoggerInterface   $logger
      *
+     * @throws \Desperado\ServiceBus\Saga\Exceptions\SagaClassNotFoundException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\SagaConfigurationException
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException
      * @throws Services\Exceptions\ServiceConfigurationExceptionInterface
      */
     final public function __construct(
@@ -100,6 +103,8 @@ abstract class AbstractKernel
      * @param ExecutionContextInterface $executionContext
      *
      * @return PromiseInterface
+     *
+     * @throws \InvalidArgumentException
      */
     final public function handle(
         EntryPointContext $entryPointContext,
@@ -136,7 +141,7 @@ abstract class AbstractKernel
 
                 return $this->processSuccessTasks($results, $entryPointContext, $executionContext);
             },
-            function(\Throwable $throwable) use ($entryPointContext, $executionContext)
+            function(\Throwable $throwable)
             {
                 $this->logger->critical(ThrowableFormatter::toString($throwable));
 
@@ -186,6 +191,10 @@ abstract class AbstractKernel
      * Process saga configuration
      *
      * @return void
+     *
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException
+     * @throws \Desperado\ServiceBus\Saga\Exceptions\SagaClassNotFoundException
+     * @throws \Desperado\ServiceBus\Saga\Configuration\Exceptions\SagaConfigurationException
      */
     private function configureSagas(): void
     {

@@ -16,7 +16,7 @@ use Desperado\ServiceBus\Application\Bootstrap\Exceptions\IncorrectCacheDirector
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Cache directory instance
+ * Cache directory
  */
 final class CacheDirectory
 {

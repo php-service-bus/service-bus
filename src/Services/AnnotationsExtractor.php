@@ -77,14 +77,16 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         LoggerInterface $logger
     )
     {
-        $this->annotationReader = $annotationReader;
+        $this->annotationReader         = $annotationReader;
         $this->autowiringServiceLocator = $autowiringServiceLocator;
-        $this->router = $router;
-        $this->logger = $logger;
+        $this->router                   = $router;
+        $this->logger                   = $logger;
     }
 
     /**
      * @inheritdoc
+     *
+     * @throws \Exception
      */
     public function extractServiceLoggerChannel(ServiceInterface $service): string
     {
@@ -112,13 +114,15 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws \LogicException
      */
     public function extractHandlers(
         ServiceInterface $service,
         string $defaultServiceLoggerChannel = null
     ): Handlers\MessageHandlersCollection
     {
-        $messageHandlers = Handlers\MessageHandlersCollection::create();
+        $messageHandlers           = Handlers\MessageHandlersCollection::create();
         $messageHandlerAnnotations = $this->annotationReader->loadClassMethodsAnnotation($service);
 
         foreach($messageHandlerAnnotations as $annotationData)
@@ -163,6 +167,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
      * @return Handlers\MessageHandlerData
      *
      * @throws ServicesExceptions\ServiceConfigurationExceptionInterface
+     * @throws \LogicException
      */
     private function extractMessageHandler(
         ServiceInterface $service,
@@ -171,7 +176,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
     ): Handlers\MessageHandlerData
     {
         $reflectionMethod = $methodAnnotation->getMethod();
-        $methodArguments = $methodAnnotation->getArguments();
+        $methodArguments  = $methodAnnotation->getArguments();
 
         ConfigurationGuard::guardMessageHandlerNumberOfParametersValid($reflectionMethod);
         ConfigurationGuard::guardValidMessageArgument($reflectionMethod, $methodArguments[0], 0);
@@ -262,9 +267,9 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
     ): Handlers\AbstractMessageExecutionParameters
     {
         $annotationClass = \get_class($annotation);
-        $loggerChannel = '' !== (string) $annotation->getLoggerChannel()
+        $loggerChannel   = '' !== (string) $annotation->getLoggerChannel()
             ? (string) $annotation->getLoggerChannel()
-            : (string) $defaultServiceLoggerChannel;
+            : $defaultServiceLoggerChannel;
 
         switch($annotationClass)
         {
@@ -333,7 +338,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
         \ReflectionMethod $reflectionMethod,
         \ReflectionParameter $reflectionParameter,
         int $index
-    )
+    ): object
     {
         if(null !== $reflectionParameter->getClass())
         {
@@ -359,7 +364,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
      *
      * @throws ServicesExceptions\InvalidHandlerArgumentException
      */
-    private function locateService(string $serviceClass)
+    private function locateService(string $serviceClass): object
     {
         try
         {
@@ -382,7 +387,7 @@ final class AnnotationsExtractor implements ServiceHandlersExtractorInterface
      *
      * @throws ServicesExceptions\InvalidHandlerArgumentException
      */
-    private function assertServiceExists(string $serviceClass)
+    private function assertServiceExists(string $serviceClass): void
     {
         if(false === $this->autowiringServiceLocator->has($serviceClass))
         {

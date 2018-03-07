@@ -41,6 +41,9 @@ final class AfterMessageExecutionListener
      * @param MessageProcessingCompletedEvent $event
      *
      * @return void
+     *
+     * @throws \Desperado\ServiceBus\Saga\Store\Exceptions\DuplicateSagaException
+     * @throws \Desperado\ServiceBus\Saga\Exceptions\CommitSagaFailedException
      */
     public function onComplete(MessageProcessingCompletedEvent $event): void
     {

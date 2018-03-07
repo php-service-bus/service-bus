@@ -14,8 +14,8 @@ namespace Desperado\ServiceBus\HttpServer\Context;
 
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\ParameterBag;
-use Desperado\Domain\Transport\Context\IncomingMessageContextInterface;
-use Desperado\Domain\Transport\Message\Message;
+use Desperado\ServiceBus\Transport\Context\IncomingMessageContextInterface;
+use Desperado\ServiceBus\Transport\Message\Message;
 use Psr\Http\Message\RequestInterface;
 
 /**

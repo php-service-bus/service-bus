@@ -15,9 +15,9 @@ namespace Desperado\ServiceBus\Tests\Saga;
 use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
-use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
-use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
+use Desperado\ServiceBus\Transport\Context\OutboundMessageContextInterface;
+use Desperado\ServiceBus\Transport\Message\MessageDeliveryOptions;
 use Psr\Log\LogLevel;
 
 /**
@@ -56,7 +56,7 @@ class LocalDeliveryContext implements ExecutionContextInterface
      */
     public function applyOutboundMessageContext(OutboundMessageContextInterface $outboundMessageContext)
     {
-
+        return new self();
     }
 
     /**
@@ -76,8 +76,6 @@ class LocalDeliveryContext implements ExecutionContextInterface
     public function send(AbstractCommand $command, MessageDeliveryOptions $deliveryOptions): void
     {
         $this->publishedCommands[] = $command;
-
-        unset($deliveryOptions);
     }
 
     /**
@@ -86,8 +84,6 @@ class LocalDeliveryContext implements ExecutionContextInterface
     public function publish(AbstractEvent $event, MessageDeliveryOptions $deliveryOptions): void
     {
         $this->publishedEvents[] = $event;
-
-        unset($deliveryOptions);
     }
 
     /**

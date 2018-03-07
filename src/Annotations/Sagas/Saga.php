@@ -8,11 +8,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Desperado\ServiceBus\Annotations\Sagas;
 
-use Desperado\Domain\Annotations\AbstractAnnotation;
+use Desperado\ServiceBus\Annotations\AbstractAnnotation;
 
 /**
  * @Annotation
@@ -25,14 +25,14 @@ final class Saga extends AbstractAnnotation
      *
      * @var string|null
      */
-    protected $identifierNamespace;
+    private $identifierNamespace;
 
     /**
      * The event property that contains the saga ID
      *
      * @var string|null
      */
-    protected $containingIdentifierProperty;
+    private $containingIdentifierProperty;
 
     /**
      * Saga expire date modifier
@@ -41,7 +41,7 @@ final class Saga extends AbstractAnnotation
      *
      * @var string
      */
-    protected $expireDateModifier = '+1 hour';
+    private $expireDateModifier = '+1 hour';
 
     /**
      * Get saga identifier class namespace
@@ -70,6 +70,6 @@ final class Saga extends AbstractAnnotation
      */
     public function getExpireDateModifier(): string
     {
-        return (string) $this->expireDateModifier;
+        return $this->expireDateModifier;
     }
 }

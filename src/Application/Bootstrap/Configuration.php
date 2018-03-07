@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\Bootstrap;
 
+use Desperado\Domain\Environment\Exceptions as EnvironmentExceptions;
 use Desperado\Domain\Environment\Environment;
 use Desperado\ServiceBus\Application\Bootstrap\Exceptions\ServiceBusConfigurationException;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,8 +24,8 @@ use Symfony\Component\Dotenv\Dotenv;
  */
 final class Configuration
 {
-    protected const DOTENV_ENV_KEY = 'APP_ENVIRONMENT';
-    protected const DOTENV_ENTRY_POINT_NAME_KEY = 'APP_ENTRY_POINT_NAME';
+    private const DOTENV_ENV_KEY              = 'APP_ENVIRONMENT';
+    private const DOTENV_ENTRY_POINT_NAME_KEY = 'APP_ENTRY_POINT_NAME';
 
     /**
      * Application environment key
@@ -84,7 +85,7 @@ final class Configuration
 
         $self = new self();
 
-        $self->environment = (string) \getenv(self::DOTENV_ENV_KEY);
+        $self->environment    = (string) \getenv(self::DOTENV_ENV_KEY);
         $self->entryPointName = (string) \getenv(self::DOTENV_ENTRY_POINT_NAME_KEY);
 
         return $self;
@@ -105,11 +106,9 @@ final class Configuration
 
         $violations = $validator->validate($this);
 
-        foreach($violations as $violation)
+        if(0 !== $violations->count())
         {
-            /** @var Validator\ConstraintViolationInterface $violation */
-
-            throw new ServiceBusConfigurationException($violation->getMessage());
+            throw new ServiceBusConfigurationException($violations[0]->getMessage());
         }
     }
 
@@ -130,6 +129,9 @@ final class Configuration
      * Get environment key
      *
      * @return Environment
+     *
+     * @throws EnvironmentExceptions\EmptyEnvironmentException
+     * @throws EnvironmentExceptions\InvalidEnvironmentException
      */
     public function getEnvironment(): Environment
     {

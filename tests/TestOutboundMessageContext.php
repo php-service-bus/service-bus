@@ -16,11 +16,11 @@ use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
-use Desperado\Domain\Transport\Context\IncomingMessageContextInterface;
-use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
-use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\HttpServer\Context\HttpIncomingContext;
 use Desperado\ServiceBus\HttpServer\HttpResponse;
+use Desperado\ServiceBus\Transport\Context\IncomingMessageContextInterface;
+use Desperado\ServiceBus\Transport\Context\OutboundMessageContextInterface;
+use Desperado\ServiceBus\Transport\Message\MessageDeliveryOptions;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -54,7 +54,7 @@ class TestOutboundMessageContext implements OutboundMessageContextInterface
      */
     public function responseBind(): bool
     {
-
+        return false;
     }
 
     /**
@@ -64,9 +64,9 @@ class TestOutboundMessageContext implements OutboundMessageContextInterface
         RequestInterface $request,
         HttpIncomingContext $incomingMessageContext,
         MessageSerializerInterface $messageSerializer
-    )
+    ): self
     {
-
+        return new self();
     }
 
     /**
@@ -82,7 +82,7 @@ class TestOutboundMessageContext implements OutboundMessageContextInterface
      */
     public function getResponseData(): ?HttpResponse
     {
-
+        return new HttpResponse();
     }
 
     /**
@@ -90,7 +90,7 @@ class TestOutboundMessageContext implements OutboundMessageContextInterface
      */
     public function httpSessionStarted(): bool
     {
-
+        return false;
     }
 
     /**

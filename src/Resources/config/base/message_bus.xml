@@ -30,11 +30,8 @@
                  public="false">
             <argument type="service" id="service_bus.services.annotations_extractor"/>
             <argument type="service" id="service_bus.event_dispatcher"/>
-            <argument type="service" id="service_bus.logger"/>
 
             <configurator service="service_bus.message_bus.configurator" method="configure"/>
-
-            <tag name="service_bus.logger" channel="message_bus"/>
         </service>
 
         <!-- Message bus builder configurator -->

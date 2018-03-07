@@ -27,6 +27,8 @@ interface ModuleInterface
      * @param MessageBusBuilder $messageBusBuilder
      *
      * @return void
+     *
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException
      */
     public function boot(MessageBusBuilder $messageBusBuilder): void;
 }

@@ -61,7 +61,7 @@ final class BootstrapServicesDefinitions
      *
      * @return self
      */
-    final public static function create(
+    public static function create(
         string $messageTransportKey,
         string $kernelKey,
         string $sagaStorageKey,

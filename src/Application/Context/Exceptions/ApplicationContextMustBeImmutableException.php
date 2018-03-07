@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\Context\Exceptions;
 
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\ServiceBus\ServiceBusExceptionInterface;
 
 /**

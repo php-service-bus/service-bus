@@ -16,10 +16,8 @@ use Desperado\Domain\Message\AbstractCommand;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
-use Desperado\Domain\Transport\Context\IncomingMessageContextInterface;
-use Desperado\Domain\Transport\Context\OutboundMessageContextInterface;
-use Desperado\Domain\Transport\Message\Message;
-use Desperado\Domain\Transport\Message\MessageDeliveryOptions;
+use Desperado\ServiceBus\Transport\Message\Message;
+use Desperado\ServiceBus\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\HttpServer\Context\HttpIncomingContext;
 use Desperado\ServiceBus\HttpServer\Context\OutboundHttpContextInterface;
 use Desperado\ServiceBus\HttpServer\HttpResponse;
@@ -76,7 +74,7 @@ final class OutboundMessageContext implements OutboundMessageContextInterface, O
         $self = new self();
 
         $self->incomingMessageContext = $incomingMessageContext;
-        $self->messageSerializer = $messageSerializer;
+        $self->messageSerializer      = $messageSerializer;
 
         return $self;
     }
@@ -96,9 +94,9 @@ final class OutboundMessageContext implements OutboundMessageContextInterface, O
     {
         $self = new self();
 
-        $self->request = $request;
+        $self->request                = $request;
         $self->incomingMessageContext = $incomingMessageContext;
-        $self->messageSerializer = $messageSerializer;
+        $self->messageSerializer      = $messageSerializer;
 
         return $self;
     }
@@ -174,8 +172,10 @@ final class OutboundMessageContext implements OutboundMessageContextInterface, O
      * @param MessageDeliveryOptions $messageDeliveryOptions
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\MessageSerializer\Exceptions\MessageSerializationFailException
      */
-    protected function addToQueue(AbstractMessage $message, MessageDeliveryOptions $messageDeliveryOptions): void
+    private function addToQueue(AbstractMessage $message, MessageDeliveryOptions $messageDeliveryOptions): void
     {
         $destination = true === $messageDeliveryOptions->destinationSpecified()
             ? $messageDeliveryOptions->getDestination()

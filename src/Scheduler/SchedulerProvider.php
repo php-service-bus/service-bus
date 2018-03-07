@@ -14,7 +14,7 @@ namespace Desperado\ServiceBus\Scheduler;
 
 use Desperado\Domain\DateTime;
 use Desperado\Domain\Message\AbstractCommand;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\Domain\Uuid;
 use Desperado\ServiceBus\Scheduler\Exceptions\InvalidScheduledOperationExecutionDateException;
 use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
@@ -48,7 +48,7 @@ final class SchedulerProvider
         string $registryNamespace = SchedulerRegistry::class
     )
     {
-        $this->storage = $storage;
+        $this->storage            = $storage;
         $this->registryIdentifier = Uuid::v5($registryNamespace);
     }
 
@@ -60,6 +60,11 @@ final class SchedulerProvider
      *
      * @return void
      *
+     * @throws \Desperado\Domain\DateTimeException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageConnectionException
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      * @throws InvalidScheduledOperationExecutionDateException
      */
     public function scheduleCommand(
@@ -92,6 +97,12 @@ final class SchedulerProvider
      * @param ExecutionContextInterface  $context
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\DateTimeException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageConnectionException
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public function emitCommand(ScheduledCommandIdentifier $id, ExecutionContextInterface $context): void
     {
@@ -102,7 +113,7 @@ final class SchedulerProvider
         if(null !== $operation)
         {
             $registry = $this->removeFromRegistry($id);
-            $command = $operation->getCommand();
+            $command  = $operation->getCommand();
 
             $context->delivery($command);
 
@@ -127,6 +138,11 @@ final class SchedulerProvider
      * @param null|string                $reason
      *
      * @return void
+     *
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageConnectionException
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public function cancelScheduledCommand(
         ScheduledCommandIdentifier $id,
@@ -152,6 +168,10 @@ final class SchedulerProvider
      * @param ScheduledCommandIdentifier $id
      *
      * @return SchedulerRegistry
+     *
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageConnectionException
      */
     private function removeFromRegistry(ScheduledCommandIdentifier $id): SchedulerRegistry
     {
@@ -169,6 +189,10 @@ final class SchedulerProvider
      * @param ScheduledOperation $operation
      *
      * @return SchedulerRegistry
+     *
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageConnectionException
      */
     private function addToRegistry(ScheduledOperation $operation): SchedulerRegistry
     {
@@ -184,11 +208,15 @@ final class SchedulerProvider
      * Load registry
      *
      * @return SchedulerRegistry
+     *
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageConnectionException
      */
     private function obtainSchedulerRegistry(): SchedulerRegistry
     {
         $registryData = $this->storage->load($this->registryIdentifier);
-        $registry = '' !== (string) $registryData ? \unserialize($registryData) : null;
+        $registry     = '' !== (string) $registryData ? \unserialize($registryData, ['allow_classes' => true]) : null;
 
         if(null === $registry)
         {

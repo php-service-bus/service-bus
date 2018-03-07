@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Task\Interceptors;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\ServiceBus\Services\Handlers;
 use Desperado\ServiceBus\Task\Interceptors\Contract\MessageValidationFailedEvent;
 use Desperado\ServiceBus\Task\TaskInterface;
@@ -60,6 +60,8 @@ class ValidateInterceptor implements TaskInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public function __invoke(
         AbstractMessage $message,
@@ -90,6 +92,9 @@ class ValidateInterceptor implements TaskInterface
      * @param ExecutionContextInterface                  $context
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\DateTimeException
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     private function processViolations(
         AbstractMessage $message,
@@ -117,6 +122,9 @@ class ValidateInterceptor implements TaskInterface
      * @param ExecutionContextInterface $context
      *
      * @return void
+     *
+     * @throws \Desperado\Domain\DateTimeException
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     protected function deliveryErrors(AbstractMessage $message, array $errors, ExecutionContextInterface $context): void
     {

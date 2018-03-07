@@ -32,12 +32,11 @@ final class RabbitMqConsumer
     public const NON_PERSISTED_DELIVERY_MODE = 1;
     public const PERSISTED_DELIVERY_MODE = 2;
 
-    protected const EXCHANGE_TYPE_DIRECT = 'direct';
-    protected const EXCHANGE_TYPE_FANOUT = 'fanout';
-    protected const EXCHANGE_TYPE_TOPIC = 'topic';
+    private const EXCHANGE_TYPE_DIRECT = 'direct';
+    private const EXCHANGE_TYPE_FANOUT = 'fanout';
 
     /** Plugin rabbitmq_delayed_message_exchange must be enabled */
-    protected const EXCHANGE_TYPE_DELAYED = 'x-delayed-message';
+    private const EXCHANGE_TYPE_DELAYED = 'x-delayed-message';
 
     /**
      * Rabbit mq configuration
@@ -95,7 +94,7 @@ final class RabbitMqConsumer
     public function subscribe(string $entryPointName): PromiseInterface
     {
         return $this
-            ->doConnect($entryPointName)
+            ->doConnect()
             ->then(
                 function(Channel $channel)
                 {
@@ -111,10 +110,10 @@ final class RabbitMqConsumer
             ->then(
                 function(array $arguments)
                 {
+                    [$frame, $channel] = $arguments;
+
                     /** @var MethodQueueDeclareOkFrame $frame */
-                    $frame = $arguments[0];
                     /** @var Channel $channel */
-                    $channel = $arguments[1];
 
                     $this->logger->info('RabbitMQ subscription started');
 
@@ -160,6 +159,7 @@ final class RabbitMqConsumer
         {
             $logger->critical(ThrowableFormatter::toString($throwable));
 
+            /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
             return new RejectedPromise($throwable);
         };
     }
@@ -167,16 +167,14 @@ final class RabbitMqConsumer
     /**
      * Connects to AMQP server
      *
-     * @param string $entryPointName
-     *
      * @return PromiseInterface
      */
-    private function doConnect(string $entryPointName): PromiseInterface
+    private function doConnect(): PromiseInterface
     {
         return $this->client
             ->connect()
             ->then(
-                function(Client $client) use ($entryPointName)
+                function(Client $client)
                 {
                     return $client->channel();
                 }
@@ -276,7 +274,7 @@ final class RabbitMqConsumer
                     return $channel
                         ->queueBind($frame->queue, \sprintf('%s.timeout', $entryPointName))
                         ->then(
-                            function() use ($channel, $frame)
+                            function() use ($frame)
                             {
                                 return $frame;
                             }

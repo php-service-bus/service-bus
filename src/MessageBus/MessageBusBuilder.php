@@ -19,7 +19,6 @@ use Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException
 use Desperado\ServiceBus\Services\ServiceHandlersExtractorInterface;
 use Desperado\ServiceBus\ServiceInterface;
 use Desperado\ServiceBus\Task\Task;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -63,26 +62,16 @@ final class MessageBusBuilder
     private $isCompiled = false;
 
     /**
-     * Logger instance
-     *
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @param ServiceHandlersExtractorInterface $serviceHandlersExtractor
      * @param EventDispatcher                   $eventDispatcher
-     * @param LoggerInterface                   $logger
      */
     public function __construct(
         ServiceHandlersExtractorInterface $serviceHandlersExtractor,
-        EventDispatcher $eventDispatcher,
-        LoggerInterface $logger = null
+        EventDispatcher $eventDispatcher
     )
     {
         $this->serviceHandlersExtractor = $serviceHandlersExtractor;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->logger = $logger;
+        $this->eventDispatcher          = $eventDispatcher;
 
         $this->messageHandlers = Handlers\MessageHandlersCollection::create();
     }
@@ -127,6 +116,7 @@ final class MessageBusBuilder
      *
      * @return void
      *
+     * @throws \Exception
      * @throws MessageBusAlreadyCreatedException
      * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
      */
@@ -135,7 +125,7 @@ final class MessageBusBuilder
         $this->guardIsCompiled();
 
         $defaultServiceLoggerChannel = $this->serviceHandlersExtractor->extractServiceLoggerChannel($service);
-        $handlers = $this->serviceHandlersExtractor->extractHandlers($service, $defaultServiceLoggerChannel);
+        $handlers                    = $this->serviceHandlersExtractor->extractHandlers($service, $defaultServiceLoggerChannel);
 
         foreach($handlers as $handlerData)
         {
@@ -166,10 +156,7 @@ final class MessageBusBuilder
 
         $taskCollection = $this->prepareTaskCollection();
 
-        $messageBus = MessageBus::build(
-            $taskCollection,
-            $this->logger
-        );
+        $messageBus = MessageBus::build($taskCollection);
 
         $this->isCompiled = true;
 

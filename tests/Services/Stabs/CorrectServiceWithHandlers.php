@@ -35,7 +35,7 @@ class CorrectServiceWithHandlers implements ServiceInterface
     public function executeTestServiceCommand(
         TestServiceCommand $command,
         TestApplicationContext $context
-    )
+    ): void
     {
         /** /tmp/executeTestServiceCommand.lock */
         \file_put_contents(\sys_get_temp_dir() . '/executeTestServiceCommand.lock', '1');

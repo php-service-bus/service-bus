@@ -155,6 +155,10 @@ final class HttpServerConfiguration
      * @param int         $port
      * @param bool        $secured
      * @param null|string $certificateFilePath
+     *
+     * @throws ConfigurationExceptions\IncorrectHttpServerHostException
+     * @throws ConfigurationExceptions\IncorrectHttpServerPortException
+     * @throws ConfigurationExceptions\IncorrectHttpServerCertException
      */
     private function __construct(
         string $host = self::DEFAULT_HOST,
@@ -168,12 +172,12 @@ final class HttpServerConfiguration
         $this->secured = $secured;
         $this->certificateFilePath = $certificateFilePath;
 
-        ConfigurationGuard::validateHost((string) $host);
-        ConfigurationGuard::validatePort((int) $port);
+        ConfigurationGuard::validateHost($host);
+        ConfigurationGuard::validatePort($port);
 
         if(true === $secured)
         {
-            ConfigurationGuard::validateCertificatePath((string) $certificateFilePath);
+            ConfigurationGuard::validateCertificatePath($certificateFilePath);
         }
     }
 }

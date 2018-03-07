@@ -20,22 +20,24 @@ use Symfony\Component\DependencyInjection as SymfonyDependencyInjection;
 
 /**
  * Base class initial initialization of the application
+ *
+ * @api
  */
 abstract class AbstractBootstrap
 {
     /**
-     * Absolute path to the root of the application
+     * Root directory
      *
-     * @var string
+     * @var RootDirectory
      */
-    private $rootDirectoryPath;
+    private $rootDirectory;
 
     /**
-     * Absolute path to the cache directory
+     * Cache directory
      *
-     * @var string
+     * @var CacheDirectory
      */
-    private $cacheDirectoryPath;
+    private $cacheDirectory;
 
     /**
      * Service bus configuration
@@ -60,10 +62,7 @@ abstract class AbstractBootstrap
      *
      * @return self
      *
-     * @throws BootstrapExceptions\IncorrectRootDirectoryPathException
-     * @throws BootstrapExceptions\IncorrectCacheDirectoryFilePathException
-     * @throws BootstrapExceptions\ServiceBusConfigurationException
-     * @throws \Exception
+     * @throws BootstrapExceptions\ApplicationBootFailedException
      */
     public static function boot(
         string $rootDirectoryPath,
@@ -71,23 +70,34 @@ abstract class AbstractBootstrap
         string $environmentFilePath
     ): self
     {
-        $startTimer = \microtime(true);
+        try
+        {
+            $startTimer = \microtime(true);
 
-        $self = new static($rootDirectoryPath, $cacheDirectoryPath);
+            $self = new static($rootDirectoryPath, $cacheDirectoryPath);
 
-        $self->configuration = Configuration::loadDotEnv($environmentFilePath);
-        $self->configuration->validate();
+            $self->configuration = Configuration::loadDotEnv($environmentFilePath);
+            $self->configuration->validate();
 
-        $self->container = $self->initializeContainer();
+            $self->container = $self->initializeContainer();
 
-        $self->init();
+            $self->init();
 
-        LoggerRegistry::getLogger('bootstrap')
-            ->info(
-                \sprintf('Application initialization time: %g', \microtime(true) - $startTimer)
+            LoggerRegistry::getLogger('bootstrap')
+                ->info(
+                    \sprintf('Application initialization time: %g', \microtime(true) - $startTimer)
+                );
+
+            return $self;
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new BootstrapExceptions\ApplicationBootFailedException(
+                $throwable->getMessage(),
+                $throwable->getCode(),
+                $throwable
             );
-
-        return $self;
+        }
     }
 
     /**
@@ -133,8 +143,8 @@ abstract class AbstractBootstrap
      */
     final protected function __construct(string $rootDirectoryPath, string $cacheDirectoryPath)
     {
-        $this->cacheDirectoryPath = $this->prepareCacheDirectoryPath($cacheDirectoryPath);
-        $this->rootDirectoryPath = $this->prepareRootDirectoryPath($rootDirectoryPath);
+        $this->cacheDirectory = $this->prepareCacheDirectory($cacheDirectoryPath);
+        $this->rootDirectory  = $this->prepareRootDirectory($rootDirectoryPath);
 
         configureAnnotationsLoader();
     }
@@ -150,12 +160,12 @@ abstract class AbstractBootstrap
     {
         try
         {
-            $builder = new ContainerBuilder($this->configuration, $this->rootDirectoryPath, $this->cacheDirectoryPath);
+            $builder = new ContainerBuilder($this->configuration, $this->rootDirectory, $this->cacheDirectory);
 
             /** If the container does not need to be re-created, just get it */
             if(
-                true === $this->configuration->getEnvironment()->isProduction() &&
-                true === $builder->isCacheActual()
+                true === $builder->isCacheActual() &&
+                true === $this->configuration->getEnvironment()->isProduction()
             )
             {
                 return $builder->getContainer();
@@ -185,20 +195,16 @@ abstract class AbstractBootstrap
      *
      * @param string $rootDirectoryPath
      *
-     * @return string
+     * @return RootDirectory
      *
      * @throws BootstrapExceptions\IncorrectRootDirectoryPathException
      */
-    private function prepareRootDirectoryPath(string $rootDirectoryPath): string
+    private function prepareRootDirectory(string $rootDirectoryPath): RootDirectory
     {
-        $rootDirectoryPath = \rtrim($rootDirectoryPath, '/');
+        $rootDirectory = new RootDirectory($rootDirectoryPath);
+        $rootDirectory->validate();
 
-        if('' === $rootDirectoryPath || false === \is_dir($rootDirectoryPath) || false === \is_readable($rootDirectoryPath))
-        {
-            throw new BootstrapExceptions\IncorrectRootDirectoryPathException($rootDirectoryPath);
-        }
-
-        return $rootDirectoryPath;
+        return $rootDirectory;
     }
 
     /**
@@ -206,15 +212,15 @@ abstract class AbstractBootstrap
      *
      * @param string $cacheDirectoryPath
      *
-     * @return string
+     * @return CacheDirectory
      *
      * @throws BootstrapExceptions\IncorrectCacheDirectoryFilePathException
      */
-    private function prepareCacheDirectoryPath(string $cacheDirectoryPath): string
+    private function prepareCacheDirectory(string $cacheDirectoryPath): CacheDirectory
     {
         $cacheDirectory = new CacheDirectory($cacheDirectoryPath);
         $cacheDirectory->prepare();
 
-        return (string) $cacheDirectory;
+        return $cacheDirectory;
     }
 }

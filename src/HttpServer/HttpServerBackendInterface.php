@@ -31,6 +31,8 @@ interface HttpServerBackendInterface
      *
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function listen(callable $requestHandler, callable $throwableHandler): void;
 

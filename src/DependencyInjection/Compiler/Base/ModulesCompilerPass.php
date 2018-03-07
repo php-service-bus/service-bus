@@ -22,8 +22,14 @@ final class ModulesCompilerPass implements DependencyInjection\Compiler\Compiler
 {
     /**
      * @inheritdoc
+     *
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @throws \Exception
      */
-    public function process(DependencyInjection\ContainerBuilder $container)
+    public function process(DependencyInjection\ContainerBuilder $container): void
     {
         $messageBusBuilder = $container->get('service_bus.message_bus.builder');
 

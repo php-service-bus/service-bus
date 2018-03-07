@@ -65,7 +65,7 @@ final class AutowiringServiceLocator
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function get(string $className)
+    public function get(string $className): object
     {
         return $this->container->get($this->servicesRelation[$className]);
     }

@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Saga\Processor;
 
 use Desperado\Domain\Message\AbstractEvent;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\ServiceBus\Saga\Identifier\AbstractSagaIdentifier;
 use Desperado\ServiceBus\Saga\Processor\Exceptions\InvalidSagaIdentifierException;
 use Desperado\ServiceBus\Saga\Processor\Guard\GuardIdentifier;
@@ -76,11 +76,11 @@ final class SagaEventProcessor
         LoggerInterface $logger = null
     )
     {
-        $this->sagaNamespace = $sagaNamespace;
-        $this->identifierNamespace = $identifierNamespace;
+        $this->sagaNamespace                = $sagaNamespace;
+        $this->identifierNamespace          = $identifierNamespace;
         $this->containingIdentifierProperty = $containingIdentifierProperty;
-        $this->sagaProvider = $sagaProvider;
-        $this->logger = $logger ?? new NullLogger();
+        $this->sagaProvider                 = $sagaProvider;
+        $this->logger                       = $logger ?? new NullLogger();
     }
 
     /**
@@ -90,11 +90,17 @@ final class SagaEventProcessor
      * @param ExecutionContextInterface $context
      *
      * @return void
+     *
+     * @throws \Desperado\ServiceBus\Saga\Exceptions\SagaIsClosedException
+     * @throws \Desperado\ServiceBus\Saga\Store\Exceptions\DuplicateSagaException
+     * @throws \Desperado\ServiceBus\Saga\Exceptions\CommitSagaFailedException
+     * @throws \Desperado\ServiceBus\Saga\Store\Exceptions\LoadSagaFailedException
+     * @throws \Desperado\ServiceBus\Saga\Processor\Exceptions\InvalidSagaIdentifierException
      */
     public function __invoke(AbstractEvent $event, ExecutionContextInterface $context): void
     {
         $identifier = $this->searchSagaIdentifier($event);
-        $saga = $this->sagaProvider->obtain($identifier);
+        $saga       = $this->sagaProvider->obtain($identifier);
 
         if(null !== $saga)
         {
@@ -122,14 +128,12 @@ final class SagaEventProcessor
         GuardIdentifier::guardIdentifierAccessorExists($this->containingIdentifierProperty, $event);
 
         $identifierAccessorName = \sprintf('get%s', \ucfirst($this->containingIdentifierProperty));
-        $identifierNamespace = $this->identifierNamespace;
-        $identifierValue = (string) $event->$identifierAccessorName();
+        $identifierNamespace    = $this->identifierNamespace;
+        $identifierValue        = (string) $event->$identifierAccessorName();
 
         GuardIdentifier::guardIdentifier($identifierValue, $event);
         GuardIdentifier::guardIdentifierClassExists($identifierNamespace);
 
-        $identifier = new $identifierNamespace($identifierValue, $this->sagaNamespace);
-
-        return $identifier;
+        return new $identifierNamespace($identifierValue, $this->sagaNamespace);
     }
 }

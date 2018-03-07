@@ -21,6 +21,8 @@ final class ServicesCompilerPass implements DependencyInjection\Compiler\Compile
 {
     /**
      * @inheritdoc
+     *
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
     public function process(DependencyInjection\ContainerBuilder $container): void
     {

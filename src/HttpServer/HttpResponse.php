@@ -29,7 +29,7 @@ class HttpResponse
      *
      * @var array
      */
-    private $headers = [];
+    private $headers;
 
     /**
      * Response body

@@ -39,11 +39,14 @@ final class MessageBusConfigurator
      * @param MessageBusBuilder  $messageBusBuilder
      * @param ContainerInterface $container
      * @param array              $services
+     *
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
     public function __construct(MessageBusBuilder $messageBusBuilder, ContainerInterface $container, array $services)
     {
         $this->messageBusBuilder = $messageBusBuilder;
-        $this->services = \array_map(
+        $this->services          = \array_map(
             function(string $id) use ($container)
             {
                 return $container->get($id);
@@ -57,6 +60,8 @@ final class MessageBusConfigurator
      *
      * @return void
      *
+     * @throws \Exception
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException
      * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
      */
     public function configure(): void

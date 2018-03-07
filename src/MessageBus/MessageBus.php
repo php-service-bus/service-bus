@@ -13,9 +13,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\MessageBus;
 
 use Desperado\Domain\Message\AbstractMessage;
-use Desperado\Domain\MessageProcessor\ExecutionContextInterface;
+use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\ServiceBus\Task\CompletedTask;
-use Psr\Log\LoggerInterface;
 use function React\Promise\all;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
@@ -33,27 +32,15 @@ final class MessageBus
     private $taskCollection;
 
     /**
-     * Logger instance
-     *
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @param MessageBusTaskCollection $collection
-     * @param LoggerInterface          $logger
      *
      * @return self
      */
-    public static function build(
-        MessageBusTaskCollection $collection,
-        LoggerInterface $logger
-    ): self
+    public static function build(MessageBusTaskCollection $collection): self
     {
         $self = new self();
 
         $self->taskCollection = $collection;
-        $self->logger = $logger;
 
         return $self;
     }
@@ -61,10 +48,12 @@ final class MessageBus
     /**
      * Handle message
      *
-     * @param AbstractMessage          $message
+     * @param AbstractMessage           $message
      * @param ExecutionContextInterface $context
      *
      * @return PromiseInterface
+     *
+     * @throws \InvalidArgumentException
      */
     public function handle(AbstractMessage $message, ExecutionContextInterface $context): PromiseInterface
     {
@@ -82,11 +71,13 @@ final class MessageBus
     /**
      * Process task
      *
-     * @param MessageBusTask           $messageBusTask
-     * @param AbstractMessage          $message
+     * @param MessageBusTask            $messageBusTask
+     * @param AbstractMessage           $message
      * @param ExecutionContextInterface $context
      *
      * @return CompletedTask
+     *
+     * @throws \InvalidArgumentException
      */
     private function executeTask(
         MessageBusTask $messageBusTask,

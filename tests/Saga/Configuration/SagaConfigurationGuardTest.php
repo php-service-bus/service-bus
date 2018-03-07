@@ -95,7 +95,8 @@ class SagaConfigurationGuardTest extends TestCase
      * @test
      * @expectedException \Desperado\ServiceBus\Saga\Configuration\Exceptions\EmptyIdentifierFieldValueException
      * @expectedExceptionMessage The field that contains the saga identifier must be specified. Please specify the
-     *                           value "containingIdentifierProperty" in Desperado\ServiceBus\Annotations\Sagas\Saga annotation
+     *                           value "containingIdentifierProperty" in Desperado\ServiceBus\Annotations\Sagas\Saga
+     *                           annotation
      *
      * @return void
      */
@@ -110,7 +111,10 @@ class SagaConfigurationGuardTest extends TestCase
      * @expectedExceptionMessage The event handler for the saga "SomeSagaNamespace" should take the first argument to
      *                           the object that implements the "Desperado\Domain\Message\EventInterface" interface
      *
+     *
      * @return void
+     *
+     * @throws \ReflectionException
      */
     public function invalidFirstEventListenerArgument(): void
     {
