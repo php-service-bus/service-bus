@@ -186,11 +186,14 @@ final class OutboundMessageContext implements OutboundMessageContextInterface, O
             : $this->incomingMessageContext->getReceivedMessage()->getRoutingKey();
 
         $this->toPublishMessages->attach(
-            Message::create(
+            Message::outbound(
                 $this->messageSerializer->serialize($message),
                 $messageDeliveryOptions->getHeaders(),
                 $destination,
-                $routingKey
+                $routingKey,
+                $message instanceof AbstractCommand
+                    ? Message::TYPE_COMMAND
+                    : Message::TYPE_EVENT
             )
         );
     }

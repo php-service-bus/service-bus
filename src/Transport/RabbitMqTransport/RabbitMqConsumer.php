@@ -27,13 +27,13 @@ use React\Promise\RejectedPromise;
 final class RabbitMqConsumer
 {
     public const HEADER_DELIVERY_MODE_KEY = 'delivery-mode';
-    public const HEADER_DELAY_KEY = 'x-delay';
+    public const HEADER_DELAY_KEY         = 'x-delay';
+
+    public const EXCHANGE_TYPE_DIRECT = 'direct';
+    public const EXCHANGE_TYPE_FANOUT = 'fanout';
 
     public const NON_PERSISTED_DELIVERY_MODE = 1;
-    public const PERSISTED_DELIVERY_MODE = 2;
-
-    private const EXCHANGE_TYPE_DIRECT = 'direct';
-    private const EXCHANGE_TYPE_FANOUT = 'fanout';
+    public const PERSISTED_DELIVERY_MODE     = 2;
 
     /** Plugin rabbitmq_delayed_message_exchange must be enabled */
     private const EXCHANGE_TYPE_DELAYED = 'x-delayed-message';
@@ -151,9 +151,9 @@ final class RabbitMqConsumer
      */
     private function __construct(Client $client, RabbitMqTransportConfig $configuration, LoggerInterface $logger)
     {
-        $this->client = $client;
+        $this->client        = $client;
         $this->configuration = $configuration;
-        $this->logger = $logger;
+        $this->logger        = $logger;
 
         $this->onFailedCallable = function(\Throwable $throwable) use ($logger)
         {

@@ -51,7 +51,7 @@ final class RabbitMqPublisher
         $self = new self();
 
         $self->environment = $environment;
-        $self->logger = $logger;
+        $self->logger      = $logger;
 
         return $self;
     }
@@ -61,13 +61,14 @@ final class RabbitMqPublisher
      *
      * @param Channel $channel
      * @param Message $message
+     * @param string  $exchangeType
      *
      * @return PromiseInterface
      */
-    public function publish(Channel $channel, Message $message): PromiseInterface
+    public function publish(Channel $channel, Message $message, string $exchangeType): PromiseInterface
     {
         return $channel
-            ->exchangeDeclare($message->getExchange(), 'direct', true)
+            ->exchangeDeclare($message->getExchange(), $exchangeType, true)
             ->then(
                 function() use ($channel, $message)
                 {

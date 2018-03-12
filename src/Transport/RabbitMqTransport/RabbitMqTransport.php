@@ -16,6 +16,7 @@ use Bunny\Async\Client;
 use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
 use Desperado\Domain\Environment\Environment;
+use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\ParameterBag;
@@ -97,10 +98,10 @@ final class RabbitMqTransport implements TransportInterface
         LoggerInterface $logger
     )
     {
-        $this->configuration = $configuration;
-        $this->environment = $environment;
+        $this->configuration     = $configuration;
+        $this->environment       = $environment;
         $this->messageSerializer = $messageSerializer;
-        $this->logger = $logger;
+        $this->logger            = $logger;
 
         \pcntl_async_signals(true);
 
@@ -129,7 +130,7 @@ final class RabbitMqTransport implements TransportInterface
             $this->logger
         );
 
-        $consumeCallable = $this->createSubscribeCallable($messageHandler);
+        $consumeCallable = $this->createSubscribeCallable($entryPointName, $messageHandler);
 
         $this->subscriber
             ->subscribe($entryPointName)
@@ -180,16 +181,17 @@ final class RabbitMqTransport implements TransportInterface
     /**
      * Create queue subscriber
      *
+     * @param string   $entryPointName
      * @param callable $applicationHandler
      *
      * @return callable
      */
-    private function createSubscribeCallable(callable $applicationHandler): callable
+    private function createSubscribeCallable(string $entryPointName, callable $applicationHandler): callable
     {
-        return function(BunnyMessage $incoming, Channel $channel) use ($applicationHandler)
+        return function(BunnyMessage $incoming, Channel $channel) use ($applicationHandler, $entryPointName)
         {
             EventLoop::getLoop()->futureTick(
-                function() use ($incoming, $channel, $applicationHandler)
+                function() use ($incoming, $channel, $applicationHandler, $entryPointName)
                 {
                     $receivedMessage = Message::create(
                         $incoming->content,
@@ -213,6 +215,7 @@ final class RabbitMqTransport implements TransportInterface
                     }
 
                     $this->handleMessage(
+                        $entryPointName,
                         $applicationHandler,
                         $receivedMessageContainer,
                         $incoming,
@@ -226,6 +229,7 @@ final class RabbitMqTransport implements TransportInterface
     /**
      * Handle message
      *
+     * @param string                   $entryPointName
      * @param callable                 $applicationHandler
      * @param IncomingMessageContainer $receivedMessageContainer
      * @param BunnyMessage             $incoming
@@ -234,6 +238,7 @@ final class RabbitMqTransport implements TransportInterface
      * @return void
      */
     private function handleMessage(
+        string $entryPointName,
         callable $applicationHandler,
         IncomingMessageContainer $receivedMessageContainer,
         BunnyMessage $incoming,
@@ -259,7 +264,7 @@ final class RabbitMqTransport implements TransportInterface
             /** @var PromiseInterface $promise */
 
             $promise->then(
-                function(array $contexts = null) use ($channel)
+                function(array $contexts = null) use ($channel, $entryPointName)
                 {
                     if(false === \is_array($contexts) || 0 === \count($contexts))
                     {
@@ -272,16 +277,23 @@ final class RabbitMqTransport implements TransportInterface
                     {
                         /** @var OutboundMessageContextInterface $context */
 
-                        $promises = \array_merge(
-                            \array_map(
-                                function(Message $message) use ($channel)
-                                {
-                                    return $this->getPublisher()->publish($channel, $message);
-                                },
-                                \iterator_to_array($context->getToPublishMessages())
-                            ),
-                            $promises
-                        );
+                        foreach(\iterator_to_array($context->getToPublishMessages()) as $message)
+                        {
+                            /** @var Message $message */
+
+                            $promises[] = $this->getPublisher()->publish(
+                                $channel, $message, RabbitMqConsumer::EXCHANGE_TYPE_DIRECT
+                            );
+
+                            if(true === $message->isEvent())
+                            {
+                                $promises[] = $this->getPublisher()->publish(
+                                    $channel,
+                                    $message->changeExchange(\sprintf('%s.events', $entryPointName)),
+                                    RabbitMqConsumer::EXCHANGE_TYPE_DIRECT
+                                );
+                            }
+                        }
                     }
 
                     all($promises)
