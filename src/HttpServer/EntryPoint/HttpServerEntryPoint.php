@@ -195,22 +195,17 @@ class HttpServerEntryPoint implements EntryPointInterface
                     {
                         foreach($contexts as $context)
                         {
-                            /** @var OutboundMessageContextInterface $context */
-                            $promises = \array_merge(
-                                \array_map(
-                                    function(Message $message)
-                                    {
-                                        return $this->publisher->publish(
-                                            $message->getExchange(),
-                                            $message->getRoutingKey(),
-                                            $message->getBody(),
-                                            $message->getHeaders()->all()
-                                        );
-                                    },
-                                    \iterator_to_array($context->getToPublishMessages())
-                                ),
-                                $promises
-                            );
+                            /** @var Message $message */
+
+                            foreach(\iterator_to_array($context->getToPublishMessages()) as $message)
+                            {
+                                $promises[] = $this->publisher->publish(
+                                    $message->getExchange(),
+                                    $message->getRoutingKey(),
+                                    $message->getBody(),
+                                    $message->getHeaders()->all()
+                                );
+                            }
 
                             if(
                                 $context instanceof OutboundHttpContextInterface &&
