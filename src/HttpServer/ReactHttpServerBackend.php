@@ -112,7 +112,7 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
                         $eventEmitter = $request->getBody();
 
                         $contentLength = 0;
-                        $contentBody = '';
+                        $contentBody   = '';
 
                         $this->readStream($eventEmitter, $contentLength, $contentBody);
                         $this->onReadingStreamError($eventEmitter, $throwableHandler, $resolve);
@@ -123,6 +123,9 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
                                 $resolve, $request, &$contentLength, &$contentBody, $requestHandler, $throwableHandler
                             )
                             {
+
+                                $this->logRequest($request, $contentBody);
+
                                 try
                                 {
                                     $stream = new BufferStream($contentLength);
@@ -147,6 +150,34 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
     }
 
     /**
+     * Log request
+     *
+     * @param ServerRequestInterface $request
+     * @param string                 $contentBody
+     *
+     * @return void
+     */
+    private function logRequest(ServerRequestInterface $request, string $contentBody): void
+    {
+        $arrayToString = function(array $data)
+        {
+            return \urldecode(\http_build_query($data));
+        };
+
+        $this->logger->debug(
+            \sprintf(
+                '[%s] %s (parameters: %s). Headers: %s',
+                $request->getMethod(),
+                $request->getUri()->getPath(),
+                'GET' === $request->getMethod()
+                    ? $arrayToString($request->getQueryParams())
+                    : $contentBody,
+                $arrayToString($request->getHeaders())
+            )
+        );
+    }
+
+    /**
      * Read request body
      *
      * @param EventEmitter $eventEmitter
@@ -163,7 +194,7 @@ final class ReactHttpServerBackend implements HttpServerBackendInterface
             'data',
             function($data) use (&$contentLength, &$contentBody)
             {
-                $contentBody .= $data;
+                $contentBody   .= $data;
                 $contentLength += \strlen($data);
             }
         );
