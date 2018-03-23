@@ -12,7 +12,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application\Bootstrap;
 
-use Desperado\Infrastructure\Bridge\Logger\LoggerRegistry;
 use Desperado\ServiceBus\Application\Bootstrap\Exceptions as BootstrapExceptions;
 use Desperado\ServiceBus\DependencyInjection\ServiceBusExtension;
 use Psr\Container\ContainerInterface;
@@ -72,21 +71,13 @@ abstract class AbstractBootstrap
     {
         try
         {
-            $startTimer = \microtime(true);
-
             $self = new static($rootDirectoryPath, $cacheDirectoryPath);
 
             $self->configuration = Configuration::loadDotEnv($environmentFilePath);
             $self->configuration->validate();
-
             $self->container = $self->initializeContainer();
 
             $self->init();
-
-            LoggerRegistry::getLogger('bootstrap')
-                ->info(
-                    \sprintf('Application initialization time: %g', \microtime(true) - $startTimer)
-                );
 
             return $self;
         }

@@ -52,7 +52,7 @@ final class DoctrineSchedulerStorage implements SchedulerStorageInterface
                 ->fetch();
 
             return true === \is_array($result) && true === isset($result['data'])
-                ? $result['data']
+                ? \hex2bin($result['data'])
                 : null;
         }
         catch(\Throwable $throwable)
@@ -75,7 +75,7 @@ final class DoctrineSchedulerStorage implements SchedulerStorageInterface
                     'id'   => '?',
                     'data' => '?'
                 ])
-                ->setParameters([$id, $registryPayload])
+                ->setParameters([$id, \bin2hex($registryPayload)])
                 ->execute();
         }
         catch(\Throwable $throwable)
@@ -96,7 +96,7 @@ final class DoctrineSchedulerStorage implements SchedulerStorageInterface
                 ->update(SchemaBuilder::TABLE_NAME_SCHEDULER)
                 ->set('data', '?')
                 ->where('id = ?')
-                ->setParameters([$registryPayload, $id])
+                ->setParameters([\bin2hex($registryPayload), $id])
                 ->execute();
         }
         catch(\Throwable $throwable)
@@ -105,3 +105,4 @@ final class DoctrineSchedulerStorage implements SchedulerStorageInterface
         }
     }
 }
+
