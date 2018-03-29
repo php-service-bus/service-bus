@@ -16,7 +16,7 @@ use Desperado\Domain\Message\AbstractMessage;
 use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\ThrowableFormatter;
-use Desperado\ServiceBus\Transport\Context\OutboundMessageContextInterface;
+use Desperado\ServiceBus\HttpServer\HttpResponse;
 use Desperado\ServiceBus\Transport\Message\Message;
 use Desperado\Infrastructure\Bridge\Publisher\PublisherInterface;
 use Desperado\Infrastructure\Bridge\Router\Exceptions\HttpException;
@@ -209,10 +209,12 @@ class HttpServerEntryPoint implements EntryPointInterface
 
                             if(
                                 $context instanceof OutboundHttpContextInterface &&
-                                true === $context->responseBind() &&
-                                !$responseData = $context->getResponseData()
+                                true === $context->responseBind()
                             )
                             {
+                                /** @var HttpResponse $responseData */
+                                $responseData = $context->getResponseData();
+
                                 $resolve(
                                     $this->createResponse(
                                         $responseData->getCode(),
