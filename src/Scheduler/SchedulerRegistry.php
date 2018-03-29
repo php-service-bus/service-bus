@@ -19,8 +19,6 @@ use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
  */
 final class SchedulerRegistry implements \Serializable
 {
-    public const GZIP_LEVEL = 6;
-
     /**
      * Operations collection
      *
@@ -48,16 +46,7 @@ final class SchedulerRegistry implements \Serializable
      */
     public function serialize(): string
     {
-        return \base64_encode(
-            \gzencode(
-                \serialize([
-                        $this->operations,
-                        $this->timetable
-                    ]
-                ),
-                self::GZIP_LEVEL
-            )
-        );
+        return \serialize([$this->operations, $this->timetable]);
     }
 
     /**
@@ -65,8 +54,6 @@ final class SchedulerRegistry implements \Serializable
      */
     public function unserialize($serialized): void
     {
-        $serialized = \gzdecode(\base64_decode($serialized));
-
         [$this->operations, $this->timetable] = \unserialize($serialized, ['allowed_classes' => true]);
     }
 

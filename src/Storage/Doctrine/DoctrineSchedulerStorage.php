@@ -52,7 +52,11 @@ final class DoctrineSchedulerStorage implements SchedulerStorageInterface
                 ->fetch();
 
             return true === \is_array($result) && true === isset($result['data'])
-                ? \hex2bin($result['data'])
+                ? \hex2bin(
+                    true === \is_resource($result['data'])
+                        ? \stream_get_contents($result['data'], -1, 0)
+                        : $result['data']
+                )
                 : null;
         }
         catch(\Throwable $throwable)
