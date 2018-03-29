@@ -52,7 +52,7 @@ final class SchedulerListenerService implements ServiceInterface
      * @Annotations\Services\CommandHandler()
      *
      * @param EmitSchedulerOperationCommand $command
-     * @param TestApplicationContext        $context
+     * @param ExecutionContextInterface     $context
      * @param SchedulerProvider             $provider
      *
      * @return void
@@ -66,7 +66,7 @@ final class SchedulerListenerService implements ServiceInterface
      */
     public function handleEmitSchedulerOperationCommand(
         EmitSchedulerOperationCommand $command,
-        TestApplicationContext $context,
+        ExecutionContextInterface $context,
         SchedulerProvider $provider
     ): void
     {
