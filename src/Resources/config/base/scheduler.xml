@@ -7,7 +7,7 @@
         <service
                 id="service_bus.scheduler.provider"
                 class="Desperado\ServiceBus\Scheduler\SchedulerProvider"
-                public="false">
+                public="true">
             <argument/>
         </service>
 
