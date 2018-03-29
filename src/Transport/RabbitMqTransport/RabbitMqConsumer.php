@@ -258,6 +258,30 @@ final class RabbitMqConsumer
                         false, ['x-dead-letter-exchange' => $entryPointName]);
                 }
             )
+            /** Events queue */
+            ->then(
+                function() use ($channel, $entryPointName)
+                {
+                    return $channel->queueDeclare(
+                        \sprintf('%s.events', $entryPointName),
+                        false, true
+                    );
+                }
+            )
+            /** Bind events queue */
+            ->then(
+                function(MethodQueueDeclareOkFrame $frame) use ($channel, $entryPointName)
+                {
+                    return $channel
+                        ->queueBind($frame->queue, \sprintf('%s.events', $entryPointName), $entryPointName)
+                        ->then(
+                            function() use ($frame)
+                            {
+                                return $frame;
+                            }
+                        );
+                }
+            )
             /** Messages (internal usage) queue */
             ->then(
                 function() use ($channel, $entryPointName)

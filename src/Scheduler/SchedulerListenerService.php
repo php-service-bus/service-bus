@@ -15,6 +15,9 @@ namespace Desperado\ServiceBus\Scheduler;
 use Desperado\Domain\Message\AbstractEvent;
 use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\Domain\ParameterBag;
+use Desperado\ServiceBus\Scheduler\Commands\EmitSchedulerOperationCommand;
+use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
+use Desperado\ServiceBus\Tests\TestApplicationContext;
 use Desperado\ServiceBus\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\ServiceInterface;
@@ -44,6 +47,36 @@ final class SchedulerListenerService implements ServiceInterface
     }
 
     /**
+     * Emit command
+     *
+     * @Annotations\Services\CommandHandler()
+     *
+     * @param EmitSchedulerOperationCommand $command
+     * @param TestApplicationContext        $context
+     * @param SchedulerProvider             $provider
+     *
+     * @return void
+     *
+     * @throws \Desperado\Domain\DateTimeException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageException
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageConnectionException
+     * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
+     * @throws \Desperado\Domain\Identity\Exceptions\EmptyIdentifierException
+     */
+    public function handleEmitSchedulerOperationCommand(
+        EmitSchedulerOperationCommand $command,
+        TestApplicationContext $context,
+        SchedulerProvider $provider
+    ): void
+    {
+        $provider->emitCommand(
+            new ScheduledCommandIdentifier($command->getId()),
+            $context
+        );
+    }
+
+    /**
      * @Annotations\Services\EventHandler()
      *
      * @param Events\SchedulerOperationEmittedEvent $event
@@ -52,6 +85,7 @@ final class SchedulerListenerService implements ServiceInterface
      * @return void
      *
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
+     * @throws \Desperado\Domain\DateTimeException
      */
     public function whenSchedulerOperationEmittedEvent(
         Events\SchedulerOperationEmittedEvent $event,
@@ -70,6 +104,7 @@ final class SchedulerListenerService implements ServiceInterface
      * @return void
      *
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
+     * @throws \Desperado\Domain\DateTimeException
      */
     public function whenSchedulerOperationCanceledEvent(
         Events\SchedulerOperationCanceledEvent $event,
@@ -88,6 +123,7 @@ final class SchedulerListenerService implements ServiceInterface
      * @return void
      *
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
+     * @throws \Desperado\Domain\DateTimeException
      */
     public function whenOperationScheduledEvent(
         Events\OperationScheduledEvent $event,
@@ -106,6 +142,7 @@ final class SchedulerListenerService implements ServiceInterface
      * @return void
      *
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
+     * @throws \Desperado\Domain\DateTimeException
      */
     private function processNextOperationEmit(AbstractEvent $event, ExecutionContextInterface $context): void
     {
