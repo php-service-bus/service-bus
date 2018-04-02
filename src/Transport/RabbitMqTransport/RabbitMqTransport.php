@@ -16,7 +16,6 @@ use Bunny\Async\Client;
 use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
 use Desperado\Domain\Environment\Environment;
-use Desperado\Domain\Message\AbstractMessage;
 use Desperado\Domain\ThrowableFormatter;
 use Desperado\Domain\MessageSerializer\MessageSerializerInterface;
 use Desperado\Domain\ParameterBag;

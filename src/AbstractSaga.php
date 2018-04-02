@@ -29,7 +29,7 @@ use Desperado\ServiceBus\Sagas\Events\SagaStatusWasChangedEvent;
  */
 abstract class AbstractSaga
 {
-    private const EVENT_APPLY_PREFIX = 'on';
+    private const EVENT_APPLY_PREFIX          = 'on';
     private const DEFAULT_EXPIRATION_MODIFIER = '+1 hour';
 
     /**
@@ -68,6 +68,36 @@ abstract class AbstractSaga
     private $expireDateModifier;
 
     /**
+     * Fired command classes
+     *
+     * [
+     *    0 => [
+     *        0 => 'SomeCommandClass',
+     *        1 => '2018-01-04 12:00:00'
+     *    ],
+     *    ...
+     * ]
+     *
+     * @var array
+     */
+    private $firedCommands = [];
+
+    /**
+     * Risen events
+     *
+     * [
+     *    0 => [
+     *        0 => 'SomeEventClass',
+     *        1 => '2018-01-04 12:00:00'
+     *    ],
+     *    ...
+     * ]
+     *
+     * @var array
+     */
+    private $risenEvents = [];
+
+    /**
      * @param AbstractSagaIdentifier $identity
      * @param SagaMetadata           $metadata
      *
@@ -76,10 +106,10 @@ abstract class AbstractSaga
      */
     final public function __construct(AbstractSagaIdentifier $identity, SagaMetadata $metadata)
     {
-        $this->id = $identity;
+        $this->id                 = $identity;
         $this->expireDateModifier = $metadata->getExpireDateModifier();
-        $this->events = [];
-        $this->commands = [];
+        $this->events             = [];
+        $this->commands           = [];
 
         $this->raiseEvent(
             SagaCreatedEvent::new($this, $this->getExpirePeriod())
@@ -226,7 +256,11 @@ abstract class AbstractSaga
 
         if(true === $publishOnFlush)
         {
-            $this->events[] = $event;
+            $this->events[]      = $event;
+            $this->risenEvents[] = [
+                $event->getMessageClass(),
+                \date('Y-m-d H:i:s')
+            ];
         }
     }
 
@@ -243,7 +277,11 @@ abstract class AbstractSaga
     {
         $this->assertIsProcessing();
 
-        $this->commands[] = $command;
+        $this->commands[]      = $command;
+        $this->firedCommands[] = [
+            $command->getMessageClass(),
+            \date('Y:m:d H:i:s')
+        ];
     }
 
     /**
@@ -271,6 +309,7 @@ abstract class AbstractSaga
      * @return void
      *
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
+     * @throws \Desperado\Domain\DateTimeException
      * @throws SagaIsClosedException
      */
     final protected function complete(?string $message = null): void
@@ -371,7 +410,7 @@ abstract class AbstractSaga
     private function applyEvent(AbstractEvent $event): void
     {
         $eventListenerMethodNameParts = \explode('\\', \get_class($event));
-        $eventListenerMethodName = \sprintf(
+        $eventListenerMethodName      = \sprintf(
             '%s%s',
             self::EVENT_APPLY_PREFIX,
             \end($eventListenerMethodNameParts)

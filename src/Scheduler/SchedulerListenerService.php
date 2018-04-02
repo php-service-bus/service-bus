@@ -17,7 +17,6 @@ use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
 use Desperado\Domain\ParameterBag;
 use Desperado\ServiceBus\Scheduler\Commands\EmitSchedulerOperationCommand;
 use Desperado\ServiceBus\Scheduler\Identifier\ScheduledCommandIdentifier;
-use Desperado\ServiceBus\Tests\TestApplicationContext;
 use Desperado\ServiceBus\Transport\Message\MessageDeliveryOptions;
 use Desperado\ServiceBus\Annotations;
 use Desperado\ServiceBus\ServiceInterface;
