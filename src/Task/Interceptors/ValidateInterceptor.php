@@ -61,6 +61,7 @@ class ValidateInterceptor implements TaskInterface
     /**
      * @inheritdoc
      *
+     * @throws \Desperado\Domain\DateTimeException
      * @throws \Desperado\Domain\Message\Exceptions\OverwriteProtectedPropertyException
      */
     public function __invoke(
@@ -76,7 +77,9 @@ class ValidateInterceptor implements TaskInterface
         /** All constraints passed */
         if(0 === $violations->count())
         {
-            return \call_user_func_array($this->task, [$message, $context, $additionalArguments]);
+            $task = $this->task;
+
+            return $task($message, $context, $additionalArguments);
         }
 
         $this->processViolations($message, $violations, $context);
