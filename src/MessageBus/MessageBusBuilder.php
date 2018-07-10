@@ -12,210 +12,166 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\MessageBus;
 
-use Desperado\ServiceBus\Application\Kernel\Events\MessageBusCompiledEvent;
-use Desperado\ServiceBus\Task\Behaviors;
-use Desperado\ServiceBus\Services\Handlers;
-use Desperado\ServiceBus\MessageBus\Exceptions\MessageBusAlreadyCreatedException;
-use Desperado\ServiceBus\Services\ServiceHandlersExtractorInterface;
-use Desperado\ServiceBus\ServiceInterface;
-use Desperado\ServiceBus\Task\Task;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Desperado\Contracts\Common\Message;
+use Desperado\ServiceBus\MessageBus\Configuration\ConfigurationLoader;
+use Desperado\ServiceBus\MessageBus\Configuration\MessageHandler;
+use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageArgumentFound;
+use Desperado\ServiceBus\MessageBus\Exceptions\NonUniqueCommandHandler;
+use Desperado\ServiceBus\MessageBus\Task\Arguments\ArgumentResolver;
+use Desperado\ServiceBus\MessageBus\Task\TaskProcessor;
+use Desperado\ServiceBus\MessageBus\Task\TaskMap;
+use Desperado\ServiceBus\MessageBus\Task\ValidateMessageTask;
+use Psr\Log\LoggerInterface;
 
 /**
- * Build message bus
+ * Compile message bus
  */
 final class MessageBusBuilder
 {
     /**
-     * Message handlers
-     *
-     * @var Handlers\MessageHandlersCollection
+     * @var ConfigurationLoader
      */
-    private $messageHandlers;
+    private $configurationLoader;
 
     /**
-     * Behaviors collection
+     * Tasks list
      *
-     * @var Behaviors\BehaviorInterface[]
+     * @var TaskMap
      */
-    private $behaviors = [];
+    private $taskMap;
 
     /**
-     * Handlers extractor
-     *
-     * @var ServiceHandlersExtractorInterface
+     * @var LoggerInterface
      */
-    private $serviceHandlersExtractor;
+    private $logger;
 
     /**
-     * Event dispatcher
-     *
-     * @var EventDispatcher
+     * @param ConfigurationLoader $configurationLoader
+     * @param LoggerInterface     $logger
      */
-    private $eventDispatcher;
-
-    /**
-     * Is message bus created
-     *
-     * @var bool
-     */
-    private $isCompiled = false;
-
-    /**
-     * @param ServiceHandlersExtractorInterface $serviceHandlersExtractor
-     * @param EventDispatcher                   $eventDispatcher
-     */
-    public function __construct(
-        ServiceHandlersExtractorInterface $serviceHandlersExtractor,
-        EventDispatcher $eventDispatcher
-    )
+    public function __construct(ConfigurationLoader $configurationLoader, LoggerInterface $logger)
     {
-        $this->serviceHandlersExtractor = $serviceHandlersExtractor;
-        $this->eventDispatcher          = $eventDispatcher;
+        $this->configurationLoader = $configurationLoader;
+        $this->logger              = $logger;
 
-        $this->messageHandlers = Handlers\MessageHandlersCollection::create();
+        $this->taskMap = new TaskMap();
     }
 
     /**
-     * Push behavior instance
+     * Register service handlers
      *
-     * @param Behaviors\BehaviorInterface $behavior
-     *
-     * @return void
-     *
-     * @throws MessageBusAlreadyCreatedException
-     */
-    public function pushBehavior(Behaviors\BehaviorInterface $behavior): void
-    {
-        $this->guardIsCompiled();
-
-        $this->behaviors[\get_class($behavior)] = $behavior;
-    }
-
-    /**
-     * Push message handler
-     *
-     * @param Handlers\MessageHandlerData $messageHandlerData
+     * @param object           $service
+     * @param ArgumentResolver ...$argumentResolvers
      *
      * @return void
      *
-     * @throws MessageBusAlreadyCreatedException
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NoMessageArgumentFound
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NonUniqueCommandHandler
      */
-    public function pushMessageHandler(Handlers\MessageHandlerData $messageHandlerData): void
+    public function configureService(object $service, ArgumentResolver ... $argumentResolvers): void
     {
-        $this->guardIsCompiled();
+        $handlers = $this->configurationLoader->extractHandlers($service);
 
-        $this->messageHandlers->add($messageHandlerData);
-    }
-
-    /**
-     * Apply service
-     * Parse service handlers (command handler, event listener, error handler)
-     *
-     * @param ServiceInterface $service
-     *
-     * @return void
-     *
-     * @throws \Exception
-     * @throws MessageBusAlreadyCreatedException
-     * @throws \Desperado\ServiceBus\Services\Exceptions\ServiceConfigurationExceptionInterface
-     */
-    public function applyService(ServiceInterface $service): void
-    {
-        $this->guardIsCompiled();
-
-        $defaultServiceLoggerChannel = $this->serviceHandlersExtractor->extractServiceLoggerChannel($service);
-        $handlers                    = $this->serviceHandlersExtractor->extractHandlers($service, $defaultServiceLoggerChannel);
-
-        foreach($handlers as $handlerData)
+        foreach($handlers as $handler)
         {
-            $this->pushMessageHandler($handlerData);
+            $this->registerHandler($handler, $service, ...$argumentResolvers);
         }
     }
 
     /**
-     * Get compiled message bus flag
+     * Register handler
      *
-     * @return bool
+     * @param MessageHandler   $handler
+     * @param object           $service
+     * @param ArgumentResolver ...$argumentResolvers
+     *
+     * @return void
+     *
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NoMessageArgumentFound
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NonUniqueCommandHandler
      */
-    public function isCompiled(): bool
+    public function registerHandler(
+        MessageHandler $handler,
+        object $service,
+        ArgumentResolver ... $argumentResolvers
+    ): void
     {
-        return $this->isCompiled;
+        $this->assertMessageClassSpecifiedInArguments($service, $handler);
+        $this->assertUniqueCommandHandler($handler);
+
+        /** @var string $messageClass */
+        $messageClass = $handler->messageClass();
+
+        $messageTask = new TaskProcessor($handler->toClosure($service), $handler->arguments(), $argumentResolvers);
+
+        if(true === $handler->options()->validationEnabled())
+        {
+            $messageTask = new ValidateMessageTask($messageTask, $handler->options()->validationGroups());
+        }
+
+        $this->taskMap->push(
+            $messageClass,
+            $messageTask
+        );
     }
 
     /**
-     * Build messages bus
+     * Compile message bus
      *
      * @return MessageBus
-     *
-     * @throws MessageBusAlreadyCreatedException
      */
-    public function build(): MessageBus
+    public function compile(): MessageBus
     {
-        $this->guardIsCompiled();
-
-        $taskCollection = $this->prepareTaskCollection();
-
-        $messageBus = MessageBus::build($taskCollection);
-
-        $this->isCompiled = true;
-
-        $this->eventDispatcher->dispatch(
-            MessageBusCompiledEvent::EVENT_NAME,
-            new MessageBusCompiledEvent($taskCollection->count())
+        $this->logger->debug(
+            'The message bus was successfully compiled. Total number of message handlers: "{messageHandlersCount}"', [
+                'messageHandlersCount' => \count($this->taskMap)
+            ]
         );
 
-        return $messageBus;
+        return new MessageBus($this->taskMap);
     }
 
     /**
-     * Create a collection of tasks
+     * @param MessageHandler $handler
      *
-     * @return MessageBusTaskCollection
+     * @return void
+     *
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NonUniqueCommandHandler
      */
-    private function prepareTaskCollection(): MessageBusTaskCollection
+    private function assertUniqueCommandHandler(MessageHandler $handler): void
     {
-        $collection = MessageBusTaskCollection::createEmpty();
+        /** @var string $messageClass */
+        $messageClass = $handler->messageClass();
 
-        foreach($this->messageHandlers as $handlerData)
+        if(true === $handler->isCommandHandler() && true === $this->taskMap->hasTask($messageClass))
         {
-            /** @var Handlers\MessageHandlerData $handlerData */
-
-            $task = Task::new(
-                $handlerData->getMessageHandler(),
-                $handlerData->getExecutionOptions()
-            );
-
-            foreach($this->behaviors as $behavior)
-            {
-                /** The task is an immutable object */
-                $task = $behavior->apply($task);
-            }
-
-            $collection->add(
-                MessageBusTask::create(
-                    $handlerData->getMessageClassNamespace(),
-                    $task,
-                    $handlerData->getAutowiringServices()
+            throw new NonUniqueCommandHandler(
+                \sprintf(
+                    'The handler for the "%s" command has already been added earlier. You can not add multiple command handlers',
+                    $messageClass
                 )
             );
         }
-
-        return $collection;
     }
 
     /**
-     * Make sure that the bus is not yet configured
+     * @param object         $service
+     * @param MessageHandler $handler
      *
      * @return void
-     *
-     * @throws MessageBusAlreadyCreatedException
      */
-    private function guardIsCompiled(): void
+    private function assertMessageClassSpecifiedInArguments(object $service, MessageHandler $handler): void
     {
-        if(true === $this->isCompiled)
+        if(null === $handler->messageClass() || '' === (string) $handler->messageClass())
         {
-            throw new MessageBusAlreadyCreatedException();
+            throw new NoMessageArgumentFound(
+                \sprintf(
+                    'In the method of "%s:%s" is not found an argument of type "%s"',
+                    \get_class($service),
+                    $handler->methodName(),
+                    Message::class
+                )
+            );
         }
     }
 }

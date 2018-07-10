@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\DependencyInjection;
+namespace Desperado\ServiceBus\DependencyInjection\Extensions\Components;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,9 +18,9 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
- * Share extension
+ *
  */
-final class ServiceBusExtension extends Extension
+final class EventSourcingComponentExtension extends Extension
 {
     /**
      * @inheritdoc
@@ -30,6 +30,6 @@ final class ServiceBusExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader($container, new FileLocator());
-        $loader->load(__DIR__ . '/service_bus.yaml');
+        $loader->load(__DIR__ . '/event_sourcing.yaml');
     }
 }

@@ -12,102 +12,65 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\MessageBus;
 
-use Desperado\Domain\Message\AbstractMessage;
-use Desperado\ServiceBus\Application\Context\ExecutionContextInterface;
-use Desperado\ServiceBus\Task\CompletedTask;
-use function React\Promise\all;
-use React\Promise\PromiseInterface;
-use React\Promise\RejectedPromise;
+use function Amp\call;
+use Amp\Promise;
+use Desperado\ServiceBus\Kernel\ApplicationContext;
+use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound;
+use Desperado\ServiceBus\MessageBus\Task\TaskProcessor;
+use Desperado\ServiceBus\MessageBus\Task\TaskMap;
 
 /**
- * Message bus
+ *
  */
 final class MessageBus
 {
     /**
-     * Tasks
-     *
-     * @var MessageBusTaskCollection
+     * @var TaskMap
      */
-    private $taskCollection;
+    private $taskMap;
 
     /**
-     * @param MessageBusTaskCollection $collection
-     *
-     * @return self
+     * @param TaskMap $taskMap
      */
-    public static function build(MessageBusTaskCollection $collection): self
+    public function __construct(TaskMap $taskMap)
     {
-        $self = new self();
-
-        $self->taskCollection = $collection;
-
-        return $self;
+        $this->taskMap = $taskMap;
     }
 
     /**
-     * Handle message
+     * @psalm-suppress LessSpecificReturnStatement
+     * @psalm-suppress MoreSpecificReturnType
      *
-     * @param AbstractMessage           $message
-     * @param ExecutionContextInterface $context
+     * @param ApplicationContext $context
      *
-     * @return PromiseInterface
+     * @return Promise<null>
      *
-     * @throws \InvalidArgumentException
+     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound
      */
-    public function handle(AbstractMessage $message, ExecutionContextInterface $context): PromiseInterface
+    public function dispatch(ApplicationContext $context): Promise
     {
-        $promises = \array_map(
-            function(MessageBusTask $messageBusTask) use ($message, $context)
+        $taskMap = $this->taskMap;
+
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(ApplicationContext $context) use ($taskMap): \Generator
             {
-                return $this->executeTask($messageBusTask, $message, $context);
+                $message      = $context->incomingEnvelope()->denormalized();
+                $messageClass = \get_class($message);
+
+                if(false === $taskMap->hasTask(\get_class($message)))
+                {
+                    throw new NoMessageHandlersFound($message);
+                }
+
+                foreach($taskMap->map($messageClass) as $task)
+                {
+                    /** @var TaskProcessor $task */
+
+                    yield $task($message, $context);
+                }
             },
-            $this->taskCollection->mapByMessageNamespace($message->getMessageClass())
+            $context
         );
-
-        return all($promises);
-    }
-
-    /**
-     * Process task
-     *
-     * @param MessageBusTask            $messageBusTask
-     * @param AbstractMessage           $message
-     * @param ExecutionContextInterface $context
-     *
-     * @return CompletedTask
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function executeTask(
-        MessageBusTask $messageBusTask,
-        AbstractMessage $message,
-        ExecutionContextInterface $context
-    ): CompletedTask
-    {
-        $task = $messageBusTask->getTask();
-
-        try
-        {
-            $result = $task($message, $context, $messageBusTask->getAutowiringServices());
-        }
-        catch(\Throwable $throwable)
-        {
-            $result = new RejectedPromise($throwable);
-        }
-
-        return CompletedTask::create(
-            $message,
-            $context,
-            $result
-        );
-    }
-
-    /**
-     * Close constructor
-     */
-    private function __construct()
-    {
-
     }
 }

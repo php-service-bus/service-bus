@@ -14,42 +14,60 @@
   "autoload": {
     "psr-4": {
       "Desperado\\ServiceBus\\": "src/"
-    }
+    },
+    "files": [
+      "src/MessageBus/functions.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
       "Desperado\\ServiceBus\\Tests\\": "tests/"
-    }
+    },
+    "files": [
+      "src/MessageBus/functions.php"
+    ]
   },
   "require": {
     "php": ">=7.2",
-    "mmasiukevich/infrastructure": "^v0.0.3",
-    "mmasiukevich/message-serializer": "^v0.0.3",
-    "mmasiukevich/event-sourcing": "^v0.0.3",
-    "symfony/dotenv": "v4.0.4",
-    "symfony/dependency-injection": "v4.0.4",
-    "symfony/config": "v4.0.4",
-    "symfony/validator": "v4.0.4",
-    "symfony/event-dispatcher": "v4.0.4",
-    "doctrine/cache": "v1.7.1",
-    "phpdocumentor/reflection-docblock": "4.2.0",
-    "react/http": "v0.8.1",
-    "react/child-process": "v0.5.2"
+    "ext-amqp": "*",
+    "amphp/amp": "^2",
+    "amphp/byte-stream": "^1.3",
+    "amphp/hpack": "^1",
+    "amphp/log": "^1",
+    "amphp/socket": "^0.10.7",
+    "mmasiukevich/service-bus-contracts": "^v1.0",
+    "mmasiukevich/saga": "^v1.0",
+    "mmasiukevich/event-sourcing": "^v1.0",
+    "symfony/serializer": "^v4.1",
+    "symfony/property-info": "^v4.1",
+    "symfony/property-access": "^v4.1",
+    "symfony/validator": "v4.1",
+    "symfony/dependency-injection": "v4.1",
+    "symfony/config": "v4.1",
+    "symfony/yaml": "v4.1",
+    "phpdocumentor/reflection-docblock": "^4.0",
+    "psr/container": "v1.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^7.0",
-    "symfony/debug": "v4.0.4"
+    "phpunit/phpunit": "^7.2",
+    "vimeo/psalm": "^2"
   },
   "config": {
     "optimize-autoloader": true
   },
+  "minimum-stability": "dev",
   "prefer-stable": true,
   "extra": {
     "branch-alias": {
-      "dev-master": "v0.0.3-dev"
+      "dev-master": "v0.0.4-dev"
     }
   },
   "scripts": {
-    "post-autoload-dump": "curl -s -H \"Accept: text/plain\" https://security.sensiolabs.org/check_lock -F lock=@composer.lock"
+    "psalm": "./vendor/bin/psalm --config=./psalm.xml",
+    "phpunit": "phpunit --configuration ./phpunit.xml --verbose",
+    "coverage": "phpunit --configuration ./phpunit.xml --coverage-html ./coverage --verbose",
+    "test": [
+      "@phpunit"
+    ]
   }
 }
