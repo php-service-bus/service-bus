@@ -1,8 +1,8 @@
 services:
 
   Desperado\Sagas\:
-    resource: '../../../../vendor/mmasiukevich/saga/src'
-    exclude: '../../../../vendor/mmasiukevich/saga/src/{functions.php}'
+    resource: '../../../../../saga/src'
+    exclude: '../../../../../saga/src/{functions.php}'
 
   # Sagas storage
   Desperado\Sagas\Store\SagasStorage:

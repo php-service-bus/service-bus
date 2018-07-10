@@ -1,8 +1,8 @@
 services:
 
   Desperado\EventSourcing\:
-    resource: '../../../../vendor/mmasiukevich/event-sourcing/src'
-    exclude: '../../../../vendor/mmasiukevich/event-sourcing/src/{*/functions.php}'
+    resource: '../../../../../event-sourcing/src'
+    exclude: '../../../../../event-sourcing/src/{*/functions.php}'
 
   # Event stream storage
   Desperado\EventSourcing\Common\Storage\EventStorage:
