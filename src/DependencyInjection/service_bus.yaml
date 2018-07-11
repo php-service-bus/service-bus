@@ -1,0 +1,46 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: false
+    public: false
+
+  Desperado\ServiceBus\:
+    resource: '../*'
+    exclude: '../{*/functions.php,Environment.php,Contract,Container,DependencyInjection,*/Exceptions,MessageBus/Configuration}'
+
+  # Application environment
+  Desperado\ServiceBus\Environment:
+    factory: ['Desperado\ServiceBus\Environment', 'create']
+    arguments:
+      $environment: '%service_bus.environment%'
+
+  # Default logger instance
+  Psr\Log\LoggerInterface:
+    public: true
+    factory: 'Desperado\ServiceBus\Logger\DefaultLoggerFactory:build'
+    arguments:
+      $entryPointName: '%service_bus.entry_point%'
+      $environment: '@Desperado\ServiceBus\Environment'
+
+  # Services configuration loader
+  Desperado\ServiceBus\MessageBus\Configuration\ConfigurationLoader:
+    class: Desperado\ServiceBus\MessageBus\Configuration\AnnotationBasedConfigurationLoader
+
+  # ServiceBusKernel locator
+  service_bus.kernel_locator:
+    class: Symfony\Component\DependencyInjection\ServiceLocator
+    tags: ['container.service_locator']
+    arguments:
+    - Desperado\ServiceBus\Transport\Transport: '@Desperado\ServiceBus\Transport\Transport'
+      Desperado\ServiceBus\MessageBus\MessageBusBuilder: '@Desperado\ServiceBus\MessageBus\MessageBusBuilder'
+      Desperado\ServiceBus\Router\OutboundMessageRouter: '@Desperado\ServiceBus\Router\OutboundMessageRouter'
+
+  # Application kernel
+  # @see \Desperado\ServiceBus\DependencyInjection\ServicesCompilerPass
+  Desperado\ServiceBus\Kernel\ServiceBusKernel:
+    public: true
+    arguments:
+      $kernelLocator: '@service_bus.kernel_locator'
+      $servicesLocator: '@service_bus.services_locator'
+      $services: '%service_bus.services_map%'
+      $logger: '@Psr\Log\LoggerInterface'

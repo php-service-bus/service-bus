@@ -1,0 +1,55 @@
+services:
+
+  Desperado\EventSourcing\:
+    resource: '../../../../../event-sourcing/src'
+    exclude: '../../../../../event-sourcing/src/{*/functions.php}'
+
+  # Event stream storage
+  Desperado\EventSourcing\Common\Storage\EventStorage:
+    class: Desperado\EventSourcing\Common\Storage\SQL\SqlEventStorage
+    arguments:
+      $adapter: '@Desperado\StorageComponent\SQL\SqlDatabaseAdapter'
+
+  # Index storage
+  Desperado\EventSourcing\Common\Storage\IndexStorage:
+    class: Desperado\EventSourcing\Common\Storage\SQL\SqlIndexesStorage
+    arguments:
+      $adapter: '@Desperado\StorageComponent\SQL\SqlDatabaseAdapter'
+
+  # Snapshots storage
+  Desperado\EventSourcing\Common\Storage\SnapshotStorage:
+    class: Desperado\EventSourcing\Common\Storage\SQL\SqlSnapshotStorage
+    arguments:
+      $adapter: '@Desperado\StorageComponent\SQL\SqlDatabaseAdapter'
+
+  # Indexer
+  Desperado\EventSourcing\IndexProvider:
+    arguments:
+      $storage: '@Desperado\EventSourcing\Common\Storage\IndexStorage'
+
+  # Aggregates serializer
+  Desperado\EventSourcing\Snapshot\Serializer\AggregateSerializer:
+    class: Desperado\EventSourcing\Snapshot\Serializer\SimpleAggregateSerializer
+
+  # Snapshots trigger
+  Desperado\EventSourcing\Aggregate\AggregateRoot\SnapshotTrigger:
+    class: Desperado\EventSourcing\Snapshot\SnapshotVersionTrigger
+
+  # Snapshotter
+  Desperado\EventSourcing\Snapshot\Snapshotter:
+    arguments:
+      $storage: '@Desperado\EventSourcing\Common\Storage\SnapshotStorage'
+      $serializer: '@Desperado\EventSourcing\Snapshot\Serializer\AggregateSerializer'
+      $trigger: '@Desperado\EventSourcing\Aggregate\AggregateRoot\SnapshotTrigger'
+      $logger: '@Psr\Log\LoggerInterface'
+
+  # Events serializer
+  Desperado\EventSourcing\Aggregate\Serializer\AggregateEventSerializer:
+    class: Desperado\EventSourcing\Aggregate\Serializer\SymfonyEventSerializer
+
+  # Aggregate provider
+  Desperado\EventSourcing\EventSourcingProvider:
+    arguments:
+      $storage: '@Desperado\EventSourcing\Common\Storage\EventStorage'
+      $serializer: '@Desperado\EventSourcing\Aggregate\Serializer\AggregateEventSerializer'
+      $snapshotter: '@Desperado\EventSourcing\Snapshot\Snapshotter'

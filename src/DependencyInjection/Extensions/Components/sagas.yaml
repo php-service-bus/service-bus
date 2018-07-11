@@ -1,0 +1,26 @@
+services:
+
+  Desperado\Sagas\:
+    resource: '../../../../../saga/src'
+    exclude: '../../../../../saga/src/{functions.php}'
+
+  # Sagas storage
+  Desperado\Sagas\Store\SagasStorage:
+    class: Desperado\Sagas\Store\SQL\SQLSagaStorage
+    arguments:
+      $adapter: '@Desperado\StorageComponent\SQL\SqlDatabaseAdapter'
+
+  # Sagas serializer
+  Desperado\Sagas\Serializer\SagaSerializer:
+    class: Desperado\Sagas\Serializer\SimpleSerializer
+
+  # Sagas store
+  Desperado\Sagas\Store\SagaStore:
+    arguments:
+      $storage: '@Desperado\Sagas\Store\SagasStorage'
+      $serializer: '@Desperado\Sagas\Serializer\SagaSerializer'
+
+  # Sagas provider
+  Desperado\Sagas\SagaProvider:
+    arguments:
+      $store: '@Desperado\Sagas\Store\SagaStore'
