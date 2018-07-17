@@ -70,7 +70,6 @@ final class AmqpConfiguration
     {
         $self = new self();
 
-        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         /** @noinspection PhpUnhandledExceptionInspection */
         $self->data = self::extractConnectionParameters(
             'amqp://guest:guest@localhost:5672'

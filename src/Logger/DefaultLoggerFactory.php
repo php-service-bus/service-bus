@@ -77,11 +77,6 @@ final class DefaultLoggerFactory
      */
     private function getProcessors(): array
     {
-        /**
-         * Cant throw exception (already validated)
-         *
-         * @noinspection ExceptionsAnnotatingAndHandlingInspection
-         */
         return [
             new MonologProcessors\ProcessIdProcessor(),
             new MonologProcessors\PsrLogMessageProcessor(),

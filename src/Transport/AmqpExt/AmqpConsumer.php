@@ -128,7 +128,7 @@ final class AmqpConsumer implements Consumer
     {
         while(true)
         {
-           Loop::run();
+            Loop::run();
 
             $this->checkCycleActivity();
             $this->increaseIterations();
