@@ -106,10 +106,7 @@ final class MessageHandler
      */
     public function toClosure(object $service): \Closure
     {
-        /** @var \Closure $closure */
-        $closure = $this->reflectionMethod->getClosure($service);
-
-        return $closure;
+        return $this->reflectionMethod->getClosure($service);
     }
 
     /**

@@ -12,10 +12,11 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Kernel;
 
+use Amp\Loop;
 use Desperado\Contracts\Common\Message;
+use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound;
 use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
-use function Desperado\ServiceBus\MessageBus\messageDispatcher;
 use Desperado\ServiceBus\MessageBus\Task\Arguments\ContainerArgumentResolver;
 use Desperado\ServiceBus\MessageBus\Task\Arguments\ContextArgumentResolver;
 use Desperado\ServiceBus\MessageBus\Task\Arguments\MessageArgumentResolver;
@@ -156,7 +157,7 @@ final class ServiceBusKernel
     public function listen(Queue $queue): void
     {
         $messageProcessor = self::createMessageProcessor(
-            messageDispatcher($this->messageBus),
+            $this->messageBus,
             self::createMessageSender(
                 $this->kernelLocator->get(Transport::class)->createPublisher(),
                 $this->kernelLocator->get(OutboundMessageRouter::class),
@@ -209,14 +210,14 @@ final class ServiceBusKernel
     /**
      * Create handle message handler
      *
-     * @param \Generator      $messageDispatcher
+     * @param MessageBus      $messageBus
      * @param \Generator      $messageSender
      * @param LoggerInterface $logger
      *
      * @return \Generator
      */
     private static function createMessageProcessor(
-        \Generator $messageDispatcher,
+        MessageBus $messageBus,
         \Generator $messageSender,
         LoggerInterface $logger
     ): \Generator
@@ -226,33 +227,28 @@ final class ServiceBusKernel
             /** @var IncomingEnvelope $envelope */
             $envelope = yield;
 
-            $logger->debug(
-                'Dispatching the message "{messageClass}" for processing', [
-                    'messageClass'             => \get_class($envelope->denormalized()),
-                    'operationId'              => $envelope->operationId(),
-                    'rawMessagePayload'        => $envelope->requestBody(),
-                    'normalizedMessagePayload' => $envelope->normalized(),
-                    'headers'                  => $envelope->headers()
-                ]
-            );
+            Loop::run(
+                static function() use ($messageBus, $envelope, $messageSender, $logger): \Generator
+                {
+                    try
+                    {
+                        self::beforeDispatch($envelope, $logger);
 
-            try
-            {
-                $messageDispatcher->send(
-                    new ApplicationContext($envelope, $messageSender, $logger)
-                );
-            }
-            catch(\Throwable $throwable)
-            {
-                $logger->error(
-                    'Operation failed: "{errorMessage}"', [
-                        'operationId'              => $envelope->operationId(),
-                        'rawMessagePayload'        => $envelope->requestBody(),
-                        'normalizedMessagePayload' => $envelope->normalized(),
-                        'headers'                  => $envelope->headers()
-                    ]
-                );
-            }
+                        yield $messageBus->dispatch(
+                            new ApplicationContext($envelope, $messageSender, $logger)
+                        );
+                    }
+                    catch(NoMessageHandlersFound $exception)
+                    {
+                        $logger->debug($exception->getMessage(), ['operationId' => $envelope->operationId()]);
+                    }
+                    catch(\Throwable $throwable)
+                    {
+                        $logger->critical($throwable->getMessage(), ['operationId' => $envelope->operationId()]);
+                        /** @todo: retry message? */
+                    }
+                }
+            );
 
             unset($envelope);
         }
@@ -298,9 +294,16 @@ final class ServiceBusKernel
                     ]
                 );
 
-                self::logOutboundMessage($logger, $messageClass, $destination, $outboundEnvelope);
+                self::beforeMessageSend($logger, $messageClass, $destination, $outboundEnvelope);
 
-                $publisher->send($destination, $outboundEnvelope);
+                try
+                {
+                    $publisher->send($destination, $outboundEnvelope);
+                }
+                catch(\Throwable $throwable)
+                {
+                    self::onSendMessageFailed($outboundEnvelope, $messageClass, $throwable, $logger);
+                }
             }
 
             unset($message, $incomingEnvelope, $messageClass, $destinations);
@@ -334,6 +337,58 @@ final class ServiceBusKernel
     }
 
     /**
+     * @param IncomingEnvelope $envelope
+     * @param LoggerInterface  $logger
+     *
+     * @return void
+     */
+    private static function beforeDispatch(IncomingEnvelope $envelope, LoggerInterface $logger): void
+    {
+        $logger->info('Dispatching the message "{messageClass}"', [
+                'messageClass' => \get_class($envelope->denormalized()),
+                'operationId'  => $envelope->operationId(),
+            ]
+        );
+
+        $logger->debug('Incoming message payload: "{rawMessagePayload}"', [
+                'rawMessagePayload'        => $envelope->requestBody(),
+                'normalizedMessagePayload' => $envelope->normalized(),
+                'headers'                  => $envelope->headers(),
+                'operationId'              => $envelope->operationId()
+            ]
+        );
+    }
+
+    /**
+     * @param OutboundEnvelope $outboundEnvelope
+     * @param string           $messageClass
+     * @param \Throwable       $throwable
+     * @param LoggerInterface  $logger
+     *
+     * @return void
+     */
+    private static function onSendMessageFailed(
+        OutboundEnvelope $outboundEnvelope,
+        string $messageClass,
+        \Throwable $throwable,
+        LoggerInterface $logger
+    ): void
+    {
+        $logger->critical(
+            'Error sending message "{messageClass}" to broker: "{exceptionMessage}"', [
+                'messageClass'     => $messageClass,
+                'exceptionMessage' => $throwable->getMessage()
+            ]
+        );
+
+        $logger->debug('The body of the unsent message: {rawMessagePayload}', [
+                'rawMessagePayload' => $outboundEnvelope->messageContent(),
+                'headers'           => $outboundEnvelope->headers()
+            ]
+        );
+    }
+
+    /**
      * @param LoggerInterface  $logger
      * @param string           $messageClass
      * @param Destination      $destination
@@ -341,22 +396,25 @@ final class ServiceBusKernel
      *
      * @return void
      */
-    private static function logOutboundMessage(
+    private static function beforeMessageSend(
         LoggerInterface $logger,
         string $messageClass,
         Destination $destination,
         OutboundEnvelope $outboundEnvelope
     ): void
     {
-        $logger->debug(
-            'Sending a "{messageClass}" message to "{destinationTopic}/{destinationRoutingKey}" with ' .
-            'the body "{rawMessagePayload}" and the headers "{headers}"',
-            [
+        $logger->info(
+            'Sending a "{messageClass}" message to "{destinationTopic}/{destinationRoutingKey}"', [
                 'messageClass'          => $messageClass,
                 'destinationTopic'      => $destination->topicName(),
-                'destinationRoutingKey' => $destination->routingKey(),
-                'rawMessagePayload'     => $outboundEnvelope->messageContent(),
-                'headers'               => $outboundEnvelope->headers()
+                'destinationRoutingKey' => $destination->routingKey()
+            ]
+        );
+
+        $logger->debug(
+            'Sending message: "{rawMessagePayload}"', [
+                'rawMessagePayload' => $outboundEnvelope->messageContent(),
+                'headers'           => $outboundEnvelope->headers()
             ]
         );
     }

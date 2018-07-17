@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Kernel;
 use function Amp\call;
 use Amp\Promise;
 use Desperado\Contracts\Common\Message;
-use Desperado\Contracts\Context\MessageDeliveryInterface;
+use Desperado\Sagas\SagaContext;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -23,7 +23,7 @@ use Psr\Log\LogLevel;
 /**
  * Application-level context
  */
-final class ApplicationContext implements MessageDeliveryInterface
+final class ApplicationContext implements SagaContext
 {
     /**
      * Send message handler

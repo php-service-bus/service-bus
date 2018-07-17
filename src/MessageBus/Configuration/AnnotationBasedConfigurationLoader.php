@@ -45,7 +45,6 @@ final class AnnotationBasedConfigurationLoader implements ConfigurationLoader
         $collection = new MessageHandlerCollection();
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         $reflectionClass = new \ReflectionClass($service);
 
         foreach($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod)

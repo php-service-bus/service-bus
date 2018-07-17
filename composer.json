@@ -14,18 +14,12 @@
   "autoload": {
     "psr-4": {
       "Desperado\\ServiceBus\\": "src/"
-    },
-    "files": [
-      "src/MessageBus/functions.php"
-    ]
+    }
   },
   "autoload-dev": {
     "psr-4": {
       "Desperado\\ServiceBus\\Tests\\": "tests/"
-    },
-    "files": [
-      "src/MessageBus/functions.php"
-    ]
+    }
   },
   "require": {
     "php": ">=7.2",
