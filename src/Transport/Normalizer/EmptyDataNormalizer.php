@@ -29,23 +29,14 @@ final class EmptyDataNormalizer implements NormalizerInterface
 
     /**
      * @inheritdoc
+     *
+     * @throws \ReflectionException
      */
     public function supportsNormalization($data, $format = null): bool
     {
         if(true === \is_object($data))
         {
-            /** @var object $data */
-
-            $closure = \Closure::bind(
-                function(): array
-                {
-                    return \get_object_vars($this);
-                },
-                $data,
-                $data
-            );
-
-            return 0 === \count($closure());
+            return 0 === \count((new \ReflectionClass($data))->getProperties());
         }
 
         return false;
