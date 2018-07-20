@@ -20,6 +20,7 @@ use Amp\Log\ConsoleFormatter;
 use Amp\Log\StreamHandler;
 use Desperado\ServiceBus\Logger\Processors\ExtraDataProcessor;
 use Desperado\ServiceBus\Logger\Processors\HostNameProcessor;
+use Psr\Log\LogLevel;
 
 /**
  * Create default logger instance
@@ -45,26 +46,29 @@ final class DefaultLoggerFactory
      *
      * @param string      $entryPointName
      * @param Environment $environment
+     * @param string      $logLevel
      *
      * @return Logger
      */
-    public static function build(string $entryPointName, Environment $environment): Logger
+    public static function build(string $entryPointName, Environment $environment, string $logLevel = LogLevel::DEBUG): Logger
     {
         $self                 = new self();
         $self->entryPointName = $entryPointName;
         $self->environment    = $environment;
 
-        return new Logger($entryPointName, $self->getHandlers(), $self->getProcessors());
+        return new Logger($entryPointName, $self->getHandlers($logLevel), $self->getProcessors());
     }
 
     /**
      * Get log handlers collection
      *
+     * @param string $logLevel
+     *
      * @return \Monolog\Handler\AbstractProcessingHandler[]
      */
-    private function getHandlers(): array
+    private function getHandlers(string $logLevel): array
     {
-        $logStreamHandler = new StreamHandler(new ResourceOutputStream(\STDOUT));
+        $logStreamHandler = new StreamHandler(new ResourceOutputStream(\STDOUT), $logLevel);
         $logStreamHandler->setFormatter(new ConsoleFormatter());
 
         return [$logStreamHandler];
