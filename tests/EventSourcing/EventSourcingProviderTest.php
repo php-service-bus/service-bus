@@ -17,7 +17,7 @@ use Amp\Coroutine;
 use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
-use Desperado\ServiceBus\EventSourcing\Contract\EventSourcing\AggregateCreated;
+use Desperado\ServiceBus\EventSourcing\Contract\AggregateCreated;
 use Desperado\ServiceBus\EventSourcing\EventStream\AggregateEventStream;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql\SqlEventStreamStore;
