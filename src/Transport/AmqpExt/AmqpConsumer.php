@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -14,12 +15,13 @@ namespace Desperado\ServiceBus\Transport\AmqpExt;
 
 use function Amp\asyncCall;
 use Amp\Loop;
+use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Transport\Consumer;
-use Desperado\ServiceBus\Transport\Decoder\MessageDecoder;
-use Desperado\ServiceBus\Transport\Exceptions\DecodeMessageFailed;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
+use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
+use Desperado\ServiceBus\Transport\Marshal\Exceptions\DecodeMessageFailed;
 use Psr\Log\LoggerInterface;
-use Ramsey\Uuid\Uuid;
+use Psr\Log\NullLogger;
 
 /**
  * Amqp extension-based consumer
@@ -27,7 +29,7 @@ use Ramsey\Uuid\Uuid;
 final class AmqpConsumer implements Consumer
 {
     public const  STOP_MESSAGE_CONTENT                 = 'quit';
-    private const ITERATIONS_BEFORE_GARBAGE_COLLECTION = 5000;
+    private const ITERATIONS_BEFORE_GARBAGE_COLLECTION = 10000;
 
     /**
      * Listen queue
@@ -39,7 +41,7 @@ final class AmqpConsumer implements Consumer
     /**
      * Restore the message object from string
      *
-     * @var MessageDecoder
+     * @var TransportMessageDecoder
      */
     private $messageDecoder;
 
@@ -70,19 +72,19 @@ final class AmqpConsumer implements Consumer
     private $cancelSubscriptionReason;
 
     /**
-     * @param \AMQPQueue      $listenQueue
-     * @param MessageDecoder  $messageDecoder
-     * @param LoggerInterface $logger
+     * @param \AMQPQueue              $listenQueue
+     * @param TransportMessageDecoder $messageDecoder
+     * @param LoggerInterface|null    $logger
      */
     public function __construct(
         \AMQPQueue $listenQueue,
-        MessageDecoder $messageDecoder,
-        LoggerInterface $logger
+        TransportMessageDecoder $messageDecoder,
+        LoggerInterface $logger = null
     )
     {
         $this->listenQueue    = $listenQueue;
         $this->messageDecoder = $messageDecoder;
-        $this->logger         = $logger;
+        $this->logger         = $logger ?? new NullLogger();
     }
 
     /**
@@ -93,7 +95,7 @@ final class AmqpConsumer implements Consumer
         Loop::run();
 
         $processor         = $this->messageHandler($messageProcessor);
-        $this->consumerTag = \sha1(Uuid::uuid4()->toString());
+        $this->consumerTag = \sha1(uuid());
 
         try
         {
@@ -159,7 +161,7 @@ final class AmqpConsumer implements Consumer
      */
     private function process(\AMQPEnvelope $envelope, callable $messageProcessor): void
     {
-        $operationId = Uuid::uuid4()->toString();
+        $operationId = uuid();
 
         try
         {
@@ -187,16 +189,16 @@ final class AmqpConsumer implements Consumer
     /**
      * Create incoming message envelope
      *
-     * @param string         $operationId
-     * @param \AMQPEnvelope  $envelope
-     * @param MessageDecoder $decoder
+     * @param string                  $operationId
+     * @param \AMQPEnvelope           $envelope
+     * @param TransportMessageDecoder $decoder
      *
      * @return IncomingEnvelope
      */
     private static function transformEnvelope(
         string $operationId,
         \AMQPEnvelope $envelope,
-        MessageDecoder $decoder
+        TransportMessageDecoder $decoder
     ): IncomingEnvelope
     {
         $body         = $envelope->getBody();
@@ -211,7 +213,7 @@ final class AmqpConsumer implements Consumer
                 $unserialized['message']
             ),
             /** @todo: only custom headers */
-            $envelope->getHeaders()
+            []
         );
     }
 

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -12,10 +13,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport\Exceptions;
 
+use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
+
 /**
  * Transport level exception marker
  */
-interface TransportFail
+interface TransportFail extends ServiceBusExceptionMarker
 {
 
 }

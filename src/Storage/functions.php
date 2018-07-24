@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
+ *
+ * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @license MIT
+ * @license https://opensource.org/licenses/MIT
+ */
+
+declare(strict_types = 1);
+
+namespace Desperado\ServiceBus\Storage;
+
+use function Amp\call;
+use Amp\Promise;
+use Amp\Success;
+use Desperado\ServiceBus\Storage\Exceptions\OneResultExpected;
+
+/**
+ * Collect iterator data
+ *
+ * @param ResultSet $iterator
+ *
+ * @return Promise
+ *
+ * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
+ */
+function fetchAll(ResultSet $iterator): Promise
+{
+    /** @psalm-suppress InvalidArgument */
+    return call(
+        static function(ResultSet $iterator): \Generator
+        {
+            $array = [];
+
+            while(yield $iterator->advance())
+            {
+                $array[] = $iterator->getCurrent();
+            }
+
+            return yield new Success($array);
+        },
+        $iterator
+    );
+}
+
+/**
+ * Extract 1 result
+ *
+ * @param ResultSet $iterator
+ *
+ * @return Promise
+ *
+ * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
+ * @throws \Desperado\ServiceBus\Storage\Exceptions\OneResultExpected
+ */
+function fetchOne(ResultSet $iterator): Promise
+{
+    /** @psalm-suppress InvalidArgument */
+    return call(
+        static function(ResultSet $iterator): \Generator
+        {
+            $collection   = yield fetchAll($iterator);
+            $resultsCount = \count($collection);
+
+            if(0 === $resultsCount || 1 === $resultsCount)
+            {
+                $endElement = \end($collection);
+
+                return yield new Success(false !== $endElement ? $endElement : null);
+            }
+
+            throw new OneResultExpected(
+                \sprintf(
+                    'A single record was requested, but the result of the query execution contains several ("%d")',
+                    $resultsCount
+                )
+            );
+        },
+        $iterator
+    );
+}

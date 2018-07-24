@@ -11,8 +11,9 @@ matrix:
 before_script:
   - composer self-update
   - composer install --no-interaction
+  - psql -c 'CREATE DATABASE test;' -U postgres
 
-script: ./vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml.dist --coverage-text --testdox ./tests
+script: ./vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml --coverage-text --testdox ./tests
 
 notifications:
   email:
@@ -21,3 +22,9 @@ notifications:
 cache:
   directories:
     - $HOME/.composer/cache
+
+services:
+  - postgresql
+
+install:
+  - travis-install-pq.sh

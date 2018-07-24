@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -18,8 +19,6 @@ use Monolog\Processor as MonologProcessors;
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\Log\ConsoleFormatter;
 use Amp\Log\StreamHandler;
-use Desperado\ServiceBus\Logger\Processors\ExtraDataProcessor;
-use Desperado\ServiceBus\Logger\Processors\HostNameProcessor;
 use Psr\Log\LogLevel;
 
 /**
@@ -50,7 +49,11 @@ final class DefaultLoggerFactory
      *
      * @return Logger
      */
-    public static function build(string $entryPointName, Environment $environment, string $logLevel = LogLevel::DEBUG): Logger
+    public static function build(
+        string $entryPointName,
+        Environment $environment,
+        string $logLevel = LogLevel::DEBUG
+    ): Logger
     {
         $self                 = new self();
         $self->entryPointName = $entryPointName;
@@ -85,10 +88,9 @@ final class DefaultLoggerFactory
             new MonologProcessors\ProcessIdProcessor(),
             new MonologProcessors\PsrLogMessageProcessor(),
             new MonologProcessors\MemoryUsageProcessor(),
-            new HostNameProcessor(),
-            new ExtraDataProcessor([
-                'entry_point' => $this->entryPointName,
-                'env'         => (string) $this->environment
+            new MonologProcessors\TagProcessor([
+                'entryPoint' => $this->entryPointName,
+                'env'        => (string) $this->environment
             ])
         ];
     }
