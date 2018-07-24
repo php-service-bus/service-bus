@@ -16,8 +16,8 @@ namespace Desperado\ServiceBus\Sagas;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
-use Desperado\ServiceBus\Sagas\Contract\Sagas\SagaCreated;
-use Desperado\ServiceBus\Sagas\Contract\Sagas\SagaStatusChanged;
+use Desperado\ServiceBus\Sagas\Contract\SagaCreated;
+use Desperado\ServiceBus\Sagas\Contract\SagaStatusChanged;
 use Desperado\ServiceBus\Sagas\Exceptions\ChangeSagaStateFailed;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier;
 

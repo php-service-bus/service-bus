@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
@@ -50,6 +50,7 @@ function readReflectionPropertyValue(object $object, string $propertyName)
     {
         $reflector = new \ReflectionObject($object);
 
+        /** @noinspection LoopWhichDoesNotLoopInspection */
         while($reflector = $reflector->getParentClass())
         {
             $attribute = $reflector->getProperty($propertyName);
@@ -60,9 +61,11 @@ function readReflectionPropertyValue(object $object, string $propertyName)
 
     if(null !== $attribute)
     {
+        /** @var \ReflectionProperty $attribute */
+
         if(true === $attribute->isPublic())
         {
-            return $object->{$attributeName};
+            return $object->{$propertyName};
         }
 
         $attribute->setAccessible(true);

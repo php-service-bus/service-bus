@@ -65,7 +65,7 @@ final class SagaProviderTest extends TestCase
     {
         parent::tearDown();
 
-        unset($this->serializer, $this->provider, $this->store, $this->adapter);
+        unset($this->provider, $this->store, $this->adapter);
     }
 
     /**

@@ -21,7 +21,7 @@ use Symfony\Component\Serializer;
 /**
  * Symfony normalizer (property-based)
  */
-class SymfonyPropertyNormalizer
+class SymfonyPropertyNormalizer implements Normalizer
 {
     /**
      * Symfony serializer

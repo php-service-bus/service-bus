@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Sagas\Contract\Sagas;
+namespace Desperado\ServiceBus\Sagas\Contract;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Sagas\SagaId;

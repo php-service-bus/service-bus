@@ -73,7 +73,8 @@ final class SqlEventStreamStore implements AggregateStore
 
                     throw $throwable;
                 }
-            }
+            },
+            $aggregateEventStream
         );
     }
 
@@ -145,7 +146,8 @@ final class SqlEventStreamStore implements AggregateStore
                 }
 
                 return yield new Success($aggregateEventStream);
-            }
+            },
+            $id, $fromVersion, $toVersion
         );
     }
 
