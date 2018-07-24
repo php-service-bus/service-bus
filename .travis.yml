@@ -27,4 +27,4 @@ services:
   - postgresql
 
 install:
-  - travis-install-pq.sh
+  - ./travis-install-pq.sh
