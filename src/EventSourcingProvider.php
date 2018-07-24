@@ -22,7 +22,7 @@ use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
 use Desperado\ServiceBus\EventSourcing\AggregateSnapshot;
-use Desperado\ServiceBus\EventSourcing\Contract\EventSourcing\AggregateCreated;
+use Desperado\ServiceBus\EventSourcing\Contract\AggregateCreated;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\LoadStreamFailed;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId;

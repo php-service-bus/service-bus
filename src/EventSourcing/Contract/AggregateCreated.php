@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\EventSourcing\Contract\EventSourcing;
+namespace Desperado\ServiceBus\EventSourcing\Contract;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 

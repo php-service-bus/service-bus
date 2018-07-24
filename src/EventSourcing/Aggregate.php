@@ -13,8 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\EventSourcing;
 
-use Desperado\ServiceBus\EventSourcing\Contract\EventSourcing\AggregateClosed;
-use Desperado\ServiceBus\EventSourcing\Contract\EventSourcing\AggregateCreated;
+use Desperado\ServiceBus\EventSourcing\Contract\AggregateClosed;
+use Desperado\ServiceBus\EventSourcing\Contract\AggregateCreated;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use function Desperado\ServiceBus\Common\uuid;
