@@ -36,14 +36,55 @@ function invokeReflectionMethod(object $object, string $methodName, ...$paramete
  *
  * @return mixed
  *
- * @throws \ReflectionException
+ * @throws \Throwable
  */
-function readPropertyValue(object $object, string $propertyName)
+function readReflectionPropertyValue(object $object, string $propertyName)
 {
-    $reflectionProperty = new \ReflectionProperty($object, $propertyName);
-    $reflectionProperty->setAccessible(true);
+    $attribute = null;
 
-    return $reflectionProperty->getValue($object);
+    try
+    {
+        $attribute = new \ReflectionProperty($object, $propertyName);
+    }
+    catch(\ReflectionException $e)
+    {
+        $reflector = new \ReflectionObject($object);
+
+        while($reflector = $reflector->getParentClass())
+        {
+            try
+            {
+                $attribute = $reflector->getProperty($propertyName);
+
+                break;
+            }
+            catch(\ReflectionException $e)
+            {
+
+            }
+        }
+    }
+
+    if(null !== $attribute)
+    {
+        if(true === $attribute->isPublic())
+        {
+            return $object->{$attributeName};
+        }
+
+        $attribute->setAccessible(true);
+        $value = $attribute->getValue($object);
+        $attribute->setAccessible(false);
+
+        return $value;
+    }
+
+    throw new \InvalidArgumentException(
+        \sprintf(
+            'Attribute "%s" not found in object.',
+            $propertyName
+        )
+    );
 }
 
 /**

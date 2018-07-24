@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Marshal\Denormalizer;
 
 use Desperado\ServiceBus\Marshal\Denormalizer\Extensions\EmptyDataDenormalizer;
+use Desperado\ServiceBus\Marshal\Normalizer\Extensions\PropertyNormalizerWrapper;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer;
 
@@ -33,7 +34,7 @@ final class SymfonyPropertyDenormalizer implements Denormalizer
     {
         $this->serializer = new Serializer\Serializer([
                 new Serializer\Normalizer\ArrayDenormalizer(),
-                new Serializer\Normalizer\PropertyNormalizer(
+                new PropertyNormalizerWrapper(
                     null,
                     null,
                     new PhpDocExtractor()

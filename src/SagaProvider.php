@@ -19,7 +19,7 @@ use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
-use function Desperado\ServiceBus\Common\readPropertyValue;
+use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use Desperado\ServiceBus\Sagas\Exceptions\DuplicateSagaId;
 use Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed;
 use Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed;
@@ -262,9 +262,9 @@ final class SagaProvider
                 $events   = invokeReflectionMethod($saga, 'raisedEvents');
 
                 /** @var \DateTimeImmutable $createdAt */
-                $createdAt = readPropertyValue($saga, 'createdAt');
+                $createdAt = readReflectionPropertyValue($saga, 'createdAt');
                 /** @var \DateTimeImmutable|null $closedAt */
-                $closedAt = readPropertyValue($saga, 'closedAt');
+                $closedAt = readReflectionPropertyValue($saga, 'closedAt');
 
                 $savedSaga = StoredSaga::create(
                     $saga->id(),
