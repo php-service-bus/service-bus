@@ -47,6 +47,7 @@
     "symfony/cache": "^v4.1",
     "symfony/dependency-injection": "v4.1",
     "symfony/config": "v4.1",
+    "symfony/dotenv": "^4.1",
     "symfony/yaml": "v4.1",
     "phpdocumentor/reflection-docblock": "^4.0",
     "doctrine/annotations": "v1.6.0",

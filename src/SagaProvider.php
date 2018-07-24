@@ -118,7 +118,7 @@ final class SagaProvider
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise<\Desperado\Sagas\Saga|null>
+     * @return Promise<\Desperado\ServiceBus\Sagas\Saga|null>
      *
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed
      */
