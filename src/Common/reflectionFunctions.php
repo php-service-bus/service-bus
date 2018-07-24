@@ -52,16 +52,9 @@ function readReflectionPropertyValue(object $object, string $propertyName)
 
         while($reflector = $reflector->getParentClass())
         {
-            try
-            {
-                $attribute = $reflector->getProperty($propertyName);
+            $attribute = $reflector->getProperty($propertyName);
 
-                break;
-            }
-            catch(\ReflectionException $e)
-            {
-
-            }
+            break;
         }
     }
 
