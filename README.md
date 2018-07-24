@@ -7,5 +7,3 @@
 [![License](https://poser.pugx.org/mmasiukevich/service-bus/license)](https://packagist.org/packages/mmasiukevich/service-bus)
 
 ### Still in development. Currently not suitable for use
-
-@see [service-bus-demo](https://github.com/mmasiukevich/service-bus-demo)
