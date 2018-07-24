@@ -11,10 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\HttpClient;
+namespace Desperado\ServiceBus\HttpClient\Data;
+
+use Desperado\ServiceBus\HttpClient\FormBody;
 
 /**
- *
+ * Http request data
  */
 final class HttpRequest
 {
@@ -96,41 +98,46 @@ final class HttpRequest
     }
 
     /**
-     * Get request http method
+     * Receive request http method
      *
      * @return string
      */
-    public function getMethod(): string
+    public function httpMethod(): string
     {
         return $this->method;
     }
 
     /**
-     * Get endpoint URL
+     * Receive endpoint URL
      *
      * @return string
      */
-    public function getUrl(): string
+    public function url(): string
     {
         return $this->url;
     }
 
     /**
-     * Get request headers
+     * Receive request headers
      *
      * @return array
      */
-    public function getHeaders(): array
+    public function headers(): array
     {
-        return null !== $this->body ? $this->body->getHeaders() : $this->headers;
+        if($this->body instanceof FormBody)
+        {
+            return $this->body->headers();
+        }
+
+        return $this->headers;
     }
 
     /**
-     * Get request payload
+     * Receive request body
      *
      * @return FormBody|string|null
      */
-    public function getBody()
+    public function body()
     {
         return $this->body;
     }

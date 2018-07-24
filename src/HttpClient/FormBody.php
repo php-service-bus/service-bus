@@ -11,10 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\HttpClient\Data;
+namespace Desperado\ServiceBus\HttpClient;
 
 use Amp\ByteStream\InputStream;
 use Amp\Promise;
+use Desperado\ServiceBus\HttpClient\Data\InputFilePath;
 
 /**
  * Form data
@@ -28,7 +29,7 @@ interface FormBody
      *
      * @return static
      */
-    public static function fromParameters(array $fields): self;
+    public static function fromParameters(array $fields);
 
     /**
      * Add a file field to the form entity body
