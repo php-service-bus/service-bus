@@ -49,7 +49,7 @@ final class AmpPostgreSQLAdapterTest extends BaseStorageAdapterTest
         }
 
         return StorageAdapterFactory::create(
-            StorageAdapterFactory::ADAPTER_ASYNC_POSTGRES,
+            AmpPostgreSQLAdapter::class,
             $connectionDSN
         );
     }
