@@ -50,16 +50,11 @@ final class AmqpConfiguration
     /**
      * @param string $connectionDSN
      *
-     * @return self
-     *
      * @throws \Desperado\ServiceBus\Transport\Exceptions\InvalidConnectionParameters
      */
-    public static function create(string $connectionDSN): self
+    public function __construct(string $connectionDSN)
     {
-        $self       = new self();
-        $self->data = self::extractConnectionParameters($connectionDSN);
-
-        return $self;
+        $this->data = self::extractConnectionParameters($connectionDSN);
     }
 
     /**
@@ -69,14 +64,8 @@ final class AmqpConfiguration
      */
     public static function createLocalhost(): self
     {
-        $self = new self();
-
         /** @noinspection PhpUnhandledExceptionInspection */
-        $self->data = self::extractConnectionParameters(
-            'amqp://guest:guest@localhost:5672'
-        );
-
-        return $self;
+        return new self('amqp://guest:guest@localhost:5672');
     }
 
     /**
@@ -221,13 +210,5 @@ final class AmqpConfiguration
         \parse_str($query, $output);
 
         return $output;
-    }
-
-    /**
-     * Close constructor
-     */
-    private function __construct()
-    {
-
     }
 }

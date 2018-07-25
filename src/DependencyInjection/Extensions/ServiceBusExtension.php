@@ -31,6 +31,6 @@ final class ServiceBusExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader($container, new FileLocator());
-        $loader->load(__DIR__ . '/service_bus.yaml');
+        $loader->load(__DIR__ . '/../service_bus.yaml');
     }
 }

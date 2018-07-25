@@ -114,6 +114,16 @@ final class MessageBusBuilder
     }
 
     /**
+     * Build message bus
+     *
+     * @return MessageBus
+     */
+    public function compile(): MessageBus
+    {
+        return new MessageBus();
+    }
+
+    /**
      * @param Handler $handler
      *
      * @return void

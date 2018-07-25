@@ -27,6 +27,7 @@ include __DIR__ . '/../vendor/autoload.php';
 $container = Bootstrap::withDotEnv(__DIR__ . '/.env')
     ->useAmqpExtTransport((string) \getenv('TRANSPORT_CONNECTION_DSN'))
     ->useSqlStorage(DoctrineDBALAdapter::class, (string) \getenv('DATABASE_CONNECTION_DSN'))
+    ->useCustomCacheDirectory(\sys_get_temp_dir())
     ->boot();
 
 $mainTopic = AmqpTopic::direct((string) \getenv('TRANSPORT_TOPIC'));

@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 
 /**
- *
+ * Event serialization
  */
 interface AggregateEventSerializer
 {
