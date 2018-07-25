@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Application\KernelContext;
-use Desperado\ServiceBus\MessageBus\MessageHandler\Argument;
+use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerArgument;
 
 /**
  * Responsible for resolving the value of an argument
@@ -25,20 +25,20 @@ interface ArgumentResolver
     /**
      * Whether this resolver can resolve the value for the given Argument
      *
-     * @param Argument $argument
+     * @param HandlerArgument $argument
      *
      * @return bool
      */
-    public function supports(Argument $argument): bool;
+    public function supports(HandlerArgument $argument): bool;
 
     /**
      * Resolve argument value
      *
-     * @param Message       $message
-     * @param KernelContext $applicationContext
-     * @param Argument      $argument
+     * @param Message         $message
+     * @param KernelContext   $applicationContext
+     * @param HandlerArgument $argument
      *
      * @return mixed
      */
-    public function resolve(Message $message, KernelContext $applicationContext, Argument $argument);
+    public function resolve(Message $message, KernelContext $applicationContext, HandlerArgument $argument);
 }

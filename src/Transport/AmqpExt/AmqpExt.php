@@ -24,13 +24,14 @@ use Desperado\ServiceBus\Transport\Publisher;
 use Desperado\ServiceBus\Transport\Queue;
 use Desperado\ServiceBus\Transport\QueueBind;
 use Desperado\ServiceBus\Transport\Topic;
+use Desperado\ServiceBus\Transport\Transport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
  * Amqp-ext based transport implementation
  */
-final class AmqpExt
+final class AmqpExt implements Transport
 {
     /**
      * Represents a AMQP connection between PHP and a AMQP server
@@ -136,6 +137,12 @@ final class AmqpExt
     {
         try
         {
+            /** Exchange already added */
+            if(true === isset($this->exchanges[(string) $topic]))
+            {
+                return;
+            }
+
             /** @var AmqpTopic $topic */
 
             $exchange = new \AMQPExchange($this->channel);
@@ -165,6 +172,12 @@ final class AmqpExt
     {
         try
         {
+            /** Queue already added */
+            if(true === isset($this->queues[(string) $queue]))
+            {
+                return;
+            }
+
             /** @var AmqpQueue $queue */
 
             $amqpQueue = new \AMQPQueue($this->channel);

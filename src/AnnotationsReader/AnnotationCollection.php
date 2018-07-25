@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\AnnotationsReader;
 /**
  * Annotations collection
  */
-final class AnnotationCollection implements \Countable
+final class AnnotationCollection implements \Countable, \IteratorAggregate
 {
     /**
      * Annotations VO
@@ -25,10 +25,12 @@ final class AnnotationCollection implements \Countable
      */
     private $collection;
 
-    public function __construct()
+    /**
+     * @param array $annotations
+     */
+    public function __construct(array $annotations = [])
     {
-        /** @var array<empty, empty> collection */
-        $this->collection = [];
+        $this->push($annotations);
     }
 
     /**
@@ -63,11 +65,11 @@ final class AnnotationCollection implements \Countable
      *
      * @param callable<\Desperado\ServiceBus\AnnotationsReader\Annotation> $callable
      *
-     * @return array<mixed, \Desperado\ServiceBus\AnnotationsReader\Annotation>
+     * @return AnnotationCollection
      */
-    public function map(callable $callable): array
+    public function map(callable $callable): AnnotationCollection
     {
-        return \array_map($callable, $this->collection);
+        return new AnnotationCollection(\array_map($callable, $this->collection));
     }
 
     /**
@@ -75,19 +77,19 @@ final class AnnotationCollection implements \Countable
      *
      * @param callable<\Desperado\ServiceBus\AnnotationsReader\Annotation> $callable
      *
-     * @return array<mixed, \Desperado\ServiceBus\AnnotationsReader\Annotation>
+     * @return AnnotationCollection
      */
-    public function filter(callable $callable): array
+    public function filter(callable $callable): AnnotationCollection
     {
-        return \array_filter($this->collection, $callable);
+        return new AnnotationCollection(\array_filter($this->collection, $callable));
     }
 
     /**
      * Find all method-level annotations
      *
-     * @return array<mixed, \Desperado\ServiceBus\AnnotationsReader\Annotation>
+     * @return AnnotationCollection
      */
-    public function methodLevelAnnotations(): array
+    public function methodLevelAnnotations(): AnnotationCollection
     {
         return $this->filter(
             static function(Annotation $annotation): ?Annotation
@@ -102,9 +104,9 @@ final class AnnotationCollection implements \Countable
     /**
      * Find all class-level annotations
      *
-     * @return array<mixed, \Desperado\ServiceBus\AnnotationsReader\Annotation>
+     * @return AnnotationCollection
      */
-    public function classLevelAnnotations(): array
+    public function classLevelAnnotations(): AnnotationCollection
     {
         return $this->filter(
             static function(Annotation $annotation): ?Annotation
@@ -117,13 +119,11 @@ final class AnnotationCollection implements \Countable
     }
 
     /**
-     * Receive all annotations
-     *
-     * @return array<mixed, \Desperado\ServiceBus\AnnotationsReader\Annotation>
+     * @inheritdoc
      */
-    public function all(): array
+    public function getIterator(): \Generator
     {
-        return $this->collection;
+        return yield from $this->collection;
     }
 
     /**

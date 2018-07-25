@@ -11,36 +11,33 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\MessageBus\Processor;
+namespace Desperado\ServiceBus\Sagas\Configuration;
 
 use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
-use Desperado\ServiceBus\Common\Contract\Messages\Event;
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
-use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use Desperado\ServiceBus\Application\KernelContext;
+use Desperado\ServiceBus\Common\Contract\Messages\Event;
+use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use Desperado\ServiceBus\SagaProvider;
+use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound;
+use Desperado\ServiceBus\Sagas\Configuration\Exceptions\ReceiveIdMethodNotFound;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier;
-use Desperado\ServiceBus\Sagas\Exceptions\Processor\IdentifierClassNotFound;
-use Desperado\ServiceBus\Sagas\Exceptions\Processor\ReceiveIdMethodNotFound;
 use Desperado\ServiceBus\Sagas\SagaId;
-use Desperado\ServiceBus\Sagas\SagaMetadata;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * Sagas listeners processor
+ * Virtual service (is created for each message) for consistent work with message handlers
  */
-final class SagaProcessor implements Processor
+final class SagaEventListenerProcessor
 {
     /**
-     * Basic information about saga
+     * Listener options
      *
-     * @var SagaMetadata
+     * @var SagaListenerOptions
      */
-    private $sagaMetadata;
+    private $sagaListenerOptions;
 
     /**
      * Saga provider
@@ -57,44 +54,49 @@ final class SagaProcessor implements Processor
     private $logger;
 
     /**
-     * @param SagaMetadata         $sagaMetadata
+     * @param SagaListenerOptions  $sagaListenerOptions
      * @param SagaProvider         $sagaProvider
      * @param LoggerInterface|null $logger
      */
-    public function __construct(SagaMetadata $sagaMetadata, SagaProvider $sagaProvider, LoggerInterface $logger = null)
+    public function __construct(
+        SagaListenerOptions $sagaListenerOptions,
+        SagaProvider $sagaProvider,
+        LoggerInterface $logger = null
+    )
     {
-        $this->sagaMetadata = $sagaMetadata;
-        $this->sagaProvider = $sagaProvider;
-        $this->logger       = $logger ?? new NullLogger();
+        $this->sagaListenerOptions = $sagaListenerOptions;
+        $this->sagaProvider        = $sagaProvider;
+        $this->logger              = $logger ?? new NullLogger();
     }
 
     /**
-     * @inheritdoc
+     * Apply received event
      *
-     * @throws \Desperado\ServiceBus\Sagas\Exceptions\Processor\ReceiveIdMethodNotFound
-     * @throws \Desperado\ServiceBus\Sagas\Exceptions\Processor\IdentifierClassNotFound
-     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
+     * @param Event         $event
+     * @param KernelContext $context
+     *
+     * @return Promise
      */
-    public function __invoke(Message $message, KernelContext $context): Promise
+    public function execute(Event $event, KernelContext $context): Promise
     {
-        $sagaMetadata = $this->sagaMetadata;
-        $sagaProvider = $this->sagaProvider;
-        $logger       = $this->logger;
+        $sagaListenerOptions = $this->sagaListenerOptions;
+        $sagaProvider        = $this->sagaProvider;
+        $logger              = $this->logger;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Message $message, KernelContext $context) use ($sagaMetadata, $sagaProvider, $logger): \Generator
+            static function(Event $event, KernelContext $context) use (
+                $sagaListenerOptions, $sagaProvider, $logger
+            ): \Generator
             {
-                /** @var Event $message $id */
-
-                $id = self::searchSagaIdentifier($message, $sagaMetadata);
+                $id = self::searchSagaIdentifier($event, $sagaListenerOptions);
 
                 /** @var \Desperado\ServiceBus\Sagas\Saga|null $saga */
                 $saga = yield $sagaProvider->obtain($id, $context);
 
                 if(null !== $saga)
                 {
-                    invokeReflectionMethod($saga, 'applyEvent', $message);
+                    invokeReflectionMethod($saga, 'applyEvent', $event);
 
                     yield $sagaProvider->save($saga);
 
@@ -109,7 +111,7 @@ final class SagaProcessor implements Processor
 
                 return yield new Success();
             },
-            $message,
+            $event,
             $context
         );
     }
@@ -117,22 +119,22 @@ final class SagaProcessor implements Processor
     /**
      * Search saga identifier object
      *
-     * @param Event        $event
-     * @param SagaMetadata $sagaMetadata
+     * @param Event               $event
+     * @param SagaListenerOptions $sagaListenerOptions
      *
      * @return SagaId
      *
-     * @throws \Desperado\ServiceBus\Sagas\Exceptions\Processor\ReceiveIdMethodNotFound
-     * @throws \Desperado\ServiceBus\Sagas\Exceptions\Processor\IdentifierClassNotFound
+     * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\ReceiveIdMethodNotFound
+     * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
      */
-    private static function searchSagaIdentifier(Event $event, SagaMetadata $sagaMetadata): SagaId
+    private static function searchSagaIdentifier(Event $event, SagaListenerOptions $sagaListenerOptions): SagaId
     {
-        $identifierClass = $sagaMetadata->identifierClass();
+        $identifierClass = $sagaListenerOptions->identifierClass();
 
         if(true === \class_exists($identifierClass))
         {
-            $propertyName = \lcfirst($sagaMetadata->containingIdentifierProperty());
+            $propertyName = \lcfirst($sagaListenerOptions->containingIdentifierProperty());
 
             $methodNames = [
                 $propertyName,
@@ -146,7 +148,7 @@ final class SagaProcessor implements Processor
                     return self::identifierInstantiator(
                         $identifierClass,
                         $event->{$methodName}(),
-                        $sagaMetadata->sagaClass()
+                        $sagaListenerOptions->sagaClass()
                     );
                 }
             }
@@ -154,7 +156,7 @@ final class SagaProcessor implements Processor
             throw new ReceiveIdMethodNotFound($event, $methodNames);
         }
 
-        throw new IdentifierClassNotFound($identifierClass, $sagaMetadata->sagaClass());
+        throw new IdentifierClassNotFound($identifierClass, $sagaListenerOptions->sagaClass());
     }
 
     /**

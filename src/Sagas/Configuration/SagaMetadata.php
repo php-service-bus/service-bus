@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Sagas;
+namespace Desperado\ServiceBus\Sagas\Configuration;
 
 /**
  * Basic information about saga
@@ -38,15 +38,31 @@ final class SagaMetadata
     private $containingIdentifierProperty;
 
     /**
+     * Saga expire date modifier
+     *
+     * @see http://php.net/manual/ru/datetime.formats.relative.php
+     *
+     * @var string
+     */
+    private $expireDateModifier;
+
+    /**
      * @param string $sagaClass
      * @param string $identifierClass
      * @param string $containingIdentifierProperty
+     * @param string $expireDateModifier
      */
-    public function __construct(string $sagaClass, string $identifierClass, string $containingIdentifierProperty)
+    public function __construct(
+        string $sagaClass,
+        string $identifierClass,
+        string $containingIdentifierProperty,
+        string $expireDateModifier
+    )
     {
         $this->sagaClass                    = $sagaClass;
         $this->identifierClass              = $identifierClass;
         $this->containingIdentifierProperty = $containingIdentifierProperty;
+        $this->expireDateModifier           = $expireDateModifier;
     }
 
     /**
@@ -57,6 +73,16 @@ final class SagaMetadata
     public function sagaClass(): string
     {
         return $this->sagaClass;
+    }
+
+    /**
+     * Receive saga expire date modifier
+     *
+     * @return string
+     */
+    public function expireDateModifier(): string
+    {
+        return $this->expireDateModifier;
     }
 
     /**

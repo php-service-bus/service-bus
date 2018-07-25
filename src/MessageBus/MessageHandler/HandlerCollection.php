@@ -14,9 +14,47 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\MessageBus\MessageHandler;
 
 /**
- *
+ * Handlers list
  */
-final class HandlerCollection
+final class HandlerCollection implements \IteratorAggregate, \Countable
 {
+    /**
+     * Message handlers
+     *
+     * @var array<mixed, \Desperado\ServiceBus\MessageBus\MessageHandler\Handler>
+     */
+    private $collection;
 
+    public function __construct()
+    {
+        $this->collection = [];
+    }
+
+    /**
+     * Push handler to collection
+     *
+     * @param Handler $handler
+     *
+     * @return void
+     */
+    public function push(Handler $handler): void
+    {
+        $this->collection[\spl_object_hash($handler)] = $handler;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIterator(): \Generator
+    {
+        yield from $this->collection;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function count(): int
+    {
+        return \count($this->collection);
+    }
 }

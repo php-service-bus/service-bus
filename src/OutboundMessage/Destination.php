@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Transport;
+namespace Desperado\ServiceBus\OutboundMessage;
 
 /**
  * Information about where to send a message

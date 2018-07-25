@@ -16,10 +16,10 @@ namespace Desperado\ServiceBus\MessageBus\MessageHandler;
 /**
  * Collection of arguments to the message handler
  */
-final class ArgumentCollection implements \IteratorAggregate, \Countable
+final class HandlerArgumentCollection implements \IteratorAggregate, \Countable
 {
     /**
-     * @var array<string, \Desperado\ServiceBus\MessageBus\MessageHandler\Argument>
+     * @var array<string, \Desperado\ServiceBus\MessageBus\MessageHandler\HandlerArgument>
      */
     private $collection;
 
@@ -29,11 +29,11 @@ final class ArgumentCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param Argument $argument
+     * @param HandlerArgument $argument
      *
      * @return void
      */
-    public function push(Argument $argument): void
+    public function push(HandlerArgument $argument): void
     {
         $this->collection[\spl_object_hash($argument)] = $argument;
     }

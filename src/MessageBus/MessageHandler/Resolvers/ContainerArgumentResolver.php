@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Application\KernelContext;
-use Desperado\ServiceBus\MessageBus\MessageHandler\Argument;
+use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerArgument;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -39,7 +39,7 @@ final class ContainerArgumentResolver implements ArgumentResolver
     /**
      * @inheritdoc
      */
-    public function supports(Argument $argument): bool
+    public function supports(HandlerArgument $argument): bool
     {
         return true === $argument->isObject() && true === $this->container->has((string) $argument->className());
     }
@@ -49,7 +49,7 @@ final class ContainerArgumentResolver implements ArgumentResolver
      *
      * @return object
      */
-    public function resolve(Message $message, KernelContext $context, Argument $argument): object
+    public function resolve(Message $message, KernelContext $context, HandlerArgument $argument): object
     {
         return $this->container->get((string) $argument->className());
     }

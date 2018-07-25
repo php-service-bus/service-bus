@@ -21,6 +21,7 @@ use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -29,18 +30,6 @@ use Symfony\Component\Dotenv\Dotenv;
  */
 final class Bootstrap
 {
-    /**
-     * Application environment
-     *
-     * @var Environment
-     */
-    private $environment;
-
-    /**
-     * @var ContainerInterface|null
-     */
-    private $container;
-
     /**
      * @var ContainerBuilder
      */
@@ -77,13 +66,21 @@ final class Bootstrap
     }
 
     /**
+     * @return ContainerInterface
+     */
+    public function boot(): ContainerInterface
+    {
+        return $this->containerBuilder->build();
+    }
+
+    /**
      * Use amqp-ext transport
      *
      * @param string $connectionDSN
      *
-     * @return void
+     * @return $this
      */
-    public function useAmqpExtTransport(string $connectionDSN): void
+    public function useAmqpExtTransport(string $connectionDSN): self
     {
         $this->containerBuilder->addParameters([
             'transport' => [
@@ -92,6 +89,8 @@ final class Bootstrap
         ]);
 
         $this->containerBuilder->addExtensions(new AmqpExtTransportExtension());
+
+        return $this;
     }
 
     /**
@@ -105,9 +104,9 @@ final class Bootstrap
      * @param string $adapter
      * @param string $connectionDSN
      *
-     * @return void
+     * @return $this
      */
-    public function useSqlStorage(string $adapter, string $connectionDSN): void
+    public function useSqlStorage(string $adapter, string $connectionDSN): self
     {
         $this->containerBuilder->addParameters([
             'storage' => [
@@ -117,6 +116,8 @@ final class Bootstrap
         ]);
 
         $this->containerBuilder->addExtensions(new DefaultStorageExtension());
+
+        return $this;
     }
 
     /**
@@ -124,31 +125,37 @@ final class Bootstrap
      *
      * @param array $parameters
      *
-     * @return void
+     * @return $this
      */
-    public function importParameters(array $parameters): void
+    public function importParameters(array $parameters): self
     {
         $this->containerBuilder->addParameters($parameters);
+
+        return $this;
     }
 
     /**
-     * @param Extension ...$extensions
+     * @param Extension[] $extensions
      *
-     * @return void
+     * @return $this
      */
-    public function addExtensions(Extension ...$extensions): void
+    public function addExtensions(Extension ...$extensions): self
     {
         $this->containerBuilder->addExtensions(...$extensions);
+
+        return $this;
     }
 
     /**
      * @param CompilerPassInterface ...$compilerPassInterfaces
      *
-     * @return void
+     * @return $this
      */
-    public function addCompilerPasses(CompilerPassInterface ...$compilerPassInterfaces): void
+    public function addCompilerPasses(CompilerPassInterface ...$compilerPassInterfaces): self
     {
         $this->containerBuilder->addCompilerPasses(...$compilerPassInterfaces);
+
+        return $this;
     }
 
     /**
@@ -161,13 +168,12 @@ final class Bootstrap
             ? (string) \getenv('APP_ENVIRONMENT')
             : 'dev';
 
-        $this->environment      = Environment::create($envValue);
         $this->containerBuilder = new ContainerBuilder(
             (string) \getenv('APP_ENTRY_POINT_NAME'),
-            $this->environment
+            Environment::create($envValue)
         );
 
-        $this->containerBuilder->addCompilerPasses(new ServicesCompilerPass());
+        $this->containerBuilder->addCompilerPasses(new ServicesCompilerPass(), new ServiceLocatorTagPass());
         $this->containerBuilder->addExtensions(new ServiceBusExtension());
     }
 }

@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport\AmqpExt;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\Transport\Destination;
+use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\Transport\Exceptions\MessageSendFailed;
 use Desperado\ServiceBus\Transport\Exceptions\NotConfiguredTopic;
 use Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder;

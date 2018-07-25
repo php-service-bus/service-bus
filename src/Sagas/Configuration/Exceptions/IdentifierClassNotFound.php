@@ -12,7 +12,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Sagas\Exceptions\Processor;
+namespace Desperado\ServiceBus\Sagas\Configuration\Exceptions;
 
 use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 

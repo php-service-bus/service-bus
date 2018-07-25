@@ -13,14 +13,14 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\MessageBus\Processor;
 
+use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Application\KernelContext;
-use Desperado\ServiceBus\MessageBus\MessageHandler\ArgumentCollection;
+use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerArgumentCollection;
 
 /**
  * Command\event processor
- * Note: For sagas used SagaProcessor
  */
 final class MessageProcessor implements Processor
 {
@@ -32,7 +32,7 @@ final class MessageProcessor implements Processor
     private $closure;
 
     /**
-     * @var ArgumentCollection
+     * @var HandlerArgumentCollection
      */
     private $arguments;
 
@@ -48,6 +48,13 @@ final class MessageProcessor implements Processor
      */
     public function __invoke(Message $message, KernelContext $context): Promise
     {
+        /** @psalm-suppress InvalidArgument */
+        return call(
+            static function(Message $message, KernelContext $context): void
+            {
 
+            },
+            $message, $context
+        );
     }
 }

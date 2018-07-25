@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\MessageBus\MessageHandler;
 /**
  * Argument of the message handler
  */
-final class Argument
+final class HandlerArgument
 {
     /**
      * @var \ReflectionParameter
@@ -92,6 +92,7 @@ final class Argument
         if(true === $this->hasType())
         {
             /** @noinspection NullPointerExceptionInspection */
+            /** @psalm-suppress PossiblyNullReference */
             return true === \class_exists($this->reflectionParameter->getType()->getName())
                 ? 'object'
                 : $this->reflectionParameter->getType()->getName();

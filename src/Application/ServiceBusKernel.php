@@ -1,0 +1,333 @@
+<?php
+
+/**
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
+ *
+ * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @license MIT
+ * @license https://opensource.org/licenses/MIT
+ */
+
+declare(strict_types = 1);
+
+namespace Desperado\ServiceBus\Application;
+
+use Amp\Loop;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound;
+use Desperado\ServiceBus\MessageBus\MessageBus;
+use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
+use Desperado\ServiceBus\OutboundMessage\Destination;
+use Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes;
+use Desperado\ServiceBus\Transport\IncomingEnvelope;
+use Desperado\ServiceBus\Transport\OutboundEnvelope;
+use Desperado\ServiceBus\Transport\Publisher;
+use Desperado\ServiceBus\Transport\Queue;
+use Desperado\ServiceBus\Transport\Transport;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+
+/**
+ * Service bus application kernel
+ */
+final class ServiceBusKernel
+{
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * @var MessageBus
+     */
+    private $messageBus;
+
+    /**
+     * Logging is forced off for all levels
+     *
+     * @var bool
+     */
+    private static $payloadLoggingForciblyDisabled = false;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container  = $container;
+        $this->messageBus = $container->get(MessageBusBuilder::class)->compile();
+    }
+
+    /**
+     * Receive transport configurator
+     *
+     * @return TransportConfigurator
+     */
+    public function transportConfigurator(): TransportConfigurator
+    {
+        return $this->container->get(TransportConfigurator::class);
+    }
+
+    /**
+     * By default, messages are logged with a level of "debug"
+     * Logging can be forcibly disabled for all levels
+     *
+     * @return void
+     */
+    public function disableMessagesPayloadLogging(): void
+    {
+        static::$payloadLoggingForciblyDisabled = true;
+    }
+
+    /**
+     * Start message listen
+     *
+     * @param Queue $queue
+     *
+     * @return void
+     */
+    public function listen(Queue $queue): void
+    {
+        $messageProcessor = self::createMessageProcessor(
+            $this->messageBus,
+            self::createMessageSender(
+                $this->container->get(Transport::class)->createPublisher(),
+                $this->container->get(OutboundMessageRoutes::class),
+                $this->container->get(LoggerInterface::class)
+            ),
+            $this->container->get(LoggerInterface::class)
+        );
+
+        $this->container
+            ->get(Transport::class)
+            ->createConsumer($queue)
+            ->listen(
+                static function(IncomingEnvelope $envelope) use ($messageProcessor): void
+                {
+                    $messageProcessor->send($envelope);
+                }
+            );
+    }
+
+    /**
+     * Create handle message handler
+     *
+     * @param MessageBus      $messageBus
+     * @param \Generator      $messageSender
+     * @param LoggerInterface $logger
+     *
+     * @return \Generator
+     */
+    private static function createMessageProcessor(
+        MessageBus $messageBus,
+        \Generator $messageSender,
+        LoggerInterface $logger
+    ): \Generator
+    {
+        while(true)
+        {
+            /** @var IncomingEnvelope $envelope */
+            $envelope = yield;
+
+            Loop::run(
+                static function() use ($messageBus, $envelope, $messageSender, $logger): \Generator
+                {
+                    try
+                    {
+                        self::beforeDispatch($envelope, $logger);
+
+                        yield $messageBus->dispatch(
+                            new KernelContext($envelope, $messageSender, $logger)
+                        );
+                    }
+                    catch(NoMessageHandlersFound $exception)
+                    {
+                        $logger->debug($exception->getMessage(), ['operationId' => $envelope->operationId()]);
+                    }
+                    catch(\Throwable $throwable)
+                    {
+                        $logger->critical($throwable->getMessage(), ['operationId' => $envelope->operationId()]);
+                        /** @todo: retry message? */
+                    }
+                }
+            );
+
+            unset($envelope);
+        }
+    }
+
+    /**
+     * Create message sender
+     *
+     * @param Publisher             $publisher
+     * @param OutboundMessageRoutes $messageRoutes
+     * @param LoggerInterface       $logger
+     *
+     * @return \Generator
+     */
+    private static function createMessageSender(
+        Publisher $publisher,
+        OutboundMessageRoutes $messageRoutes,
+        LoggerInterface $logger
+    ): \Generator
+    {
+        while(true)
+        {
+            /**
+             * @var Message          $message
+             * @var IncomingEnvelope $incomingEnvelope
+             */
+            [$message, $incomingEnvelope] = yield;
+
+            $messageClass = \get_class($message);
+            $destinations = $messageRoutes->destinationsFor($messageClass);
+
+            foreach($destinations as $destination)
+            {
+                /** @var Destination $destination */
+
+                $outboundEnvelope = self::createOutboundEnvelope(
+                    $publisher,
+                    $incomingEnvelope->operationId(),
+                    $message, [
+                        'x-message-class'         => $messageClass,
+                        'x-created-after-message' => \get_class($incomingEnvelope->denormalized()),
+                        'x-hostname'              => \gethostname()
+                    ]
+                );
+
+                self::beforeMessageSend($logger, $messageClass, $destination, $outboundEnvelope);
+
+                try
+                {
+                    $publisher->send($destination, $outboundEnvelope);
+                }
+                catch(\Throwable $throwable)
+                {
+                    self::onSendMessageFailed($outboundEnvelope, $messageClass, $throwable, $logger);
+                }
+            }
+
+            unset($message, $incomingEnvelope, $messageClass, $destinations);
+        }
+    }
+
+    /**
+     * Create outbound message package
+     *
+     * @param Publisher $publisher
+     * @param string    $operationId
+     * @param Message   $message
+     * @param array     $headers
+     *
+     * @return OutboundEnvelope
+     */
+    private static function createOutboundEnvelope(
+        Publisher $publisher,
+        string $operationId,
+        Message $message,
+        array $headers
+    ): OutboundEnvelope
+    {
+        $envelope = $publisher->createEnvelope($message, $headers);
+
+        $envelope->setupMessageId($operationId);
+        $envelope->makeMandatory();
+        $envelope->makePersistent();
+
+        return $envelope;
+    }
+
+    /**
+     * @param IncomingEnvelope $envelope
+     * @param LoggerInterface  $logger
+     *
+     * @return void
+     */
+    private static function beforeDispatch(IncomingEnvelope $envelope, LoggerInterface $logger): void
+    {
+        $logger->info('Dispatching the message "{messageClass}"', [
+                'messageClass' => \get_class($envelope->denormalized()),
+                'operationId'  => $envelope->operationId(),
+            ]
+        );
+
+        if(false === static::$payloadLoggingForciblyDisabled)
+        {
+            $logger->debug('Incoming message payload: "{rawMessagePayload}"', [
+                    'rawMessagePayload'        => $envelope->requestBody(),
+                    'normalizedMessagePayload' => $envelope->normalized(),
+                    'headers'                  => $envelope->headers(),
+                    'operationId'              => $envelope->operationId()
+                ]
+            );
+        }
+    }
+
+    /**
+     * @param OutboundEnvelope $outboundEnvelope
+     * @param string           $messageClass
+     * @param \Throwable       $throwable
+     * @param LoggerInterface  $logger
+     *
+     * @return void
+     */
+    private static function onSendMessageFailed(
+        OutboundEnvelope $outboundEnvelope,
+        string $messageClass,
+        \Throwable $throwable,
+        LoggerInterface $logger
+    ): void
+    {
+        $logger->critical(
+            'Error sending message "{messageClass}" to broker: "{exceptionMessage}"', [
+                'messageClass'     => $messageClass,
+                'exceptionMessage' => $throwable->getMessage()
+            ]
+        );
+
+        if(false === static::$payloadLoggingForciblyDisabled)
+        {
+            $logger->debug('The body of the unsent message: {rawMessagePayload}', [
+                    'rawMessagePayload' => $outboundEnvelope->messageContent(),
+                    'headers'           => $outboundEnvelope->headers()
+                ]
+            );
+        }
+    }
+
+    /**
+     * @param LoggerInterface  $logger
+     * @param string           $messageClass
+     * @param Destination      $destination
+     * @param OutboundEnvelope $outboundEnvelope
+     *
+     * @return void
+     */
+    private static function beforeMessageSend(
+        LoggerInterface $logger,
+        string $messageClass,
+        Destination $destination,
+        OutboundEnvelope $outboundEnvelope
+    ): void
+    {
+        $logger->info(
+            'Sending a "{messageClass}" message to "{destinationTopic}/{destinationRoutingKey}"', [
+                'messageClass'          => $messageClass,
+                'destinationTopic'      => $destination->topicName(),
+                'destinationRoutingKey' => $destination->routingKey()
+            ]
+        );
+
+        if(false === static::$payloadLoggingForciblyDisabled)
+        {
+            $logger->debug(
+                'Sending message: "{rawMessagePayload}"', [
+                    'rawMessagePayload' => $outboundEnvelope->messageContent(),
+                    'headers'           => $outboundEnvelope->headers()
+                ]
+            );
+        }
+    }
+}
