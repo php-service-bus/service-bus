@@ -1,0 +1,171 @@
+services:
+  _defaults:
+    autowire: false
+    autoconfigure: false
+    public: false
+
+  # Annotation extractor
+  Desperado\ServiceBus\AnnotationsReader:
+    class: Desperado\ServiceBus\AnnotationsReader\DefaultAnnotationsReader
+
+  # Application environment
+  Desperado\ServiceBus\Environment:
+    factory: ['Desperado\ServiceBus\Environment', 'create']
+    arguments:
+      $environment: '%service_bus.environment%'
+
+  #  Create default logger instance factory
+  Desperado\ServiceBus\Logger\DefaultLoggerFactory:
+
+  # Default logger instance
+  Psr\Log\LoggerInterface:
+    factory: 'Desperado\ServiceBus\Logger\DefaultLoggerFactory:build'
+    arguments:
+      $entryPointName: '%service_bus.entry_point%'
+      $environment: '@Desperado\ServiceBus\Environment'
+
+  # Denormalizer (execute convert array -> object)
+  Desperado\ServiceBus\Marshal\Denormalizer\Denormalizer:
+    class: Desperado\ServiceBus\Marshal\Denormalizer\SymfonyPropertyDenormalizer
+
+  # Normalizer (execute convert object -> array)
+  Desperado\ServiceBus\Marshal\Normalizer\Normalizer:
+    class: Desperado\ServiceBus\Marshal\Normalizer\SymfonyPropertyNormalizer
+
+  # Serializer
+  Desperado\ServiceBus\Marshal\Serializer\ArraySerializer:
+    class: Desperado\ServiceBus\Marshal\Serializer\SymfonyJsonSerializer
+
+  # Transport configuration
+  Desperado\ServiceBus\Transport\AmqpExt\AmqpConfiguration:
+    arguments:
+      $connectionDSN: '%service_bus.transport.dsn%'
+
+  # Transport messages encoder
+  Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder:
+    class: Desperado\ServiceBus\Transport\Marshal\Encoder\JsonMessageEncoder
+    arguments:
+      $normalizer: '@Desperado\ServiceBus\Marshal\Normalizer\Normalizer'
+      $serializer: '@Desperado\ServiceBus\Marshal\Serializer\ArraySerializer'
+
+  # Transport messages decoder
+  Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder:
+    class: Desperado\ServiceBus\Transport\Marshal\Decoder\JsonMessageDecoder
+    arguments:
+      $denormalizer: '@Desperado\ServiceBus\Marshal\Denormalizer\Denormalizer'
+      $serializer: '@Desperado\ServiceBus\Marshal\Serializer\ArraySerializer'
+
+  # Messages transport
+  Desperado\ServiceBus\Transport\Transport:
+    class: Desperado\ServiceBus\Transport\AmqpExt\AmqpExt
+    arguments:
+      $amqpConfiguration: '@Desperado\ServiceBus\Transport\AmqpExt\AmqpConfiguration'
+      $messageEncoder: '@Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder'
+      $messageDecoder: '@Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder'
+      $logger: '@Psr\Log\LoggerInterface'
+
+  # Transport configuration for starting a subscription
+  Desperado\ServiceBus\Application\TransportConfigurator:
+    arguments:
+      $transport: '@Desperado\ServiceBus\Transport\Transport'
+      $outboundMessagesRoutes: '@Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes'
+
+  # Storage adapter factory
+  Desperado\ServiceBus\Storage\StorageAdapterFactory:
+
+  # Storage adapter
+  Desperado\ServiceBus\Storage\StorageAdapter:
+    factory: 'Desperado\ServiceBus\Storage\StorageAdapterFactory:create'
+    arguments:
+      $adapter: '%service_bus.storage.adapter%'
+      $connectionDSN: '%service_bus.storage.dsn%'
+
+  # Sagas store
+  Desperado\ServiceBus\Sagas\SagaStore\SagasStore:
+    class: Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore
+    arguments:
+      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+
+  # Sagas provider
+  Desperado\ServiceBus\SagaProvider:
+    arguments:
+      $store: '@Desperado\ServiceBus\Sagas\SagaStore\SagasStore'
+
+  # Retrieving a list of saga event handlers
+  Desperado\ServiceBus\Sagas\Configuration\SagaListenersLoader:
+    class: Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaListenersLoader
+    arguments:
+      $annotationReader: '@Desperado\ServiceBus\AnnotationsReader'
+      $sagaProvider: '@Desperado\ServiceBus\SagaProvider'
+      $logger: '@Psr\Log\LoggerInterface'
+
+  # Retrieving a list of message handlers for the specified object
+  Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader:
+    class: Desperado\ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader
+    arguments:
+      $annotationReader: '@Desperado\ServiceBus\AnnotationsReader'
+
+  # Http client
+  Desperado\ServiceBus\HttpClient\HttpClient:
+    class: Desperado\ServiceBus\HttpClient\Artax\ArtaxHttpClient
+    arguments:
+      $logger: '@Psr\Log\LoggerInterface'
+
+  # Routes to which messages will be sent (Directions are indicated in the context of the current transport)
+  Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes:
+
+  # Event serialization
+  Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\AggregateEventSerializer:
+    class: Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\DefaultEventSerializer
+    arguments:
+      $serializer: '@Desperado\ServiceBus\Marshal\Serializer\ArraySerializer'
+      $normalizer: '@Desperado\ServiceBus\Marshal\Normalizer\Normalizer'
+      $denormalizer: '@Desperado\ServiceBus\Marshal\Denormalizer\Denormalizer'
+
+  # Aggregates (event stream) store
+  Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore:
+    class: Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql\SqlEventStreamStore
+    arguments:
+      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+
+  # Snapshots store
+  Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore:
+    class: Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SqlSnapshotStore
+    arguments:
+      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+
+  # Snapshots trigger
+  Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotTrigger:
+    class: Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotVersionTrigger
+
+  # Snapshotter
+  Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter:
+    arguments:
+      $storage: '@Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore'
+      $trigger: '@Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotTrigger'
+      $logger: '@Psr\Log\LoggerInterface'
+
+  # Event sourcing provider
+  Desperado\ServiceBus\EventSourcingProvider:
+    arguments:
+      $storage: '@Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore'
+      $serializer: '@Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\AggregateEventSerializer'
+      $snapshotter: '@Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter'
+
+  # Message bus builder
+  Desperado\ServiceBus\MessageBus\MessageBusBuilder:
+    arguments:
+      $sagasConfigurationLoader: '@Desperado\ServiceBus\Sagas\Configuration\SagaListenersLoader'
+      $servicesConfigurationLoader: '@Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader'
+
+  # ServiceBusKernel locator
+  service_bus.kernel_locator:
+    public: true
+    class: Symfony\Component\DependencyInjection\ServiceLocator
+    tags: ['container.service_locator']
+    arguments:
+    - Desperado\ServiceBus\Transport\Transport: '@Desperado\ServiceBus\Transport\Transport'
+      Desperado\ServiceBus\MessageBus\MessageBusBuilder: '@Desperado\ServiceBus\MessageBus\MessageBusBuilder'
+      Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes: '@Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes'
+      Psr\Log\LoggerInterface: '@Psr\Log\LoggerInterface'
+      Desperado\ServiceBus\Application\TransportConfigurator: '@Desperado\ServiceBus\Application\TransportConfigurator'

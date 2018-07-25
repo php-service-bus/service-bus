@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Marshal\Denormalizer;
 
 /**
- * Normalizer (execute convert array -> object)
+ * Denormalizer (execute convert array -> object)
  */
 interface Denormalizer
 {

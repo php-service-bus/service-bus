@@ -56,7 +56,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
              */
             $handlerAnnotation = $annotation->annotationObject();
 
-            /** @var @var \ReflectionMethod $handlerReflectionMethod $handlerReflectionMethod */
+            /** @var \ReflectionMethod $handlerReflectionMethod */
             $handlerReflectionMethod = $annotation->reflectionMethod();
 
             $factoryMethod = $handlerAnnotation instanceof CommandHandler ? 'commandHandler' : 'eventListener';

@@ -21,12 +21,9 @@ use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
  */
 final class StorageAdapterFactory
 {
-    public const ADAPTER_DOCTRINE       = 'doctrine';
-    public const ADAPTER_ASYNC_POSTGRES = 'asyncPostgres';
-
     private const SUPPORTED = [
-        self::ADAPTER_DOCTRINE       => DoctrineDBALAdapter::class,
-        self::ADAPTER_ASYNC_POSTGRES => AmpPostgreSQLAdapter::class
+        DoctrineDBALAdapter::class,
+        AmpPostgreSQLAdapter::class
     ];
 
     /**
@@ -49,15 +46,13 @@ final class StorageAdapterFactory
      */
     public static function create(string $adapter, string $connectionDSN): StorageAdapter
     {
-        if(true === isset(self::SUPPORTED[$adapter]))
+        if(
+            true === \in_array($adapter, self::SUPPORTED, true) &&
+            true === \class_exists($adapter) &&
+            true === \is_a($adapter, StorageAdapter::class, true)
+        )
         {
-            /** @var string $adapterClass */
-            $adapterClass = self::SUPPORTED[$adapter];
-
-            if(true === \class_exists($adapterClass) && true === \is_a($adapterClass, StorageAdapter::class, true))
-            {
-                return new $adapterClass(StorageConfiguration::fromDSN($connectionDSN));
-            }
+            return new $adapter(StorageConfiguration::fromDSN($connectionDSN));
         }
 
         throw new \LogicException(

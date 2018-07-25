@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 /**
- * Environment Value object
+ * Application environment
  */
 final class Environment
 {

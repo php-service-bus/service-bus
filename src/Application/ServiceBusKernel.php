@@ -55,8 +55,9 @@ final class ServiceBusKernel
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container  = $container;
-        $this->messageBus = $container->get(MessageBusBuilder::class)->compile();
+        /** custom service locator for application kernel only */
+        $this->container  = $container->get('service_bus.kernel_locator');
+        $this->messageBus = $this->container->get(MessageBusBuilder::class)->compile();
     }
 
     /**

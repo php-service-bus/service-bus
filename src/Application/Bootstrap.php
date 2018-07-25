@@ -15,8 +15,6 @@ namespace Desperado\ServiceBus\Application;
 
 use Desperado\ServiceBus\DependencyInjection\Compiler\ServicesCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
-use Desperado\ServiceBus\DependencyInjection\Extensions\AmqpExtTransportExtension;
-use Desperado\ServiceBus\DependencyInjection\Extensions\DefaultStorageExtension;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
 use Psr\Container\ContainerInterface;
@@ -82,13 +80,7 @@ final class Bootstrap
      */
     public function useAmqpExtTransport(string $connectionDSN): self
     {
-        $this->containerBuilder->addParameters([
-            'transport' => [
-                'dsn' => $connectionDSN
-            ]
-        ]);
-
-        $this->containerBuilder->addExtensions(new AmqpExtTransportExtension());
+        $this->containerBuilder->addParameters(['service_bus.transport.dsn' => $connectionDSN]);
 
         return $this;
     }
@@ -109,13 +101,24 @@ final class Bootstrap
     public function useSqlStorage(string $adapter, string $connectionDSN): self
     {
         $this->containerBuilder->addParameters([
-            'storage' => [
-                'adapter' => $adapter,
-                'dsn'     => $connectionDSN
-            ]
+            'service_bus.storage.adapter' => $adapter,
+            'service_bus.storage.dsn'     => $connectionDSN
+
         ]);
 
-        $this->containerBuilder->addExtensions(new DefaultStorageExtension());
+        return $this;
+    }
+
+    /**
+     * Use custom cache directory
+     *
+     * @param string $cacheDirectoryPath
+     *
+     * @return $this
+     */
+    public function useCustomCacheDirectory(string $cacheDirectoryPath): self
+    {
+        $this->containerBuilder->setupCacheDirectoryPath($cacheDirectoryPath);
 
         return $this;
     }
@@ -164,15 +167,17 @@ final class Bootstrap
      */
     private function __construct()
     {
-        $envValue = '' !== (string) \getenv('APP_ENVIRONMENT')
+        $entryPoint = (string) \getenv('APP_ENTRY_POINT_NAME');
+        $envValue   = '' !== (string) \getenv('APP_ENVIRONMENT')
             ? (string) \getenv('APP_ENVIRONMENT')
             : 'dev';
 
-        $this->containerBuilder = new ContainerBuilder(
-            (string) \getenv('APP_ENTRY_POINT_NAME'),
-            Environment::create($envValue)
-        );
+        $this->containerBuilder = new ContainerBuilder($entryPoint, Environment::create($envValue));
 
+        $this->containerBuilder->addParameters([
+            'service_bus.environment' => $envValue,
+            'service_bus.entry_point' => $entryPoint
+        ]);
         $this->containerBuilder->addCompilerPasses(new ServicesCompilerPass(), new ServiceLocatorTagPass());
         $this->containerBuilder->addExtensions(new ServiceBusExtension());
     }
