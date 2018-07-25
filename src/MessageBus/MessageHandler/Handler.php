@@ -119,6 +119,16 @@ final class Handler
     }
 
     /**
+     * Is a handler form command
+     *
+     * @return bool
+     */
+    public function isCommandHandler(): bool
+    {
+        return self::TYPE_COMMAND_HANDLER === $this->type;
+    }
+
+    /**
      * @return string|null
      */
     public function messageClass(): ?string

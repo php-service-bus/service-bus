@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Services;
+namespace Desperado\ServiceBus\Services\Configuration;
 
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerCollection;
 

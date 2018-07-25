@@ -13,12 +13,14 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\MessageBus;
 
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\MessageBus\MessageHandler\Handler;
 use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ArgumentResolver;
 use Desperado\ServiceBus\MessageBus\Processor\MessageProcessor;
 use Desperado\ServiceBus\MessageBus\Processor\ProcessorsMap;
 use Desperado\ServiceBus\MessageBus\Processor\ValidationMessageProcessor;
 use Desperado\ServiceBus\Sagas\Configuration\SagaListenersLoader;
-use Desperado\ServiceBus\Services\ServiceHandlersLoader;
+use Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader;
 
 /**
  * Message bus builder
@@ -91,6 +93,9 @@ final class MessageBusBuilder
         {
             /** @var \Desperado\ServiceBus\MessageBus\MessageHandler\Handler $handler */
 
+            $this->assertMessageClassSpecifiedInArguments($service, $handler);
+            $this->assertUniqueCommandHandler($handler);
+
             $messageProcessor = new MessageProcessor(
                 $handler->toClosure($service),
                 $handler->arguments(),
@@ -105,6 +110,52 @@ final class MessageBusBuilder
             }
 
             $this->processorsList->push((string) $handler->messageClass(), $messageProcessor);
+        }
+    }
+
+    /**
+     * @param Handler $handler
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    private function assertUniqueCommandHandler(Handler $handler): void
+    {
+        /** @var string $messageClass */
+        $messageClass = $handler->messageClass();
+
+        if(true === $handler->isCommandHandler() && true === $this->processorsList->hasTask($messageClass))
+        {
+            throw new \LogicException(
+                \sprintf(
+                    'The handler for the "%s" command has already been added earlier. You can not add multiple command handlers',
+                    $messageClass
+                )
+            );
+        }
+    }
+
+    /**
+     * @param object  $service
+     * @param Handler $handler
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    private function assertMessageClassSpecifiedInArguments(object $service, Handler $handler): void
+    {
+        if(null === $handler->messageClass() || '' === (string) $handler->messageClass())
+        {
+            throw new \LogicException(
+                \sprintf(
+                    'In the method of "%s:%s" is not found an argument of type "%s"',
+                    \get_class($service),
+                    $handler->methodName(),
+                    Message::class
+                )
+            );
         }
     }
 }

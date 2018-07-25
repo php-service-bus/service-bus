@@ -74,14 +74,9 @@ final class AnnotationsBasedSagaListenersLoader implements SagaListenersLoader
             $annotations = $this->annotationReader
                 ->extract($sagaClass)
                 ->filter(
-                    static function(object $annotation): ?Annotation
+                    static function(Annotation $annotation): ?Annotation
                     {
-                        if($annotation instanceof Annotation)
-                        {
-                            return $annotation->annotationObject() instanceof SagaAnnotationMarker ? $annotation : null;
-                        }
-
-                        return null;
+                        return $annotation->annotationObject() instanceof SagaAnnotationMarker ? $annotation : null;
                     }
                 );
 
@@ -129,14 +124,9 @@ final class AnnotationsBasedSagaListenersLoader implements SagaListenersLoader
     ): void
     {
         $methodAnnotations = $annotationCollection->filter(
-            static function(object $annotation): ?Annotation
+            static function(Annotation $annotation): ?Annotation
             {
-                if($annotation instanceof Annotation)
-                {
-                    return $annotation->annotationObject() instanceof SagaEventListener ? $annotation : null;
-                }
-
-                return null;
+                return $annotation->annotationObject() instanceof SagaEventListener ? $annotation : null;
             }
         );
 
