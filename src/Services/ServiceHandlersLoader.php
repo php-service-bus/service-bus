@@ -11,17 +11,17 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Sagas\Configuration;
+namespace Desperado\ServiceBus\Services;
 
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerCollection;
 
 /**
- * Retrieving a list of saga event handlers
+ * Retrieving a list of message handlers for the specified object
  */
-interface SagaListenersLoader
+interface ServiceHandlersLoader
 {
     /**
-     * Retrieving a list of saga event handlers
+     * Load specified saga listeners
      *
      * @param string $sagaClass
      *
@@ -29,5 +29,5 @@ interface SagaListenersLoader
      *
      * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
      */
-    public function load(string $sagaClass): HandlerCollection;
+    public function load(object $service): HandlerCollection;
 }

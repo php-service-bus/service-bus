@@ -44,6 +44,19 @@ final class MessageProcessor implements Processor
     private $argumentResolvers;
 
     /**
+     * @param \Closure                  $closure
+     * @param HandlerArgumentCollection $arguments
+     * @param array                     $argumentResolvers
+     */
+    public function __construct(\Closure $closure, HandlerArgumentCollection $arguments, array $argumentResolvers)
+    {
+        $this->closure           = $closure;
+        $this->arguments         = $arguments;
+        $this->argumentResolvers = $argumentResolvers;
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function __invoke(Message $message, KernelContext $context): Promise

@@ -49,6 +49,7 @@
     "symfony/config": "v4.1",
     "symfony/dotenv": "^4.1",
     "symfony/yaml": "v4.1",
+    "symfony/validator": "v4.1",
     "phpdocumentor/reflection-docblock": "^4.0",
     "doctrine/annotations": "v1.6.0",
     "guzzlehttp/psr7": "1.4.2"

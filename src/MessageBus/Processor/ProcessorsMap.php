@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\MessageBus\Processor;
 
 /**
- * Tasks list
+ * List of tasks for processing messages
  */
 final class ProcessorsMap implements \Countable
 {
