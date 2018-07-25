@@ -6,4 +6,4 @@
 [![Total Downloads](https://poser.pugx.org/mmasiukevich/storage-component/downloads)](https://packagist.org/packages/mmasiukevich/storage-component)
 [![License](https://poser.pugx.org/mmasiukevich/storage-component/license)](https://packagist.org/packages/mmasiukevich/storage-component)
 
-#### This component is part of the [service-bus](https://github.com/mmasiukevich/service-bus)
+### Still in development. Currently not suitable for use
