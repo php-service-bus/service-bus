@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -12,140 +13,121 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\MessageBus;
 
-use Desperado\Contracts\Common\Message;
-use Desperado\ServiceBus\MessageBus\Configuration\ConfigurationLoader;
-use Desperado\ServiceBus\MessageBus\Configuration\MessageHandler;
-use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageArgumentFound;
-use Desperado\ServiceBus\MessageBus\Exceptions\NonUniqueCommandHandler;
-use Desperado\ServiceBus\MessageBus\Task\Arguments\ArgumentResolver;
-use Desperado\ServiceBus\MessageBus\Task\TaskProcessor;
-use Desperado\ServiceBus\MessageBus\Task\TaskMap;
-use Desperado\ServiceBus\MessageBus\Task\ValidateMessageTask;
-use Psr\Log\LoggerInterface;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\MessageBus\MessageHandler\Handler;
+use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ArgumentResolver;
+use Desperado\ServiceBus\MessageBus\Processor\MessageProcessor;
+use Desperado\ServiceBus\MessageBus\Processor\ProcessorsMap;
+use Desperado\ServiceBus\MessageBus\Processor\ValidationMessageProcessor;
+use Desperado\ServiceBus\Sagas\Configuration\SagaListenersLoader;
+use Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader;
 
 /**
- * Compile message bus
+ * Message bus builder
  */
 final class MessageBusBuilder
 {
     /**
-     * @var ConfigurationLoader
+     * @var SagaListenersLoader
      */
-    private $configurationLoader;
+    private $sagasConfigurationLoader;
 
     /**
-     * Tasks list
+     * @var ServiceHandlersLoader
+     */
+    private $servicesConfigurationLoader;
+
+    /**
+     * List of tasks for processing messages
      *
-     * @var TaskMap
+     * @var ProcessorsMap
      */
-    private $taskMap;
+    private $processorsList;
 
     /**
-     * @var LoggerInterface
+     * @param SagaListenersLoader   $sagasConfigurationLoader
+     * @param ServiceHandlersLoader $servicesConfigurationLoader
      */
-    private $logger;
-
-    /**
-     * @param ConfigurationLoader $configurationLoader
-     * @param LoggerInterface     $logger
-     */
-    public function __construct(ConfigurationLoader $configurationLoader, LoggerInterface $logger)
+    public function __construct(SagaListenersLoader $sagasConfigurationLoader, ServiceHandlersLoader $servicesConfigurationLoader)
     {
-        $this->configurationLoader = $configurationLoader;
-        $this->logger              = $logger;
+        $this->sagasConfigurationLoader    = $sagasConfigurationLoader;
+        $this->servicesConfigurationLoader = $servicesConfigurationLoader;
 
-        $this->taskMap = new TaskMap();
+        $this->processorsList = new ProcessorsMap();
     }
 
     /**
-     * Register service handlers
+     * Add saga listeners to messages bus
+     *
+     * @param string $sagaClass
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function addSaga(string $sagaClass, ArgumentResolver ... $argumentResolvers): void
+    {
+        foreach($this->sagasConfigurationLoader->load($sagaClass) as $handler)
+        {
+            /** @var \Desperado\ServiceBus\MessageBus\MessageHandler\Handler $handler */
+            $this->processorsList->push(
+                (string) $handler->messageClass(),
+                new MessageProcessor($handler->toClosure(), $handler->arguments(), $argumentResolvers)
+            );
+        }
+    }
+
+    /**
+     * Add service messages (command\event) handlers
      *
      * @param object           $service
      * @param ArgumentResolver ...$argumentResolvers
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NoMessageArgumentFound
-     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NonUniqueCommandHandler
+     * @throws \Throwable
      */
-    public function configureService(object $service, ArgumentResolver ... $argumentResolvers): void
+    public function addService(object $service, ArgumentResolver ... $argumentResolvers): void
     {
-        $handlers = $this->configurationLoader->extractHandlers($service);
-
-        foreach($handlers as $handler)
+        foreach($this->servicesConfigurationLoader->load($service) as $handler)
         {
-            $this->registerHandler($handler, $service, ...$argumentResolvers);
+            /** @var \Desperado\ServiceBus\MessageBus\MessageHandler\Handler $handler */
+
+            $this->assertMessageClassSpecifiedInArguments($service, $handler);
+            $this->assertUniqueCommandHandler($handler);
+
+            $messageProcessor = new MessageProcessor(
+                $handler->toClosure($service),
+                $handler->arguments(),
+                $argumentResolvers
+            );
+
+            if(true === $handler->options()->validationEnabled())
+            {
+                $messageProcessor = new ValidationMessageProcessor(
+                    $messageProcessor, $handler->options()->validationGroups()
+                );
+            }
+
+            $this->processorsList->push((string) $handler->messageClass(), $messageProcessor);
         }
     }
 
     /**
-     * Register handler
-     *
-     * @param MessageHandler   $handler
-     * @param object           $service
-     * @param ArgumentResolver ...$argumentResolvers
+     * @param Handler $handler
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NoMessageArgumentFound
-     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NonUniqueCommandHandler
+     * @throws \LogicException
      */
-    public function registerHandler(
-        MessageHandler $handler,
-        object $service,
-        ArgumentResolver ... $argumentResolvers
-    ): void
-    {
-        $this->assertMessageClassSpecifiedInArguments($service, $handler);
-        $this->assertUniqueCommandHandler($handler);
-
-        /** @var string $messageClass */
-        $messageClass = $handler->messageClass();
-
-        $messageTask = new TaskProcessor($handler->toClosure($service), $handler->arguments(), $argumentResolvers);
-
-        if(true === $handler->options()->validationEnabled())
-        {
-            $messageTask = new ValidateMessageTask($messageTask, $handler->options()->validationGroups());
-        }
-
-        $this->taskMap->push(
-            $messageClass,
-            $messageTask
-        );
-    }
-
-    /**
-     * Compile message bus
-     *
-     * @return MessageBus
-     */
-    public function compile(): MessageBus
-    {
-        $this->logger->debug(
-            'The message bus was successfully compiled. Total number of message handlers: "{messageHandlersCount}"', [
-                'messageHandlersCount' => \count($this->taskMap)
-            ]
-        );
-
-        return new MessageBus($this->taskMap);
-    }
-
-    /**
-     * @param MessageHandler $handler
-     *
-     * @return void
-     *
-     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NonUniqueCommandHandler
-     */
-    private function assertUniqueCommandHandler(MessageHandler $handler): void
+    private function assertUniqueCommandHandler(Handler $handler): void
     {
         /** @var string $messageClass */
         $messageClass = $handler->messageClass();
 
-        if(true === $handler->isCommandHandler() && true === $this->taskMap->hasTask($messageClass))
+        if(true === $handler->isCommandHandler() && true === $this->processorsList->hasTask($messageClass))
         {
-            throw new NonUniqueCommandHandler(
+            throw new \LogicException(
                 \sprintf(
                     'The handler for the "%s" command has already been added earlier. You can not add multiple command handlers',
                     $messageClass
@@ -155,16 +137,18 @@ final class MessageBusBuilder
     }
 
     /**
-     * @param object         $service
-     * @param MessageHandler $handler
+     * @param object  $service
+     * @param Handler $handler
      *
      * @return void
+     *
+     * @throws \LogicException
      */
-    private function assertMessageClassSpecifiedInArguments(object $service, MessageHandler $handler): void
+    private function assertMessageClassSpecifiedInArguments(object $service, Handler $handler): void
     {
         if(null === $handler->messageClass() || '' === (string) $handler->messageClass())
         {
-            throw new NoMessageArgumentFound(
+            throw new \LogicException(
                 \sprintf(
                     'In the method of "%s:%s" is not found an argument of type "%s"',
                     \get_class($service),

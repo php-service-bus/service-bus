@@ -1,6 +1,6 @@
 filter:
     paths: [src/*]
-    excluded_paths: [tests/*, examples/*]
+    excluded_paths: [tests/*]
 tools:
     php_analyzer: true
     php_sim: true
@@ -57,19 +57,19 @@ checks:
 build:
     dependencies:
         before:
-            - composer self-update
+        - composer self-update
     tests:
         override:
-            -
-                command: 'vendor/bin/phpunit --coverage-clover=coverage-report'
-                coverage:
-                    file: 'coverage-report'
-                    format: 'clover'
+        -
+            command: 'vendor/bin/phpunit --configuration=phpunit.xml --coverage-clover=coverage-report'
+            coverage:
+                file: 'coverage-report'
+                format: 'clover'
     nodes:
         analysis:
             project_setup:
                 override: true
             tests:
                 override:
-                    - php-scrutinizer-run --enable-security-analysis
+                - php-scrutinizer-run --enable-security-analysis
 

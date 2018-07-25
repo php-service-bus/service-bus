@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -12,7 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport;
 
-use Desperado\Contracts\Common\Message;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\OutboundMessage\Destination;
 
 /**
  *
@@ -27,7 +29,7 @@ interface Publisher
      *
      * @return OutboundEnvelope
      *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\EncodeMessageFailed
+     * @throws \Desperado\ServiceBus\Transport\Marshal\Exceptions\EncodeMessageFailed
      */
     public function createEnvelope(Message $message, array $headers = []): OutboundEnvelope;
 

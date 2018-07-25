@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -14,61 +15,26 @@ namespace Desperado\ServiceBus\MessageBus;
 
 use function Amp\call;
 use Amp\Promise;
-use Desperado\ServiceBus\Kernel\ApplicationContext;
-use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound;
-use Desperado\ServiceBus\MessageBus\Task\TaskProcessor;
-use Desperado\ServiceBus\MessageBus\Task\TaskMap;
+use Desperado\ServiceBus\Application\KernelContext;
 
 /**
  *
  */
 final class MessageBus
 {
-    /**
-     * @var TaskMap
-     */
-    private $taskMap;
 
     /**
-     * @param TaskMap $taskMap
+     * @param KernelContext $context
+     *
+     * @return Promise
      */
-    public function __construct(TaskMap $taskMap)
+    public function dispatch(KernelContext $context): Promise
     {
-        $this->taskMap = $taskMap;
-    }
-
-    /**
-     * @psalm-suppress LessSpecificReturnStatement
-     * @psalm-suppress MoreSpecificReturnType
-     *
-     * @param ApplicationContext $context
-     *
-     * @return Promise<null>
-     *
-     * @throws \Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound
-     */
-    public function dispatch(ApplicationContext $context): Promise
-    {
-        $taskMap = $this->taskMap;
-
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /** @psalm-suppress InvalidArgument */
         return call(
-            static function(ApplicationContext $context) use ($taskMap): \Generator
+            static function(KernelContext $context): void
             {
-                $message      = $context->incomingEnvelope()->denormalized();
-                $messageClass = \get_class($message);
 
-                if(false === $taskMap->hasTask(\get_class($message)))
-                {
-                    throw new NoMessageHandlersFound($message);
-                }
-
-                foreach($taskMap->map($messageClass) as $task)
-                {
-                    /** @var TaskProcessor $task */
-
-                    yield $task($message, $context);
-                }
             },
             $context
         );

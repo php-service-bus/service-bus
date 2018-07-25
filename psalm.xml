@@ -2,7 +2,8 @@
 <psalm
     totallyTyped="false"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="/home/desperado/var/www/Desperado/event-sourcing/vendor/vimeo/psalm/src/config.xsd"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config file:///home/desperado/var/www/Desperado/sagas/vendor/vimeo/psalm/config.xsd"
 >
     <projectFiles>
         <directory name="src" />

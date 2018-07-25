@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -127,6 +128,18 @@ final class Environment
     }
 
     /**
+     * Is environments equals
+     *
+     * @param Environment $environment
+     *
+     * @return bool
+     */
+    public function equals(Environment $environment): bool
+    {
+        return $this->environment === $environment->environment;
+    }
+
+    /**
      * Get a textual representation of the current environment
      *
      * @return string
@@ -153,7 +166,7 @@ final class Environment
         {
             throw new \LogicException(
                 \sprintf(
-                    'Stated an incorrect value of the environment: "%s". Allowable values: %s',
+                    'Provided incorrect value of the environment: "%s". Allowable values: %s',
                     $specifiedEnvironment, \implode(', ', \array_values(self::LIST))
                 )
             );

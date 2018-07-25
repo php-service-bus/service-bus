@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -18,8 +19,7 @@ use Monolog\Processor as MonologProcessors;
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\Log\ConsoleFormatter;
 use Amp\Log\StreamHandler;
-use Desperado\ServiceBus\Logger\Processors\ExtraDataProcessor;
-use Desperado\ServiceBus\Logger\Processors\HostNameProcessor;
+use Psr\Log\LogLevel;
 
 /**
  * Create default logger instance
@@ -45,26 +45,33 @@ final class DefaultLoggerFactory
      *
      * @param string      $entryPointName
      * @param Environment $environment
+     * @param string      $logLevel
      *
      * @return Logger
      */
-    public static function build(string $entryPointName, Environment $environment): Logger
+    public static function build(
+        string $entryPointName,
+        Environment $environment,
+        string $logLevel = LogLevel::DEBUG
+    ): Logger
     {
         $self                 = new self();
         $self->entryPointName = $entryPointName;
         $self->environment    = $environment;
 
-        return new Logger($entryPointName, $self->getHandlers(), $self->getProcessors());
+        return new Logger($entryPointName, $self->getHandlers($logLevel), $self->getProcessors());
     }
 
     /**
      * Get log handlers collection
      *
+     * @param string $logLevel
+     *
      * @return \Monolog\Handler\AbstractProcessingHandler[]
      */
-    private function getHandlers(): array
+    private function getHandlers(string $logLevel): array
     {
-        $logStreamHandler = new StreamHandler(new ResourceOutputStream(\STDOUT));
+        $logStreamHandler = new StreamHandler(new ResourceOutputStream(\STDOUT), $logLevel);
         $logStreamHandler->setFormatter(new ConsoleFormatter());
 
         return [$logStreamHandler];
@@ -81,10 +88,9 @@ final class DefaultLoggerFactory
             new MonologProcessors\ProcessIdProcessor(),
             new MonologProcessors\PsrLogMessageProcessor(),
             new MonologProcessors\MemoryUsageProcessor(),
-            new HostNameProcessor(),
-            new ExtraDataProcessor([
-                'entry_point' => $this->entryPointName,
-                'env'         => (string) $this->environment
+            new MonologProcessors\TagProcessor([
+                'entryPoint' => $this->entryPointName,
+                'env'        => (string) $this->environment
             ])
         ];
     }

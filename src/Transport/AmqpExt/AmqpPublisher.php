@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -12,16 +13,16 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport\AmqpExt;
 
-use Desperado\Contracts\Common\Message;
-use Desperado\ServiceBus\Transport\Destination;
-use Desperado\ServiceBus\Transport\Encoder\MessageEncoder;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\Transport\Exceptions\MessageSendFailed;
 use Desperado\ServiceBus\Transport\Exceptions\NotConfiguredTopic;
-use Desperado\ServiceBus\Transport\Publisher;
+use Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder;
 use Desperado\ServiceBus\Transport\OutboundEnvelope;
+use Desperado\ServiceBus\Transport\Publisher;
 
 /**
- *
+ * Amqp-ext based publisher
  */
 final class AmqpPublisher implements Publisher
 {
@@ -35,15 +36,15 @@ final class AmqpPublisher implements Publisher
     /**
      * Message encoder
      *
-     * @var MessageEncoder
+     * @var TransportMessageEncoder
      */
     private $encoder;
 
     /**
      * @param array<string, \AMQPExchange> $exchanges
-     * @param MessageEncoder $encoder
+     * @param TransportMessageEncoder $encoder
      */
-    public function __construct(array $exchanges, MessageEncoder $encoder)
+    public function __construct(array $exchanges, TransportMessageEncoder $encoder)
     {
         $this->exchanges = $exchanges;
         $this->encoder   = $encoder;

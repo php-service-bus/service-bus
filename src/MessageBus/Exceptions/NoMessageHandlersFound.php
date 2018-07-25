@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -12,12 +13,13 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\MessageBus\Exceptions;
 
-use Desperado\Contracts\Common\Message;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 
 /**
  * There are no handlers configured for the message
  */
-final class NoMessageHandlersFound extends \RuntimeException
+final class NoMessageHandlersFound extends \InvalidArgumentException implements ServiceBusExceptionMarker
 {
     /**
      * @param Message $message

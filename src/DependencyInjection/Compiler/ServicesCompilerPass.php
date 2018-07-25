@@ -1,7 +1,8 @@
 <?php
 
 /**
- * PHP Service Bus (CQS implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
  *
  * @author  Maksim Masiukevich <desperado@minsk-info.ru>
  * @license MIT
@@ -12,8 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\DependencyInjection\Compiler;
 
-use Desperado\Contracts\Common\Message;
-use Desperado\ServiceBus\Kernel\ApplicationContext;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -92,7 +93,7 @@ final class ServicesCompilerPass implements CompilerPassInterface
 
         return true === \class_exists($reflectionTypeName) &&
             false === \is_a($reflectionTypeName, Message::class, true) &&
-            false === \is_a($reflectionTypeName, ApplicationContext::class, true) &&
+            false === \is_a($reflectionTypeName, MessageDeliveryContext::class, true) &&
             true === $container->has($reflectionTypeName);
     }
 }
