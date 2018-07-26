@@ -145,7 +145,7 @@ final class HandlerArgument
             /** @var \ReflectionType $type */
             $type = $this->reflectionParameter->getType();
 
-            if(true === \class_exists($type->getName()))
+            if(true === \class_exists($type->getName()) || true === \interface_exists($type->getName()))
             {
                 return 'object' === $expectedType;
             }
