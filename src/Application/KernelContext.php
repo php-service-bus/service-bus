@@ -63,14 +63,15 @@ final class KernelContext implements MessageDeliveryContext
     public function delivery(Message ...$messages): Promise
     {
         $messageSender = $this->messageSender;
+        $incomingEnvelope = $this->incomingEnvelope;
 
         /** @psalm-suppress InvalidArgument */
         return call(
-            static function(array $messages) use ($messageSender): void
+            static function(array $messages) use ($messageSender, $incomingEnvelope): void
             {
                 foreach($messages as $message)
                 {
-                    $messageSender->send($message);
+                    $messageSender->send([$message, $incomingEnvelope]);
                 }
             },
             $messages

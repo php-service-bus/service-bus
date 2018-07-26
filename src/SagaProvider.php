@@ -225,7 +225,7 @@ final class SagaProvider
 
                 if(null !== $savedSaga)
                 {
-                    $saga = \unserialize($savedSaga->payload(), ['allowed_classes' => true]);
+                    $saga = \unserialize(\base64_decode($savedSaga->payload()), ['allowed_classes' => true]);
                 }
 
                 return yield new Success($saga);
@@ -269,7 +269,7 @@ final class SagaProvider
                 $savedSaga = StoredSaga::create(
                     $saga->id(),
                     $saga->status(),
-                    \serialize($saga),
+                    \base64_encode(\serialize($saga)),
                     $createdAt,
                     $closedAt
                 );

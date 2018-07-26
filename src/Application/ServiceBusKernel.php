@@ -235,7 +235,10 @@ final class ServiceBusKernel
                     }
                     catch(\Throwable $throwable)
                     {
-                        $logger->critical($throwable->getMessage(), ['operationId' => $envelope->operationId()]);
+                        $logger->critical($throwable->getMessage(), [
+                            'operationId' => $envelope->operationId(),
+                            'file'        => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                        ]);
                         /** @todo: retry message? */
                     }
                 }
