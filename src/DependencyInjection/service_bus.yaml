@@ -30,6 +30,8 @@ services:
     class: Desperado\ServiceBus\Transport\AmqpExt\AmqpExt
     arguments:
       $amqpConfiguration: '@Desperado\ServiceBus\Transport\AmqpExt\AmqpConfiguration'
+      $messageEncoder: null
+      $messageDecoder: null
       $logger: '@Psr\Log\LoggerInterface'
 
   # Transport configuration for starting a subscription
@@ -64,6 +66,7 @@ services:
     class: Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaListenersLoader
     arguments:
       $sagaProvider: '@Desperado\ServiceBus\SagaProvider'
+      $annotationReader: null
       $logger: '@Psr\Log\LoggerInterface'
 
   # Retrieving a list of message handlers for the specified object
