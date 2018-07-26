@@ -18,6 +18,9 @@ use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound;
 use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
+use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ContainerArgumentResolver;
+use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ContextArgumentResolver;
+use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\MessageArgumentResolver;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
@@ -33,10 +36,15 @@ use Psr\Log\LoggerInterface;
  */
 final class ServiceBusKernel
 {
+    private const KERNEL_LOCATOR_INDEX = 'service_bus.kernel_locator';
+    private const SERVICES_LOCATOR     = 'service_bus.services_locator';
+
     /**
+     * Custom service locator for application kernel only
+     *
      * @var ContainerInterface
      */
-    private $container;
+    private $kernelContainer;
 
     /**
      * @var MessageBus
@@ -52,12 +60,14 @@ final class ServiceBusKernel
 
     /**
      * @param ContainerInterface $container
+     *
+     * @throws \Throwable
      */
     public function __construct(ContainerInterface $container)
     {
-        /** custom service locator for application kernel only */
-        $this->container  = $container->get('service_bus.kernel_locator');
-        $this->messageBus = $this->container->get(MessageBusBuilder::class)->compile();
+        $this->kernelContainer = $container->get(self::KERNEL_LOCATOR_INDEX);
+
+        $this->messageBus = $this->buildMessageBus($container);
     }
 
     /**
@@ -67,7 +77,7 @@ final class ServiceBusKernel
      */
     public function transportConfigurator(): TransportConfigurator
     {
-        return $this->container->get(TransportConfigurator::class);
+        return $this->kernelContainer->get(TransportConfigurator::class);
     }
 
     /**
@@ -93,14 +103,14 @@ final class ServiceBusKernel
         $messageProcessor = self::createMessageProcessor(
             $this->messageBus,
             self::createMessageSender(
-                $this->container->get(Transport::class)->createPublisher(),
-                $this->container->get(OutboundMessageRoutes::class),
-                $this->container->get(LoggerInterface::class)
+                $this->kernelContainer->get(Transport::class)->createPublisher(),
+                $this->kernelContainer->get(OutboundMessageRoutes::class),
+                $this->kernelContainer->get(LoggerInterface::class)
             ),
-            $this->container->get(LoggerInterface::class)
+            $this->kernelContainer->get(LoggerInterface::class)
         );
 
-        $this->container
+        $this->kernelContainer
             ->get(Transport::class)
             ->createConsumer($queue)
             ->listen(
@@ -109,6 +119,57 @@ final class ServiceBusKernel
                     $messageProcessor->send($envelope);
                 }
             );
+    }
+
+    /**
+     * @param ContainerInterface $globalContainer
+     *
+     * @return MessageBus
+     *
+     * @throws \Throwable
+     */
+    private function buildMessageBus(ContainerInterface $globalContainer): MessageBus
+    {
+        /** @var \Symfony\Component\DependencyInjection\Container $globalContainer */
+
+        /** @var MessageBusBuilder $messagesBusBuilder */
+        $messagesBusBuilder = $this->kernelContainer->get(MessageBusBuilder::class);
+
+        $this->registerServices(
+            $globalContainer->getParameter('service_bus.services_map'),
+            $messagesBusBuilder,
+            $globalContainer->get(self::SERVICES_LOCATOR)
+        );
+
+        return $messagesBusBuilder->compile();
+    }
+
+    /**
+     * Register event\command handlers from services
+     *
+     * @param array<mixed, string>              $serviceIds
+     * @param MessageBusBuilder  $messagesBusBuilder
+     * @param ContainerInterface $servicesLocator
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    private function registerServices(
+        array $serviceIds,
+        MessageBusBuilder $messagesBusBuilder,
+        ContainerInterface $servicesLocator
+    ): void
+    {
+        $resolvers = self::createDefaultResolvers($servicesLocator);
+
+        foreach($serviceIds as $serviceId)
+        {
+            $messagesBusBuilder->addService(
+                $servicesLocator->get(\sprintf('%s_service', $serviceId)),
+                ...$resolvers
+            );
+        }
     }
 
     /**
@@ -330,5 +391,19 @@ final class ServiceBusKernel
                 ]
             );
         }
+    }
+
+    /**
+     * @param ContainerInterface $servicesLocator
+     *
+     * @return array<mixed, \Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ArgumentResolver>
+     */
+    private static function createDefaultResolvers(ContainerInterface $servicesLocator): array
+    {
+        return [
+            new ContainerArgumentResolver($servicesLocator),
+            new ContextArgumentResolver(),
+            new MessageArgumentResolver()
+        ];
     }
 }

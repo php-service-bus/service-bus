@@ -23,7 +23,7 @@ final class AnnotationCollection implements \Countable, \IteratorAggregate
      *
      * @var array<string, \Desperado\ServiceBus\AnnotationsReader\Annotation>
      */
-    private $collection;
+    private $collection = [];
 
     /**
      * @param array $annotations

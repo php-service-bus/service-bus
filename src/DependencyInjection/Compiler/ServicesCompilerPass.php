@@ -39,30 +39,9 @@ final class ServicesCompilerPass implements CompilerPassInterface
 
         foreach($container->findTaggedServiceIds('service_bus.service') as $id => $tags)
         {
-            $serviceClass    = $container->getDefinition($id)->getClass();
-            $reflectionClass = new \ReflectionClass($serviceClass);
+            $serviceClass = $container->getDefinition($id)->getClass();
 
-            foreach($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod)
-            {
-                foreach($reflectionMethod->getParameters() as $parameter)
-                {
-                    if(false === $parameter->hasType())
-                    {
-                        continue;
-                    }
-
-                    /** @var \ReflectionType $reflectionType */
-                    $reflectionType     = $parameter->getType();
-                    $reflectionTypeName = $reflectionType->getName();
-
-                    if(true === self::supportedType($parameter, $container))
-                    {
-                        $servicesReference[$reflectionTypeName] = new ServiceClosureArgument(
-                            new Reference($reflectionTypeName)
-                        );
-                    }
-                }
-            }
+            $this->collectServiceDependencies($serviceClass, $container, $servicesReference);
 
             $serviceIds[] = $serviceClass;
 
@@ -77,6 +56,39 @@ final class ServicesCompilerPass implements CompilerPassInterface
             ->register('service_bus.services_locator', ServiceLocator::class)
             ->setPublic(true)
             ->setArguments([$servicesReference]);
+    }
+
+    /**
+     * @param string           $serviceClass
+     * @param ContainerBuilder $container
+     * @param array            $servicesReference (passed by reference)
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
+    private function collectServiceDependencies(string $serviceClass, ContainerBuilder $container, array &$servicesReference): void
+    {
+        $reflectionClass = new \ReflectionClass($serviceClass);
+
+        foreach($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod)
+        {
+            foreach($reflectionMethod->getParameters() as $parameter)
+            {
+                if(false === $parameter->hasType())
+                {
+                    continue;
+                }
+
+                /** @var \ReflectionType $reflectionType */
+                $reflectionType     = $parameter->getType();
+                $reflectionTypeName = $reflectionType->getName();
+
+                if(true === self::supportedType($parameter, $container))
+                {
+                    $servicesReference[$reflectionTypeName] = new ServiceClosureArgument(new Reference($reflectionTypeName));
+                }
+            }
+        }
     }
 
     /**

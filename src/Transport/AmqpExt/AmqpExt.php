@@ -137,14 +137,14 @@ final class AmqpExt implements Transport
      */
     public function createTopic(Topic $topic): void
     {
+        /** Exchange already added */
+        if(true === isset($this->exchanges[(string) $topic]))
+        {
+            return;
+        }
+
         try
         {
-            /** Exchange already added */
-            if(true === isset($this->exchanges[(string) $topic]))
-            {
-                return;
-            }
-
             /** @var AmqpTopic $topic */
 
             $exchange = new \AMQPExchange($this->channel);
@@ -172,14 +172,14 @@ final class AmqpExt implements Transport
      */
     public function createQueue(Queue $queue, QueueBind $bind = null): void
     {
+        /** Queue already added */
+        if(true === isset($this->queues[(string) $queue]))
+        {
+            return;
+        }
+
         try
         {
-            /** Queue already added */
-            if(true === isset($this->queues[(string) $queue]))
-            {
-                return;
-            }
-
             /** @var AmqpQueue $queue */
 
             $amqpQueue = new \AMQPQueue($this->channel);
@@ -189,15 +189,7 @@ final class AmqpExt implements Transport
 
             $amqpQueue->declareQueue();
 
-            if(null !== $bind && null !== $bind->routingKey() && '' !== (string) $bind->routingKey())
-            {
-                $routingKey = (string) $bind->routingKey();
-
-                /** @psalm-suppress InvalidPropertyAssignmentValue */
-                $this->exchangeBinds[(string) $bind->topic()][] = $routingKey;
-
-                $amqpQueue->bind((string) $bind->topic(), $routingKey);
-            }
+            $this->bindQueue($amqpQueue, $bind);
 
             /** @psalm-suppress InvalidArrayAssignment */
             $this->queues[(string) $queue] = $amqpQueue;
@@ -253,6 +245,30 @@ final class AmqpExt implements Transport
         catch(\Throwable $throwable)
         {
 
+        }
+    }
+
+    /**
+     * Bind queue to exchange with specified routing key
+     *
+     * @param \AMQPQueue     $amqpQueue
+     * @param QueueBind|null $bind
+     *
+     * @return void
+     *
+     * @throws \AMQPChannelException
+     * @throws \AMQPConnectionException
+     */
+    private function bindQueue(\AMQPQueue $amqpQueue, ?QueueBind $bind): void
+    {
+        if(null !== $bind && null !== $bind->routingKey() && '' !== (string) $bind->routingKey())
+        {
+            $routingKey = (string) $bind->routingKey();
+
+            /** @psalm-suppress InvalidPropertyAssignmentValue */
+            $this->exchangeBinds[(string) $bind->topic()][] = $routingKey;
+
+            $amqpQueue->bind((string) $bind->topic(), $routingKey);
         }
     }
 

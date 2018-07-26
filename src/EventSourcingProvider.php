@@ -120,18 +120,7 @@ final class EventSourcingProvider
                     /** @var StoredAggregateEventStream|null $storedEventStream */
                     $storedEventStream = yield  $storage->loadStream($id, $fromStreamVersion);
 
-                    if(null !== $storedEventStream)
-                    {
-                        $eventStream = $transformer->streamToDomainRepresentation($storedEventStream);
-
-                        if(null === $aggregate)
-                        {
-                            /** @var Aggregate $aggregate */
-                            $aggregate = createWithoutConstructor($storedEventStream->aggregateClass());
-                        }
-
-                        invokeReflectionMethod($aggregate, 'appendStream', $eventStream);
-                    }
+                    $aggregate = self::restoreStream($aggregate, $storedEventStream, $transformer);
 
                     return yield new Success($aggregate);
                 }
@@ -214,6 +203,40 @@ final class EventSourcingProvider
             $aggregate,
             $context
         );
+    }
+
+    /**
+     * Restore the aggregate from the event stream/Add missing events to the aggregate from the snapshot
+     *
+     * @param Aggregate|null                      $aggregate
+     * @param StoredAggregateEventStream|null     $storedEventStream
+     * @param AggregateEventStreamDataTransformer $transformer
+     *
+     * @return Aggregate|null
+     *
+     * @throws \ReflectionException
+     */
+    private static function restoreStream(
+        ?Aggregate $aggregate,
+        ?StoredAggregateEventStream $storedEventStream,
+        AggregateEventStreamDataTransformer $transformer
+    ): ?Aggregate
+    {
+        if(null !== $storedEventStream)
+        {
+            $eventStream = $transformer->streamToDomainRepresentation($storedEventStream);
+
+            if(null === $aggregate)
+            {
+                /** @var Aggregate $aggregate */
+                /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+                $aggregate = createWithoutConstructor($storedEventStream->aggregateClass());
+            }
+
+            invokeReflectionMethod($aggregate, 'appendStream', $eventStream);
+        }
+
+        return $aggregate;
     }
 
     /**
