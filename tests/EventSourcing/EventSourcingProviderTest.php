@@ -21,15 +21,11 @@ use Desperado\ServiceBus\EventSourcing\Contract\AggregateCreated;
 use Desperado\ServiceBus\EventSourcing\EventStream\AggregateEventStream;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql\SqlEventStreamStore;
-use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\DefaultEventSerializer;
 use Desperado\ServiceBus\EventSourcingProvider;
 use Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore;
 use Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SqlSnapshotStore;
 use Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter;
 use Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotVersionTrigger;
-use Desperado\ServiceBus\Marshal\Denormalizer\SymfonyPropertyDenormalizer;
-use Desperado\ServiceBus\Marshal\Normalizer\SymfonyPropertyNormalizer;
-use Desperado\ServiceBus\Marshal\Serializer\SymfonyJsonSerializer;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\EventSourcing\Mocks\TestAggregate;
@@ -83,11 +79,6 @@ final class EventSourcingProviderTest extends TestCase
 
         $this->provider = new EventSourcingProvider(
             $this->store,
-            new DefaultEventSerializer(
-                new SymfonyJsonSerializer(),
-                new SymfonyPropertyNormalizer(),
-                new SymfonyPropertyDenormalizer()
-            ),
             $this->snapshotter
         );
 
