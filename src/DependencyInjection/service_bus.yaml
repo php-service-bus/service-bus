@@ -1,3 +1,6 @@
+parameters:
+  service_bus.sagas: []
+
 services:
   _defaults:
     autowire: false

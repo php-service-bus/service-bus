@@ -141,6 +141,11 @@ final class ServiceBusKernel
             $globalContainer->get(self::SERVICES_LOCATOR)
         );
 
+        $this->registerSagas(
+            $globalContainer->getParameter('service_bus.sagas'),
+            $messagesBusBuilder
+        );
+
         return $messagesBusBuilder->compile();
     }
 
@@ -161,7 +166,8 @@ final class ServiceBusKernel
         ContainerInterface $servicesLocator
     ): void
     {
-        $resolvers = self::createDefaultResolvers($servicesLocator);
+        $resolvers   = self::createDefaultResolvers();
+        $resolvers[] = new ContainerArgumentResolver($servicesLocator);
 
         foreach($serviceIds as $serviceId)
         {
@@ -169,6 +175,26 @@ final class ServiceBusKernel
                 $servicesLocator->get(\sprintf('%s_service', $serviceId)),
                 ...$resolvers
             );
+        }
+    }
+
+    /**
+     * Reguster sagas listeners
+     *
+     * @param array             $sagas
+     * @param MessageBusBuilder $messageBusBuilder
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    private function registerSagas(array $sagas, MessageBusBuilder $messageBusBuilder): void
+    {
+        $resolvers = self::createDefaultResolvers();
+
+        foreach($sagas as $sagaClass)
+        {
+            $messageBusBuilder->addSaga($sagaClass, ...$resolvers);
         }
     }
 
@@ -394,14 +420,13 @@ final class ServiceBusKernel
     }
 
     /**
-     * @param ContainerInterface $servicesLocator
+     * Create default argument resolvers
      *
      * @return array<mixed, \Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ArgumentResolver>
      */
-    private static function createDefaultResolvers(ContainerInterface $servicesLocator): array
+    private static function createDefaultResolvers(): array
     {
         return [
-            new ContainerArgumentResolver($servicesLocator),
             new ContextArgumentResolver(),
             new MessageArgumentResolver()
         ];
