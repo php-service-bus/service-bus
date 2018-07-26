@@ -21,6 +21,8 @@ use Desperado\ServiceBus\MessageBus\Processor\ProcessorsMap;
 use Desperado\ServiceBus\MessageBus\Processor\ValidationMessageProcessor;
 use Desperado\ServiceBus\Sagas\Configuration\SagaListenersLoader;
 use Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Message bus builder
@@ -45,13 +47,24 @@ final class MessageBusBuilder
     private $processorsList;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param SagaListenersLoader   $sagasConfigurationLoader
      * @param ServiceHandlersLoader $servicesConfigurationLoader
+     * @param LoggerInterface|null  $logger
      */
-    public function __construct(SagaListenersLoader $sagasConfigurationLoader, ServiceHandlersLoader $servicesConfigurationLoader)
+    public function __construct(
+        SagaListenersLoader $sagasConfigurationLoader,
+        ServiceHandlersLoader $servicesConfigurationLoader,
+        LoggerInterface $logger = null
+    )
     {
         $this->sagasConfigurationLoader    = $sagasConfigurationLoader;
         $this->servicesConfigurationLoader = $servicesConfigurationLoader;
+        $this->logger                      = $logger ?? new NullLogger();
 
         $this->processorsList = new ProcessorsMap();
     }
@@ -120,7 +133,13 @@ final class MessageBusBuilder
      */
     public function compile(): MessageBus
     {
-        return new MessageBus();
+        $this->logger->info(
+            'The message bus has been successfully configured. "{registeredHandlersCount}" handlers registered', [
+                'registeredHandlersCount' => \count($this->processorsList)
+            ]
+        );
+
+        return new MessageBus($this->processorsList);
     }
 
     /**

@@ -30,6 +30,7 @@ use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFai
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStream;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\AggregateEventSerializer;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\AggregateEventStreamDataTransformer;
+use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\DefaultEventSerializer;
 use Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter;
 
 /**
@@ -59,16 +60,22 @@ final class EventSourcingProvider
     private $snapshotter;
 
     /**
-     * @param AggregateStore           $storage
-     * @param AggregateEventSerializer $serializer
-     * @param Snapshotter              $snapshotter
+     * @param AggregateStore                $storage
+     * @param Snapshotter                   $snapshotter
+     * @param AggregateEventSerializer|null $serializer
      */
-    public function __construct(AggregateStore $storage, AggregateEventSerializer $serializer, Snapshotter $snapshotter)
+    public function __construct(
+        AggregateStore $storage,
+        Snapshotter $snapshotter,
+        AggregateEventSerializer $serializer = null
+    )
     {
         $this->storage     = $storage;
         $this->snapshotter = $snapshotter;
 
-        $this->streamDataTransformer = new AggregateEventStreamDataTransformer($serializer);
+        $this->streamDataTransformer = new AggregateEventStreamDataTransformer(
+            $serializer ?? new DefaultEventSerializer()
+        );
     }
 
     /**

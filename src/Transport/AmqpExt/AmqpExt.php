@@ -18,7 +18,9 @@ use Desperado\ServiceBus\Transport\Exceptions\ConnectionFail;
 use Desperado\ServiceBus\Transport\Exceptions\CreateQueueFailed;
 use Desperado\ServiceBus\Transport\Exceptions\CreateTopicFailed;
 use Desperado\ServiceBus\Transport\Exceptions\NotConfiguredQueue;
+use Desperado\ServiceBus\Transport\Marshal\Decoder\JsonMessageDecoder;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
+use Desperado\ServiceBus\Transport\Marshal\Encoder\JsonMessageEncoder;
 use Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder;
 use Desperado\ServiceBus\Transport\Publisher;
 use Desperado\ServiceBus\Transport\Queue;
@@ -84,24 +86,24 @@ final class AmqpExt implements Transport
     private $exchangeBinds = [];
 
     /**
-     * @param AmqpConfiguration       $amqpConfiguration
-     * @param TransportMessageEncoder $messageEncoder
-     * @param TransportMessageDecoder $messageDecoder
-     * @param LoggerInterface|null    $logger
+     * @param AmqpConfiguration            $amqpConfiguration
+     * @param TransportMessageEncoder|null $messageEncoder
+     * @param TransportMessageDecoder|null $messageDecoder
+     * @param LoggerInterface|null         $logger
      *
      * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
      */
     public function __construct(
         AmqpConfiguration $amqpConfiguration,
-        TransportMessageEncoder $messageEncoder,
-        TransportMessageDecoder $messageDecoder,
+        TransportMessageEncoder $messageEncoder = null,
+        TransportMessageDecoder $messageDecoder = null,
         LoggerInterface $logger = null
     )
     {
         try
         {
-            $this->messageEncoder = $messageEncoder;
-            $this->messageDecoder = $messageDecoder;
+            $this->messageEncoder = $messageEncoder ?? new JsonMessageEncoder();
+            $this->messageDecoder = $messageDecoder ?? new JsonMessageDecoder();
             $this->logger         = $logger ?? new NullLogger();
 
             $this->connection = self::createConnection($amqpConfiguration);

@@ -16,6 +16,7 @@ namespace Desperado\ServiceBus\Sagas\Configuration;
 use Desperado\ServiceBus\AnnotationsReader\Annotation;
 use Desperado\ServiceBus\AnnotationsReader\AnnotationCollection;
 use Desperado\ServiceBus\AnnotationsReader\AnnotationsReader;
+use Desperado\ServiceBus\AnnotationsReader\DefaultAnnotationsReader;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\MessageBus\MessageHandler\Handler;
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerCollection;
@@ -49,18 +50,18 @@ final class AnnotationsBasedSagaListenersLoader implements SagaListenersLoader
     private $logger;
 
     /**
-     * @param AnnotationsReader    $annotationReader
-     * @param SagaProvider         $sagaProvider
-     * @param LoggerInterface|null $logger
+     * @param SagaProvider           $sagaProvider
+     * @param AnnotationsReader|null $annotationReader
+     * @param LoggerInterface|null   $logger
      */
     public function __construct(
-        AnnotationsReader $annotationReader,
         SagaProvider $sagaProvider,
+        AnnotationsReader $annotationReader = null,
         LoggerInterface $logger = null
     )
     {
-        $this->annotationReader = $annotationReader;
         $this->sagaProvider     = $sagaProvider;
+        $this->annotationReader = $annotationReader ?? new DefaultAnnotationsReader();
         $this->logger           = $logger ?? new NullLogger();
     }
 

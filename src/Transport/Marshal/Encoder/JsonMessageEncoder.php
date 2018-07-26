@@ -15,7 +15,9 @@ namespace Desperado\ServiceBus\Transport\Marshal\Encoder;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Marshal\Normalizer\Normalizer;
+use Desperado\ServiceBus\Marshal\Normalizer\SymfonyPropertyNormalizer;
 use Desperado\ServiceBus\Marshal\Serializer\ArraySerializer;
+use Desperado\ServiceBus\Marshal\Serializer\SymfonyJsonSerializer;
 use Desperado\ServiceBus\Transport\Marshal\Exceptions\EncodeMessageFailed;
 use Desperado\ServiceBus\Transport\Marshal\MessageDTO;
 
@@ -35,13 +37,13 @@ final class JsonMessageEncoder implements TransportMessageEncoder
     private $serializer;
 
     /**
-     * @param Normalizer      $normalizer
-     * @param ArraySerializer $serializer
+     * @param Normalizer|null      $normalizer
+     * @param ArraySerializer|null $serializer
      */
-    public function __construct(Normalizer $normalizer, ArraySerializer $serializer)
+    public function __construct(Normalizer $normalizer = null, ArraySerializer $serializer = null)
     {
-        $this->normalizer = $normalizer;
-        $this->serializer = $serializer;
+        $this->normalizer = $normalizer ?? new SymfonyPropertyNormalizer();
+        $this->serializer = $serializer ?? new SymfonyJsonSerializer();
     }
 
     /**

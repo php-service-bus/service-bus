@@ -16,6 +16,7 @@ namespace Desperado\ServiceBus\Services\Configuration;
 use Desperado\ServiceBus\AnnotationsReader\Annotation;
 use Desperado\ServiceBus\AnnotationsReader\AnnotationCollection;
 use Desperado\ServiceBus\AnnotationsReader\AnnotationsReader;
+use Desperado\ServiceBus\AnnotationsReader\DefaultAnnotationsReader;
 use Desperado\ServiceBus\MessageBus\MessageHandler\Handler;
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerCollection;
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerOptions;
@@ -36,9 +37,9 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     /**
      * @param AnnotationsReader $annotationReader
      */
-    public function __construct(AnnotationsReader $annotationReader)
+    public function __construct(AnnotationsReader $annotationReader = null)
     {
-        $this->annotationReader = $annotationReader;
+        $this->annotationReader = $annotationReader ?? new DefaultAnnotationsReader();
     }
 
     /**

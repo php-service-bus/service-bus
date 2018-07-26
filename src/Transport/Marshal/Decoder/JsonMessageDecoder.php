@@ -15,7 +15,9 @@ namespace Desperado\ServiceBus\Transport\Marshal\Decoder;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Marshal\Denormalizer\Denormalizer;
+use Desperado\ServiceBus\Marshal\Denormalizer\SymfonyPropertyDenormalizer;
 use Desperado\ServiceBus\Marshal\Serializer\ArraySerializer;
+use Desperado\ServiceBus\Marshal\Serializer\SymfonyJsonSerializer;
 use Desperado\ServiceBus\Transport\Marshal\Exceptions\DecodeMessageFailed;
 use Desperado\ServiceBus\Transport\Marshal\MessageDTO;
 
@@ -35,13 +37,13 @@ final class JsonMessageDecoder implements TransportMessageDecoder
     private $serializer;
 
     /**
-     * @param Denormalizer    $denormalizer
-     * @param ArraySerializer $serializer
+     * @param Denormalizer|null    $denormalizer
+     * @param ArraySerializer|null $serializer
      */
-    public function __construct(Denormalizer $denormalizer, ArraySerializer $serializer)
+    public function __construct(Denormalizer $denormalizer = null, ArraySerializer $serializer = null)
     {
-        $this->denormalizer = $denormalizer;
-        $this->serializer   = $serializer;
+        $this->denormalizer = $denormalizer ?? new SymfonyPropertyDenormalizer();
+        $this->serializer   = $serializer ?? new SymfonyJsonSerializer();
     }
 
     /**
