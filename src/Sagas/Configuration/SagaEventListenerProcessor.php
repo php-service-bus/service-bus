@@ -19,9 +19,10 @@ use Amp\Success;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
+use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound;
-use Desperado\ServiceBus\Sagas\Configuration\Exceptions\ReceiveIdMethodNotFound;
+use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierFieldNotFound;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Psr\Log\LoggerInterface;
@@ -124,7 +125,7 @@ final class SagaEventListenerProcessor
      *
      * @return SagaId
      *
-     * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\ReceiveIdMethodNotFound
+     * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierFieldNotFound
      * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
      */
@@ -136,24 +137,24 @@ final class SagaEventListenerProcessor
         {
             $propertyName = \lcfirst($sagaListenerOptions->containingIdentifierProperty());
 
-            $methodNames = [
-                $propertyName,
-                \sprintf('get%s', \ucfirst($propertyName))
-            ];
-
-            foreach($methodNames as $methodName)
+            try
             {
-                if(true === \method_exists($event, $methodName))
-                {
-                    return self::identifierInstantiator(
-                        $identifierClass,
-                        $event->{$methodName}(),
-                        $sagaListenerOptions->sagaClass()
-                    );
-                }
+                $propertyValue = (string) readReflectionPropertyValue($event, $propertyName);
+            }
+            catch(\Throwable $throwable)
+            {
+                throw new IdentifierFieldNotFound($event, $propertyName);
             }
 
-            throw new ReceiveIdMethodNotFound($event, $methodNames);
+
+            if('' !== $propertyValue)
+            {
+                return self::identifierInstantiator(
+                    $identifierClass,
+                    $propertyValue,
+                    $sagaListenerOptions->sagaClass()
+                );
+            }
         }
 
         throw new IdentifierClassNotFound($identifierClass, $sagaListenerOptions->sagaClass());

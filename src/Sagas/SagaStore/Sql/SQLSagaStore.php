@@ -137,6 +137,12 @@ final class SQLSagaStore implements SagasStore
 
                 if(null !== $result && true === isset($result['payload']))
                 {
+                    /** For DoctrineDBAL */
+                    if(true === \is_resource($result['payload']))
+                    {
+                        $result['payload'] = \stream_get_contents($result['payload'], -1, 0);
+                    }
+
                     $result['payload'] = $adapter->unescapeBinary($result['payload']);
 
                     return yield new Success(StoredSaga::fromRow($result));

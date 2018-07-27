@@ -17,20 +17,20 @@ use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 
 /**
- * The method of obtaining the identifier was not found
+ * A property that contains an identifier was not found
  */
-final class ReceiveIdMethodNotFound extends \RuntimeException implements ServiceBusExceptionMarker
+final class IdentifierFieldNotFound extends \RuntimeException implements ServiceBusExceptionMarker
 {
     /**
-     * @param Event $event
-     * @param array $choices
+     * @param Event  $event
+     * @param string $property
      */
-    public function __construct(Event $event, array $choices)
+    public function __construct(Event $event, string $property)
     {
         parent::__construct(
             \sprintf(
-                'The method of obtaining the identifier (variants: %s) was not found in the event event class "%s"',
-                \implode(', ', \array_values($choices)),
+                'A property that contains an identifier ("%s") was not found in class "%s"',
+                $property,
                 \get_class($event)
             )
         );
