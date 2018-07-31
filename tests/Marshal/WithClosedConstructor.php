@@ -21,6 +21,9 @@ final class WithClosedConstructor
     /** @var string */
     private $key;
 
+    /** @var string|null */
+    private $someSecondKey;
+
     /**
      * @param string $key
      *

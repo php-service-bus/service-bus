@@ -33,7 +33,7 @@ final class SymfonyPropertyNormalizerTest extends TestCase
 
         $normalized = (new SymfonyPropertyNormalizer())->normalize($object);
 
-        static::assertEquals(['key' => 'value'], $normalized);
+        static::assertEquals(['key' => 'value', 'someSecondKey' => null], $normalized);
 
         $result = (new SymfonyPropertyDenormalizer())->denormalize(WithClosedConstructor::class, $normalized);
 
@@ -55,5 +55,24 @@ final class SymfonyPropertyNormalizerTest extends TestCase
         $normalizer = new SymfonyPropertyNormalizer();
 
         (new SymfonyPropertyDenormalizer())->denormalize(WithWrongType::class, $normalizer->normalize($object));
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function snakeCase(): void
+    {
+        /** @var WithClosedConstructor $result */
+        $result = (new SymfonyPropertyDenormalizer())->denormalize(
+            WithClosedConstructor::class,
+            ['key' => 'value', 'some_second_key' => '100500']
+        );
+
+        static::assertEquals(
+            '100500',
+            static::readAttribute($result, 'someSecondKey')
+        );
     }
 }

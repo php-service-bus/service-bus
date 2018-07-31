@@ -36,7 +36,7 @@ final class SymfonyPropertyNameConverter implements NameConverterInterface
         /** @var string $result */
         $result = \preg_replace_callback(
             '/_(.?)/',
-            static function(string $matches): string
+            static function(array $matches): string
             {
                 return \ucfirst($matches[1]);
             },
