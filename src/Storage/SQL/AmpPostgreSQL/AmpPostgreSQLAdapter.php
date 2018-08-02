@@ -74,7 +74,6 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
                     /** @var \Amp\Postgres\Statement $statement */
                     $statement = yield $connectionsPool->prepare($queryString);
 
-
                     /** @psalm-suppress UndefinedClass Class or interface Amp\Postgres\TupleResult does not exist */
                     return new AmpPostgreSQLResultSet(
                         yield $statement->execute($parameters)

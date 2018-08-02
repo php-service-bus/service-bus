@@ -76,7 +76,7 @@ final class DoctrineDBALAdapter implements StorageAdapter
                 // @codeCoverageIgnoreEnd
             }
 
-            return new Success(new DoctrineDBALResultSet($statement));
+            return new Success(new DoctrineDBALResultSet($this->connection, $statement));
         }
         catch(\Throwable $throwable)
         {

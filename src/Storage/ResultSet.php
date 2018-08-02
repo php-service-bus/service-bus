@@ -40,6 +40,19 @@ interface ResultSet
      * Gets the last emitted value or throws an exception if the iterator has completed
      *
      * @return mixed Value emitted from the iterator
+     *
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
      */
     public function getCurrent();
+
+    /**
+     * Receive last insert id
+     *
+     * @param string $sequence
+     *
+     * @return string|int|null
+     *
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
+     */
+    public function lastInsertId(?string $sequence = null);
 }

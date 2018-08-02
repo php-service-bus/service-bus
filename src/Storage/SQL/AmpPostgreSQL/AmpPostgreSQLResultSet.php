@@ -79,4 +79,29 @@ class AmpPostgreSQLResultSet implements ResultSet
             throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function lastInsertId(?string $sequence = null): ?string
+    {
+        try
+        {
+            if($this->originalResultSet instanceof PgSqlResultSet)
+            {
+                $result = $this->originalResultSet->getCurrent();
+
+                if(true === isset($result['id']))
+                {
+                    return (string) $result['id'];
+                }
+            }
+
+            return null;
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+        }
+    }
 }

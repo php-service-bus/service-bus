@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Storage\SQL;
 
+use Amp\Coroutine;
 use function Amp\Promise\wait;
 use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapter;
@@ -40,6 +41,57 @@ final class DoctrineDBALAdapterTest extends BaseStorageAdapterTest
         }
 
         return self::$adapter;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @throws \Throwable
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        wait(
+            static::getAdapter()->execute(
+                'CREATE TABLE IF NOT EXISTS test_ai (id serial PRIMARY KEY, value VARCHAR)'
+            )
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @return string
+     *
+     * @throws \Throwable
+     */
+    public function lastInsertId(): void
+    {
+        $handler = static function(DoctrineDBALAdapterTest $self): \Generator
+        {
+            try
+            {
+                $adapter = static::getAdapter();
+
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
+                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')');
+
+                static::assertEquals('1', $result->lastInsertId());
+
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
+                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')');
+
+                static::assertEquals('2', $result->lastInsertId());
+            }
+            catch(\Throwable $throwable)
+            {
+                /** @noinspection StaticInvocationViaThisInspection */
+                $self->fail($throwable->getMessage());
+            }
+        };
+
+        wait(new Coroutine($handler($this)));
     }
 
     /**

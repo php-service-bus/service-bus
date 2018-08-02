@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Storage\SQL\DoctrineDBAL;
 
 use Amp\Success;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Amp\Promise;
 use Desperado\ServiceBus\Storage\ResultSet;
@@ -52,10 +53,18 @@ final class DoctrineDBALResultSet implements ResultSet
     private $currentPosition = 0;
 
     /**
+     * Connection instance
+     *
+     * @var Connection
+     */
+    private $connection;
+
+    /**
      * @param Statement $wrappedStmt
      */
-    public function __construct(Statement $wrappedStmt)
+    public function __construct(Connection $connection, Statement $wrappedStmt)
     {
+        $this->connection   = $connection;
         $this->fetchResult  = $wrappedStmt->fetchAll();
         $this->resultsCount = \count($this->fetchResult);
     }
@@ -86,5 +95,13 @@ final class DoctrineDBALResultSet implements ResultSet
         }
 
         return $this->currentRow = $this->fetchResult[$this->currentPosition - 1] ?? null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function lastInsertId(?string $sequence = null): ?string
+    {
+        return $this->connection->lastInsertId($sequence);
     }
 }
