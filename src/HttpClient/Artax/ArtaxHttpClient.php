@@ -123,9 +123,12 @@ final class ArtaxHttpClient implements HttpClient
      */
     private function executeGet(HttpRequest $requestData): Promise
     {
+        $request = (new Request($requestData->url(), $requestData->httpMethod()))
+            ->withHeaders($requestData->headers());
+
         return self::doRequest(
             $this->handler,
-            new Request($requestData->url(), $requestData->httpMethod()),
+            $request,
             $this->logger
         );
     }
@@ -147,7 +150,8 @@ final class ArtaxHttpClient implements HttpClient
                 $body instanceof ArtaxFormBody
                     ? $body->preparedBody()
                     : $body
-            );
+            )
+            ->withHeaders($requestData->headers());
 
         return self::doRequest($this->handler, $request, $this->logger);
     }

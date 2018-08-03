@@ -65,12 +65,13 @@ final class HttpRequest
     /**
      * @param string          $url
      * @param FormBody|string $body
+     * @param array           $headers
      *
      * @return self
      */
-    public static function post(string $url, $body): self
+    public static function post(string $url, $body, array $headers = []): self
     {
-        return new self('POST', $url, [], $body);
+        return new self('POST', $url, $headers, $body);
     }
 
     /**
