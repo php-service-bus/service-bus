@@ -80,6 +80,8 @@ services:
   Desperado\ServiceBus\HttpClient\HttpClient:
     class: Desperado\ServiceBus\HttpClient\Artax\ArtaxHttpClient
     arguments:
+      $handler: null
+      $transferTimeout: 5000
       $logger: '@Psr\Log\LoggerInterface'
 
   # Routes to which messages will be sent (Directions are indicated in the context of the current transport)
