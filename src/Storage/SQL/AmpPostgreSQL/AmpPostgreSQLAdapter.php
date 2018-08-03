@@ -145,7 +145,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
         $dsn = \sprintf(
             'host=%s port=%d dbname=%s options=\'--client_encoding=%s\'',
             $configuration->host(),
-            $configuration->port() ?? 5342,
+            $configuration->port() ?? 5432,
             $configuration->databaseName(),
             $configuration->encoding()
         );
