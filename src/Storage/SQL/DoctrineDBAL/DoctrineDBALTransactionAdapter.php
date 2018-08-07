@@ -58,7 +58,7 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
                 // @codeCoverageIgnoreEnd
             }
 
-            return new Success(new DoctrineDBALResultSet($statement));
+            return new Success(new DoctrineDBALResultSet($this->connection, $statement));
         }
         catch(\Throwable $throwable)
         {

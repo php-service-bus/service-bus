@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL;
 
 use function Amp\call;
+use Amp\Postgres\Connection;
 use function Amp\Postgres\pool;
 use Amp\Postgres\Pool;
 use Amp\Promise;
@@ -71,13 +72,20 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
             {
                 try
                 {
+                    /** @var Connection $connection */
+                    $connection = yield $connectionsPool->extractConnection();
+
                     /** @var \Amp\Postgres\Statement $statement */
-                    $statement = yield $connectionsPool->prepare($queryString);
+                    $statement = yield $connection->prepare($queryString);
 
                     /** @psalm-suppress UndefinedClass Class or interface Amp\Postgres\TupleResult does not exist */
-                    return new AmpPostgreSQLResultSet(
+                    $result = new AmpPostgreSQLResultSet(
                         yield $statement->execute($parameters)
                     );
+
+                    $connection->close();
+
+                    return $result;
                 }
                 catch(\Throwable $throwable)
                 {

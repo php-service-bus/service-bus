@@ -85,7 +85,9 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
             {
                 try
                 {
-                    return yield $transaction->commit();
+                    yield $transaction->commit();
+
+                    $transaction->close();
                 }
                 catch(\Throwable $throwable)
                 {
