@@ -56,13 +56,17 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
             {
                 try
                 {
-                    /** @var \Amp\Postgres\Statement $statement */
+                    /** @var \Amp\Sql\Statement $statement */
                     $statement = yield $transaction->prepare($queryString);
 
                     /** @psalm-suppress UndefinedClass Class or interface Amp\Postgres\TupleResult does not exist */
                     $result = new AmpPostgreSQLResultSet(
                         yield $statement->execute($parameters)
                     );
+
+                    unset($statement);
+                    
+                    return $result;
                 }
                 catch(\Throwable $throwable)
                 {

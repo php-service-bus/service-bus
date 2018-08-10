@@ -11,6 +11,7 @@
          beStrictAboutTestsThatDoNotTestAnything="false">
     <php>
         <ini name="error_reporting" value="-1"/>
+        <env name="TEST_POSTGRES_DSN" value="pgsql://postgres:123456789@localhost:5432/test"/>
     </php>
 
     <testsuites>

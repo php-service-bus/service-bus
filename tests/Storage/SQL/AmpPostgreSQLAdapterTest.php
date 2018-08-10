@@ -59,16 +59,9 @@ final class AmpPostgreSQLAdapterTest extends BaseStorageAdapterTest
      */
     protected static function getAdapter(): StorageAdapter
     {
-        $connectionDSN = (string) \getenv('TEST_POSTGRES_DSN');
-
-        if('' === $connectionDSN)
-        {
-            $connectionDSN = 'pgsql://postgres:123456789@localhost:5432/test';
-        }
-
         return StorageAdapterFactory::create(
             AmpPostgreSQLAdapter::class,
-            $connectionDSN
+            (string) \getenv('TEST_POSTGRES_DSN')
         );
     }
 
