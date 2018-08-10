@@ -109,7 +109,7 @@ function deleteQuery(string $fromTable): DeleteQuery
  * Create insert query
  *
  * @param string $toTable
- * @param array<string, mixed>|object  $rows
+ * @param array<string, mixed>|object $toInsert
  *
  * @return InsertQuery
  */
