@@ -17,6 +17,7 @@
     },
     "files": [
       "src/Storage/functions.php",
+      "src/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
       "src/Common/reflectionFunctions.php"
@@ -28,6 +29,7 @@
     },
     "files": [
       "src/Storage/functions.php",
+      "src/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
       "src/Common/reflectionFunctions.php"
@@ -52,7 +54,8 @@
     "symfony/validator": "v4.1",
     "phpdocumentor/reflection-docblock": "^4.0",
     "doctrine/annotations": "v1.6.0",
-    "guzzlehttp/psr7": "1.4.2"
+    "guzzlehttp/psr7": "1.4.2",
+    "latitude/latitude": "^3.1"
   },
   "require-dev": {
     "doctrine/dbal": "^v2.6",

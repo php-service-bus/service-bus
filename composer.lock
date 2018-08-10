@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bb54fe54002eaa2b9707c8851f42664c",
-    "content-hash": "63cf55d7b6ccb5afd2691cb711e6d0aa",
+    "hash": "892055ed47cc0826b1d41617e1614122",
+    "content-hash": "b13baa8b91d8e6d3cb9d0d980063e296",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1202,6 +1202,57 @@
                 "x509"
             ],
             "time": "2017-07-04 19:37:30"
+        },
+        {
+            "name": "latitude/latitude",
+            "version": "3.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/shadowhand/latitude.git",
+                "reference": "2b76eab67eef05bf88f2505cea2c4c11033f27c2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/shadowhand/latitude/zipball/2b76eab67eef05bf88f2505cea2c4c11033f27c2",
+                "reference": "2b76eab67eef05bf88f2505cea2c4c11033f27c2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "eloquent/liberator": "^2.0",
+                "hoa/devtools": "^1.17",
+                "hoa/ruler": "2.17.05.16",
+                "phpstan/phpstan": "^0.9.1",
+                "phpunit/phpunit": "^6.0",
+                "vimeo/psalm": "^0.3.88"
+            },
+            "suggest": {
+                "hoa/ruler": "Adds support for creating criteria from strings"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/functions.php"
+                ],
+                "psr-4": {
+                    "Latitude\\QueryBuilder\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Woody Gilk",
+                    "email": "woody.gilk@gmail.com",
+                    "homepage": "https://github.com/shadowhand"
+                }
+            ],
+            "description": "A SQL query builder with zero dependencies",
+            "time": "2018-05-09 14:39:02"
         },
         {
             "name": "monolog/monolog",
