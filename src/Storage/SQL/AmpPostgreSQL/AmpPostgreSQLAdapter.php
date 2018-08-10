@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL;
 
 use function Amp\call;
 use Amp\Postgres\Connection;
+use Amp\Postgres\ConnectionConfig;
 use function Amp\Postgres\pool;
 use Amp\Postgres\Pool;
 use Amp\Promise;
@@ -49,7 +50,13 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
         {
             $queryData  = $configuration->queryParameters();
             $this->pool = pool(
-                $this->createConnectionDSN($configuration),
+                new ConnectionConfig(
+                    $configuration->host(),
+                    $configuration->port() ?? ConnectionConfig::DEFAULT_PORT,
+                    $configuration->username(),
+                    $configuration->password(),
+                    $configuration->databaseName()
+                ),
                 $queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS
             );
         }
@@ -72,10 +79,10 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
             {
                 try
                 {
-                    /** @var Connection $connection */
+                    /** @var \Amp\Sql\Link $connection */
                     $connection = yield $connectionsPool->extractConnection();
 
-                    /** @var \Amp\Postgres\Statement $statement */
+                    /** @var \Amp\Sql\Statement $statement */
                     $statement = yield $connection->prepare($queryString);
 
                     /** @psalm-suppress UndefinedClass Class or interface Amp\Postgres\TupleResult does not exist */
@@ -137,31 +144,5 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
     {
         /** @noinspection PhpComposerExtensionStubsInspection */
         return \pg_unescape_bytea($string);
-    }
-
-    /**
-     * Create connection DSN string
-     *
-     * user=root password=qwerty host=localhost port=5342 dbname=test options='--client_encoding=UTF8'
-     *
-     * @param StorageConfiguration $configuration
-     *
-     * @return string
-     */
-    private function createConnectionDSN(StorageConfiguration $configuration): string
-    {
-        $dsn = \sprintf(
-            'host=%s port=%d dbname=%s options=\'--client_encoding=%s\'',
-            $configuration->host(),
-            $configuration->port() ?? 5432,
-            $configuration->databaseName(),
-            $configuration->encoding()
-        );
-        if(true === $configuration->hasCredentials())
-        {
-            $dsn .= \sprintf(' user=%s password=%s ', $configuration->username(), $configuration->password());
-        }
-
-        return \trim($dsn);
     }
 }
