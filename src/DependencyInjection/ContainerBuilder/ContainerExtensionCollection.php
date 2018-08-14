@@ -26,6 +26,8 @@ final class ContainerExtensionCollection implements \IteratorAggregate
     private $collection = [];
 
     /**
+     * @noinspection PhpDocSignatureInspection
+     *
      * @param Extension ...$extensions
      *
      * @return void

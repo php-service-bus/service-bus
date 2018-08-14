@@ -23,7 +23,7 @@ interface ServiceHandlersLoader
     /**
      * Load specified saga listeners
      *
-     * @param string $sagaClass
+     * @param object $service
      *
      * @return HandlerCollection
      *

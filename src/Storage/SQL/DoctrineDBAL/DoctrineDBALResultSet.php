@@ -60,7 +60,8 @@ final class DoctrineDBALResultSet implements ResultSet
     private $connection;
 
     /**
-     * @param Statement $wrappedStmt
+     * @param Connection $connection
+     * @param Statement  $wrappedStmt
      */
     public function __construct(Connection $connection, Statement $wrappedStmt)
     {

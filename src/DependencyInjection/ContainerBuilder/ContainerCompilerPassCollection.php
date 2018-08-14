@@ -26,6 +26,8 @@ final class ContainerCompilerPassCollection implements \IteratorAggregate
     private $collection = [];
 
     /**
+     * @noinspection PhpDocSignatureInspection
+     *
      * @param CompilerPassInterface ...$compilerPasses
      *
      * @return void

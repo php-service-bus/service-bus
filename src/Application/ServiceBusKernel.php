@@ -135,12 +135,14 @@ final class ServiceBusKernel
         /** @var MessageBusBuilder $messagesBusBuilder */
         $messagesBusBuilder = $this->kernelContainer->get(MessageBusBuilder::class);
 
+        /** @psalm-suppress UndefinedMethod */
         $this->registerServices(
             $globalContainer->getParameter('service_bus.services_map'),
             $messagesBusBuilder,
             $globalContainer->get(self::SERVICES_LOCATOR)
         );
 
+        /** @psalm-suppress UndefinedMethod */
         $this->registerSagas(
             $globalContainer->getParameter('service_bus.sagas'),
             $messagesBusBuilder
@@ -179,7 +181,7 @@ final class ServiceBusKernel
     }
 
     /**
-     * Reguster sagas listeners
+     * Register sagas listeners
      *
      * @param array             $sagas
      * @param MessageBusBuilder $messageBusBuilder
@@ -338,7 +340,7 @@ final class ServiceBusKernel
      */
     private static function beforeDispatch(IncomingEnvelope $envelope, LoggerInterface $logger): void
     {
-        $logger->info('Dispatching the message "{messageClass}"', [
+        $logger->debug('Dispatching the message "{messageClass}"', [
                 'messageClass' => \get_class($envelope->denormalized()),
                 'operationId'  => $envelope->operationId(),
             ]
@@ -403,7 +405,7 @@ final class ServiceBusKernel
         OutboundEnvelope $outboundEnvelope
     ): void
     {
-        $logger->info(
+        $logger->debug(
             'Sending a "{messageClass}" message to "{destinationTopic}/{destinationRoutingKey}"', [
                 'messageClass'          => $messageClass,
                 'destinationTopic'      => $destination->topicName(),

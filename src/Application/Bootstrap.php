@@ -150,6 +150,8 @@ final class Bootstrap
     }
 
     /**
+     * @noinspection PhpDocSignatureInspection
+     *
      * @param CompilerPassInterface ...$compilerPassInterfaces
      *
      * @return $this

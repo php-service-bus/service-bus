@@ -41,13 +41,16 @@ final class ServicesCompilerPass implements CompilerPassInterface
         {
             $serviceClass = $container->getDefinition($id)->getClass();
 
-            $this->collectServiceDependencies($serviceClass, $container, $servicesReference);
+            if(null !== $serviceClass)
+            {
+                $this->collectServiceDependencies($serviceClass, $container, $servicesReference);
 
-            $serviceIds[] = $serviceClass;
+                $serviceIds[] = $serviceClass;
 
-            $servicesReference[\sprintf('%s_service', $serviceClass)] = new ServiceClosureArgument(
-                new Reference($id)
-            );
+                $servicesReference[\sprintf('%s_service', $serviceClass)] = new ServiceClosureArgument(
+                    new Reference($id)
+                );
+            }
         }
 
         $container->setParameter('service_bus.services_map', $serviceIds);

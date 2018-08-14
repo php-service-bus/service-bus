@@ -163,6 +163,7 @@ function getObjectVars(object $object): array
     $closure = \Closure::bind(
         function(): array
         {
+            /** @psalm-suppress InvalidScope */
             return \get_object_vars($this);
         },
         $object,
@@ -188,6 +189,7 @@ function toSnakeCase(string $string): string
  * @param string $key
  * @param mixed  $value
  *
+ * @psalm-return scalar|null
  * @return int|float|null|string
  *
  * @throws \LogicException
@@ -219,15 +221,18 @@ function cast(string $key, $value)
  * @param object $object
  *
  * @return string
+ *
+ * @throws \LogicException
  */
 function castObjectToString(object $object): string
 {
-    if(false === \method_exists($object, '__toString'))
+    if(true === \method_exists($object, '__toString'))
     {
-        throw new \LogicException(
-            \sprintf('"%s" must implements "__toString" method', \get_class($object))
-        );
+        /** @psalm-suppress InvalidCast */
+        return (string) $object;
     }
 
-    return (string) $object;
+    throw new \LogicException(
+        \sprintf('"%s" must implements "__toString" method', \get_class($object))
+    );
 }

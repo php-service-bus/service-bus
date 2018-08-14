@@ -72,7 +72,10 @@ final class MessageBusBuilder
     /**
      * Add saga listeners to messages bus
      *
+     * @noinspection PhpDocSignatureInspection
+     *
      * @param string $sagaClass
+     * @param ArgumentResolver ...$argumentResolvers
      *
      * @return void
      *
@@ -92,6 +95,8 @@ final class MessageBusBuilder
 
     /**
      * Add service messages (command\event) handlers
+     *
+     * @noinspection PhpDocSignatureInspection
      *
      * @param object           $service
      * @param ArgumentResolver ...$argumentResolvers

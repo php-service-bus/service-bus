@@ -228,8 +228,8 @@ final class EventSourcingProvider
 
             if(null === $aggregate)
             {
-                /** @var Aggregate $aggregate */
                 /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+                /** @var Aggregate $aggregate */
                 $aggregate = createWithoutConstructor($storedEventStream->aggregateClass());
             }
 

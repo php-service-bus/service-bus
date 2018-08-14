@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL;
 
 use function Amp\call;
-use Amp\Postgres\Connection;
 use Amp\Postgres\ConnectionConfig;
 use function Amp\Postgres\pool;
 use Amp\Postgres\Pool;
