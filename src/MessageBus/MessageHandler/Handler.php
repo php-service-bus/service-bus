@@ -206,7 +206,7 @@ final class Handler
      *
      * @return bool
      */
-    public function hasParameters(): bool
+    public function hasArguments(): bool
     {
         return 0 !== \count($this->argumentCollection);
     }
