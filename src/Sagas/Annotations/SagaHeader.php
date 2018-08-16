@@ -47,7 +47,7 @@ final class SagaHeader implements SagaAnnotationMarker
     /**
      * @param array<string, mixed> $data
      *
-     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $data)
     {
@@ -55,7 +55,7 @@ final class SagaHeader implements SagaAnnotationMarker
         {
             if(false === \property_exists($this, $key))
             {
-                throw new \RuntimeException(
+                throw new \InvalidArgumentException(
                     \sprintf('Unknown property "%s" on annotation "%s"', $key, \get_class($this))
                 );
             }
