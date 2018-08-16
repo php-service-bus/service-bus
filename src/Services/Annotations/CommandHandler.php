@@ -39,15 +39,21 @@ final class CommandHandler implements ServicesAnnotationsMarker
 
     /**
      * @param array $data
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $data)
     {
         foreach($data as $property => $value)
         {
-            if(true === \property_exists($this, $property))
+            if(false === \property_exists($this, $property))
             {
-                $this->{$property} = $value;
+                throw new \InvalidArgumentException(
+                    \sprintf('Unknown property "%s" on annotation "%s"', $property, \get_class($this))
+                );
             }
+
+            $this->{$property} = $value;
         }
     }
 

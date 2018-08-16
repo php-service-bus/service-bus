@@ -28,7 +28,7 @@ final class SagaEventListenerTest extends TestCase
      */
     public function withContainingIdProperty(): void
     {
-        $annotation = new  SagaEventListener(['containingIdProperty' => 'qwerty']);
+        $annotation = new SagaEventListener(['containingIdProperty' => 'qwerty']);
 
         static::assertTrue($annotation->hasContainingIdProperty());
         static::assertEquals('qwerty', $annotation->containingIdProperty());
@@ -41,7 +41,7 @@ final class SagaEventListenerTest extends TestCase
      */
     public function withoutContainingIdProperty(): void
     {
-        $annotation = new  SagaEventListener([]);
+        $annotation = new SagaEventListener([]);
 
         static::assertFalse($annotation->hasContainingIdProperty());
         static::assertNull($annotation->containingIdProperty());
@@ -55,6 +55,6 @@ final class SagaEventListenerTest extends TestCase
      */
     public function withWrongProperties(): void
     {
-        new  SagaEventListener(['qwerty' => 'root']);
+        new SagaEventListener(['qwerty' => 'root']);
     }
 }
