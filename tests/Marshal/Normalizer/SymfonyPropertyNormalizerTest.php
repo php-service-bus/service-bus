@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection UnnecessaryAssertionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
@@ -11,10 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Marshal;
+namespace Desperado\ServiceBus\Tests\Marshal\Normalizer;
 
 use Desperado\ServiceBus\Marshal\Normalizer\SymfonyPropertyNormalizer;
 use Desperado\ServiceBus\Marshal\Denormalizer\SymfonyPropertyDenormalizer;
+use Desperado\ServiceBus\Tests\Marshal\Normalizer\Stubs\EmptyClass;
+use Desperado\ServiceBus\Tests\Marshal\Normalizer\Stubs\WithClosedConstructor;
+use Desperado\ServiceBus\Tests\Marshal\Normalizer\Stubs\WithWrongType;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -74,5 +77,31 @@ final class SymfonyPropertyNormalizerTest extends TestCase
             '100500',
             static::readAttribute($result, 'someSecondKey')
         );
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function withEmptyClass(): void
+    {
+        $result = (new SymfonyPropertyDenormalizer())->denormalize(
+            EmptyClass::class, (new SymfonyPropertyNormalizer())->normalize(new EmptyClass())
+        );
+
+        /** @noinspection UnnecessaryAssertionInspection */
+        static::assertInstanceOf(EmptyClass::class, $result);
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Marshal\Normalizer\Exceptions\NormalizationFailed
+     *
+     * @return void
+     */
+    public function unSupportedNormalization(): void
+    {
+        (new SymfonyPropertyNormalizer())->normalize($this);
     }
 }

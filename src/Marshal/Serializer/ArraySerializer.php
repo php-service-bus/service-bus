@@ -25,7 +25,7 @@ interface ArraySerializer
      *
      * @return string
      *
-     * @throws \RuntimeException
+     * @throws \Desperado\ServiceBus\Marshal\Serializer\Exceptions\SerializationFailed
      */
     public function serialize(array $data): string;
 
@@ -36,7 +36,7 @@ interface ArraySerializer
      *
      * @return array<string, mixed>
      *
-     * @throws \RuntimeException
+     * @throws \Desperado\ServiceBus\Marshal\Serializer\Exceptions\DeserializationFailed
      */
     public function unserialize(string $payload): array;
 }

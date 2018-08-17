@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Marshal\Serializer;
 
+use Desperado\ServiceBus\Marshal\Serializer\Exceptions\DeserializationFailed;
+use Desperado\ServiceBus\Marshal\Serializer\Exceptions\SerializationFailed;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
@@ -47,16 +49,18 @@ final class SymfonyJsonSerializer implements ArraySerializer
                 return $serialized;
             }
 
+            // @codeCoverageIgnoreStart
             throw new \UnexpectedValueException(
                 \sprintf(
                     'An incorrect type of data received during the serialization process: "%s". string expected',
                     \gettype($serialized)
                 )
             );
+            // @codeCoverageIgnoreEnd
         }
         catch(\Throwable $throwable)
         {
-            throw new \RuntimeException($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new SerializationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
     }
 
@@ -74,18 +78,20 @@ final class SymfonyJsonSerializer implements ArraySerializer
                 return $data;
             }
 
+            // @codeCoverageIgnoreStart
             throw new \UnexpectedValueException(
                 \sprintf(
                     'An incorrect type of data received in the process of deserialization: "%s". array expected',
                     \gettype($data)
                 )
             );
+            // @codeCoverageIgnoreEnd
         }
         catch(\Throwable $throwable)
         {
             $message = \sprintf('Incorrect json format: %s', $throwable->getMessage());
 
-            throw new \RuntimeException($message, $throwable->getCode(), $throwable);
+            throw new DeserializationFailed($message, $throwable->getCode(), $throwable);
         }
     }
 }
