@@ -55,28 +55,10 @@ checks:
     code_rating: true
 
 build:
-  dependencies:
-    before:
-    - composer self-update
-  environment:
-    variables:
-      TEST_POSTGRES_DSN: 'pgsql://scrutinizer:scrutinizer@localhost:5432/test'
-  nodes:
-    node-that-needs-postgresql:
-      dependencies:
-        before:
-        - psql -c "CREATE DATABASE test WITH OWNER = scrutinizer ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' TEMPLATE template0"
-    coverage:
-      tests:
-        override:
-        - command: ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover build/logs/clover.xml
-          coverage:
-            file: build/logs/clover.xml
-            format: clover
-    analysis:
-      project_setup:
-        override: true
-      tests:
-        override:
-        - php-scrutinizer-run --enable-security-analysis
+  analysis:
+    project_setup:
+      override: true
+    tests:
+      override:
+      - php-scrutinizer-run --enable-security-analysis
 
