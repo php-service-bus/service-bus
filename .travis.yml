@@ -1,28 +1,31 @@
 language: php
 
-sudo: false
+php:
+- 7.2
 
-matrix:
-    include:
-        - php: 7.2
-        - nightly
-    fast_finish: true
+install:
+
+- travis_retry composer install --no-interaction --no-suggest
+- wget -c -nc --retry-connrefused --tries=0 https://github.com/php-coveralls/php-coveralls/releases/download/v2.0.0/php-coveralls.phar -O coveralls.phar
+- chmod +x coveralls.phar
+- php coveralls.phar --version
 
 before_script:
-  - composer self-update
-  - composer install --no-interaction
-  - psql -c 'CREATE DATABASE test;' -U postgres
+- mkdir -p build/logs
+- ls -al
 
-script: ./vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml --coverage-text --testdox ./tests
+script:
+- ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover build/logs/clover.xml
 
-notifications:
-  email:
-    - desperado@minsk-info.ru
+after_success:
+- travis_retry php coveralls.phar -v
+- bash <(curl -s https://codecov.io/bash)
 
 cache:
   directories:
-    - $HOME/.composer/cache
+  - vendor
+  - $HOME/.cache/composer
 
 services:
-  - postgresql
+- postgresql
 
