@@ -8,3 +8,7 @@ make;
 make install;
 popd;
 echo "extension=pq.so" >> "$(php -r 'echo php_ini_loaded_file();')";
+
+apt-get install librabbitmq-dev;
+pecl install amqp
+echo "extension=pq.so" >> "$(php -r 'echo php_ini_loaded_file();')";
