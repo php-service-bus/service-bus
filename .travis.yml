@@ -26,5 +26,3 @@ cache:
 services:
   - postgresql
 
-install:
-  - ./travis-install.sh
