@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions;
 
 use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-use Desperado\ServiceBus\EventSourcing\AggregateId;
 
 /**
  * Attempt to add a stream with an existing identifier
@@ -22,12 +21,13 @@ use Desperado\ServiceBus\EventSourcing\AggregateId;
 final class NonUniqueStreamId extends \RuntimeException implements ServiceBusExceptionMarker
 {
     /**
-     * @param AggregateId $id
+     * @param string $id
+     * @param string $class
      */
-    public function __construct(AggregateId $id)
+    public function __construct(string $id, string $class)
     {
         parent::__construct(
-            \sprintf('attempt to add a stream with an existing identifier "%s:%s"', $id, \get_class($id))
+            \sprintf('attempt to add a stream with an existing identifier "%s:%s"', $id, $class)
         );
     }
 }

@@ -18,6 +18,10 @@ use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
 use function Desperado\ServiceBus\Storage\fetchOne;
+use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
+use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
+use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
+use function Desperado\ServiceBus\Storage\SQL\selectQuery;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 
 /**
@@ -44,20 +48,21 @@ final class SqlSnapshotStore implements SnapshotStore
     public function save(StoredAggregateSnapshot $aggregateSnapshot): Promise
     {
         $adapter = $this->adapter;
-        $sql     = 'INSERT INTO event_store_snapshots (id, aggregate_id_class, aggregate_class, version, payload, created_at) VALUES (?, ?, ?, ?, ?, ?)';
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(StoredAggregateSnapshot $aggregateSnapshot) use ($adapter, $sql): \Generator
+            static function(StoredAggregateSnapshot $aggregateSnapshot) use ($adapter): \Generator
             {
-                yield $adapter->execute($sql, [
-                    $aggregateSnapshot->aggregateId(),
-                    $aggregateSnapshot->aggregateIdClass(),
-                    $aggregateSnapshot->aggregateClass(),
-                    $aggregateSnapshot->version(),
-                    $aggregateSnapshot->payload(),
-                    $aggregateSnapshot->createdAt()
-                ]);
+                $query = createInsertQuery('event_store_snapshots', [
+                    'id'                 => $aggregateSnapshot->aggregateId(),
+                    'aggregate_id_class' => $aggregateSnapshot->aggregateIdClass(),
+                    'aggregate_class'    => $aggregateSnapshot->aggregateClass(),
+                    'version'            => $aggregateSnapshot->version(),
+                    'payload'            => $aggregateSnapshot->payload(),
+                    'created_at'         => $aggregateSnapshot->createdAt()
+                ])->compile();
+
+                yield $adapter->execute($query->sql(), $query->params());
 
                 return yield new Success();
             },
@@ -78,23 +83,29 @@ final class SqlSnapshotStore implements SnapshotStore
             {
                 $storedSnapshot = null;
 
+                $query = selectQuery('event_store_snapshots')
+                    ->where(equalsCriteria('id', $id))
+                    ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)))
+                    ->compile();
+
                 /** @var array|null $data */
                 $data = yield fetchOne(
-                    yield $adapter->execute(
-                        'SELECT * FROM event_store_snapshots WHERE id = ? AND aggregate_id_class = ?', [
-                            (string) $id,
-                            \get_class($id)
-                        ]
-                    )
+                    yield $adapter->execute($query->sql(), $query->params())
                 );
 
-                if(null !== $data)
+                if(true === \is_array($data) && 0 !== \count($data))
                 {
+                    /** For DoctrineDBAL */
+                    if(true === \is_resource($data['payload']))
+                    {
+                        $data['payload'] = \stream_get_contents($data['payload'], -1, 0);
+                    }
+
                     $storedSnapshot = new StoredAggregateSnapshot(
                         $data['id'],
                         $data['aggregate_id_class'],
                         $data['aggregate_class'],
-                        $data['version'],
+                        (int) $data['version'],
                         $adapter->unescapeBinary($data['payload']),
                         $data['created_at']
                     );
@@ -117,13 +128,12 @@ final class SqlSnapshotStore implements SnapshotStore
         return call(
             static function(AggregateId $id) use ($adapter): \Generator
             {
-                yield $adapter->execute(
-                /** @lang text */
-                    'DELETE FROM event_store_snapshots WHERE id = ? AND aggregate_id_class = ?', [
-                        (string) $id,
-                        \get_class($id)
-                    ]
-                );
+                $query = deleteQuery('event_store_snapshots')
+                    ->where(equalsCriteria('id', $id))
+                    ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)))
+                    ->compile();
+
+                yield $adapter->execute($query->sql(), $query->params());
 
                 return yield new Success();
             },

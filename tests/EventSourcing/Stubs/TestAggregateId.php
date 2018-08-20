@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\EventSourcing\Mocks;
+namespace Desperado\ServiceBus\Tests\EventSourcing\Stubs;
 
-use Desperado\ServiceBus\EventSourcing\Aggregate;
+use Desperado\ServiceBus\EventSourcing\AggregateId;
 
 /**
  *
  */
-final class TestAggregate extends Aggregate
+final class TestAggregateId extends AggregateId
 {
 
 }

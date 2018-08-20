@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\EventSourcing\Mocks;
+namespace Desperado\ServiceBus\Tests\EventSourcing\Stubs;
 
 use Amp\Promise;
 use Amp\Success;
