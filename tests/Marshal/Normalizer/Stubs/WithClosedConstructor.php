@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Marshal;
+namespace Desperado\ServiceBus\Tests\Marshal\Normalizer\Stubs;
 
 /**
  *

@@ -81,13 +81,9 @@ final class AnnotationsBasedSagaListenersLoader implements SagaListenersLoader
                     }
                 );
 
-            $sagaHeader = $this->searchSagaHeader($sagaClass, $annotations);
-
-            $sagaMetadata = new SagaMetadata(
+            $sagaMetadata = self::createSagaMetadata(
                 $sagaClass,
-                $sagaHeader->idClass(),
-                $sagaHeader->containingIdProperty(),
-                $sagaHeader->expireDateModifier()
+                self::searchSagaHeader($sagaClass, $annotations)
             );
 
             $handlersCollection = new HandlerCollection();
@@ -212,6 +208,38 @@ final class AnnotationsBasedSagaListenersLoader implements SagaListenersLoader
     }
 
     /**
+     * Collect metadata information
+     *
+     * @param string     $sagaClass
+     * @param SagaHeader $sagaHeader
+     *
+     * @return SagaMetadata
+     *
+     * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
+     */
+    private static function createSagaMetadata(string $sagaClass, SagaHeader $sagaHeader): SagaMetadata
+    {
+        if(
+            false === $sagaHeader->hasIdClass() ||
+            false === \class_exists($sagaHeader->idClass())
+        )
+        {
+            throw new InvalidSagaConfiguration(
+                \sprintf(
+                    'In the meta data of the saga "%s", an incorrect value of the "idClass"', $sagaClass
+                )
+            );
+        }
+
+        return new SagaMetadata(
+            $sagaClass,
+            $sagaHeader->idClass(),
+            $sagaHeader->containingIdProperty(),
+            $sagaHeader->expireDateModifier()
+        );
+    }
+
+    /**
      * Search saga header information
      *
      * @param string               $sagaClass
@@ -221,7 +249,7 @@ final class AnnotationsBasedSagaListenersLoader implements SagaListenersLoader
      *
      * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
      */
-    private function searchSagaHeader(string $sagaClass, AnnotationCollection $annotationCollection): SagaHeader
+    private static function searchSagaHeader(string $sagaClass, AnnotationCollection $annotationCollection): SagaHeader
     {
         foreach($annotationCollection->classLevelAnnotations() as $annotation)
         {

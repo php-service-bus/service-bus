@@ -93,6 +93,8 @@ final class ContainerBuilder
     /**
      * Add customer compiler pass
      *
+     * @noinspection PhpDocSignatureInspection
+     *
      * @param CompilerPassInterface ...$compilerPasses
      *
      * @return void
@@ -104,6 +106,8 @@ final class ContainerBuilder
 
     /**
      * Add customer extension
+     *
+     * @noinspection PhpDocSignatureInspection
      *
      * @param Extension ...$extensions
      *

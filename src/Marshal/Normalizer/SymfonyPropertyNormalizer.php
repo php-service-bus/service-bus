@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Marshal\Normalizer;
 
 use Desperado\ServiceBus\Marshal\Converters\SymfonyPropertyNameConverter;
+use Desperado\ServiceBus\Marshal\Normalizer\Exceptions\NormalizationFailed;
 use Desperado\ServiceBus\Marshal\Normalizer\Extensions\EmptyDataNormalizer;
 use Desperado\ServiceBus\Marshal\Normalizer\Extensions\PropertyNormalizerWrapper;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -63,6 +64,7 @@ class SymfonyPropertyNormalizer implements Normalizer
                 return $data;
             }
 
+            // @codeCoverageIgnoreStart
             throw new \UnexpectedValueException(
                 \sprintf(
                     'The normalization was to return the array. Type "%s" was obtained when object "%s" was normalized',
@@ -71,10 +73,11 @@ class SymfonyPropertyNormalizer implements Normalizer
 
                 )
             );
+            // @codeCoverageIgnoreEnd
         }
         catch(\Throwable $throwable)
         {
-            throw new \RuntimeException($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new NormalizationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
     }
 

@@ -25,7 +25,7 @@ interface Normalizer
      *
      * @return array
      *
-     * @throws \RuntimeException
+     * @throws \Desperado\ServiceBus\Marshal\Normalizer\Exceptions\NormalizationFailed
      */
     public function normalize(object $object): array;
 }
