@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\EventSourcing;
+namespace Desperado\ServiceBus\Tests;
 
 use function Amp\call;
 use Amp\Coroutine;
@@ -317,15 +317,15 @@ final class EventSourcingProviderTest extends TestCase
             static function() use ($adapter): \Generator
             {
                 yield $adapter->execute(
-                    \file_get_contents(__DIR__ . '/../../src/EventSourcing/EventStreamStore/Sql/schema/event_store_stream.sql')
+                    \file_get_contents(__DIR__ . '/../src/EventSourcing/EventStreamStore/Sql/schema/event_store_stream.sql')
                 );
 
                 yield $adapter->execute(
-                    \file_get_contents(__DIR__ . '/../../src/EventSourcing/EventStreamStore/Sql/schema/event_store_stream_events.sql')
+                    \file_get_contents(__DIR__ . '/../src/EventSourcing/EventStreamStore/Sql/schema/event_store_stream_events.sql')
                 );
 
                 yield $adapter->execute(
-                    \file_get_contents(__DIR__ . '/../../src/EventSourcing/EventStreamStore/Sql/schema/event_store_snapshots.sql')
+                    \file_get_contents(__DIR__ . '/../src/EventSourcing/EventStreamStore/Sql/schema/event_store_snapshots.sql')
                 );
             }
         );
