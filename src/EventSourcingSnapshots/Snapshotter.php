@@ -100,6 +100,8 @@ final class Snapshotter
                             $storedSnapshot->version()
                         );
                     }
+
+                    return yield new Success($snapshot);
                 }
                 catch(\Throwable $throwable)
                 {

@@ -59,28 +59,13 @@ function readReflectionPropertyValue(object $object, string $propertyName)
         }
     }
 
-    if(null !== $attribute)
-    {
-        /** @var \ReflectionProperty $attribute */
+    /** @var \ReflectionProperty $attribute */
 
-        if(true === $attribute->isPublic())
-        {
-            return $object->{$propertyName};
-        }
+    $attribute->setAccessible(true);
+    $value = $attribute->getValue($object);
+    $attribute->setAccessible(false);
 
-        $attribute->setAccessible(true);
-        $value = $attribute->getValue($object);
-        $attribute->setAccessible(false);
-
-        return $value;
-    }
-
-    throw new \InvalidArgumentException(
-        \sprintf(
-            'Attribute "%s" not found in object.',
-            $propertyName
-        )
-    );
+    return $value;
 }
 
 /**

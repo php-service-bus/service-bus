@@ -14,11 +14,12 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL;
 
 use Amp\Promise;
+use Amp\Sql\PooledResultSet;
 use Amp\Success;
 use Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed;
 use Desperado\ServiceBus\Storage\ResultSet;
 use Amp\Postgres\PgSqlResultSet;
-use Amp\Postgres\PgSqlCommandResult;
+use Amp\Sql\ResultSet as AmpResultSet;
 
 /**
  *
@@ -26,14 +27,14 @@ use Amp\Postgres\PgSqlCommandResult;
 class AmpPostgreSQLResultSet implements ResultSet
 {
     /**
-     * @var PgSqlCommandResult|PgSqlResultSet
+     * @var AmpResultSet|PooledResultSet
      */
     private $originalResultSet;
 
     /**
      * @noinspection PhpDocSignatureInspection
      *
-     * @param PgSqlCommandResult|PgSqlResultSet $originalResultSet
+     * @param AmpResultSet|PooledResultSet $originalResultSet
      */
     public function __construct(object $originalResultSet)
     {
@@ -47,17 +48,19 @@ class AmpPostgreSQLResultSet implements ResultSet
     {
         try
         {
-            if($this->originalResultSet instanceof PgSqlResultSet)
+            if($this->originalResultSet instanceof AmpResultSet)
             {
                 return $this->originalResultSet->advance($rowType);
             }
 
-            return new Success(true);
+            return new Success(false);
         }
+            // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
             throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -67,17 +70,14 @@ class AmpPostgreSQLResultSet implements ResultSet
     {
         try
         {
-            if($this->originalResultSet instanceof PgSqlResultSet)
-            {
-                return $this->originalResultSet->getCurrent();
-            }
-
-            return null;
+            return $this->originalResultSet->getCurrent();
         }
+            // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
             throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -99,9 +99,11 @@ class AmpPostgreSQLResultSet implements ResultSet
 
             return null;
         }
+            // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
             throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
+        // @codeCoverageIgnoreEnd
     }
 }

@@ -175,7 +175,7 @@ final class SagaProvider
                 try
                 {
                     /** @var Saga|null $existsSaga */
-                    $existsSaga = self::doLoad($this->store, $saga->id());
+                    $existsSaga = yield self::doLoad($this->store, $saga->id());
 
                     if(null !== $existsSaga)
                     {

@@ -11,14 +11,20 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\EventSourcing\Mocks;
-
-use Desperado\ServiceBus\EventSourcing\AggregateId;
+namespace Desperado\ServiceBus\Tests\Common\Stubs;
 
 /**
  *
  */
-final class TestAggregateId extends AggregateId
+final class SecondClass extends FirstClass
 {
+    /**
+     * @var string
+     */
+    private $secondClassValue = 'root';
 
+    /**
+     * @var string
+     */
+    private $secondClassPublicValue = 'abube';
 }

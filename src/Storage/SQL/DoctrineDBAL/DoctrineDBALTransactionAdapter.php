@@ -82,10 +82,12 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
 
                     return yield new Success();
                 }
+                    // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)
                 {
                     throw DoctrineDBALExceptionConvert::do($throwable);
                 }
+                // @codeCoverageIgnoreEnd
             }
         );
     }
@@ -106,10 +108,12 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
 
                     return yield new Success();
                 }
+                    // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)
                 {
                     throw DoctrineDBALExceptionConvert::do($throwable);
                 }
+                // @codeCoverageIgnoreEnd
             }
         );
     }

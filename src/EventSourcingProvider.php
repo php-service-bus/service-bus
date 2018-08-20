@@ -83,7 +83,7 @@ final class EventSourcingProvider
      *
      * @param AggregateId $id
      *
-     * @return Promise<\Desperado\EventSourcing\Aggregate\AggregateRoot|null>
+     * @return Promise<\Desperado\ServiceBus\EventSourcing\Aggregate|null>
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
@@ -102,23 +102,20 @@ final class EventSourcingProvider
             {
                 try
                 {
-                    $aggregate = null;
+                    $aggregate         = null;
+                    $fromStreamVersion = Aggregate::START_PLAYHEAD_INDEX;
 
                     /** @var AggregateSnapshot|null $loadedSnapshot */
                     $loadedSnapshot = yield $snapshotter->load($id);
 
                     if(null !== $loadedSnapshot)
                     {
-                        $aggregate = $loadedSnapshot->aggregate();
+                        $aggregate         = $loadedSnapshot->aggregate();
+                        $fromStreamVersion = $aggregate->version() + 1;
                     }
 
-                    $fromStreamVersion = null !== $aggregate
-                        ? $aggregate->version() + 1
-                        : Aggregate::START_PLAYHEAD_INDEX;
-
-
                     /** @var StoredAggregateEventStream|null $storedEventStream */
-                    $storedEventStream = yield  $storage->loadStream($id, $fromStreamVersion);
+                    $storedEventStream = yield $storage->loadStream($id, $fromStreamVersion);
 
                     $aggregate = self::restoreStream($aggregate, $storedEventStream, $transformer);
 
@@ -208,7 +205,7 @@ final class EventSourcingProvider
     /**
      * Restore the aggregate from the event stream/Add missing events to the aggregate from the snapshot
      *
-     * @param Aggregate|null                      $aggregate
+     * @param Aggregate                      $aggregate
      * @param StoredAggregateEventStream|null     $storedEventStream
      * @param AggregateEventStreamDataTransformer $transformer
      *

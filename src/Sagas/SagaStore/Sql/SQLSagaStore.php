@@ -20,6 +20,11 @@ use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
 use function Desperado\ServiceBus\Storage\fetchOne;
+use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
+use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
+use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
+use function Desperado\ServiceBus\Storage\SQL\selectQuery;
+use function Desperado\ServiceBus\Storage\SQL\updateQuery;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 
 /**
@@ -51,17 +56,17 @@ final class SQLSagaStore implements SagasStore
         return call(
             static function(StoredSaga $storedSaga) use ($adapter, $afterSaveHandler): \Generator
             {
-                yield $adapter->execute(
-                    'INSERT INTO sagas_store (id, identifier_class, saga_class, payload, state_id, created_at, closed_at) VALUES (?, ?, ?, ?, ?, ?, ?)', [
-                        $storedSaga->id(),
-                        $storedSaga->idClass(),
-                        $storedSaga->sagaClass(),
-                        $storedSaga->payload(),
-                        $storedSaga->status(),
-                        $storedSaga->formatCreatedAt(),
-                        $storedSaga->formatClosedAt()
-                    ]
-                );
+                $query = createInsertQuery('sagas_store', [
+                    'id'               => $storedSaga->id(),
+                    'identifier_class' => $storedSaga->idClass(),
+                    'saga_class'       => $storedSaga->sagaClass(),
+                    'payload'          => $storedSaga->payload(),
+                    'state_id'         => $storedSaga->status(),
+                    'created_at'       => $storedSaga->formatCreatedAt(),
+                    'closed_at'        => $storedSaga->formatClosedAt()
+                ])->compile();
+
+                yield $adapter->execute($query->sql(), $query->params());
 
                 yield call($afterSaveHandler);
 
@@ -87,15 +92,16 @@ final class SQLSagaStore implements SagasStore
 
                 try
                 {
-                    yield $transaction->execute(
-                        'UPDATE sagas_store SET payload = ?, state_id = ?, closed_at = ? WHERE id = ? AND identifier_class = ?', [
-                            $storedSaga->payload(),
-                            $storedSaga->status(),
-                            $storedSaga->formatClosedAt(),
-                            $storedSaga->id(),
-                            $storedSaga->idClass()
-                        ]
-                    );
+                    $query = updateQuery('sagas_store', [
+                        'payload'   => $storedSaga->payload(),
+                        'state_id'  => $storedSaga->status(),
+                        'closed_at' => $storedSaga->formatClosedAt()
+                    ])
+                        ->where(equalsCriteria('id', $storedSaga->id()))
+                        ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass()))
+                        ->compile();
+
+                    yield $transaction->execute($query->sql(), $query->params());
 
                     yield call($afterSaveHandler);
 
@@ -125,12 +131,12 @@ final class SQLSagaStore implements SagasStore
         return call(
             static function(SagaId $id) use ($adapter): \Generator
             {
-                $iterator = yield $adapter->execute(
-                    'SELECT * FROM sagas_store WHERE id = ? AND identifier_class = ?', [
-                        (string) $id,
-                        \get_class($id)
-                    ]
-                );
+                $query = selectQuery('sagas_store')
+                    ->where(equalsCriteria('id', $id))
+                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
+                    ->compile();
+
+                $iterator = yield $adapter->execute($query->sql(), $query->params());
 
                 /** @var array|null $result */
                 $result = yield fetchOne($iterator);
@@ -165,13 +171,12 @@ final class SQLSagaStore implements SagasStore
         return call(
             static function(SagaId $id) use ($adapter): \Generator
             {
-                yield $adapter->execute(
-                /** @lang text */
-                    'DELETE FROM sagas_store WHERE id = ? AND identifier_class = ?', [
-                        (string) $id,
-                        \get_class($id)
-                    ]
-                );
+                $query = deleteQuery('sagas_store')
+                    ->where(equalsCriteria('id', $id))
+                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
+                    ->compile();
+
+                yield $adapter->execute($query->sql(), $query->params());
 
                 return yield new Success();
             },

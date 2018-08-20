@@ -68,6 +68,17 @@ abstract class BaseStorageAdapterTest extends TestCase
         wait($adapter->execute('DELETE FROM storage_test_table'));
     }
 
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function supportsTransaction(): void
+    {
+        static::assertTrue(static::getAdapter()->supportsTransaction());
+    }
+
     /**
      * @test
      *

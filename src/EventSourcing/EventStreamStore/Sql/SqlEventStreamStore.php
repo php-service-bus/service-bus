@@ -16,6 +16,10 @@ namespace Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql;
 use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
+use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId;
+use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed;
+use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
+use function Latitude\QueryBuilder\field;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore;
@@ -23,6 +27,10 @@ use Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStream;
 use function Desperado\ServiceBus\Storage\fetchAll;
 use function Desperado\ServiceBus\Storage\fetchOne;
+use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
+use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
+use function Desperado\ServiceBus\Storage\SQL\selectQuery;
+use function Desperado\ServiceBus\Storage\SQL\updateQuery;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\TransactionAdapter;
 
@@ -67,11 +75,20 @@ final class SqlEventStreamStore implements AggregateStore
 
                     yield $transaction->commit();
                 }
+                catch(UniqueConstraintViolationCheckFailed $exception)
+                {
+                    yield $transaction->rollback();
+
+                    throw new NonUniqueStreamId(
+                        $eventsStream->aggregateId(),
+                        $eventsStream->getAggregateIdClass()
+                    );
+                }
                 catch(\Throwable $throwable)
                 {
                     yield $transaction->rollback();
 
-                    throw $throwable;
+                    throw new SaveStreamFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
                 }
             },
             $aggregateEventStream
@@ -162,13 +179,12 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(AggregateId $id) use ($adapter): \Generator
             {
-                yield $adapter->execute(
-                    'UPDATE event_store_stream SET closed_at = ? WHERE id = ? AND identifier_class = ?', [
-                        \date('Y-m-d H:i:s'),
-                        (string) $id,
-                        \get_class($id)
-                    ]
-                );
+                $query = updateQuery('event_store_stream', ['closed_at' => \date('Y-m-d H:i:s')])
+                    ->where(equalsCriteria('id', $id))
+                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
+                    ->compile();
+
+                yield $adapter->execute($query->sql(), $query->params());
 
                 return yield new Success();
             },
@@ -194,26 +210,23 @@ final class SqlEventStreamStore implements AggregateStore
      */
     private static function doSaveStream(TransactionAdapter $transaction, StoredAggregateEventStream $eventsStream): Promise
     {
-        $sql = /** @lang text */
-            'INSERT INTO event_store_stream (id, identifier_class, aggregate_class, created_at, closed_at) VALUES (?, ?, ?, ?, ?)';
-
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(TransactionAdapter $transaction, StoredAggregateEventStream $eventsStream) use ($sql): \Generator
+            static function(StoredAggregateEventStream $eventsStream) use ($transaction): \Generator
             {
-                yield $transaction->execute(
-                    $sql, [
-                        $eventsStream->aggregateId(),
-                        $eventsStream->getAggregateIdClass(),
-                        $eventsStream->aggregateClass(),
-                        $eventsStream->createdAt(),
-                        $eventsStream->closedAt()
-                    ]
-                );
+                $query = createInsertQuery('event_store_stream', [
+                    'id'               => $eventsStream->aggregateId(),
+                    'identifier_class' => $eventsStream->getAggregateIdClass(),
+                    'aggregate_class'  => $eventsStream->aggregateClass(),
+                    'created_at'       => $eventsStream->createdAt(),
+                    'closed_at'        => $eventsStream->closedAt()
+                ])->compile();
+
+
+                yield $transaction->execute($query->sql(), $query->params());
 
                 return yield new Success();
             },
-            $transaction,
             $eventsStream
         );
     }
@@ -354,11 +367,13 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StorageAdapter $adapter, AggregateId $id): \Generator
             {
+                $query = selectQuery('event_store_stream')
+                    ->where(equalsCriteria('id', $id))
+                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
+                    ->compile();
+
                 $data = yield fetchOne(
-                    yield $adapter->execute(
-                        'SELECT * FROM event_store_stream WHERE id = ? AND identifier_class = ?',
-                        [(string) $id, \get_class($id)]
-                    )
+                    yield $adapter->execute($query->sql(), $query->params())
                 );
 
                 return yield new Success($data);
@@ -396,19 +411,20 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StorageAdapter $adapter, string $streamId, int $fromVersion, ?int $toVersion): \Generator
             {
-                $statements = [$streamId, $fromVersion];
-                $sql        = 'SELECT * FROM event_store_stream_events WHERE stream_id = ? AND playhead >= ?';
+                $query = selectQuery('event_store_stream_events')
+                    ->where(field('stream_id')->eq($streamId))
+                    ->andWhere(field('playhead')->gte($fromVersion));
 
                 if(null !== $toVersion && $fromVersion < $toVersion)
                 {
-                    $sql .= ' AND playhead <= ?';
-
-                    $statements[] = $toVersion;
+                    $query->andWhere(field('playhead')->lte($toVersion));
                 }
+
+                $query = $query->compile();
 
                 return yield new Success(
                     yield fetchAll(
-                        yield $adapter->execute($sql, $statements)
+                        yield $adapter->execute($query->sql(), $query->params())
                     )
                 );
             },
