@@ -11,19 +11,15 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs;
+namespace Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
-use Desperado\ServiceBus\Sagas\Annotations\SagaHeader;
 use Desperado\ServiceBus\Sagas\Saga;
 
 /**
- * @SagaHeader(
- *     idClass="Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs\TestSagaId",
- *     containingIdProperty="qwerty"
- * )
+ *
  */
-final class SagaWithoutListeners extends Saga
+final class SagaWithoutAnnotations extends Saga
 {
     /**
      * @inheritdoc

@@ -11,17 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs;
-
-use Desperado\ServiceBus\Sagas\Annotations\SagaHeader;
+namespace Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs;
 
 /**
- * @SagaHeader(
- *     containingIdProperty="requestId",
- *     idClass="SomeIdClass"
- * )
+ *
  */
-final class SagaWrongIdClassSpecified
+final class IncorrectSagaId
 {
 
 }

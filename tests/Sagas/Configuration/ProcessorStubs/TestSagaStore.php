@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs;
+namespace Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs;
 
 use Amp\Promise;
 use Desperado\ServiceBus\Sagas\SagaId;
@@ -21,23 +21,35 @@ use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
 /**
  *
  */
-class TestSagaStoreImplementation implements SagasStore
+class TestSagaStore implements SagasStore
 {
+    /**
+     * @inheritdoc
+     */
     public function save(StoredSaga $savedSaga, callable $afterSaveHandler): Promise
     {
 
     }
 
+    /**
+     * @inheritdoc
+     */
     public function update(StoredSaga $savedSaga, callable $afterSaveHandler): Promise
     {
 
     }
 
+    /**
+     * @inheritdoc
+     */
     public function load(SagaId $id): Promise
     {
 
     }
 
+    /**
+     * @inheritdoc
+     */
     public function remove(SagaId $id): Promise
     {
 

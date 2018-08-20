@@ -11,21 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs;
+namespace Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
-use Desperado\ServiceBus\Sagas\Saga;
 
 /**
  *
  */
-final class SagaWithoutAnnotations extends Saga
+final class StartSagaCommand implements Command
 {
-    /**
-     * @inheritdoc
-     */
-    public function start(Command $command): void
-    {
 
-    }
 }

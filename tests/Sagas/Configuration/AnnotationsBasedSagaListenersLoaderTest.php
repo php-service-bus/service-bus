@@ -15,10 +15,14 @@ namespace Desperado\ServiceBus\Tests\Sagas\Configuration;
 
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaListenersLoader;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs\SagaWithoutAnnotations;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs\SagaWithoutListeners;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs\SagaWrongIdClassSpecified;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs\TestSagaStoreImplementation;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\CorrectSaga;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithIncorrectEventListenerClass;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithoutAnnotations;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithoutListeners;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithToManyArguments;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithUnExistsEventListenerClass;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWrongIdClassSpecified;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\TestSagaStoreImplementation;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -90,5 +94,65 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
         $result = (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWithoutListeners::class);
 
         static::assertEmpty($result);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function correctSagaWithListeners(): void
+    {
+        $result = (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(CorrectSaga::class);
+
+        static::assertNotEmpty($result);
+        static::assertCount(2, $result);
+
+        foreach($result as $messageHandler)
+        {
+            /** @var \Desperado\ServiceBus\MessageBus\MessageHandler\Handler $messageHandler */
+            static::assertFalse($messageHandler->isCommandHandler());
+            static::assertTrue($messageHandler->hasReturnDeclaration());
+
+            $closure = $messageHandler->toClosure();
+
+            /** @noinspection UnnecessaryAssertionInspection */
+            static::assertInstanceOf(\Closure::class, $closure);
+            /** @see SagaEventListenerProcessor */
+            static::assertCount(2, $messageHandler->arguments());
+        }
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
+     *
+     * @return void
+     */
+    public function sagaWithUnExistsEventClass(): void
+    {
+        (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWithUnExistsEventListenerClass::class);
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
+     *
+     * @return void
+     */
+    public function sagaWithToManyListenerArguments(): void
+    {
+        (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWithToManyArguments::class);
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
+     *
+     * @return void
+     */
+    public function sagaWithIncorrectListenerClass(): void
+    {
+        (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWithIncorrectEventListenerClass::class);
     }
 }

@@ -16,13 +16,13 @@ namespace Desperado\ServiceBus\Sagas\Configuration;
 use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
-use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
+use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound;
-use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierFieldNotFound;
+use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Psr\Log\LoggerInterface;
@@ -73,12 +73,12 @@ final class SagaEventListenerProcessor
     /**
      * Apply received event
      *
-     * @param Event         $event
-     * @param KernelContext $context
+     * @param Event                  $event
+     * @param MessageDeliveryContext $context
      *
      * @return Promise
      */
-    public function execute(Event $event, KernelContext $context): Promise
+    public function execute(Event $event, MessageDeliveryContext $context): Promise
     {
         $sagaListenerOptions = $this->sagaListenerOptions;
         $sagaProvider        = $this->sagaProvider;
@@ -86,7 +86,7 @@ final class SagaEventListenerProcessor
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Event $event, KernelContext $context) use (
+            static function(Event $event, MessageDeliveryContext $context) use (
                 $sagaListenerOptions, $sagaProvider, $logger
             ): \Generator
             {
@@ -125,7 +125,7 @@ final class SagaEventListenerProcessor
      *
      * @return SagaId
      *
-     * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierFieldNotFound
+     * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified
      * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
      */
@@ -143,9 +143,8 @@ final class SagaEventListenerProcessor
             }
             catch(\Throwable $throwable)
             {
-                throw new IdentifierFieldNotFound($event, $propertyName);
+                throw IncorrectIdentifierFieldSpecified::notFound($event, $propertyName);
             }
-
 
             if('' !== $propertyValue)
             {
@@ -155,6 +154,8 @@ final class SagaEventListenerProcessor
                     $sagaListenerOptions->sagaClass()
                 );
             }
+
+            throw IncorrectIdentifierFieldSpecified::empty($event, $propertyName);
         }
 
         throw new IdentifierClassNotFound($identifierClass, $sagaListenerOptions->sagaClass());

@@ -19,17 +19,36 @@ use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 /**
  * A property that contains an identifier was not found
  */
-final class IdentifierFieldNotFound extends \RuntimeException implements ServiceBusExceptionMarker
+final class IncorrectIdentifierFieldSpecified extends \RuntimeException implements ServiceBusExceptionMarker
 {
     /**
      * @param Event  $event
      * @param string $property
+     *
+     * @return self
      */
-    public function __construct(Event $event, string $property)
+    public static function notFound(Event $event, string $property): self
     {
-        parent::__construct(
+        return new static(
             \sprintf(
                 'A property that contains an identifier ("%s") was not found in class "%s"',
+                $property,
+                \get_class($event)
+            )
+        );
+    }
+
+    /**
+     * @param Event  $event
+     * @param string $property
+     *
+     * @return self
+     */
+    public static function empty(Event $event, string $property): self
+    {
+        return new static(
+            \sprintf(
+                'The value of the "%s" property of the "%s" event can not be empty, since it is the saga id',
                 $property,
                 \get_class($event)
             )

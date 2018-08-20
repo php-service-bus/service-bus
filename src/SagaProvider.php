@@ -37,7 +37,6 @@ use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
  */
 final class SagaProvider
 {
-
     /**
      * Sagas store
      *
@@ -235,7 +234,7 @@ final class SagaProvider
     }
 
     /**
-     *  Execute add/update saga entry
+     * Execute add/update saga entry
      *
      * @param SagasStore             $store
      * @param Saga                   $saga
