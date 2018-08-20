@@ -11,57 +11,52 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Storage\SQL;
+namespace Desperado\ServiceBus\Tests\Storage\SQL\DoctrineDBAL;
 
 use Amp\Coroutine;
 use function Amp\Promise\wait;
-use Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
+use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Storage\StorageConfiguration;
+use Desperado\ServiceBus\Tests\Storage\SQL\BaseStorageAdapterTest;
 
 /**
  *
  */
-final class AmpPostgreSQLAdapterTest extends BaseStorageAdapterTest
+final class DoctrineDBALAdapterTest extends BaseStorageAdapterTest
 {
     /**
-     * @return void
-     *
-     * @throws \Throwable
+     * @var DoctrineDBALAdapter
      */
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
-
-        wait(
-            static::getAdapter()->execute(
-                'CREATE TABLE IF NOT EXISTS test_ai (id serial PRIMARY KEY, value VARCHAR)'
-            )
-        );
-    }
-
-    /**
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public static function tearDownAfterClass(): void
-    {
-        $adapter = static::getAdapter();
-
-        wait($adapter->execute('DROP TABLE storage_test_table'));
-        wait($adapter->execute('DROP TABLE test_ai'));
-    }
+    private static $adapter;
 
     /**
      * @inheritdoc
      */
     protected static function getAdapter(): StorageAdapter
     {
-        return StorageAdapterFactory::create(
-            AmpPostgreSQLAdapter::class,
-            (string) \getenv('TEST_POSTGRES_DSN')
+        if(null === self::$adapter)
+        {
+            self::$adapter = StorageAdapterFactory::inMemory();
+        }
+
+        return self::$adapter;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @throws \Throwable
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        wait(
+            static::getAdapter()->execute(
+                'CREATE TABLE IF NOT EXISTS test_ai (id serial PRIMARY KEY, value VARCHAR)'
+            )
         );
     }
 
@@ -74,19 +69,19 @@ final class AmpPostgreSQLAdapterTest extends BaseStorageAdapterTest
      */
     public function lastInsertId(): void
     {
-        $handler = static function(AmpPostgreSQLAdapterTest $self): \Generator
+        $handler = static function(DoctrineDBALAdapterTest $self): \Generator
         {
             try
             {
                 $adapter = static::getAdapter();
 
                 /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
-                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\') RETURNING id');
+                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')');
 
                 static::assertEquals('1', $result->lastInsertId());
 
                 /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
-                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\') RETURNING id');
+                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')');
 
                 static::assertEquals('2', $result->lastInsertId());
             }
@@ -110,8 +105,25 @@ final class AmpPostgreSQLAdapterTest extends BaseStorageAdapterTest
      */
     public function failedConnection(): void
     {
-        $adapter = new AmpPostgreSQLAdapter(
-            StorageConfiguration::fromDSN('qwerty')
+        $adapter = new DoctrineDBALAdapter(
+            StorageConfiguration::fromDSN('pgsql://localhost:4486/foo?charset=UTF-8')
+        );
+
+        wait($adapter->execute('SELECT now()'));
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function failedConnectionString(): void
+    {
+        $adapter = new DoctrineDBALAdapter(
+            StorageConfiguration::fromDSN('')
         );
 
         wait($adapter->execute('SELECT now()'));

@@ -16,6 +16,7 @@ namespace Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL;
 use Amp\Postgres\Transaction as AmpTransaction;
 use function Amp\call;
 use Amp\Promise;
+use Amp\Success;
 use Desperado\ServiceBus\Storage\TransactionAdapter;
 
 /**
@@ -59,19 +60,21 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
                     /** @var \Amp\Sql\Statement $statement */
                     $statement = yield $transaction->prepare($queryString);
 
-                    /** @psalm-suppress UndefinedClass Class or interface Amp\Postgres\TupleResult does not exist */
-                    $result = new AmpPostgreSQLResultSet(
-                        yield $statement->execute($parameters)
-                    );
+                    /** @var \Amp\Postgres\PooledResultSet $result */
+                    $result = yield $statement->execute($parameters);
 
                     unset($statement);
-                    
-                    return $result;
+
+                    return yield new Success(
+                        new AmpPostgreSQLResultSet($result)
+                    );
                 }
+                    // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)
                 {
                     throw AmpExceptionConvert::do($throwable);
                 }
+                // @codeCoverageIgnoreEnd
             },
             $queryString,
             $parameters
@@ -95,10 +98,12 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
 
                     $transaction->close();
                 }
+                    // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)
                 {
                     throw AmpExceptionConvert::do($throwable);
                 }
+                // @codeCoverageIgnoreEnd
             }
         );
     }
@@ -118,10 +123,12 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
                 {
                     return yield $transaction->rollback();
                 }
+                    // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)
                 {
                     throw AmpExceptionConvert::do($throwable);
                 }
+                // @codeCoverageIgnoreEnd
             }
         );
     }

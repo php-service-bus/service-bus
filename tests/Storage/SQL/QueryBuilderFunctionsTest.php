@@ -12,10 +12,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Storage\SQL;
 
+use function Desperado\ServiceBus\Common\uuid;
 use function Desperado\ServiceBus\Storage\SQL\cast;
 use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
 use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
 use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
+use function Desperado\ServiceBus\Storage\SQL\notEqualsCriteria;
 use function Desperado\ServiceBus\Storage\SQL\selectQuery;
 use function Desperado\ServiceBus\Storage\SQL\toSnakeCase;
 use function Desperado\ServiceBus\Storage\SQL\updateQuery;
@@ -187,5 +189,49 @@ final class QueryBuilderFunctionsTest extends TestCase
         };
 
         static::assertSame('qwerty', cast('key', $object));
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function objectNotEqualsCriteria(): void
+    {
+        $object = new class()
+        {
+            /** @var string */
+            private $id;
+
+            public function __construct()
+            {
+                $this->id = uuid();
+            }
+
+            public function __toString()
+            {
+                return $this->id;
+            }
+        };
+
+        $query = selectQuery('test')->where(notEqualsCriteria('id', $object))->compile();
+
+        static::assertEquals('SELECT * FROM "test" WHERE "id" != ?', $query->sql());
+        static::assertEquals([(string) $object], $query->params());
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function scalarNotEqualsCriteria(): void
+    {
+        $id = uuid();
+
+        $query = selectQuery('test')->where(notEqualsCriteria('id', $id))->compile();
+
+        static::assertEquals('SELECT * FROM "test" WHERE "id" != ?', $query->sql());
+        static::assertEquals([$id], $query->params());
     }
 }

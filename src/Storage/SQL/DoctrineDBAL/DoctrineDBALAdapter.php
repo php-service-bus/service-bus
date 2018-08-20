@@ -103,10 +103,12 @@ final class DoctrineDBALAdapter implements StorageAdapter
 
             return new Success(new DoctrineDBALTransactionAdapter($this->connection));
         }
+            // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
             return new Failure(DoctrineDBALExceptionConvert::do($throwable));
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**

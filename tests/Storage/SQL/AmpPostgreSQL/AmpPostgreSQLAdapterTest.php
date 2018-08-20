@@ -11,46 +11,29 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Storage\SQL;
+namespace Desperado\ServiceBus\Tests\Storage\SQL\AmpPostgreSQL;
 
 use Amp\Coroutine;
 use function Amp\Promise\wait;
-use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
+use Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Storage\StorageConfiguration;
+use Desperado\ServiceBus\Tests\Storage\SQL\BaseStorageAdapterTest;
 
 /**
  *
  */
-final class DoctrineDBALAdapterTest extends BaseStorageAdapterTest
+final class AmpPostgreSQLAdapterTest extends BaseStorageAdapterTest
 {
     /**
-     * @var DoctrineDBALAdapter
-     */
-    private static $adapter;
-
-    /**
-     * @inheritdoc
-     */
-    protected static function getAdapter(): StorageAdapter
-    {
-        if(null === self::$adapter)
-        {
-            self::$adapter = StorageAdapterFactory::inMemory();
-        }
-
-        return self::$adapter;
-    }
-
-    /**
-     * @inheritdoc
+     * @return void
      *
      * @throws \Throwable
      */
-    protected function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        parent::setUp();
+        parent::setUpBeforeClass();
 
         wait(
             static::getAdapter()->execute(
@@ -60,27 +43,51 @@ final class DoctrineDBALAdapterTest extends BaseStorageAdapterTest
     }
 
     /**
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public static function tearDownAfterClass(): void
+    {
+        $adapter = static::getAdapter();
+
+        wait($adapter->execute('DROP TABLE storage_test_table'));
+        wait($adapter->execute('DROP TABLE test_ai'));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function getAdapter(): StorageAdapter
+    {
+        return StorageAdapterFactory::create(
+            AmpPostgreSQLAdapter::class,
+            (string) \getenv('TEST_POSTGRES_DSN')
+        );
+    }
+
+    /**
      * @test
      *
-     * @return string
+     * @return void
      *
      * @throws \Throwable
      */
     public function lastInsertId(): void
     {
-        $handler = static function(DoctrineDBALAdapterTest $self): \Generator
+        $handler = static function(AmpPostgreSQLAdapterTest $self): \Generator
         {
             try
             {
                 $adapter = static::getAdapter();
 
                 /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
-                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')');
+                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\') RETURNING id');
 
                 static::assertEquals('1', $result->lastInsertId());
 
                 /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
-                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')');
+                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\') RETURNING id');
 
                 static::assertEquals('2', $result->lastInsertId());
             }
@@ -104,25 +111,8 @@ final class DoctrineDBALAdapterTest extends BaseStorageAdapterTest
      */
     public function failedConnection(): void
     {
-        $adapter = new DoctrineDBALAdapter(
-            StorageConfiguration::fromDSN('pgsql://localhost:4486/foo?charset=UTF-8')
-        );
-
-        wait($adapter->execute('SELECT now()'));
-    }
-
-    /**
-     * @test
-     * @expectedException \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function failedConnectionString(): void
-    {
-        $adapter = new DoctrineDBALAdapter(
-            StorageConfiguration::fromDSN('')
+        $adapter = new AmpPostgreSQLAdapter(
+            StorageConfiguration::fromDSN('qwerty')
         );
 
         wait($adapter->execute('SELECT now()'));

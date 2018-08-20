@@ -18,6 +18,7 @@ use Amp\Postgres\ConnectionConfig;
 use function Amp\Postgres\pool;
 use Amp\Postgres\Pool;
 use Amp\Promise;
+use Amp\Sql\Transaction;
 use Amp\Success;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\StorageConfiguration;
@@ -45,24 +46,17 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
      */
     public function __construct(StorageConfiguration $configuration)
     {
-        try
-        {
-            $queryData  = $configuration->queryParameters();
-            $this->pool = pool(
-                new ConnectionConfig(
-                    $configuration->host(),
-                    $configuration->port() ?? ConnectionConfig::DEFAULT_PORT,
-                    $configuration->username(),
-                    $configuration->password(),
-                    $configuration->databaseName()
-                ),
-                $queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS
-            );
-        }
-        catch(\Throwable $throwable)
-        {
-            throw AmpExceptionConvert::do($throwable);
-        }
+        $queryData  = $configuration->queryParameters();
+        $this->pool = pool(
+            new ConnectionConfig(
+                $configuration->host(),
+                $configuration->port() ?? ConnectionConfig::DEFAULT_PORT,
+                $configuration->username(),
+                $configuration->password(),
+                $configuration->databaseName()
+            ),
+            $queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS
+        );
     }
 
     /**
@@ -125,13 +119,17 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
                 try
                 {
                     return yield new Success(
-                        new AmpPostgreSQLTransactionAdapter(yield $connectionsPool->transaction())
+                        new AmpPostgreSQLTransactionAdapter(
+                            yield $connectionsPool->transaction(Transaction::ISOLATION_COMMITTED)
+                        )
                     );
                 }
+                    // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)
                 {
                     throw AmpExceptionConvert::do($throwable);
                 }
+                // @codeCoverageIgnoreEnd
             }
         );
     }
