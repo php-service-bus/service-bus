@@ -11,14 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs;
-
-use Desperado\ServiceBus\Sagas\SagaId;
+namespace Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs;
 
 /**
  *
  */
-final class TestSagaId extends SagaId
+final class IncorrectSagaEvent
 {
 
 }
