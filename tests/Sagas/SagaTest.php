@@ -83,7 +83,10 @@ class SagaTest extends TestCase
         static::assertCount(0, $raisedEvents);
         static::assertCount(0, $firedCommands);
 
-        static::assertEquals(SagaStatus::STATUS_IN_PROGRESS, (string) $saga->status());
+        static::assertEquals(
+            SagaStatus::STATUS_IN_PROGRESS,
+            (string) readReflectionPropertyValue($saga, 'status')
+        );
 
         $saga->doSomethingElse();
 
@@ -93,7 +96,10 @@ class SagaTest extends TestCase
         static::assertCount(3, $raisedEvents);
         static::assertCount(0, $firedCommands);
 
-        static::assertEquals(SagaStatus::STATUS_FAILED, (string) $saga->status());
+        static::assertEquals(
+            SagaStatus::STATUS_FAILED,
+            (string) readReflectionPropertyValue($saga, 'status')
+        );
     }
 
     /**
@@ -129,7 +135,10 @@ class SagaTest extends TestCase
         $saga->start(new SomeCommand());
         $saga->closeWithSuccessStatus();
 
-        static::assertEquals(SagaStatus::STATUS_COMPLETED, (string) $saga->status());
+        static::assertEquals(
+            SagaStatus::STATUS_COMPLETED,
+            (string) readReflectionPropertyValue($saga, 'status')
+        );
 
         /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events */
         $events = \iterator_to_array(invokeReflectionMethod($saga, 'raisedEvents'));
@@ -187,6 +196,8 @@ class SagaTest extends TestCase
         static::assertInstanceOf(SagaCreated::class, $sagaCreatedEvent);
         /** @noinspection UnnecessaryAssertionInspection */
         static::assertInstanceOf(\DateTimeImmutable::class, $sagaCreatedEvent->datetime());
+        /** @noinspection UnnecessaryAssertionInspection */
+        static::assertInstanceOf(\DateTimeImmutable::class, $sagaCreatedEvent->expirationDate());
         static::assertEquals((string) $id, $sagaCreatedEvent->id());
         static::assertEquals(\get_class($id), $sagaCreatedEvent->idClass());
         static::assertEquals(SimpleSaga::class, $sagaCreatedEvent->sagaClass());

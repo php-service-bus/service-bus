@@ -63,6 +63,7 @@ final class SQLSagaStore implements SagasStore
                     'payload'          => $storedSaga->payload(),
                     'state_id'         => $storedSaga->status(),
                     'created_at'       => $storedSaga->formatCreatedAt(),
+                    'expiration_date'  => $storedSaga->formatExpirationDate(),
                     'closed_at'        => $storedSaga->formatClosedAt()
                 ])->compile();
 

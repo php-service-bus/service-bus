@@ -16,9 +16,9 @@ namespace Desperado\ServiceBus\Sagas\Configuration;
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerCollection;
 
 /**
- * Retrieving a list of saga event handlers
+ * Retrieving a list of saga event handlers and saga metadata
  */
-interface SagaListenersLoader
+interface SagaConfigurationLoader
 {
     /**
      * Retrieving a list of saga event handlers
@@ -29,5 +29,5 @@ interface SagaListenersLoader
      *
      * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
      */
-    public function load(string $sagaClass): HandlerCollection;
+    public function load(string $sagaClass): SagaConfiguration;
 }
