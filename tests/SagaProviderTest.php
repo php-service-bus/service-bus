@@ -15,7 +15,9 @@ namespace Desperado\ServiceBus\Tests;
 
 use Amp\Coroutine;
 use function Amp\Promise\wait;
+use function Desperado\ServiceBus\Common\writeReflectionPropertyValue;
 use Desperado\ServiceBus\SagaProvider;
+use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed;
 use Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed;
 use Desperado\ServiceBus\Sagas\Exceptions\StartSagaFailed;
@@ -116,6 +118,20 @@ final class SagaProviderTest extends TestCase
 
             $context = new SagasContext();
 
+            writeReflectionPropertyValue(
+                $self->provider,
+                'sagaMetaDataCollection',
+                [
+                    TestSaga::class => new SagaMetadata(
+                        TestSaga::class,
+                        SimpleSagaSagaId::class,
+                        'requestId',
+                        '+1 year'
+                    )
+                ]
+            );
+
+            /** @var TestSaga $saga */
             $saga = yield $self->provider->start($id, new SomeCommand(), $context);
 
             static::assertInstanceOf(Saga::class, $saga);
@@ -148,6 +164,19 @@ final class SagaProviderTest extends TestCase
             );
 
             $id = SimpleSagaSagaId::new(TestSaga::class);
+
+            writeReflectionPropertyValue(
+                $self->provider,
+                'sagaMetaDataCollection',
+                [
+                    TestSaga::class => new SagaMetadata(
+                        TestSaga::class,
+                        SimpleSagaSagaId::class,
+                        'requestId',
+                        '+1 year'
+                    )
+                ]
+            );
 
             yield $self->provider->start($id, new SomeCommand(), new SagasContext());
             yield $self->provider->start($id, new SomeCommand(), new SagasContext());

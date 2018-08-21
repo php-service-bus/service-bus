@@ -31,6 +31,27 @@ function invokeReflectionMethod(object $object, string $methodName, ...$paramete
 }
 
 /**
+ * Write value to property
+ *
+ * @param object $object
+ * @param string $propertyName
+ * @param mixed  $value
+ *
+ * @return void
+ *
+ * @throws \Throwable
+ */
+function writeReflectionPropertyValue(object $object, string $propertyName, $value): void
+{
+    $attribute = extractReflectionProprty($object, $propertyName);
+
+    $attribute->setAccessible(true);
+    $value = $attribute->setValue($object, $value);
+}
+
+/**
+ * Read property value
+ *
  * @param object $object
  * @param string $propertyName
  *
@@ -40,11 +61,28 @@ function invokeReflectionMethod(object $object, string $methodName, ...$paramete
  */
 function readReflectionPropertyValue(object $object, string $propertyName)
 {
-    $attribute = null;
+    $attribute = extractReflectionProprty($object, $propertyName);
+
+    $attribute->setAccessible(true);
+    $value = $attribute->getValue($object);
+
+    return $value;
+}
+
+/**
+ * Extract property
+ *
+ * @return \ReflectionProperty
+ *
+ * @throws \Throwable
+ */
+function extractReflectionProprty(object $object, string $propertyName): \ReflectionProperty
+{
+    $property = null;
 
     try
     {
-        $attribute = new \ReflectionProperty($object, $propertyName);
+        $property = new \ReflectionProperty($object, $propertyName);
     }
     catch(\ReflectionException $e)
     {
@@ -53,19 +91,15 @@ function readReflectionPropertyValue(object $object, string $propertyName)
         /** @noinspection LoopWhichDoesNotLoopInspection */
         while($reflector = $reflector->getParentClass())
         {
-            $attribute = $reflector->getProperty($propertyName);
+            $property = $reflector->getProperty($propertyName);
 
             break;
         }
     }
 
-    /** @var \ReflectionProperty $attribute */
+    /** @var \ReflectionProperty $property */
 
-    $attribute->setAccessible(true);
-    $value = $attribute->getValue($object);
-    $attribute->setAccessible(false);
-
-    return $value;
+    return $property;
 }
 
 /**

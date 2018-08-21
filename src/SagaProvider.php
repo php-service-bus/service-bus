@@ -17,12 +17,14 @@ use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
+use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Exceptions\DuplicateSagaId;
 use Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed;
+use Desperado\ServiceBus\Sagas\Exceptions\SagaMetaDataNotFound;
 use Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed;
 use Desperado\ServiceBus\Sagas\Exceptions\StartSagaFailed;
 use Desperado\ServiceBus\Sagas\Saga;
@@ -83,8 +85,13 @@ final class SagaProvider
                 {
                     $sagaClass = $id->sagaClass();
 
+                    $sagaMetaData = $this->extractSagaMetaData($sagaClass);
+
+                    /** @var \DateTimeImmutable $expireDate */
+                    $expireDate = datetimeInstantiator($sagaMetaData->expireDateModifier());
+
                     /** @var Saga $saga */
-                    $saga = new $sagaClass($id);
+                    $saga = new $sagaClass($id, $expireDate);
                     $saga->start($command);
 
                     yield self::doStore($this->store, $saga, $context, true);
@@ -276,9 +283,30 @@ final class SagaProvider
     }
 
     /**
+     * Receive saga meta data information
+     *
+     * @param string $sagaClass
+     *
+     * @return SagaMetadata
+     *
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\SagaMetaDataNotFound
+     */
+    private function extractSagaMetaData(string $sagaClass): SagaMetadata
+    {
+        if(true === isset($this->sagaMetaDataCollection[$sagaClass]))
+        {
+            return $this->sagaMetaDataCollection[$sagaClass];
+        }
+
+        throw new SagaMetaDataNotFound($sagaClass);
+    }
+
+    /**
      * Add meta data for specified saga
      *
      * @noinspection PhpUnusedPrivateMethodInspection
+     *
+     * @see          MessageBusBuilder::addSaga
      *
      * @param string       $sagaClass
      * @param SagaMetadata $metadata

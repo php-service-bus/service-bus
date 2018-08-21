@@ -18,6 +18,7 @@ use function Amp\Promise\wait;
 use Amp\Success;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use function Desperado\ServiceBus\Common\uuid;
+use function Desperado\ServiceBus\Common\writeReflectionPropertyValue;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound;
 use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified;
@@ -265,6 +266,19 @@ final class SagaEventListenerProcessorTest extends TestCase
             $id = TestProcessorSagaId::new(CorrectTestProcessorSaga::class);
 
             $sagaProvider = new SagaProvider(new SQLSagaStore($adapter));
+
+            writeReflectionPropertyValue(
+                $sagaProvider,
+                'sagaMetaDataCollection',
+                [
+                    CorrectTestProcessorSaga::class => new SagaMetadata(
+                        CorrectTestProcessorSaga::class,
+                        TestProcessorSagaId::class,
+                        'requestId',
+                        '+1 year'
+                    )
+                ]
+            );
 
             /** @var CorrectTestProcessorSaga $saga */
             $saga = yield $sagaProvider->start($id, new StartSagaCommand(), $context);
