@@ -263,9 +263,12 @@ final class SagaProvider
                 /** @var \DateTimeImmutable|null $closedAt */
                 $closedAt = readReflectionPropertyValue($saga, 'closedAt');
 
+                /** @var \Desperado\ServiceBus\Sagas\SagaStatus $state */
+                $state = readReflectionPropertyValue($saga, 'status');
+
                 $savedSaga = StoredSaga::create(
                     $saga->id(),
-                    $saga->status(),
+                    $state,
                     \base64_encode(\serialize($saga)),
                     $saga->createdAt(),
                     $saga->expireDate(),

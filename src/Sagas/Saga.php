@@ -143,16 +143,6 @@ abstract class Saga
     }
 
     /**
-     * Receive saga status
-     *
-     * @return SagaStatus
-     */
-    final public function status(): SagaStatus
-    {
-        return $this->status;
-    }
-
-    /**
      * Date of creation
      *
      * @return \DateTimeImmutable

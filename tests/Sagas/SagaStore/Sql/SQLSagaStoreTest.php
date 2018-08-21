@@ -90,7 +90,7 @@ final class SQLSagaStoreTest extends TestCase
 
             yield $self->store->save(
                 $savedSaga,
-                static function()
+                static function(): void
                 {
 
                 }
@@ -106,6 +106,7 @@ final class SQLSagaStoreTest extends TestCase
             static::assertEquals($savedSaga->status(), $loadedSaga->status());
             static::assertEquals($savedSaga->payload(), $loadedSaga->payload());
             static::assertEquals($savedSaga->createdAt(), $loadedSaga->createdAt());
+            static::assertEquals($savedSaga->expirationDate(), $loadedSaga->expirationDate());
             static::assertEquals($savedSaga->closedAt(), $loadedSaga->closedAt());
 
             $toUpdate = StoredSaga::fromRow([
@@ -121,7 +122,7 @@ final class SQLSagaStoreTest extends TestCase
 
             yield $self->store->update(
                 $toUpdate,
-                static function()
+                static function(): void
                 {
 
                 }
