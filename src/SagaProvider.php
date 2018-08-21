@@ -260,8 +260,6 @@ final class SagaProvider
                 $commands = invokeReflectionMethod($saga, 'firedCommands');
                 $events   = invokeReflectionMethod($saga, 'raisedEvents');
 
-                /** @var \DateTimeImmutable $createdAt */
-                $createdAt = readReflectionPropertyValue($saga, 'createdAt');
                 /** @var \DateTimeImmutable|null $closedAt */
                 $closedAt = readReflectionPropertyValue($saga, 'closedAt');
 
@@ -269,7 +267,8 @@ final class SagaProvider
                     $saga->id(),
                     $saga->status(),
                     \base64_encode(\serialize($saga)),
-                    $createdAt,
+                    $saga->createdAt(),
+                    $saga->expireDate(),
                     $closedAt
                 );
 

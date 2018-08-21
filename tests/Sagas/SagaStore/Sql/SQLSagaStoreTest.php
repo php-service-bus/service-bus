@@ -84,6 +84,7 @@ final class SQLSagaStoreTest extends TestCase
                 'payload'          => 'qwertyRoot',
                 'state_id'         => SagaStatus::STATUS_COMPLETED,
                 'created_at'       => '2018-01-01 00:00:00',
+                'expiration_date'  => '2018-01-01 00:00:00',
                 'closed_at'        => '2019-01-01 00:00:00'
             ]);
 
@@ -114,6 +115,7 @@ final class SQLSagaStoreTest extends TestCase
                 'payload'          => 'qwertyRoot333',
                 'state_id'         => SagaStatus::STATUS_COMPLETED,
                 'created_at'       => '2018-01-01 00:00:00',
+                'expiration_date'  => '2018-01-01 00:00:00',
                 'closed_at'        => '2019-01-01 00:00:00'
             ]);
 

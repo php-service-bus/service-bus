@@ -16,6 +16,7 @@ namespace Desperado\ServiceBus\Sagas;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
+use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
 use Desperado\ServiceBus\Sagas\Contract\SagaCreated;
 use Desperado\ServiceBus\Sagas\Contract\SagaStatusChanged;
@@ -70,6 +71,13 @@ abstract class Saga
     private $createdAt;
 
     /**
+     * Saga expiration date
+     *
+     * @var \DateTimeImmutable
+     */
+    private $expireDate;
+
+    /**
      * Date of saga closed
      *
      * @var \DateTimeImmutable|null
@@ -79,12 +87,13 @@ abstract class Saga
     /**
      * @noinspection PhpDocMissingThrowsInspection
      *
-     * @param SagaId $id
+     * @param SagaId                  $id
+     * @param \DateTimeImmutable|null $expireDate
      *
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\ChangeSagaStateFailed
      */
-    final public function __construct(SagaId $id)
+    final public function __construct(SagaId $id, ?\DateTimeImmutable $expireDate = null)
     {
         $this->assertSagaClassEqualsWithId($id);
         $this->clear();
@@ -92,17 +101,16 @@ abstract class Saga
         /** @var \DateTimeImmutable $currentDatetime */
         $currentDatetime = datetimeInstantiator('NOW');
 
+        /** @var \DateTimeImmutable $expireDate */
+        $expireDate = $expireDate ?? datetimeInstantiator(SagaMetadata::DEFAULT_EXPIRE_INTERVAL);
+
         $this->id     = $id;
         $this->status = SagaStatus::created();
 
-        /**
-         * @noinspection UnusedConstructorDependenciesInspection
-         *
-         * @see          SagaProvider::doStore()
-         */
-        $this->createdAt = $currentDatetime;
+        $this->createdAt  = $currentDatetime;
+        $this->expireDate = $expireDate;
 
-        $this->raise(SagaCreated::create($id));
+        $this->raise(SagaCreated::create($id, $currentDatetime, $expireDate));
     }
 
     /**
@@ -142,6 +150,26 @@ abstract class Saga
     final public function status(): SagaStatus
     {
         return $this->status;
+    }
+
+    /**
+     * Date of creation
+     *
+     * @return \DateTimeImmutable
+     */
+    final public function createdAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Date of expiration
+     *
+     * @return \DateTimeImmutable
+     */
+    final public function expireDate(): \DateTimeImmutable
+    {
+        return $this->expireDate;
     }
 
     /**
