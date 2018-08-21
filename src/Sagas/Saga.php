@@ -16,6 +16,7 @@ namespace Desperado\ServiceBus\Sagas;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
+use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
 use Desperado\ServiceBus\Sagas\Contract\SagaCreated;
 use Desperado\ServiceBus\Sagas\Contract\SagaStatusChanged;
 use Desperado\ServiceBus\Sagas\Exceptions\ChangeSagaStateFailed;
@@ -155,6 +156,7 @@ abstract class Saga
     final protected function raise(Event $event): void
     {
         $this->assertNotClosedSaga();
+
         $this->applyEvent($event);
         $this->events->attach($event);
     }
@@ -190,17 +192,8 @@ abstract class Saga
     {
         $this->assertNotClosedSaga();
 
-        $event = SagaStatusChanged::create(
-            $this->id,
-            $this->status,
-            SagaStatus::completed(),
-            $withReason
-        );
-
-        $this->events->attach($event);
-
-        $this->status   = SagaStatus::completed();
-        $this->closedAt = $event->datetime();
+        $this->doChangeState(SagaStatus::completed(), $withReason);
+        $this->doClose($withReason);
     }
 
     /**
@@ -218,17 +211,8 @@ abstract class Saga
     {
         $this->assertNotClosedSaga();
 
-        $event = SagaStatusChanged::create(
-            $this->id,
-            $this->status,
-            SagaStatus::failed(),
-            $withReason
-        );
-
-        $this->events->attach($event);
-
-        $this->status   = SagaStatus::failed();
-        $this->closedAt = $event->datetime();
+        $this->doChangeState(SagaStatus::failed(), $withReason);
+        $this->doClose($withReason);
     }
 
     /**
@@ -314,6 +298,44 @@ abstract class Saga
             self::EVENT_APPLY_PREFIX,
             \end($eventListenerMethodNameParts)
         );
+    }
+
+    /**
+     * Close saga
+     *
+     * @param string|null $withReason
+     *
+     * @return void
+     */
+    private function doClose(string $withReason = null): void
+    {
+        $event = SagaClosed::create($this->id, $withReason);
+
+        $this->closedAt = $event->datetime();
+
+        $this->events->attach($event);
+    }
+
+    /**
+     * Change saga state
+     *
+     * @param SagaStatus  $toState
+     * @param string|null $withReason
+     *
+     * @return void
+     */
+    private function doChangeState(SagaStatus $toState, string $withReason = null): void
+    {
+        $this->events->attach(
+            SagaStatusChanged::create(
+                $this->id,
+                $this->status,
+                $toState,
+                $withReason
+            )
+        );
+
+        $this->status = $toState;
     }
 
     /**

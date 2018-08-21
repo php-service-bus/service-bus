@@ -13,8 +13,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Sagas;
 
+use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
+use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
+use Desperado\ServiceBus\Sagas\Contract\SagaCreated;
+use Desperado\ServiceBus\Sagas\Contract\SagaStatusChanged;
 use Desperado\ServiceBus\Sagas\SagaStatus;
 use Desperado\ServiceBus\Tests\Sagas\Mocks\SimpleSaga;
 use Desperado\ServiceBus\Tests\Sagas\Mocks\SimpleSagaSagaId;
@@ -55,6 +59,12 @@ class SagaTest extends TestCase
         $saga->start(new SomeCommand());
         $saga->doSomething();
 
+        static::assertTrue(
+            $id->equals(
+                readReflectionPropertyValue($saga, 'id')
+            )
+        );
+
         /** @var \DateTimeInterface $createdAt */
         $createdAt = readReflectionPropertyValue($saga, 'createdAt');
 
@@ -81,7 +91,7 @@ class SagaTest extends TestCase
         $raisedEvents  = invokeReflectionMethod($saga, 'raisedEvents');
         $firedCommands = invokeReflectionMethod($saga, 'firedCommands');
 
-        static::assertCount(2, $raisedEvents);
+        static::assertCount(3, $raisedEvents);
         static::assertCount(0, $firedCommands);
 
         static::assertEquals(SagaStatus::STATUS_FAILED, (string) $saga->status());
@@ -109,6 +119,8 @@ class SagaTest extends TestCase
      * @test
      *
      * @return void
+     *
+     * @throws \Throwable
      */
     public function changeStateToCompleted(): void
     {
@@ -119,5 +131,65 @@ class SagaTest extends TestCase
         $saga->closeWithSuccessStatus();
 
         static::assertEquals(SagaStatus::STATUS_COMPLETED, (string) $saga->status());
+
+        /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events */
+        $events = \iterator_to_array(invokeReflectionMethod($saga, 'raisedEvents'));
+
+        static::assertNotEmpty($events);
+        static::assertCount(3, $events);
+
+        /** @var \Desperado\ServiceBus\Sagas\Contract\SagaStatusChanged $changedStatusEvent */
+        $changedStatusEvent = $events[1];
+
+        static::assertInstanceOf(SagaStatusChanged::class, $changedStatusEvent);
+        /** @noinspection UnnecessaryAssertionInspection */
+        static::assertInstanceOf(\DateTimeImmutable::class, $changedStatusEvent->datetime());
+        static::assertEquals((string) $id, $changedStatusEvent->id());
+        static::assertEquals(\get_class($id), $changedStatusEvent->idClass());
+        static::assertEquals(SimpleSaga::class, $changedStatusEvent->sagaClass());
+        static::assertTrue(SagaStatus::created()->equals(SagaStatus::create($changedStatusEvent->previousStatus())));
+        static::assertTrue(SagaStatus::completed()->equals(SagaStatus::create($changedStatusEvent->newStatus())));
+        static::assertNull($changedStatusEvent->withReason());
+
+        /** @var \Desperado\ServiceBus\Sagas\Contract\SagaClosed $sagaClosedEvent */
+        $sagaClosedEvent = $events[2];
+
+        static::assertInstanceOf(SagaClosed::class, $sagaClosedEvent);
+        /** @noinspection UnnecessaryAssertionInspection */
+        static::assertInstanceOf(\DateTimeImmutable::class, $sagaClosedEvent->datetime());
+        static::assertEquals((string) $id, $sagaClosedEvent->id());
+        static::assertEquals(\get_class($id), $sagaClosedEvent->idClass());
+        static::assertEquals(SimpleSaga::class, $sagaClosedEvent->sagaClass());
+        static::assertNull($sagaClosedEvent->withReason());
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function sagaCreated(): void
+    {
+        $id   = new SimpleSagaSagaId('123456789', SimpleSaga::class);
+        $saga = new SimpleSaga($id);
+        $saga->start(new SomeCommand());
+
+        /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events */
+        $events = \iterator_to_array(invokeReflectionMethod($saga, 'raisedEvents'));
+
+        static::assertNotEmpty($events);
+        static::assertCount(1, $events);
+
+        /** @var \Desperado\ServiceBus\Sagas\Contract\SagaCreated $sagaCreatedEvent */
+        $sagaCreatedEvent = \end($events);
+
+        static::assertInstanceOf(SagaCreated::class, $sagaCreatedEvent);
+        /** @noinspection UnnecessaryAssertionInspection */
+        static::assertInstanceOf(\DateTimeImmutable::class, $sagaCreatedEvent->datetime());
+        static::assertEquals((string) $id, $sagaCreatedEvent->id());
+        static::assertEquals(\get_class($id), $sagaCreatedEvent->idClass());
+        static::assertEquals(SimpleSaga::class, $sagaCreatedEvent->sagaClass());
     }
 }

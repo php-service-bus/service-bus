@@ -26,7 +26,7 @@ class InvalidSagaStatus extends \InvalidArgumentException implements ServiceBusE
     public function __construct(string $status)
     {
         parent::__construct(
-            \sprintf('Incorrect saga status indicated: %s', $status)
+            \sprintf('Incorrect saga status specified: %s', $status)
         );
     }
 }
