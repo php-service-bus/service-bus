@@ -16,17 +16,20 @@ namespace Desperado\ServiceBus\Sagas\Exceptions;
 use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 
 /**
- * Incorrect saga status indicated
+ *
  */
-class InvalidSagaStatus extends \InvalidArgumentException implements ServiceBusExceptionMarker
+final class SagaMetaDataNotFound extends \RuntimeException implements ServiceBusExceptionMarker
 {
     /**
-     * @param string $status
+     * @param string $sagaClass
      */
-    public function __construct(string $status)
+    public function __construct(string $sagaClass)
     {
         parent::__construct(
-            \sprintf('Incorrect saga status specified: %s', $status)
+            \sprintf(
+                'Meta data of the saga "%s" not found. The saga was not configured',
+                $sagaClass
+            )
         );
     }
 }

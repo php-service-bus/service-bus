@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Sagas\Configuration;
 
 use Desperado\ServiceBus\SagaProvider;
-use Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaListenersLoader;
+use Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaConfigurationLoader;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\CorrectSaga;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithIncorrectEventListenerClass;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithoutAnnotations;
@@ -67,7 +67,7 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function sagaWithoutAnnotations(): void
     {
-        (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWithoutAnnotations::class);
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))->load(SagaWithoutAnnotations::class);
     }
 
     /**
@@ -81,7 +81,9 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function sagaWithIncorrectHeaderAnnotationData(): void
     {
-        (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWrongIdClassSpecified::class);
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
+            ->load(SagaWrongIdClassSpecified::class)
+            ->handlerCollection();
     }
 
     /**
@@ -91,7 +93,9 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function sagaWithoutListeners(): void
     {
-        $result = (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWithoutListeners::class);
+        $result = (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
+            ->load(SagaWithoutListeners::class)
+            ->handlerCollection();
 
         static::assertEmpty($result);
     }
@@ -103,7 +107,9 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function correctSagaWithListeners(): void
     {
-        $result = (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(CorrectSaga::class);
+        $result = (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
+            ->load(CorrectSaga::class)
+            ->handlerCollection();
 
         static::assertNotEmpty($result);
         static::assertCount(2, $result);
@@ -131,7 +137,7 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function sagaWithUnExistsEventClass(): void
     {
-        (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWithUnExistsEventListenerClass::class);
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))->load(SagaWithUnExistsEventListenerClass::class);
     }
 
     /**
@@ -142,7 +148,7 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function sagaWithToManyListenerArguments(): void
     {
-        (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWithToManyArguments::class);
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))->load(SagaWithToManyArguments::class);
     }
 
     /**
@@ -153,6 +159,6 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function sagaWithIncorrectListenerClass(): void
     {
-        (new AnnotationsBasedSagaListenersLoader($this->sagaProvider))->load(SagaWithIncorrectEventListenerClass::class);
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))->load(SagaWithIncorrectEventListenerClass::class);
     }
 }

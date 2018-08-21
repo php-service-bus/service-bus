@@ -16,6 +16,8 @@ namespace Desperado\ServiceBus\Sagas;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
+use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
+use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
 use Desperado\ServiceBus\Sagas\Contract\SagaCreated;
 use Desperado\ServiceBus\Sagas\Contract\SagaStatusChanged;
 use Desperado\ServiceBus\Sagas\Exceptions\ChangeSagaStateFailed;
@@ -69,6 +71,13 @@ abstract class Saga
     private $createdAt;
 
     /**
+     * Saga expiration date
+     *
+     * @var \DateTimeImmutable
+     */
+    private $expireDate;
+
+    /**
      * Date of saga closed
      *
      * @var \DateTimeImmutable|null
@@ -78,12 +87,13 @@ abstract class Saga
     /**
      * @noinspection PhpDocMissingThrowsInspection
      *
-     * @param SagaId $id
+     * @param SagaId                  $id
+     * @param \DateTimeImmutable|null $expireDate
      *
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\ChangeSagaStateFailed
      */
-    final public function __construct(SagaId $id)
+    final public function __construct(SagaId $id, ?\DateTimeImmutable $expireDate = null)
     {
         $this->assertSagaClassEqualsWithId($id);
         $this->clear();
@@ -91,17 +101,16 @@ abstract class Saga
         /** @var \DateTimeImmutable $currentDatetime */
         $currentDatetime = datetimeInstantiator('NOW');
 
+        /** @var \DateTimeImmutable $expireDate */
+        $expireDate = $expireDate ?? datetimeInstantiator(SagaMetadata::DEFAULT_EXPIRE_INTERVAL);
+
         $this->id     = $id;
         $this->status = SagaStatus::created();
 
-        /**
-         * @noinspection UnusedConstructorDependenciesInspection
-         *
-         * @see          SagaProvider::doStore()
-         */
-        $this->createdAt = $currentDatetime;
+        $this->createdAt  = $currentDatetime;
+        $this->expireDate = $expireDate;
 
-        $this->raise(SagaCreated::create($id));
+        $this->raise(SagaCreated::create($id, $currentDatetime, $expireDate));
     }
 
     /**
@@ -134,13 +143,23 @@ abstract class Saga
     }
 
     /**
-     * Receive saga status
+     * Date of creation
      *
-     * @return SagaStatus
+     * @return \DateTimeImmutable
      */
-    final public function status(): SagaStatus
+    final public function createdAt(): \DateTimeImmutable
     {
-        return $this->status;
+        return $this->createdAt;
+    }
+
+    /**
+     * Date of expiration
+     *
+     * @return \DateTimeImmutable
+     */
+    final public function expireDate(): \DateTimeImmutable
+    {
+        return $this->expireDate;
     }
 
     /**
@@ -155,6 +174,7 @@ abstract class Saga
     final protected function raise(Event $event): void
     {
         $this->assertNotClosedSaga();
+
         $this->applyEvent($event);
         $this->events->attach($event);
     }
@@ -190,17 +210,8 @@ abstract class Saga
     {
         $this->assertNotClosedSaga();
 
-        $event = SagaStatusChanged::create(
-            $this->id,
-            $this->status,
-            SagaStatus::completed(),
-            $withReason
-        );
-
-        $this->events->attach($event);
-
-        $this->status   = SagaStatus::completed();
-        $this->closedAt = $event->datetime();
+        $this->doChangeState(SagaStatus::completed(), $withReason);
+        $this->doClose($withReason);
     }
 
     /**
@@ -218,17 +229,8 @@ abstract class Saga
     {
         $this->assertNotClosedSaga();
 
-        $event = SagaStatusChanged::create(
-            $this->id,
-            $this->status,
-            SagaStatus::failed(),
-            $withReason
-        );
-
-        $this->events->attach($event);
-
-        $this->status   = SagaStatus::failed();
-        $this->closedAt = $event->datetime();
+        $this->doChangeState(SagaStatus::failed(), $withReason);
+        $this->doClose($withReason);
     }
 
     /**
@@ -314,6 +316,44 @@ abstract class Saga
             self::EVENT_APPLY_PREFIX,
             \end($eventListenerMethodNameParts)
         );
+    }
+
+    /**
+     * Close saga
+     *
+     * @param string|null $withReason
+     *
+     * @return void
+     */
+    private function doClose(string $withReason = null): void
+    {
+        $event = SagaClosed::create($this->id, $withReason);
+
+        $this->closedAt = $event->datetime();
+
+        $this->events->attach($event);
+    }
+
+    /**
+     * Change saga state
+     *
+     * @param SagaStatus  $toState
+     * @param string|null $withReason
+     *
+     * @return void
+     */
+    private function doChangeState(SagaStatus $toState, string $withReason = null): void
+    {
+        $this->events->attach(
+            SagaStatusChanged::create(
+                $this->id,
+                $this->status,
+                $toState,
+                $withReason
+            )
+        );
+
+        $this->status = $toState;
     }
 
     /**

@@ -43,28 +43,37 @@ final class SagaCreated implements Event
     private $sagaClass;
 
     /**
-     * Operation datetime
+     * Date of creation
      *
      * @var \DateTimeImmutable
      */
     private $datetime;
 
     /**
+     * Date of expiration
+     *
+     * @var \DateTimeImmutable
+     */
+    private $expirationDate;
+
+    /**
      * @noinspection PhpDocMissingThrowsInspection
      *
-     * @param SagaId $sagaId
+     * @param SagaId             $sagaId
+     * @param \DateTimeImmutable $dateTime
+     * @param \DateTimeImmutable $expirationDate
      *
      * @return self
      */
-    public static function create(SagaId $sagaId): self
+    public static function create(SagaId $sagaId, \DateTimeImmutable $dateTime, \DateTimeImmutable $expirationDate): self
     {
         $self = new self();
 
-        $self->id        = (string) $sagaId;
-        $self->idClass   = \get_class($sagaId);
-        $self->sagaClass = $sagaId->sagaClass();
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $self->datetime = new \DateTimeImmutable('NOW');
+        $self->id             = (string) $sagaId;
+        $self->idClass        = \get_class($sagaId);
+        $self->sagaClass      = $sagaId->sagaClass();
+        $self->datetime       = $dateTime;
+        $self->expirationDate = $expirationDate;
 
         return $self;
     }
@@ -100,12 +109,22 @@ final class SagaCreated implements Event
     }
 
     /**
-     * Receive operation datetime
+     * Receive date of creation
      *
      * @return \DateTimeImmutable
      */
     public function datetime(): \DateTimeImmutable
     {
         return $this->datetime;
+    }
+
+    /**
+     * Receive date of expiration
+     *
+     * @return \DateTimeImmutable
+     */
+    public function expirationDate(): \DateTimeImmutable
+    {
+        return $this->expirationDate;
     }
 }

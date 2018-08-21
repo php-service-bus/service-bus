@@ -18,6 +18,8 @@ namespace Desperado\ServiceBus\Sagas\Configuration;
  */
 final class SagaMetadata
 {
+    public const DEFAULT_EXPIRE_INTERVAL = '+1 hour';
+
     /**
      * @var string
      */
