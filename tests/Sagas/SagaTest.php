@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Sagas;
 
-use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
