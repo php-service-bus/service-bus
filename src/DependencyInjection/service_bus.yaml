@@ -65,8 +65,8 @@ services:
       $store: '@Desperado\ServiceBus\Sagas\SagaStore\SagasStore'
 
   # Retrieving a list of saga event handlers
-  Desperado\ServiceBus\Sagas\Configuration\SagaListenersLoader:
-    class: Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaListenersLoader
+  Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader:
+    class: Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaConfigurationLoader
     arguments:
       $sagaProvider: '@Desperado\ServiceBus\SagaProvider'
       $annotationReader: null
