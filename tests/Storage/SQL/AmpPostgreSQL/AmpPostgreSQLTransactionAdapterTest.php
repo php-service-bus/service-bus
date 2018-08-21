@@ -21,7 +21,6 @@ use function Desperado\ServiceBus\Storage\fetchOne;
 use Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
 use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
-use function Desperado\ServiceBus\Storage\SQL\notEqualsCriteria;
 use function Desperado\ServiceBus\Storage\SQL\selectQuery;
 use Desperado\ServiceBus\Storage\StorageConfiguration;
 use PHPUnit\Framework\TestCase;
