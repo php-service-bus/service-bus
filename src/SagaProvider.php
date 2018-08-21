@@ -20,6 +20,7 @@ use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
+use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Exceptions\DuplicateSagaId;
 use Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed;
 use Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed;
@@ -41,6 +42,13 @@ final class SagaProvider
      * @var SagasStore
      */
     private $store;
+
+    /**
+     * Sagas meta data
+     *
+     * @var array<string, \Desperado\ServiceBus\Sagas\Configuration\SagaMetadata>
+     */
+    private $sagaMetaDataCollection = [];
 
     /**
      * @param SagasStore $store
@@ -265,5 +273,20 @@ final class SagaProvider
             $context,
             $isNew
         );
+    }
+
+    /**
+     * Add meta data for specified saga
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
+     *
+     * @param string       $sagaClass
+     * @param SagaMetadata $metadata
+     *
+     * @return void
+     */
+    private function appendMetaData(string $sagaClass, SagaMetadata $metadata): void
+    {
+        $this->sagaMetaDataCollection[$sagaClass] = $metadata;
     }
 }

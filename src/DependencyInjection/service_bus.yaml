@@ -121,6 +121,7 @@ services:
     arguments:
       $sagasConfigurationLoader: '@Desperado\ServiceBus\Sagas\Configuration\SagaListenersLoader'
       $servicesConfigurationLoader: '@Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader'
+      $sagaProvider: '@Desperado\ServiceBus\SagaProvider'
       $logger: '@Psr\Log\LoggerInterface'
 
   # ServiceBusKernel locator
