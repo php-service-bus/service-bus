@@ -119,7 +119,7 @@ services:
   # Message bus builder
   Desperado\ServiceBus\MessageBus\MessageBusBuilder:
     arguments:
-      $sagasConfigurationLoader: '@Desperado\ServiceBus\Sagas\Configuration\SagaListenersLoader'
+      $sagasConfigurationLoader: '@Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader'
       $servicesConfigurationLoader: '@Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader'
       $sagaProvider: '@Desperado\ServiceBus\SagaProvider'
       $logger: '@Psr\Log\LoggerInterface'
