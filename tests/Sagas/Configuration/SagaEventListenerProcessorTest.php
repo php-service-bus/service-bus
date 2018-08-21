@@ -16,7 +16,6 @@ namespace Desperado\ServiceBus\Tests\Sagas\Configuration;
 use Amp\Coroutine;
 use function Amp\Promise\wait;
 use Amp\Success;
-use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\SagaProvider;
@@ -25,9 +24,7 @@ use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierField
 use Desperado\ServiceBus\Sagas\Configuration\SagaListenerOptions;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier;
-use Desperado\ServiceBus\Sagas\SagaStatus;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
-use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\CorrectTestProcessorSaga;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\IncorrectSagaId;
@@ -255,7 +252,7 @@ final class SagaEventListenerProcessorTest extends TestCase
      */
     public function successTransition(): void
     {
-        $handler = static function(SagaEventListenerProcessorTest $self): \Generator
+        $handler = static function(): \Generator
         {
             $adapter = StorageAdapterFactory::inMemory();
 
@@ -272,7 +269,7 @@ final class SagaEventListenerProcessorTest extends TestCase
             /** @var CorrectTestProcessorSaga $saga */
             $saga = yield $sagaProvider->start($id, new StartSagaCommand(), $context);
 
-            yield $sagaProvider->save($saga);
+            yield $sagaProvider->save($saga, $context);
 
             /** @var TestSagaStore $sagaStoreMock */
 
@@ -308,6 +305,6 @@ final class SagaEventListenerProcessorTest extends TestCase
             static::assertEquals((string) $id, $responseEvent->requestId());
         };
 
-        wait(new Coroutine($handler($this)));
+        wait(new Coroutine($handler()));
     }
 }

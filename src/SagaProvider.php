@@ -32,8 +32,6 @@ use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
 
 /**
  * Saga provider
- *
- * @todo: clear old contexts
  */
 final class SagaProvider
 {
@@ -43,13 +41,6 @@ final class SagaProvider
      * @var SagasStore
      */
     private $store;
-
-    /**
-     * Contexts in which sagas are performed
-     *
-     * @var array<string, \Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext>
-     */
-    private $sagasContexts = [];
 
     /**
      * @param SagasStore $store
@@ -88,9 +79,6 @@ final class SagaProvider
                     $saga = new $sagaClass($id);
                     $saga->start($command);
 
-                    /** Store context */
-                    $this->sagasContexts[\spl_object_hash($saga)] = $context;
-
                     yield self::doStore($this->store, $saga, $context, true);
 
                     return yield new Success($saga);
@@ -111,8 +99,7 @@ final class SagaProvider
     /**
      * Load saga
      *
-     * @param SagaId                 $id
-     * @param MessageDeliveryContext $context
+     * @param SagaId $id
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
@@ -121,26 +108,16 @@ final class SagaProvider
      *
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed
      */
-    public function obtain(SagaId $id, MessageDeliveryContext $context): Promise
+    public function obtain(SagaId $id): Promise
     {
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            function(SagaId $id, MessageDeliveryContext $context): \Generator
+            function(SagaId $id): \Generator
             {
                 try
                 {
                     /** @var Saga|null $saga */
                     $saga = yield self::doLoad($this->store, $id);
-
-                    if(null !== $saga)
-                    {
-                        $sagaHash = \spl_object_hash($saga);
-
-                        if(false === isset($this->sagasContexts[$sagaHash]))
-                        {
-                            $this->sagasContexts[$sagaHash] = $context;
-                        }
-                    }
 
                     return yield new Success($saga);
                 }
@@ -149,14 +126,15 @@ final class SagaProvider
                     throw new LoadSagaFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
                 }
             },
-            $id, $context
+            $id
         );
     }
 
     /**
      * Save saga
      *
-     * @param Saga $saga
+     * @param Saga                   $saga
+     * @param MessageDeliveryContext $context
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
@@ -165,11 +143,11 @@ final class SagaProvider
      *
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed
      */
-    public function save(Saga $saga): Promise
+    public function save(Saga $saga, MessageDeliveryContext $context): Promise
     {
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            function(Saga $saga): \Generator
+            function(Saga $saga, MessageDeliveryContext $context): \Generator
             {
                 try
                 {
@@ -178,12 +156,7 @@ final class SagaProvider
 
                     if(null !== $existsSaga)
                     {
-                        yield self::doStore(
-                            $this->store,
-                            $saga,
-                            $this->sagasContexts[\spl_object_hash($saga)],
-                            false
-                        );
+                        yield self::doStore($this->store, $saga, $context, false);
 
                         return yield new Success();
                     }
@@ -201,7 +174,8 @@ final class SagaProvider
                     throw new SaveSagaFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
                 }
             },
-            $saga
+            $saga,
+            $context
         );
     }
 

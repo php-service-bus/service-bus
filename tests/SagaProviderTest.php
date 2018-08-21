@@ -91,7 +91,7 @@ final class SagaProviderTest extends TestCase
             $id   = SimpleSagaSagaId::new(TestSaga::class);
             $saga = new TestSaga($id);
 
-            yield $self->provider->save($saga);
+            yield $self->provider->save($saga, new SagasContext());
         };
 
         wait(new Coroutine($handler($this)));
@@ -121,9 +121,9 @@ final class SagaProviderTest extends TestCase
             static::assertInstanceOf(Saga::class, $saga);
             static::assertCount(1, $context->messages);
 
-            yield $self->provider->save($saga);
+            yield $self->provider->save($saga, $context);
 
-            $loadedSaga = yield $self->provider->obtain($id, $context);
+            $loadedSaga = yield $self->provider->obtain($id);
 
             static::assertInstanceOf(Saga::class, $loadedSaga);
         };
@@ -169,7 +169,10 @@ final class SagaProviderTest extends TestCase
         {
             $self->expectException(SaveSagaFailed::class);
 
-            yield $self->provider->save(new TestSaga(SimpleSagaSagaId::new(TestSaga::class)));
+            yield $self->provider->save(
+                new TestSaga(SimpleSagaSagaId::new(TestSaga::class)),
+                new SagasContext()
+            );
         };
 
         wait(new Coroutine($handler($this)));
@@ -190,7 +193,7 @@ final class SagaProviderTest extends TestCase
 
             $sagaId = SimpleSagaSagaId::new(TestSaga::class);
 
-            yield $self->provider->obtain($sagaId, new SagasContext());
+            yield $self->provider->obtain($sagaId);
         };
 
         wait(new Coroutine($handler($this)));
@@ -234,7 +237,10 @@ final class SagaProviderTest extends TestCase
                 (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
             );
 
-            yield $self->provider->save(new TestSaga(SimpleSagaSagaId::new(TestSaga::class)));
+            yield $self->provider->save(
+                new TestSaga(SimpleSagaSagaId::new(TestSaga::class)),
+                new SagasContext()
+            );
         };
 
         wait(new Coroutine($handler($this)));
