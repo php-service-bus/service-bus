@@ -103,6 +103,7 @@ final class MessageBusBuilder
             );
         }
 
+
         invokeReflectionMethod(
             $this->sagaProvider,
             'appendMetaData',
