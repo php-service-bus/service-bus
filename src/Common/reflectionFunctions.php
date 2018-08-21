@@ -46,7 +46,7 @@ function writeReflectionPropertyValue(object $object, string $propertyName, $val
     $attribute = extractReflectionProprty($object, $propertyName);
 
     $attribute->setAccessible(true);
-    $value = $attribute->setValue($object, $value);
+    $attribute->setValue($object, $value);
 }
 
 /**
