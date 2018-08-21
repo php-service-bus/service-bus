@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\Application\KernelContext;
+use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerArgument;
 
 /**
@@ -27,15 +27,15 @@ final class ContextArgumentResolver implements ArgumentResolver
      */
     public function supports(HandlerArgument $argument): bool
     {
-        return $argument->isA(KernelContext::class);
+        return $argument->isA(MessageDeliveryContext::class);
     }
 
     /**
      * @inheritdoc
      *
-     * @return KernelContext
+     * @return MessageDeliveryContext
      */
-    public function resolve(Message $message, KernelContext $context, HandlerArgument $argument): KernelContext
+    public function resolve(Message $message, MessageDeliveryContext $context, HandlerArgument $argument): MessageDeliveryContext
     {
         return $context;
     }
