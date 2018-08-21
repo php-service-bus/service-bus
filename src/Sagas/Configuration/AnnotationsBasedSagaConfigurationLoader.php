@@ -32,7 +32,7 @@ use Psr\Log\NullLogger;
 /**
  * Annotations based saga listeners loader
  */
-final class AnnotationsBasedSagaListenersLoader implements SagaListenersLoader
+final class AnnotationsBasedSagaConfigurationLoader implements SagaConfigurationLoader
 {
     /**
      * @var AnnotationsReader
@@ -68,7 +68,7 @@ final class AnnotationsBasedSagaListenersLoader implements SagaListenersLoader
     /**
      * @inheritdoc
      */
-    public function load(string $sagaClass): HandlerCollection
+    public function load(string $sagaClass): SagaConfiguration
     {
         try
         {
@@ -90,7 +90,7 @@ final class AnnotationsBasedSagaListenersLoader implements SagaListenersLoader
 
             $this->collectSagaEventHandlers($handlersCollection, $annotations, $sagaMetadata);
 
-            return $handlersCollection;
+            return new SagaConfiguration($sagaMetadata, $handlersCollection);
         }
         catch(InvalidSagaConfiguration $exception)
         {

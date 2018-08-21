@@ -93,13 +93,13 @@ final class SagaEventListenerProcessor
                 $id = self::searchSagaIdentifier($event, $sagaListenerOptions);
 
                 /** @var \Desperado\ServiceBus\Sagas\Saga|null $saga */
-                $saga = yield $sagaProvider->obtain($id, $context);
+                $saga = yield $sagaProvider->obtain($id);
 
                 if(null !== $saga)
                 {
                     invokeReflectionMethod($saga, 'applyEvent', $event);
 
-                    yield $sagaProvider->save($saga);
+                    yield $sagaProvider->save($saga, $context);
 
                     return yield new Success();
                 }

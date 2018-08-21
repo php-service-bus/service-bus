@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\SagaStore;
 
+use function Desperado\ServiceBus\Common\datetimeInstantiator;
+use function Desperado\ServiceBus\Common\datetimeToString;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStatus;
 use Desperado\ServiceBus\Sagas\SagaStore\Exceptions\RestoreSagaFailed;
@@ -58,11 +60,18 @@ final class StoredSaga
     private $status;
 
     /**
-     * ate of creation of the saga
+     * Date of creation
      *
      * @var \DateTimeImmutable
      */
     private $createdAt;
+
+    /**
+     * Date of expiration
+     *
+     * @var \DateTimeImmutable
+     */
+    private $expirationDate;
 
     /**
      * Closing date of the saga
@@ -76,6 +85,7 @@ final class StoredSaga
      * @param SagaStatus              $status
      * @param string                  $payload
      * @param \DateTimeImmutable      $createdAt
+     * @param \DateTimeImmutable      $expirationDate
      * @param \DateTimeImmutable|null $closedAt
      *
      * @return self
@@ -85,18 +95,20 @@ final class StoredSaga
         SagaStatus $status,
         string $payload,
         \DateTimeImmutable $createdAt,
+        \DateTimeImmutable $expirationDate,
         ?\DateTimeImmutable $closedAt
     ): self
     {
         $self = new self();
 
-        $self->id        = (string) $id;
-        $self->idClass   = \get_class($id);
-        $self->sagaClass = $id->sagaClass();
-        $self->status    = (string) $status;
-        $self->payload   = $payload;
-        $self->createdAt = $createdAt;
-        $self->closedAt  = $closedAt;
+        $self->id             = (string) $id;
+        $self->idClass        = \get_class($id);
+        $self->sagaClass      = $id->sagaClass();
+        $self->status         = (string) $status;
+        $self->payload        = $payload;
+        $self->createdAt      = $createdAt;
+        $self->expirationDate = $expirationDate;
+        $self->closedAt       = $closedAt;
 
         return $self;
     }
@@ -108,6 +120,7 @@ final class StoredSaga
      * @param string      $payload
      * @param string      $status
      * @param string      $createdAt
+     * @param string      $expirationDate
      * @param null|string $closedAt
      *
      * @return self
@@ -121,17 +134,22 @@ final class StoredSaga
         string $payload,
         string $status,
         string $createdAt,
+        string $expirationDate,
         ?string $closedAt
     ): self
     {
         try
         {
+            /** @var \DateTimeImmutable|null $closedAtDateTime */
+            $closedAtDateTime = datetimeInstantiator($closedAt);
+
             return self::create(
                 self::identifierInstantiator($idClass, $id, $sagaClass),
                 SagaStatus::create($status),
                 $payload,
                 new \DateTimeImmutable($createdAt),
-                null !== $closedAt ? new \DateTimeImmutable($closedAt) : null
+                new \DateTimeImmutable($expirationDate),
+                $closedAtDateTime
             );
         }
         catch(\Throwable $throwable)
@@ -156,6 +174,7 @@ final class StoredSaga
             $rowData['payload'],
             $rowData['state_id'],
             $rowData['created_at'],
+            $rowData['expiration_date'],
             '' !== (string) $rowData['closed_at']
                 ? $rowData['closed_at']
                 : null
@@ -233,6 +252,16 @@ final class StoredSaga
     }
 
     /**
+     * Receive expiration date
+     *
+     * @return \DateTimeImmutable
+     */
+    public function expirationDate(): \DateTimeImmutable
+    {
+        return $this->expirationDate;
+    }
+
+    /**
      * Receive created_at as string
      *
      * @param string $format
@@ -245,6 +274,18 @@ final class StoredSaga
     }
 
     /**
+     * Receive expiration_date as string
+     *
+     * @param string $format
+     *
+     * @return string
+     */
+    public function formatExpirationDate(string $format = 'Y-m-d H:i:s'): string
+    {
+        return $this->expirationDate->format($format);
+    }
+
+    /**
      * Receive closed_at as string (if defined)
      *
      * @param string $format
@@ -253,14 +294,8 @@ final class StoredSaga
      */
     public function formatClosedAt(string $format = 'Y-m-d H:i:s'): ?string
     {
-        if(null !== $this->closedAt)
-        {
-            return $this->closedAt->format($format);
-        }
-
-        return null;
+        return datetimeToString($this->closedAt, $format);
     }
-
 
     /**
      * Create identifier instance

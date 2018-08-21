@@ -84,12 +84,13 @@ final class SQLSagaStoreTest extends TestCase
                 'payload'          => 'qwertyRoot',
                 'state_id'         => SagaStatus::STATUS_COMPLETED,
                 'created_at'       => '2018-01-01 00:00:00',
+                'expiration_date'  => '2018-01-01 00:00:00',
                 'closed_at'        => '2019-01-01 00:00:00'
             ]);
 
             yield $self->store->save(
                 $savedSaga,
-                static function()
+                static function(): void
                 {
 
                 }
@@ -105,6 +106,7 @@ final class SQLSagaStoreTest extends TestCase
             static::assertEquals($savedSaga->status(), $loadedSaga->status());
             static::assertEquals($savedSaga->payload(), $loadedSaga->payload());
             static::assertEquals($savedSaga->createdAt(), $loadedSaga->createdAt());
+            static::assertEquals($savedSaga->expirationDate(), $loadedSaga->expirationDate());
             static::assertEquals($savedSaga->closedAt(), $loadedSaga->closedAt());
 
             $toUpdate = StoredSaga::fromRow([
@@ -114,12 +116,13 @@ final class SQLSagaStoreTest extends TestCase
                 'payload'          => 'qwertyRoot333',
                 'state_id'         => SagaStatus::STATUS_COMPLETED,
                 'created_at'       => '2018-01-01 00:00:00',
+                'expiration_date'  => '2018-01-01 00:00:00',
                 'closed_at'        => '2019-01-01 00:00:00'
             ]);
 
             yield $self->store->update(
                 $toUpdate,
-                static function()
+                static function(): void
                 {
 
                 }

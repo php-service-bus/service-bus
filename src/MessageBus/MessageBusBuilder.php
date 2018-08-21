@@ -14,12 +14,14 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\MessageBus;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use Desperado\ServiceBus\MessageBus\MessageHandler\Handler;
 use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ArgumentResolver;
 use Desperado\ServiceBus\MessageBus\Processor\MessageProcessor;
 use Desperado\ServiceBus\MessageBus\Processor\ProcessorsMap;
 use Desperado\ServiceBus\MessageBus\Processor\ValidationMessageProcessor;
-use Desperado\ServiceBus\Sagas\Configuration\SagaListenersLoader;
+use Desperado\ServiceBus\SagaProvider;
+use Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader;
 use Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -30,7 +32,7 @@ use Psr\Log\NullLogger;
 final class MessageBusBuilder
 {
     /**
-     * @var SagaListenersLoader
+     * @var SagaConfigurationLoader
      */
     private $sagasConfigurationLoader;
 
@@ -47,23 +49,30 @@ final class MessageBusBuilder
     private $processorsList;
 
     /**
+     * @var SagaProvider
+     */
+    private $sagaProvider;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
 
     /**
-     * @param SagaListenersLoader   $sagasConfigurationLoader
-     * @param ServiceHandlersLoader $servicesConfigurationLoader
-     * @param LoggerInterface|null  $logger
+     * @param SagaConfigurationLoader $sagasConfigurationLoader
+     * @param ServiceHandlersLoader   $servicesConfigurationLoader
+     * @param LoggerInterface|null    $logger
      */
     public function __construct(
-        SagaListenersLoader $sagasConfigurationLoader,
+        SagaConfigurationLoader $sagasConfigurationLoader,
         ServiceHandlersLoader $servicesConfigurationLoader,
+        SagaProvider $sagaProvider,
         LoggerInterface $logger = null
     )
     {
         $this->sagasConfigurationLoader    = $sagasConfigurationLoader;
         $this->servicesConfigurationLoader = $servicesConfigurationLoader;
+        $this->sagaProvider                = $sagaProvider;
         $this->logger                      = $logger ?? new NullLogger();
 
         $this->processorsList = new ProcessorsMap();
@@ -74,7 +83,7 @@ final class MessageBusBuilder
      *
      * @noinspection PhpDocSignatureInspection
      *
-     * @param string $sagaClass
+     * @param string           $sagaClass
      * @param ArgumentResolver ...$argumentResolvers
      *
      * @return void
@@ -83,7 +92,9 @@ final class MessageBusBuilder
      */
     public function addSaga(string $sagaClass, ArgumentResolver ... $argumentResolvers): void
     {
-        foreach($this->sagasConfigurationLoader->load($sagaClass) as $handler)
+        $sagaConfiguration = $this->sagasConfigurationLoader->load($sagaClass);
+
+        foreach($sagaConfiguration->handlerCollection() as $handler)
         {
             /** @var \Desperado\ServiceBus\MessageBus\MessageHandler\Handler $handler */
             $this->processorsList->push(
@@ -91,6 +102,14 @@ final class MessageBusBuilder
                 new MessageProcessor($handler->toClosure(), $handler->arguments(), $argumentResolvers)
             );
         }
+
+
+        invokeReflectionMethod(
+            $this->sagaProvider,
+            'appendMetaData',
+            $sagaClass,
+            $sagaConfiguration->metaData()
+        );
     }
 
     /**

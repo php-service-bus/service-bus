@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\Application\KernelContext;
+use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerArgument;
 
 /**
@@ -35,7 +35,7 @@ final class MessageArgumentResolver implements ArgumentResolver
      *
      * @return Message
      */
-    public function resolve(Message $message, KernelContext $context, HandlerArgument $argument): Message
+    public function resolve(Message $message, MessageDeliveryContext $context, HandlerArgument $argument): Message
     {
         return $message;
     }

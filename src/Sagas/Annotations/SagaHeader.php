@@ -13,14 +13,14 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Annotations;
 
+use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
+
 /**
  * @Annotation
  * @Target("CLASS")
  */
 final class SagaHeader implements SagaAnnotationMarker
 {
-    private const DEFAULT_EXPIRE_INTERVAL = '+1 hour';
-
     /**
      * Saga identifier class
      *
@@ -42,7 +42,7 @@ final class SagaHeader implements SagaAnnotationMarker
      *
      * @var string|null
      */
-    private $expireDateModifier = self::DEFAULT_EXPIRE_INTERVAL;
+    private $expireDateModifier = SagaMetadata::DEFAULT_EXPIRE_INTERVAL;
 
     /**
      * @param array<string, mixed> $data
@@ -93,7 +93,7 @@ final class SagaHeader implements SagaAnnotationMarker
     {
         return true === $this->hasSpecifiedExpireDateModifier()
             ? (string) $this->expireDateModifier
-            : self::DEFAULT_EXPIRE_INTERVAL;
+            : SagaMetadata::DEFAULT_EXPIRE_INTERVAL;
     }
 
     /**
