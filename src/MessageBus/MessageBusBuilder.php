@@ -92,6 +92,7 @@ final class MessageBusBuilder
      */
     public function addSaga(string $sagaClass, ArgumentResolver ... $argumentResolvers): void
     {
+        /** @var \Desperado\ServiceBus\Sagas\Configuration\SagaConfiguration $sagaConfiguration */
         $sagaConfiguration = $this->sagasConfigurationLoader->load($sagaClass);
 
         foreach($sagaConfiguration->handlerCollection() as $handler)

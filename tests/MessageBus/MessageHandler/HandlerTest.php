@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\MessageBus\MessageHandler;
 
 use Amp\Promise;
+use Amp\Success;
 use Desperado\ServiceBus\MessageBus\MessageHandler\Handler;
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerArgument;
 use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerOptions;
@@ -93,7 +94,7 @@ final class HandlerTest extends TestCase
         {
             public function method(): Promise
             {
-
+                return new Success();
             }
         };
 
@@ -122,7 +123,7 @@ final class HandlerTest extends TestCase
         {
             public function method(): \Generator
             {
-
+                yield from [];
             }
         };
 
@@ -151,7 +152,7 @@ final class HandlerTest extends TestCase
         {
             public function method(): string
             {
-
+                return '';
             }
         };
 
@@ -180,7 +181,7 @@ final class HandlerTest extends TestCase
         {
             public function method(string $argument): string
             {
-
+                return $argument;
             }
         };
 
@@ -220,7 +221,7 @@ final class HandlerTest extends TestCase
         {
             public function method(\stdClass $argument): string
             {
-
+                return (string) $argument->qwerty;
             }
         };
 
@@ -259,7 +260,7 @@ final class HandlerTest extends TestCase
         {
             public function method($argument): \Generator
             {
-
+                yield $argument;
             }
         };
 
@@ -301,7 +302,7 @@ final class HandlerTest extends TestCase
         {
             public function method(\stdClass $argument): string
             {
-
+                return (string) $argument->qwerty;
             }
         };
 

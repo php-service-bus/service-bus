@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Stubs\Sagas;
 
 use Amp\Promise;
+use Amp\Success;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
@@ -28,7 +29,7 @@ class SagasStoreStub implements SagasStore
      */
     public function save(StoredSaga $savedSaga, callable $afterSaveHandler): Promise
     {
-
+        return new Success();
     }
 
     /**
@@ -36,7 +37,7 @@ class SagasStoreStub implements SagasStore
      */
     public function update(StoredSaga $savedSaga, callable $afterSaveHandler): Promise
     {
-
+        return new Success();
     }
 
     /**
@@ -44,7 +45,7 @@ class SagasStoreStub implements SagasStore
      */
     public function load(SagaId $id): Promise
     {
-
+        return new Success();
     }
 
     /**
@@ -52,7 +53,6 @@ class SagasStoreStub implements SagasStore
      */
     public function remove(SagaId $id): Promise
     {
-
+        return new Success();
     }
-
 }

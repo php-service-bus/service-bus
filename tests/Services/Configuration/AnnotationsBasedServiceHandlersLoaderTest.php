@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Services\Configuration;
 
 use Amp\Promise;
+use Amp\Success;
 use Desperado\ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader;
 use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
@@ -78,7 +79,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              */
             public function firstEventListener(FirstEmptyEvent $event, TestContext $context): Promise
             {
-
+                return new Success();
             }
 
             /**
@@ -91,7 +92,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              */
             public function secondEventListener(FirstEmptyEvent $event, TestContext $context): \Generator
             {
-
+                yield from [];
             }
 
             /**

@@ -37,6 +37,22 @@ final class WithClosedConstructor
         return $self;
     }
 
+    /**
+     * @return string
+     */
+    public function key(): string
+    {
+        return $this->key;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function someSecondKey(): ?string
+    {
+        return $this->someSecondKey;
+    }
+
     private function __construct()
     {
 

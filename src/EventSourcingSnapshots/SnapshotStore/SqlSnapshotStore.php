@@ -83,6 +83,7 @@ final class SqlSnapshotStore implements SnapshotStore
             {
                 $storedSnapshot = null;
 
+                /** @psalm-suppress ImplicitToStringCast */
                 $query = selectQuery('event_store_snapshots')
                     ->where(equalsCriteria('id', $id))
                     ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)))
@@ -128,6 +129,7 @@ final class SqlSnapshotStore implements SnapshotStore
         return call(
             static function(AggregateId $id) use ($adapter): \Generator
             {
+                /** @psalm-suppress ImplicitToStringCast */
                 $query = deleteQuery('event_store_snapshots')
                     ->where(equalsCriteria('id', $id))
                     ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)))
