@@ -13,6 +13,9 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Application\Kernel;
 
+use Amp\Promise;
+use function Amp\Promise\wait;
+use Amp\Success;
 use Desperado\ServiceBus\Application\Bootstrap;
 use Desperado\ServiceBus\Application\ServiceBusKernel;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
@@ -20,9 +23,15 @@ use function Desperado\ServiceBus\Common\removeDirectory;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\FailedMessageSendMarkerEvent;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\KernelTestExtension;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\SuccessResponseEvent;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerFailedResponseMessageSendCommand;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerResponseEventCommand;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommand;
 use Desperado\ServiceBus\Tests\Stubs\Messages\CommandWithPayload;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
+use Desperado\ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
 use Desperado\ServiceBus\Tests\Stubs\Transport\VirtualQueue;
 use Desperado\ServiceBus\Tests\Stubs\Transport\VirtualTopic;
 use Desperado\ServiceBus\Tests\Stubs\Transport\VirtualTransportBuffer;
@@ -31,12 +40,18 @@ use Desperado\ServiceBus\Transport\QueueBind;
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  *
  */
 final class ServiceBusKernelTest extends TestCase
 {
+    /**
+     * @var ServiceBusKernel
+     */
+    private $kernel;
+
     /**
      * @var ContainerInterface
      */
@@ -48,7 +63,14 @@ final class ServiceBusKernelTest extends TestCase
     private $cacheDirectory;
 
     /**
+     * @var TestHandler
+     */
+    private $logHandler;
+
+    /**
      * @inheritdoc
+     *
+     * @throws \Throwable
      */
     protected function setUp(): void
     {
@@ -68,6 +90,23 @@ final class ServiceBusKernelTest extends TestCase
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
 
         $this->container = $bootstrap->boot();
+
+        $this->kernel = new ServiceBusKernel($this->container);
+
+        $topic = new VirtualTopic('test_topic');
+        $queue = new VirtualQueue('test_queue');
+
+        $defaultOutboundDestination = new Destination('test_topic', 'test_key');
+        $customOutboundDestination  = new Destination('custom_test_topic', 'custom_test_key');
+
+        $this->kernel
+            ->transportConfigurator()
+            ->createTopic($topic)
+            ->addQueue($queue, new QueueBind($topic, 'test_key'))
+            ->addDefaultDestinations($defaultOutboundDestination)
+            ->registerCustomMessageDestinations(FirstEmptyEvent::class, $customOutboundDestination);
+
+        $this->logHandler = $this->container->get(TestHandler::class);
     }
 
     /**
@@ -81,49 +120,156 @@ final class ServiceBusKernelTest extends TestCase
 
         removeDirectory($this->cacheDirectory);
 
-        unset($this->kernel, $this->cacheDirectory);
+        unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
     }
 
     /**
      * @test
      *
-     * @return ServiceBusKernel
+     * @return void
      *
      * @throws \Throwable
      */
-    public function simpleCreate(): ServiceBusKernel
+    public function listenMessageWithNoHandlers(): void
     {
-        $kernel = new ServiceBusKernel($this->container);
+        $this->sendMessage(new CommandWithPayload('payload'));
 
-        $topic = new VirtualTopic('test_topic');
-        $queue = new VirtualQueue('test_queue');
+        $this->kernel->listen(new VirtualQueue('test_queue'));
 
-        $defaultOutboundDestination = new Destination('test_topic', 'test_key');
-        $customOutboundDestination  = new Destination('custom_test_topic', 'custom_test_key');
+        $records = $this->logHandler->getRecords();
 
-        $kernel
-            ->transportConfigurator()
-            ->createTopic($topic)
-            ->addQueue($queue, new QueueBind($topic, 'test_key'))
-            ->addDefaultDestinations($defaultOutboundDestination)
-            ->registerCustomMessageDestinations(FirstEmptyEvent::class, $customOutboundDestination);
+        static::assertNotEmpty($records);
+        static::assertCount(4, $records);
 
-        return $kernel;
+        $latest = \end($records);
+
+        static::assertEquals(
+            'There are no handlers configured for the message "Desperado\\ServiceBus\\Tests\\Stubs\\Messages\\CommandWithPayload"',
+            $latest['message']
+        );
     }
 
     /**
      * @test
-     * @depends simpleCreate
-     *
-     * @param ServiceBusKernel $kernel
      *
      * @return void
+     *
+     * @throws \Throwable
      */
-    public function listenMessageWithNoHandlers(ServiceBusKernel $kernel): void
+    public function listenFailedMessageExecution(): void
     {
-        $this->sendMessage(new CommandWithPayload('payload'));
+        $this->sendMessage(new TriggerThrowableCommand());
 
-        $kernel->listen(new VirtualQueue('test_queue'));
+        $this->kernel->disableMessagesPayloadLogging();
+        $this->kernel->listen(new VirtualQueue('test_queue'));
+        $records = $this->logHandler->getRecords();
+
+        static::assertNotEmpty($records);
+        static::assertCount(3, $records);
+
+        $latest = \end($records);
+
+        static::assertEquals(
+            'Desperado\\ServiceBus\\Tests\\Application\\Kernel\\Stubs\\KernelTestService::handleWithThrowable',
+            $latest['message']
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function successExecutionWithResponseMessage(): void
+    {
+        $this->sendMessage(new TriggerResponseEventCommand());
+
+        $this->kernel->disableMessagesPayloadLogging();
+
+        $this->kernel->listen(new VirtualQueue('test_queue'));
+        $records = $this->logHandler->getRecords();
+
+        static::assertNotEmpty($records);
+        static::assertCount(3, $records);
+
+        $latest = \end($records);
+
+        static::assertEquals(
+            'Sending a "{messageClass}" message to "{destinationTopic}/{destinationRoutingKey}"',
+            $latest['message']
+        );
+
+        static::assertEquals(
+            [
+                'messageClass'          => SuccessResponseEvent::class,
+                'destinationTopic'      => 'test_topic',
+                'destinationRoutingKey' => 'test_key',
+            ],
+            $latest['context']
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function failedResponseDelivery(): void
+    {
+        $this->sendMessage(new TriggerFailedResponseMessageSendCommand());
+
+        $this->kernel->listen(new VirtualQueue('test_queue'));
+        $records = $this->logHandler->getRecords();
+
+        static::assertNotEmpty($records);
+        static::assertCount(7, $records);
+
+        $messageEntry = $records[\count($records) - 2];
+
+        /** @see VirtualPublisher::send() */
+        static::assertEquals(
+            'Error sending message "{messageClass}" to broker: "{exceptionMessage}"',
+            $messageEntry['message']
+        );
+
+        static::assertEquals(
+            [
+                'messageClass'     => FailedMessageSendMarkerEvent::class,
+                'exceptionMessage' => 'shit happens'
+            ],
+            $messageEntry['context']
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function contextLogging(): void
+    {
+        $this->sendMessage(new SecondEmptyCommand());
+
+        $this->kernel->listen(new VirtualQueue('test_queue'));
+        $records = $this->logHandler->getRecords();
+
+        static::assertNotEmpty($records);
+        static::assertCount(5, $records);
+
+        $messageEntry = \end($records);
+        \reset($records);
+
+        static::assertEquals('test exception message', $messageEntry['message']);
+
+        $messageEntry = $records[\count($records) - 2];
+
+        static::assertEquals('Test message', $messageEntry['message']);
     }
 
     /**

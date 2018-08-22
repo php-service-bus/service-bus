@@ -1,6 +1,6 @@
 parameters:
   service_bus.sagas:
-    - Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga
+  - Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga
 services:
   Monolog\Handler\TestHandler:
     public: true
@@ -11,6 +11,7 @@ services:
     class: Desperado\ServiceBus\Tests\Stubs\Transport\VirtualTransport
     public: true
     arguments:
+      $messageEncoder: null
       $messageDecoder: null
 
   Psr\Log\LoggerInterface:
@@ -21,5 +22,5 @@ services:
       - '@Monolog\Handler\TestHandler'
       $processors: {}
 
-  Desperado\ServiceBus\Tests\Stubs\Services\CorrectService:
+  Desperado\ServiceBus\Tests\Application\Kernel\Stubs\KernelTestService:
     tags: ["service_bus.service"]

@@ -56,7 +56,7 @@ final class ServiceBusKernel
      *
      * @var bool
      */
-    private static $payloadLoggingForciblyDisabled = false;
+    private static $payloadLoggingForciblyDisabled;
 
     /**
      * @param ContainerInterface $container
@@ -65,6 +65,8 @@ final class ServiceBusKernel
      */
     public function __construct(ContainerInterface $container)
     {
+        static::$payloadLoggingForciblyDisabled = false;
+
         $this->kernelContainer = $container->get(self::KERNEL_LOCATOR_INDEX);
 
         $this->messageBus = $this->buildMessageBus($container);
@@ -298,6 +300,7 @@ final class ServiceBusKernel
                 }
                 catch(\Throwable $throwable)
                 {
+
                     self::onSendMessageFailed($outboundEnvelope, $messageClass, $throwable, $logger);
                 }
             }
