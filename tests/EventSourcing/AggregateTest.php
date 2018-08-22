@@ -16,8 +16,8 @@ namespace Desperado\ServiceBus\Tests\EventSourcing;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use Desperado\ServiceBus\EventSourcing\Contract\AggregateClosed;
 use Desperado\ServiceBus\EventSourcing\Contract\AggregateCreated;
-use Desperado\ServiceBus\Tests\EventSourcing\Stubs\TestAggregate;
-use Desperado\ServiceBus\Tests\EventSourcing\Stubs\TestAggregateId;
+use Desperado\ServiceBus\Tests\Stubs\EventSourcing\TestAggregate;
+use Desperado\ServiceBus\Tests\Stubs\EventSourcing\TestAggregateId;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 

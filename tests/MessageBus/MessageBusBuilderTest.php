@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpInconsistentReturnPointsInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
@@ -18,14 +18,16 @@ use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaConfigurationLoader;
 use Desperado\ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader;
-use Desperado\ServiceBus\Tests\MessageBus\Stubs\MessageBusTestingSaga;
-use Desperado\ServiceBus\Tests\MessageBus\Stubs\MessageBusTestingSagaStore;
-use Desperado\ServiceBus\Tests\MessageBus\Stubs\MessageBusTestingService;
-use Desperado\ServiceBus\Tests\MessageBus\Stubs\MessageBusTestingServiceWithDoubleHandlers;
-use Desperado\ServiceBus\Tests\MessageBus\Stubs\MessageBusTestingServiceWithoutMessageArgument;
+use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\SagasStoreStub;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Desperado\ServiceBus\Services\Annotations\CommandHandler;
+use Desperado\ServiceBus\Services\Annotations\EventListener;
 
 /**
  *
@@ -58,7 +60,7 @@ final class MessageBusBuilderTest extends TestCase
 
         $logger = new Logger(__CLASS__, [$this->testLogHandler]);
 
-        $this->sagaProvider = new SagaProvider(new MessageBusTestingSagaStore());
+        $this->sagaProvider = new SagaProvider(new SagasStoreStub());
 
         $servicesConfigurationLoader = new AnnotationsBasedServiceHandlersLoader();
         $sagasConfigurationLoader    = new AnnotationsBasedSagaConfigurationLoader(
@@ -120,7 +122,7 @@ final class MessageBusBuilderTest extends TestCase
      */
     public function addCorrectSaga(): void
     {
-        $this->messageBusBuilder->addSaga(MessageBusTestingSaga::class);
+        $this->messageBusBuilder->addSaga(CorrectSaga::class);
 
         $messageBus = $this->messageBusBuilder->compile();
 
@@ -132,20 +134,20 @@ final class MessageBusBuilderTest extends TestCase
             $record['message']
         );
 
-        static::assertEquals(['registeredHandlersCount' => 1], $record['context']);
+        static::assertEquals(['registeredHandlersCount' => 2], $record['context']);
 
         /** @var array $metaDataCollection */
         $metaDataCollection = static::readAttribute($this->sagaProvider, 'sagaMetaDataCollection');
 
         static::assertNotEmpty($metaDataCollection);
         static::assertCount(1, $metaDataCollection);
-        static::assertArrayHasKey(MessageBusTestingSaga::class, $metaDataCollection);
+        static::assertArrayHasKey(CorrectSaga::class, $metaDataCollection);
 
         /** @var array $processorsList */
         $processorsList = static::readAttribute($messageBus, 'processorsList');
 
         static::assertNotEmpty($processorsList);
-        static::assertCount(1, $processorsList);
+        static::assertCount(2, $processorsList);
     }
 
     /**
@@ -157,7 +159,45 @@ final class MessageBusBuilderTest extends TestCase
      */
     public function addCorrectService(): void
     {
-        $this->messageBusBuilder->addService(new MessageBusTestingService());
+        $object = new class()
+        {
+            /**
+             * @CommandHandler()
+             *
+             * @param FirstEmptyCommand $command
+             * @param TestContext       $context
+             *
+             * @return void
+             */
+            public function commandHandler(
+                FirstEmptyCommand $command,
+                TestContext $context
+            ): void
+            {
+
+            }
+
+            /**
+             * @EventListener(
+             *     validate=true,
+             *     groups={"testing"}
+             * )
+             *
+             * @param FirstEmptyEvent $event
+             * @param TestContext     $context
+             *
+             * @return \Generator
+             */
+            public function eventListener(
+                FirstEmptyEvent $event,
+                TestContext $context
+            ): \Generator
+            {
+
+            }
+        };
+
+        $this->messageBusBuilder->addService($object);
 
         $messageBus = $this->messageBusBuilder->compile();
 
@@ -182,7 +222,7 @@ final class MessageBusBuilderTest extends TestCase
      * @test
      * @expectedException  \LogicException
      * @expectedExceptionMessage The handler for the
-     *                           "Desperado\ServiceBus\Tests\MessageBus\Stubs\MessageBusTestingCommand" command has
+     *                           "Desperado\ServiceBus\Tests\MessageBus\Stubs\FirstEmptyCommand" command has
      *                           already been added earlier. You can not add multiple command handlers
      *
      * @return void
@@ -191,7 +231,42 @@ final class MessageBusBuilderTest extends TestCase
      */
     public function addDuplicateCommandHandler(): void
     {
-        $this->messageBusBuilder->addService(new MessageBusTestingServiceWithDoubleHandlers());
+        $object = new class ()
+        {
+            /**
+             * @CommandHandler()
+             *
+             * @param FirstEmptyCommand $command
+             * @param TestContext       $context
+             *
+             * @return void
+             */
+            public function commandHandler(
+                FirstEmptyCommand $command,
+                TestContext $context
+            ): void
+            {
+
+            }
+
+            /**
+             * @CommandHandler()
+             *
+             * @param FirstEmptyCommand $command
+             * @param TestContext       $context
+             *
+             * @return void
+             */
+            public function commandHandler2(
+                FirstEmptyCommand $command,
+                TestContext $context
+            ): void
+            {
+
+            }
+        };
+
+        $this->messageBusBuilder->addService($object);
     }
 
     /**
@@ -208,6 +283,25 @@ final class MessageBusBuilderTest extends TestCase
      */
     public function addServiceHandlerWithoutMessageArgument(): void
     {
-        $this->messageBusBuilder->addService(new MessageBusTestingServiceWithoutMessageArgument());
+        $object = new class()
+        {
+            /**
+             * @CommandHandler()
+             *
+             * @param \stdClass   $command
+             * @param TestContext $context
+             *
+             * @return void
+             */
+            public function commandHandler(
+                \stdClass $command,
+                TestContext $context
+            ): void
+            {
+
+            }
+        };
+
+        $this->messageBusBuilder->addService($object);
     }
 }

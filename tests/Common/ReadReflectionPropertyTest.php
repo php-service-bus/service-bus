@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Common;
 
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
-use Desperado\ServiceBus\Tests\Common\Stubs\SecondClass;
 use PHPUnit\Framework\TestCase;
 
 /**

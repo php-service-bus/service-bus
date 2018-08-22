@@ -93,6 +93,7 @@ final class SQLSagaStore implements SagasStore
 
                 try
                 {
+                    /** @psalm-suppress ImplicitToStringCast */
                     $query = updateQuery('sagas_store', [
                         'payload'   => $storedSaga->payload(),
                         'state_id'  => $storedSaga->status(),
@@ -132,6 +133,7 @@ final class SQLSagaStore implements SagasStore
         return call(
             static function(SagaId $id) use ($adapter): \Generator
             {
+                /** @psalm-suppress ImplicitToStringCast */
                 $query = selectQuery('sagas_store')
                     ->where(equalsCriteria('id', $id))
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
@@ -172,6 +174,7 @@ final class SQLSagaStore implements SagasStore
         return call(
             static function(SagaId $id) use ($adapter): \Generator
             {
+                /** @psalm-suppress ImplicitToStringCast */
                 $query = deleteQuery('sagas_store')
                     ->where(equalsCriteria('id', $id))
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)))

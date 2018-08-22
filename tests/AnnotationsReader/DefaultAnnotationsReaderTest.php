@@ -16,7 +16,6 @@ namespace Desperado\ServiceBus\Tests\AnnotationsReader;
 use Desperado\ServiceBus\AnnotationsReader\DefaultAnnotationsReader;
 use Desperado\ServiceBus\Tests\AnnotationsReader\Stubs\ClassWithCorrectAnnotations;
 use Desperado\ServiceBus\Tests\AnnotationsReader\Stubs\ClassWithIncorrectAnnotation;
-use Desperado\ServiceBus\Tests\AnnotationsReader\Stubs\ClassWithoutAnnotations;
 use Desperado\ServiceBus\Tests\AnnotationsReader\Stubs\TestClassLevelAnnotation;
 use Desperado\ServiceBus\Tests\AnnotationsReader\Stubs\TestMethodLevelAnnotation;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +32,11 @@ final class DefaultAnnotationsReaderTest extends TestCase
      */
     public function parseEmptyClass(): void
     {
-        $annotations = (new DefaultAnnotationsReader())->extract(ClassWithoutAnnotations::class);
+        $object = new class() {
+
+        };
+
+        $annotations = (new DefaultAnnotationsReader())->extract(\get_class($object));
 
         static::assertEmpty($annotations);
     }

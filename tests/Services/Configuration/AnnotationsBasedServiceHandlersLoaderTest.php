@@ -13,12 +13,15 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Services\Configuration;
 
+use Amp\Promise;
+use Amp\Success;
 use Desperado\ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader;
-use Desperado\ServiceBus\Tests\Services\Configuration\Stubs\ServiceWithCorrectMessageHandlers;
-use Desperado\ServiceBus\Tests\Services\Configuration\Stubs\ServiceWithoutMessageHandlers;
-use Desperado\ServiceBus\Tests\Services\Configuration\Stubs\SomeCommand;
-use Desperado\ServiceBus\Tests\Services\Configuration\Stubs\SomeEvent;
+use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
 use PHPUnit\Framework\TestCase;
+use Desperado\ServiceBus\Services\Annotations\EventListener;
+use Desperado\ServiceBus\Services\Annotations\CommandHandler;
 
 /**
  *
@@ -32,7 +35,12 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
      */
     public function loadFromEmptyService(): void
     {
-        $handlers = (new AnnotationsBasedServiceHandlersLoader())->load(new ServiceWithoutMessageHandlers());
+        $object = new class()
+        {
+
+        };
+
+        $handlers = (new AnnotationsBasedServiceHandlersLoader())->load($object);
 
         static::assertEmpty($handlers);
     }
@@ -44,7 +52,62 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
      */
     public function loadFilledService(): void
     {
-        $service = new ServiceWithCorrectMessageHandlers();
+        $service = new class()
+        {
+            /**
+             * @CommandHandler(
+             *     validate=true,
+             *     groups={"qwerty", "root"}
+             * )
+             *
+             * @param FirstEmptyCommand $command
+             *
+             * @return void
+             */
+            public function handle(FirstEmptyCommand $command, TestContext $context): void
+            {
+
+            }
+
+            /**
+             * @EventListener()
+             *
+             * @param FirstEmptyEvent $event
+             * @param TestContext     $context
+             *
+             * @return Promise
+             */
+            public function firstEventListener(FirstEmptyEvent $event, TestContext $context): Promise
+            {
+                return new Success();
+            }
+
+            /**
+             * @EventListener()
+             *
+             * @param FirstEmptyEvent $event
+             * @param TestContext     $context
+             *
+             * @return \Generator
+             */
+            public function secondEventListener(FirstEmptyEvent $event, TestContext $context): \Generator
+            {
+                yield from [];
+            }
+
+            /**
+             * @Desperado\ServiceBus\Tests\Services\Configuration\SomeAnotherMethodLevelAnnotation
+             *
+             * @param FirstEmptyCommand $command
+             * @param TestContext       $context
+             *
+             * @return void
+             */
+            public function ignoredMethod(FirstEmptyCommand $command, TestContext $context): void
+            {
+
+            }
+        };
 
         $handlers = (new AnnotationsBasedServiceHandlersLoader())->load($service);
 
@@ -64,18 +127,18 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
 
             if(true === $handler->isCommandHandler())
             {
-                static::assertEquals(SomeCommand::class, $handler->messageClass());
+                static::assertEquals(FirstEmptyCommand::class, $handler->messageClass());
                 /** @noinspection UnnecessaryAssertionInspection */
                 static::assertInstanceOf(\Closure::class, $handler->toClosure($service));
 
                 static::assertTrue($options->validationEnabled());
-                static::assertEquals(['qwerty', 'root'],$options->validationGroups());
+                static::assertEquals(['qwerty', 'root'], $options->validationGroups());
 
                 static::assertEquals('handle', $handler->methodName());
             }
             else
             {
-                static::assertEquals(SomeEvent::class, $handler->messageClass());
+                static::assertEquals(FirstEmptyEvent::class, $handler->messageClass());
                 /** @noinspection UnnecessaryAssertionInspection */
                 static::assertInstanceOf(\Closure::class, $handler->toClosure($service));
 

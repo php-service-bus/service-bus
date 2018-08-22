@@ -179,6 +179,7 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(AggregateId $id) use ($adapter): \Generator
             {
+                /** @psalm-suppress ImplicitToStringCast */
                 $query = updateQuery('event_store_stream', ['closed_at' => \date('Y-m-d H:i:s')])
                     ->where(equalsCriteria('id', $id))
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
@@ -367,6 +368,7 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StorageAdapter $adapter, AggregateId $id): \Generator
             {
+                /** @psalm-suppress ImplicitToStringCast */
                 $query = selectQuery('event_store_stream')
                     ->where(equalsCriteria('id', $id))
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)))

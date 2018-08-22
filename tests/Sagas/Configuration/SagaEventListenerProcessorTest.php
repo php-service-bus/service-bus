@@ -27,14 +27,15 @@ use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\CorrectTestProcessorSaga;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\IncorrectSagaId;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\SimpleReceivedEvent;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\StartSagaCommand;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\SuccessResponseEvent;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\TestProcessorContext;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\TestProcessorSagaId;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\TestSagaStore;
+use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEventWithKey;
+use Desperado\ServiceBus\Tests\Stubs\Messages\SecondEventWithKey;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\IncorrectSagaId;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\SagasStoreStub;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\TestSagaId;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
@@ -59,22 +60,22 @@ final class SagaEventListenerProcessorTest extends TestCase
             $self->expectException(IncorrectIdentifierFieldSpecified::class);
             $self->expectExceptionMessage(
                 'A property that contains an identifier ("") was not found in class '
-                . '"Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\SimpleReceivedEvent"'
+                . '"Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent"'
             );
 
             $processor = new SagaEventListenerProcessor(
                 SagaListenerOptions::withGlobalOptions(
                     new SagaMetadata(
-                        CorrectTestProcessorSaga::class,
-                        TestProcessorSagaId::class,
+                        CorrectSaga::class,
+                        TestSagaId::class,
                         '',
                         '+1 year'
                     )
                 ),
-                new SagaProvider(new TestSagaStore())
+                new SagaProvider(new SagasStoreStub())
             );
 
-            yield $processor->execute(new SimpleReceivedEvent(), new TestProcessorContext());
+            yield $processor->execute(new FirstEmptyEvent(), new TestContext());
         };
 
         wait(new Coroutine($handler($this)));
@@ -93,24 +94,24 @@ final class SagaEventListenerProcessorTest extends TestCase
         {
             $self->expectException(IncorrectIdentifierFieldSpecified::class);
             $self->expectExceptionMessage(
-                'The value of the "requestId" property of the '
-                . '"Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\SimpleReceivedEvent" event can not '
+                'The value of the "key" property of the '
+                . '"Desperado\ServiceBus\Tests\Stubs\Messages\FirstEventWithKey" event can not '
                 . 'be empty, since it is the saga id'
             );
 
             $processor = new SagaEventListenerProcessor(
                 SagaListenerOptions::withGlobalOptions(
                     new SagaMetadata(
-                        CorrectTestProcessorSaga::class,
-                        TestProcessorSagaId::class,
-                        'requestId',
+                        CorrectSaga::class,
+                        TestSagaId::class,
+                        'key',
                         '+1 year'
                     )
                 ),
-                new SagaProvider(new TestSagaStore())
+                new SagaProvider(new SagasStoreStub())
             );
 
-            yield $processor->execute(new SimpleReceivedEvent(), new TestProcessorContext());
+            yield $processor->execute(new FirstEventWithKey(''), new TestContext());
         };
 
         wait(new Coroutine($handler($this)));
@@ -130,22 +131,22 @@ final class SagaEventListenerProcessorTest extends TestCase
             $self->expectException(InvalidIdentifier::class);
             $self->expectExceptionMessage(
                 'Saga identifier mus be type of "Desperado\ServiceBus\Sagas\SagaId". '
-                . '"Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\IncorrectSagaId" type specified'
+                . '"Desperado\ServiceBus\Tests\Stubs\Sagas\IncorrectSagaId" type specified'
             );
 
             $processor = new SagaEventListenerProcessor(
                 SagaListenerOptions::withGlobalOptions(
                     new SagaMetadata(
-                        CorrectTestProcessorSaga::class,
+                        CorrectSaga::class,
                         IncorrectSagaId::class,
-                        'requestId',
+                        'key',
                         '+1 year'
                     )
                 ),
-                new SagaProvider(new TestSagaStore())
+                new SagaProvider(new SagasStoreStub())
             );
 
-            yield $processor->execute(new SimpleReceivedEvent('root'), new TestProcessorContext());
+            yield $processor->execute(new FirstEventWithKey('root'), new TestContext());
         };
 
         wait(new Coroutine($handler($this)));
@@ -165,7 +166,7 @@ final class SagaEventListenerProcessorTest extends TestCase
             $self->expectException(IdentifierClassNotFound::class);
             $self->expectExceptionMessage(
                 'Identifier class "Desperado\ServiceBus\Tests\Sagas\Configuration\SomeUnExistsClass" '
-                . 'specified in the saga "Desperado\ServiceBus\Tests\Sagas\Configuration\ProcessorStubs\CorrectTestProcessorSaga" '
+                . 'specified in the saga "Desperado\ServiceBus\Tests\Stubs\Sagas\\CorrectSaga" '
                 . 'not found'
             );
 
@@ -173,16 +174,16 @@ final class SagaEventListenerProcessorTest extends TestCase
             $processor = new SagaEventListenerProcessor(
                 SagaListenerOptions::withGlobalOptions(
                     new SagaMetadata(
-                        CorrectTestProcessorSaga::class,
+                        CorrectSaga::class,
                         SomeUnExistsClass::class,
-                        'requestId',
+                        'key',
                         '+1 year'
                     )
                 ),
-                new SagaProvider(new TestSagaStore())
+                new SagaProvider(new SagasStoreStub())
             );
 
-            yield $processor->execute(new SimpleReceivedEvent('root'), new TestProcessorContext());
+            yield $processor->execute(new FirstEventWithKey(uuid()), new TestContext());
         };
 
         wait(new Coroutine($handler($this)));
@@ -199,7 +200,7 @@ final class SagaEventListenerProcessorTest extends TestCase
     {
         $handler = static function(SagaEventListenerProcessorTest $self): \Generator
         {
-            $sagaStoreMock = $self->getMockBuilder(TestSagaStore::class)
+            $sagaStoreMock = $self->getMockBuilder(SagasStoreStub::class)
                 ->setMethods(['load'])
                 ->getMock();
 
@@ -210,14 +211,14 @@ final class SagaEventListenerProcessorTest extends TestCase
             $testLogHandler = new TestHandler();
             $logger         = new Logger('testing', [$testLogHandler]);
 
-            /** @var TestSagaStore $sagaStoreMock */
+            /** @var SagasStoreStub $sagaStoreMock */
 
             $processor = new SagaEventListenerProcessor(
                 SagaListenerOptions::withGlobalOptions(
                     new SagaMetadata(
-                        CorrectTestProcessorSaga::class,
-                        TestProcessorSagaId::class,
-                        'requestId',
+                        CorrectSaga::class,
+                        TestSagaId::class,
+                        'key',
                         '+1 year'
                     )
                 ),
@@ -226,7 +227,7 @@ final class SagaEventListenerProcessorTest extends TestCase
             );
 
             yield $processor->execute(
-                new SimpleReceivedEvent(uuid()), new TestProcessorContext()
+                new FirstEventWithKey(uuid()), new TestContext()
             );
 
             static::assertTrue($testLogHandler->hasRecords(200));
@@ -261,9 +262,9 @@ final class SagaEventListenerProcessorTest extends TestCase
                 \file_get_contents(__DIR__ . '/../../../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
             );
 
-            $context = new TestProcessorContext();
+            $context = new TestContext();
 
-            $id = TestProcessorSagaId::new(CorrectTestProcessorSaga::class);
+            $id = TestSagaId::new(CorrectSaga::class);
 
             $sagaProvider = new SagaProvider(new SQLSagaStore($adapter));
 
@@ -271,21 +272,21 @@ final class SagaEventListenerProcessorTest extends TestCase
                 $sagaProvider,
                 'sagaMetaDataCollection',
                 [
-                    CorrectTestProcessorSaga::class => new SagaMetadata(
-                        CorrectTestProcessorSaga::class,
-                        TestProcessorSagaId::class,
-                        'requestId',
+                    CorrectSaga::class => new SagaMetadata(
+                        CorrectSaga::class,
+                        TestSagaId::class,
+                        'key',
                         '+1 year'
                     )
                 ]
             );
 
-            /** @var CorrectTestProcessorSaga $saga */
-            $saga = yield $sagaProvider->start($id, new StartSagaCommand(), $context);
+            /** @var CorrectSaga $saga */
+            $saga = yield $sagaProvider->start($id, new FirstEmptyCommand(), $context);
 
             yield $sagaProvider->save($saga, $context);
 
-            /** @var TestSagaStore $sagaStoreMock */
+            /** @var SagasStoreStub $sagaStoreMock */
 
             $testLogHandler = new TestHandler();
             $logger         = new Logger('testing', [$testLogHandler]);
@@ -293,9 +294,9 @@ final class SagaEventListenerProcessorTest extends TestCase
             $processor = new SagaEventListenerProcessor(
                 SagaListenerOptions::withGlobalOptions(
                     new SagaMetadata(
-                        CorrectTestProcessorSaga::class,
-                        TestProcessorSagaId::class,
-                        'requestId',
+                        CorrectSaga::class,
+                        TestSagaId::class,
+                        'key',
                         '+1 year'
                     )
                 ),
@@ -303,7 +304,7 @@ final class SagaEventListenerProcessorTest extends TestCase
                 $logger
             );
 
-            yield $processor->execute(new SimpleReceivedEvent((string) $id), $context);
+            yield $processor->execute(new FirstEventWithKey((string) $id), $context);
 
             static::assertFalse($testLogHandler->hasRecords(200));
 
@@ -313,10 +314,10 @@ final class SagaEventListenerProcessorTest extends TestCase
             static::assertInternalType('array', $messages);
             static::assertNotEmpty($messages);
 
-            /** @var SuccessResponseEvent $responseEvent */
+            /** @var SecondEventWithKey $responseEvent */
             $responseEvent = $messages[0];
 
-            static::assertEquals((string) $id, $responseEvent->requestId());
+            static::assertEquals((string) $id, $responseEvent->key());
         };
 
         wait(new Coroutine($handler()));
