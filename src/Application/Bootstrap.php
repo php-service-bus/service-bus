@@ -177,8 +177,11 @@ final class Bootstrap
         $this->containerBuilder = new ContainerBuilder($entryPoint, Environment::create($envValue));
 
         $this->containerBuilder->addParameters([
-            'service_bus.environment' => $envValue,
-            'service_bus.entry_point' => $entryPoint
+            'service_bus.environment'     => $envValue,
+            'service_bus.entry_point'     => $entryPoint,
+            'service_bus.transport.dsn'   => '',
+            'service_bus.storage.adapter' => '',
+            'service_bus.storage.dsn'     => ''
         ]);
         $this->containerBuilder->addCompilerPasses(new ServicesCompilerPass(), new ServiceLocatorTagPass());
         $this->containerBuilder->addExtensions(new ServiceBusExtension());

@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder;
 
+use function Desperado\ServiceBus\Common\removeDirectory;
 use Desperado\ServiceBus\DependencyInjection\Compiler\ServicesCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
@@ -24,7 +25,6 @@ use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\SomeTe
 use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\TestCompilerPass;
 use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\TestExtension;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  *
@@ -58,7 +58,7 @@ final class ContainerBuilderTest extends TestCase
     {
         parent::tearDown();
 
-        @\unlink($this->cacheDirectory);
+        removeDirectory($this->cacheDirectory);
 
         unset($this->cacheDirectory);
     }
@@ -74,7 +74,7 @@ final class ContainerBuilderTest extends TestCase
 
         static::assertFalse($containerBuilder->hasActualContainer());
 
-        /** @var ContainerInterface $container */
+        /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $containerBuilder->build();
 
         static::assertFileExists(\sys_get_temp_dir() . '/containerBuilderTestProdProjectContainer.php');
@@ -107,8 +107,8 @@ final class ContainerBuilderTest extends TestCase
         $containerBuilder->addParameters([
                 'testing.class'               => \get_class($this),
                 'service_bus.transport.dsn'   => 'amqp://user:password@host:port',
-                'service_bus.storage.adapter' => '',
-                'service_bus.storage.dsn'     => DoctrineDBALAdapter::class
+                'service_bus.storage.adapter' => DoctrineDBALAdapter::class,
+                'service_bus.storage.dsn'     => ''
             ]
         );
 
@@ -116,7 +116,7 @@ final class ContainerBuilderTest extends TestCase
 
         $containerBuilder->addCompilerPasses(new TestCompilerPass(), new ServicesCompilerPass());
 
-        /** @var ContainerInterface $container */
+        /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $containerBuilder->build();
 
         static::assertFileExists($this->cacheDirectory . '/containerBuilderTestDevProjectContainer.php');
