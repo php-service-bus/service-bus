@@ -1,0 +1,7 @@
+services:
+  Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\SomeTestService:
+    public: true
+
+  Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\MessageHandlerService:
+    public: true
+    tags: ["service_bus.service"]
