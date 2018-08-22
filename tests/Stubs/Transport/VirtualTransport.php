@@ -16,6 +16,8 @@ namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\JsonMessageDecoder;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
+use Desperado\ServiceBus\Transport\Marshal\Encoder\JsonMessageEncoder;
+use Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder;
 use Desperado\ServiceBus\Transport\Publisher;
 use Desperado\ServiceBus\Transport\Queue;
 use Desperado\ServiceBus\Transport\QueueBind;
@@ -30,6 +32,13 @@ class VirtualTransport implements Transport
     /**
      * Restore the message object from string
      *
+     * @var TransportMessageEncoder
+     */
+    private $messageEncoder;
+
+    /**
+     * Restore the message object from string
+     *
      * @var TransportMessageDecoder
      */
     private $messageDecoder;
@@ -37,8 +46,12 @@ class VirtualTransport implements Transport
     /**
      * @param TransportMessageDecoder|null $messageDecoder
      */
-    public function __construct(TransportMessageDecoder $messageDecoder = null)
+    public function __construct(
+        TransportMessageEncoder $messageEncoder = null,
+        TransportMessageDecoder $messageDecoder = null
+    )
     {
+        $this->messageEncoder = $messageEncoder ?? new JsonMessageEncoder();
         $this->messageDecoder = $messageDecoder ?? new JsonMessageDecoder();
     }
 
@@ -63,7 +76,7 @@ class VirtualTransport implements Transport
      */
     public function createPublisher(): Publisher
     {
-        return new VirtualPublisher();
+        return new VirtualPublisher($this->messageEncoder);
     }
 
     /**
