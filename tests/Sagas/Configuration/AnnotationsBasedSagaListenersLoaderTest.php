@@ -15,14 +15,13 @@ namespace Desperado\ServiceBus\Tests\Sagas\Configuration;
 
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaConfigurationLoader;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\CorrectSaga;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithIncorrectEventListenerClass;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithoutAnnotations;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithoutListeners;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithToManyArguments;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithUnExistsEventListenerClass;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWrongIdClassSpecified;
-use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\TestSagaStoreImplementation;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSagaWithoutListeners;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\SagasStoreStub;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -42,7 +41,7 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
     {
         parent::setUp();
 
-        $this->sagaProvider = new SagaProvider(new TestSagaStoreImplementation);
+        $this->sagaProvider = new SagaProvider(new SagasStoreStub());
     }
 
     /**
@@ -59,15 +58,17 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
     /**
      * @test
      * @expectedException \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
-     * @expectedExceptionMessage Could not find class-level annotation
-     *                           "Desperado\ServiceBus\Sagas\Annotations\SagaHeader" in
-     *                           "Desperado\ServiceBus\Tests\Sagas\Configuration\Stubs\SagaWithoutAnnotations"
      *
      * @return void
      */
     public function sagaWithoutAnnotations(): void
     {
-        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))->load(SagaWithoutAnnotations::class);
+        $object = new class()
+        {
+
+        };
+
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))->load(\get_class($object));
     }
 
     /**
@@ -94,7 +95,7 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
     public function sagaWithoutListeners(): void
     {
         $result = (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
-            ->load(SagaWithoutListeners::class)
+            ->load(CorrectSagaWithoutListeners::class)
             ->handlerCollection();
 
         static::assertEmpty($result);
@@ -137,7 +138,8 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function sagaWithUnExistsEventClass(): void
     {
-        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))->load(SagaWithUnExistsEventListenerClass::class);
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
+            ->load(SagaWithUnExistsEventListenerClass::class);
     }
 
     /**
@@ -148,7 +150,8 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function sagaWithToManyListenerArguments(): void
     {
-        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))->load(SagaWithToManyArguments::class);
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
+            ->load(SagaWithToManyArguments::class);
     }
 
     /**
@@ -159,6 +162,7 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
      */
     public function sagaWithIncorrectListenerClass(): void
     {
-        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))->load(SagaWithIncorrectEventListenerClass::class);
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
+            ->load(SagaWithIncorrectEventListenerClass::class);
     }
 }

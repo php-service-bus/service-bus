@@ -18,6 +18,7 @@ use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Sagas\Saga;
 use Desperado\ServiceBus\Sagas\Annotations\SagaEventListener;
 use Desperado\ServiceBus\Sagas\Annotations\SagaHeader;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEventWithKey;
 
 /**
  * @SagaHeader(
@@ -41,12 +42,12 @@ final class SagaWithToManyArguments extends Saga
      *
      * @SagaEventListener()
      *
-     * @param SomeSagaEvent $event
+     * @param FirstEventWithKey $event
      * @param KernelContext $context
      *
      * @return void
      */
-    private function onSomeSagaEvent(SomeSagaEvent $event, KernelContext $context): void
+    private function onSomeSagaEvent(FirstEventWithKey $event, KernelContext $context): void
     {
 
     }

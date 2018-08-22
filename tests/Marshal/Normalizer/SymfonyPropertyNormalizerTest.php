@@ -15,9 +15,7 @@ namespace Desperado\ServiceBus\Tests\Marshal\Normalizer;
 
 use Desperado\ServiceBus\Marshal\Normalizer\SymfonyPropertyNormalizer;
 use Desperado\ServiceBus\Marshal\Denormalizer\SymfonyPropertyDenormalizer;
-use Desperado\ServiceBus\Tests\Marshal\Normalizer\Stubs\EmptyClass;
 use Desperado\ServiceBus\Tests\Marshal\Normalizer\Stubs\WithClosedConstructor;
-use Desperado\ServiceBus\Tests\Marshal\Normalizer\Stubs\WithWrongType;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -54,10 +52,24 @@ final class SymfonyPropertyNormalizerTest extends TestCase
      */
     public function withWrongType(): void
     {
-        $object     = WithWrongType::create(1000);
+        $object     = new class(100500)
+        {
+            /** @var string */
+            private $property;
+
+            public function __construct(int $qwerty)
+            {
+                $this->property = $qwerty;
+            }
+
+            public function property(): string
+            {
+                return (string) $this->property;
+            }
+        };
         $normalizer = new SymfonyPropertyNormalizer();
 
-        (new SymfonyPropertyDenormalizer())->denormalize(WithWrongType::class, $normalizer->normalize($object));
+        (new SymfonyPropertyDenormalizer())->denormalize(\get_class($object), $normalizer->normalize($object));
     }
 
     /**
@@ -86,12 +98,17 @@ final class SymfonyPropertyNormalizerTest extends TestCase
      */
     public function withEmptyClass(): void
     {
+        $object = new class()
+        {
+
+        };
+
         $result = (new SymfonyPropertyDenormalizer())->denormalize(
-            EmptyClass::class, (new SymfonyPropertyNormalizer())->normalize(new EmptyClass())
+            \get_class($object), (new SymfonyPropertyNormalizer())->normalize($object)
         );
 
         /** @noinspection UnnecessaryAssertionInspection */
-        static::assertInstanceOf(EmptyClass::class, $result);
+        static::assertInstanceOf(\get_class($object), $result);
     }
 
     /**

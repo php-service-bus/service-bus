@@ -15,13 +15,14 @@ namespace Desperado\ServiceBus\Tests\Sagas;
 
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
+use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
 use Desperado\ServiceBus\Sagas\Contract\SagaCreated;
 use Desperado\ServiceBus\Sagas\Contract\SagaStatusChanged;
 use Desperado\ServiceBus\Sagas\SagaStatus;
-use Desperado\ServiceBus\Tests\Sagas\Mocks\SimpleSaga;
-use Desperado\ServiceBus\Tests\Sagas\Mocks\SimpleSagaSagaId;
-use Desperado\ServiceBus\Tests\Sagas\Mocks\SomeCommand;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\TestSagaId;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,7 +41,7 @@ class SagaTest extends TestCase
      */
     public function createWithNotEqualsSagaClass(): void
     {
-        new SimpleSaga(new SimpleSagaSagaId('123456789', \SomeClass::class));
+        new CorrectSaga(new TestSagaId('123456789', \SomeClass::class));
     }
 
     /**
@@ -52,10 +53,10 @@ class SagaTest extends TestCase
      */
     public function successfulStart(): void
     {
-        $id = new SimpleSagaSagaId('123456789', SimpleSaga::class);
+        $id = new TestSagaId(uuid(), CorrectSaga::class);
 
-        $saga = new SimpleSaga($id);
-        $saga->start(new SomeCommand());
+        $saga = new CorrectSaga($id);
+        $saga->start(new FirstEmptyCommand());
         $saga->doSomething();
 
         static::assertTrue(
@@ -64,10 +65,7 @@ class SagaTest extends TestCase
             )
         );
 
-        /** @var \DateTimeInterface $createdAt */
-        $createdAt = readReflectionPropertyValue($saga, 'createdAt');
-
-        static::assertNotFalse(\strtotime($createdAt->format('Y-m-d H:i:s')));
+        static::assertNotFalse(\strtotime($saga->createdAt()->format('Y-m-d H:i:s')));
 
         static::assertEquals((string) $id, (string) $saga->id());
 
@@ -93,11 +91,11 @@ class SagaTest extends TestCase
         $raisedEvents  = invokeReflectionMethod($saga, 'raisedEvents');
         $firedCommands = invokeReflectionMethod($saga, 'firedCommands');
 
-        static::assertCount(3, $raisedEvents);
+        static::assertCount(1, $raisedEvents);
         static::assertCount(0, $firedCommands);
 
         static::assertEquals(
-            SagaStatus::STATUS_FAILED,
+            SagaStatus::STATUS_IN_PROGRESS,
             (string) readReflectionPropertyValue($saga, 'status')
         );
     }
@@ -111,13 +109,13 @@ class SagaTest extends TestCase
      */
     public function changeStateOnClosedSaga(): void
     {
-        $id = new SimpleSagaSagaId('123456789', SimpleSaga::class);
+        $id = new TestSagaId('123456789', CorrectSaga::class);
 
-        $saga = new SimpleSaga($id);
-        $saga->start(new SomeCommand());
+        $saga = new CorrectSaga($id);
+        $saga->start(new FirstEmptyCommand());
 
-        $saga->doSomethingElse();
         $saga->closeWithSuccessStatus();
+        $saga->doSomethingElse();
     }
 
     /**
@@ -129,10 +127,10 @@ class SagaTest extends TestCase
      */
     public function changeStateToCompleted(): void
     {
-        $id = new SimpleSagaSagaId('123456789', SimpleSaga::class);
+        $id = new TestSagaId('123456789', CorrectSaga::class);
 
-        $saga = new SimpleSaga($id);
-        $saga->start(new SomeCommand());
+        $saga = new CorrectSaga($id);
+        $saga->start(new FirstEmptyCommand());
         $saga->closeWithSuccessStatus();
 
         static::assertEquals(
@@ -154,7 +152,7 @@ class SagaTest extends TestCase
         static::assertInstanceOf(\DateTimeImmutable::class, $changedStatusEvent->datetime());
         static::assertEquals((string) $id, $changedStatusEvent->id());
         static::assertEquals(\get_class($id), $changedStatusEvent->idClass());
-        static::assertEquals(SimpleSaga::class, $changedStatusEvent->sagaClass());
+        static::assertEquals(CorrectSaga::class, $changedStatusEvent->sagaClass());
         static::assertTrue(SagaStatus::created()->equals(SagaStatus::create($changedStatusEvent->previousStatus())));
         static::assertTrue(SagaStatus::completed()->equals(SagaStatus::create($changedStatusEvent->newStatus())));
         static::assertNull($changedStatusEvent->withReason());
@@ -167,7 +165,7 @@ class SagaTest extends TestCase
         static::assertInstanceOf(\DateTimeImmutable::class, $sagaClosedEvent->datetime());
         static::assertEquals((string) $id, $sagaClosedEvent->id());
         static::assertEquals(\get_class($id), $sagaClosedEvent->idClass());
-        static::assertEquals(SimpleSaga::class, $sagaClosedEvent->sagaClass());
+        static::assertEquals(CorrectSaga::class, $sagaClosedEvent->sagaClass());
         static::assertNull($sagaClosedEvent->withReason());
     }
 
@@ -180,9 +178,9 @@ class SagaTest extends TestCase
      */
     public function sagaCreated(): void
     {
-        $id   = new SimpleSagaSagaId('123456789', SimpleSaga::class);
-        $saga = new SimpleSaga($id);
-        $saga->start(new SomeCommand());
+        $id   = new TestSagaId('123456789', CorrectSaga::class);
+        $saga = new CorrectSaga($id);
+        $saga->start(new FirstEmptyCommand());
 
         /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events */
         $events = \iterator_to_array(invokeReflectionMethod($saga, 'raisedEvents'));
@@ -200,6 +198,6 @@ class SagaTest extends TestCase
         static::assertInstanceOf(\DateTimeImmutable::class, $sagaCreatedEvent->expirationDate());
         static::assertEquals((string) $id, $sagaCreatedEvent->id());
         static::assertEquals(\get_class($id), $sagaCreatedEvent->idClass());
-        static::assertEquals(SimpleSaga::class, $sagaCreatedEvent->sagaClass());
+        static::assertEquals(CorrectSaga::class, $sagaCreatedEvent->sagaClass());
     }
 }

@@ -20,8 +20,8 @@ use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
-use Desperado\ServiceBus\Tests\Sagas\SagaStore\Mocks\TestIdentifier;
-use Desperado\ServiceBus\Tests\Sagas\SagaStore\Mocks\TestSaga;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\TestSagaId;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -79,8 +79,8 @@ final class SQLSagaStoreTest extends TestCase
 
             $savedSaga = StoredSaga::fromRow([
                 'id'               => $uuid,
-                'identifier_class' => TestIdentifier::class,
-                'saga_class'       => TestSaga::class,
+                'identifier_class' => TestSagaId::class,
+                'saga_class'       => CorrectSaga::class,
                 'payload'          => 'qwertyRoot',
                 'state_id'         => SagaStatus::STATUS_COMPLETED,
                 'created_at'       => '2018-01-01 00:00:00',
@@ -97,7 +97,7 @@ final class SQLSagaStoreTest extends TestCase
             );
 
             /** @var StoredSaga $loadedSaga */
-            $loadedSaga = yield $self->store->load(new TestIdentifier($uuid, TestSaga::class));
+            $loadedSaga = yield $self->store->load(new TestSagaId($uuid, CorrectSaga::class));
 
             static::assertEquals($savedSaga->id(), $loadedSaga->id());
             static::assertEquals($savedSaga->idClass(), $loadedSaga->idClass());
@@ -111,8 +111,8 @@ final class SQLSagaStoreTest extends TestCase
 
             $toUpdate = StoredSaga::fromRow([
                 'id'               => $uuid,
-                'identifier_class' => TestIdentifier::class,
-                'saga_class'       => TestSaga::class,
+                'identifier_class' => TestSagaId::class,
+                'saga_class'       => CorrectSaga::class,
                 'payload'          => 'qwertyRoot333',
                 'state_id'         => SagaStatus::STATUS_COMPLETED,
                 'created_at'       => '2018-01-01 00:00:00',
@@ -129,14 +129,14 @@ final class SQLSagaStoreTest extends TestCase
             );
 
             /** @var StoredSaga $loadedSaga */
-            $loadedSaga = yield $self->store->load(new TestIdentifier($uuid, TestSaga::class));
+            $loadedSaga = yield $self->store->load(new TestSagaId($uuid, CorrectSaga::class));
 
             static::assertEquals('qwertyRoot333', $loadedSaga->payload());
 
-            yield $self->store->remove(new TestIdentifier($uuid, TestSaga::class));
+            yield $self->store->remove(new TestSagaId($uuid, CorrectSaga::class));
 
             static::assertNull(
-                yield $self->store->load(new TestIdentifier($uuid, TestSaga::class))
+                yield $self->store->load(new TestSagaId($uuid, CorrectSaga::class))
             );
         };
 

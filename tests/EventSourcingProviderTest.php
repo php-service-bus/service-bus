@@ -33,9 +33,9 @@ use Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter;
 use Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotVersionTrigger;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
-use Desperado\ServiceBus\Tests\EventSourcing\Stubs\TestAggregate;
-use Desperado\ServiceBus\Tests\EventSourcing\Stubs\TestAggregateContext;
-use Desperado\ServiceBus\Tests\EventSourcing\Stubs\TestAggregateId;
+use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
+use Desperado\ServiceBus\Tests\Stubs\EventSourcing\TestAggregate;
+use Desperado\ServiceBus\Tests\Stubs\EventSourcing\TestAggregateId;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -113,7 +113,7 @@ final class EventSourcingProviderTest extends TestCase
         {
             yield self::createSchema($self->adapter);
 
-            $context = new TestAggregateContext();
+            $context = new TestContext();
 
             $aggregate = new TestAggregate(TestAggregateId::new());
 
@@ -161,7 +161,7 @@ final class EventSourcingProviderTest extends TestCase
         {
             yield self::createSchema($self->adapter);
 
-            $context = new TestAggregateContext();
+            $context = new TestContext();
 
             $aggregate = new TestAggregate(TestAggregateId::new());
 
@@ -234,7 +234,7 @@ final class EventSourcingProviderTest extends TestCase
         {
             yield static::createSchema($self->adapter);
 
-            $context = new TestAggregateContext();
+            $context = new TestContext();
 
             $id = TestAggregateId::new();
 
@@ -260,7 +260,7 @@ final class EventSourcingProviderTest extends TestCase
         {
             $self->expectException(SaveStreamFailed::class);
 
-            yield $self->provider->save(new TestAggregate(TestAggregateId::new()), new TestAggregateContext());
+            yield $self->provider->save(new TestAggregate(TestAggregateId::new()), new TestContext());
         };
 
         wait(new Coroutine($handler($this)));
@@ -287,7 +287,7 @@ final class EventSourcingProviderTest extends TestCase
 
             yield self::createSchema($self->adapter);
 
-            $context = new TestAggregateContext();
+            $context = new TestContext();
 
             $id = TestAggregateId::new();
 

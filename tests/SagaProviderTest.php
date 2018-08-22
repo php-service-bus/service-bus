@@ -26,10 +26,10 @@ use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
-use Desperado\ServiceBus\Tests\Sagas\Mocks\SimpleSagaSagaId;
-use Desperado\ServiceBus\Tests\Sagas\Mocks\SomeCommand;
-use Desperado\ServiceBus\Tests\Sagas\SagasContext;
-use Desperado\ServiceBus\Tests\Sagas\SagaStore\Mocks\TestSaga;
+use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
+use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga;
+use Desperado\ServiceBus\Tests\Stubs\Sagas\TestSagaId;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -90,10 +90,10 @@ final class SagaProviderTest extends TestCase
                 (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
             );
 
-            $id   = SimpleSagaSagaId::new(TestSaga::class);
-            $saga = new TestSaga($id);
+            $id   = TestSagaId::new(CorrectSaga::class);
+            $saga = new CorrectSaga($id);
 
-            yield $self->provider->save($saga, new SagasContext());
+            yield $self->provider->save($saga, new TestContext());
         };
 
         wait(new Coroutine($handler($this)));
@@ -114,25 +114,25 @@ final class SagaProviderTest extends TestCase
                 (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
             );
 
-            $id = SimpleSagaSagaId::new(TestSaga::class);
+            $id = TestSagaId::new(CorrectSaga::class);
 
-            $context = new SagasContext();
+            $context = new TestContext();
 
             writeReflectionPropertyValue(
                 $self->provider,
                 'sagaMetaDataCollection',
                 [
-                    TestSaga::class => new SagaMetadata(
-                        TestSaga::class,
-                        SimpleSagaSagaId::class,
+                    CorrectSaga::class => new SagaMetadata(
+                        CorrectSaga::class,
+                        TestSagaId::class,
                         'requestId',
                         '+1 year'
                     )
                 ]
             );
 
-            /** @var TestSaga $saga */
-            $saga = yield $self->provider->start($id, new SomeCommand(), $context);
+            /** @var CorrectSaga $saga */
+            $saga = yield $self->provider->start($id, new FirstEmptyCommand(), $context);
 
             static::assertInstanceOf(Saga::class, $saga);
             static::assertCount(1, $context->messages);
@@ -163,23 +163,23 @@ final class SagaProviderTest extends TestCase
                 (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
             );
 
-            $id = SimpleSagaSagaId::new(TestSaga::class);
+            $id = TestSagaId::new(CorrectSaga::class);
 
             writeReflectionPropertyValue(
                 $self->provider,
                 'sagaMetaDataCollection',
                 [
-                    TestSaga::class => new SagaMetadata(
-                        TestSaga::class,
-                        SimpleSagaSagaId::class,
+                    CorrectSaga::class => new SagaMetadata(
+                        CorrectSaga::class,
+                        TestSagaId::class,
                         'requestId',
                         '+1 year'
                     )
                 ]
             );
 
-            yield $self->provider->start($id, new SomeCommand(), new SagasContext());
-            yield $self->provider->start($id, new SomeCommand(), new SagasContext());
+            yield $self->provider->start($id, new FirstEmptyCommand(), new TestContext());
+            yield $self->provider->start($id, new FirstEmptyCommand(), new TestContext());
         };
 
         wait(new Coroutine($handler($this)));
@@ -199,8 +199,8 @@ final class SagaProviderTest extends TestCase
             $self->expectException(SaveSagaFailed::class);
 
             yield $self->provider->save(
-                new TestSaga(SimpleSagaSagaId::new(TestSaga::class)),
-                new SagasContext()
+                new CorrectSaga(TestSagaId::new(CorrectSaga::class)),
+                new TestContext()
             );
         };
 
@@ -220,7 +220,7 @@ final class SagaProviderTest extends TestCase
         {
             $self->expectException(LoadSagaFailed::class);
 
-            $sagaId = SimpleSagaSagaId::new(TestSaga::class);
+            $sagaId = TestSagaId::new(CorrectSaga::class);
 
             yield $self->provider->obtain($sagaId);
         };
@@ -241,9 +241,9 @@ final class SagaProviderTest extends TestCase
         {
             $self->expectException(StartSagaFailed::class);
 
-            $sagaId = SimpleSagaSagaId::new(TestSaga::class);
+            $sagaId = TestSagaId::new(CorrectSaga::class);
 
-            yield $self->provider->start($sagaId, new SomeCommand(), new SagasContext());
+            yield $self->provider->start($sagaId, new FirstEmptyCommand(), new TestContext());
         };
 
         wait(new Coroutine($handler($this)));
@@ -267,8 +267,8 @@ final class SagaProviderTest extends TestCase
             );
 
             yield $self->provider->save(
-                new TestSaga(SimpleSagaSagaId::new(TestSaga::class)),
-                new SagasContext()
+                new CorrectSaga(TestSagaId::new(CorrectSaga::class)),
+                new TestContext()
             );
         };
 

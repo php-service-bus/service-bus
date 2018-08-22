@@ -305,8 +305,6 @@ final class HandlerTest extends TestCase
             }
         };
 
-        $reflectionMethod = new \ReflectionMethod($object, 'method');
-
         $handler = Handler::eventListener(
             new HandlerOptions(),
             new \ReflectionMethod($object, 'method')
