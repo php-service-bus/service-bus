@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Application;
+namespace Desperado\ServiceBus\Tests\Application\Bootstrap;
 
 use Desperado\ServiceBus\Application\Bootstrap;
 use function Desperado\ServiceBus\Common\removeDirectory;

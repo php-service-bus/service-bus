@@ -169,7 +169,7 @@ final class ContainerBuilder
          * @noinspection   PhpIncludeInspection
          * @psalm-suppress UnresolvableInclude
          */
-        include $this->getContainerClassPath();
+        include_once $this->getContainerClassPath();
 
         $containerClassName = $this->getContainerClassName();
 
