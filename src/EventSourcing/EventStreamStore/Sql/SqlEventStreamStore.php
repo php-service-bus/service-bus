@@ -116,8 +116,6 @@ final class SqlEventStreamStore implements AggregateStore
                     yield call($afterSaveHandler);
 
                     yield $transaction->commit();
-
-                    return yield new Success();
                 }
                 catch(\Throwable $throwable)
                 {
@@ -186,8 +184,6 @@ final class SqlEventStreamStore implements AggregateStore
                     ->compile();
 
                 yield $adapter->execute($query->sql(), $query->params());
-
-                return yield new Success();
             },
             $id
         );
@@ -225,8 +221,6 @@ final class SqlEventStreamStore implements AggregateStore
 
 
                 yield $transaction->execute($query->sql(), $query->params());
-
-                return yield new Success();
             },
             $eventsStream
         );
@@ -263,8 +257,6 @@ final class SqlEventStreamStore implements AggregateStore
                         self::collectSaveEventQueryParameters($eventsStream)
                     );
                 }
-
-                return yield new Success();
             },
             $transaction,
             $eventsStream

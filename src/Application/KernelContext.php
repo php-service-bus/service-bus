@@ -15,7 +15,10 @@ namespace Desperado\ServiceBus\Application;
 
 use function Amp\call;
 use Amp\Promise;
+use Desperado\ServiceBus\Common\Contract\Messages\Command;
+use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Psr\Log\LoggerInterface;
@@ -24,7 +27,7 @@ use Psr\Log\LogLevel;
 /**
  *
  */
-final class KernelContext implements MessageDeliveryContext
+final class KernelContext implements MessageDeliveryContext, LoggingInContext
 {
     /**
      * Send message handler
@@ -62,7 +65,7 @@ final class KernelContext implements MessageDeliveryContext
      */
     public function delivery(Message ...$messages): Promise
     {
-        $messageSender = $this->messageSender;
+        $messageSender    = $this->messageSender;
         $incomingEnvelope = $this->incomingEnvelope;
 
         /** @psalm-suppress InvalidArgument */
@@ -71,10 +74,48 @@ final class KernelContext implements MessageDeliveryContext
             {
                 foreach($messages as $message)
                 {
-                    $messageSender->send([$message, $incomingEnvelope]);
+                    $messageSender->send([$message, $incomingEnvelope, []]);
                 }
             },
             $messages
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function send(Command $command, array $headers = []): Promise
+    {
+        $messageSender    = $this->messageSender;
+        $incomingEnvelope = $this->incomingEnvelope;
+
+        /** @psalm-suppress InvalidArgument */
+        return call(
+            static function(Command $command, array $headers) use ($messageSender, $incomingEnvelope): void
+            {
+                $messageSender->send([$command, $incomingEnvelope, $headers]);
+            },
+            $command,
+            $headers
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function publish(Event $event, array $headers = []): Promise
+    {
+        $messageSender    = $this->messageSender;
+        $incomingEnvelope = $this->incomingEnvelope;
+
+        /** @psalm-suppress InvalidArgument */
+        return call(
+            static function(Event $event, array $headers) use ($messageSender, $incomingEnvelope): void
+            {
+                $messageSender->send([$event, $incomingEnvelope, $headers]);
+            },
+            $event,
+            $headers
         );
     }
 
@@ -89,13 +130,7 @@ final class KernelContext implements MessageDeliveryContext
     }
 
     /**
-     * Log message with context details
-     *
-     * @param string $logMessage
-     * @param array  $extra
-     * @param string $level
-     *
-     * @return void
+     * @inheritdoc
      */
     public function logContextMessage(
         string $logMessage,
@@ -112,13 +147,7 @@ final class KernelContext implements MessageDeliveryContext
     }
 
     /**
-     * Log Throwable in execution context
-     *
-     * @param \Throwable $throwable
-     * @param array      $extra
-     * @param string     $level
-     *
-     * @return void
+     * @inheritdoc
      */
     public function logContextThrowable(
         \Throwable $throwable,

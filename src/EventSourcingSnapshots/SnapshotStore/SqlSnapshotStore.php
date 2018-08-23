@@ -63,8 +63,6 @@ final class SqlSnapshotStore implements SnapshotStore
                 ])->compile();
 
                 yield $adapter->execute($query->sql(), $query->params());
-
-                return yield new Success();
             },
             $aggregateSnapshot
         );
@@ -96,11 +94,7 @@ final class SqlSnapshotStore implements SnapshotStore
 
                 if(true === \is_array($data) && 0 !== \count($data))
                 {
-                    /** For DoctrineDBAL */
-                    if(true === \is_resource($data['payload']))
-                    {
-                        $data['payload'] = \stream_get_contents($data['payload'], -1, 0);
-                    }
+                    $data['payload'] = \stream_get_contents($data['payload'], -1, 0);
 
                     $storedSnapshot = new StoredAggregateSnapshot(
                         $data['id'],
@@ -136,8 +130,6 @@ final class SqlSnapshotStore implements SnapshotStore
                     ->compile();
 
                 yield $adapter->execute($query->sql(), $query->params());
-
-                return yield new Success();
             },
             $id
         );

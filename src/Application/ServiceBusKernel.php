@@ -272,8 +272,9 @@ final class ServiceBusKernel
             /**
              * @var Message          $message
              * @var IncomingEnvelope $incomingEnvelope
+             * @var array            $headers
              */
-            [$message, $incomingEnvelope] = yield;
+            [$message, $incomingEnvelope, $headers] = yield;
 
             $messageClass = \get_class($message);
             $destinations = $messageRoutes->destinationsFor($messageClass);
@@ -285,11 +286,15 @@ final class ServiceBusKernel
                 $outboundEnvelope = self::createOutboundEnvelope(
                     $publisher,
                     $incomingEnvelope->operationId(),
-                    $message, [
-                        'x-message-class'         => $messageClass,
-                        'x-created-after-message' => \get_class($incomingEnvelope->denormalized()),
-                        'x-hostname'              => \gethostname()
-                    ]
+                    $message,
+                    \array_merge(
+                        [
+                            'x-message-class'         => $messageClass,
+                            'x-created-after-message' => \get_class($incomingEnvelope->denormalized()),
+                            'x-hostname'              => \gethostname()
+                        ],
+                        $headers
+                    )
                 );
 
                 self::beforeMessageSend($logger, $messageClass, $destination, $outboundEnvelope);
@@ -305,7 +310,7 @@ final class ServiceBusKernel
                 }
             }
 
-            unset($message, $incomingEnvelope, $messageClass, $destinations);
+            unset($message, $incomingEnvelope, $messageClass, $destinations, $headers);
         }
     }
 

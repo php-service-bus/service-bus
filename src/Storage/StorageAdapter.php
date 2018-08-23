@@ -56,9 +56,9 @@ interface StorageAdapter
     /**
      * Unescape binary string
      *
-     * @param string $string
+     * @param string|resource $payload
      *
      * @return string
      */
-    public function unescapeBinary(string $string): string;
+    public function unescapeBinary($payload): string;
 }

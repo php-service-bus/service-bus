@@ -70,8 +70,6 @@ final class SQLSagaStore implements SagasStore
                 yield $adapter->execute($query->sql(), $query->params());
 
                 yield call($afterSaveHandler);
-
-                return yield new Success();
             },
             $storedSaga
         );
@@ -108,8 +106,6 @@ final class SQLSagaStore implements SagasStore
                     yield call($afterSaveHandler);
 
                     yield $transaction->commit();
-
-                    return yield new Success();
                 }
                 catch(\Throwable $throwable)
                 {
@@ -146,18 +142,10 @@ final class SQLSagaStore implements SagasStore
 
                 if(null !== $result && true === isset($result['payload']))
                 {
-                    /** For DoctrineDBAL */
-                    if(true === \is_resource($result['payload']))
-                    {
-                        $result['payload'] = \stream_get_contents($result['payload'], -1, 0);
-                    }
-
                     $result['payload'] = $adapter->unescapeBinary($result['payload']);
 
                     return yield new Success(StoredSaga::fromRow($result));
                 }
-
-                return yield new Success();
             },
             $id
         );
@@ -181,8 +169,6 @@ final class SQLSagaStore implements SagasStore
                     ->compile();
 
                 yield $adapter->execute($query->sql(), $query->params());
-
-                return yield new Success();
             },
             $id
         );

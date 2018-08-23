@@ -137,9 +137,9 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
     /**
      * @inheritdoc
      */
-    public function unescapeBinary(string $string): string
+    public function unescapeBinary($payload): string
     {
         /** @noinspection PhpComposerExtensionStubsInspection */
-        return \pg_unescape_bytea($string);
+        return \pg_unescape_bytea($payload);
     }
 }

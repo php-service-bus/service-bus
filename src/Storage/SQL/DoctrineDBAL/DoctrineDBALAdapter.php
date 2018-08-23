@@ -114,8 +114,13 @@ final class DoctrineDBALAdapter implements StorageAdapter
     /**
      * @inheritdoc
      */
-    public function unescapeBinary(string $string): string
+    public function unescapeBinary($payload): string
     {
-        return $string;
+        if(true === \is_resource($payload))
+        {
+            return \stream_get_contents($payload, -1, 0);
+        }
+
+        return $payload;
     }
 }
