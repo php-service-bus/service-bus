@@ -95,7 +95,8 @@ final class SqlSchedulerStore implements SchedulerStore
                 )->compile();
 
                 yield $adapter->execute($query->sql(), $query->params());
-            }
+            },
+            $registry
         );
     }
 

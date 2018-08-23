@@ -156,7 +156,8 @@ final class SchedulerListener
      */
     private static function calculateExecutionDelay(NextScheduledOperation $nextScheduledOperation): int
     {
-        $executionDelay = $nextScheduledOperation->time() - (\microtime(true) * 1000);
+        /** @noinspection UnnecessaryCastingInspection */
+        $executionDelay = $nextScheduledOperation->time() - (int) (\microtime(true) * 1000);
 
         if(0 > $executionDelay)
         {

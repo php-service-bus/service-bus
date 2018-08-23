@@ -52,7 +52,7 @@ final class SchedulerProvider
      */
     public function __construct(SchedulerStore $store, string $registryName = 'scheduler_registry')
     {
-        $this->registryId = Uuid::uuid5(SchedulerRegistry::class, $registryName)->toString();
+        $this->registryId = Uuid::uuid5(Uuid::NAMESPACE_X500, $registryName)->toString();
         $this->store      = $store;
     }
 
