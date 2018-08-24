@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport\AmqpExt;
 
 use Desperado\ServiceBus\Transport\Queue;
+use Desperado\ServiceBus\Transport\Topic;
 
 /**
  * Queue details
@@ -130,10 +131,11 @@ final class AmqpQueue implements Queue
      *
      * @return self
      */
-    public static function createDelayedQueue(string $name): self
+    public static function createDelayedQueue(string $name, Topic $toTopic): self
     {
-        $self                                      = new self($name);
-        $self->arguments['x-dead-letter-exchange'] = 'delayed';
+        $self = new self($name, true);
+
+        $self->arguments['x-dead-letter-exchange'] = (string) $toTopic;
 
         return $self;
     }

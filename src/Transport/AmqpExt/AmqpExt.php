@@ -174,7 +174,7 @@ final class AmqpExt implements Transport
                 /** @var \AMQPExchange $exchange */
                 $exchange = $this->exchanges[(string) $to->sourceTopic()];
 
-                $exchange->bind((string) $to->destinationTopic(), $to->routingKey());
+                $exchange->bind((string) $to->destinationTopic(), (string) $to->routingKey());
 
                 return;
             }
@@ -238,7 +238,7 @@ final class AmqpExt implements Transport
                 /** @var \AMQPQueue $queue */
                 $queue = $this->queues[(string) $to->queue()];
 
-                $queue->bind((string) $to->topic(), $to->routingKey());
+                $queue->bind((string) $to->topic(), (string) $to->routingKey());
 
                 return;
             }
