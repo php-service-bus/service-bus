@@ -22,6 +22,7 @@ use Desperado\ServiceBus\Transport\Publisher;
 use Desperado\ServiceBus\Transport\Queue;
 use Desperado\ServiceBus\Transport\QueueBind;
 use Desperado\ServiceBus\Transport\Topic;
+use Desperado\ServiceBus\Transport\TopicBind;
 use Desperado\ServiceBus\Transport\Transport;
 
 /**
@@ -66,7 +67,23 @@ class VirtualTransport implements Transport
     /**
      * @inheritDoc
      */
-    public function createQueue(Queue $queue, QueueBind $bind = null): void
+    public function bindTopic(TopicBind $to): void
+    {
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function bindQueue(QueueBind $to): void
+    {
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createQueue(Queue $queue): void
     {
 
     }

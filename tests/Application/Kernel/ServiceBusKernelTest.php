@@ -101,7 +101,8 @@ final class ServiceBusKernelTest extends TestCase
         $this->kernel
             ->transportConfigurator()
             ->createTopic($topic)
-            ->addQueue($queue, new QueueBind($topic, 'test_key'))
+            ->addQueue($queue)
+            ->bindQueue(new QueueBind($queue, $topic, 'test_key'))
             ->addDefaultDestinations($defaultOutboundDestination)
             ->registerCustomMessageDestinations(FirstEmptyEvent::class, $customOutboundDestination);
 

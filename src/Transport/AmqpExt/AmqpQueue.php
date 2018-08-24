@@ -101,9 +101,14 @@ final class AmqpQueue implements Queue
     /**
      * @param string $name
      */
-    public function __construct(string $name)
+    public function __construct(string $name, bool $durable = false)
     {
         $this->name = $name;
+
+        if(true === $durable)
+        {
+            $this->makeDurable();
+        }
     }
 
     /**
@@ -111,9 +116,9 @@ final class AmqpQueue implements Queue
      *
      * @return self
      */
-    public static function create(string $name): self
+    public static function create(string $name, bool $durable = false): self
     {
-        return new self($name);
+        return new self($name, $durable);
     }
 
     /**
@@ -144,10 +149,13 @@ final class AmqpQueue implements Queue
     /**
      * @return $this
      */
-    public function passive(): self
+    public function makePassive(): self
     {
-        $this->passive = true;
-        $this->flags   += \AMQP_PASSIVE;
+        if(false === $this->passive)
+        {
+            $this->passive = true;
+            $this->flags   += \AMQP_PASSIVE;
+        }
 
         return $this;
     }
@@ -155,10 +163,13 @@ final class AmqpQueue implements Queue
     /**
      * @return $this
      */
-    public function exclusive(): self
+    public function makeExclusive(): self
     {
-        $this->exclusive = true;
-        $this->flags     += \AMQP_EXCLUSIVE;
+        if(false === $this->exclusive)
+        {
+            $this->exclusive = true;
+            $this->flags     += \AMQP_EXCLUSIVE;
+        }
 
         return $this;
     }
@@ -166,10 +177,13 @@ final class AmqpQueue implements Queue
     /**
      * @return $this
      */
-    public function durable(): self
+    public function makeDurable(): self
     {
-        $this->durable = true;
-        $this->flags   += \AMQP_DURABLE;
+        if(false === $this->durable)
+        {
+            $this->durable = true;
+            $this->flags   += \AMQP_DURABLE;
+        }
 
         return $this;
     }
@@ -179,8 +193,11 @@ final class AmqpQueue implements Queue
      */
     public function enableAutoDelete(): self
     {
-        $this->autoDelete = true;
-        $this->flags      += \AMQP_AUTODELETE;
+        if(false === $this->autoDelete)
+        {
+            $this->autoDelete = true;
+            $this->flags      += \AMQP_AUTODELETE;
+        }
 
         return $this;
     }

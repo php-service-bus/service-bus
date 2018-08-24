@@ -31,17 +31,40 @@ interface Transport
     public function createTopic(Topic $topic): void;
 
     /**
+     * Bind topic to topic with specified key
+     *
+     * @param TopicBind $to
+     *
+     * @return void
+     *
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
+     */
+    public function bindTopic(TopicBind $to): void;
+
+    /**
      * Create queue
      *
-     * @param Queue     $queue
-     * @param QueueBind $bind
+     * @param Queue $queue
      *
      * @return void
      *
      * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
      * @throws \Desperado\ServiceBus\Transport\Exceptions\CreateQueueFailed
      */
-    public function createQueue(Queue $queue, QueueBind $bind = null): void;
+    public function createQueue(Queue $queue): void;
+
+    /**
+     * Bind queue to topic with specified key
+     *
+     * @param TopicBind $to
+     *
+     * @return void
+     *
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
+     */
+    public function bindQueue(QueueBind $to): void;
 
     /**
      * Create publisher
@@ -53,7 +76,7 @@ interface Transport
     /**
      * Create consumer
      *
-     * @param Queue          $listenQueue
+     * @param Queue $listenQueue
      *
      * @return Consumer
      *

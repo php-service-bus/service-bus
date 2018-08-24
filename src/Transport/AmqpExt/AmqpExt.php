@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport\AmqpExt;
 
 use Desperado\ServiceBus\Transport\Consumer;
+use Desperado\ServiceBus\Transport\Exceptions\BindFailed;
 use Desperado\ServiceBus\Transport\Exceptions\ConnectionFail;
 use Desperado\ServiceBus\Transport\Exceptions\CreateQueueFailed;
 use Desperado\ServiceBus\Transport\Exceptions\CreateTopicFailed;
@@ -26,6 +27,7 @@ use Desperado\ServiceBus\Transport\Publisher;
 use Desperado\ServiceBus\Transport\Queue;
 use Desperado\ServiceBus\Transport\QueueBind;
 use Desperado\ServiceBus\Transport\Topic;
+use Desperado\ServiceBus\Transport\TopicBind;
 use Desperado\ServiceBus\Transport\Transport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -77,13 +79,6 @@ final class AmqpExt implements Transport
      * @var array<string, \AMQPQueue>
      */
     private $queues = [];
-
-    /**
-     * Relation exchange -> routing keys
-     *
-     * @var array<string, string[]>
-     */
-    private $exchangeBinds = [];
 
     /**
      * @param AmqpConfiguration            $amqpConfiguration
@@ -168,9 +163,38 @@ final class AmqpExt implements Transport
     }
 
     /**
+     * @inheritDoc
+     */
+    public function bindTopic(TopicBind $to): void
+    {
+        try
+        {
+            if(true === isset($this->exchanges[(string) $to->sourceTopic()]))
+            {
+                /** @var \AMQPExchange $exchange */
+                $exchange = $this->exchanges[(string) $to->sourceTopic()];
+
+                $exchange->bind((string) $to->destinationTopic(), $to->routingKey());
+
+                return;
+            }
+
+            throw new \LogicException('Queue not configured. Use createQueue method');
+        }
+        catch(\AMQPConnectionException $exception)
+        {
+            throw new ConnectionFail($exception->getMessage(), $exception->getCode(), $exception);
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new BindFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+        }
+    }
+
+    /**
      * @inheritdoc
      */
-    public function createQueue(Queue $queue, QueueBind $bind = null): void
+    public function createQueue(Queue $queue): void
     {
         /** Queue already added */
         if(true === isset($this->queues[(string) $queue]))
@@ -189,8 +213,6 @@ final class AmqpExt implements Transport
 
             $amqpQueue->declareQueue();
 
-            $this->bindQueue($amqpQueue, $bind);
-
             /** @psalm-suppress InvalidArrayAssignment */
             $this->queues[(string) $queue] = $amqpQueue;
         }
@@ -201,6 +223,35 @@ final class AmqpExt implements Transport
         catch(\Throwable $throwable)
         {
             throw new CreateQueueFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function bindQueue(QueueBind $to): void
+    {
+        try
+        {
+            if(true === isset($this->queues[(string) $to->queue()]))
+            {
+                /** @var \AMQPQueue $queue */
+                $queue = $this->queues[(string) $to->queue()];
+
+                $queue->bind((string) $to->topic(), $to->routingKey());
+
+                return;
+            }
+
+            throw new \LogicException('Queue not configured. Use createQueue method');
+        }
+        catch(\AMQPConnectionException $exception)
+        {
+            throw new ConnectionFail($exception->getMessage(), $exception->getCode(), $exception);
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new BindFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
     }
 
@@ -245,30 +296,6 @@ final class AmqpExt implements Transport
         catch(\Throwable $throwable)
         {
 
-        }
-    }
-
-    /**
-     * Bind queue to exchange with specified routing key
-     *
-     * @param \AMQPQueue     $amqpQueue
-     * @param QueueBind|null $bind
-     *
-     * @return void
-     *
-     * @throws \AMQPChannelException
-     * @throws \AMQPConnectionException
-     */
-    private function bindQueue(\AMQPQueue $amqpQueue, ?QueueBind $bind): void
-    {
-        if(null !== $bind && null !== $bind->routingKey() && '' !== (string) $bind->routingKey())
-        {
-            $routingKey = (string) $bind->routingKey();
-
-            /** @psalm-suppress InvalidPropertyAssignmentValue */
-            $this->exchangeBinds[(string) $bind->topic()][] = $routingKey;
-
-            $amqpQueue->bind((string) $bind->topic(), $routingKey);
         }
     }
 

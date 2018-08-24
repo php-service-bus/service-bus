@@ -16,17 +16,17 @@ namespace Desperado\ServiceBus\Transport;
 /**
  *
  */
-final class QueueBind
+final class TopicBind
 {
     /**
-     * @var Queue
+     * @var Topic
      */
-    private $queue;
+    private $sourceTopic;
 
     /**
      * @var Topic
      */
-    private $topic;
+    private $destinationTopic;
 
     /**
      * @var string|null
@@ -37,27 +37,27 @@ final class QueueBind
      * @param Topic       $topic
      * @param string|null $routingKey
      */
-    public function __construct(Queue $queue, Topic $topic, ?string $routingKey = null)
+    public function __construct(Topic $sourceTopic, Topic $destinationTopic, ?string $routingKey = null)
     {
-        $this->queue      = $queue;
-        $this->topic      = $topic;
+        $this->sourceTopic      = $sourceTopic;
+        $this->destinationTopic = $destinationTopic;
         $this->routingKey = $routingKey;
-    }
-
-    /**
-     * @return Queue
-     */
-    public function queue(): Queue
-    {
-        return $this->queue;
     }
 
     /**
      * @return Topic
      */
-    public function topic(): Topic
+    public function sourceTopic(): Topic
     {
-        return $this->topic;
+        return $this->sourceTopic;
+    }
+
+    /**
+     * @return Topic
+     */
+    public function destinationTopic(): Topic
+    {
+        return $this->destinationTopic;
     }
 
     /**
