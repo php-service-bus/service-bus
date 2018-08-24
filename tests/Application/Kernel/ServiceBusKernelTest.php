@@ -40,7 +40,6 @@ use Desperado\ServiceBus\Transport\QueueBind;
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  *
