@@ -382,9 +382,10 @@ final class ServiceBusKernel
     ): void
     {
         $logger->critical(
-            'Error sending message "{messageClass}" to broker: "{exceptionMessage}"', [
+            'Error sending message "{messageClass}" to broker: "{throwableMessage}"', [
                 'messageClass'     => $messageClass,
-                'exceptionMessage' => $throwable->getMessage()
+                'throwableMessage' => $throwable->getMessage(),
+                'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
             ]
         );
 

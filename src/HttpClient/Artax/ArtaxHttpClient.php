@@ -271,11 +271,11 @@ final class ArtaxHttpClient implements HttpClient
     private static function logThrowable(LoggerInterface $logger, \Throwable $throwable, string $requestId): void
     {
         $logger->error(
-            'During the execution of the request with identifier "{requestId}" an exception was caught: "{exceptionMessage}"',
+            'During the execution of the request with identifier "{requestId}" an exception was caught: "{throwableMessage}"',
             [
                 'requestId'        => $requestId,
-                'exceptionMessage' => $throwable->getMessage(),
-                'file'             => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                'throwableMessage' => $throwable->getMessage(),
+                'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
             ]
         );
     }

@@ -212,8 +212,7 @@ final class AmqpConsumer implements Consumer
                 $unserialized['namespace'],
                 $unserialized['message']
             ),
-            /** @todo: only custom headers */
-            []
+            $envelope->getHeaders()
         );
     }
 
@@ -233,10 +232,9 @@ final class AmqpConsumer implements Consumer
         catch(\Throwable $throwable)
         {
             $this->logger->error(
-                'Acknowledge error: "{exceptionMessage}"', [
-                    'exceptionMessage' => $throwable->getMessage(),
-                    'exceptionFile'    => $throwable->getFile(),
-                    'exceptionLine'    => $throwable->getLine()
+                'Acknowledge error: "{throwableMessage}"', [
+                    'throwableMessage' => $throwable->getMessage(),
+                    'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
                 ]
             );
         }
@@ -262,10 +260,9 @@ final class AmqpConsumer implements Consumer
         catch(\Throwable $throwable)
         {
             $this->logger->error(
-                'Error while rejecting message: "{exceptionMessage}"', [
-                    'exceptionMessage' => $throwable->getMessage(),
-                    'exceptionFile'    => $throwable->getFile(),
-                    'exceptionLine'    => $throwable->getLine()
+                'Error while rejecting message: "{throwableMessage}"', [
+                    'throwableMessage' => $throwable->getMessage(),
+                    'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
                 ]
             );
         }
@@ -346,10 +343,9 @@ final class AmqpConsumer implements Consumer
     private function handleDecodeFailed(string $operationId, \AMQPEnvelope $envelope, DecodeMessageFailed $exception): void
     {
         $this->logger->error(
-            'An incorrectly serialized message was received. Error details: "{exceptionMessage}"', [
-                'exceptionMessage'  => $exception->getMessage(),
-                'exceptionFile'     => $exception->getFile(),
-                'exceptionLine'     => $exception->getLine(),
+            'An incorrectly serialized message was received. Error details: "{throwableMessage}"', [
+                'throwableMessage'  => $exception->getMessage(),
+                'throwablePoint'    => \sprintf('%s:%d', $exception->getFile(), $exception->getLine()),
                 'operationId'       => $operationId,
                 'rawMessagePayload' => $envelope->getBody()
             ]
@@ -366,8 +362,9 @@ final class AmqpConsumer implements Consumer
     private function handleConnectionFail(\Exception $connectionException): void
     {
         $this->logger->emergency(
-            'Connection to broker failed: "{exceptionMessage}". Cancel subscription', [
-                'exceptionMessage' => $connectionException->getMessage()
+            'Connection to broker failed: "{throwableMessage}". Cancel subscription', [
+                'throwableMessage' => $connectionException->getMessage(),
+                'throwablePoint'   => \sprintf('%s:%d', $connectionException->getFile(), $connectionException->getLine())
             ]
         );
 
@@ -384,10 +381,9 @@ final class AmqpConsumer implements Consumer
     private function handleThrowable(string $operationId, \AMQPEnvelope $envelope, \Throwable $throwable): void
     {
         $this->logger->error(
-            'Error processing message: "{exceptionMessage}"', [
-                'exceptionMessage'  => $throwable->getMessage(),
-                'exceptionFile'     => $throwable->getFile(),
-                'exceptionLine'     => $throwable->getLine(),
+            'Error processing message: "{throwableMessage}"', [
+                'throwableMessage'  => $throwable->getMessage(),
+                'throwablePoint'    => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
                 'operationId'       => $operationId,
                 'rawMessagePayload' => $envelope->getBody(),
             ]

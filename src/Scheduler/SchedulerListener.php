@@ -138,8 +138,7 @@ final class SchedulerListener
             /** Send a message that will return after a specified time interval */
             return $context->send(
                 EmitSchedulerOperation::create(new ScheduledOperationId($nextOperation->id())), [
-                    'expiration' => 0,
-                    'x-delay'    => self::calculateExecutionDelay($nextOperation)
+                    'x-delay' => self::calculateExecutionDelay($nextOperation)
                 ]
             );
         }
