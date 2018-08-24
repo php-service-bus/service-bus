@@ -117,6 +117,23 @@ final class AmqpQueue implements Queue
     }
 
     /**
+     * Create delayed queue
+     *
+     * @see https://github.com/rabbitmq/rabbitmq-delayed-message-exchange
+     *
+     * @param string $name
+     *
+     * @return self
+     */
+    public static function createDelayedQueue(string $name): self
+    {
+        $self                                      = new self($name);
+        $self->arguments['x-dead-letter-exchange'] = 'delayed';
+
+        return $self;
+    }
+
+    /**
      * @return string
      */
     public function __toString(): string
@@ -175,7 +192,7 @@ final class AmqpQueue implements Queue
      */
     public function wthArguments(array $arguments): self
     {
-        $this->arguments = $arguments;
+        $this->arguments = \array_merge($this->arguments, $arguments);
 
         return $this;
     }

@@ -121,7 +121,10 @@ final class AmqpTopic implements Topic
      */
     public static function delayed(string $name): self
     {
-        return new self($name, self::TYPE_DELAYED);
+        $self                              = new self($name, self::TYPE_DELAYED);
+        $self->arguments['x-delayed-type'] = 'fanout';
+
+        return $self;
     }
 
     /**
@@ -161,7 +164,7 @@ final class AmqpTopic implements Topic
      */
     public function wthArguments(array $arguments): self
     {
-        $this->arguments = $arguments;
+        $this->arguments = \array_merge($this->arguments, $arguments);
 
         return $this;
     }
