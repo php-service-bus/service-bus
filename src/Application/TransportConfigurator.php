@@ -48,8 +48,7 @@ final class TransportConfigurator
     }
 
     /**
-     * Configure default destinations
-     * In them, messages will be sent regardless of the availability of individual routes
+     * Configure default routes for messages
      *
      * @noinspection PhpDocSignatureInspection
      *
@@ -66,7 +65,8 @@ final class TransportConfigurator
     }
 
     /**
-     * Add directions for a specific message (in addition to the default directions)
+     * Add routes for specific messages
+     * If the message has its own route, it will not be sent to the default route
      *
      * @noinspection PhpDocSignatureInspection
      *
