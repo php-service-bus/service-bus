@@ -418,7 +418,8 @@ final class ServiceBusKernel
             'Sending a "{messageClass}" message to "{destinationTopic}/{destinationRoutingKey}"', [
                 'messageClass'          => $messageClass,
                 'destinationTopic'      => $destination->topicName(),
-                'destinationRoutingKey' => $destination->routingKey()
+                'destinationRoutingKey' => $destination->routingKey(),
+                'headers'               => $outboundEnvelope->headers()
             ]
         );
 
