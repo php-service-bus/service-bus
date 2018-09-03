@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Scheduler\Data;
 
+use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
+
 /**
  * Scheduled job data (for next job)
  */
@@ -21,44 +23,40 @@ final class NextScheduledOperation
     /**
      * Job identifier
      *
-     * @var string
+     * @var ScheduledOperationId
      */
     private $id;
 
     /**
      * Time in milliseconds
      *
-     * @var int
+     * @var \DateTimeImmutable
      */
     private $time;
 
     /**
-     * @param string $id
-     * @param int    $time
+     * @param ScheduledOperationId $id
+     * @param \DateTimeImmutable   $time
      */
-    public function __construct(string $id, int $time)
+    public function __construct(ScheduledOperationId $id, \DateTimeImmutable $time)
     {
         $this->id = $id;
         $this->time = $time;
     }
 
     /**
-     * Receive identifier
-     *
-     * @return string
+     * @return ScheduledOperationId
      */
-    public function id(): string
+    public function id(): ScheduledOperationId
     {
         return $this->id;
     }
 
     /**
-     * Receive time in microseconds
-     *
-     * @return int
+     * @return \DateTimeImmutable
      */
-    public function time(): int
+    public function time(): \DateTimeImmutable
     {
         return $this->time;
-    }
+    }   
 }

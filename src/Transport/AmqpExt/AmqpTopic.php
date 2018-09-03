@@ -126,7 +126,7 @@ final class AmqpTopic implements Topic
     {
         $self = new self($name, self::TYPE_DELAYED, true);
 
-        $self->arguments['x-delayed-type'] = self::TYPE_FANOUT;
+        $self->arguments['x-delayed-type'] = self::TYPE_DIRECT;
 
         return $self;
     }

@@ -57,7 +57,7 @@ interface Transport
     /**
      * Bind queue to topic with specified key
      *
-     * @param TopicBind $to
+     * @param QueueBind $to
      *
      * @return void
      *

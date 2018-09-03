@@ -117,7 +117,7 @@ final class AmqpQueue implements Queue
      *
      * @return self
      */
-    public static function create(string $name, bool $durable = false): self
+    public static function default(string $name, bool $durable = false): self
     {
         return new self($name, $durable);
     }
@@ -131,7 +131,7 @@ final class AmqpQueue implements Queue
      *
      * @return self
      */
-    public static function createDelayedQueue(string $name, Topic $toTopic): self
+    public static function delayed(string $name, Topic $toTopic): self
     {
         $self = new self($name, true);
 

@@ -157,6 +157,5 @@ final class TransportConfigurator
         $this->transport->bindQueue($bindTo);
 
         return $this;
-
     }
 }

@@ -17,6 +17,7 @@ use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
+use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Messages\Command\EmitSchedulerOperation;
@@ -137,7 +138,7 @@ final class SchedulerListener
         {
             /** Send a message that will return after a specified time interval */
             return $context->send(
-                EmitSchedulerOperation::create(new ScheduledOperationId($nextOperation->id())), [
+                EmitSchedulerOperation::create($nextOperation->id()), [
                     'x-delay' => self::calculateExecutionDelay($nextOperation)
                 ]
             );
@@ -155,12 +156,15 @@ final class SchedulerListener
      */
     private static function calculateExecutionDelay(NextScheduledOperation $nextScheduledOperation): int
     {
+        /** @var \DateTimeImmutable $currentDate */
+        $currentDate = datetimeInstantiator('NOW');
+
         /** @noinspection UnnecessaryCastingInspection */
-        $executionDelay = $nextScheduledOperation->time() - (int) (\microtime(true) * 1000);
+        $executionDelay = $nextScheduledOperation->time()->getTimestamp() - $currentDate->getTimestamp();
 
         if(0 > $executionDelay)
         {
-            $executionDelay *= -1;
+            $executionDelay = \abs($executionDelay);
         }
 
         return $executionDelay;

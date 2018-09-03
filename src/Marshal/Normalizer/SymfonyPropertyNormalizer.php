@@ -43,7 +43,7 @@ class SymfonyPropertyNormalizer implements Normalizer
                 ),
                 new EmptyDataNormalizer(),
                 new Serializer\Normalizer\DateTimeNormalizer(
-                    \DateTime::RFC3339,
+                    'c',
                     new \DateTimeZone('UTC')
                 )
             ]

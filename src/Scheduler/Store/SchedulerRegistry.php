@@ -37,7 +37,7 @@ final class SchedulerRegistry implements \Serializable
     /**
      * Time table of operations in milliseconds
      *
-     * @var array<string, int>
+     * @var array<string, float>
      */
     private $timetable;
 
@@ -91,7 +91,7 @@ final class SchedulerRegistry implements \Serializable
         $operationId = (string) $operation->id();
 
         $this->operations[$operationId] = $operation;
-        $this->timetable[$operationId]  = (int) $operation->date()->format('U.u') * 1000;
+        $this->timetable[$operationId]  = (float) $operation->date()->format('U.u');
     }
 
     /**
@@ -140,6 +140,7 @@ final class SchedulerRegistry implements \Serializable
     {
         if(0 !== \count($this->timetable))
         {
+            /** @var float $minTime */
             $minTime = \min($this->timetable);
             $id      = (string) \array_search($minTime, $this->timetable, true);
 
@@ -157,7 +158,7 @@ final class SchedulerRegistry implements \Serializable
             {
                 $this->operations[$id] = $operation->sent();
 
-                return new NextScheduledOperation($id, $minTime);
+                return new NextScheduledOperation($operation->id(), $operation->date());
             }
         }
 

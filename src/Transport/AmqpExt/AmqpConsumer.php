@@ -212,8 +212,22 @@ final class AmqpConsumer implements Consumer
                 $unserialized['namespace'],
                 $unserialized['message']
             ),
-            $envelope->getHeaders()
+            self::extractHeaders($envelope)
         );
+    }
+
+    /**
+     * Extract message headers
+     *
+     * @todo: only custom headers
+     *
+     * @param \AMQPEnvelope $envelope
+     *
+     * @return array<string, string>
+     */
+    private static function extractHeaders(\AMQPEnvelope $envelope): array
+    {
+        return $envelope->getHeaders();
     }
 
     /**
