@@ -24,7 +24,8 @@ use Desperado\ServiceBus\OutboundMessage\Exceptions\MessageClassCantBeEmpty;
 final class OutboundMessageRoutes
 {
     /**
-     * Routes to which messages will be sent
+     * Routes for specific messages
+     * If the message has its own route, it will not be sent to the default route
      *
      * [
      *     'SomeClassNamespace' => Destination[]
@@ -32,15 +33,14 @@ final class OutboundMessageRoutes
      *
      * @var array<string, \Desperado\ServiceBus\OutboundMessage\Destination>
      */
-    private $destinations;
+    private $customDestinations = [];
 
     /**
-     * Default destinations
-     * In them, messages will be sent regardless of the availability of individual routes
+     * The default routes for messages
      *
      * @var array<mixed, \Desperado\ServiceBus\OutboundMessage\Destination>
      */
-    private $defaultDestinations;
+    private $defaultDestinations = [];
 
     /**
      * Receive destinations for specified message
@@ -54,10 +54,16 @@ final class OutboundMessageRoutes
      */
     public function destinationsFor(string $messageClass): array
     {
-        return \array_merge(
-            $this->defaultDestinations,
-            $this->destinations[$messageClass] ?? []
-        );
+        if(
+            true === isset($this->customDestinations[$messageClass]) &&
+            true === \is_array($this->customDestinations[$messageClass]) &&
+            0 !== \count($this->customDestinations[$messageClass])
+        )
+        {
+            return $this->customDestinations[$messageClass];
+        }
+
+        return $this->defaultDestinations;
     }
 
     /**
@@ -81,7 +87,7 @@ final class OutboundMessageRoutes
     }
 
     /**
-     * Add directions for a specific message (in addition to the default directions)
+     * Add directions for a specific message
      *
      * @param string      $messageClass
      * @param Destination $destination
@@ -97,7 +103,7 @@ final class OutboundMessageRoutes
         self::validateDestination($destination);
 
         /** @psalm-suppress InvalidArrayAssignment */
-        $this->destinations[$messageClass][] = $destination;
+        $this->customDestinations[$messageClass][] = $destination;
     }
 
     /**

@@ -40,7 +40,6 @@ use Desperado\ServiceBus\Transport\QueueBind;
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -102,7 +101,8 @@ final class ServiceBusKernelTest extends TestCase
         $this->kernel
             ->transportConfigurator()
             ->createTopic($topic)
-            ->addQueue($queue, new QueueBind($topic, 'test_key'))
+            ->addQueue($queue)
+            ->bindQueue(new QueueBind($queue, $topic, 'test_key'))
             ->addDefaultDestinations($defaultOutboundDestination)
             ->registerCustomMessageDestinations(FirstEmptyEvent::class, $customOutboundDestination);
 
@@ -206,6 +206,11 @@ final class ServiceBusKernelTest extends TestCase
                 'messageClass'          => SuccessResponseEvent::class,
                 'destinationTopic'      => 'test_topic',
                 'destinationRoutingKey' => 'test_key',
+                'headers'               => [
+                    'x-message-class'         => SuccessResponseEvent::class,
+                    'x-created-after-message' => TriggerResponseEventCommand::class,
+                    'x-hostname'              => \gethostname()
+                ]
             ],
             $latest['context']
         );
@@ -232,14 +237,16 @@ final class ServiceBusKernelTest extends TestCase
 
         /** @see VirtualPublisher::send() */
         static::assertEquals(
-            'Error sending message "{messageClass}" to broker: "{exceptionMessage}"',
+            'Error sending message "{messageClass}" to broker: "{throwableMessage}"',
             $messageEntry['message']
         );
+
+        unset($messageEntry['context']['throwablePoint']);
 
         static::assertEquals(
             [
                 'messageClass'     => FailedMessageSendMarkerEvent::class,
-                'exceptionMessage' => 'shit happens'
+                'throwableMessage' => 'shit happens'
             ],
             $messageEntry['context']
         );

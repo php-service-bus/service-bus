@@ -18,6 +18,7 @@ use Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes;
 use Desperado\ServiceBus\Transport\Queue;
 use Desperado\ServiceBus\Transport\QueueBind;
 use Desperado\ServiceBus\Transport\Topic;
+use Desperado\ServiceBus\Transport\TopicBind;
 use Desperado\ServiceBus\Transport\Transport;
 
 /**
@@ -48,8 +49,7 @@ final class TransportConfigurator
     }
 
     /**
-     * Configure default destinations
-     * In them, messages will be sent regardless of the availability of individual routes
+     * Configure default routes for messages
      *
      * @noinspection PhpDocSignatureInspection
      *
@@ -66,7 +66,8 @@ final class TransportConfigurator
     }
 
     /**
-     * Add directions for a specific message (in addition to the default directions)
+     * Add routes for specific messages
+     * If the message has its own route, it will not be sent to the default route
      *
      * @noinspection PhpDocSignatureInspection
      *
@@ -91,27 +92,69 @@ final class TransportConfigurator
      * @param QueueBind|null $bindTo
      *
      * @return $this
+     *
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
      */
     public function addQueue(Queue $queue, ?QueueBind $bindTo = null): self
     {
+        $this->transport->createQueue($queue);
+
         if(null !== $bindTo)
         {
-            $this->transport->createTopic($bindTo->topic());
+            $this->bindQueue($bindTo);
         }
-
-        $this->transport->createQueue($queue, $bindTo);
 
         return $this;
     }
 
     /**
-     * @param Topic $topic
+     * @param Topic          $topic
+     * @param TopicBind|null $bindTo
      *
      * @return $this
+     *
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
      */
-    public function createTopic(Topic $topic): self
+    public function createTopic(Topic $topic, ?TopicBind $bindTo = null): self
     {
         $this->transport->createTopic($topic);
+
+        if(null !== $bindTo)
+        {
+            $this->bindTopic($bindTo);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param TopicBind $bindTo
+     *
+     * @return $this
+     *
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
+     */
+    public function bindTopic(TopicBind $bindTo): self
+    {
+        $this->transport->bindTopic($bindTo);
+
+        return $this;
+    }
+
+    /**
+     * @param QueueBind $bindTo
+     *
+     * @return $this
+     *
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
+     */
+    public function bindQueue(QueueBind $bindTo): self
+    {
+        $this->transport->bindQueue($bindTo);
 
         return $this;
     }

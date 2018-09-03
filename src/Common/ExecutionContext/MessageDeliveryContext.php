@@ -14,6 +14,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Common\ExecutionContext;
 
 use Amp\Promise;
+use Desperado\ServiceBus\Common\Contract\Messages\Command;
+use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 
 /**
@@ -21,5 +23,32 @@ use Desperado\ServiceBus\Common\Contract\Messages\Message;
  */
 interface MessageDeliveryContext
 {
+    /**
+     * Execute simple messages (commands\events) delivery
+     *
+     * @param Message ...$messages
+     *
+     * @return Promise<null>
+     */
     public function delivery(Message ...$messages): Promise;
+
+    /**
+     * Send command with specified options
+     *
+     * @param Command            headers
+     * @param array $headers
+     *
+     * @return Promise<null>
+     */
+    public function send(Command $command, array $headers = []): Promise;
+
+    /**
+     * Publish event with specified headers
+     *
+     * @param Event $event
+     * @param array $headers
+     *
+     * @return Promise<null>
+     */
+    public function publish(Event $event, array $headers = []): Promise;
 }

@@ -86,32 +86,35 @@ final class AmqpTopic implements Topic
 
     /**
      * @param string $name
+     * @param bool   $durable
      *
      * @return self
      */
-    public static function fanout(string $name): self
+    public static function fanout(string $name, bool $durable = false): self
     {
-        return new self($name, self::TYPE_FANOUT);
+        return new self($name, self::TYPE_FANOUT, $durable);
     }
 
     /**
      * @param string $name
+     * @param bool   $durable
      *
      * @return self
      */
-    public static function direct(string $name): self
+    public static function direct(string $name, bool $durable = false): self
     {
-        return new self($name, self::TYPE_DIRECT);
+        return new self($name, self::TYPE_DIRECT, $durable);
     }
 
     /**
      * @param string $name
+     * @param bool   $durable
      *
      * @return self
      */
-    public static function topic(string $name): self
+    public static function topic(string $name, bool $durable = false): self
     {
-        return new self($name, self::TYPE_TOPIC);
+        return new self($name, self::TYPE_TOPIC, $durable);
     }
 
     /**
@@ -121,7 +124,11 @@ final class AmqpTopic implements Topic
      */
     public static function delayed(string $name): self
     {
-        return new self($name, self::TYPE_DELAYED);
+        $self = new self($name, self::TYPE_DELAYED, true);
+
+        $self->arguments['x-delayed-type'] = self::TYPE_DIRECT;
+
+        return $self;
     }
 
     /**
@@ -135,10 +142,13 @@ final class AmqpTopic implements Topic
     /**
      * @return $this
      */
-    public function passive(): self
+    public function makePassive(): self
     {
-        $this->passive = true;
-        $this->flags   += \AMQP_PASSIVE;
+        if(false === $this->passive)
+        {
+            $this->passive = true;
+            $this->flags   += \AMQP_PASSIVE;
+        }
 
         return $this;
     }
@@ -146,10 +156,13 @@ final class AmqpTopic implements Topic
     /**
      * @return $this
      */
-    public function durable(): self
+    public function makeDurable(): self
     {
-        $this->durable = true;
-        $this->flags   += \AMQP_DURABLE;
+        if(false === $this->durable)
+        {
+            $this->durable = true;
+            $this->flags   += \AMQP_DURABLE;
+        }
 
         return $this;
     }
@@ -161,7 +174,7 @@ final class AmqpTopic implements Topic
      */
     public function wthArguments(array $arguments): self
     {
-        $this->arguments = $arguments;
+        $this->arguments = \array_merge($this->arguments, $arguments);
 
         return $this;
     }
@@ -193,10 +206,16 @@ final class AmqpTopic implements Topic
     /**
      * @param string $name
      * @param string $type
+     * @param bool   $durable
      */
-    private function __construct(string $name, string $type)
+    private function __construct(string $name, string $type, bool $durable)
     {
         $this->name = $name;
         $this->type = $type;
+
+        if(true === $durable)
+        {
+            $this->makeDurable();
+        }
     }
 }

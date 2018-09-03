@@ -37,6 +37,9 @@ final class StorageAdapterFactory
     }
 
     /**
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
+     *
      * @param string $adapter
      * @param string $connectionDSN
      *

@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport\AmqpExt;
 
 use Desperado\ServiceBus\Transport\Queue;
+use Desperado\ServiceBus\Transport\Topic;
 
 /**
  * Queue details
@@ -101,9 +102,14 @@ final class AmqpQueue implements Queue
     /**
      * @param string $name
      */
-    public function __construct(string $name)
+    public function __construct(string $name, bool $durable = false)
     {
         $this->name = $name;
+
+        if(true === $durable)
+        {
+            $this->makeDurable();
+        }
     }
 
     /**
@@ -111,9 +117,27 @@ final class AmqpQueue implements Queue
      *
      * @return self
      */
-    public static function create(string $name): self
+    public static function default(string $name, bool $durable = false): self
     {
-        return new self($name);
+        return new self($name, $durable);
+    }
+
+    /**
+     * Create delayed queue
+     *
+     * @see https://github.com/rabbitmq/rabbitmq-delayed-message-exchange
+     *
+     * @param string $name
+     *
+     * @return self
+     */
+    public static function delayed(string $name, Topic $toTopic): self
+    {
+        $self = new self($name, true);
+
+        $self->arguments['x-dead-letter-exchange'] = (string) $toTopic;
+
+        return $self;
     }
 
     /**
@@ -127,10 +151,13 @@ final class AmqpQueue implements Queue
     /**
      * @return $this
      */
-    public function passive(): self
+    public function makePassive(): self
     {
-        $this->passive = true;
-        $this->flags   += \AMQP_PASSIVE;
+        if(false === $this->passive)
+        {
+            $this->passive = true;
+            $this->flags   += \AMQP_PASSIVE;
+        }
 
         return $this;
     }
@@ -138,10 +165,13 @@ final class AmqpQueue implements Queue
     /**
      * @return $this
      */
-    public function exclusive(): self
+    public function makeExclusive(): self
     {
-        $this->exclusive = true;
-        $this->flags     += \AMQP_EXCLUSIVE;
+        if(false === $this->exclusive)
+        {
+            $this->exclusive = true;
+            $this->flags     += \AMQP_EXCLUSIVE;
+        }
 
         return $this;
     }
@@ -149,10 +179,13 @@ final class AmqpQueue implements Queue
     /**
      * @return $this
      */
-    public function durable(): self
+    public function makeDurable(): self
     {
-        $this->durable = true;
-        $this->flags   += \AMQP_DURABLE;
+        if(false === $this->durable)
+        {
+            $this->durable = true;
+            $this->flags   += \AMQP_DURABLE;
+        }
 
         return $this;
     }
@@ -162,8 +195,11 @@ final class AmqpQueue implements Queue
      */
     public function enableAutoDelete(): self
     {
-        $this->autoDelete = true;
-        $this->flags      += \AMQP_AUTODELETE;
+        if(false === $this->autoDelete)
+        {
+            $this->autoDelete = true;
+            $this->flags      += \AMQP_AUTODELETE;
+        }
 
         return $this;
     }
@@ -175,7 +211,7 @@ final class AmqpQueue implements Queue
      */
     public function wthArguments(array $arguments): self
     {
-        $this->arguments = $arguments;
+        $this->arguments = \array_merge($this->arguments, $arguments);
 
         return $this;
     }
