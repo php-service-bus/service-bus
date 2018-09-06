@@ -60,11 +60,13 @@ final class Bootstrap
      * @param array $directories
      * @param array $excludedSagas Excluded sagas (classes)
      *
-     * @return void
+     * @return $this
      */
-    public function enableAutoImportSagas(array $directories, array $excludedSagas = []): void
+    public function enableAutoImportSagas(array $directories, array $excludedSagas = []): self
     {
         $this->containerBuilder->addCompilerPasses(new ImportSagasCompilerPass($directories, $excludedSagas));
+
+        return $this;
     }
 
     /**
@@ -74,11 +76,13 @@ final class Bootstrap
      * @param array $directories
      * @param array $excludedClasses
      *
-     * @return void
+     * @return $this
      */
-    public function enableAutoImportMessageHandlers(array $directories, array $excludedClasses): void
+    public function enableAutoImportMessageHandlers(array $directories, array $excludedClasses): self
     {
         $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass($directories, $excludedClasses));
+
+        return $this;
     }
 
     /**
