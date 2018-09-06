@@ -69,27 +69,30 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
                 continue;
             }
 
-            $fileContent = \file_get_contents($filePath);
-
             $class = extractNamespaceFromFile($filePath);
 
-            if(null === $class)
-            {
-                continue;
-            }
-
             if(
-                false !== \strpos($fileContent, '@CommandHandler') ||
-                false !== \strpos($fileContent, '@EventListener')
+                null !== $class &&
+                true === self::isMessageHandler($filePath) &&
+                false === $container->hasDefinition($class)
             )
             {
-                if(false === $container->hasDefinition($class))
-                { 
-                    $container
-                        ->register($class, $class)
-                        ->addTag('service_bus.service');
-                }
+
+                $container->register($class, $class)->addTag('service_bus.service');
             }
         }
+    }
+
+    /**
+     * @param string $filePath
+     *
+     * @return bool
+     */
+    private static function isMessageHandler(string $filePath): bool
+    {
+        $fileContent = \file_get_contents($filePath);
+
+        return false !== \strpos($fileContent, '@CommandHandler') ||
+            false !== \strpos($fileContent, '@EventListener');
     }
 }
