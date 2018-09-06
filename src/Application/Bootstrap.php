@@ -78,7 +78,7 @@ final class Bootstrap
      *
      * @return $this
      */
-    public function enableAutoImportMessageHandlers(array $directories, array $excludedClasses): self
+    public function enableAutoImportMessageHandlers(array $directories, array $excludedClasses = []): self
     {
         $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass($directories, $excludedClasses));
 
