@@ -57,21 +57,25 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $excludedFiles = canonicalizeFilesPath($this->excludedFiles);
         $foundSagas    = [];
+        $excludedFiles = canonicalizeFilesPath($this->excludedFiles);
 
         foreach(searchFiles($this->directories, '/\.php/i') as $file)
         {
-            $filePath = (string) $file;
+            /** @var \SplFileInfo $file */
 
-            if(false === \in_array($filePath, $excludedFiles, true))
+            $filePath = $file->getRealPath();
+
+            if(true === \in_array($filePath, $excludedFiles, true))
             {
-                $class = extractNamespaceFromFile((string) $file);
+                continue;
+            }
 
-                if(null !== $class && true === \is_a($class, Saga::class, true))
-                {
-                    $foundSagas[] = $class;
-                }
+            $class = extractNamespaceFromFile((string) $file);
+
+            if(null !== $class && true === \is_a($class, Saga::class, true))
+            {
+                $foundSagas[] = $class;
             }
         }
 

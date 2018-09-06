@@ -102,6 +102,8 @@ final class Bootstrap
      */
     public function boot(): ContainerInterface
     {
+        $this->containerBuilder->addCompilerPasses(new TaggedMessageHandlersCompilerPass(), new ServiceLocatorTagPass());
+
         return $this->containerBuilder->build();
     }
 
@@ -217,7 +219,7 @@ final class Bootstrap
             'service_bus.storage.adapter' => '',
             'service_bus.storage.dsn'     => ''
         ]);
-        $this->containerBuilder->addCompilerPasses(new TaggedMessageHandlersCompilerPass(), new ServiceLocatorTagPass());
+
         $this->containerBuilder->addExtensions(new ServiceBusExtension());
     }
 }

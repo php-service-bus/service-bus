@@ -84,7 +84,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
             )
             {
                 if(false === $container->hasDefinition($class))
-                {
+                { 
                     $container
                         ->register($class, $class)
                         ->addTag('service_bus.service');
