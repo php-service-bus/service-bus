@@ -13,7 +13,9 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
-use Desperado\ServiceBus\DependencyInjection\Compiler\ServicesCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\ImportSagasCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
@@ -52,6 +54,42 @@ final class Bootstrap
     }
 
     /**
+     * All sagas from the specified directories will be registered automatically
+     *
+     * Note: All files containing user-defined functions must be excluded
+     * Note: Increases start time because of the need to scan files
+     *
+     * @param array $directories
+     * @param array $excludedFiles
+     *
+     * @return $this
+     */
+    public function enableAutoImportSagas(array $directories, array $excludedFiles = []): self
+    {
+        $this->containerBuilder->addCompilerPasses(new ImportSagasCompilerPass($directories, $excludedFiles));
+
+        return $this;
+    }
+
+    /**
+     * All message handlers from the specified directories will be registered automatically
+     *
+     * Note: All files containing user-defined functions must be excluded
+     * Note: Increases start time because of the need to scan files
+     *
+     * @param array $directories
+     * @param array $excludedFiles
+     *
+     * @return $this
+     */
+    public function enableAutoImportMessageHandlers(array $directories, array $excludedFiles = []): self
+    {
+        $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass($directories, $excludedFiles));
+
+        return $this;
+    }
+
+    /**
      * Create based on environment settings
      *
      * @return self
@@ -68,6 +106,8 @@ final class Bootstrap
      */
     public function boot(): ContainerInterface
     {
+        $this->containerBuilder->addCompilerPasses(new TaggedMessageHandlersCompilerPass(), new ServiceLocatorTagPass());
+
         return $this->containerBuilder->build();
     }
 
@@ -183,7 +223,7 @@ final class Bootstrap
             'service_bus.storage.adapter' => '',
             'service_bus.storage.dsn'     => ''
         ]);
-        $this->containerBuilder->addCompilerPasses(new ServicesCompilerPass(), new ServiceLocatorTagPass());
+
         $this->containerBuilder->addExtensions(new ServiceBusExtension());
     }
 }

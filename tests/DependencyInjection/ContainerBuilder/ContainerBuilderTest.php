@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder;
 
 use function Desperado\ServiceBus\Common\removeDirectory;
-use Desperado\ServiceBus\DependencyInjection\Compiler\ServicesCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
@@ -114,7 +114,7 @@ final class ContainerBuilderTest extends TestCase
 
         $containerBuilder->addExtensions(new ServiceBusExtension(), new TestExtension());
 
-        $containerBuilder->addCompilerPasses(new TestCompilerPass(), new ServicesCompilerPass());
+        $containerBuilder->addCompilerPasses(new TestCompilerPass(), new TaggedMessageHandlersCompilerPass());
 
         /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $containerBuilder->build();

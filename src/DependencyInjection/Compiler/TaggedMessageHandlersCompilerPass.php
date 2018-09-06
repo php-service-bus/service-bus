@@ -22,11 +22,10 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
- * Collect services
+ * Collect message handlers
  */
-final class ServicesCompilerPass implements CompilerPassInterface
+final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 {
-
     /**
      * @inheritdoc
      *

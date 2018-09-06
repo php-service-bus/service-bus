@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Tests\Application\Bootstrap;
 
 use Desperado\ServiceBus\Application\Bootstrap;
 use function Desperado\ServiceBus\Common\removeDirectory;
-use Desperado\ServiceBus\DependencyInjection\Compiler\ServicesCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use PHPUnit\Framework\TestCase;
@@ -68,7 +68,7 @@ final class BootstrapTest extends TestCase
 
         $bootstrap->useCustomCacheDirectory($this->cacheDirectory);
         $bootstrap->addExtensions(new ServiceBusExtension());
-        $bootstrap->addCompilerPasses(new ServicesCompilerPass());
+        $bootstrap->addCompilerPasses(new TaggedMessageHandlersCompilerPass());
         $bootstrap->importParameters(['qwerty' => 'root']);
 
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
@@ -98,7 +98,7 @@ final class BootstrapTest extends TestCase
 
         $bootstrap->useCustomCacheDirectory($this->cacheDirectory);
         $bootstrap->addExtensions(new ServiceBusExtension());
-        $bootstrap->addCompilerPasses(new ServicesCompilerPass());
+        $bootstrap->addCompilerPasses(new TaggedMessageHandlersCompilerPass());
         $bootstrap->importParameters(['qwerty1' => 'root1']);
 
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
