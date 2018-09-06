@@ -13,7 +13,9 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
-use Desperado\ServiceBus\DependencyInjection\Compiler\ServicesCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\ImportSagasCompilerPass;
+use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
@@ -49,6 +51,34 @@ final class Bootstrap
         (new Dotenv())->load($envFilePath);
 
         return new self();
+    }
+
+    /**
+     * All sagas from the specified directories will be registered automatically
+     * Note: Increases start time because of the need to scan files
+     *
+     * @param array $directories
+     * @param array $excludedSagas Excluded sagas (classes)
+     *
+     * @return void
+     */
+    public function enableAutoImportSagas(array $directories, array $excludedSagas = []): void
+    {
+        $this->containerBuilder->addCompilerPasses(new ImportSagasCompilerPass($directories, $excludedSagas));
+    }
+
+    /**
+     * All message handlers from the specified directories will be registered automatically
+     * Note: Increases start time because of the need to scan files
+     *
+     * @param array $directories
+     * @param array $excludedClasses
+     *
+     * @return void
+     */
+    public function enableAutoImportMessageHandlers(array $directories, array $excludedClasses): void
+    {
+        $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass($directories, $excludedClasses));
     }
 
     /**
@@ -183,7 +213,7 @@ final class Bootstrap
             'service_bus.storage.adapter' => '',
             'service_bus.storage.dsn'     => ''
         ]);
-        $this->containerBuilder->addCompilerPasses(new ServicesCompilerPass(), new ServiceLocatorTagPass());
+        $this->containerBuilder->addCompilerPasses(new TaggedMessageHandlersCompilerPass(), new ServiceLocatorTagPass());
         $this->containerBuilder->addExtensions(new ServiceBusExtension());
     }
 }
