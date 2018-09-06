@@ -30,16 +30,24 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
     /**
      * @var array<mixed, string>
      */
-    private $excludedSagas;
+    private $excludedFiles;
 
     /**
      * @param array $directories
-     * @param array $excludedSagas
+     * @param array $excludedFiles
      */
-    public function __construct(array $directories, array $excludedSagas)
+    public function __construct(array $directories, array $excludedFiles)
     {
         $this->directories   = $directories;
-        $this->excludedSagas = $excludedSagas;
+        $this->excludedFiles = \array_merge($excludedFiles, [
+            __FILE__,
+            __DIR__ . '/../../../src/Storage/functions.php',
+            __DIR__ . '/../../../src/DependencyInjection/Compiler/functions.php',
+            __DIR__ . '/../../../src/Storage/SQL/queryBuilderFunctions.php',
+            __DIR__ . '/../../../src/Common/commonFunctions.php',
+            __DIR__ . '/../../../src/Common/datetimeFunctions.php',
+            __DIR__ . '/../../../src/Common/reflectionFunctions.php',
+        ]);
     }
 
     /**
@@ -49,19 +57,21 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $foundSagas = [];
+        $excludedFiles = canonicalizeFilesPath($this->excludedFiles);
+        $foundSagas    = [];
 
         foreach(searchFiles($this->directories, '/\.php/i') as $file)
         {
-            $class = extractNamespaceFromFile((string) $file);
+            $filePath = (string) $file;
 
-            if(
-                null !== $class &&
-                true === \is_a($class, Saga::class, true) &&
-                false === \in_array($class, $this->excludedSagas, true)
-            )
+            if(false === \in_array($filePath, $excludedFiles, true))
             {
-                $foundSagas[] = $class;
+                $class = extractNamespaceFromFile((string) $file);
+
+                if(null !== $class && true === \is_a($class, Saga::class, true))
+                {
+                    $foundSagas[] = $class;
+                }
             }
         }
 

@@ -63,3 +63,20 @@ function searchFiles(array $directories, string $regExp): \Generator
         }
     }
 }
+
+/**
+ * @param array<mixed, string> $paths
+ *
+ * @return array<int, string>
+ */
+function canonicalizeFilesPath(array $paths): array
+{
+    $result = [];
+
+    foreach($paths as $path)
+    {
+        $result[] = (new \SplFileInfo($path))->getRealPath();
+    }
+
+    return $result;
+}

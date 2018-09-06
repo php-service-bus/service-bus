@@ -58,13 +58,13 @@ final class Bootstrap
      * Note: Increases start time because of the need to scan files
      *
      * @param array $directories
-     * @param array $excludedSagas Excluded sagas (classes)
+     * @param array $excludedFiles
      *
      * @return $this
      */
-    public function enableAutoImportSagas(array $directories, array $excludedSagas = []): self
+    public function enableAutoImportSagas(array $directories, array $excludedFiles = []): self
     {
-        $this->containerBuilder->addCompilerPasses(new ImportSagasCompilerPass($directories, $excludedSagas));
+        $this->containerBuilder->addCompilerPasses(new ImportSagasCompilerPass($directories, $excludedFiles));
 
         return $this;
     }
@@ -74,13 +74,13 @@ final class Bootstrap
      * Note: Increases start time because of the need to scan files
      *
      * @param array $directories
-     * @param array $excludedClasses
+     * @param array $excludedFiles
      *
      * @return $this
      */
-    public function enableAutoImportMessageHandlers(array $directories, array $excludedClasses = []): self
+    public function enableAutoImportMessageHandlers(array $directories, array $excludedFiles = []): self
     {
-        $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass($directories, $excludedClasses));
+        $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass($directories, $excludedFiles));
 
         return $this;
     }

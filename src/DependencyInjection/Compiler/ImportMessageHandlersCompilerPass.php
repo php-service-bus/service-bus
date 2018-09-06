@@ -29,18 +29,24 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     /**
      * @var array<mixed, string>
      */
-    private $excludedClasses;
+    private $excludedFiles;
 
     /**
      * @param array $directories
-     * @param array $excludedClasses
+     * @param array $excludedFiles
      */
-    public function __construct(array $directories, array $excludedClasses)
+    public function __construct(array $directories, array $excludedFiles)
     {
-        $this->directories     = $directories;
-        $this->excludedClasses = $excludedClasses;
-        /** ignore current file */
-        $this->excludedClasses[] = __CLASS__;
+        $this->directories   = $directories;
+        $this->excludedFiles = \array_merge($excludedFiles, [
+            __FILE__,
+            __DIR__ . '/../../../src/Storage/functions.php',
+            __DIR__ . '/../../../src/DependencyInjection/Compiler/functions.php',
+            __DIR__ . '/../../../src/Storage/SQL/queryBuilderFunctions.php',
+            __DIR__ . '/../../../src/Common/commonFunctions.php',
+            __DIR__ . '/../../../src/Common/datetimeFunctions.php',
+            __DIR__ . '/../../../src/Common/reflectionFunctions.php',
+        ]);
     }
 
     /**
@@ -50,9 +56,19 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
+        $excludedFiles = canonicalizeFilesPath($this->excludedFiles);
+
         foreach(searchFiles($this->directories, '/\.php/i') as $file)
         {
-            $filePath    = (string) $file;
+            /** @var \SplFileInfo $file */
+
+            $filePath = $file->getRealPath();
+
+            if(true === \in_array($filePath, $excludedFiles, true))
+            {
+                continue;
+            }
+
             $fileContent = \file_get_contents($filePath);
 
             $class = extractNamespaceFromFile($filePath);
@@ -67,10 +83,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
                 false !== \strpos($fileContent, '@EventListener')
             )
             {
-                if(
-                    false === $container->hasDefinition($class) &&
-                    false === \in_array($class, $this->excludedClasses, true)
-                )
+                if(false === $container->hasDefinition($class))
                 {
                     $container
                         ->register($class, $class)
