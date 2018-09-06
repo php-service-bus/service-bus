@@ -55,6 +55,8 @@ final class Bootstrap
 
     /**
      * All sagas from the specified directories will be registered automatically
+     *
+     * Note: All files containing user-defined functions must be excluded
      * Note: Increases start time because of the need to scan files
      *
      * @param array $directories
@@ -71,6 +73,8 @@ final class Bootstrap
 
     /**
      * All message handlers from the specified directories will be registered automatically
+     *
+     * Note: All files containing user-defined functions must be excluded
      * Note: Increases start time because of the need to scan files
      *
      * @param array $directories
