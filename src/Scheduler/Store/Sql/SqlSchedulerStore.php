@@ -19,7 +19,7 @@ use Amp\Success;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerRegistry;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
 use function Desperado\ServiceBus\Storage\fetchOne;
-use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
+use function Desperado\ServiceBus\Storage\SQL\insertQuery;
 use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Storage\SQL\selectQuery;
 use function Desperado\ServiceBus\Storage\SQL\updateQuery;
@@ -89,7 +89,7 @@ final class SqlSchedulerStore implements SchedulerStore
         return call(
             static function(SchedulerRegistry $registry) use ($adapter): \Generator
             {
-                $query = createInsertQuery(
+                $query = insertQuery(
                     'scheduler_registry',
                     ['id' => $registry->id(), 'payload' => \base64_encode(\serialize($registry))]
                 )->compile();

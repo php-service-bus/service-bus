@@ -20,7 +20,7 @@ use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
 use function Desperado\ServiceBus\Storage\fetchOne;
-use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
+use function Desperado\ServiceBus\Storage\SQL\insertQuery;
 use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
 use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Storage\SQL\selectQuery;
@@ -56,7 +56,7 @@ final class SQLSagaStore implements SagasStore
         return call(
             static function(StoredSaga $storedSaga) use ($adapter, $afterSaveHandler): \Generator
             {
-                $query = createInsertQuery('sagas_store', [
+                $query = insertQuery('sagas_store', [
                     'id'               => $storedSaga->id(),
                     'identifier_class' => $storedSaga->idClass(),
                     'saga_class'       => $storedSaga->sagaClass(),
@@ -156,21 +156,12 @@ final class SQLSagaStore implements SagasStore
      */
     public function remove(SagaId $id): Promise
     {
-        $adapter = $this->adapter;
+        /** @psalm-suppress ImplicitToStringCast */
+        $query = deleteQuery('sagas_store')
+            ->where(equalsCriteria('id', $id))
+            ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
+            ->compile();
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(SagaId $id) use ($adapter): \Generator
-            {
-                /** @psalm-suppress ImplicitToStringCast */
-                $query = deleteQuery('sagas_store')
-                    ->where(equalsCriteria('id', $id))
-                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
-                    ->compile();
-
-                yield $adapter->execute($query->sql(), $query->params());
-            },
-            $id
-        );
+        return $this->adapter->execute($query->sql(), $query->params());
     }
 }

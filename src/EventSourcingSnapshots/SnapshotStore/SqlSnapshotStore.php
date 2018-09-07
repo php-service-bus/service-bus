@@ -18,7 +18,7 @@ use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
 use function Desperado\ServiceBus\Storage\fetchOne;
-use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
+use function Desperado\ServiceBus\Storage\SQL\insertQuery;
 use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
 use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Storage\SQL\selectQuery;
@@ -53,7 +53,7 @@ final class SqlSnapshotStore implements SnapshotStore
         return call(
             static function(StoredAggregateSnapshot $aggregateSnapshot) use ($adapter): \Generator
             {
-                $query = createInsertQuery('event_store_snapshots', [
+                $query = insertQuery('event_store_snapshots', [
                     'id'                 => $aggregateSnapshot->aggregateId(),
                     'aggregate_id_class' => $aggregateSnapshot->aggregateIdClass(),
                     'aggregate_class'    => $aggregateSnapshot->aggregateClass(),
