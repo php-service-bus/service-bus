@@ -23,7 +23,7 @@ use Desperado\ServiceBus\Storage\Exceptions\OneResultExpected;
  *
  * @param ResultSet $iterator
  *
- * @return Promise
+ * @return Promise<array|null>
  *
  * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
  */
@@ -51,7 +51,7 @@ function fetchAll(ResultSet $iterator): Promise
  *
  * @param ResultSet $iterator
  *
- * @return Promise
+ * @return Promise<array|null>
  *
  * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
  * @throws \Desperado\ServiceBus\Storage\Exceptions\OneResultExpected

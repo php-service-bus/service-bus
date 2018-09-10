@@ -246,7 +246,9 @@ final class SagaProvider
         return call(
             static function(Saga $saga, MessageDeliveryContext $context, bool $isNew) use ($store): \Generator
             {
+                /** @var array<int, string> $commands */
                 $commands = invokeReflectionMethod($saga, 'firedCommands');
+                /** @var array<int, string> $events */
                 $events   = invokeReflectionMethod($saga, 'raisedEvents');
 
                 /** @var \DateTimeImmutable|null $closedAt */

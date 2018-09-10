@@ -171,13 +171,22 @@ final class SqlEventStreamStore implements AggregateStore
      */
     public function closeStream(AggregateId $id): Promise
     {
-        /** @psalm-suppress ImplicitToStringCast */
-        $query = updateQuery('event_store_stream', ['closed_at' => \date('Y-m-d H:i:s')])
-            ->where(equalsCriteria('id', $id))
-            ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
-            ->compile();
+        $adapter = $this->adapter;
 
-        return $this->adapter->execute($query->sql(), $query->params());
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(AggregateId $id) use ($adapter): \Generator
+            {
+                /** @psalm-suppress ImplicitToStringCast */
+                $query = updateQuery('event_store_stream', ['closed_at' => \date('Y-m-d H:i:s')])
+                    ->where(equalsCriteria('id', $id))
+                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
+                    ->compile();
+
+                yield $adapter->execute($query->sql(), $query->params());
+            },
+            $id
+        );
     }
 
     /**
@@ -198,15 +207,22 @@ final class SqlEventStreamStore implements AggregateStore
      */
     private static function doSaveStream(TransactionAdapter $transaction, StoredAggregateEventStream $eventsStream): Promise
     {
-        $query = insertQuery('event_store_stream', [
-            'id'               => $eventsStream->aggregateId(),
-            'identifier_class' => $eventsStream->getAggregateIdClass(),
-            'aggregate_class'  => $eventsStream->aggregateClass(),
-            'created_at'       => $eventsStream->createdAt(),
-            'closed_at'        => $eventsStream->closedAt()
-        ])->compile();
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(StoredAggregateEventStream $eventsStream) use ($transaction): \Generator
+            {
+                $query = insertQuery('event_store_stream', [
+                    'id'               => $eventsStream->aggregateId(),
+                    'identifier_class' => $eventsStream->getAggregateIdClass(),
+                    'aggregate_class'  => $eventsStream->aggregateClass(),
+                    'created_at'       => $eventsStream->createdAt(),
+                    'closed_at'        => $eventsStream->closedAt()
+                ])->compile();
 
-        return $transaction->execute($query->sql(), $query->params());
+                yield $transaction->execute($query->sql(), $query->params());
+            },
+            $eventsStream
+        );
     }
 
     /**
@@ -227,17 +243,22 @@ final class SqlEventStreamStore implements AggregateStore
      */
     private static function doSaveEvents(TransactionAdapter $transaction, StoredAggregateEventStream $eventsStream): Promise
     {
-        $eventsCount = \count($eventsStream->aggregateEvents());
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(StoredAggregateEventStream $eventsStream) use ($transaction): \Generator
+            {
+                $eventsCount = \count($eventsStream->aggregateEvents());
 
-        if(0 !== $eventsCount)
-        {
-            return $transaction->execute(
-                self::createSaveEventQueryString($eventsCount),
-                self::collectSaveEventQueryParameters($eventsStream)
-            );
-        }
-
-        return new Success();
+                if(0 !== $eventsCount)
+                {
+                    yield $transaction->execute(
+                        self::createSaveEventQueryString($eventsCount),
+                        self::collectSaveEventQueryParameters($eventsStream)
+                    );
+                }
+            },
+            $eventsStream
+        );
     }
 
     /**
