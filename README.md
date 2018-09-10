@@ -6,7 +6,7 @@
 [![Total Downloads](https://poser.pugx.org/mmasiukevich/service-bus/downloads)](https://packagist.org/packages/mmasiukevich/service-bus)
 [![License](https://poser.pugx.org/mmasiukevich/service-bus/license)](https://packagist.org/packages/mmasiukevich/service-bus)
 
-####   What is it?
+## What is it?
 Фреймворк, позволяющий реализовать асинхронный обмен сообщениями, прозрачный workflow, а так же контроль долгоживущих бизнесс процессов благодаря применению паттерна Saga. 
 Основан на **[message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html)** и включает реализацию следующих паттернов:
   - Publish\subscribe
@@ -32,7 +32,7 @@
 Фреймворк основан на компонентах Symfony 4.x (на текущий момент 4.1)
 - **Transport**: абстракция над транспортным слоем (на текущий момент только RabbitMQ)
 - **Storage**: абстракция для работы с хранилищем. 
-  - На текущий момент реализована работа только с пулом соединений **PostgreSQL**. Для тестирования доступен адаптер для работы с PDO (на базе DoctrineDBAL), но использовать его крайне не рекомендуется.
+  - На текущий момент реализована работа только с пулом соединений PostgreSQL. Для тестирования доступен адаптер для работы с PDO (на базе DoctrineDBAL), но использовать его крайне не рекомендуется.
 - **Sagas**
 - **EventSourcing**
 - **EventSourcingSnapshots**: поддержка снимков агрегатов. Необходимо для того, что бы сократить время и ресурсы на восстановление состояния агрегата.
@@ -41,3 +41,14 @@
 - **Marshal**: Нормализация\денормализация, а так же сериализация\десериализация объектов сообщений. На текущий момент используется SymfonySerializer, который кодирует сообщения в json и обратно.
 - **MessageBus**: Шина сообщений. В ней регистрируются все обработчики и слушатели. Служит своего рода роутером для сообщений.
 - **HttpClient**: Неблокирующий http клиент
+
+#### Requirements 
+  - PHP 7.2
+
+## Security
+
+If you discover any security related issues, please email [`desperado@minsk-info.ru`](mailto:desperado@minsk-info.ru) instead of using the issue tracker.
+
+## License
+
+The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
