@@ -56,6 +56,7 @@ final class IndexProvider
         return call(
             static function(IndexKey $indexKey) use ($storage): \Generator
             {
+                /** @var mixed $value */
                 $value = yield $storage->find(
                     $indexKey->indexName(),
                     $indexKey->valueKey()
@@ -89,6 +90,7 @@ final class IndexProvider
         return call(
             static function(IndexKey $indexKey) use ($storage): \Generator
             {
+                /** @var mixed $value */
                 $value = yield $storage->find(
                     $indexKey->indexName(),
                     $indexKey->valueKey()

@@ -75,11 +75,11 @@ final class AggregateEventStreamDataTransformer
      */
     public function streamToDomainRepresentation(StoredAggregateEventStream $storedAggregateEventsStream): AggregateEventStream
     {
-        $events = new \SplObjectStorage();
+        $events = [];
 
         foreach($storedAggregateEventsStream->aggregateEvents() as $storedAggregateEvent)
         {
-            $events->attach($this->eventToDomainRepresentation($storedAggregateEvent));
+            $events[] = $this->eventToDomainRepresentation($storedAggregateEvent);
         }
 
         /** @var \DateTimeImmutable $createdAt */

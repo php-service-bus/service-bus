@@ -45,14 +45,14 @@ abstract class Saga
     /**
      * List of events that should be published while saving
      *
-     * @var \SplObjectStorage<\Desperado\ServiceBus\Common\Contract\Messages\Event>
+     * @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event>
      */
     private $events;
 
     /**
      * List of commands that should be fired while saving
      *
-     * @var \SplObjectStorage<\Desperado\ServiceBus\Common\Contract\Messages\Command>
+     * @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Command>
      */
     private $commands;
 
@@ -176,7 +176,7 @@ abstract class Saga
         $this->assertNotClosedSaga();
 
         $this->applyEvent($event);
-        $this->events->attach($event);
+        $this->attachEvent($event);
     }
 
     /**
@@ -192,7 +192,7 @@ abstract class Saga
     {
         $this->assertNotClosedSaga();
 
-        $this->commands->attach($command);
+        $this->attachCommand($command);
     }
 
     /**
@@ -240,12 +240,12 @@ abstract class Saga
      *
      * @see          SagaProvider::doStore()
      *
-     * @return \SplObjectStorage<\Desperado\ServiceBus\Common\Contract\Messages\Command>
+     * @return array<int, \Desperado\ServiceBus\Common\Contract\Messages\Command>
      */
-    private function firedCommands(): \SplObjectStorage
+    private function firedCommands(): array
     {
-        /** @var \SplObjectStorage<\Desperado\ServiceBus\Common\Contract\Messages\Command> $commands */
-        $commands = clone $this->commands;
+        /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Command> $commands */
+        $commands = $this->commands;
 
         $this->clearFiredCommands();
 
@@ -259,12 +259,12 @@ abstract class Saga
      *
      * @see          SagaProvider::doStore()
      *
-     * @return \SplObjectStorage<\Desperado\ServiceBus\Common\Contract\Messages\Event>
+     * @return array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event>
      */
-    private function raisedEvents(): \SplObjectStorage
+    private function raisedEvents(): array
     {
-        /** @var \SplObjectStorage<\Desperado\ServiceBus\Common\Contract\Messages\Event> $events */
-        $events = clone $this->events;
+        /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $commands */
+        $events = $this->events;
 
         $this->clearRaisedEvents();
 
@@ -331,7 +331,7 @@ abstract class Saga
 
         $this->closedAt = $event->datetime();
 
-        $this->events->attach($event);
+        $this->attachEvent($event);
     }
 
     /**
@@ -344,7 +344,7 @@ abstract class Saga
      */
     private function doChangeState(SagaStatus $toState, string $withReason = null): void
     {
-        $this->events->attach(
+        $this->attachEvent(
             SagaStatusChanged::create(
                 $this->id,
                 $this->status,
@@ -374,7 +374,7 @@ abstract class Saga
      */
     private function clearRaisedEvents(): void
     {
-        $this->events = new \SplObjectStorage();
+        $this->events = [];
     }
 
     /**
@@ -384,7 +384,27 @@ abstract class Saga
      */
     private function clearFiredCommands(): void
     {
-        $this->commands = new \SplObjectStorage();
+        $this->commands = [];
+    }
+
+    /**
+     * @param Event $event
+     *
+     * @return void
+     */
+    private function attachEvent(Event $event): void
+    {
+        $this->events[] = $event;
+    }
+
+    /**
+     * @param Command $command
+     *
+     * @return void
+     */
+    private function attachCommand(Command $command): void
+    {
+        $this->commands[] = $command;
     }
 
     /**

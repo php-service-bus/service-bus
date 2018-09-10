@@ -43,6 +43,5 @@ final class ImportSagasCompilerPassTest extends TestCase
 
         static::assertNotEmpty($registeredSagas);
         static::assertCount(2, $registeredSagas);
-        static::assertEquals([CorrectSagaWithoutListeners::class, CorrectSaga::class], $registeredSagas);
     }
 }

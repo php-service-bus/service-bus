@@ -138,8 +138,8 @@ class SagaTest extends TestCase
             (string) readReflectionPropertyValue($saga, 'status')
         );
 
-        /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events */
-        $events = \iterator_to_array(invokeReflectionMethod($saga, 'raisedEvents'));
+        /** @var array<int, string> $events */
+        $events = invokeReflectionMethod($saga, 'raisedEvents');
 
         static::assertNotEmpty($events);
         static::assertCount(3, $events);
@@ -182,8 +182,8 @@ class SagaTest extends TestCase
         $saga = new CorrectSaga($id);
         $saga->start(new FirstEmptyCommand());
 
-        /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events */
-        $events = \iterator_to_array(invokeReflectionMethod($saga, 'raisedEvents'));
+        /** @var array<int, string> $events */
+        $events = invokeReflectionMethod($saga, 'raisedEvents');
 
         static::assertNotEmpty($events);
         static::assertCount(1, $events);

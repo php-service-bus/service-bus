@@ -59,6 +59,7 @@ final class SqlIndexesStorage implements IndexesStorage
                     ->andWhere(equalsCriteria('value_key', $valueKey))
                     ->compile();
 
+                /** @var array<string, mixed>|null $result */
                 $result = yield fetchOne(
                     yield $adapter->execute($query->sql(), $query->params())
                 );
@@ -77,13 +78,24 @@ final class SqlIndexesStorage implements IndexesStorage
      */
     public function add(string $indexKey, string $valueKey, $value): Promise
     {
-        $query = insertQuery('event_sourcing_indexes', [
-            'index_tag'  => $indexKey,
-            'value_key'  => $valueKey,
-            'value_data' => $value
-        ])->compile();
+        $adapter = $this->adapter;
 
-        return $this->adapter->execute($query->sql(), $query->params());
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+        /** @psalm-suppress MissingClosureParamType */
+            static function(string $indexKey, string $valueKey, $value) use ($adapter): \Generator
+            {
+                $query = insertQuery('event_sourcing_indexes', [
+                    'index_tag'  => $indexKey,
+                    'value_key'  => $valueKey,
+                    'value_data' => $value
+                ])->compile();
+
+                yield $adapter->execute($query->sql(), $query->params());
+
+            },
+            $indexKey, $valueKey, $value
+        );
     }
 
     /**
@@ -91,12 +103,21 @@ final class SqlIndexesStorage implements IndexesStorage
      */
     public function delete(string $indexKey, string $valueKey): Promise
     {
-        $query = deleteQuery('event_sourcing_indexes')
-            ->where(equalsCriteria('index_tag', $indexKey))
-            ->andWhere(equalsCriteria('value_key', $valueKey))
-            ->compile();
+        $adapter = $this->adapter;
 
-        return $this->adapter->execute($query->sql(), $query->params());
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(string $indexKey, string $valueKey) use ($adapter): \Generator
+            {
+                $query = deleteQuery('event_sourcing_indexes')
+                    ->where(equalsCriteria('index_tag', $indexKey))
+                    ->andWhere(equalsCriteria('value_key', $valueKey))
+                    ->compile();
+
+                yield $adapter->execute($query->sql(), $query->params());
+
+            }, $indexKey, $valueKey
+        );
     }
 
     /**
@@ -104,11 +125,21 @@ final class SqlIndexesStorage implements IndexesStorage
      */
     public function update(string $indexKey, string $valueKey, $value): Promise
     {
-        $query = updateQuery('event_sourcing_indexes', ['value_data' => $value])
-            ->where(equalsCriteria('index_tag', $indexKey))
-            ->andWhere(equalsCriteria('value_key', $valueKey))
-            ->compile();
+        $adapter = $this->adapter;
 
-        return $this->adapter->execute($query->sql(), $query->params());
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+        /** @psalm-suppress MissingClosureParamType */
+            static function(string $indexKey, string $valueKey, $value) use ($adapter): \Generator
+            {
+                $query = updateQuery('event_sourcing_indexes', ['value_data' => $value])
+                    ->where(equalsCriteria('index_tag', $indexKey))
+                    ->andWhere(equalsCriteria('value_key', $valueKey))
+                    ->compile();
+
+                yield $adapter->execute($query->sql(), $query->params());
+
+            }, $indexKey, $valueKey, $value
+        );
     }
 }

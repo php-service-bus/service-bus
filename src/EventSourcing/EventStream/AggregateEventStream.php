@@ -66,14 +66,14 @@ final class AggregateEventStream
     /**
      * @param AggregateId             $id
      * @param string                  $aggregateClass
-     * @param \SplObjectStorage<\Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent>  $events
+     * @param array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent> $events
      * @param \DateTimeImmutable      $createdAt
      * @param \DateTimeImmutable|null $closedAt
      */
     public function __construct(
         AggregateId $id,
         string $aggregateClass,
-        \SplObjectStorage $events,
+        array $events,
         \DateTimeImmutable $createdAt,
         ?\DateTimeImmutable $closedAt
     )
@@ -147,15 +147,15 @@ final class AggregateEventStream
     }
 
     /**
-     * @param \SplObjectStorage<\Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent>  $events
+     * @param array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent> $events
      *
      * @return array
      */
-    private static function sortEvents(\SplObjectStorage $storage): array
+    private static function sortEvents(array $events): array
     {
         $result = [];
 
-        foreach($storage as $aggregateEvent)
+        foreach($events as $aggregateEvent)
         {
             /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent $aggregateEvent */
 
@@ -168,7 +168,7 @@ final class AggregateEventStream
     }
 
     /**
-     * @param array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent>
+     * @param array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent> $events
      *
      * @return array<mixed, \Desperado\ServiceBus\Common\Contract\Messages\Event>
      */
