@@ -105,7 +105,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
         $reflectionType     = $parameter->getType();
         $reflectionTypeName = $reflectionType->getName();
 
-        return true === \class_exists($reflectionTypeName) &&
+        return (true === \class_exists($reflectionTypeName) || true === \interface_exists($reflectionTypeName)) &&
             false === \is_a($reflectionTypeName, Message::class, true) &&
             false === \is_a($reflectionTypeName, MessageDeliveryContext::class, true) &&
             true === $container->has($reflectionTypeName);

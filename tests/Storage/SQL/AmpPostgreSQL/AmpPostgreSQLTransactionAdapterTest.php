@@ -19,7 +19,7 @@ use function Desperado\ServiceBus\Common\uuid;
 use function Desperado\ServiceBus\Storage\fetchAll;
 use function Desperado\ServiceBus\Storage\fetchOne;
 use Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
-use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
+use function Desperado\ServiceBus\Storage\SQL\insertQuery;
 use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Storage\SQL\selectQuery;
 use Desperado\ServiceBus\Storage\StorageConfiguration;
@@ -127,7 +127,7 @@ final class AmpPostgreSQLTransactionAdapterTest extends TestCase
         {
             $uuid = uuid();
 
-            $query = createInsertQuery('test_result_set', ['id' => $uuid, 'value' => 'value2'])->compile();
+            $query = insertQuery('test_result_set', ['id' => $uuid, 'value' => 'value2'])->compile();
 
             yield $self->adapter->execute($query->sql(), $query->params());
 
@@ -172,7 +172,7 @@ final class AmpPostgreSQLTransactionAdapterTest extends TestCase
             /** @var \Desperado\ServiceBus\Storage\TransactionAdapter $transaction */
             $transaction = yield $self->adapter->transaction();
 
-            $query = createInsertQuery('test_result_set', ['id' => uuid(), 'value' => 'value2'])->compile();
+            $query = insertQuery('test_result_set', ['id' => uuid(), 'value' => 'value2'])->compile();
 
             yield $transaction->execute($query->sql(), $query->params());
             yield $transaction->rollback();

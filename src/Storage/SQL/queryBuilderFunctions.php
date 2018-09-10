@@ -113,7 +113,7 @@ function deleteQuery(string $fromTable): DeleteQuery
  *
  * @return InsertQuery
  */
-function createInsertQuery(string $toTable, $toInsert): InsertQuery
+function insertQuery(string $toTable, $toInsert): InsertQuery
 {
     if(true === \is_object($toInsert))
     {

@@ -14,7 +14,7 @@ namespace Desperado\ServiceBus\Tests\Storage\SQL;
 
 use function Desperado\ServiceBus\Common\uuid;
 use function Desperado\ServiceBus\Storage\SQL\cast;
-use function Desperado\ServiceBus\Storage\SQL\createInsertQuery;
+use function Desperado\ServiceBus\Storage\SQL\insertQuery;
 use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
 use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Storage\SQL\notEqualsCriteria;
@@ -102,7 +102,7 @@ final class QueryBuilderFunctionsTest extends TestCase
             }
         };
 
-        $query = createInsertQuery('test', $object)->compile();
+        $query = insertQuery('test', $object)->compile();
 
         static::assertSame(
             'INSERT INTO "test" ("first", "second") VALUES (?, ?)',
@@ -120,7 +120,7 @@ final class QueryBuilderFunctionsTest extends TestCase
      */
     public function insertQueryFromArray(): void
     {
-        $query = createInsertQuery('test', ['first' => 'qwerty', 'second' => 'root'])->compile();
+        $query = insertQuery('test', ['first' => 'qwerty', 'second' => 'root'])->compile();
 
         static::assertSame(
             'INSERT INTO "test" ("first", "second") VALUES (?, ?)',
