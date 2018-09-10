@@ -53,7 +53,7 @@ abstract class Aggregate
     /**
      * List of applied aggregate events
      *
-     * @var \SplObjectStorage<\Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent>
+     * @var array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent>
      */
     private $events;
 
@@ -174,13 +174,14 @@ abstract class Aggregate
      *
      * @noinspection PhpUnusedPrivateMethodInspection
      *
-     * @see EventSourcingProvider::save()
+     * @see          EventSourcingProvider::save()
      *
      * @return AggregateEventStream
      */
     private function makeStream(): AggregateEventStream
     {
-        $events = clone $this->events;
+        /** @var array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent> $events */
+        $events = $this->events;
 
         $this->clearEvents();
 
@@ -198,7 +199,7 @@ abstract class Aggregate
      *
      * @noinspection PhpUnusedPrivateMethodInspection
      *
-     * @see EventSourcingProvider::load()
+     * @see          EventSourcingProvider::load()
      *
      * @param AggregateEventStream $aggregateEventsStream
      *
@@ -235,9 +236,7 @@ abstract class Aggregate
         /** @var \DateTimeImmutable $currentDate */
         $currentDate = datetimeInstantiator('NOW');
 
-        $this->events->attach(
-            new AggregateEvent(uuid(), $event, $this->version, $currentDate)
-        );
+        $this->events[] = new AggregateEvent(uuid(), $event, $this->version, $currentDate);
     }
 
     /**
@@ -342,6 +341,6 @@ abstract class Aggregate
      */
     private function clearEvents(): void
     {
-        $this->events = new \SplObjectStorage();
+        $this->events = [];
     }
 }
