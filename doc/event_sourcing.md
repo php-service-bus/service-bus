@@ -1,16 +1,17 @@
 Оглавление
-* [Что такое Event Sourcing]()
-* [Область применения]()
-* [Поток событий]()
-* [Проблемы]()
-* [Снимки (Snapshot)]()
-* [Индексы]()
-* [Пример агрегата]()
-* [Доступные методы]()
-* [Жизненный цикл]()
-* [Работа с индексами]()
-* [Работа со снимками]()
-* [Примеры кода]()
+* [Что такое Event Sourcing](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%A7%D1%82%D0%BE-%D1%82%D0%B0%D0%BA%D0%BE%D0%B5-event-sourcing)
+* [Область применения](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%9E%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F)
+* [Поток событий](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%9F%D0%BE%D1%82%D0%BE%D0%BA-%D1%81%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D0%B9)
+* [Проблемы](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%9F%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D1%8B)
+* [Снимки (Snapshot)](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%A1%D0%BD%D0%B8%D0%BC%D0%BA%D0%B8-snapshot)
+* [Представления (Projections)](): 
+* [Индексы](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%98%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D1%8B)
+* [Пример агрегата](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80-%D0%B0%D0%B3%D1%80%D0%B5%D0%B3%D0%B0%D1%82%D0%B0)
+* [Доступные методы](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%94%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D1%8B%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B)
+* [Жизненный цикл](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%96%D0%B8%D0%B7%D0%BD%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9-%D1%86%D0%B8%D0%BA%D0%BB)
+* [Работа с индексами](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%A0%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D1%81-%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D0%B0%D0%BC%D0%B8)
+* [Работа со снимками](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%A0%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D1%81%D0%BE-%D1%81%D0%BD%D0%B8%D0%BC%D0%BA%D0%B0%D0%BC%D0%B8)
+* [Примеры кода](https://github.com/mmasiukevich/service-bus/blob/develop/doc/event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B-%D0%BA%D0%BE%D0%B4%D0%B0)
 
 #### Что такое Event Sourcing
 Классическая схема работы работы предполагает то, что в базе у нас хранится именно конечное состояние агрегата.
@@ -38,13 +39,18 @@
 #### Проблемы
 Существует несколько проблем данного подхода.
 Во-первых, это избыточность данных. Мы храним огромное кол-во ненормализованных данных (событий).
-Во-вторых, необходимо затратить ресурсы на конвертацию потока событий в агрегат
+Во-вторых, необходимо затратить ресурсы на конвертацию потока событий в агрегат. 
 В-третьих, у нас нет возможности искать по каким-либо полям (ведь полей у нас нет. Есть лишь сериализованное представление события)
 
 #### Снимки (Snapshot)
 Для решения проблемы, связанной с необходимостью накладывать множество событий на агрегат используются снимки.
 Снимок - сериализованное представление агрегата какой-либо версии (например, 10)
 Когда в следующий раз мы захотим получить текущее состояние агрегата для версии 20, нам не обязательно накладывать все предшествующие 20 событий. Достаточно получить снимок 10й версии и применить к нему недостающие события (т.е. ещё 10)
+
+#### Представления (Projections)
+Эффективная работа с Event Sourcing предполагает разделение на 2 интерфейса: write model (наш агрегат) и read model (представление). 
+Представление - это то, с чем будут работать клиенты (например, через API). Оно формируется на основании изменений и в том виде, в котором необходимо. По сути представление - это просто ключ и набор данных, которые были собраны специально под тип запроса.
+Данный подход позволяет полностью исключить из работы все запросы с соединениями, группировками и т.д., ибо данные уже сохранены в том виде, в котором необходимо для использования.
 
 #### Индексы
 Для решения проблемы, связанной с фильтрацией данных можно взять любое key\value хранилище для реализации маппинга.
