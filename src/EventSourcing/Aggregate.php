@@ -86,20 +86,6 @@ abstract class Aggregate
     }
 
     /**
-     * Close aggregate (make it read-only)
-     *
-     * @return void
-     *
-     * @throws \Desperado\ServiceBus\EventSourcing\AttemptToChangeClosedStream
-     */
-    final public function close(): void
-    {
-        $this->raise(
-            AggregateClosed::create((string) $this->id, \get_class($this->id), \get_class($this))
-        );
-    }
-
-    /**
      * Receive id
      *
      * @return AggregateId
@@ -139,6 +125,20 @@ abstract class Aggregate
     final public function version(): int
     {
         return $this->version;
+    }
+
+    /**
+     * Close aggregate (make it read-only)
+     *
+     * @return void
+     *
+     * @throws \Desperado\ServiceBus\EventSourcing\AttemptToChangeClosedStream
+     */
+    final protected function close(): void
+    {
+        $this->raise(
+            AggregateClosed::create((string) $this->id, \get_class($this->id), \get_class($this))
+        );
     }
 
     /**
