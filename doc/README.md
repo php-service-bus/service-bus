@@ -1,1 +1,0 @@
-- [Sagas](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md)
