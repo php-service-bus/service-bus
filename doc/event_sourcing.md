@@ -105,7 +105,7 @@ final class Customer extends Aggregate
 При создании нового агрегата в транспорт будет отправлено событие [AggregateCreated](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateCreated.php), при закрытии агрегата - [AggregateClosed](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateClosed.php)
 
 #### Работа с индексами
-Для работы с индексами используется [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), у которого есть следующие методы (все возвращают объект Promise):
+Для работы с индексами используется [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), у которого есть следующие методы (все возвращают объект [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php)):
 * [get](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L51): Получить сохранённое значение
 * [has](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L85): Было ли значение сохранено
 * [add](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L122): Добавить значение в индекс. По принципу работы схож с методом ```\Memcached:add```: если значения с таким ключём не существовало, вернёт ```true```, в противном случае - ```false```
