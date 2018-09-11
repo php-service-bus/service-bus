@@ -67,18 +67,18 @@ catch(\Throwable $throwable)
 
 ```
 Список параметров окружения:
-- *APP_ENVIRONMENT*: Окружение (*test*, *dev*, *prod*). На текущий момент разница только на уровне компиляции контейнера (сохранять его, или пересоздавать каждый раз (*test*, *dev*))
-- *APP_ENTRY_POINT_NAME*: название точки входа (произвольное название вашего демона)
-- *TRANSPORT_CONNECTION_DSN*: DSN подключения к транспорту. Формат вида ```amqp://user:password@host:port```
-- *DATABASE_CONNECTION_DSN*: DSN подключения к базе данных. Формат вида ```sqlite:///:memory:``` для тестов и ```pgsql://user:password@host:port/database``` для реального использования
-- *LOG_LEVEL*: Уровень логгирования сообщений для логгера по умолчанию (stdOut)
-- *AMP_LOG_COLOR*: (1/0) Нужно ли подсвечивать уровни сообщения разными цветами (в зависимости от уровня применяется свой цвет)
-- *LOG_MESSAGE_PAYLOAD*: Необходимо ли логировать сообщение целиклм, включая заголовки. Если выключено, то данные, содержащиеся в сообщении залогированы не будут. Только факт того, что сообщение было получено\отправлено
-- *TRANSPORT_TOPIC*: Точка входа брокера сообщений. В контексте RabbitMQ - название exchange
-- *TRANSPORT_QUEUE*: Очередь, которую будет слушать демон
-- *TRANSPORT_ROUTING_KEY*: ключ роутинга для сообщений (topic -> queue)
-- *SENDER_DESTINATION_TOPIC*: Точка входа, в которую будут отправляться сообщения
-- *SENDER_DESTINATION_TOPIC_ROUTING_KEY*: Ключ роутинга для отправляемых сообщений
+- ```APP_ENVIRONMENT```: Окружение (*test*, *dev*, *prod*). На текущий момент разница только на уровне компиляции контейнера (сохранять его, или пересоздавать каждый раз (*test*, *dev*))
+- ```APP_ENTRY_POINT_NAME```: название точки входа (произвольное название вашего демона)
+- ```TRANSPORT_CONNECTION_DSN```: DSN подключения к транспорту. Формат вида ```amqp://user:password@host:port```
+- ```DATABASE_CONNECTION_DSN```: DSN подключения к базе данных. Формат вида ```sqlite:///:memory:``` для тестов и ```pgsql://user:password@host:port/database``` для реального использования
+- ```LOG_LEVEL```: Уровень логгирования сообщений для логгера по умолчанию (stdOut)
+- ```AMP_LOG_COLOR```: (1/0) Нужно ли подсвечивать уровни сообщения разными цветами (в зависимости от уровня применяется свой цвет)
+- ```LOG_MESSAGE_PAYLOAD```: Необходимо ли логировать сообщение целиклм, включая заголовки. Если выключено, то данные, содержащиеся в сообщении залогированы не будут. Только факт того, что сообщение было получено\отправлено
+- ```TRANSPORT_TOPIC```: Точка входа брокера сообщений. В контексте RabbitMQ - название exchange
+- ```TRANSPORT_QUEUE```: Очередь, которую будет слушать демон
+- ```TRANSPORT_ROUTING_KEY```: ключ роутинга для сообщений (topic -> queue)
+- ```SENDER_DESTINATION_TOPIC```: Точка входа, в которую будут отправляться сообщения
+- ```SENDER_DESTINATION_TOPIC_ROUTING_KEY```: Ключ роутинга для отправляемых сообщений
 
 При старте демона будут созданы все указанные exchangeы, queueы и проставлены routing keys.
 
@@ -101,3 +101,15 @@ catch(\Throwable $throwable)
 - [createTopic](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L120): Создаёт exchange (если не существует)
 - [bindQueue](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L155): Привязывает очередь к exchange
 - [bindTopic](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L140): Привязывает exchange к exchange
+
+**Важно**: при старте приложения не создаётся схема базы данных. Это отдано на откуп пользователям.
+Доступные для SQL фикстуры:
+- [extensions.sql](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/EventStreamStore/Sql/schema/extensions.sql)
+- [event_store_stream.sql](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/EventStreamStore/Sql/schema/event_store_stream.sql)
+- [event_store_stream_events.sql](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/EventStreamStore/Sql/schema/event_store_stream_events.sql)
+- [event_store_snapshots.sql](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/EventStreamStore/Sql/schema/event_store_snapshots.sql)
+- [indexes.sql](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/EventStreamStore/Sql/schema/indexes.sql)
+- [sagas_store.sql](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/SagaStore/Sql/schema/sagas_store.sql)
+- [indexes.sql](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/SagaStore/Sql/schema/indexes.sql)
+- [scheduler_registry.sql](https://github.com/mmasiukevich/service-bus/blob/master/src/Scheduler/Store/Sql/schema/scheduler_registry.sql)
+- [event_sourcing_indexes.sql](https://github.com/mmasiukevich/service-bus/blob/master/src/Index/Storage/Sql/schema/event_sourcing_indexes.sql)
