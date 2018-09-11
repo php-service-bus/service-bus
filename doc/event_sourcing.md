@@ -108,7 +108,7 @@ final class Customer extends Aggregate
 Для работы с индексами используется [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), у которого есть следующие методы (все возвращают объект Promise):
 * [get](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L51): Получить сохранённое значение
 * [has](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L85): Было ли значение сохранено
-* [add](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L122): Добавить значение в индекс. По принципу работы схож с методом ```\Memcached:add```: если значения с таким ключём не существовало, вернёт ```true``, в противном случае - ```false```
+* [add](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L122): Добавить значение в индекс. По принципу работы схож с методом ```\Memcached:add```: если значения с таким ключём не существовало, вернёт ```true```, в противном случае - ```false```
 * [remove](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L160): Удаляет сохранённое значение
 * [update](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L177): Обновляет сохранённое значение
 
