@@ -6,4 +6,35 @@
 [![Total Downloads](https://poser.pugx.org/mmasiukevich/service-bus/downloads)](https://packagist.org/packages/mmasiukevich/service-bus)
 [![License](https://poser.pugx.org/mmasiukevich/service-bus/license)](https://packagist.org/packages/mmasiukevich/service-bus)
 
-### Still in development. Currently not suitable for use
+## What is it?
+Фреймворк, позволяющий реализовать асинхронный обмен сообщениями, прозрачный workflow, а так же контроль долгоживущих бизнесс процессов благодаря применению паттерна Saga. 
+Основан на **[message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html)** и включает реализацию следующих паттернов: Saga, CQRS, Publish\subscribe, Message bus
+
+#### Scope of use
+Главным образом подходит для реализации распределённых систем. Благодаря применению шины сообщений и паттерна Saga позволяет если и не убрать полностью, то по крайней мере серьёзно уменьшить связь отдельных контекстов
+
+#### Main Features
+ - Асинхронное выполнение сообщений
+ - Распределённость (Сообщения могут обрабатываться разными процессами)
+   - Подписчики могут быть написаны на любом языке программирования
+ - Аркестрация долгоживущих бизнесс процессов (например, выполнение процесса оформления заказа в интернет магазине) с помощью [Saga Pattern](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md)
+ - Полная история изменения агрегата благодаря применению [EventSourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md)
+ - Уменьшение связанности между компонентами (контекстами) приложения
+
+#### Documentation 
+- [EventSourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md)
+- [Sagas](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md)
+- [Messages (Command/Event/Query)](https://github.com/mmasiukevich/service-bus/blob/master/doc/messages.md)
+- [Processing of messages](https://github.com/mmasiukevich/service-bus/blob/master/doc/massage_handlers.md)
+- [Initialization](https://github.com/mmasiukevich/service-bus/blob/master/doc/initialization.md)
+
+#### Requirements 
+  - PHP 7.2
+
+## Security
+
+If you discover any security related issues, please email [`desperado@minsk-info.ru`](mailto:desperado@minsk-info.ru) instead of using the issue tracker.
+
+## License
+
+The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
