@@ -98,19 +98,19 @@ final class Customer extends Aggregate
 ```
 #### Доступные методы
 В рамках агрегата доступны следуюшие защищённые методы:
-* [close](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L137): Аналог soft delete. Мы не удаляем весь поток событий, лишь помечаем его закрытым. Закрытый поток нельзя получить, и, как следствие, изменить
-* [raise](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L107): Применение события к агрегату. Именование обработчиков событий происходит по шаблону ```on{ClassName}```, где *on* - префикс, *{ClassName}* - базовое название класса события 
+* [close()](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L137): Аналог soft delete. Мы не удаляем весь поток событий, лишь помечаем его закрытым. Закрытый поток нельзя получить, и, как следствие, изменить
+* [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L107): Применение события к агрегату. Именование обработчиков событий происходит по шаблону ```on{ClassName}```, где *on* - префикс, *{ClassName}* - базовое название класса события 
 
 #### Жизненный цикл
 При создании нового агрегата в транспорт будет отправлено событие [AggregateCreated](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateCreated.php), при закрытии агрегата - [AggregateClosed](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateClosed.php)
 
 #### Работа с индексами
 Для работы с индексами используется [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), у которого есть следующие методы (все возвращают объект [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php)):
-* [get](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L51): Получить сохранённое значение
-* [has](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L85): Было ли значение сохранено
-* [add](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L122): Добавить значение в индекс. По принципу работы схож с методом ```\Memcached:add```: если значения с таким ключём не существовало, вернёт ```true```, в противном случае - ```false```
-* [remove](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L160): Удаляет сохранённое значение
-* [update](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L177): Обновляет сохранённое значение
+* [get()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L51): Получить сохранённое значение
+* [has()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L85): Было ли значение сохранено
+* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L122): Добавить значение в индекс. По принципу работы схож с методом ```\Memcached:add```: если значения с таким ключём не существовало, вернёт ```true```, в противном случае - ```false```
+* [remove()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L160): Удаляет сохранённое значение
+* [update()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L177): Обновляет сохранённое значение
 
 #### Работа со снимками
 По умолчанию реализована лишь 1 стратегия генерации снимков - [SnapshotVersionTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcingSnapshots/Trigger/SnapshotVersionTrigger.php), основанная на версиях (создавать снимок каждые N версий). Снимки создаются автоматически, за исключением выбора стратегии (реализовать свои можно с помощью интерфейса [SnapshotTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcingSnapshots/Trigger/SnapshotTrigger.php)) никаких настроект не требуется
