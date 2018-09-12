@@ -6,7 +6,7 @@
 * [Конфигурация](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D1%8F)
 * [Жизненный цикл](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%96%D0%B8%D0%B7%D0%BD%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9-%D1%86%D0%B8%D0%BA%D0%BB)
 * [Создание](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5)
-* [Примеры кода](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80)
+* [Примеры кода](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B-%D0%BA%D0%BE%D0%B4%D0%B0)
 
 #### Что такое саги
 Какой-либо описанный бизнесс процесс. Если провести аналогию на что-то попроще, то сага - это Event Listener. Она ждёт какое-либо [событие](https://github.com/mmasiukevich/service-bus/blob/master/doc/messages.md#%D0%A1%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D1%8F-event) и на основании него выполняет действие.
@@ -24,12 +24,12 @@
 Любую незакрытую сагу можно запустить с любого из её шагов, отправив в транспорт соответствующее шагу событие.
 
 #### Минусы при использовании
-С ростом кол-ва саг (ровно как и шагов в них) возрастает требования к документации всего процесса. Одна сага может запускать другие, что ещё сильнее увеличивает сложность понимания.
+С ростом количества саг (ровно как и шагов в них) возрастает требования к документации всего процесса. Одна сага может запускать другие, что ещё сильнее увеличивает сложность понимания.
 [Message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) непривычна в начале и требует довольно ответственного подхода.
 
 
 #### Конфигурация
-Конфигурация саг указывается в аннотациях [@SagaHeader](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaHeader.php) и [@SagaEventListener()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaEventListener.php) соответсвенно
+Конфигурация саг указывается в аннотациях [@SagaHeader](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaHeader.php) и [@SagaEventListener](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaEventListener.php) соответсвенно
  - ```idClass```: Пространство имён класса идентификатора саги.
  - ```expireDateModifier```: Интервал времени, в течение которого сага будет считаться открытой
  - ```containingIdProperty```: Поле, в которм будет передаваться идентификатор саги. В нашем примере это поле называется *operationId*. Для того, что бы привязать событие к конкретной саге (ведь одно и то же событие может ждать несколько саг),  нужно передавать идентификатор. Данная опция указывает на то, какое свойство события содержит этот идентификатор. Параметр можно переопределить в рамках конкретного слушателя, указав в аннотации @SagaEventListener нужное значение.
