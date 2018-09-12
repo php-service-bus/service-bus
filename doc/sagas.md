@@ -25,7 +25,7 @@
 
 #### Минусы при использовании
 С ростом кол-ва саг (ровно как и шагов в них) возрастает требования к документации всего процесса. Одна сага может запускать другие, что ещё сильнее увеличивает сложность понимания.
-[Message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) довольна непривычна в начале и требует довольно ответственного подхода.
+[Message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) непривычна в начале и требует довольно ответственного подхода.
 
 
 #### Конфигурация
