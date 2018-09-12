@@ -24,24 +24,24 @@
 #### Инциализация
 За первоначальную инциализацию приложения отвечает объект класса [Bootstrap](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php). На выбор доступны 2 варианта создания объекта: метод [withDotEnv](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L49) загрузит параметры окружения из указанного файла; [withEnvironmentValues](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L99) предполагает, что параметры окружения уже загружены кем-то
 Помимо всего прочего, доступны следующие методы:
-- [enableAutoImportSagas](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L67): Сканирует файлы проекта и автоматически регистрирует все найденные саги
-- [enableAutoImportMessageHandlers](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L85): Сканирует файлы проекта и автоматически регистрирует все найденные обработчики сообщений
-- [useAmqpExtTransport](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L121): Конфигурирует RabbitMQ транспорт
-- [useSqlStorage](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L141): Конфигурация SQL базы данных
-- [useCustomCacheDirectory](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L159): Если не указан, то будет использования к директории по умолчанию (sys_get_temp_dir)
-- [importParameters](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L173): Импортирует параметры в DI-контейнера
-- [addExtensions](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L185): Регистрирует пользовательский [Extension](https://symfony.com/doc/current/bundles/extension.html) в DI-контейнере
-- [addCompilerPasses](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L199): Регистрирует пользовательский [CompilerPass](https://symfony.com/doc/current/service_container/compiler_passes.html)
-- [boot](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L107): Компилирует DI-контейнер
+- [enableAutoImportSagas()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L67): Сканирует файлы проекта и автоматически регистрирует все найденные саги
+- [enableAutoImportMessageHandlers()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L85): Сканирует файлы проекта и автоматически регистрирует все найденные обработчики сообщений
+- [useAmqpExtTransport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L121): Конфигурирует RabbitMQ транспорт
+- [useSqlStorage()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L141): Конфигурация SQL базы данных
+- [useCustomCacheDirectory()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L159): Если не указан, то будет использования к директории по умолчанию (sys_get_temp_dir)
+- [importParameters()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L173): Импортирует параметры в DI-контейнера
+- [addExtensions()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L185): Регистрирует пользовательский [Extension](https://symfony.com/doc/current/bundles/extension.html) в DI-контейнере
+- [addCompilerPasses()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L199): Регистрирует пользовательский [CompilerPass](https://symfony.com/doc/current/service_container/compiler_passes.html)
+- [boot()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L107): Компилирует DI-контейнер
 
 #### Конфигурация транспорта
 За конфигурацию транспортного уровня отвечает [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), в котором доступен [TransportConfigurator](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php)
-- [addDefaultDestinations](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L61): Регистрация маршрута доставки сообщений по умолчанию
-- [registerCustomMessageDestinations](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L80): Регистрирует специфичный маршрут доставки для сообщения
-- [addQueue](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L99): Создаёт новую очередь (если не существует)
-- [createTopic](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L120): Создаёт exchange (если не существует)
-- [bindQueue](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L155): Привязывает очередь к exchange
-- [bindTopic](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L140): Привязывает exchange к exchange
+- [addDefaultDestinations()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L61): Регистрация маршрута доставки сообщений по умолчанию
+- [registerCustomMessageDestinations()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L80): Регистрирует специфичный маршрут доставки для сообщения
+- [addQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L99): Создаёт новую очередь (если не существует)
+- [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L120): Создаёт exchange (если не существует)
+- [bindQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L155): Привязывает очередь к exchange
+- [bindTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L140): Привязывает exchange к exchange
 
 #### Создание схемы базы данных
 **Важно**: при старте приложения не создаётся схема базы данных. Это отдано на откуп пользователям.

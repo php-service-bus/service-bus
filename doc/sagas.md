@@ -1,15 +1,32 @@
 Оглавление
 * [Что такое саги](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%A7%D1%82%D0%BE-%D1%82%D0%B0%D0%BA%D0%BE%D0%B5-%D1%81%D0%B0%D0%B3%D0%B8)
+* [Область применения](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%9E%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F)
+* [Особенности реализации](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%9E%D1%81%D0%BE%D0%B1%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D0%B8-%D1%80%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8)
+* [Минусы при использовании](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%9C%D0%B8%D0%BD%D1%83%D1%81%D1%8B-%D0%BF%D1%80%D0%B8-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B8)
 * [Конфигурация](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D1%8F)
 * [Жизненный цикл](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%96%D0%B8%D0%B7%D0%BD%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9-%D1%86%D0%B8%D0%BA%D0%BB)
 * [Создание](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5)
 * [Примеры кода](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80)
 
 #### Что такое саги
-Сага - какой-либо описанный бизнесс процесс. 
-Например, процесс чекаута в интернет магазине. Он состоит из нескольких шагов, которые могут быть выполнены сразу, а могут быть в течение неопределённого времени.
-Так же саги можно использовать в качестве распределённых транзакций (эмулируя Atomicity)
+Какой-либо описанный бизнесс процесс. Если провести аналогию на что-то попроще, то сага - это Event Listener. Она ждёт какое-либо [событие](https://github.com/mmasiukevich/service-bus/blob/master/doc/messages.md#%D0%A1%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D1%8F-event) и на основании него выполняет действие.
+Самый яркий пример - блок-схема: есть условие, есть действие. 
+
+Саги бывают синхронные, асинхронные и смешанные (в которых часть шагов может выполняться синхронно, а часть асинхронно). По личному опыту, только асинхронный вариант является хоть сколько-нибудь оправданным.
+
 Более подробное описание: [Pattern: Saga](https://microservices.io/patterns/data/saga.html)
+#### Область применения
+* Описание сложных процессов. Хороший пример - электронный документооборот. Передача документа от одной к компании к другой может занимать минуты, дни, недели... сам процесс состоит из десятка пунктов, включаящих 3 электронные подписи сторон (3-я сторона - оператор)
+* Рапспределённые транзакции (эмулирует Atomicity): либо успешно завершаются все шаги, либо будет выполнено какое-либо компенсирующее действие, которое отменит изменения.
+
+#### Особенности реализации
+Саги всегда асинхронные и могут иметь состояние. Оно хранится в базе данных в сериализованном виде. Вы можете использовать любые переменные (за исключением переменных, содержащих замыкания).
+Любую незакрытую сагу можно запустить с любого из её шагов, отправив в транспорт соответствующее шагу событие.
+
+#### Минусы при использовании
+С ростом кол-ва саг (ровно как и шагов в них) возрастает требования к документации всего процесса. Одна сага может запускать другие, что ещё сильнее увеличивает сложность понимания.
+[Message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) непривычна в начале и требует довольно ответственного подхода.
+
 
 #### Конфигурация
 Конфигурация саг указывается в аннотациях [@SagaHeader](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaHeader.php) и [@SagaEventListener()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaEventListener.php) соответсвенно

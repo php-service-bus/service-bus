@@ -8,7 +8,7 @@
 
 ## What is it?
 Фреймворк, позволяющий реализовать асинхронный обмен сообщениями, прозрачный workflow, а так же контроль долгоживущих бизнесс процессов благодаря применению паттерна Saga. 
-Основан на **[message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html)** и включает реализацию следующих паттернов: Saga, CQRS, Publish\subscribe, Message bus
+Основан на [message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) и включает реализацию следующих паттернов: Saga, CQRS, Publish\subscribe, Message bus
 
 #### Scope of use
 Главным образом подходит для реализации распределённых систем. Благодаря применению шины сообщений и паттерна Saga позволяет если и не убрать полностью, то по крайней мере серьёзно уменьшить связь отдельных контекстов
