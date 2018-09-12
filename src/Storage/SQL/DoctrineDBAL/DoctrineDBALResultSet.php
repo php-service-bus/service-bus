@@ -60,6 +60,13 @@ final class DoctrineDBALResultSet implements ResultSet
     private $connection;
 
     /**
+     * Number of rows affected by the last DELETE, INSERT, or UPDATE statement
+     *
+     * @var int
+     */
+    private $affectedRows;
+
+    /**
      * @param Connection $connection
      * @param Statement  $wrappedStmt
      */
@@ -67,6 +74,7 @@ final class DoctrineDBALResultSet implements ResultSet
     {
         $this->connection   = $connection;
         $this->fetchResult  = $wrappedStmt->fetchAll();
+        $this->affectedRows = $wrappedStmt->rowCount();
         $this->resultsCount = \count($this->fetchResult);
     }
 
@@ -104,5 +112,13 @@ final class DoctrineDBALResultSet implements ResultSet
     public function lastInsertId(?string $sequence = null): ?string
     {
         return $this->connection->lastInsertId($sequence);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rowsCount(): int
+    {
+        return $this->affectedRows;
     }
 }

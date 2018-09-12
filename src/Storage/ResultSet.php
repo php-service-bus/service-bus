@@ -55,4 +55,13 @@ interface ResultSet
      * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
      */
     public function lastInsertId(?string $sequence = null);
+
+    /**
+     * Returns the number of rows affected by the last DELETE, INSERT, or UPDATE statement executed
+     *
+     * @return int
+     *
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
+     */
+    public function rowsCount(): int;
 }

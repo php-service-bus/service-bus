@@ -353,6 +353,71 @@ abstract class BaseStorageAdapterTest extends TestCase
     }
 
     /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function rowsCount(): void
+    {
+        $handler = static function(BaseStorageAdapterTest $self): \Generator
+        {
+            try
+            {
+                $adapter = static::getAdapter();
+
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
+                $result = yield $adapter->execute(
+                    'INSERT INTO storage_test_table (id, identifier_class) VALUES (?, ?), (?, ?)',
+                    [
+                        '77961031-fd0f-4946-b439-dfc2902b961a', 'SomeIdentifierClass',
+                        '77961031-fd0f-4946-b439-dfc2902b961d', 'SomeIdentifierClass'
+                    ]
+                );
+
+                static::assertSame(2, $result->rowsCount());
+
+                unset($result);
+
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
+                $result = yield $adapter->execute(
+                    'DELETE FROM storage_test_table where id = \'77961031-fd0f-4946-b439-dfc2902b961d\''
+                );
+
+                static::assertSame(1, $result->rowsCount());
+
+                unset($result);
+
+                yield $adapter->execute('DELETE FROM storage_test_table');
+
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
+                $result = yield $adapter->execute('DELETE FROM storage_test_table');
+
+                static::assertSame(0, $result->rowsCount());
+
+                unset($result);
+
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
+                $result = yield $adapter->execute(
+                    'SELECT * FROM storage_test_table where id = \'77961031-fd0f-4946-b439-dfc2902b961d\''
+                );
+
+                static::assertSame(0, $result->rowsCount());
+
+                unset($result);
+            }
+            catch(\Throwable $throwable)
+            {
+                /** @noinspection StaticInvocationViaThisInspection */
+                $self->fail($throwable->getMessage());
+            }
+        };
+
+        wait(new Coroutine($handler($this)));
+    }
+
+    /**
      * @param StorageAdapter $adapter
      *
      * @return Promise

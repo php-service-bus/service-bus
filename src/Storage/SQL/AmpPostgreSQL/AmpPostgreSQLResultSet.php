@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL;
 
+use Amp\Postgres\PgSqlCommandResult;
 use Amp\Promise;
 use Amp\Sql\PooledResultSet;
 use Amp\Success;
@@ -98,6 +99,28 @@ class AmpPostgreSQLResultSet implements ResultSet
             }
 
             return null;
+        }
+            // @codeCoverageIgnoreStart
+        catch(\Throwable $throwable)
+        {
+            throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+        }
+        // @codeCoverageIgnoreEnd
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rowsCount(): int
+    {
+        try
+        {
+            if($this->originalResultSet instanceof PgSqlCommandResult)
+            {
+                return $this->originalResultSet->affectedRows();
+            }
+
+            return 0;
         }
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
