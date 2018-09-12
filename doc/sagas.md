@@ -29,7 +29,7 @@
 
 
 #### Конфигурация
-Конфигурация саг указывается в аннотациях [@SagaHeader](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaHeader.php) и [@SagaEventListener()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaEventListener.php) соответсвенно
+Конфигурация саг указывается в аннотациях [@SagaHeader](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaHeader.php) и [@SagaEventListener](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Annotations/SagaEventListener.php) соответсвенно
  - **idClass**: Пространство имён класса идентификатора саги.
  - **expireDateModifier**: Интервал времени, в течение которого сага будет считаться открытой
  - **containingIdProperty**: Поле, в которм будет передаваться идентификатор саги. В нашем примере это поле называется *operationId*. Для того, что бы привязать событие к конкретной саге (ведь одно и то же событие может ждать несколько саг),  нужно передавать идентификатор. Данная опция указывает на то, какое свойство события содержит этот идентификатор. Параметр можно переопределить в рамках конкретного слушателя, указав в аннотации @SagaEventListener нужное значение.
