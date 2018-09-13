@@ -27,6 +27,7 @@
 - [Sagas](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md)
 - [Messages (Command/Event/Query)](https://github.com/mmasiukevich/service-bus/blob/master/doc/messages.md)
 - [Processing of messages](https://github.com/mmasiukevich/service-bus/blob/master/doc/massage_handlers.md)
+- [Database adapters](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md)
 
 #### Requirements
   - PHP 7.2
