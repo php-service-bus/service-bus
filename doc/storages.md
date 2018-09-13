@@ -1,11 +1,11 @@
 Оглавление
-* [Пулы соединений]()
-* [Интерфейс StorageAdapter]()
-* [Адаптер для работы с PostgreSQL]()
-* [Адаптер для работы с DoctrineDBAL (используется только для тестирования)]()
-* [Транзакции]()
-* [Обработка результатов запросов]()
-* [QueryBuilder]()
+* [Пулы соединений](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md#%D0%9F%D1%83%D0%BB%D1%8B-%D1%81%D0%BE%D0%B5%D0%B4%D0%B8%D0%BD%D0%B5%D0%BD%D0%B8%D0%B9)
+* [Интерфейс StorageAdapter](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md#storageadapter)
+* [Адаптер для работы с PostgreSQL](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md#%D0%90%D0%B4%D0%B0%D0%BF%D1%82%D0%B5%D1%80-%D0%B4%D0%BB%D1%8F-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B-%D1%81-postgresql)
+* [Адаптер для работы с DoctrineDBAL (используется только для тестирования)](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md#%D0%90%D0%B4%D0%B0%D0%BF%D1%82%D0%B5%D1%80-%D0%B4%D0%BB%D1%8F-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B-%D1%81-doctrinedbal)
+* [Транзакции](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md#%D0%A2%D1%80%D0%B0%D0%BD%D0%B7%D0%B0%D0%BA%D1%86%D0%B8%D0%B8)
+* [Обработка результатов запросов](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md#resultset)
+* [QueryBuilder](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md#querybuilder)
 
 # Пулы соединений
 
@@ -32,8 +32,8 @@
 
 #### Транзакции
 Транзакции представлены в виде интерфейса [TransactionAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/TransactionAdapter.php)
-Для адаптера [AmpPostgreSQLAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/AmpPostgreSQL/AmpPostgreSQLAdapter.php) используется уровень сериализации [Read Committed](https://postgrespro.com/docs/postgrespro/9.5/transaction-iso#xact-read-committed). Каждая транзакция выполняется в рамках своего подключения к базе данных (получается из пула соединений)
-В [DoctrineDBALAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/DoctrineDBAL/DoctrineDBALAdapter.php) транзакции реализованы только в целях совместимости и, опять-таки, для тестирования. Уровень изоляции транзакций зависит от значения по умолчанию у выбранного драйвера
+Для адаптера [AmpPostgreSQLAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/AmpPostgreSQL/AmpPostgreSQLAdapter.php) используется уровень изоляции [Read Committed](https://postgrespro.com/docs/postgrespro/9.5/transaction-iso#xact-read-committed). Каждая транзакция выполняется в рамках своего подключения к базе данных (получается из пула соединений). 
+В [DoctrineDBALAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/DoctrineDBAL/DoctrineDBALAdapter.php) реализованы только в целях совместимости и, опять-таки, для тестирования. Уровень изоляции зависит от значения по умолчанию у выбранного драйвера
 
 #### ResultSet
 
