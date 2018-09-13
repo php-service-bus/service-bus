@@ -9,12 +9,12 @@
 
 #### Введение
 Все обработчики представлены в виде публичных методов класса, у которых есть 2 обязательных аргумента (идущих первыми):
-* Объект сообщения (Реализующего интерфейс [Command](https://github.com/mmasiukevich/service-bus/blob/master/src/Common/Contract/Messages/Command.php) или [Event](https://github.com/mmasiukevich/service-bus/blob/master/src/Common/Contract/Messages/Event.php)). [Подробнее о сообщениях](https://github.com/mmasiukevich/service-bus/blob/master/doc/messages.md)
+* Объект сообщения (реализующего интерфейс [Command](https://github.com/mmasiukevich/service-bus/blob/master/src/Common/Contract/Messages/Command.php) или [Event](https://github.com/mmasiukevich/service-bus/blob/master/src/Common/Contract/Messages/Event.php)). [Подробнее о сообщениях](https://github.com/mmasiukevich/service-bus/blob/master/doc/messages.md)
 * Объект [KernelContext](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/KernelContext.php). [Побробнее про контекст](https://github.com/mmasiukevich/service-bus/blob/master/doc/context.md)
 
 Методы могут возвращать void, \Generator и [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php)
 Название методов с точки зрения инфраструктуры значения не имеет.
-В классе могут содержаться вспомогательные методы, которые не помечены, как обработчики
+В классе могут содержаться вспомогательные методы, которые не помечены как обработчики
 
 #### Конфигурация
 В [примере инициализации](https://github.com/mmasiukevich/service-bus/blob/master/doc/initialization.md) указан вариант автоматической регистрации всех обработчиков. Если по каким-либо причинам автоматическая регистрация не подходит, вы можете описать класс в виде сервиса, добавив ему тег ```service_bus.service``` (без значения)
