@@ -41,13 +41,13 @@
 * [advance](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L37): возвращает true, если в итераторе есть значение, которое можно получить в методе [getCurrent()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L46)
 * [getCurrent()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L46): возвращает текущий элемент
 * [lastInsertId()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L57): Возвращает идентификатор последней добавленной записи
-  * Для PostgreSQL необходимо воспользоваться конструкцией [RETURNING](https://www.postgresql.org/docs/9.1/static/sql-insert.html), вернув поле ```id``` (именования важно)
+  * Для PostgreSQL необходимо воспользоваться конструкцией [RETURNING](https://www.postgresql.org/docs/9.1/static/sql-insert.html), вернув поле ```id``` (именование важно)
 * [rowsCount](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L66): Возвращает кол-во строк, которое было затронуто операциями INSERT/UPDATE/DELETE
 
-Для упрощения работы с результатами есть вспомогательные функции, которые позволяют получить результат в виде массива:  [fetchOne()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/functions.php#L59), и [fetchAll()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/functions.php#L30)
+Для упрощения работы с результатом есть вспомогательные функции, которые позволяют получить результат в виде массива:  [fetchOne()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/functions.php#L59), и [fetchAll()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/functions.php#L30)
 
 #### QueryBuilder
-Для упрощения работы с SQL используется библиотека [shadowhand/latitude](https://github.com/shadowhand/latitude)
+Для упрощения работы с SQL используется библиотека [shadowhand/latitude](https://github.com/shadowhand/latitude). 
 В рамках приложения поверх неё реализовано несколько функций-помошников:
 
 * [queryBuilder()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/queryBuilderFunctions.php#L29): Создаёт объект билдера запроса для указанного адаптера (по умолчанию PostgreSQL)
