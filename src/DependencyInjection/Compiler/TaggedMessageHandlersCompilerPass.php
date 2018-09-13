@@ -66,6 +66,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
      * @param array            $servicesReference (passed by reference)
      *
      * @return void
+     * @throws \LogicException
      * @throws \ReflectionException
      */
     private function collectServiceDependencies(string $serviceClass, ContainerBuilder $container, array &$servicesReference): void
@@ -85,8 +86,15 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
                 $reflectionType     = $parameter->getType();
                 $reflectionTypeName = $reflectionType->getName();
 
-                if(true === self::supportedType($parameter, $container))
+                if(true === self::supportedType($parameter))
                 {
+                    if(false === $container->has($reflectionTypeName))
+                    {
+                        throw new \LogicException(
+                            \sprintf('The "%s" service was not found in the dependency container', $reflectionTypeName)
+                        );
+                    }
+
                     $servicesReference[$reflectionTypeName] = new ServiceClosureArgument(new Reference($reflectionTypeName));
                 }
             }
@@ -99,7 +107,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
      *
      * @return bool
      */
-    private static function supportedType(\ReflectionParameter $parameter, ContainerBuilder $container): bool
+    private static function supportedType(\ReflectionParameter $parameter): bool
     {
         /** @var \ReflectionType $reflectionType */
         $reflectionType     = $parameter->getType();
@@ -107,7 +115,6 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 
         return (true === \class_exists($reflectionTypeName) || true === \interface_exists($reflectionTypeName)) &&
             false === \is_a($reflectionTypeName, Message::class, true) &&
-            false === \is_a($reflectionTypeName, MessageDeliveryContext::class, true) &&
-            true === $container->has($reflectionTypeName);
+            false === \is_a($reflectionTypeName, MessageDeliveryContext::class, true);
     }
 }

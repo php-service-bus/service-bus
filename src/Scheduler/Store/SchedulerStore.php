@@ -14,6 +14,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Scheduler\Store;
 
 use Amp\Promise;
+use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
+use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 
 /**
  *
@@ -21,22 +23,47 @@ use Amp\Promise;
 interface SchedulerStore
 {
     /**
-     * Load registry
+     * Extract operation (load and delete)
      *
-     * @param string $id
+     * @param ScheduledOperationId $id
+     * @param callable             $postExtractCallback function(ScheduledOperation $operation) {}
      *
-     * @return Promise<\Desperado\ServiceBus\Scheduler\Store\SchedulerRegistry>
+     * @return Promise<\Desperado\ServiceBus\Scheduler\Data\ScheduledOperation|null>
      *
      * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
      */
-    public function load(string $id): Promise;
+    public function extract(ScheduledOperationId $id, callable $postExtractCallback): Promise;
 
     /**
-     * Save new registry
+     * Load next scheduled operation
      *
-     * @param SchedulerRegistry $registry
+     * @return Promise<\Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null>
+     *
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     */
+    public function loadNextOperation(): Promise;
+
+    /**
+     * Remove operation
+     *
+     * @param ScheduledOperationId $id
+     *
+     * @return Promise<bool>
+     *
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     */
+    public function remove(ScheduledOperationId $id): Promise;
+
+    /**
+     * Save new operation
+     *
+     * @param ScheduledOperation $operation
      *
      * @return Promise<null>
      *
@@ -45,18 +72,5 @@ interface SchedulerStore
      * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
      */
-    public function add(SchedulerRegistry $registry): Promise;
-
-    /**
-     * Update registry
-     *
-     * @param SchedulerRegistry $registry
-     *
-     * @return Promise<null>
-     *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
-     */
-    public function update(SchedulerRegistry $registry): Promise;
+    public function add(ScheduledOperation $operation): Promise;
 }

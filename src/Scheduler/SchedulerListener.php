@@ -167,6 +167,6 @@ final class SchedulerListener
             $executionDelay = \abs($executionDelay);
         }
 
-        return $executionDelay;
+        return $executionDelay * 1000;
     }
 }

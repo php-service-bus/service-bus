@@ -16,6 +16,7 @@ namespace Desperado\ServiceBus\Tests\DependencyInjection\Compiler;
 use Desperado\ServiceBus\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use Desperado\ServiceBus\Scheduler\SchedulerListener;
+use Desperado\ServiceBus\SchedulerProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -34,6 +35,8 @@ final class ImportMessageHandlersCompilerPassTest extends TestCase
     public function process(): void
     {
         $containerBuilder = new ContainerBuilder();
+
+        $containerBuilder->register(SchedulerProvider::class);
 
         (new ImportMessageHandlersCompilerPass([__DIR__ . '/../../../src'], []))->process($containerBuilder);
         (new TaggedMessageHandlersCompilerPass())->process($containerBuilder);
