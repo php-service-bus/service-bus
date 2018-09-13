@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Scheduler\Data;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
+use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 
 /**
@@ -43,13 +44,6 @@ final class ScheduledOperation
     private $date;
 
     /**
-     * Is command sent
-     *
-     * @var bool
-     */
-    private $isSent = false;
-
-    /**
      * @param ScheduledOperationId $id
      * @param Command              $command
      * @param \DateTimeImmutable   $dateTime
@@ -62,16 +56,23 @@ final class ScheduledOperation
     }
 
     /**
-     * Sent job
+     * @param array<id:string, processing_date:string, command:string> $data
      *
-     * @return self
+     * @return ScheduledOperation
      */
-    public function sent(): self
+    public static function fromRow(array $data): self
     {
-        $self         = new self($this->id, $this->command, $this->date);
-        $self->isSent = true;
+        /** @var \DateTimeImmutable $dateTime */
+        $dateTime = datetimeInstantiator($data['processing_date']);
 
-        return $self;
+        /** @var Command $command */
+        $command = \unserialize(\base64_decode($data['command']), ['allowed_classes' => true]);
+
+        return new self(
+            new ScheduledOperationId($data['id']),
+            $command,
+            $dateTime
+        );
     }
 
     /**
@@ -102,15 +103,5 @@ final class ScheduledOperation
     public function date(): \DateTimeImmutable
     {
         return $this->date;
-    }
-
-    /**
-     * Is command sent
-     *
-     * @return bool
-     */
-    public function isSent(): bool
-    {
-        return $this->isSent;
     }
 }

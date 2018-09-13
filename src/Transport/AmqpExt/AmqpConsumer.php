@@ -99,6 +99,8 @@ final class AmqpConsumer implements Consumer
 
         try
         {
+            self::setupReturnCallback($this->listenQueue->getChannel(), $this->logger);
+
             $this->listenQueue->consume(
                 function(\AMQPEnvelope $envelope) use ($processor): void
                 {
@@ -329,6 +331,41 @@ final class AmqpConsumer implements Consumer
 
             }
         }
+    }
+
+    /**
+     * Handle basic.return
+     *
+     * @param \AMQPChannel    $channel
+     * @param LoggerInterface $logger
+     *
+     * @return void
+     */
+    private static function setupReturnCallback(\AMQPChannel $channel, LoggerInterface $logger): void
+    {
+        $handler = static function(
+            int $code, string $description, string $exchange, ?string $routingKey,
+            \AMQPBasicProperties $properties, string $originalBody
+        ) use ($logger): void
+        {
+            $headers = $properties->getHeaders();
+
+            /** Scheduled messages have this heading and somehow get here. Not consider them */
+            if(false === isset($headers['x-delay']))
+            {
+                $logger->critical(
+                    'The message was not delivered to the exchange "{exchange}/{routingKey}" due to "{returnReason}" (reason code "{returnCode}"', [
+                        'exchange'        => $exchange,
+                        'routingKey'      => $routingKey,
+                        'returnReason'    => $description,
+                        'returnCode'      => $code,
+                        'originalMessage' => $originalBody
+                    ]
+                );
+            }
+        };
+
+        $channel->setReturnCallback($handler);
     }
 
     /**

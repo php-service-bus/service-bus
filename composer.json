@@ -56,6 +56,7 @@
     "symfony/validator": "v4.1",
     "phpdocumentor/reflection-docblock": "^4.0",
     "doctrine/annotations": "v1.6.0",
+    "doctrine/cache": "v1.8.0",
     "guzzlehttp/psr7": "1.4.2",
     "latitude/latitude": "^3.1"
   },

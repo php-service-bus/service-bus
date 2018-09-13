@@ -38,7 +38,7 @@
 Для работы с результатом выполнения [execute()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/StorageAdapter.php#L35) используется [ResultSet](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php)
 По сути представляет собой итератор с несколькими дополнительными методами:
 
-* [advance](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L37): возвращает true, если в итераторе есть значение, которое можно получить в методе [getCurrent()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L46)
+* [advance()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L37): возвращает true, если в итераторе есть значение, которое можно получить в методе [getCurrent()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L46)
 * [getCurrent()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L46): возвращает текущий элемент
 * [lastInsertId()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L57): Возвращает идентификатор последней добавленной записи
   * Для PostgreSQL необходимо воспользоваться конструкцией [RETURNING](https://www.postgresql.org/docs/9.1/static/sql-insert.html), вернув поле ```id``` (именование важно)

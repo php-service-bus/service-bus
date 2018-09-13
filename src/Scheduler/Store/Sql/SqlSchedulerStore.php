@@ -13,16 +13,21 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Scheduler\Store\Sql;
 
+use function Amp\asyncCall;
 use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
-use Desperado\ServiceBus\Scheduler\Store\SchedulerRegistry;
+use function Desperado\ServiceBus\Common\datetimeInstantiator;
+use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
+use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
+use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
+use function Desperado\ServiceBus\Common\datetimeToString;
 use function Desperado\ServiceBus\Storage\fetchOne;
+use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
 use function Desperado\ServiceBus\Storage\SQL\insertQuery;
 use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Storage\SQL\selectQuery;
-use function Desperado\ServiceBus\Storage\SQL\updateQuery;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 
 /**
@@ -44,81 +49,150 @@ final class SqlSchedulerStore implements SchedulerStore
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function load(string $id): Promise
+    public function add(ScheduledOperation $operation): Promise
     {
         $adapter = $this->adapter;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(string $id) use ($adapter): \Generator
+            static function(ScheduledOperation $operation) use ($adapter): \Generator
             {
-                $registry = null;
+                /** @psalm-suppress ImplicitToStringCast */
+                $query = insertQuery('scheduler_registry', [
+                    'id'              => (string) $operation->id(),
+                    'processing_date' => datetimeToString($operation->date()),
+                    'command'         => \base64_encode(\serialize($operation->command()))
+                ])->compile();
 
+                yield $adapter->execute($query->sql(), $query->params());
+            },
+            $operation
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function extract(ScheduledOperationId $id, callable $postExtractCallback): Promise
+    {
+        $adapter = $this->adapter;
+
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(ScheduledOperationId $id, callable $postExtractCallback) use ($adapter): \Generator
+            {
+                /** @psalm-suppress ImplicitToStringCast */
                 $query = selectQuery('scheduler_registry')
                     ->where(equalsCriteria('id', $id))
                     ->compile();
 
-                /** @var array|null $row */
-                $row = yield fetchOne(
+                /** @var array|null $result */
+                $result = yield fetchOne(
                     yield $adapter->execute($query->sql(), $query->params())
                 );
 
-                if(true === \is_array($row) && 0 !== \count($row))
+                /** Scheduled operation not found */
+                if(false === \is_array($result) || 0 === \count($result))
                 {
-                    $row['payload'] = $adapter->unescapeBinary($row['payload']);
-
-                    $registry = \unserialize(\base64_decode($row['payload']), ['allowed_classes' => true]);
+                    return yield new Success(null);
                 }
 
-                return yield new Success($registry);
+                $result['command'] = $adapter->unescapeBinary($result['command']);
+
+                $operation = ScheduledOperation::fromRow($result);
+
+                /** @var \Desperado\ServiceBus\Storage\TransactionAdapter $transaction */
+                $transaction = yield $adapter->transaction();
+
+                try
+                {
+                    /** @psalm-suppress ImplicitToStringCast */
+                    $deleteQuery = deleteQuery('scheduler_registry')
+                        ->where(equalsCriteria('id', $id))
+                        ->compile();
+
+                    yield $transaction->execute($deleteQuery->sql(), $deleteQuery->params());
+
+                    asyncCall($postExtractCallback, $operation);
+
+                    yield $transaction->commit();
+
+                    return yield new Success($operation);
+                }
+                catch(\Throwable $throwable)
+                {
+                    yield $transaction->rollback();
+
+                    throw $throwable;
+                }
             },
-            $id
+            $id, $postExtractCallback
         );
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function add(SchedulerRegistry $registry): Promise
+    public function loadNextOperation(): Promise
     {
         $adapter = $this->adapter;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(SchedulerRegistry $registry) use ($adapter): \Generator
+            static function() use ($adapter): \Generator
             {
-                $query = insertQuery(
-                    'scheduler_registry',
-                    ['id' => $registry->id(), 'payload' => \base64_encode(\serialize($registry))]
-                )->compile();
+                $result = null;
 
-                yield $adapter->execute($query->sql(), $query->params());
-            },
-            $registry
-        );
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function update(SchedulerRegistry $registry): Promise
-    {
-        $adapter = $this->adapter;
-
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(SchedulerRegistry $registry) use ($adapter): \Generator
-            {
-                $query = updateQuery('scheduler_registry', ['payload' => \base64_encode(\serialize($registry))])
-                    ->where(equalsCriteria('id', $registry->id()))
+                $query = selectQuery('scheduler_registry')
+                    ->orderBy('processing_date', 'ASC')
+                    ->limit(1)
                     ->compile();
 
-                yield $adapter->execute($query->sql(), $query->params());
+                /** @var array|null $result */
+                $result = yield fetchOne(
+                    yield $adapter->execute($query->sql(), $query->params())
+                );
+
+                if(true === \is_array($result) && 0 !== \count($result))
+                {
+                    /** @var \DateTimeImmutable $datetime */
+                    $datetime = datetimeInstantiator($result['processing_date']);
+
+                    $result = new NextScheduledOperation(
+                        new ScheduledOperationId($result['id']),
+                        $datetime
+                    );
+                }
+
+                return yield new Success($result);
+            }
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function remove(ScheduledOperationId $id): Promise
+    {
+        $adapter = $this->adapter;
+
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(ScheduledOperationId $id) use ($adapter): \Generator
+            {
+                /** @psalm-suppress ImplicitToStringCast */
+                $query = deleteQuery('scheduler_registry')
+                    ->where(equalsCriteria('id', $id))
+                    ->compile();
+
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+
+                return yield new Success(0 !== $resultSet->rowsCount());
             },
-            $registry
+            $id
         );
     }
 }
