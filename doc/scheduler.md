@@ -1,8 +1,8 @@
 Оглавление
-* [Особенности реализации]()
-* [Конфигурация]()
-* [Использование]()
-* [Отмена команды]()
+* [Особенности реализации](https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md#%D0%9E%D1%81%D0%BE%D0%B1%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D0%B8-%D1%80%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8)
+* [Конфигурация](https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md#%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D1%8F)
+* [Использование](https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md#%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5)
+* [Отмена команды](https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md#%D0%9E%D1%82%D0%BC%D0%B5%D0%BD%D0%B0-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B)
 
 #### Особенности реализации
 На данный момент планировщик работает **только** с [RabbitMQ](https://www.rabbitmq.com/) с установленным [rabbitmq-delayed-message-exchange](https://github.com/rabbitmq/rabbitmq-delayed-message-exchange) плагином.
@@ -62,4 +62,4 @@
 В данном примере команда ```SomeDelayedCommand``` будет выполнена через 2 минуты.
 
 #### Отмена команды
-Если по каким-либо причинам вам необходимо отменить выполнение запланированной команды, то нужно вызвать метод [cancel()]() класса [SchedulerProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php), передав в него идентификатор, с которым задание было создано (в примере выше это ```$delayedOperationId```)
+Если по каким-либо причинам вам необходимо отменить выполнение запланированной команды, то нужно вызвать метод [cancel()](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php#L95) класса [SchedulerProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php), передав в него идентификатор, с которым задание было создано (в примере выше это ```$delayedOperationId```)
