@@ -14,6 +14,7 @@ namespace Desperado\ServiceBus\Storage\SQL;
 
 use Latitude\QueryBuilder\CriteriaInterface;
 use Latitude\QueryBuilder\Engine\PostgresEngine;
+use Latitude\QueryBuilder\EngineInterface;
 use function Latitude\QueryBuilder\field;
 use Latitude\QueryBuilder\Query\DeleteQuery;
 use Latitude\QueryBuilder\Query\InsertQuery;
@@ -24,11 +25,13 @@ use Latitude\QueryBuilder\QueryFactory;
 /**
  * Create query builder
  *
+ * @param EngineInterface|null $engine
+ *
  * @return QueryFactory
  */
-function queryBuilder(): QueryFactory
+function queryBuilder(EngineInterface $engine = null): QueryFactory
 {
-    return new QueryFactory(new PostgresEngine());
+    return new QueryFactory($engine ?? new PostgresEngine());
 }
 
 /**
