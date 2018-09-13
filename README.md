@@ -31,7 +31,7 @@
 #### Requirements
   - PHP 7.2
   - RabbitMQ (можно использовать свой транспорт, реализовав  [Transport](https://github.com/mmasiukevich/service-bus/blob/master/src/Transport/Transport.php))
-  - PostgreSQL (можно использовать свой адаптер, реализовав [StorageAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/StorageAdapter.php)) [Подробнее про адаптеры](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md)
+  - PostgreSQL [Подробнее про адаптеры](https://github.com/mmasiukevich/service-bus/blob/master/doc/storages.md)
 
 
 ## Security
