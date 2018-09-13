@@ -17,6 +17,7 @@ use Desperado\ServiceBus\DependencyInjection\Compiler\ImportMessageHandlersCompi
 use Desperado\ServiceBus\DependencyInjection\Compiler\ImportSagasCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
+use Desperado\ServiceBus\DependencyInjection\Extensions\SchedulerExtension;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
 use Psr\Container\ContainerInterface;
@@ -54,6 +55,18 @@ final class Bootstrap
     }
 
     /**
+     * Create based on environment settings
+     *
+     * @return self
+     *
+     * @throws \LogicException Invalid environment specified
+     */
+    public static function withEnvironmentValues(): self
+    {
+        return new self();
+    }
+
+    /**
      * All sagas from the specified directories will be registered automatically
      *
      * Note: All files containing user-defined functions must be excluded
@@ -67,6 +80,20 @@ final class Bootstrap
     public function enableAutoImportSagas(array $directories, array $excludedFiles = []): self
     {
         $this->containerBuilder->addCompilerPasses(new ImportSagasCompilerPass($directories, $excludedFiles));
+
+        return $this;
+    }
+
+    /**
+     * Enable scheduler (amqp-base)
+     *
+     * @see https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md
+     *
+     * @return Bootstrap
+     */
+    public function enableScheduler(): self
+    {
+        $this->containerBuilder->addExtensions(new SchedulerExtension());
 
         return $this;
     }
@@ -87,18 +114,6 @@ final class Bootstrap
         $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass($directories, $excludedFiles));
 
         return $this;
-    }
-
-    /**
-     * Create based on environment settings
-     *
-     * @return self
-     *
-     * @throws \LogicException Invalid environment specified
-     */
-    public static function withEnvironmentValues(): self
-    {
-        return new self();
     }
 
     /**

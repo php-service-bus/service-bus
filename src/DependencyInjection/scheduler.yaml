@@ -1,0 +1,16 @@
+services:
+
+  # Scheduler store
+  Desperado\ServiceBus\Scheduler\Store\SchedulerStore:
+    class: Desperado\ServiceBus\Scheduler\Store\Sql\SqlSchedulerStore
+    arguments:
+      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+
+  # Scheduler provider
+  Desperado\ServiceBus\SchedulerProvider:
+    arguments:
+      $store: '@Desperado\ServiceBus\Scheduler\Store\SchedulerStore'
+
+  # Scheduler listener
+  Desperado\ServiceBus\Scheduler\SchedulerListener:
+    tags: ['service_bus.service']
