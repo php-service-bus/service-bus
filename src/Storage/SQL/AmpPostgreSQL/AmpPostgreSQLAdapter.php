@@ -55,7 +55,8 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
                 $configuration->password(),
                 $configuration->databaseName()
             ),
-            $queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS
+            $queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS,
+            $queryData['idle_timeout'] ?? Pool::DEFAULT_IDLE_TIMEOUT
         );
     }
 
