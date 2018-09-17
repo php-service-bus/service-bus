@@ -223,6 +223,7 @@ final class SchedulerProvider
 
         if(0 > $executionDelay)
         {
+            /** @var int $executionDelay */
             $executionDelay = \abs($executionDelay);
         }
 
