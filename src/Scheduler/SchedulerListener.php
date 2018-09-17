@@ -83,7 +83,7 @@ final class SchedulerListener
      * @param KernelContext             $context
      * @param SchedulerProvider         $schedulerProvider
      *
-     * @return \Generator<null>
+     * @return \Generator<int, \Amp\Promise<null>
      */
     public function whenSchedulerOperationEmitted(
         SchedulerOperationEmitted $event,
@@ -104,7 +104,7 @@ final class SchedulerListener
      * @param SchedulerProvider          $schedulerProvider
      *
      *
-     * @return \Generator<null>
+     * @return \Generator<int, \Amp\Promise<null>
      */
     public function whenSchedulerOperationCanceled(
         SchedulerOperationCanceled $event,
@@ -124,7 +124,7 @@ final class SchedulerListener
      * @param KernelContext      $context
      * @param SchedulerProvider  $schedulerProvider
      *
-     * @return \Generator<null>
+     * @return \Generator<int, \Amp\Promise<null>
      */
     public function whenOperationScheduled(
         OperationScheduled $event,
