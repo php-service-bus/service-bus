@@ -83,15 +83,15 @@ final class SchedulerListener
      * @param KernelContext             $context
      * @param SchedulerProvider         $schedulerProvider
      *
-     * @return Promise<null>
+     * @return \Generator<null>
      */
     public function whenSchedulerOperationEmitted(
         SchedulerOperationEmitted $event,
         KernelContext $context,
         SchedulerProvider $schedulerProvider
-    ): Promise
+    ): \Generator
     {
-        return self::processNextOperationEmit($event, $schedulerProvider, $context);
+        yield self::processNextOperationEmit($event, $schedulerProvider, $context);
     }
 
     /**
@@ -104,15 +104,15 @@ final class SchedulerListener
      * @param SchedulerProvider          $schedulerProvider
      *
      *
-     * @return Promise<null>
+     * @return \Generator<null>
      */
     public function whenSchedulerOperationCanceled(
         SchedulerOperationCanceled $event,
         KernelContext $context,
         SchedulerProvider $schedulerProvider
-    ): Promise
+    ): \Generator
     {
-        return self::processNextOperationEmit($event, $schedulerProvider, $context);
+        yield self::processNextOperationEmit($event, $schedulerProvider, $context);
     }
 
     /**
@@ -124,15 +124,15 @@ final class SchedulerListener
      * @param KernelContext      $context
      * @param SchedulerProvider  $schedulerProvider
      *
-     * @return Promise<null>
+     * @return \Generator<null>
      */
     public function whenOperationScheduled(
         OperationScheduled $event,
         KernelContext $context,
         SchedulerProvider $schedulerProvider
-    ): Promise
+    ): \Generator
     {
-        return self::processNextOperationEmit($event, $schedulerProvider, $context);
+        yield self::processNextOperationEmit($event, $schedulerProvider, $context);
     }
 
     /**
@@ -150,7 +150,6 @@ final class SchedulerListener
         KernelContext $context
     ): Promise
     {
-
         if(
             true === ($event instanceof SchedulerOperationEmitted) ||
             true === ($event instanceof SchedulerOperationCanceled) ||
@@ -161,6 +160,7 @@ final class SchedulerListener
 
             try
             {
+
                 /**
                  * @see SchedulerProvider::emitNextOperation()
                  *

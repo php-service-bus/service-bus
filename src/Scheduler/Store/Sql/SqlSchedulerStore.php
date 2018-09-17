@@ -22,6 +22,7 @@ use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
+use function Desperado\ServiceBus\Storage\fetchOne;
 use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
 use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Storage\SQL\insertQuery;
@@ -193,7 +194,8 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     throw $throwable;
                 }
-            }
+            },
+            $id, $postExtract
         );
     }
 
@@ -217,7 +219,9 @@ final class SqlSchedulerStore implements SchedulerStore
                 $compiledQuery = $selectQuery->compile();
 
                 /** @var array|null $result */
-                $result = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+                $result = yield fetchOne(
+                    yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params())
+                );
 
                 unset($compiledQuery, $selectQuery);
 
@@ -269,7 +273,9 @@ final class SqlSchedulerStore implements SchedulerStore
                 $compiledQuery = $selectQuery->compile();
 
                 /** @var array|null $result */
-                $result = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+                $result = yield fetchOne(
+                    yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params())
+                );
 
                 unset($selectQuery, $compiledQuery);
 
