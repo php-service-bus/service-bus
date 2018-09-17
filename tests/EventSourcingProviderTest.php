@@ -178,7 +178,7 @@ final class EventSourcingProviderTest extends TestCase
 
             $toPublish = $context->messages;
 
-            static::assertCount(1, $toPublish);
+            static::assertCount(2, $toPublish);
 
             /** second action  */
             $aggregate->secondAction('root');
@@ -187,7 +187,7 @@ final class EventSourcingProviderTest extends TestCase
 
             $toPublish = $context->messages;
 
-            static::assertCount(1, $toPublish);
+            static::assertCount(3, $toPublish);
 
 
             /** assert values */

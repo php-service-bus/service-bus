@@ -22,12 +22,16 @@ use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
+use Desperado\ServiceBus\Scheduler\Exceptions\DuplicateScheduledJob;
+use Desperado\ServiceBus\Scheduler\Exceptions\ScheduledOperationNotFound;
+use Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure;
 use Desperado\ServiceBus\Scheduler\Messages\Command\EmitSchedulerOperation;
 use Desperado\ServiceBus\Scheduler\Messages\Event\OperationScheduled;
 use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationCanceled;
 use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationEmitted;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
+use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
 
 /**
  *
@@ -56,6 +60,9 @@ final class SchedulerProvider
      * @param MessageDeliveryContext $context
      *
      * @return Promise<null>
+     *
+     * @throws \Desperado\ServiceBus\Scheduler\Exceptions\DuplicateScheduledJob
+     * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
      */
     public function schedule(
         ScheduledOperationId $id,
@@ -70,22 +77,41 @@ final class SchedulerProvider
         return call(
             static function(ScheduledOperation $operation) use ($store, $context): \Generator
             {
-                yield $store->add(
-                    $operation,
-                    static function(ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
-                    {
-                        yield $context->delivery(
-                            OperationScheduled::create(
-                                $operation->id(),
-                                $operation->command(),
-                                $operation->date(),
-                                $nextOperation
-                            )
-                        );
-                    }
-                );
+                try
+                {
+                    yield $store->add(
+                        $operation,
+                        static function(ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
+                        {
+                            yield $context->delivery(
+                                OperationScheduled::create(
+                                    $operation->id(),
+                                    $operation->command(),
+                                    $operation->date(),
+                                    $nextOperation
+                                )
+                            );
+                        }
+                    );
+                }
+                catch(UniqueConstraintViolationCheckFailed $exception)
+                {
+                    throw new DuplicateScheduledJob(
+                        \sprintf('Job with ID "%s" already exists', $operation->id()),
+                        $exception->getCode(),
+                        $exception
+                    );
+                }
+                catch(\Throwable $throwable)
+                {
+                    throw new SchedulerFailure(
+                        $throwable->getMessage(),
+                        $throwable->getCode(),
+                        $throwable
+                    );
+                }
             },
-            new ScheduledOperation($id, $command, $executionDate)
+            ScheduledOperation::new($id, $command, $executionDate)
         );
     }
 
@@ -96,6 +122,8 @@ final class SchedulerProvider
      * @param MessageDeliveryContext $context
      *
      * @return Promise<null>
+     *
+     * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
      */
     public function cancel(ScheduledOperationId $id, MessageDeliveryContext $context, ?string $reason = null): Promise
     {
@@ -105,15 +133,26 @@ final class SchedulerProvider
         return call(
             static function(ScheduledOperationId $id, ?string $reason = null) use ($store, $context): \Generator
             {
-                yield $store->remove(
-                    $id,
-                    static function(?NextScheduledOperation $nextOperation) use ($id, $reason, $context): \Generator
-                    {
-                        yield $context->delivery(
-                            SchedulerOperationCanceled::create($id, $reason, $nextOperation)
-                        );
-                    }
-                );
+                try
+                {
+                    yield $store->remove(
+                        $id,
+                        static function(?NextScheduledOperation $nextOperation) use ($id, $reason, $context): \Generator
+                        {
+                            yield $context->delivery(
+                                SchedulerOperationCanceled::create($id, $reason, $nextOperation)
+                            );
+                        }
+                    );
+                }
+                catch(\Throwable $throwable)
+                {
+                    throw new SchedulerFailure(
+                        $throwable->getMessage(),
+                        $throwable->getCode(),
+                        $throwable
+                    );
+                }
             },
             $id, $reason
         );
@@ -129,6 +168,8 @@ final class SchedulerProvider
      * @param MessageDeliveryContext $context
      *
      * @return Promise<null>
+     *
+     * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
      */
     private function emit(ScheduledOperationId $id, MessageDeliveryContext $context): Promise
     {
@@ -138,36 +179,54 @@ final class SchedulerProvider
         return call(
             static function(ScheduledOperationId $id) use ($store, $context): \Generator
             {
-                yield $store->extract(
-                    $id,
-                    static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($id, $context): \Generator
-                    {
-                        if(null !== $operation)
+                try
+                {
+                    yield $store->extract(
+                        $id,
+                        static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($id, $context): \Generator
                         {
-                            yield $context->delivery($operation->command());
-
-                            if($context instanceof LoggingInContext)
+                            if(null !== $operation)
                             {
-                                $context->logContextMessage(
-                                    'The delayed "{messageClass}" command has been sent to the transport', [
-                                        'messageClass'         => \get_class($operation->command()),
-                                        'scheduledOperationId' => (string) $operation->id()
-                                    ]
+                                yield $context->delivery($operation->command());
+
+                                if($context instanceof LoggingInContext)
+                                {
+                                    $context->logContextMessage(
+                                        'The delayed "{messageClass}" command has been sent to the transport', [
+                                            'messageClass'         => \get_class($operation->command()),
+                                            'scheduledOperationId' => (string) $operation->id()
+                                        ]
+                                    );
+                                }
+
+                                yield $context->delivery(
+                                    SchedulerOperationEmitted::create($operation->id(), $nextOperation)
                                 );
+
+                                return;
                             }
-
-                            yield $context->delivery(
-                                SchedulerOperationEmitted::create($operation->id(), $nextOperation)
-                            );
-
-                            return;
                         }
-
-                        yield $context->delivery(
-                            SchedulerOperationEmitted::create($id, $nextOperation)
-                        );
+                    );
+                }
+                catch(ScheduledOperationNotFound $exception)
+                {
+                    if($context instanceof LoggingInContext)
+                    {
+                        $context->logContextThrowable($exception);
                     }
-                );
+
+                    yield $context->delivery(
+                        SchedulerOperationEmitted::create($id, null)
+                    );
+                }
+                catch(\Throwable $throwable)
+                {
+                    throw new SchedulerFailure(
+                        $throwable->getMessage(),
+                        $throwable->getCode(),
+                        $throwable
+                    );
+                }
             },
             $id
         );
@@ -182,7 +241,9 @@ final class SchedulerProvider
      * @param NextScheduledOperation|null $nextOperation
      * @param MessageDeliveryContext      $context
      *
-     * @return Promise
+     * @return Promise<null>
+     *
+     * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
      */
     private function emitNextOperation(?NextScheduledOperation $nextOperation, MessageDeliveryContext $context): Promise
     {
@@ -190,17 +251,28 @@ final class SchedulerProvider
         return call(
             static function(?NextScheduledOperation $nextOperation) use ($context): \Generator
             {
-                if(null !== $nextOperation)
+                try
                 {
-                    /** Send a message that will return after a specified time interval */
-                    yield $context->send(
-                        EmitSchedulerOperation::create($nextOperation->id()), [
-                            'x-delay' => self::calculateExecutionDelay($nextOperation)
-                        ]
+                    if(null !== $nextOperation)
+                    {
+                        /** Send a message that will return after a specified time interval */
+                        yield $context->send(
+                            EmitSchedulerOperation::create($nextOperation->id()), [
+                                'x-delay' => self::calculateExecutionDelay($nextOperation)
+                            ]
+                        );
+                    }
+
+                    return yield new Success();
+                }
+                catch(\Throwable $throwable)
+                {
+                    throw new SchedulerFailure(
+                        $throwable->getMessage(),
+                        $throwable->getCode(),
+                        $throwable
                     );
                 }
-
-                return yield new Success();
             },
             $nextOperation
         );

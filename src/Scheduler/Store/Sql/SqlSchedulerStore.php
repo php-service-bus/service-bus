@@ -20,6 +20,7 @@ use Amp\Success;
 use function Desperado\ServiceBus\Common\datetimeToString;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
+use Desperado\ServiceBus\Scheduler\Exceptions\ScheduledOperationNotFound;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
 use function Desperado\ServiceBus\Storage\fetchOne;
@@ -73,7 +74,7 @@ final class SqlSchedulerStore implements SchedulerStore
                         'id'              => (string) $operation->id(),
                         'processing_date' => datetimeToString($operation->date()),
                         'command'         => \base64_encode(\serialize($operation->command())),
-                        'is_sent'         => $operation->isSent()
+                        'is_sent'         => (int) $operation->isSent()
                     ]);
 
                     $compiledQuery = $insertQuery->compile();
@@ -163,7 +164,9 @@ final class SqlSchedulerStore implements SchedulerStore
                 /** Scheduled operation not found */
                 if(null === $operation)
                 {
-                    return;
+                    throw new ScheduledOperationNotFound(
+                        \sprintf('Operation with ID "%s" not found', $id)
+                    );
                 }
 
                 /** @var \Desperado\ServiceBus\Storage\TransactionAdapter $transaction */
@@ -212,7 +215,7 @@ final class SqlSchedulerStore implements SchedulerStore
             {
                 /** @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery */
                 $selectQuery = selectQuery('scheduler_registry')
-                    ->where(equalsCriteria('is_sent', false))
+                    ->where(equalsCriteria('is_sent', 0))
                     ->orderBy('processing_date', 'ASC')
                     ->limit(1);
 
@@ -230,9 +233,9 @@ final class SqlSchedulerStore implements SchedulerStore
                     /** Update barrier flag */
 
                     /** @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery */
-                    $updateQuery = updateQuery('scheduler_registry', ['is_sent' => true])
+                    $updateQuery = updateQuery('scheduler_registry', ['is_sent' => 1])
                         ->where(equalsCriteria('id', $result['id']))
-                        ->andWhere(equalsCriteria('is_sent', false));
+                        ->andWhere(equalsCriteria('is_sent', 0));
 
                     $compiledQuery = $updateQuery->compile();
 
@@ -287,7 +290,7 @@ final class SqlSchedulerStore implements SchedulerStore
                 $result['command'] = $adapter->unescapeBinary($result['command']);
 
                 return yield new Success(
-                    ScheduledOperation::fromRow($result)
+                    ScheduledOperation::restoreFromRow($result)
                 );
             },
             $id

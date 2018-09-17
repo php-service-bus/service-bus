@@ -30,6 +30,7 @@ interface SchedulerStore
      *
      * @return Promise<null>
      *
+     * @throws \Desperado\ServiceBus\Scheduler\Exceptions\ScheduledOperationNotFound
      * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
