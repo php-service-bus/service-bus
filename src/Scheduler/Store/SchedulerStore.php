@@ -26,31 +26,22 @@ interface SchedulerStore
      * Extract operation (load and delete)
      *
      * @param ScheduledOperationId $id
-     * @param callable             $postExtractCallback function(ScheduledOperation $operation) {}
+     * @param callable             $postExtract function(ScheduledOperation $operation) {}
      *
-     * @return Promise<\Desperado\ServiceBus\Scheduler\Data\ScheduledOperation|null>
+     * @return Promise<null>
      *
+     * @throws \Desperado\ServiceBus\Scheduler\Exceptions\ScheduledOperationNotFound
      * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
      */
-    public function extract(ScheduledOperationId $id, callable $postExtractCallback): Promise;
-
-    /**
-     * Load next scheduled operation
-     *
-     * @return Promise<\Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null>
-     *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
-     */
-    public function loadNextOperation(): Promise;
+    public function extract(ScheduledOperationId $id, callable $postExtract): Promise;
 
     /**
      * Remove operation
      *
      * @param ScheduledOperationId $id
+     * @param callable             $postRemove function(?NextScheduledOperation){}
      *
      * @return Promise<bool>
      *
@@ -58,12 +49,13 @@ interface SchedulerStore
      * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
      */
-    public function remove(ScheduledOperationId $id): Promise;
+    public function remove(ScheduledOperationId $id, callable $postRemove): Promise;
 
     /**
      * Save new operation
      *
      * @param ScheduledOperation $operation
+     * @param callable           $postAdd function(ScheduledOperation $operation, ?NextScheduledOperation) {}
      *
      * @return Promise<null>
      *
@@ -72,5 +64,5 @@ interface SchedulerStore
      * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
      */
-    public function add(ScheduledOperation $operation): Promise;
+    public function add(ScheduledOperation $operation, callable $postAdd): Promise;
 }

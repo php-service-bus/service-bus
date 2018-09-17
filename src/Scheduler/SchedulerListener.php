@@ -13,13 +13,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Scheduler;
 
+use Amp\Failure;
 use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
-use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
-use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Messages\Command\EmitSchedulerOperation;
 use Desperado\ServiceBus\Scheduler\Messages\Event\OperationScheduled;
 use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationCanceled;
@@ -82,12 +81,17 @@ final class SchedulerListener
      *
      * @param SchedulerOperationEmitted $event
      * @param KernelContext             $context
+     * @param SchedulerProvider         $schedulerProvider
      *
-     * @return Promise<null>
+     * @return \Generator<int, \Amp\Promise<null>
      */
-    public function whenSchedulerOperationEmitted(SchedulerOperationEmitted $event, KernelContext $context): Promise
+    public function whenSchedulerOperationEmitted(
+        SchedulerOperationEmitted $event,
+        KernelContext $context,
+        SchedulerProvider $schedulerProvider
+    ): \Generator
     {
-        return self::processNextOperationEmit($event, $context);
+        yield self::processNextOperationEmit($event, $schedulerProvider, $context);
     }
 
     /**
@@ -97,12 +101,18 @@ final class SchedulerListener
      *
      * @param SchedulerOperationCanceled $event
      * @param KernelContext              $context
+     * @param SchedulerProvider          $schedulerProvider
      *
-     * @return Promise<null>
+     *
+     * @return \Generator<int, \Amp\Promise<null>
      */
-    public function whenSchedulerOperationCanceled(SchedulerOperationCanceled $event, KernelContext $context): Promise
+    public function whenSchedulerOperationCanceled(
+        SchedulerOperationCanceled $event,
+        KernelContext $context,
+        SchedulerProvider $schedulerProvider
+    ): \Generator
     {
-        return self::processNextOperationEmit($event, $context);
+        yield self::processNextOperationEmit($event, $schedulerProvider, $context);
     }
 
     /**
@@ -112,61 +122,67 @@ final class SchedulerListener
      *
      * @param OperationScheduled $event
      * @param KernelContext      $context
+     * @param SchedulerProvider  $schedulerProvider
      *
-     * @return Promise<null>
+     * @return \Generator<int, \Amp\Promise<null>
      */
-    public function whenOperationScheduled(OperationScheduled $event, KernelContext $context): Promise
+    public function whenOperationScheduled(
+        OperationScheduled $event,
+        KernelContext $context,
+        SchedulerProvider $schedulerProvider
+    ): \Generator
     {
-        return self::processNextOperationEmit($event, $context);
+        yield self::processNextOperationEmit($event, $schedulerProvider, $context);
     }
 
     /**
      * Emit next operation
      *
-     * @param Event         $event
-     * @param KernelContext $context
+     * @param Event             $event
+     * @param SchedulerProvider $schedulerProvider
+     * @param KernelContext     $context
      *
      * @return Promise<null>
      */
-    private static function processNextOperationEmit(Event $event, KernelContext $context): Promise
+    private static function processNextOperationEmit(
+        Event $event,
+        SchedulerProvider $schedulerProvider,
+        KernelContext $context
+    ): Promise
     {
-        /** @var SchedulerOperationEmitted|SchedulerOperationCanceled|OperationScheduled $event */
-
-        $nextOperation = $event->nextOperation();
-
-        if(null !== $nextOperation)
+        if(
+            true === ($event instanceof SchedulerOperationEmitted) ||
+            true === ($event instanceof SchedulerOperationCanceled) ||
+            true === ($event instanceof OperationScheduled)
+        )
         {
-            /** Send a message that will return after a specified time interval */
-            return $context->send(
-                EmitSchedulerOperation::create($nextOperation->id()), [
-                    'x-delay' => self::calculateExecutionDelay($nextOperation)
-                ]
-            );
+            /** @var SchedulerOperationEmitted|SchedulerOperationCanceled|OperationScheduled $event */
+
+            try
+            {
+
+                /**
+                 * @see SchedulerProvider::emitNextOperation()
+                 *
+                 * @var Promise $promise
+                 */
+                $promise = invokeReflectionMethod(
+                    $schedulerProvider,
+                    'emitNextOperation',
+                    $event->nextOperation(),
+                    $context
+                );
+
+                return $promise;
+            }
+            catch(\Throwable $throwable)
+            {
+                return new Failure($throwable);
+            }
         }
 
-        return new Success();
-    }
-
-    /**
-     * Calculate next execution delay
-     *
-     * @param NextScheduledOperation $nextScheduledOperation
-     *
-     * @return int
-     */
-    private static function calculateExecutionDelay(NextScheduledOperation $nextScheduledOperation): int
-    {
-        /** @var \DateTimeImmutable $currentDate */
-        $currentDate = datetimeInstantiator('NOW');
-
-        /** @noinspection UnnecessaryCastingInspection */
-        $executionDelay = $nextScheduledOperation->time()->getTimestamp() - $currentDate->getTimestamp();
-
-        if(0 > $executionDelay)
-        {
-            $executionDelay = \abs($executionDelay);
-        }
-
-        return $executionDelay * 1000;
+        return new Failure(
+            new \LogicException('Invalid event type specified')
+        );
     }
 }

@@ -37,6 +37,22 @@ final class NextScheduledOperation
     private $time;
 
     /**
+     * @param array<string, string> $row
+     *
+     * @return self
+     */
+    public static function fromRow(array $row): self
+    {
+        /** @var \DateTimeImmutable $datetime */
+        $datetime = datetimeInstantiator($row['processing_date']);
+
+        return new self(
+            new ScheduledOperationId($row['id']),
+            $datetime
+        );
+    }
+
+    /**
      * @param ScheduledOperationId $id
      * @param \DateTimeImmutable   $time
      */
@@ -59,6 +75,7 @@ final class NextScheduledOperation
      */
     public function time(): \DateTimeImmutable
     {
+        /** @noinspection OneTimeUseVariablesInspection */
         /** @var \DateTimeImmutable $datetime */
         $datetime = datetimeInstantiator($this->time);
 
