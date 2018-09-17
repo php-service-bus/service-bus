@@ -44,19 +44,28 @@ final class ScheduledOperation
     private $date;
 
     /**
+     * The message was sent to the transport
+     *
+     * @var bool
+     */
+    private $isSent;
+
+    /**
      * @param ScheduledOperationId $id
      * @param Command              $command
      * @param \DateTimeImmutable   $dateTime
+     * @param bool                 $isSent
      */
-    public function __construct(ScheduledOperationId $id, Command $command, \DateTimeImmutable $dateTime)
+    public function __construct(ScheduledOperationId $id, Command $command, \DateTimeImmutable $dateTime, bool $isSent = false)
     {
         $this->id      = $id;
         $this->command = $command;
         $this->date    = $dateTime;
+        $this->isSent  = $isSent;
     }
 
     /**
-     * @param array<id:string, processing_date:string, command:string> $data
+     * @param array<string:id, string:processing_date, command:string> $data
      *
      * @return ScheduledOperation
      */
@@ -71,7 +80,8 @@ final class ScheduledOperation
         return new self(
             new ScheduledOperationId($data['id']),
             $command,
-            $dateTime
+            $dateTime,
+            $data['is_sent']
         );
     }
 
@@ -103,5 +113,15 @@ final class ScheduledOperation
     public function date(): \DateTimeImmutable
     {
         return $this->date;
+    }
+
+    /**
+     * Receive the message sending flag
+     *
+     * @return bool
+     */
+    public function isSent(): bool
+    {
+        return $this->isSent;
     }
 }
