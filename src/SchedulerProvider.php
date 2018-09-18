@@ -183,27 +183,15 @@ final class SchedulerProvider
                 {
                     yield $store->extract(
                         $id,
-                        static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($id, $context): \Generator
+                        static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
                         {
                             if(null !== $operation)
                             {
-                                yield $context->delivery($operation->command());
-
-                                if($context instanceof LoggingInContext)
-                                {
-                                    $context->logContextMessage(
-                                        'The delayed "{messageClass}" command has been sent to the transport', [
-                                            'messageClass'         => \get_class($operation->command()),
-                                            'scheduledOperationId' => (string) $operation->id()
-                                        ]
-                                    );
-                                }
+                                yield self::processSendCommand($operation, $context);
 
                                 yield $context->delivery(
                                     SchedulerOperationEmitted::create($operation->id(), $nextOperation)
                                 );
-
-                                return;
                             }
                         }
                     );
@@ -300,5 +288,33 @@ final class SchedulerProvider
         }
 
         return $executionDelay * 1000;
+    }
+
+    /**
+     * @param ScheduledOperation     $operation
+     * @param MessageDeliveryContext $context
+     *
+     * @return Promise<null>
+     */
+    private static function processSendCommand(ScheduledOperation $operation, MessageDeliveryContext $context): Promise
+    {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(ScheduledOperation $operation, MessageDeliveryContext $context): \Generator
+            {
+                yield $context->delivery($operation->command());
+
+                if($context instanceof LoggingInContext)
+                {
+                    $context->logContextMessage(
+                        'The delayed "{messageClass}" command has been sent to the transport', [
+                            'messageClass'         => \get_class($operation->command()),
+                            'scheduledOperationId' => (string) $operation->id()
+                        ]
+                    );
+                }
+            },
+            $operation, $context
+        );
     }
 }
