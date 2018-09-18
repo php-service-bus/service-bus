@@ -269,6 +269,8 @@ final class SqlSchedulerStore implements SchedulerStore
         return call(
             static function(ScheduledOperationId $id) use ($adapter): \Generator
             {
+                $operation = null;
+
                 /** @psalm-suppress ImplicitToStringCast */
                 $selectQuery = selectQuery('scheduler_registry')
                     ->where(equalsCriteria('id', $id));
@@ -282,16 +284,14 @@ final class SqlSchedulerStore implements SchedulerStore
 
                 unset($selectQuery, $compiledQuery);
 
-                if(false === \is_array($result) || 0 === \count($result))
+                if(true === \is_array($result) || 0 !== \count($result))
                 {
-                    return yield new Success(null);
+                    $result['command'] = $adapter->unescapeBinary($result['command']);
+
+                    $operation = ScheduledOperation::restoreFromRow($result);
                 }
 
-                $result['command'] = $adapter->unescapeBinary($result['command']);
-
-                return yield new Success(
-                    ScheduledOperation::restoreFromRow($result)
-                );
+                return yield new Success($operation);
             },
             $id
         );
