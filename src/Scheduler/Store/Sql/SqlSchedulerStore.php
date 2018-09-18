@@ -284,7 +284,7 @@ final class SqlSchedulerStore implements SchedulerStore
 
                 unset($selectQuery, $compiledQuery);
 
-                if(true === \is_array($result) || 0 !== \count($result))
+                if(true === \is_array($result) && 0 !== \count($result))
                 {
                     $result['command'] = $adapter->unescapeBinary($result['command']);
 
