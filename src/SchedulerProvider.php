@@ -183,7 +183,7 @@ final class SchedulerProvider
                 {
                     yield $store->extract(
                         $id,
-                        static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($id, $context): \Generator
+                        static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
                         {
                             if(null !== $operation)
                             {
