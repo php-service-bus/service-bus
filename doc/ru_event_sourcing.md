@@ -1,17 +1,17 @@
 Оглавление
-* [Что такое Event Sourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%A7%D1%82%D0%BE-%D1%82%D0%B0%D0%BA%D0%BE%D0%B5-event-sourcing)
-* [Область применения](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%9E%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F)
-* [Поток событий](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%9F%D0%BE%D1%82%D0%BE%D0%BA-%D1%81%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D0%B9)
-* [Проблемы](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%9F%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D1%8B)
-* [Снимки (Snapshot)](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%A1%D0%BD%D0%B8%D0%BC%D0%BA%D0%B8-snapshot)
-* [Представления (Projections)](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%9F%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-projections)
-* [Индексы](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%98%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D1%8B)
-* [Пример агрегата](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80-%D0%B0%D0%B3%D1%80%D0%B5%D0%B3%D0%B0%D1%82%D0%B0)
-* [Доступные методы](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%94%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D1%8B%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B)
-* [Жизненный цикл](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%96%D0%B8%D0%B7%D0%BD%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9-%D1%86%D0%B8%D0%BA%D0%BB)
-* [Работа с индексами](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%A0%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D1%81-%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D0%B0%D0%BC%D0%B8)
-* [Работа со снимками](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%A0%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D1%81%D0%BE-%D1%81%D0%BD%D0%B8%D0%BC%D0%BA%D0%B0%D0%BC%D0%B8)
-* [Примеры кода](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B-%D0%BA%D0%BE%D0%B4%D0%B0)
+* [Что такое Event Sourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%A7%D1%82%D0%BE-%D1%82%D0%B0%D0%BA%D0%BE%D0%B5-event-sourcing)
+* [Область применения](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%9E%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F)
+* [Поток событий](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%9F%D0%BE%D1%82%D0%BE%D0%BA-%D1%81%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D0%B9)
+* [Проблемы](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%9F%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D1%8B)
+* [Снимки (Snapshot)](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%A1%D0%BD%D0%B8%D0%BC%D0%BA%D0%B8-snapshot)
+* [Представления (Projections)](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%9F%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-projections)
+* [Индексы](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%98%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D1%8B)
+* [Пример агрегата](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80-%D0%B0%D0%B3%D1%80%D0%B5%D0%B3%D0%B0%D1%82%D0%B0)
+* [Доступные методы](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%94%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D1%8B%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B)
+* [Жизненный цикл](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%96%D0%B8%D0%B7%D0%BD%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9-%D1%86%D0%B8%D0%BA%D0%BB)
+* [Работа с индексами](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%A0%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D1%81-%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D0%B0%D0%BC%D0%B8)
+* [Работа со снимками](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%A0%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D1%81%D0%BE-%D1%81%D0%BD%D0%B8%D0%BC%D0%BA%D0%B0%D0%BC%D0%B8)
+* [Примеры кода](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B-%D0%BA%D0%BE%D0%B4%D0%B0)
 
 #### Что такое Event Sourcing
 Классическая схема работы предполагает то, что в базе у нас хранится именно конечное состояние агрегата.
@@ -58,7 +58,7 @@
 Например, нам необходимо обеспечить уникальность email пользователя.
 В классической Event Sourcing имплементации это если и возможно, то весьма затратно. Но можно поступить иначе:
 когда мы создаём пользователя, мы записываем его идентификатор и email в специальное хранилище. Когда мы будем создавать другого пользователя, мы можем проверить, используется ли у кого-либо данный email, или нет.
-Также, благодаря такому подходу решается проблема поиска ([Пример с использованием индексов](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B-%D0%BA%D0%BE%D0%B4%D0%B0))
+Также, благодаря такому подходу решается проблема поиска ([Пример с использованием индексов](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B-%D0%BA%D0%BE%D0%B4%D0%B0))
 
 #### Пример агрегата
 ```php
