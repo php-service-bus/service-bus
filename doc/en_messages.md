@@ -12,7 +12,7 @@ All commands must implement the [Command](https://github.com/mmasiukevich/servic
 *Note*: For a specific command, there can be only 1 handler
 
 #### Event
-Event - Consequence of something that happened. There can be an unlimited number of subscribers for an event.
+Event - consequence of something that happened (For example, due to changes in the data caused by the execution of the command). There can be an unlimited number of subscribers for an event.
 All events must implement the [Event](https://github.com/mmasiukevich/service-bus/blob/master/src/Common/Contract/Messages/Event.php) interface. 
 
 #### Query
