@@ -30,8 +30,8 @@
 
 ## Безопасность
 
-If you discover any security related issues, please email [`desperado@minsk-info.ru`](mailto:desperado@minsk-info.ru) instead of using the issue tracker.
+Если вы обнаружили какую-либо ошибку, связанную с безопасностью, напишите, пожалуйста, на email [`desperado@minsk-info.ru`](mailto:desperado@minsk-info.ru) вместо использования трекера.
 
 ## Лицензия
 
-The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
+Информация о лицензии (MIT): [LICENSE](LICENSE.md)

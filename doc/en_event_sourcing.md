@@ -86,7 +86,7 @@ While using the aggregate the following secure methods are available:
 While creating a new aggregate event [AggregateCreated](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateCreated.php) will be sent into transport;  when the aggregate is closed - [AggregateClosed](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateClosed.php)
 
 #### Working with indexes
-To work with indexes, use [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), which has the following methods  (the [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php)) object is returned in each of them):
+To work with indexes, use [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), which has the following methods  (the [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php) object is returned in each of them):
 * [get()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L51): Receive a saved value
 * [has()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L85): Was a value saved
 * [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L122): Add a value to index. Working principle is similar to the ```\Memcached:add```: method, if values with such a keyword didn’t exist it will turn «true», otherwise - «false» (best choice)
