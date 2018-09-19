@@ -44,3 +44,11 @@ If you discover any security related issues, please email [`desperado@minsk-info
 ## License
 
 The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
+
+## Known Issues
+
+Error in package [amphp/postgres](https://github.com/amphp/postgres). To solve it, you need to add the following dependencies to your *composer.json* file (in the *require* section):
+```json
+    "amphp/postgres": "dev-master#16e2b56f205d346c3e8c76ec012c179fc90a92f4",
+    "amphp/sql": "dev-master#15c209094591cdc5b29f08d403a917e464d463c0",
+```

@@ -35,3 +35,10 @@
 ## Лицензия
 
 Информация о лицензии (MIT): [LICENSE](../LICENSE.md)
+
+## Известные ошибки
+При возникновении ошибки реализации интерфейса в компоненте [amphp/postgres](https://github.com/amphp/postgres) необходимо добавить в ваш *composer.json* следующие зависимости:
+```json
+    "amphp/postgres": "dev-master#16e2b56f205d346c3e8c76ec012c179fc90a92f4",
+    "amphp/sql": "dev-master#15c209094591cdc5b29f08d403a917e464d463c0",
+```
