@@ -34,4 +34,4 @@
 
 ## Лицензия
 
-Информация о лицензии (MIT): [LICENSE](LICENSE.md)
+Информация о лицензии (MIT): [LICENSE](../LICENSE.md)
