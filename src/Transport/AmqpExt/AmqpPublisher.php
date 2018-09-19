@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport\AmqpExt;
 
+use function Amp\call;
+use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\Transport\Exceptions\MessageSendFailed;
@@ -61,25 +63,32 @@ final class AmqpPublisher implements Publisher
     /**
      * @inheritdoc
      */
-    public function send(Destination $destination, OutboundEnvelope $envelope): void
+    public function send(Destination $destination, OutboundEnvelope $envelope): Promise
     {
         /** @var AmqpOutboundEnvelope $envelope */
 
-        $exchange = $this->extractExchange((string) $destination->topicName());
+        /** @psalm-suppress InvalidArgument */
+        return call(
+            function(Destination $destination, AmqpOutboundEnvelope $envelope): void
+            {
+                $exchange = $this->extractExchange((string) $destination->topicName());
 
-        try
-        {
-            $exchange->publish(
-                $envelope->messageContent(),
-                (string) $destination->routingKey(),
-                true === $envelope->isMandatory() ? \AMQP_MANDATORY : \AMQP_NOPARAM,
-                $envelope->attributes()
-            );
-        }
-        catch(\Throwable $throwable)
-        {
-            throw new MessageSendFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
-        }
+                try
+                {
+                    $exchange->publish(
+                        $envelope->messageContent(),
+                        (string) $destination->routingKey(),
+                        true === $envelope->isMandatory() ? \AMQP_MANDATORY : \AMQP_NOPARAM,
+                        $envelope->attributes()
+                    );
+                }
+                catch(\Throwable $throwable)
+                {
+                    throw new MessageSendFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                }
+            },
+            $destination, $envelope
+        );
     }
 
     /**

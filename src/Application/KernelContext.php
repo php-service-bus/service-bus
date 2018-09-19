@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
+use function Amp\asyncCall;
 use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
@@ -32,11 +33,9 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     /**
      * Send message handler
      *
-     * @see ServiceBusKernel::createMessageSender()
-     *
-     * @var \Generator
+     * @var callable
      */
-    private $messageSender;
+    private $messagePublisher;
 
     /**
      * @var IncomingEnvelope
@@ -50,13 +49,14 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
 
     /**
      * @param IncomingEnvelope $incomingEnvelope
-     * @param \Generator       $messageSender
+     * @param callable         $messagePublisher function(Message $message, array $headers, IncomingEnvelope
+     *                                           $incomingEnvelope): Promise {}
      * @param LoggerInterface  $logger
      */
-    public function __construct(IncomingEnvelope $incomingEnvelope, \Generator $messageSender, LoggerInterface $logger)
+    public function __construct(IncomingEnvelope $incomingEnvelope, callable $messagePublisher, LoggerInterface $logger)
     {
         $this->incomingEnvelope = $incomingEnvelope;
-        $this->messageSender    = $messageSender;
+        $this->messagePublisher = $messagePublisher;
         $this->logger           = $logger;
     }
 
@@ -65,20 +65,7 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
      */
     public function delivery(Message ...$messages): Promise
     {
-        $messageSender    = $this->messageSender;
-        $incomingEnvelope = $this->incomingEnvelope;
-
-        /** @psalm-suppress InvalidArgument */
-        return call(
-            static function(array $messages) use ($messageSender, $incomingEnvelope): void
-            {
-                foreach($messages as $message)
-                {
-                    $messageSender->send([$message, $incomingEnvelope, []]);
-                }
-            },
-            $messages
-        );
+        return $this->processSendMessages($messages, []);
     }
 
     /**
@@ -86,18 +73,7 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
      */
     public function send(Command $command, array $headers = []): Promise
     {
-        $messageSender    = $this->messageSender;
-        $incomingEnvelope = $this->incomingEnvelope;
-
-        /** @psalm-suppress InvalidArgument */
-        return call(
-            static function(Command $command, array $headers) use ($messageSender, $incomingEnvelope): void
-            {
-                $messageSender->send([$command, $incomingEnvelope, $headers]);
-            },
-            $command,
-            $headers
-        );
+        return $this->processSendMessages([$command], $headers);
     }
 
     /**
@@ -105,17 +81,32 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
      */
     public function publish(Event $event, array $headers = []): Promise
     {
-        $messageSender    = $this->messageSender;
+        return $this->processSendMessages([$event], $headers);
+    }
+
+    /**
+     * Execute messages sent
+     *
+     * @param array $messages
+     * @param array $headers
+     *
+     * @return Promise<null>
+     */
+    private function processSendMessages(array $messages, array $headers): Promise
+    {
+        $messagePublisher = $this->messagePublisher;
         $incomingEnvelope = $this->incomingEnvelope;
 
         /** @psalm-suppress InvalidArgument */
         return call(
-            static function(Event $event, array $headers) use ($messageSender, $incomingEnvelope): void
+            static function(array $messages, array $headers) use ($messagePublisher, $incomingEnvelope): void
             {
-                $messageSender->send([$event, $incomingEnvelope, $headers]);
+                foreach($messages as $message)
+                {
+                    asyncCall($messagePublisher, $message, $headers, $incomingEnvelope);
+                }
             },
-            $event,
-            $headers
+            $messages, $headers
         );
     }
 
@@ -138,10 +129,7 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
         string $level = LogLevel::INFO
     ): void
     {
-        $extra = \array_merge_recursive($extra, [
-                'operationId' => $this->incomingEnvelope->operationId()
-            ]
-        );
+        $extra = \array_merge_recursive($extra, ['operationId' => $this->incomingEnvelope->operationId()]);
 
         $this->logger->log($level, $logMessage, $extra);
     }
@@ -155,13 +143,10 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
         array $extra = []
     ): void
     {
-        $this->logContextMessage(
-            $throwable->getMessage(),
-            \array_merge_recursive(
-                $extra,
-                ['throwable' => $throwable]
-            ),
-            $level
+        $extra = \array_merge_recursive(
+            $extra, ['throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())]
         );
+
+        $this->logContextMessage($throwable->getMessage(), $extra, $level);
     }
 }

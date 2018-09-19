@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 
+use function Amp\call;
+use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\FailedMessageSendMarkerEvent;
@@ -52,14 +54,21 @@ final class VirtualPublisher implements Publisher
     /**
      * @inheritDoc
      */
-    public function send(Destination $destination, OutboundEnvelope $envelope): void
+    public function send(Destination $destination, OutboundEnvelope $envelope): Promise
     {
-        if(false !== \strpos( $envelope->messageContent(), 'FailedMessageSendMarkerEvent'))
-        {
-            /** @see ServiceBusKernelTest::failedResponseDelivery */
-            throw new \LogicException('shit happens');
-        }
+        /** @psalm-suppress InvalidArgument */
+        return call(
+            static function(OutboundEnvelope $envelope): void
+            {
+                if(false !== \strpos($envelope->messageContent(), 'FailedMessageSendMarkerEvent'))
+                {
+                    /** @see ServiceBusKernelTest::failedResponseDelivery */
+                    throw new \LogicException('shit happens');
+                }
 
-        VirtualTransportBuffer::instance()->add($envelope->messageContent(), $envelope->headers());
+                VirtualTransportBuffer::instance()->add($envelope->messageContent(), $envelope->headers());
+            },
+            $envelope
+        );
     }
 }

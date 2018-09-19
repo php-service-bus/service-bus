@@ -59,7 +59,8 @@
     "doctrine/annotations": "v1.6.0",
     "doctrine/cache": "v1.8.0",
     "guzzlehttp/psr7": "1.4.2",
-    "latitude/latitude": "^3.1"
+    "latitude/latitude": "^3.1",
+    "kelunik/loop-block": "^1.0"
   },
   "require-dev": {
     "doctrine/dbal": "^v2.6",

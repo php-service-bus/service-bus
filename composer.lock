@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "49b554a35c1f84981a26d4487b5613d2",
-    "content-hash": "5af9692d58f11c6bdf86cb2413b8db42",
+    "hash": "654e388240cca39c786fa398bd6db346",
+    "content-hash": "2d6eeb290970a8cfcf5b282b80f281f9",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1278,6 +1278,47 @@
                 "x509"
             ],
             "time": "2017-07-04 19:37:30"
+        },
+        {
+            "name": "kelunik/loop-block",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kelunik/loop-block.git",
+                "reference": "f2729737fc20705a4675bb07624b481a8ddbc170"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kelunik/loop-block/zipball/f2729737fc20705a4675bb07624b481a8ddbc170",
+                "reference": "f2729737fc20705a4675bb07624b481a8ddbc170",
+                "shasum": ""
+            },
+            "require": {
+                "amphp/amp": "^2"
+            },
+            "require-dev": {
+                "amphp/phpunit-util": "^1",
+                "friendsofphp/php-cs-fixer": "^2.3",
+                "phpunit/phpunit": "^6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kelunik\\LoopBlock\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Niklas Keller",
+                    "email": "me@kelunik.com"
+                }
+            ],
+            "description": "Detect blocking ticks in the Amp event loop.",
+            "time": "2017-06-15 17:41:23"
         },
         {
             "name": "latitude/latitude",
@@ -3258,16 +3299,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.0.3",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "bd088dc940a418f09cda079a9b5c7c478890fb8d"
+                "reference": "fa6ee28600d21d49b2b4e1006b48426cec8e579c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/bd088dc940a418f09cda079a9b5c7c478890fb8d",
-                "reference": "bd088dc940a418f09cda079a9b5c7c478890fb8d",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/fa6ee28600d21d49b2b4e1006b48426cec8e579c",
+                "reference": "fa6ee28600d21d49b2b4e1006b48426cec8e579c",
                 "shasum": ""
             },
             "require": {
@@ -3305,7 +3346,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2018-07-15 17:25:16"
+            "time": "2018-09-18 07:03:24"
         },
         {
             "name": "openlss/lib-array2xml",

@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport;
 
+use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 
@@ -39,10 +40,10 @@ interface Publisher
      * @param Destination      $destination
      * @param OutboundEnvelope $envelope
      *
-     * @return void
+     * @return Promise<null>
      *
      * @throws \Desperado\ServiceBus\Transport\Exceptions\NotConfiguredTopic
      * @throws \Desperado\ServiceBus\Transport\Exceptions\MessageSendFailed
      */
-    public function send(Destination $destination, OutboundEnvelope $envelope): void;
+    public function send(Destination $destination, OutboundEnvelope $envelope): Promise;
 }

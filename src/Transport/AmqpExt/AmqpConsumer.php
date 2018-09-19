@@ -28,8 +28,7 @@ use Psr\Log\NullLogger;
  */
 final class AmqpConsumer implements Consumer
 {
-    public const  STOP_MESSAGE_CONTENT                 = 'quit';
-    private const ITERATIONS_BEFORE_GARBAGE_COLLECTION = 10000;
+    public const  STOP_MESSAGE_CONTENT = 'quit';
 
     /**
      * Listen queue
@@ -49,13 +48,6 @@ final class AmqpConsumer implements Consumer
      * @var LoggerInterface
      */
     private $logger;
-
-    /**
-     * Total number of iterations during the session
-     *
-     * @var int
-     */
-    private $iterationsCount = 0;
 
     /**
      * A string describing this consumer. Used for canceling subscriptions with cancel()
@@ -92,9 +84,6 @@ final class AmqpConsumer implements Consumer
      */
     public function listen(callable $messageProcessor): void
     {
-        Loop::run();
-
-        $processor         = $this->messageHandler($messageProcessor);
         $this->consumerTag = \sha1(uuid());
 
         try
@@ -102,9 +91,21 @@ final class AmqpConsumer implements Consumer
             self::setupReturnCallback($this->listenQueue->getChannel(), $this->logger);
 
             $this->listenQueue->consume(
-                function(\AMQPEnvelope $envelope) use ($processor): void
+                function(\AMQPEnvelope $envelope) use ($messageProcessor): void
                 {
-                    $processor->send($envelope);
+                    Loop::run();
+
+                    $this->checkCycleActivity();
+
+                    if(self::STOP_MESSAGE_CONTENT !== $envelope->getBody())
+                    {
+                        $this->process($envelope, $messageProcessor);
+                    }
+                    else
+                    {
+                        $this->acknowledge($envelope);
+                        $this->cancelSubscription('Received stop message command');
+                    }
                 },
                 \AMQP_NOPARAM,
                 $this->consumerTag
@@ -117,39 +118,6 @@ final class AmqpConsumer implements Consumer
         catch(\Throwable $throwable)
         {
             $this->logger->critical($throwable->getMessage(), ['e' => $throwable]);
-        }
-    }
-
-
-    /**
-     * Create message handler
-     *
-     * @param callable $messageProcessor
-     *
-     * @return \Generator
-     */
-    private function messageHandler(callable $messageProcessor): \Generator
-    {
-        while(true)
-        {
-            Loop::run();
-
-            $this->checkCycleActivity();
-            $this->increaseIterations();
-            $this->garbageCleaning();
-
-            /** @var \AMQPEnvelope $envelope */
-            $envelope = yield;
-
-            if(self::STOP_MESSAGE_CONTENT !== $envelope->getBody())
-            {
-                $this->process($envelope, $messageProcessor);
-            }
-            else
-            {
-                $this->acknowledge($envelope);
-                $this->cancelSubscription('Received stop message command');
-            }
         }
     }
 
@@ -297,16 +265,6 @@ final class AmqpConsumer implements Consumer
     }
 
     /**
-     * Increase loop iterations count
-     *
-     * @return void
-     */
-    private function increaseIterations(): void
-    {
-        $this->iterationsCount++;
-    }
-
-    /**
      * If a command was issued to stop the loop, perform this
      *
      * @return void
@@ -366,22 +324,6 @@ final class AmqpConsumer implements Consumer
         };
 
         $channel->setReturnCallback($handler);
-    }
-
-    /**
-     * @return void
-     */
-    private function garbageCleaning(): void
-    {
-        if(0 === $this->iterationsCount % self::ITERATIONS_BEFORE_GARBAGE_COLLECTION)
-        {
-            $this->logger->info(
-                'Processed "{iterationsCount}" iterations. Number of collected cycles: "{collectedCycles}"', [
-                    'iterationsCount' => $this->iterationsCount,
-                    'collectedCycles' => \gc_collect_cycles()
-                ]
-            );
-        }
     }
 
     /**
