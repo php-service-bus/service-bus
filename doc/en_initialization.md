@@ -1,9 +1,9 @@
 Table of contents
-* [The list of environment variables](https://github.com/mmasiukevich/service-bus/blob/master/doc/initialization.md#%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA-%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D0%BE%D0%B2-%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F)
-* [Initialization](https://github.com/mmasiukevich/service-bus/blob/master/doc/initialization.md#%D0%98%D0%BD%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F)
-* [Transport Configuration](https://github.com/mmasiukevich/service-bus/blob/master/doc/initialization.md#%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D1%8F-%D1%82%D1%80%D0%B0%D0%BD%D1%81%D0%BF%D0%BE%D1%80%D1%82%D0%B0)
-* [Creation of database schema](https://github.com/mmasiukevich/service-bus/blob/master/doc/initialization.md#%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-%D1%81%D1%85%D0%B5%D0%BC%D1%8B-%D0%B1%D0%B0%D0%B7%D1%8B-%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85)
-* [Initialization demon example](https://github.com/mmasiukevich/service-bus/blob/master/doc/initialization.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80-%D0%B8%D0%BD%D0%B8%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8-%D0%B4%D0%B5%D0%BC%D0%BE%D0%BD%D0%B0)
+* [The list of environment variables](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#the-list-of-environment-variables)
+* [Initialization](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#initialization)
+* [Transport Configuration](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#transport-configuration)
+* [Creation of database schema](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#creation-of-database-schema)
+* [Initialization demon example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#initialization-demon-example)
 
 #### The list of environment variables:
 - ```APP_ENVIRONMENT```: Environment (*test*, *dev*, *prod*). Currently the difference is only on the container compilation level (to save it, or to recreate it each time (test, dev))

@@ -1,17 +1,17 @@
-Оглавление
-* [What is Event Sourcing?](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%A7%D1%82%D0%BE-%D1%82%D0%B0%D0%BA%D0%BE%D0%B5-event-sourcing)
-* [Field of appliance](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%9E%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F)
-* [Event stream](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%9F%D0%BE%D1%82%D0%BE%D0%BA-%D1%81%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D0%B9)
-* [Problems](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%9F%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D1%8B)
-* [Snapshots](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%A1%D0%BD%D0%B8%D0%BC%D0%BA%D0%B8-snapshot)
-* [Projections](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%9F%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-projections)
-* [Indexes](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%98%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D1%8B)
-* [Aggregate example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80-%D0%B0%D0%B3%D1%80%D0%B5%D0%B3%D0%B0%D1%82%D0%B0)
-* [Available methods](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%94%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D1%8B%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B)
-* [Life cycle](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%96%D0%B8%D0%B7%D0%BD%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9-%D1%86%D0%B8%D0%BA%D0%BB)
-* [Working with indexes](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%A0%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D1%81-%D0%B8%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%D0%B0%D0%BC%D0%B8)
-* [Working with snapshots](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%A0%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D1%81%D0%BE-%D1%81%D0%BD%D0%B8%D0%BC%D0%BA%D0%B0%D0%BC%D0%B8)
-* [Code example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B-%D0%BA%D0%BE%D0%B4%D0%B0)
+Table of contents
+* [What is Event Sourcing?](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#what-is-event-sourcing)
+* [Field of appliance](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#field-of-appliance)
+* [Event stream](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#event-stream)
+* [Problems](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#problems)
+* [Snapshots](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#snapshots)
+* [Projections](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#projections)
+* [Indexes](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#indexes)
+* [Aggregate example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#aggregate-example)
+* [Available methods](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#available-methods)
+* [Life cycle](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#life-cycle)
+* [Working with indexes](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#working-with-indexes)
+* [Working with snapshots](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#working-with-snapshots)
+* [Code example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#code-examples)
 
 #### What is Event Sourcing?
 While the classic scheme implies the storage of the final aggregate state, Event Sourcing persists the state of business entity as a sequence of state-changing events. For example, we have ```User<string:name, string:email, string:password_hash>``` structure. All data is stored in database as a table of ```users``` with fields of the same name. This approach doesn’t let us see the history of user data changes: at what time, by whom and under which conditions they were initiated. Also it isn’t possible to cancel some operations. Event Sourcing ensures that all changes to user state are stored as a sequence of events. For example ```UserRegisteredEvent```, ```UserPasswordChangedEvent```, ```UserEmailChangedEvent```, ```UserPasswordChangedEvent```. To restore current aggregate state we need to apply all events one by one in the initial order. As a result we can have a full history of changes.
