@@ -17,7 +17,7 @@
 - [EventSourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md)
 - [Sagas](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md)
 - [Messages (Command/Event/Query)](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_messages.md)
-- [Processing of messages](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_massage_handlers.md)
+- [Processing of messages](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_message_handlers.md)
 - [Scheduler](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_scheduler.md)
 - [Database adapters](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_storages.md)
 - [Initialization](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_initialization.md)

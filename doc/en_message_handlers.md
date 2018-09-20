@@ -1,11 +1,11 @@
 Table of contents
-* [Introduction](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_massage_handlers.md#introduction)
-* [Configuration](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_massage_handlers.md#configuration)
-* [Command handler](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_massage_handlers.md#command-handler)
-* [Event listener](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_massage_handlers.md#event-listener)
-* [Argument Resolver](https://github.com/mmasiukevich/service-bus/blob/master/doc/massage_handlers.md#argument-resolver)
-* [Validation](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_massage_handlers.md#validation)
-* [Code example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_massage_handlers.md#code-example)
+* [Introduction](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_message_handlers.md#introduction)
+* [Configuration](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_message_handlers.md#configuration)
+* [Command handler](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_message_handlers.md#command-handler)
+* [Event listener](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_message_handlers.md#event-listener)
+* [Argument Resolver](https://github.com/mmasiukevich/service-bus/blob/master/doc/message_handlers.md#argument-resolver)
+* [Validation](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_message_handlers.md#validation)
+* [Code example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_message_handlers.md#code-example)
 
 #### Introduction
 All handlers are represented as public class methods, which have 2 required arguments (going first):
