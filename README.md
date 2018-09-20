@@ -24,7 +24,7 @@ Basically, it is suitable for development of distributed applications. By using 
 - [EventSourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md)
 - [Sagas](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_sagas.md)
 - [Messages (Command/Event/Query)](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_messages.md)
-- [Processing of messages](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_massage_handlers.md)
+- [Processing of messages](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_message_handlers.md)
 - [Scheduler](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_scheduler.md)
 - [Database adapters](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_storages.md)
 - [Initialization](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md)
