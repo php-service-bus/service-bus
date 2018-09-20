@@ -19,7 +19,7 @@ While the classic scheme implies the storage of the final aggregate state, Event
 For more details look up the [Event Sourcing](https://microservices.io/patterns/data/event-sourcing.html) description
 
 #### Field of appliance
-We cannot use Event Sourcing anywhere. It is used when we want to monitor and control all the changes of our business entity.
+We cannot use Event Sourcing everywhere. It is used when we want to monitor and control all the each change of our business entity.
 
 For example, we have a payment aggregate that includes all payment details. It can switch to many states; can be cancelled (fully or partially) etc. Looking at this from business perspective, it can be very useful to see the history and be able to influence on it. In such cases Event Sourcing is the best option.
 
