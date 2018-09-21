@@ -14,9 +14,6 @@ before_script:
 - mkdir -p build/logs
 - ls -al
 - psql -c 'CREATE DATABASE test;' -U postgres
-- sudo rabbitmqctl add_vhost /
-- sudo rabbitmqctl add_user guest guest
-- sudo rabbitmqctl set_permissions -p / guest ".*" ".*" ".*"
 
 script:
 - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover build/logs/clover.xml
