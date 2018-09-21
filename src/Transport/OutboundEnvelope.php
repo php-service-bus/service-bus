@@ -79,6 +79,13 @@ interface OutboundEnvelope
     public function makeImmediate(): void;
 
     /**
+     * Is high priority message
+     *
+     * @return bool
+     */
+    public function isImmediate(): bool;
+
+    /**
      * Save message in broker
      *
      * @return void

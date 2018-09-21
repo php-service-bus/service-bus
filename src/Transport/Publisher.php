@@ -42,7 +42,6 @@ interface Publisher
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\NotConfiguredTopic
      * @throws \Desperado\ServiceBus\Transport\Exceptions\MessageSendFailed
      */
     public function send(Destination $destination, OutboundEnvelope $envelope): Promise;

@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Transport\AmqpExt;
+namespace Desperado\ServiceBus\Transport\Amqp;
 
 use Desperado\ServiceBus\Transport\Queue;
 use Desperado\ServiceBus\Transport\Topic;
@@ -21,6 +21,11 @@ use Desperado\ServiceBus\Transport\Topic;
  */
 final class AmqpQueue implements Queue
 {
+    private const AMQP_DURABLE     = 2;
+    private const AMQP_PASSIVE     = 4;
+    private const AMQP_EXCLUSIVE   = 8;
+    private const AMQP_AUTO_DELETE = 16;
+
     /**
      * The queue name MAY be empty, in which case the server MUST create a new queue with a unique generated name and
      * return this to the client in the Declare-Ok method. Queue names starting with "amq." are reserved for
@@ -153,13 +158,21 @@ final class AmqpQueue implements Queue
      */
     public function makePassive(): self
     {
-        if(false === $this->passive)
+        if(false === $this->isPassive())
         {
             $this->passive = true;
-            $this->flags   += \AMQP_PASSIVE;
+            $this->flags   += self::AMQP_PASSIVE;
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPassive(): bool
+    {
+        return $this->passive;
     }
 
     /**
@@ -167,13 +180,21 @@ final class AmqpQueue implements Queue
      */
     public function makeExclusive(): self
     {
-        if(false === $this->exclusive)
+        if(false === $this->isExclusive())
         {
             $this->exclusive = true;
-            $this->flags     += \AMQP_EXCLUSIVE;
+            $this->flags     += self::AMQP_EXCLUSIVE;
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isExclusive(): bool
+    {
+        return $this->exclusive;
     }
 
     /**
@@ -181,13 +202,21 @@ final class AmqpQueue implements Queue
      */
     public function makeDurable(): self
     {
-        if(false === $this->durable)
+        if(false === $this->isDurable())
         {
             $this->durable = true;
-            $this->flags   += \AMQP_DURABLE;
+            $this->flags   += self::AMQP_DURABLE;
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDurable(): bool
+    {
+        return $this->durable;
     }
 
     /**
@@ -195,13 +224,21 @@ final class AmqpQueue implements Queue
      */
     public function enableAutoDelete(): self
     {
-        if(false === $this->autoDelete)
+        if(false === $this->autoDeleteEnabled())
         {
             $this->autoDelete = true;
-            $this->flags      += \AMQP_AUTODELETE;
+            $this->flags      += self::AMQP_AUTO_DELETE;
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function autoDeleteEnabled(): bool
+    {
+        return $this->autoDelete;
     }
 
     /**

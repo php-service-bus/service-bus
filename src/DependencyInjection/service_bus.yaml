@@ -29,15 +29,15 @@ services:
       $logger: '@Psr\Log\LoggerInterface'
 
   # Transport configuration
-  Desperado\ServiceBus\Transport\AmqpExt\AmqpConfiguration:
+  Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration:
     arguments:
       $connectionDSN: '%service_bus.transport.dsn%'
 
   # Messages transport
   Desperado\ServiceBus\Transport\Transport:
-    class: Desperado\ServiceBus\Transport\AmqpExt\AmqpExt
+    class: Desperado\ServiceBus\Transport\Amqp\Bunny\AmqpBunny
     arguments:
-      $amqpConfiguration: '@Desperado\ServiceBus\Transport\AmqpExt\AmqpConfiguration'
+      $amqpConfiguration: '@Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration'
       $messageEncoder: null
       $messageDecoder: null
       $logger: '@Psr\Log\LoggerInterface'

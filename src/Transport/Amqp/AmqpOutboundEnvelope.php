@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Transport\AmqpExt;
+namespace Desperado\ServiceBus\Transport\Amqp;
 
 use Desperado\ServiceBus\Transport\OutboundEnvelope;
 
@@ -152,6 +152,14 @@ final class AmqpOutboundEnvelope implements OutboundEnvelope
     public function makeImmediate(): void
     {
         $this->immediate = true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isImmediate(): bool
+    {
+        return $this->immediate;
     }
 
     /**

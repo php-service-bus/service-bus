@@ -24,8 +24,7 @@ interface Transport
      * @param Topic $topic
      *
      * @return void
-     *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
+
      * @throws \Desperado\ServiceBus\Transport\Exceptions\CreateTopicFailed
      */
     public function createTopic(Topic $topic): void;
@@ -37,7 +36,6 @@ interface Transport
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
      * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
      */
     public function bindTopic(TopicBind $to): void;
@@ -49,7 +47,6 @@ interface Transport
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
      * @throws \Desperado\ServiceBus\Transport\Exceptions\CreateQueueFailed
      */
     public function createQueue(Queue $queue): void;
@@ -61,7 +58,6 @@ interface Transport
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
      * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
      */
     public function bindQueue(QueueBind $to): void;
@@ -79,8 +75,6 @@ interface Transport
      * @param Queue $listenQueue
      *
      * @return Consumer
-     *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\NotConfiguredQueue
      */
     public function createConsumer(Queue $listenQueue): Consumer;
 

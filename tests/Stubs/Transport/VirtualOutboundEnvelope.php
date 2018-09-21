@@ -107,6 +107,14 @@ final class VirtualOutboundEnvelope implements OutboundEnvelope
     /**
      * @inheritDoc
      */
+    public function isImmediate(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function makePersistent(): void
     {
 

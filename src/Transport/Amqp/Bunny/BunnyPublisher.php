@@ -11,29 +11,28 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Transport\AmqpExt;
+namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
 use function Amp\call;
 use Amp\Promise;
+use Bunny\Channel;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\OutboundMessage\Destination;
+use Desperado\ServiceBus\Transport\Amqp\AmqpOutboundEnvelope;
 use Desperado\ServiceBus\Transport\Exceptions\MessageSendFailed;
-use Desperado\ServiceBus\Transport\Exceptions\NotConfiguredTopic;
 use Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder;
 use Desperado\ServiceBus\Transport\OutboundEnvelope;
 use Desperado\ServiceBus\Transport\Publisher;
 
 /**
- * Amqp-ext based publisher
+ *
  */
-final class AmqpPublisher implements Publisher
+final class BunnyPublisher implements Publisher
 {
     /**
-     * Configured amqp exchanges
-     *
-     * @var array<string, \AMQPExchange>
+     * @var Channel
      */
-    private $exchanges;
+    private $channel;
 
     /**
      * Message encoder
@@ -43,17 +42,17 @@ final class AmqpPublisher implements Publisher
     private $encoder;
 
     /**
-     * @param array<string, \AMQPExchange> $exchanges
+     * @param Channel                 $channel
      * @param TransportMessageEncoder $encoder
      */
-    public function __construct(array $exchanges, TransportMessageEncoder $encoder)
+    public function __construct(Channel $channel, TransportMessageEncoder $encoder)
     {
-        $this->exchanges = $exchanges;
-        $this->encoder   = $encoder;
+        $this->channel = $channel;
+        $this->encoder = $encoder;
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function createEnvelope(Message $message, array $headers = []): OutboundEnvelope
     {
@@ -61,25 +60,25 @@ final class AmqpPublisher implements Publisher
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function send(Destination $destination, OutboundEnvelope $envelope): Promise
     {
-        /** @var AmqpOutboundEnvelope $envelope */
+        $channel = $this->channel;
 
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            function(Destination $destination, AmqpOutboundEnvelope $envelope): void
+            static function(Destination $destination, OutboundEnvelope $envelope) use ($channel): \Generator
             {
-                $exchange = $this->extractExchange((string) $destination->topicName());
-
                 try
                 {
-                    $exchange->publish(
+                    yield $channel->publish(
                         $envelope->messageContent(),
-                        (string) $destination->routingKey(),
-                        true === $envelope->isMandatory() ? \AMQP_MANDATORY : \AMQP_NOPARAM,
-                        $envelope->attributes()
+                        $envelope->headers(),
+                        $destination->topicName(),
+                        $destination->routingKey(),
+                        $envelope->isMandatory(),
+                        $envelope->isImmediate()
                     );
                 }
                 catch(\Throwable $throwable)
@@ -88,25 +87,6 @@ final class AmqpPublisher implements Publisher
                 }
             },
             $destination, $envelope
-        );
-    }
-
-    /**
-     * @param string $exchangeName
-     *
-     * @return \AMQPExchange
-     *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\NotConfiguredTopic
-     */
-    private function extractExchange(string $exchangeName): \AMQPExchange
-    {
-        if(true === isset($this->exchanges[$exchangeName]))
-        {
-            return $this->exchanges[$exchangeName];
-        }
-
-        throw new NotConfiguredTopic(
-            \sprintf('Topic "%s" was not configured. Please use createTopic method', $exchangeName)
         );
     }
 }
