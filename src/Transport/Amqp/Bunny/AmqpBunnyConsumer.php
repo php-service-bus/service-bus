@@ -303,7 +303,7 @@ final class AmqpBunnyConsumer implements Consumer
                 }
                 catch(\Throwable $throwable)
                 {
-
+                    /** Not interested */
                 }
             },
             $this->consumerTag, $this->cancelSubscriptionReason
