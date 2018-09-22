@@ -14,8 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\DependencyInjection\Compiler;
 
 use Desperado\ServiceBus\DependencyInjection\Compiler\ImportSagasCompilerPass;
-use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga;
-use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSagaWithoutListeners;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

@@ -103,7 +103,6 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 
     /**
      * @param \ReflectionParameter $parameter
-     * @param ContainerBuilder     $container
      *
      * @return bool
      */

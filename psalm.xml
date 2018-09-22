@@ -9,8 +9,6 @@
         <directory name="src"/>
         <ignoreFiles>
             <directory name="vendor"/>
-            <!-- Storage for AMQPEnvelope::getheaders is not user-defined -->
-            <file name="src/Transport/AmqpExt/AmqpConsumer.php"/>
         </ignoreFiles>
     </projectFiles>
 

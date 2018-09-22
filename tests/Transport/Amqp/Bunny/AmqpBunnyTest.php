@@ -62,7 +62,7 @@ final class AmqpBunnyTest extends TestCase
             wait($channel->exchangeDelete('createExchange2'));
             wait($channel->queueDelete('createQueue2'));
 
-            $this->transport->close();
+            wait($this->transport->close());
 
             unset($this->transport);
         }
@@ -103,7 +103,7 @@ final class AmqpBunnyTest extends TestCase
      */
     public function bindTopic(): void
     {
-        $source      = AmqpExchange::topic('createExchange');
+        $source = AmqpExchange::topic('createExchange');
         $destination = AmqpExchange::topic('createExchange2');
 
         $this->transport->createTopic($source);
@@ -126,5 +126,29 @@ final class AmqpBunnyTest extends TestCase
         $this->transport->createQueue($queue);
 
         $this->transport->bindQueue(new QueueBind($queue, $destination, 'root'));
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function createPublisher(): void
+    {
+        $this->transport->createPublisher();
+
+        static::assertTrue(true);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function createConsumer(): void
+    {
+        $this->transport->createConsumer(AmqpQueue::default('qwerty'));
+
+        static::assertTrue(true);
     }
 }

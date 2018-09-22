@@ -13,8 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
-use function Amp\asyncCall;
 use function Amp\call;
+use Amp\Promise;
 use function Amp\Promise\wait;
 use Bunny\Channel;
 use Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration;
@@ -85,7 +85,7 @@ final class AmqpBunny implements Transport
     {
         $this->messageEncoder = $messageEncoder ?? new JsonMessageEncoder();
         $this->messageDecoder = $messageDecoder ?? new JsonMessageDecoder();
-        $this->logger         = $logger ?? new NullLogger();
+        $this->logger = $logger ?? new NullLogger();
 
         $this->client = new AmqpBunnyClient($amqpConfiguration, $logger);
 
@@ -95,6 +95,8 @@ final class AmqpBunny implements Transport
     }
 
     /**
+     * @psalm-suppress TypeCoercion
+     *
      * @inheritDoc
      */
     public function createTopic(Topic $topic): void
@@ -117,6 +119,8 @@ final class AmqpBunny implements Transport
     }
 
     /**
+     * @psalm-suppress TypeCoercion
+     *
      * @inheritDoc
      */
     public function createQueue(Queue $queue): void
@@ -167,14 +171,9 @@ final class AmqpBunny implements Transport
     /**
      * @inheritDoc
      */
-    public function close(): void
+    public function close(): Promise
     {
-        asyncCall(
-            function(): \Generator
-            {
-                yield $this->client->disconnect();
-            }
-        );
+        return $this->client->disconnect();
     }
 
     /**
@@ -191,7 +190,10 @@ final class AmqpBunny implements Transport
                 {
                     yield $this->client->connect();
 
-                    $this->channel = yield  $this->client->channel();
+                    /** @var Channel $channel */
+                    $channel = yield $this->client->channel();
+
+                    $this->channel = $channel;
                 }
             );
 
@@ -200,6 +202,13 @@ final class AmqpBunny implements Transport
         }
         catch(\Throwable $throwable)
         {
+            /** Delete message from promise resolver (wait()) */
+            if(null !== $throwable->getPrevious())
+            {
+                /** @var \Throwable $throwable */
+                $throwable = $throwable->getPrevious();
+            }
+
             throw new ConnectionFail($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
     }

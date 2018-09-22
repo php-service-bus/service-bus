@@ -19,6 +19,7 @@ use Amp\Failure as AmpFailurePromise;
 use Amp\Loop as AmpLoop;
 use Amp\Loop;
 use Amp\Promise as AmpPromise;
+use Amp\Success;
 use Bunny\AbstractClient;
 use Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration;
 use Psr\Log\NullLogger;
@@ -40,34 +41,41 @@ use Psr\Log\LoggerInterface;
 final class AmqpBunnyClient extends Client
 {
     /**
+     * @var AmqpConnectionConfiguration
+     */
+    private $configuration;
+
+    /**
      * Read from stream watcher
      *
-     * @var string
+     * @var string|null
      */
     private $readWatcher;
 
     /**
      * Write to stream watcher
      *
-     * @var string
+     * @var string|null
      */
     private $writeWatcher;
 
     /**
      * Heartbeat watcher
      *
-     * @var string
+     * @var string|null
      */
     private $heartbeatWatcher;
 
     /**
      * @noinspection PhpMissingParentConstructorInspection
      *
-     * @param array                $options
-     * @param LoggerInterface|null $log
+     * @param AmqpConnectionConfiguration $configuration
+     * @param LoggerInterface|null        $log
      */
     public function __construct(AmqpConnectionConfiguration $configuration, LoggerInterface $log = null)
     {
+        $this->configuration = $configuration;
+
         $parameters = [
             'async'     => true,
             'host'      => $configuration->host(),
@@ -86,6 +94,8 @@ final class AmqpBunnyClient extends Client
 
     /**
      * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch
      *
      * @return AmpPromise<null>
      */
@@ -108,6 +118,8 @@ final class AmqpBunnyClient extends Client
     /**
      * @inheritdoc
      *
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     *
      * @return AmpPromise<null>
      */
     public function disconnect($replyCode = 0, $replyText = ''): AmpPromise
@@ -116,14 +128,9 @@ final class AmqpBunnyClient extends Client
         return call(
             function(int $replyCode, string $replyText): \Generator
             {
-                if($this->state === ClientStateEnum::DISCONNECTING && null !== $this->disconnectPromise)
-                {
-                    yield $this->disconnectPromise;
-                }
-
                 if($this->state !== ClientStateEnum::CONNECTED)
                 {
-                    throw new ClientException('Client is not connected');
+                    return new Success();
                 }
 
                 $this->onDisconnecting();
@@ -143,10 +150,14 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->connectionClose($replyCode, $replyText, 0, 0);
 
-                Loop::cancel($this->readWatcher);
+                $this->cancelReadWatcher();
+                $this->cancelWriteWatcher();
+                $this->cancelHeartbeatWatcher();
 
                 $this->closeStream();
                 $this->init();
+
+                return yield new Success();
             },
             $replyCode, $replyText
         );
@@ -163,22 +174,27 @@ final class AmqpBunnyClient extends Client
         return call(
             function(): \Generator
             {
-                $now = \microtime(true);
+                $currentTime = \microtime(true);
 
-                $nextHeartbeat = ($this->lastWrite ?: $now) + $this->options['heartbeat'];
+                /** @var float|null $lastWrite */
+                $lastWrite = $this->lastWrite;
 
-                if($now >= $nextHeartbeat)
+                if(null === $lastWrite)
+                {
+                    $lastWrite = $currentTime;
+                }
+
+                /** @var float $nextHeartbeat */
+                $nextHeartbeat = $lastWrite + $this->configuration->heartbeatInterval();
+
+                if($currentTime >= $nextHeartbeat)
                 {
                     $this->writer->appendFrame(new HeartbeatFrame(), $this->writeBuffer);
 
                     yield $this->flushWriteBuffer();
 
                     $this->addHeartbeatTimer();
-
-                    return;
                 }
-
-
             }
         );
     }
@@ -197,7 +213,7 @@ final class AmqpBunnyClient extends Client
 
         $this->writeWatcher = AmpLoop::onWritable(
             $this->getStream(),
-            function() use ($deferred)
+            function() use ($deferred): void
             {
                 try
                 {
@@ -205,7 +221,7 @@ final class AmqpBunnyClient extends Client
 
                     if($this->writeBuffer->isEmpty())
                     {
-                        AmpLoop::cancel($this->writeWatcher);
+                        $this->cancelWriteWatcher();
 
                         $this->flushWriteBufferPromise = null;
                         $deferred->resolve(true);
@@ -214,7 +230,7 @@ final class AmqpBunnyClient extends Client
                 }
                 catch(\Exception $e)
                 {
-                    AmpLoop::cancel($this->writeWatcher);
+                    $this->cancelWriteWatcher();
 
                     $this->flushWriteBufferPromise = null;
                     $deferred->reject($e);
@@ -292,15 +308,41 @@ final class AmqpBunnyClient extends Client
     }
 
     /**
-     * Cancel heartbeat timer
-     *
      * @return void
      */
-    private function cancelHeartbeatTimer(): void
+    private function cancelHeartbeatWatcher(): void
     {
-        if('' !== $this->heartbeatWatcher)
+        if(null !== $this->heartbeatWatcher)
         {
             AmpLoop::cancel($this->heartbeatWatcher);
+
+            $this->heartbeatWatcher = null;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function cancelReadWatcher(): void
+    {
+        if(null !== $this->readWatcher)
+        {
+            Loop::cancel($this->readWatcher);
+
+            $this->readWatcher = null;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function cancelWriteWatcher(): void
+    {
+        if(null !== $this->writeWatcher)
+        {
+            Loop::cancel($this->writeWatcher);
+
+            $this->writeWatcher = null;
         }
     }
 
@@ -335,7 +377,7 @@ final class AmqpBunnyClient extends Client
     {
         $this->state = ClientStateEnum::DISCONNECTING;
 
-        $this->cancelHeartbeatTimer();
+        $this->cancelHeartbeatWatcher();
     }
 
     /**

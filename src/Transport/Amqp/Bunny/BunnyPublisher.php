@@ -74,7 +74,7 @@ final class BunnyPublisher implements Publisher
                 {
                     yield $channel->publish(
                         $envelope->messageContent(),
-                        $envelope->headers(),
+                        self::collectHeaders($envelope),
                         $destination->topicName(),
                         $destination->routingKey(),
                         $envelope->isMandatory(),
@@ -88,5 +88,26 @@ final class BunnyPublisher implements Publisher
             },
             $destination, $envelope
         );
+    }
+
+    /**
+     * @param OutboundEnvelope $envelope
+     *
+     * @return array<string, mixed>
+     */
+    private static function collectHeaders(OutboundEnvelope $envelope): array
+    {
+        $headers = \array_merge($envelope->headers(), [
+            'content-type'     => $envelope->contentType(),
+            'content-encoding' => $envelope->contentEncoding(),
+            'delivery-mode'    => true === $envelope->isPersistent() ? AmqpOutboundEnvelope::AMQP_DURABLE : null,
+            'priority'         => $envelope->priority(),
+            'expiration'       => $envelope->expirationTime(),
+            'message-id'       => $envelope->messageId(),
+            'user-id'          => $envelope->clientId(),
+            'app-id'           => $envelope->appId()
+        ]);
+
+        return \array_filter($headers);
     }
 }

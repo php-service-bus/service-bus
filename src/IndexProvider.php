@@ -32,7 +32,7 @@ final class IndexProvider
     private $storage;
 
     /**
-     * @param IndexesStorage $adapter
+     * @param IndexesStorage $storage
      */
     public function __construct(IndexesStorage $storage)
     {

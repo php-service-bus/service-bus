@@ -13,8 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
-use Amp\Coroutine;
-use Amp\Loop;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector;
 use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound;
@@ -222,7 +220,7 @@ final class ServiceBusKernel
 
             try
             {
-                $d = yield $messageBus->dispatch(
+                yield $messageBus->dispatch(
                     new KernelContext($envelope, $messagePublisher, $logger)
                 );
             }

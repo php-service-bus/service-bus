@@ -83,10 +83,10 @@ final class AmqpBunnyConsumer implements Consumer
         LoggerInterface $logger = null
     )
     {
-        $this->listenQueue    = $listenQueue;
-        $this->channel        = $channel;
+        $this->listenQueue = $listenQueue;
+        $this->channel = $channel;
         $this->messageDecoder = $messageDecoder;
-        $this->logger         = $logger ?? new NullLogger();
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
@@ -95,7 +95,7 @@ final class AmqpBunnyConsumer implements Consumer
     public function listen(callable $messageProcessor): void
     {
         $this->consumerTag = \sha1(uuid());
-        $logger            = $this->logger;
+        $logger = $this->logger;
 
         $this->channel->run(
             function(BunnyMessage $envelope, Channel $channel) use ($messageProcessor, $logger): \Generator
@@ -130,7 +130,7 @@ final class AmqpBunnyConsumer implements Consumer
     private function process(BunnyMessage $envelope, Channel $channel, LoggerInterface $logger, callable $messageProcessor): Promise
     {
         $operationId = uuid();
-        $decoder     = $this->messageDecoder;
+        $decoder = $this->messageDecoder;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
@@ -244,7 +244,7 @@ final class AmqpBunnyConsumer implements Consumer
         TransportMessageDecoder $decoder
     ): IncomingEnvelope
     {
-        $body         = $envelope->content;
+        $body = $envelope->content;
         $unserialized = $decoder->unserialize($body);
 
         return new IncomingEnvelope(
@@ -284,7 +284,7 @@ final class AmqpBunnyConsumer implements Consumer
         }
 
         $channel = $this->channel;
-        $logger  = $this->logger;
+        $logger = $this->logger;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
@@ -311,9 +311,10 @@ final class AmqpBunnyConsumer implements Consumer
     }
 
     /**
-     * @param string       $operationId
-     * @param BunnyMessage $envelope
-     * @param \Throwable   $throwable
+     * @param string          $operationId
+     * @param BunnyMessage    $envelope
+     * @param \Throwable      $throwable
+     * @param LoggerInterface $logger
      *
      * @return void
      */
@@ -338,6 +339,7 @@ final class AmqpBunnyConsumer implements Consumer
      * @param string              $operationId
      * @param BunnyMessage        $envelope
      * @param DecodeMessageFailed $exception
+     * @param LoggerInterface     $logger
      *
      * @return void
      */

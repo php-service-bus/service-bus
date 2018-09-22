@@ -39,7 +39,7 @@ final class LoopBlockDetector
     private $detector;
 
     /**
-     * @param BlockDetector $detector
+     * @param LoggerInterface|null $logger
      */
     public function __construct(LoggerInterface $logger = null)
     {
@@ -90,7 +90,7 @@ final class LoopBlockDetector
     {
         return static function(int $blockInterval) use ($logger): void
         {
-            $trace     = \debug_backtrace();
+            $trace = \debug_backtrace();
             $traceData = ['info' => []];
 
             /** skip first since it's always the current method */

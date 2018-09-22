@@ -34,12 +34,13 @@ final class TopicBind
     private $routingKey;
 
     /**
-     * @param Topic       $topic
+     * @param Topic       $sourceTopic
+     * @param Topic       $destinationTopic
      * @param string|null $routingKey
      */
     public function __construct(Topic $sourceTopic, Topic $destinationTopic, ?string $routingKey = null)
     {
-        $this->sourceTopic      = $sourceTopic;
+        $this->sourceTopic = $sourceTopic;
         $this->destinationTopic = $destinationTopic;
         $this->routingKey = $routingKey;
     }

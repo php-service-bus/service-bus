@@ -120,6 +120,7 @@ final class SchedulerProvider
      *
      * @param ScheduledOperationId   $id
      * @param MessageDeliveryContext $context
+     * @param string|null            $reason
      *
      * @return Promise<null>
      *
@@ -164,7 +165,7 @@ final class SchedulerProvider
      *
      * @noinspection PhpUnusedPrivateMethodInspection
      *
-     * @param ScheduledOperationId   $operationId
+     * @param ScheduledOperationId   $id
      * @param MessageDeliveryContext $context
      *
      * @return Promise<null>

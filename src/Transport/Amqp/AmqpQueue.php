@@ -21,9 +21,9 @@ use Desperado\ServiceBus\Transport\Topic;
  */
 final class AmqpQueue implements Queue
 {
-    private const AMQP_DURABLE     = 2;
-    private const AMQP_PASSIVE     = 4;
-    private const AMQP_EXCLUSIVE   = 8;
+    private const AMQP_DURABLE = 2;
+    private const AMQP_PASSIVE = 4;
+    private const AMQP_EXCLUSIVE = 8;
     private const AMQP_AUTO_DELETE = 16;
 
     /**
@@ -106,6 +106,7 @@ final class AmqpQueue implements Queue
 
     /**
      * @param string $name
+     * @param bool   $durable
      */
     public function __construct(string $name, bool $durable = false)
     {
@@ -119,6 +120,7 @@ final class AmqpQueue implements Queue
 
     /**
      * @param string $name
+     * @param bool   $durable
      *
      * @return self
      */
@@ -133,6 +135,7 @@ final class AmqpQueue implements Queue
      * @see https://github.com/rabbitmq/rabbitmq-delayed-message-exchange
      *
      * @param string $name
+     * @param Topic  $toTopic
      *
      * @return self
      */
@@ -161,7 +164,7 @@ final class AmqpQueue implements Queue
         if(false === $this->isPassive())
         {
             $this->passive = true;
-            $this->flags   += self::AMQP_PASSIVE;
+            $this->flags += self::AMQP_PASSIVE;
         }
 
         return $this;
@@ -183,7 +186,7 @@ final class AmqpQueue implements Queue
         if(false === $this->isExclusive())
         {
             $this->exclusive = true;
-            $this->flags     += self::AMQP_EXCLUSIVE;
+            $this->flags += self::AMQP_EXCLUSIVE;
         }
 
         return $this;
@@ -205,7 +208,7 @@ final class AmqpQueue implements Queue
         if(false === $this->isDurable())
         {
             $this->durable = true;
-            $this->flags   += self::AMQP_DURABLE;
+            $this->flags += self::AMQP_DURABLE;
         }
 
         return $this;
@@ -227,7 +230,7 @@ final class AmqpQueue implements Queue
         if(false === $this->autoDeleteEnabled())
         {
             $this->autoDelete = true;
-            $this->flags      += self::AMQP_AUTO_DELETE;
+            $this->flags += self::AMQP_AUTO_DELETE;
         }
 
         return $this;

@@ -26,6 +26,8 @@ interface MessageDeliveryContext
     /**
      * Execute simple messages (commands\events) delivery
      *
+     * @noinspection PhpDocSignatureInspection
+     *
      * @param Message ...$messages
      *
      * @return Promise<null>
@@ -34,6 +36,8 @@ interface MessageDeliveryContext
 
     /**
      * Send command with specified options
+     *
+     * @noinspection PhpDocSignatureInspection
      *
      * @param Command            headers
      * @param array $headers

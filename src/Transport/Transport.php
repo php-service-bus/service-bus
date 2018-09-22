@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport;
 
+use Amp\Promise;
+
 /**
  *
  */
@@ -81,7 +83,7 @@ interface Transport
     /**
      * Close context
      *
-     * @return void
+     * @return Promise<null>
      */
-    public function close(): void;
+    public function close(): Promise;
 }

@@ -73,6 +73,8 @@ function notEqualsCriteria(string $field, $value): CriteriaInterface
 /**
  * Create select query
  *
+ * @noinspection PhpDocSignatureInspection
+ *
  * @param string $fromTable
  * @param string ...$columns
  *

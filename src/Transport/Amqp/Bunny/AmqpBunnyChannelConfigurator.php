@@ -46,7 +46,7 @@ final class AmqpBunnyChannelConfigurator
     public function __construct(Channel $channel, LoggerInterface $logger)
     {
         $this->channel = $channel;
-        $this->logger  = $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -151,6 +151,10 @@ final class AmqpBunnyChannelConfigurator
     }
 
     /**
+     * @param string $queue
+     * @param string $exchange
+     * @param string $routingKey
+     *
      * @return void
      *
      * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed

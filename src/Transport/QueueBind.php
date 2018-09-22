@@ -34,13 +34,14 @@ final class QueueBind
     private $routingKey;
 
     /**
+     * @param Queue       $queue
      * @param Topic       $topic
      * @param string|null $routingKey
      */
     public function __construct(Queue $queue, Topic $topic, ?string $routingKey = null)
     {
-        $this->queue      = $queue;
-        $this->topic      = $topic;
+        $this->queue = $queue;
+        $this->topic = $topic;
         $this->routingKey = $routingKey;
     }
 

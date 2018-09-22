@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 
+use Amp\Promise;
+use Amp\Success;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\JsonMessageDecoder;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
@@ -107,9 +109,8 @@ class VirtualTransport implements Transport
     /**
      * @inheritDoc
      */
-    public function close(): void
+    public function close(): Promise
     {
-
+        return new Success();
     }
-
 }

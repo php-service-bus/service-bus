@@ -58,4 +58,28 @@ final class AmqpConnectionConfigurationTest extends TestCase
             )
         );
     }
+
+    /**
+     * @test
+     * @expectedException  \Desperado\ServiceBus\Transport\Exceptions\InvalidConnectionParameters
+     * @expectedExceptionMessage Can't parse specified connection DSN (///example.org:80)
+     *
+     * @return void
+     */
+    public function failedQuery(): void
+    {
+        new AmqpConnectionConfiguration('///example.org:80');
+    }
+
+    /**
+     * @test
+     * @expectedException  \Desperado\ServiceBus\Transport\Exceptions\InvalidConnectionParameters
+     * @expectedExceptionMessage Connection DSN can't be empty
+     *
+     * @return void
+     */
+    public function emptyDSN(): void
+    {
+        new AmqpConnectionConfiguration('');
+    }
 }

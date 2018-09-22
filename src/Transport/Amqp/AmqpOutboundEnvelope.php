@@ -20,6 +20,8 @@ use Desperado\ServiceBus\Transport\OutboundEnvelope;
  */
 final class AmqpOutboundEnvelope implements OutboundEnvelope
 {
+    public const AMQP_DURABLE = 2;
+
     /**
      * Message body
      *
@@ -229,27 +231,64 @@ final class AmqpOutboundEnvelope implements OutboundEnvelope
     /**
      * @inheritdoc
      */
-    public function headers(): array
+    public function contentType(): string
     {
-        return $this->headers;
+        return $this->contentType;
     }
 
     /**
      * @inheritdoc
      */
-    public function attributes(): array
+    public function contentEncoding(): string
     {
-        return \array_filter([
-                'content_type'     => $this->contentType,
-                'content_encoding' => $this->contentEncoding,
-                'message_id'       => $this->messageId,
-                'user_id'          => $this->userId,
-                'app_id'           => $this->appId,
-                'delivery_mode'    => true === $this->persistent ? \AMQP_DURABLE : null,
-                'priority'         => $this->priority,
-                'expiration'       => $this->expirationTime,
-                'headers'          => $this->headers
-            ]
-        );
+        return $this->contentEncoding;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isPersistent(): bool
+    {
+        return $this->persistent;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function priority(): int
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function expirationTime(): ?int
+    {
+        return $this->expirationTime;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function appId(): ?string
+    {
+        return $this->appId;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function clientId(): ?string
+    {
+        return $this->userId;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function headers(): array
+    {
+        return $this->headers;
     }
 }
