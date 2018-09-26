@@ -19,6 +19,7 @@ use Amp\Failure as AmpFailurePromise;
 use Amp\Loop as AmpLoop;
 use Amp\Loop;
 use Amp\Promise as AmpPromise;
+use Amp\Promise;
 use Amp\Success;
 use Bunny\AbstractClient;
 use Bunny\Protocol as AmqpProtocol;
@@ -166,11 +167,16 @@ final class AmqpBunnyClient extends Client
 
     /**
      * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     *
+     * @return Promise<\Desperado\ServiceBus\Transport\Amqp\Bunny\AmqpBunnyChannel>
      */
-    public function channel()
+    public function channel(): Promise
     {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            function()
+            function(): \Generator
             {
                 try
                 {
@@ -229,10 +235,17 @@ final class AmqpBunnyClient extends Client
     /**
      * @inheritdoc
      *
+     * @psalm-suppress MissingParamType
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     *
      * @return AmpPromise<bool>
      */
-    public function consume($channel, $queue = '', $consumerTag = '', $noLocal = false, $noAck = false, $exclusive = false, $nowait = false, $arguments = []): AmpPromise
+    public function consume(
+        $channel, $queue = '', $consumerTag = '', $noLocal = false, $noAck = false,
+        $exclusive = false, $nowait = false, $arguments = []
+    ): AmpPromise
     {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             function(
                 int $channel, string $queue, string $consumerTag, bool $noLocal, bool $noAck,
@@ -254,7 +267,8 @@ final class AmqpBunnyClient extends Client
                 $frame              = new AmqpProtocol\MethodFrame(60, 20);
                 $frame->channel     = $channel;
                 $frame->payloadSize = $buffer->getLength();
-                $frame->payload     = $buffer;
+                /** @psalm-suppress InvalidPropertyAssignmentValue */
+                $frame->payload = $buffer;
 
                 $this->getWriter()->appendFrame($frame, $this->getWriteBuffer());
 

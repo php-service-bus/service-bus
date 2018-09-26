@@ -98,7 +98,7 @@ final class AmqpBunnyConsumer implements Consumer
         $this->consumerTag = \sha1(uuid());
 
         asyncCall(
-            function() use ($messageProcessor)
+            function() use ($messageProcessor): \Generator
             {
                 $logger = $this->logger;
 
