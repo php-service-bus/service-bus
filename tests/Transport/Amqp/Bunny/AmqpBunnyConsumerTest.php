@@ -26,6 +26,7 @@ use Desperado\ServiceBus\Transport\Amqp\Bunny\AmqpBunny;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Desperado\ServiceBus\Transport\QueueBind;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 /**
  *
@@ -53,7 +54,7 @@ final class AmqpBunnyConsumerTest extends TestCase
 
         $this->transport = new AmqpBunny(AmqpConnectionConfiguration::createLocalhost());
 
-        $queue = AmqpQueue::default('qwerty.message');
+        $queue    = AmqpQueue::default('qwerty.message');
         $exchange = AmqpExchange::direct('qwerty');
 
         $this->transport->createTopic($exchange);
@@ -110,14 +111,32 @@ final class AmqpBunnyConsumerTest extends TestCase
             ->listen(
                 function(IncomingEnvelope $incomingEnvelope)
                 {
-                    die(__FILE__);
+                    try
+                    {
+                        static::assertNotEmpty($incomingEnvelope->operationId());
+                        static::assertTrue(Uuid::isValid($incomingEnvelope->operationId()));
+
+                        static::assertNotEmpty($incomingEnvelope->headers());
+                        static::assertCount(3, $incomingEnvelope->headers());
+                        static::assertEquals([
+                            'headerKey'        => 'headerValue',
+                            'content-type'     => 'application/json',
+                            'content-encoding' => 'UTF-8',
+                        ], $incomingEnvelope->headers());
+
+                        /** @noinspection UnnecessaryAssertionInspection */
+                        static::assertInstanceOf(CommandWithPayload::class, $incomingEnvelope->denormalized());
+                    }
+                    catch(\Throwable $throwable)
+                    {
+                        echo $throwable->getMessage(), \PHP_EOL;
+                        exit(1);
+                    }
+
+                    Loop::stop();
                 }
             );
 
-        Loop::run(
-            function(){
-                echo 'tick', PHP_EOL;
-            }
-        );
+        Loop::run();
     }
 }

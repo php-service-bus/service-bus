@@ -75,7 +75,7 @@ final class Snapshotter
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise<\Desperado\EventSourcing\Snapshot\AggregateSnapshot|null>
+     * @return Promise<\Desperado\ServiceBus\EventSourcing\AggregateSnapshot|null>
      */
     public function load(AggregateId $id): Promise
     {

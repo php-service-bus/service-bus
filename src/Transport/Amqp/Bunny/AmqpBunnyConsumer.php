@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
 use function Amp\asyncCall;
 use function Amp\call;
-use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Bunny\Channel;
@@ -85,10 +84,10 @@ final class AmqpBunnyConsumer implements Consumer
         LoggerInterface $logger = null
     )
     {
-        $this->listenQueue = $listenQueue;
-        $this->channel = $channel;
+        $this->listenQueue    = $listenQueue;
+        $this->channel        = $channel;
         $this->messageDecoder = $messageDecoder;
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger         = $logger ?? new NullLogger();
     }
 
     /**
@@ -138,7 +137,7 @@ final class AmqpBunnyConsumer implements Consumer
     private function process(BunnyMessage $envelope, Channel $channel, LoggerInterface $logger, callable $messageProcessor): Promise
     {
         $operationId = uuid();
-        $decoder = $this->messageDecoder;
+        $decoder     = $this->messageDecoder;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
@@ -161,9 +160,9 @@ final class AmqpBunnyConsumer implements Consumer
                 }
                 catch(\Throwable $throwable)
                 {
-                    $this->logThrowable($operationId, $envelope, $throwable, $logger);
+                    self::logThrowable($operationId, $envelope, $throwable, $logger);
 
-                    $this->reject($channel, $envelope, $logger, true);
+                    self::reject($channel, $envelope, $logger, true);
                 }
             },
             $operationId, $envelope
@@ -213,7 +212,7 @@ final class AmqpBunnyConsumer implements Consumer
      *
      * @return Promise<null>
      */
-    private function reject(Channel $channel, BunnyMessage $envelope, LoggerInterface $logger, bool $retry = false): Promise
+    private static function reject(Channel $channel, BunnyMessage $envelope, LoggerInterface $logger, bool $retry = false): Promise
     {
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
@@ -252,7 +251,7 @@ final class AmqpBunnyConsumer implements Consumer
         TransportMessageDecoder $decoder
     ): IncomingEnvelope
     {
-        $body = $envelope->content;
+        $body         = $envelope->content;
         $unserialized = $decoder->unserialize($body);
 
         return new IncomingEnvelope(
@@ -292,7 +291,7 @@ final class AmqpBunnyConsumer implements Consumer
         }
 
         $channel = $this->channel;
-        $logger = $this->logger;
+        $logger  = $this->logger;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
@@ -333,6 +332,7 @@ final class AmqpBunnyConsumer implements Consumer
         LoggerInterface $logger
     ): void
     {
+
         $logger->error(
             'Error processing message: "{throwableMessage}"', [
                 'throwableMessage'  => $throwable->getMessage(),

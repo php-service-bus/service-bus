@@ -21,13 +21,10 @@ use Amp\Loop;
 use Amp\Promise as AmpPromise;
 use Amp\Success;
 use Bunny\AbstractClient;
-use Bunny\Protocol\Buffer;
-use Bunny\Protocol\MethodFrame;
+use Bunny\Protocol as AmqpProtocol;
 use Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration;
 use Psr\Log\NullLogger;
 use React\Promise\Deferred as ReactDeferred;
-use React\Promise\FulfilledPromise;
-use React\Promise\Promise;
 use React\Promise\PromiseInterface as ReactPromise;
 use Bunny\Protocol\HeartbeatFrame;
 use Bunny\Protocol\MethodConnectionStartFrame;
@@ -229,33 +226,43 @@ final class AmqpBunnyClient extends Client
         );
     }
 
-    public function consume($channel, $queue = '', $consumerTag = '', $noLocal = false, $noAck = false, $exclusive = false, $nowait = false, $arguments = [])
+    /**
+     * @inheritdoc
+     *
+     * @return AmpPromise<bool>
+     */
+    public function consume($channel, $queue = '', $consumerTag = '', $noLocal = false, $noAck = false, $exclusive = false, $nowait = false, $arguments = []): AmpPromise
     {
         return call(
-            function() use ($channel, $queue, $consumerTag, $noLocal, $noAck, $exclusive, $nowait, $arguments)
+            function(
+                int $channel, string $queue, string $consumerTag, bool $noLocal, bool $noAck,
+                bool $exclusive, bool $nowait, array $arguments
+            ): \Generator
             {
-                $buffer = new Buffer();
+                $buffer = new AmqpProtocol\Buffer();
                 $buffer->appendUint16(60);
                 $buffer->appendUint16(20);
                 $buffer->appendInt16(0);
-                $buffer->appendUint8(strlen($queue));
+                $buffer->appendUint8(\strlen($queue));
                 $buffer->append($queue);
-                $buffer->appendUint8(strlen($consumerTag));
+                $buffer->appendUint8(\strlen($consumerTag));
                 $buffer->append($consumerTag);
+
                 $this->getWriter()->appendBits([$noLocal, $noAck, $exclusive, $nowait], $buffer);
                 $this->getWriter()->appendTable($arguments, $buffer);
-                $frame = new MethodFrame(60, 20);
-                $frame->channel = $channel;
+
+                $frame              = new AmqpProtocol\MethodFrame(60, 20);
+                $frame->channel     = $channel;
                 $frame->payloadSize = $buffer->getLength();
-                $frame->payload = $buffer;
+                $frame->payload     = $buffer;
+
                 $this->getWriter()->appendFrame($frame, $this->getWriteBuffer());
 
                 yield $this->flushWriteBuffer();
 
-                $result = yield $this->awaitConsumeOk($channel);
-
-                return yield new FulfilledPromise($result);
-            }
+                return yield new Success(yield $this->awaitConsumeOk($channel));
+            },
+            $channel, $queue, $consumerTag, $noLocal, $noAck, $exclusive, $nowait, $arguments
         );
     }
 

@@ -63,7 +63,7 @@ interface AggregateStore
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise<\Desperado\ServiceBus\EventSourcing\Store\StoredAggregateEventStream|null>
+     * @return Promise<\Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStream|null>
      *
      * @param AggregateId $id
      * @param int         $fromVersion
