@@ -16,7 +16,6 @@ namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 use function Amp\call;
 use Amp\Promise;
 use function Amp\Promise\wait;
-use Bunny\Channel;
 use Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\Exceptions\ConnectionFail;
@@ -44,7 +43,7 @@ final class AmqpBunny implements Transport
     private $client;
 
     /**
-     * @var Channel
+     * @var AmqpBunnyChannel
      */
     private $channel;
 
@@ -190,7 +189,7 @@ final class AmqpBunny implements Transport
                 {
                     yield $this->client->connect();
 
-                    /** @var Channel $channel */
+                    /** @var AmqpBunnyChannel $channel */
                     $channel = yield $this->client->channel();
 
                     $this->channel = $channel;

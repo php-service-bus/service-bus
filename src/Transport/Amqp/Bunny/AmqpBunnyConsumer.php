@@ -13,7 +13,9 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
+use function Amp\asyncCall;
 use function Amp\call;
+use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Bunny\Channel;
@@ -95,25 +97,31 @@ final class AmqpBunnyConsumer implements Consumer
     public function listen(callable $messageProcessor): void
     {
         $this->consumerTag = \sha1(uuid());
-        $logger = $this->logger;
 
-        $this->channel->run(
-            function(BunnyMessage $envelope, Channel $channel) use ($messageProcessor, $logger): \Generator
+        asyncCall(
+            function() use ($messageProcessor)
             {
-                if(self::STOP_MESSAGE_CONTENT !== $envelope->content)
-                {
-                    yield $this->process($envelope, $channel, $logger, $messageProcessor);
-                }
-                else
-                {
-                    yield static::acknowledge($channel, $envelope, $logger);
+                $logger = $this->logger;
 
-                    $this->cancelSubscription('Received stop message command');
-                }
+                yield $this->channel->consume(
+                    function(BunnyMessage $envelope, Channel $channel) use ($messageProcessor, $logger): \Generator
+                    {
+                        if(self::STOP_MESSAGE_CONTENT !== $envelope->content)
+                        {
+                            yield $this->process($envelope, $channel, $logger, $messageProcessor);
+                        }
+                        else
+                        {
+                            yield static::acknowledge($channel, $envelope, $logger);
 
-                yield $this->checkCycleActivity();
-            },
-            (string) $this->listenQueue, $this->consumerTag
+                            $this->cancelSubscription('Received stop message command');
+                        }
+
+                        yield $this->checkCycleActivity();
+                    },
+                    (string) $this->listenQueue, $this->consumerTag
+                );
+            }
         );
     }
 

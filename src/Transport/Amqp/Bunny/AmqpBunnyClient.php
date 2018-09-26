@@ -21,9 +21,13 @@ use Amp\Loop;
 use Amp\Promise as AmpPromise;
 use Amp\Success;
 use Bunny\AbstractClient;
+use Bunny\Protocol\Buffer;
+use Bunny\Protocol\MethodFrame;
 use Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration;
 use Psr\Log\NullLogger;
 use React\Promise\Deferred as ReactDeferred;
+use React\Promise\FulfilledPromise;
+use React\Promise\Promise;
 use React\Promise\PromiseInterface as ReactPromise;
 use Bunny\Protocol\HeartbeatFrame;
 use Bunny\Protocol\MethodConnectionStartFrame;
@@ -165,6 +169,32 @@ final class AmqpBunnyClient extends Client
 
     /**
      * @inheritdoc
+     */
+    public function channel()
+    {
+        return call(
+            function()
+            {
+                try
+                {
+                    $channelId = $this->findChannelId();
+
+                    $this->channels[$channelId] = new AmqpBunnyChannel($this, $channelId);
+
+                    yield $this->channelOpen($channelId);
+
+                    return yield new Success($this->channels[$channelId]);
+                }
+                catch(\Throwable $throwable)
+                {
+                    throw new ClientException('channel.open unexpected response', $throwable->getCode(), $throwable);
+                }
+            }
+        );
+    }
+
+    /**
+     * @inheritdoc
      *
      * @return AmpPromise<null>
      */
@@ -199,6 +229,36 @@ final class AmqpBunnyClient extends Client
         );
     }
 
+    public function consume($channel, $queue = '', $consumerTag = '', $noLocal = false, $noAck = false, $exclusive = false, $nowait = false, $arguments = [])
+    {
+        return call(
+            function() use ($channel, $queue, $consumerTag, $noLocal, $noAck, $exclusive, $nowait, $arguments)
+            {
+                $buffer = new Buffer();
+                $buffer->appendUint16(60);
+                $buffer->appendUint16(20);
+                $buffer->appendInt16(0);
+                $buffer->appendUint8(strlen($queue));
+                $buffer->append($queue);
+                $buffer->appendUint8(strlen($consumerTag));
+                $buffer->append($consumerTag);
+                $this->getWriter()->appendBits([$noLocal, $noAck, $exclusive, $nowait], $buffer);
+                $this->getWriter()->appendTable($arguments, $buffer);
+                $frame = new MethodFrame(60, 20);
+                $frame->channel = $channel;
+                $frame->payloadSize = $buffer->getLength();
+                $frame->payload = $buffer;
+                $this->getWriter()->appendFrame($frame, $this->getWriteBuffer());
+
+                yield $this->flushWriteBuffer();
+
+                $result = yield $this->awaitConsumeOk($channel);
+
+                return yield new FulfilledPromise($result);
+            }
+        );
+    }
+
     /**
      * @inheritdoc
      */
@@ -219,7 +279,7 @@ final class AmqpBunnyClient extends Client
                 {
                     $this->write();
 
-                    if($this->writeBuffer->isEmpty())
+                    if(true === $this->writeBuffer->isEmpty())
                     {
                         $this->cancelWriteWatcher();
 

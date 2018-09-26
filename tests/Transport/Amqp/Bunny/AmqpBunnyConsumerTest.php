@@ -13,9 +13,9 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Transport\Amqp\Bunny;
 
+use Amp\Loop;
 use function Amp\Promise\wait;
 use Bunny\Channel;
-use Bunny\Message;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\Tests\Stubs\Messages\CommandWithPayload;
@@ -23,13 +23,14 @@ use Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration;
 use Desperado\ServiceBus\Transport\Amqp\AmqpExchange;
 use Desperado\ServiceBus\Transport\Amqp\AmqpQueue;
 use Desperado\ServiceBus\Transport\Amqp\Bunny\AmqpBunny;
+use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Desperado\ServiceBus\Transport\QueueBind;
 use PHPUnit\Framework\TestCase;
 
 /**
  *
  */
-final class BunnyPublisherTest extends TestCase
+final class AmqpBunnyConsumerTest extends TestCase
 {
     /**
      * @var AmqpBunny
@@ -94,7 +95,7 @@ final class BunnyPublisherTest extends TestCase
      *
      * @throws \Throwable
      */
-    public function successPublish(): void
+    public function successConsume(): void
     {
         $publisher = $this->transport->createPublisher();
 
@@ -104,38 +105,19 @@ final class BunnyPublisherTest extends TestCase
 
         wait($publisher->send(new Destination('qwerty', 'testing'), $envelope));
 
-        /** @var \Bunny\Message $incomingMessage */
-        $incomingMessage = wait($this->channel->get('qwerty.message'));
+        $this->transport
+            ->createConsumer(AmqpQueue::default('qwerty.message'))
+            ->listen(
+                function(IncomingEnvelope $incomingEnvelope)
+                {
+                    die(__FILE__);
+                }
+            );
 
-        static::assertNotNull($message);
-        static::assertInstanceOf(Message::class, $incomingMessage);
-
-        $jsonDecodedMessage = \json_decode($incomingMessage->content, true);
-
-        static::assertInternalType('array', $jsonDecodedMessage);
-        static::assertNotEmpty($jsonDecodedMessage);
-        static::assertArrayHasKey('message', $jsonDecodedMessage);
-        static::assertArrayHasKey('namespace', $jsonDecodedMessage);
-        static::assertArrayHasKey('payload', $jsonDecodedMessage['message']);
-        static::assertEquals($message->payload(), $jsonDecodedMessage['message']['payload']);
-
-    }
-
-    /**
-     * @test
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function publishToWrongExchange(): void
-    {
-        $publisher = $this->transport->createPublisher();
-        $promise = $publisher->send(
-            new Destination('qwerty', 'root'),
-            $publisher->createEnvelope(new CommandWithPayload('payload'))
+        Loop::run(
+            function(){
+                echo 'tick', PHP_EOL;
+            }
         );
-
-        wait($promise);
     }
 }

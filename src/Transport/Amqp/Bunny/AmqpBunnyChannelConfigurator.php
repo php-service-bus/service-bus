@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
 use function Amp\Promise\wait;
-use Bunny\Channel;
 use Desperado\ServiceBus\Transport\Amqp\AmqpExchange;
 use Desperado\ServiceBus\Transport\Amqp\AmqpQueue;
 use Desperado\ServiceBus\Transport\Exceptions\BindFailed;
@@ -30,7 +29,7 @@ final class AmqpBunnyChannelConfigurator
 {
 
     /**
-     * @var Channel
+     * @var AmqpBunnyChannel
      */
     private $channel;
 
@@ -40,10 +39,10 @@ final class AmqpBunnyChannelConfigurator
     private $logger;
 
     /**
-     * @param Channel         $channel
+     * @param AmqpBunnyChannel         $channel
      * @param LoggerInterface $logger
      */
-    public function __construct(Channel $channel, LoggerInterface $logger)
+    public function __construct(AmqpBunnyChannel $channel, LoggerInterface $logger)
     {
         $this->channel = $channel;
         $this->logger = $logger;
