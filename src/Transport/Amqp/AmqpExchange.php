@@ -11,18 +11,21 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Transport\AmqpExt;
+namespace Desperado\ServiceBus\Transport\Amqp;
 
 use Desperado\ServiceBus\Transport\Topic;
 
 /**
  * Exchange details
  */
-final class AmqpTopic implements Topic
+final class AmqpExchange implements Topic
 {
-    private const TYPE_FANOUT = \AMQP_EX_TYPE_FANOUT;
-    private const TYPE_DIRECT = \AMQP_EX_TYPE_DIRECT;
-    private const TYPE_TOPIC  = \AMQP_EX_TYPE_TOPIC;
+    private const TYPE_FANOUT = 'fanout';
+    private const TYPE_DIRECT = 'direct';
+    private const TYPE_TOPIC  = 'topic';
+
+    private const AMQP_DURABLE = 2;
+    private const AMQP_PASSIVE = 4;
 
     /** Plugin rabbitmq_delayed_message_exchange */
     private const TYPE_DELAYED = 'x-delayed-message';
@@ -144,13 +147,21 @@ final class AmqpTopic implements Topic
      */
     public function makePassive(): self
     {
-        if(false === $this->passive)
+        if(false === $this->isPassive())
         {
             $this->passive = true;
-            $this->flags   += \AMQP_PASSIVE;
+            $this->flags   += self::AMQP_PASSIVE;
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPassive(): bool
+    {
+        return $this->passive;
     }
 
     /**
@@ -158,13 +169,21 @@ final class AmqpTopic implements Topic
      */
     public function makeDurable(): self
     {
-        if(false === $this->durable)
+        if(false === $this->isDurable())
         {
             $this->durable = true;
-            $this->flags   += \AMQP_DURABLE;
+            $this->flags   += self::AMQP_DURABLE;
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDurable(): bool
+    {
+        return $this->durable;
     }
 
     /**

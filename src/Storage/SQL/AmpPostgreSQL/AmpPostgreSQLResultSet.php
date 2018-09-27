@@ -33,6 +33,7 @@ class AmpPostgreSQLResultSet implements ResultSet
     private $originalResultSet;
 
     /**
+     * @noinspection   PhpDocSignatureInspection
      * @psalm-suppress TypeCoercion
      *
      * @param AmpResultSet|PooledResultSet $originalResultSet

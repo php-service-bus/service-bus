@@ -13,9 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Application\Kernel;
 
-use Amp\Promise;
-use function Amp\Promise\wait;
-use Amp\Success;
 use Desperado\ServiceBus\Application\Bootstrap;
 use Desperado\ServiceBus\Application\ServiceBusKernel;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;

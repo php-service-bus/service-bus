@@ -3,14 +3,12 @@
         totallyTyped="false"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="https://getpsalm.org/schema/config"
-        xsi:schemaLocation="https://getpsalm.org/schema/config file:///home/desperado/var/www/Desperado/sagas/vendor/vimeo/psalm/config.xsd"
+        xsi:schemaLocation="https://getpsalm.org/schema/config"
 >
     <projectFiles>
         <directory name="src"/>
         <ignoreFiles>
             <directory name="vendor"/>
-            <!-- Storage for AMQPEnvelope::getheaders is not user-defined -->
-            <file name="src/Transport/AmqpExt/AmqpConsumer.php"/>
         </ignoreFiles>
     </projectFiles>
 

@@ -46,7 +46,7 @@ final class KernelTestService
      * @param TriggerResponseEventCommand $command
      * @param KernelContext               $context
      *
-     * @return void
+     * @return \Generator
      */
     public function handleWithSuccessResponse(
         TriggerResponseEventCommand $command,

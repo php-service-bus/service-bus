@@ -13,8 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Configuration;
 
-use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerCollection;
-
 /**
  * Retrieving a list of saga event handlers and saga metadata
  */
@@ -25,7 +23,7 @@ interface SagaConfigurationLoader
      *
      * @param string $sagaClass
      *
-     * @return HandlerCollection
+     * @return SagaConfiguration
      *
      * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
      */

@@ -16,6 +16,7 @@ namespace Desperado\ServiceBus\Tests\Scheduler;
 use Amp\Coroutine;
 use function Amp\Promise\wait;
 use Desperado\ServiceBus\Application\KernelContext;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
@@ -386,10 +387,8 @@ final class SchedulerProviderTest extends TestCase
      */
     private function createKernelContext(): KernelContext
     {
-        $generator = function(): \Generator
+        $sender = function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope): void
         {
-            [$message, ,] = yield;
-
             $this->kernelContextMessages [] = $message;
         };
 
@@ -399,7 +398,7 @@ final class SchedulerProviderTest extends TestCase
             new IncomingEnvelope(
                 uuid(), '', [], new FirstEmptyCommand(), []
             ),
-            $generator(),
+            $sender,
             $logger
         );
     }

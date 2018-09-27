@@ -11,22 +11,23 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Transport\AmqpExt;
+namespace Desperado\ServiceBus\Transport\Amqp;
 
 use Desperado\ServiceBus\Transport\Exceptions\InvalidConnectionParameters;
 
 /**
  * Amqp configuration details
  */
-final class AmqpConfiguration
+final class AmqpConnectionConfiguration
 {
-    private const DEFAULT_SCHEMA       = 'amqp';
-    private const DEFAULT_HOST         = 'localhost';
-    private const DEFAULT_PORT         = 5672;
-    private const DEFAULT_USERNAME     = 'guest';
-    private const DEFAULT_PASSWORD     = 'guest';
-    private const DEFAULT_TIMEOUT      = 1;
-    private const DEFAULT_VIRTUAL_HOST = '/';
+    private const DEFAULT_SCHEMA             = 'amqp';
+    private const DEFAULT_HOST               = 'localhost';
+    private const DEFAULT_PORT               = 5672;
+    private const DEFAULT_USERNAME           = 'guest';
+    private const DEFAULT_PASSWORD           = 'guest';
+    private const DEFAULT_TIMEOUT            = 1;
+    private const DEFAULT_HEARTBEAT_INTERVAL = 60.0;
+    private const DEFAULT_VIRTUAL_HOST       = '/';
 
     /**
      * Connection DSN parameters bag
@@ -34,13 +35,14 @@ final class AmqpConfiguration
      * Created from array with keys:
      *
      * [
-     *     'scheme'   => 'amqp',
-     *     'user'     => 'guest',
-     *     'password' => 'guest',
-     *     'host'     => 'localhost',
-     *     'port'     => 5672,
-     *     'vhost'    => '/',
-     *     'timeout'  => 1
+     *     'scheme'    => 'amqp',
+     *     'user'      => 'guest',
+     *     'password'  => 'guest',
+     *     'host'      => 'localhost',
+     *     'port'      => 5672,
+     *     'vhost'     => '/',
+     *     'timeout'   => 1б,
+     *     'heartbeat' => 60.0
      * ]
      *
      * @var array
@@ -74,14 +76,15 @@ final class AmqpConfiguration
     public function __toString(): string
     {
         return \sprintf(
-            '%s://%s:%s@%s:%s?vhost=%s&timeout=%d',
+            '%s://%s:%s@%s:%s?vhost=%s&timeout=%d&heartbeat=%.2f',
             $this->data['scheme'],
             $this->data['user'],
             $this->data['password'],
             $this->data['host'],
             $this->data['port'],
             $this->data['vhost'],
-            $this->data['timeout']
+            $this->data['timeout'],
+            $this->data['heartbeat']
         );
     }
 
@@ -93,6 +96,16 @@ final class AmqpConfiguration
     public function timeout(): float
     {
         return (float) $this->data['timeout'];
+    }
+
+    /**
+     * Receive heartbeat interval
+     *
+     * @return float
+     */
+    public function heartbeatInterval(): float
+    {
+        return (float) $this->data['heartbeat'];
     }
 
     /**
@@ -158,13 +171,14 @@ final class AmqpConfiguration
         $queryParts      = self::parseQuery($connectionParts['query'] ?? '');
 
         return [
-            'scheme'   => $connectionParts['scheme'] ?? self::DEFAULT_SCHEMA,
-            'host'     => $connectionParts['host'] ?? self::DEFAULT_HOST,
-            'port'     => $connectionParts['port'] ?? self::DEFAULT_PORT,
-            'user'     => $connectionParts['user'] ?? self::DEFAULT_USERNAME,
-            'password' => $connectionParts['pass'] ?? self::DEFAULT_PASSWORD,
-            'timeout'  => $queryParts['timeout'] ?? self::DEFAULT_TIMEOUT,
-            'vhost'    => $queryParts['vhost'] ?? self::DEFAULT_VIRTUAL_HOST,
+            'scheme'    => $connectionParts['scheme'] ?? self::DEFAULT_SCHEMA,
+            'host'      => $connectionParts['host'] ?? self::DEFAULT_HOST,
+            'port'      => $connectionParts['port'] ?? self::DEFAULT_PORT,
+            'user'      => $connectionParts['user'] ?? self::DEFAULT_USERNAME,
+            'password'  => $connectionParts['pass'] ?? self::DEFAULT_PASSWORD,
+            'timeout'   => $queryParts['timeout'] ?? self::DEFAULT_TIMEOUT,
+            'vhost'     => $queryParts['vhost'] ?? self::DEFAULT_VIRTUAL_HOST,
+            'heartbeat' => $queryParts['heartbeat'] ?? self::DEFAULT_HEARTBEAT_INTERVAL,
         ];
     }
 

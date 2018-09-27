@@ -14,6 +14,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 
 use function Amp\asyncCall;
+use function Amp\call;
+use Amp\Promise;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;

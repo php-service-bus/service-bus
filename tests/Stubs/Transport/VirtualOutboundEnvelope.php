@@ -36,7 +36,7 @@ final class VirtualOutboundEnvelope implements OutboundEnvelope
      */
     public function __construct(string $body, array $headers)
     {
-        $this->body    = $body;
+        $this->body = $body;
         $this->headers = $headers;
     }
 
@@ -54,14 +54,6 @@ final class VirtualOutboundEnvelope implements OutboundEnvelope
     public function headers(): array
     {
         return $this->headers;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function attributes(): array
-    {
-        return [];
     }
 
     /**
@@ -102,6 +94,14 @@ final class VirtualOutboundEnvelope implements OutboundEnvelope
     public function makeImmediate(): void
     {
 
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isImmediate(): bool
+    {
+        return false;
     }
 
     /**
@@ -159,4 +159,41 @@ final class VirtualOutboundEnvelope implements OutboundEnvelope
     {
         return null;
     }
+
+    public function clientId(): ?string
+    {
+
+    }
+
+    public function appId(): ?string
+    {
+
+    }
+
+    public function expirationTime(): ?int
+    {
+
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
+
+    public function isPersistent(): bool
+    {
+        return false;
+    }
+
+    public function contentEncoding(): string
+    {
+        return '';
+    }
+
+    public function contentType(): string
+    {
+        return '';
+    }
+
+
 }

@@ -11,12 +11,12 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Transport\AmqpExt;
+namespace Desperado\ServiceBus\Transport\Amqp;
 
 /**
  * Quality Of Service settings
  */
-final class AmqpQoS
+final class AmqpQoSConfiguration
 {
     private const DEFAULT_QOS_PRE_FETCH_SIZE  = 0;
     private const DEFAULT_QOS_PRE_FETCH_COUNT = 5;

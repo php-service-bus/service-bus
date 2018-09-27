@@ -33,13 +33,6 @@ interface OutboundEnvelope
     public function headers(): array;
 
     /**
-     * Receive message additional parameters
-     *
-     * @return array
-     */
-    public function attributes(): array;
-
-    /**
      * Change message content-type
      *
      * @param string $contentType
@@ -77,6 +70,13 @@ interface OutboundEnvelope
      * @return void
      */
     public function makeImmediate(): void;
+
+    /**
+     * Is high priority message
+     *
+     * @return bool
+     */
+    public function isImmediate(): bool;
 
     /**
      * Save message in broker
@@ -136,4 +136,53 @@ interface OutboundEnvelope
      * @return string|null
      */
     public function messageId(): ?string;
+
+    /**
+     * Receive client id
+     *
+     * @return null|string
+     */
+    public function clientId(): ?string;
+
+    /**
+     * Receive application id
+     *
+     * @return null|string
+     */
+    public function appId(): ?string;
+
+    /**
+     * Receive expiration time in milliseconds
+     *
+     * @return int|null
+     */
+    public function expirationTime(): ?int;
+
+    /**
+     * Receive message priority
+     *
+     * @return int
+     */
+    public function priority(): int;
+
+    /**
+     * Is persistence message
+     *
+     * @return bool
+     */
+    public function isPersistent(): bool;
+
+    /**
+     * Message encoding
+     *
+     * @return string
+     */
+    public function contentEncoding(): string;
+
+    /**
+     * Message content-type
+     *
+     * @return string
+     */
+    public function contentType(): string;
 }

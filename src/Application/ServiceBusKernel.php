@@ -13,8 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
-use Amp\Loop;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector;
 use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound;
 use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
@@ -83,6 +83,18 @@ final class ServiceBusKernel
     }
 
     /**
+     * Enable watch for event loop blocking
+     *
+     * @return self
+     */
+    public function monitorLoopBlock(): self
+    {
+        $this->kernelContainer->get(LoopBlockDetector::class)->listen();
+
+        return $this;
+    }
+
+    /**
      * By default, messages are logged with a level of "debug"
      * Logging can be forcibly disabled for all levels
      *
@@ -102,25 +114,14 @@ final class ServiceBusKernel
      */
     public function listen(Queue $queue): void
     {
-        $messageProcessor = self::createMessageProcessor(
-            $this->messageBus,
-            self::createMessageSender(
-                $this->kernelContainer->get(Transport::class)->createPublisher(),
-                $this->kernelContainer->get(OutboundMessageRoutes::class),
-                $this->kernelContainer->get(LoggerInterface::class)
-            ),
-            $this->kernelContainer->get(LoggerInterface::class)
+        $messageProcessor = $this->createMessageProcessor(
+            $this->createMessageSender()
         );
 
-        $this->kernelContainer
-            ->get(Transport::class)
-            ->createConsumer($queue)
-            ->listen(
-                static function(IncomingEnvelope $envelope) use ($messageProcessor): void
-                {
-                    $messageProcessor->send($envelope);
-                }
-            );
+        /** @var \Desperado\ServiceBus\Transport\Consumer $consumer */
+        $consumer = $this->kernelContainer->get(Transport::class)->createConsumer($queue);
+
+        $consumer->listen($messageProcessor);
     }
 
     /**
@@ -202,106 +203,78 @@ final class ServiceBusKernel
         }
     }
 
+
     /**
-     * Create handle message handler
+     * @param callable $messagePublisher
      *
-     * @param MessageBus      $messageBus
-     * @param \Generator      $messageSender
-     * @param LoggerInterface $logger
-     *
-     * @return \Generator
+     * @return callable function(IncomingEnvelope $envelope): \Generator
      */
-    private static function createMessageProcessor(
-        MessageBus $messageBus,
-        \Generator $messageSender,
-        LoggerInterface $logger
-    ): \Generator
+    private function createMessageProcessor(callable $messagePublisher): callable
     {
-        while(true)
+        $logger     = $this->kernelContainer->get(LoggerInterface::class);
+        $messageBus = $this->messageBus;
+
+        return static function(IncomingEnvelope $envelope) use ($messagePublisher, $messageBus, $logger): \Generator
         {
-            /** @var IncomingEnvelope $envelope */
-            $envelope = yield;
+            self::beforeDispatch($envelope, $logger);
 
-            Loop::run(
-                static function() use ($messageBus, $envelope, $messageSender, $logger): \Generator
-                {
-                    try
-                    {
-                        self::beforeDispatch($envelope, $logger);
-
-                        yield $messageBus->dispatch(
-                            new KernelContext($envelope, $messageSender, $logger)
-                        );
-                    }
-                    catch(NoMessageHandlersFound $exception)
-                    {
-                        $logger->debug($exception->getMessage(), ['operationId' => $envelope->operationId()]);
-                    }
-                    catch(\Throwable $throwable)
-                    {
-                        $logger->critical($throwable->getMessage(), [
-                            'operationId' => $envelope->operationId(),
-                            'file'        => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-                        ]);
-                        /** @todo: retry message? */
-                    }
-                }
-            );
-
-            unset($envelope);
-        }
+            try
+            {
+                yield $messageBus->dispatch(
+                    new KernelContext($envelope, $messagePublisher, $logger)
+                );
+            }
+            catch(NoMessageHandlersFound $exception)
+            {
+                $logger->debug($exception->getMessage(), ['operationId' => $envelope->operationId()]);
+            }
+            catch(\Throwable $throwable)
+            {
+                $logger->critical($throwable->getMessage(), [
+                    'operationId' => $envelope->operationId(),
+                    'file'        => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                ]);
+                /** @todo: retry message? */
+            }
+        };
     }
 
     /**
-     * Create message sender
+     * Create publish message processor
      *
-     * @param Publisher             $publisher
-     * @param OutboundMessageRoutes $messageRoutes
-     * @param LoggerInterface       $logger
-     *
-     * @return \Generator
+     * @return callable function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope): Promise {}
      */
-    private static function createMessageSender(
-        Publisher $publisher,
-        OutboundMessageRoutes $messageRoutes,
-        LoggerInterface $logger
-    ): \Generator
+    private function createMessageSender(): callable
     {
-        while(true)
-        {
-            /**
-             * @var Message          $message
-             * @var IncomingEnvelope $incomingEnvelope
-             * @var array            $headers
-             */
-            [$message, $incomingEnvelope, $headers] = yield;
+        $publisher     = $this->kernelContainer->get(Transport::class)->createPublisher();
+        $messageRoutes = $this->kernelContainer->get(OutboundMessageRoutes::class);
+        $logger        = $this->kernelContainer->get(LoggerInterface::class);
 
+        return static function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope) use (
+            $publisher, $messageRoutes, $logger
+        ): \Generator
+        {
             $messageClass = \get_class($message);
             $destinations = $messageRoutes->destinationsFor($messageClass);
 
             foreach($destinations as $destination)
             {
-                /** @var Destination $destination */
-
                 $outboundEnvelope = self::createOutboundEnvelope(
                     $publisher,
                     $incomingEnvelope->operationId(),
                     $message,
-                    \array_merge(
-                        [
-                            'x-message-class'         => $messageClass,
-                            'x-created-after-message' => \get_class($incomingEnvelope->denormalized()),
-                            'x-hostname'              => \gethostname()
-                        ],
-                        $headers
-                    )
+                    \array_merge([
+                        'x-message-class'         => $messageClass,
+                        'x-created-after-message' => \get_class($incomingEnvelope->denormalized()),
+                        'x-hostname'              => \gethostname()
+                    ], $headers)
                 );
 
                 self::beforeMessageSend($logger, $messageClass, $destination, $outboundEnvelope);
 
                 try
                 {
-                    $publisher->send($destination, $outboundEnvelope);
+                    yield $publisher->send($destination, $outboundEnvelope);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -310,8 +283,8 @@ final class ServiceBusKernel
                 }
             }
 
-            unset($message, $incomingEnvelope, $messageClass, $destinations, $headers);
-        }
+            unset($messageClass, $destinations);
+        };
     }
 
     /**

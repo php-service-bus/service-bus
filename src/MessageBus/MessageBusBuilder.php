@@ -61,6 +61,7 @@ final class MessageBusBuilder
     /**
      * @param SagaConfigurationLoader $sagasConfigurationLoader
      * @param ServiceHandlersLoader   $servicesConfigurationLoader
+     * @param SagaProvider           $sagaProvider
      * @param LoggerInterface|null    $logger
      */
     public function __construct(
@@ -70,10 +71,10 @@ final class MessageBusBuilder
         LoggerInterface $logger = null
     )
     {
-        $this->sagasConfigurationLoader    = $sagasConfigurationLoader;
+        $this->sagasConfigurationLoader = $sagasConfigurationLoader;
         $this->servicesConfigurationLoader = $servicesConfigurationLoader;
-        $this->sagaProvider                = $sagaProvider;
-        $this->logger                      = $logger ?? new NullLogger();
+        $this->sagaProvider = $sagaProvider;
+        $this->logger = $logger ?? new NullLogger();
 
         $this->processorsList = new ProcessorsMap();
     }

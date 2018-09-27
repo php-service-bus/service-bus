@@ -23,16 +23,21 @@ services:
       $entryPointName: '%service_bus.entry_point%'
       $environment: '@Desperado\ServiceBus\Environment'
 
+  # Detect blocking ticks in an event loop
+  Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector:
+    arguments:
+      $logger: '@Psr\Log\LoggerInterface'
+
   # Transport configuration
-  Desperado\ServiceBus\Transport\AmqpExt\AmqpConfiguration:
+  Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration:
     arguments:
       $connectionDSN: '%service_bus.transport.dsn%'
 
   # Messages transport
   Desperado\ServiceBus\Transport\Transport:
-    class: Desperado\ServiceBus\Transport\AmqpExt\AmqpExt
+    class: Desperado\ServiceBus\Transport\Amqp\Bunny\AmqpBunny
     arguments:
-      $amqpConfiguration: '@Desperado\ServiceBus\Transport\AmqpExt\AmqpConfiguration'
+      $amqpConfiguration: '@Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration'
       $messageEncoder: null
       $messageDecoder: null
       $logger: '@Psr\Log\LoggerInterface'
@@ -135,3 +140,4 @@ services:
       Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes: '@Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes'
       Desperado\ServiceBus\Application\TransportConfigurator: '@Desperado\ServiceBus\Application\TransportConfigurator'
       Psr\Log\LoggerInterface: '@Psr\Log\LoggerInterface'
+      Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector: '@Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector'
