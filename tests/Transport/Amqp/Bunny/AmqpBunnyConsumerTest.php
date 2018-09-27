@@ -133,7 +133,7 @@ final class AmqpBunnyConsumerTest extends TestCase
                         exit(1);
                     }
 
-                    Loop::stop();
+                    yield $this->transport->close();
                 }
             );
 

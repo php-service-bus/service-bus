@@ -103,6 +103,21 @@ final class BunnyPublisherTest extends TestCase
         $envelope = $publisher->createEnvelope($message, ['headerKey' => 'headerValue']);
 
         wait($publisher->send(new Destination('qwerty', 'testing'), $envelope));
+
+        /** @var \Bunny\Message $incomingMessage */
+        $incomingMessage = wait($this->channel->get('qwerty.message'));
+
+        static::assertNotNull($message);
+        static::assertInstanceOf(Message::class, $incomingMessage);
+
+        $jsonDecodedMessage = \json_decode($incomingMessage->content, true);
+
+        static::assertInternalType('array', $jsonDecodedMessage);
+        static::assertNotEmpty($jsonDecodedMessage);
+        static::assertArrayHasKey('message', $jsonDecodedMessage);
+        static::assertArrayHasKey('namespace', $jsonDecodedMessage);
+        static::assertArrayHasKey('payload', $jsonDecodedMessage['message']);
+        static::assertEquals($message->payload(), $jsonDecodedMessage['message']['payload']);
     }
 
     /**
