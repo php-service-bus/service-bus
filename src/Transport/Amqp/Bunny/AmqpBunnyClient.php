@@ -522,7 +522,7 @@ final class AmqpBunnyClient extends Client
                     yield $this->awaitAccessRequestOk($channel)
                 );
             },
-            $channel, $read, $exclusive, $passive, $active, $write, $read
+            $channel, $realm, $exclusive, $passive, $active, $write, $read
         );
     }
 
@@ -1193,7 +1193,7 @@ final class AmqpBunnyClient extends Client
 
                 if($awaitResult instanceof PromiseInterface)
                 {
-                    return yield Promise\adapt($awaitResult);
+                    return yield $awaitResult;
                 }
 
                 return yield new Success($awaitResult);
