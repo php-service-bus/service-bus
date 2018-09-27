@@ -39,13 +39,13 @@ final class AmqpBunnyChannelConfigurator
     private $logger;
 
     /**
-     * @param AmqpBunnyChannel         $channel
-     * @param LoggerInterface $logger
+     * @param AmqpBunnyChannel $channel
+     * @param LoggerInterface  $logger
      */
     public function __construct(AmqpBunnyChannel $channel, LoggerInterface $logger)
     {
         $this->channel = $channel;
-        $this->logger = $logger;
+        $this->logger  = $logger;
     }
 
     /**
@@ -129,7 +129,7 @@ final class AmqpBunnyChannelConfigurator
         try
         {
             /** @var PromiseInterface $promise */
-            $promise = $this->channel->exchangeBind($destinationTopic, $sourceTopic, $routingKey);
+            $promise = $this->channel->exchangeBind($sourceTopic, $destinationTopic, $routingKey);
 
             /** force promise resolve */
             wait($promise);

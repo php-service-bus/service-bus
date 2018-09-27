@@ -21,7 +21,8 @@
       "src/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
-      "src/Common/reflectionFunctions.php"
+      "src/Common/reflectionFunctions.php",
+      "src/Transport/Amqp/Bunny/appendBufferFunctions.php"
     ]
   },
   "autoload-dev": {
@@ -34,7 +35,8 @@
       "src/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
-      "src/Common/reflectionFunctions.php"
+      "src/Common/reflectionFunctions.php",
+      "src/Transport/Amqp/Bunny/appendBufferFunctions.php"
     ]
   },
   "require": {

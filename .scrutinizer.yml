@@ -1,6 +1,6 @@
 filter:
   paths: [src/*]
-  excluded_paths: [tests/*]
+  excluded_paths: [tests/*,src/Transport/Amqp/Bunny/AmqpBunnyClient.php]
 tools:
   php_analyzer: true
   php_sim: true
