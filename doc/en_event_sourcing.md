@@ -19,7 +19,7 @@ While the classic scheme implies the storage of the final aggregate state, Event
 For more details look up the [Event Sourcing](https://microservices.io/patterns/data/event-sourcing.html) description
 
 #### Field of appliance
-We cannot use Event Sourcing anywhere. It is used when we want to monitor and control all the changes of our business entity.
+We cannot use Event Sourcing everywhere. It is used when we want to monitor and control all the each change of our business entity.
 
 For example, we have a payment aggregate that includes all payment details. It can switch to many states; can be cancelled (fully or partially) etc. Looking at this from business perspective, it can be very useful to see the history and be able to influence on it. In such cases Event Sourcing is the best option.
 
@@ -89,7 +89,7 @@ While creating a new aggregate event [AggregateCreated](https://github.com/mmasi
 To work with indexes, use [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), which has the following methods  (the [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php) object is returned in each of them):
 * [get()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L51): Receive a saved value
 * [has()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L85): Was a value saved
-* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L122): Add a value to index. Working principle is similar to the ```\Memcached:add```: method, if values with such a keyword didn’t exist it will turn «true», otherwise - «false» (best choice)
+* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L122): Add a value to index. Working principle is similar to the ```\Memcached:add```: method, if values with such a keyword didn’t exist it will return «true», otherwise - «false» (best choice)
 * [remove()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L160): Delete saved value
 * [update()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L177): Update saved value
 
