@@ -21,7 +21,7 @@ use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
 use Desperado\ServiceBus\Sagas\Contract\SagaCreated;
 use Desperado\ServiceBus\Sagas\Contract\SagaStatusChanged;
 use Desperado\ServiceBus\Sagas\Exceptions\ChangeSagaStateFailed;
-use Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier;
+use Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier;
 
 /**
  * Base class for all sagas
@@ -90,7 +90,7 @@ abstract class Saga
      * @param SagaId                  $id
      * @param \DateTimeImmutable|null $expireDate
      *
-     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\ChangeSagaStateFailed
      */
     final public function __construct(SagaId $id, ?\DateTimeImmutable $expireDate = null)
@@ -427,7 +427,7 @@ abstract class Saga
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier
      */
     private function assertSagaClassEqualsWithId(SagaId $id): void
     {
@@ -435,7 +435,7 @@ abstract class Saga
 
         if($currentSagaClass !== $id->sagaClass())
         {
-            throw new InvalidIdentifier(
+            throw new InvalidSagaIdentifier(
                 \sprintf(
                     'The class of the saga in the identifier ("%s") differs from the saga to which it was transmitted ("%s")',
                     $currentSagaClass,

@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Sagas;
 
 use function Desperado\ServiceBus\Common\uuid;
+use Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier;
 
 /**
  * Base saga id class
@@ -47,9 +48,24 @@ abstract class SagaId
     /**
      * @param string $id
      * @param string $sagaClass
+     *
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier
      */
     final public function __construct(string $id, string $sagaClass)
     {
+        if('' === $id)
+        {
+            throw new InvalidSagaIdentifier('The saga identifier can\'t be empty');
+        }
+
+        if('' === $sagaClass || false === \class_exists($sagaClass))
+        {
+            throw new InvalidSagaIdentifier(
+                \sprintf('Invalid saga class specified ("%s")', $sagaClass)
+            );
+        }
+
         $this->id        = $id;
         $this->sagaClass = $sagaClass;
     }

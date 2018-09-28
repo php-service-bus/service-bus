@@ -24,7 +24,7 @@ use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound;
 use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified;
 use Desperado\ServiceBus\Sagas\Configuration\SagaListenerOptions;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
-use Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier;
+use Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
@@ -128,7 +128,7 @@ final class SagaEventListenerProcessorTest extends TestCase
     {
         $handler = static function(SagaEventListenerProcessorTest $self): \Generator
         {
-            $self->expectException(InvalidIdentifier::class);
+            $self->expectException(InvalidSagaIdentifier::class);
             $self->expectExceptionMessage(
                 'Saga identifier mus be type of "Desperado\ServiceBus\Sagas\SagaId". '
                 . '"Desperado\ServiceBus\Tests\Stubs\Sagas\IncorrectSagaId" type specified'
