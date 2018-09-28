@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
+use Amp\Loop;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector;
 use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound;
@@ -122,6 +123,8 @@ final class ServiceBusKernel
         $consumer = $this->kernelContainer->get(Transport::class)->createConsumer($queue);
 
         $consumer->listen($messageProcessor);
+
+        Loop::run();
     }
 
     /**
@@ -157,9 +160,9 @@ final class ServiceBusKernel
     /**
      * Register event\command handlers from services
      *
-     * @param array<mixed, string>              $serviceIds
-     * @param MessageBusBuilder  $messagesBusBuilder
-     * @param ContainerInterface $servicesLocator
+     * @param array<mixed, string> $serviceIds
+     * @param MessageBusBuilder    $messagesBusBuilder
+     * @param ContainerInterface   $servicesLocator
      *
      * @return void
      *
