@@ -121,4 +121,46 @@ final class SymfonyPropertyNormalizerTest extends TestCase
     {
         (new SymfonyPropertyNormalizer())->normalize($this);
     }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function datetimeNormalize(): void
+    {
+        $datetime = new \DateTimeImmutable('NOW');
+
+        $object = new class($datetime)
+        {
+            /**
+             * @var \DateTimeImmutable
+             */
+            private $datetime;
+
+            /**
+             * @param \DateTimeImmutable $datetime
+             */
+            public function __construct(\DateTimeImmutable $datetime)
+            {
+                $this->datetime = $datetime;
+            }
+
+            public function datetime(): \DateTimeImmutable
+            {
+                return $this->datetime;
+            }
+        };
+
+        $normalized = (new SymfonyPropertyNormalizer())->normalize($object);
+
+        $denormalized = (new SymfonyPropertyDenormalizer())->denormalize(\get_class($object), $normalized);
+
+        static::assertEquals(
+            $datetime->format('Y-m-md H:i:s'),
+            $denormalized->datetime()->format('Y-m-md H:i:s')
+        );
+    }
 }

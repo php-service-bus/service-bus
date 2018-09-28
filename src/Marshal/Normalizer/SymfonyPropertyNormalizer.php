@@ -35,17 +35,17 @@ class SymfonyPropertyNormalizer implements Normalizer
     public function __construct()
     {
         $this->serializer = new Serializer\Serializer([
+                new Serializer\Normalizer\DateTimeNormalizer(
+                    'c',
+                    new \DateTimeZone('UTC')
+                ),
                 new Serializer\Normalizer\ArrayDenormalizer(),
                 new PropertyNormalizerWrapper(
                     null,
                     new SymfonyPropertyNameConverter(),
                     new PhpDocExtractor()
                 ),
-                new EmptyDataNormalizer(),
-                new Serializer\Normalizer\DateTimeNormalizer(
-                    'c',
-                    new \DateTimeZone('UTC')
-                )
+                new EmptyDataNormalizer()
             ]
         );
     }
