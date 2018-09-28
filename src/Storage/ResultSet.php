@@ -28,22 +28,22 @@ interface ResultSet
      * Succeeds with true if an emitted value is available by calling getCurrent() or false if the iterator has
      * resolved. If the iterator fails, the returned promise will fail with the same exception.
      *
-     * @param int $rowType
-     *
      * @return Promise
      *
      * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
      */
-    public function advance(int $rowType = ResultSet::FETCH_ASSOC): Promise;
+    public function advance(): Promise;
 
     /**
      * Gets the last emitted value or throws an exception if the iterator has completed
+     *
+     * @param int $rowType
      *
      * @return mixed Value emitted from the iterator
      *
      * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
      */
-    public function getCurrent();
+    public function getCurrent(int $rowType = ResultSet::FETCH_ASSOC);
 
     /**
      * Receive last insert id
