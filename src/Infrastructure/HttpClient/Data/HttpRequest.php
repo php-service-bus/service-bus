@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\HttpClient\Data;
+namespace Desperado\ServiceBus\Infrastructure\HttpClient\Data;
 
-use Desperado\ServiceBus\HttpClient\FormBody;
+use Desperado\ServiceBus\Infrastructure\HttpClient\FormBody;
 
 /**
  * Http request data

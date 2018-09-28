@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\HttpClient;
+namespace Desperado\ServiceBus\Infrastructure\HttpClient;
 
 use Amp\Promise;
-use Desperado\ServiceBus\HttpClient\Data\HttpRequest;
+use Desperado\ServiceBus\Infrastructure\HttpClient\Data\HttpRequest;
 
 /**
  * Http client interface

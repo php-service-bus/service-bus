@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- *
+ * @codeCoverageIgnore
  */
 final class LoopBlockDetector
 {
