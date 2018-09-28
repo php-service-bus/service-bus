@@ -23,14 +23,14 @@ final class MessageDTO
      *
      * @var array
      */
-    private $message;
+    public $message;
 
     /**
      * Message class
      *
      * @var string
      */
-    private $namespace;
+    public $namespace;
 
     /**
      * @param array  $message
@@ -40,25 +40,5 @@ final class MessageDTO
     {
         $this->message   = $message;
         $this->namespace = $messageClass;
-    }
-
-    /**
-     * Receive message normalized data
-     *
-     * @return array
-     */
-    public function payload(): array
-    {
-        return $this->message;
-    }
-
-    /**
-     * Receive message class
-     *
-     * @return string
-     */
-    public function messageClass(): string
-    {
-        return $this->namespace;
     }
 }
