@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\HttpClient\Artax;
+namespace Desperado\ServiceBus\Infrastructure\HttpClient\Artax;
 
 use Amp\Artax\Client;
 use Amp\Artax\Cookie\ArrayCookieJar;
@@ -26,7 +26,6 @@ use Amp\File\StatCache;
 use Amp\Promise;
 use Amp\Success;
 use function Desperado\ServiceBus\Common\uuid;
-use Desperado\ServiceBus\Infrastructure\HttpClient\Artax\ArtaxFormBody;
 use Desperado\ServiceBus\Infrastructure\HttpClient\Data\HttpRequest;
 use Desperado\ServiceBus\Infrastructure\HttpClient\HttpClient;
 use Psr\Log\LoggerInterface;
