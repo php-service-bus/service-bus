@@ -244,7 +244,7 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     unset($compiledQuery, $updateQuery);
 
-                    if(0 !== $updateResultSet->rowsCount())
+                    if(0 !== $updateResultSet->affectedRows())
                     {
                         return yield new Success(
                             NextScheduledOperation::fromRow($result)

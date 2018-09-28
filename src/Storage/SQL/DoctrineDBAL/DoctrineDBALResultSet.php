@@ -117,7 +117,7 @@ final class DoctrineDBALResultSet implements ResultSet
     /**
      * @inheritdoc
      */
-    public function rowsCount(): int
+    public function affectedRows(): int
     {
         return $this->affectedRows;
     }

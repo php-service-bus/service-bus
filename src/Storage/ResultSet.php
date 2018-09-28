@@ -63,5 +63,5 @@ interface ResultSet
      *
      * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
      */
-    public function rowsCount(): int;
+    public function affectedRows(): int;
 }

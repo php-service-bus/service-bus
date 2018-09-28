@@ -376,7 +376,7 @@ abstract class BaseStorageAdapterTest extends TestCase
                     ]
                 );
 
-                static::assertSame(2, $result->rowsCount());
+                static::assertSame(2, $result->affectedRows());
 
                 unset($result);
 
@@ -385,7 +385,7 @@ abstract class BaseStorageAdapterTest extends TestCase
                     'DELETE FROM storage_test_table where id = \'77961031-fd0f-4946-b439-dfc2902b961d\''
                 );
 
-                static::assertSame(1, $result->rowsCount());
+                static::assertSame(1, $result->affectedRows());
 
                 unset($result);
 
@@ -394,7 +394,7 @@ abstract class BaseStorageAdapterTest extends TestCase
                 /** @var \Desperado\ServiceBus\Storage\ResultSet $result */
                 $result = yield $adapter->execute('DELETE FROM storage_test_table');
 
-                static::assertSame(0, $result->rowsCount());
+                static::assertSame(0, $result->affectedRows());
 
                 unset($result);
 
@@ -403,7 +403,7 @@ abstract class BaseStorageAdapterTest extends TestCase
                     'SELECT * FROM storage_test_table where id = \'77961031-fd0f-4946-b439-dfc2902b961d\''
                 );
 
-                static::assertSame(0, $result->rowsCount());
+                static::assertSame(0, $result->affectedRows());
 
                 unset($result);
             }
