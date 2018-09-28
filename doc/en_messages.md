@@ -6,7 +6,7 @@ Table of contents
 #### Command
 A command is an order to do something.
 
-There are many opinions as to whether the team can return any value. In the current implementation, due to the nuances of the asynchronous interaction scheme, the message handlers (command\event) can\'t return the result. 
+There are many opinions as to whether the team can return any value or not. In the current implementation, due to the nuances of the asynchronous interaction scheme, the message handlers (command\event) can\'t return the result. 
 All commands must implement the [Command](https://github.com/mmasiukevich/service-bus/blob/master/src/Common/Contract/Messages/Command.php) interface. 
 
 *Note*: For a specific command, there can be only 1 handler
