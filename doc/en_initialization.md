@@ -12,7 +12,7 @@ Table of contents
 - ```DATABASE_CONNECTION_DSN```: DSN of database connection. A format of type ```sqlite:///:memory:``` for tests and ```pgsql://user:password@host:port/database``` for real usage
 - ```LOG_LEVEL```: Level of message logging for a logger by default (stdOut)
 - ```AMP_LOG_COLOR```: (1/0) Do message levels need to be highlighted by different colors (a different color for each level is used)
-- ```LOG_MESSAGE_PAYLOAD```: Does a message need to be logged completely. If switched of, data, contained in the message won’t be logged. Only the fact that a message was received/sent
+- ```LOG_MESSAGE_PAYLOAD```: Does a message need to be logged completely. If switched off, data, contained in the message won’t be logged. Only the fact that a message was received/sent
 - ```TRANSPORT_TOPIC```: Access point of message broker. In the RabbitMQ context – the name is exchange
 - ```TRANSPORT_QUEUE```: A queue, which for demon to listen
 - ```TRANSPORT_ROUTING_KEY```: Routing key for messages (topic -> queue)
@@ -28,18 +28,18 @@ An object of [Bootstrap](https://github.com/mmasiukevich/service-bus/blob/master
 Available methods:
 - [enableAutoImportSagas()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L80): Scans the project files and automatically registers all found sagas
 - [enableAutoImportMessageHandlers()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L112): Scans the project files and automatically registers all found message processors
-- [useAmqpExtTransport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L136): Configures RabbitMQ transport
-- [useSqlStorage()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L156): Configuration of the SQL database
+- [useAmqpExtTransport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L136): Configuration for the RabbitMQ transport
+- [useSqlStorage()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L156): Configuration for the SQL database
 - [useCustomCacheDirectory()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L174): If not designated, the default directory will be used ([sys_get_temp_dir()](http://php.net/manual/en/function.sys-get-temp-dir.php))
 - [importParameters()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L188): Imports the parameters into DI-containers
 - [addExtensions()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L200): Registers user [Extension](https://symfony.com/doc/current/bundles/extension.html) in DI-container
-- [addCompilerPasses()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L214): registers user [CompilerPass](https://symfony.com/doc/current/service_container/compiler_passes.html) in DI-container
+- [addCompilerPasses()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L214): Registers user [CompilerPass](https://symfony.com/doc/current/service_container/compiler_passes.html) in DI-container
 - [boot()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L122): Compiles DI-container
-- [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L94): Enable scheduler support. [Подробнее](https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md)
+- [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L94): Enable scheduler support. [Read more](https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md)
 
 #### Transport Configuration
 For the configuration of the transport layer is responsible [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), in which is available [TransportConfigurator](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php)
-- [addDefaultDestinations()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L61): Registering the default message delivery route
+- [addDefaultDestinations()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L61): Registers the default message delivery route
 - [registerCustomMessageDestinations()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L80): Registers a specific delivery route for the message
 - [addQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L99): Creates a new queue (if it does not exist)
 - [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L120): Creates an exchange (if it does not exist)
