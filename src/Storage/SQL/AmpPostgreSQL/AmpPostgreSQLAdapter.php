@@ -121,7 +121,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
                 {
                     return yield new Success(
                         new AmpPostgreSQLTransactionAdapter(
-                            yield $connectionsPool->transaction(Transaction::ISOLATION_COMMITTED)
+                            yield $connectionsPool->beginTransaction(Transaction::ISOLATION_COMMITTED)
                         )
                     );
                 }

@@ -21,8 +21,7 @@
       "src/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
-      "src/Common/reflectionFunctions.php",
-      "src/Transport/Amqp/Bunny/appendBufferFunctions.php"
+      "src/Common/reflectionFunctions.php"
     ]
   },
   "autoload-dev": {
@@ -35,8 +34,7 @@
       "src/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
-      "src/Common/reflectionFunctions.php",
-      "src/Transport/Amqp/Bunny/appendBufferFunctions.php"
+      "src/Common/reflectionFunctions.php"
     ]
   },
   "require": {
@@ -45,8 +43,7 @@
     "amphp/log": "^1",
     "amphp/file": "^0.3",
     "amphp/artax": "^3.0",
-    "amphp/postgres": "dev-master#16e2b56f205d346c3e8c76ec012c179fc90a92f4",
-    "amphp/sql": "dev-master#15c209094591cdc5b29f08d403a917e464d463c0",
+    "amphp/postgres": "dev-master",
     "ramsey/uuid": "^3.7",
     "symfony/serializer": "^v4.1",
     "symfony/property-info": "^v4.1",

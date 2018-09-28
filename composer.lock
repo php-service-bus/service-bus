@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "41e1ceff74061b3e51cac517f6d44911",
-    "content-hash": "9f6be9020fd621e0cbd2817a2908f29f",
+    "hash": "3d3f0a8b7103915fae4d5de2a68a419a",
+    "content-hash": "11afe557accb8ebb37a462fa48228b8b",
     "packages": [
         {
             "name": "amphp/amp",
@@ -571,17 +571,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/postgres.git",
-                "reference": "16e2b56f205d346c3e8c76ec012c179fc90a92f4"
+                "reference": "4e2ca3760817ace288e2dc72c56741fb27467c3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/postgres/zipball/16e2b56f205d346c3e8c76ec012c179fc90a92f4",
-                "reference": "16e2b56f205d346c3e8c76ec012c179fc90a92f4",
+                "url": "https://api.github.com/repos/amphp/postgres/zipball/4e2ca3760817ace288e2dc72c56741fb27467c3b",
+                "reference": "4e2ca3760817ace288e2dc72c56741fb27467c3b",
                 "shasum": ""
             },
             "require": {
                 "amphp/amp": "^2",
-                "amphp/sql": "dev-master"
+                "amphp/sql": "dev-master",
+                "php": "^7.0"
             },
             "require-dev": {
                 "amphp/php-cs-fixer-config": "dev-master",
@@ -620,7 +621,7 @@
                 "postgre",
                 "postgresql"
             ],
-            "time": "2018-08-09 17:31:51"
+            "time": "2018-09-26 17:47:08"
         },
         {
             "name": "amphp/process",
@@ -750,12 +751,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/sql.git",
-                "reference": "15c209094591cdc5b29f08d403a917e464d463c0"
+                "reference": "79e9b849adf957443d97435f95b0378af3d14767"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/sql/zipball/15c209094591cdc5b29f08d403a917e464d463c0",
-                "reference": "15c209094591cdc5b29f08d403a917e464d463c0",
+                "url": "https://api.github.com/repos/amphp/sql/zipball/79e9b849adf957443d97435f95b0378af3d14767",
+                "reference": "79e9b849adf957443d97435f95b0378af3d14767",
                 "shasum": ""
             },
             "require": {
@@ -786,7 +787,7 @@
                 "db",
                 "sql"
             ],
-            "time": "2018-07-29 14:33:53"
+            "time": "2018-09-26 17:27:31"
         },
         {
             "name": "amphp/sync",
@@ -4697,16 +4698,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "2.0.11",
+            "version": "2.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "3e69a333c9683596ad4a4325e0039374516295a0"
+                "reference": "db3ddaa42cbc81ffb6f9f8290d01c4db6dbbc3e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/3e69a333c9683596ad4a4325e0039374516295a0",
-                "reference": "3e69a333c9683596ad4a4325e0039374516295a0",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/db3ddaa42cbc81ffb6f9f8290d01c4db6dbbc3e6",
+                "reference": "db3ddaa42cbc81ffb6f9f8290d01c4db6dbbc3e6",
                 "shasum": ""
             },
             "require": {
@@ -4760,14 +4761,13 @@
                 "inspection",
                 "php"
             ],
-            "time": "2018-08-30 00:54:48"
+            "time": "2018-09-21 15:35:51"
         }
     ],
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "amphp/postgres": 20,
-        "amphp/sql": 20
+        "amphp/postgres": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

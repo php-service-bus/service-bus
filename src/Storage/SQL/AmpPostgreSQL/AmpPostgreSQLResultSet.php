@@ -112,13 +112,13 @@ class AmpPostgreSQLResultSet implements ResultSet
     /**
      * @inheritdoc
      */
-    public function rowsCount(): int
+    public function affectedRows(): int
     {
         try
         {
             if($this->originalResultSet instanceof PgSqlCommandResult)
             {
-                return $this->originalResultSet->affectedRows();
+                return $this->originalResultSet->getAffectedRowCount();
             }
 
             return 0;
