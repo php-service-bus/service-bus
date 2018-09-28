@@ -21,6 +21,7 @@ use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
 use Desperado\ServiceBus\Sagas\Contract\SagaCreated;
 use Desperado\ServiceBus\Sagas\Contract\SagaStatusChanged;
 use Desperado\ServiceBus\Sagas\Exceptions\ChangeSagaStateFailed;
+use Desperado\ServiceBus\Sagas\Exceptions\InvalidExpireDateInterval;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier;
 
 /**
@@ -92,6 +93,7 @@ abstract class Saga
      *
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\ChangeSagaStateFailed
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidExpireDateInterval
      */
     final public function __construct(SagaId $id, ?\DateTimeImmutable $expireDate = null)
     {
@@ -103,6 +105,8 @@ abstract class Saga
 
         /** @var \DateTimeImmutable $expireDate */
         $expireDate = $expireDate ?? datetimeInstantiator(SagaMetadata::DEFAULT_EXPIRE_INTERVAL);
+
+        $this->assertExpirationDateIsCorrect($expireDate);
 
         $this->id     = $id;
         $this->status = SagaStatus::created();
@@ -441,6 +445,26 @@ abstract class Saga
                     $currentSagaClass,
                     $id->sagaClass()
                 )
+            );
+        }
+    }
+
+    /**
+     * @param \DateTimeImmutable $dateTime
+     *
+     * @return void
+     *
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidExpireDateInterval
+     */
+    private function assertExpirationDateIsCorrect(\DateTimeImmutable $dateTime): void
+    {
+        /** @var \DateTimeImmutable $currentDate */
+        $currentDate = datetimeInstantiator('NOW');
+
+        if($currentDate > $dateTime)
+        {
+            throw new InvalidExpireDateInterval(
+                'The expiration date of the saga can not be less than the current date'
             );
         }
     }
