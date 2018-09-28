@@ -28,7 +28,7 @@ final class AggregateTest extends TestCase
 {
     /**
      * @test
-     * @expectedException \Desperado\ServiceBus\EventSourcing\AttemptToChangeClosedStream
+     * @expectedException \Desperado\ServiceBus\EventSourcing\Exceptions\AttemptToChangeClosedStream
      *
      * @return void
      *

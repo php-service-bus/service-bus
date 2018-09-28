@@ -82,8 +82,8 @@ services:
     class: Desperado\ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader
 
   # Http client
-  Desperado\ServiceBus\HttpClient\HttpClient:
-    class: Desperado\ServiceBus\HttpClient\Artax\ArtaxHttpClient
+  Desperado\ServiceBus\Infrastructure\HttpClient\HttpClient:
+    class: Desperado\ServiceBus\Infrastructure\HttpClient\Artax\ArtaxHttpClient
     arguments:
       $handler: null
       $transferTimeout: 5000

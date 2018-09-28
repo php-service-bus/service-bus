@@ -20,6 +20,7 @@ use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent;
 use Desperado\ServiceBus\EventSourcing\EventStream\AggregateEventStream;
+use Desperado\ServiceBus\EventSourcing\Exceptions\AttemptToChangeClosedStream;
 
 /**
  * Aggregate base class
@@ -102,7 +103,7 @@ abstract class Aggregate
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\EventSourcing\AttemptToChangeClosedStream
+     * @throws \Desperado\ServiceBus\EventSourcing\Exceptions\AttemptToChangeClosedStream
      */
     final protected function raise(Event $event): void
     {
@@ -132,7 +133,7 @@ abstract class Aggregate
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\EventSourcing\AttemptToChangeClosedStream
+     * @throws \Desperado\ServiceBus\EventSourcing\Exceptions\AttemptToChangeClosedStream
      */
     final protected function close(): void
     {

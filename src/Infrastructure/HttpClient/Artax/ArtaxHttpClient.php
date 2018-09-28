@@ -11,9 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\HttpClient\Artax;
+namespace Desperado\ServiceBus\Infrastructure\HttpClient\Artax;
 
 use Amp\Artax\Client;
+use Amp\Artax\Cookie\ArrayCookieJar;
 use Amp\Artax\DefaultClient;
 use Amp\Artax\Request;
 use Amp\Artax\Response;
@@ -25,8 +26,8 @@ use Amp\File\StatCache;
 use Amp\Promise;
 use Amp\Success;
 use function Desperado\ServiceBus\Common\uuid;
-use Desperado\ServiceBus\HttpClient\Data\HttpRequest;
-use Desperado\ServiceBus\HttpClient\HttpClient;
+use Desperado\ServiceBus\Infrastructure\HttpClient\Data\HttpRequest;
+use Desperado\ServiceBus\Infrastructure\HttpClient\HttpClient;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Psr\Log\NullLogger;
@@ -58,7 +59,7 @@ final class ArtaxHttpClient implements HttpClient
      */
     public function __construct(Client $handler = null, int $transferTimeout = 5000, LoggerInterface $logger = null)
     {
-        $this->handler = $handler ?? new DefaultClient();
+        $this->handler = $handler ?? new DefaultClient(new ArrayCookieJar());
         $this->logger  = $logger ?? new NullLogger();
 
         if(true === \method_exists($this->handler, 'setOption'))

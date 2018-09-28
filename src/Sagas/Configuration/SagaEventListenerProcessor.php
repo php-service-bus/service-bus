@@ -23,7 +23,7 @@ use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound;
 use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified;
-use Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier;
+use Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -127,7 +127,7 @@ final class SagaEventListenerProcessor
      *
      * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified
      * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound
-     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier
      */
     private static function searchSagaIdentifier(Event $event, SagaListenerOptions $sagaListenerOptions): SagaId
     {
@@ -173,7 +173,7 @@ final class SagaEventListenerProcessor
      *
      * @return SagaId
      *
-     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier
      */
     private static function identifierInstantiator(string $idClass, string $idValue, string $sagaClass): SagaId
     {
@@ -184,7 +184,7 @@ final class SagaEventListenerProcessor
             return $identifier;
         }
 
-        throw new InvalidIdentifier(
+        throw new InvalidSagaIdentifier(
             \sprintf(
                 'Saga identifier mus be type of "%s". "%s" type specified',
                 SagaId::class, \get_class($identifier)

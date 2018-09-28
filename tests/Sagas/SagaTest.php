@@ -32,16 +32,13 @@ class SagaTest extends TestCase
 {
     /**
      * @test
-     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\InvalidIdentifier
-     * @expectedExceptionMessage  The class of the saga in the identifier
-     *                            ("Desperado\Sagas\Tests\Domain\Stub\SimpleSaga") differs from the saga to which it
-     *                            was transmitted ("SomeClass")
+     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier
      *
      * @return void
      */
     public function createWithNotEqualsSagaClass(): void
     {
-        new CorrectSaga(new TestSagaId('123456789', \SomeClass::class));
+        new CorrectSaga(new TestSagaId('123456789', \get_class($this)));
     }
 
     /**

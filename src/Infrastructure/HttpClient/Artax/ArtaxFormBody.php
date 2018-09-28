@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\HttpClient\Artax;
+namespace Desperado\ServiceBus\Infrastructure\HttpClient\Artax;
 
 use Amp\Artax\FormBody as AmpFormBody;
 use Amp\ByteStream\InputStream;
 use Amp\Promise;
-use Desperado\ServiceBus\HttpClient\Data\InputFilePath;
-use Desperado\ServiceBus\HttpClient\FormBody;
+use Desperado\ServiceBus\Infrastructure\HttpClient\Data\InputFilePath;
+use Desperado\ServiceBus\Infrastructure\HttpClient\FormBody;
 
 /**
  * Artax form body implementation

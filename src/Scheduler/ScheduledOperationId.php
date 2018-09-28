@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Scheduler;
 
 use function Desperado\ServiceBus\Common\uuid;
+use Desperado\ServiceBus\Scheduler\Exceptions\EmptyScheduledOperationIdentifierNotAllowed;
 
 /**
  *
@@ -27,9 +28,16 @@ final class ScheduledOperationId
 
     /**
      * @param string $value
+     *
+     * @throws \Desperado\ServiceBus\Scheduler\Exceptions\EmptyScheduledOperationIdentifierNotAllowed
      */
     public function __construct(string $value)
     {
+        if('' === $value)
+        {
+            throw new EmptyScheduledOperationIdentifierNotAllowed();
+        }
+
         $this->value = $value;
     }
 

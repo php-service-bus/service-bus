@@ -11,9 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\EventSourcing;
+namespace Desperado\ServiceBus\EventSourcing\Exceptions;
 
 use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
+use Desperado\ServiceBus\EventSourcing\AggregateId;
 
 /**
  * It is not allowed to modify the closed event stream

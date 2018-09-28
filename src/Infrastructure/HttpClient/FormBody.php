@@ -11,11 +11,11 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\HttpClient;
+namespace Desperado\ServiceBus\Infrastructure\HttpClient;
 
 use Amp\ByteStream\InputStream;
 use Amp\Promise;
-use Desperado\ServiceBus\HttpClient\Data\InputFilePath;
+use Desperado\ServiceBus\Infrastructure\HttpClient\Data\InputFilePath;
 
 /**
  * Form data

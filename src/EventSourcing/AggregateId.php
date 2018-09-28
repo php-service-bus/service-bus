@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\EventSourcing;
 
 use function Desperado\ServiceBus\Common\uuid;
+use Desperado\ServiceBus\EventSourcing\Exceptions\EmptyAggregateIdentifierNotAllowed;
 
 /**
  * Base aggregate identifier class
@@ -37,9 +38,16 @@ abstract class AggregateId
 
     /**
      * @param string $id
+     *
+     * @throws \Desperado\ServiceBus\EventSourcing\Exceptions\EmptyAggregateIdentifierNotAllowed
      */
     final public function __construct(string $id)
     {
+        if('' === $id)
+        {
+            throw new EmptyAggregateIdentifierNotAllowed();
+        }
+
         $this->id = $id;
     }
 

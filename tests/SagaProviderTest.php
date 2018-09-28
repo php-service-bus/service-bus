@@ -274,4 +274,40 @@ final class SagaProviderTest extends TestCase
 
         wait(new Coroutine($handler($this)));
     }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\StartSagaFailed
+     * @expectedExceptionMessage The expiration date of the saga can not be less than the current date
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function startWithWrongExpirationInterval(): void
+    {
+        $handler = static function(SagaProviderTest $self): \Generator
+        {
+            $id = TestSagaId::new(CorrectSaga::class);
+
+            $context = new TestContext();
+
+            writeReflectionPropertyValue(
+                $self->provider,
+                'sagaMetaDataCollection',
+                [
+                    CorrectSaga::class => new SagaMetadata(
+                        CorrectSaga::class,
+                        TestSagaId::class,
+                        'requestId',
+                        '-1 year'
+                    )
+                ]
+            );
+
+            yield $self->provider->start($id, new FirstEmptyCommand(), $context);
+        };
+
+        wait(new Coroutine($handler($this)));
+    }
 }
