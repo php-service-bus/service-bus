@@ -38,10 +38,10 @@
 
 #### Жизненный цикл
 Выполнение саги начинается с команды [start()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L133), которая будет вызвана автоматически (пример создания ниже). В рамках саги доступны методы (имеют protected область видимости):
-- [fire()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L191): Отправляет в транспорт команду
-- [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L174): Отправляет в транспорт событие
-- [makeCompleted()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L209): Закрывает сагу, помечая её как успешную
-- [makeFailed()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L228): Завершает сагу, помечая её как неуспешную
+- [fire()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L195): Отправляет в транспорт команду
+- [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L178): Отправляет в транспорт событие
+- [makeCompleted()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L213): Закрывает сагу, помечая её как успешную
+- [makeFailed()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L232): Завершает сагу, помечая её как неуспешную
 
 При изменениях статуса в транспорт будут отправлены события:
 - [SagaCreated()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Contract/SagaCreated.php): Сага была создана

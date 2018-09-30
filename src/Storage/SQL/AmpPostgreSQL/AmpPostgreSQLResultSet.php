@@ -46,13 +46,13 @@ class AmpPostgreSQLResultSet implements ResultSet
     /**
      * @inheritdoc
      */
-    public function advance(int $rowType = ResultSet::FETCH_ASSOC): Promise
+    public function advance(): Promise
     {
         try
         {
             if($this->originalResultSet instanceof AmpResultSet)
             {
-                return $this->originalResultSet->advance($rowType);
+                return $this->originalResultSet->advance();
             }
 
             return new Success(false);
@@ -68,11 +68,11 @@ class AmpPostgreSQLResultSet implements ResultSet
     /**
      * @inheritdoc
      */
-    public function getCurrent()
+    public function getCurrent(int $rowType = ResultSet::FETCH_ASSOC)
     {
         try
         {
-            return $this->originalResultSet->getCurrent();
+            return $this->originalResultSet->getCurrent($rowType);
         }
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
