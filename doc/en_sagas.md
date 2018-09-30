@@ -1,12 +1,12 @@
 ## Table of contents
-* [Что такое саги](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md#%D0%A7%D1%82%D0%BE-%D1%82%D0%B0%D0%BA%D0%BE%D0%B5-%D1%81%D0%B0%D0%B3%D0%B8)
-* [Область применения](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md#%D0%9E%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F)
-* [Особенности реализации](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md#%D0%9E%D1%81%D0%BE%D0%B1%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D0%B8-%D1%80%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8)
-* [Минусы при использовании](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md#%D0%9C%D0%B8%D0%BD%D1%83%D1%81%D1%8B-%D0%BF%D1%80%D0%B8-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B8)
-* [Конфигурация](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md#%D0%9A%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D1%8F)
-* [Жизненный цикл](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md#%D0%96%D0%B8%D0%B7%D0%BD%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9-%D1%86%D0%B8%D0%BA%D0%BB)
-* [Создание](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md#%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5)
-* [Примеры кода](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md#%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B-%D0%BA%D0%BE%D0%B4%D0%B0)
+* [What is Saga?](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_sagas.md#what-is-saga)
+* [Field of use](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_sagas.md#field-of-use)
+* [Implementation features](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_sagas.md#implementation-features)
+* [Caveats](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_sagas.md#caveats)
+* [Configuration](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_sagas.md#configuration)
+* [Lifecycle](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_sagas.md#lifecycle)
+* [Creation](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_sagas.md#creation)
+* [Example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_sagas.md#example)
 
 #### What is Saga?
 Saga may be interpreted as any documented business process which consists of steps. Speaking technically, Saga is an Event Listener which listens to some [event](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_messages.md#event) and performs an action based on that event. A good example is a flowchart with a decision symbol.
@@ -39,10 +39,10 @@ Parameters:
  
  #### Lifecycle
  Saga execution starts on call of method [start()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L133), which will be called automatically (see example below). There are following methods (protected) available inside Saga instance:
-- [fire()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L191): Dispatches a command;
-- [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L174): Dispatches an event;
-- [makeCompleted()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L209): Closes saga marking it as successfully finished.
-- [makeFailed()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L228): Closes saga marking it as failed.
+- [fire()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L195): Dispatches a command;
+- [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L178): Dispatches an event;
+- [makeCompleted()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L213): Closes saga marking it as successfully finished.
+- [makeFailed()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L232): Closes saga marking it as failed.
 
 On saga status change next events will be raised:
 - [SagaCreated()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Contract/SagaCreated.php): Saga was created (started);
