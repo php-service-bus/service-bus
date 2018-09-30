@@ -39,10 +39,10 @@ Parameters:
  
  #### Lifecycle
  Saga execution starts on call of method [start()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L133), which will be called automatically (see example below). There are following methods (protected) available inside Saga instance:
-- [fire()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L191): Dispatches a command;
-- [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L174): Dispatches an event;
-- [makeCompleted()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L209): Closes saga marking it as successfully finished.
-- [makeFailed()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L228): Closes saga marking it as failed.
+- [fire()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L195): Dispatches a command;
+- [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L178): Dispatches an event;
+- [makeCompleted()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L213): Closes saga marking it as successfully finished.
+- [makeFailed()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Saga.php#L232): Closes saga marking it as failed.
 
 On saga status change next events will be raised:
 - [SagaCreated()](https://github.com/mmasiukevich/service-bus/blob/master/src/Sagas/Contract/SagaCreated.php): Saga was created (started);
