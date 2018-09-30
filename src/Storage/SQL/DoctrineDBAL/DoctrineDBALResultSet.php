@@ -81,7 +81,7 @@ final class DoctrineDBALResultSet implements ResultSet
     /**
      * @inheritdoc
      */
-    public function advance(int $rowType = ResultSet::FETCH_ASSOC): Promise
+    public function advance(): Promise
     {
         $this->currentRow = null;
 
@@ -96,7 +96,7 @@ final class DoctrineDBALResultSet implements ResultSet
     /**
      * @inheritdoc
      */
-    public function getCurrent()
+    public function getCurrent(int $rowType = ResultSet::FETCH_ASSOC)
     {
         if(null !== $this->currentRow)
         {

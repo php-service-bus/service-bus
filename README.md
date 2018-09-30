@@ -17,7 +17,7 @@ Basically, it is suitable for development of distributed applications. By using 
  - Distribution (messages can be handled by different processes).
    - Subscribers can be implemented on any programming language.
  - Orchestration of long-lived business transactions (for example, a checkout) with the help of [Saga Pattern](https://github.com/mmasiukevich/service-bus/blob/master/doc/sagas.md)
- - Full history of aggregate changes ([EventSourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/event_sourcing.md))
+ - Full history of aggregate changes ([EventSourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md))
  - Decrease of the coupling between the components (contexts)
 
 #### Documentation
