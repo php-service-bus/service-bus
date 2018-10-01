@@ -21,13 +21,6 @@ use Desperado\ServiceBus\Common\Contract\Messages\Message;
 final class IncomingEnvelope
 {
     /**
-     * The identifier of the received message (generated at the time of receipt from the broker)
-     *
-     * @var string
-     */
-    private $operationId;
-
-    /**
      * Serialized message (received)
      *
      * @var string
@@ -62,23 +55,12 @@ final class IncomingEnvelope
      * @param Message $decoded
      * @param array   $headers
      */
-    public function __construct(string $operationId, string $plain, array $normalized, Message $decoded, array $headers = [])
+    public function __construct(string $plain, array $normalized, Message $decoded, array $headers = [])
     {
-        $this->operationId = $operationId;
         $this->plain       = $plain;
         $this->normalized  = $normalized;
         $this->decoded     = $decoded;
         $this->headers     = $headers;
-    }
-
-    /**
-     * Receive identifier of the message (generated at the time of receipt from the broker)
-     *
-     * @return string
-     */
-    public function operationId(): string
-    {
-        return $this->operationId;
     }
 
     /**

@@ -22,6 +22,7 @@ use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
+use Desperado\ServiceBus\Transport\TransportContext;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -30,6 +31,11 @@ use Psr\Log\LogLevel;
  */
 final class KernelContext implements MessageDeliveryContext, LoggingInContext
 {
+    /**
+     * @var TransportContext
+     */
+    private $transportContext;
+
     /**
      * Send message handler
      *
@@ -49,13 +55,20 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
 
     /**
      * @param IncomingEnvelope $incomingEnvelope
+     * @param TransportContext $transportContext
      * @param callable         $messagePublisher function(Message $message, array $headers, IncomingEnvelope
      *                                           $incomingEnvelope): Promise {}
      * @param LoggerInterface  $logger
      */
-    public function __construct(IncomingEnvelope $incomingEnvelope, callable $messagePublisher, LoggerInterface $logger)
+    public function __construct(
+        IncomingEnvelope $incomingEnvelope,
+        TransportContext $transportContext,
+        callable $messagePublisher,
+        LoggerInterface $logger
+    )
     {
         $this->incomingEnvelope = $incomingEnvelope;
+        $this->transportContext = $transportContext;
         $this->messagePublisher = $messagePublisher;
         $this->logger           = $logger;
     }
@@ -96,14 +109,15 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     {
         $messagePublisher = $this->messagePublisher;
         $incomingEnvelope = $this->incomingEnvelope;
+        $transportContext = $this->transportContext;
 
         /** @psalm-suppress InvalidArgument */
         return call(
-            static function(array $messages, array $headers) use ($messagePublisher, $incomingEnvelope): void
+            static function(array $messages, array $headers) use ($messagePublisher, $incomingEnvelope, $transportContext): void
             {
                 foreach($messages as $message)
                 {
-                    asyncCall($messagePublisher, $message, $headers, $incomingEnvelope);
+                    asyncCall($messagePublisher, $message, $headers, $incomingEnvelope, $transportContext);
                 }
             },
             $messages, $headers
@@ -129,7 +143,7 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
         string $level = LogLevel::INFO
     ): void
     {
-        $extra = \array_merge_recursive($extra, ['operationId' => $this->incomingEnvelope->operationId()]);
+        $extra = \array_merge_recursive($extra, ['operationId' => $this->transportContext->id()]);
 
         $this->logger->log($level, $logMessage, $extra);
     }

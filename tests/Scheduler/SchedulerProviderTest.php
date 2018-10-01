@@ -35,6 +35,7 @@ use Desperado\ServiceBus\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
+use Desperado\ServiceBus\Transport\TransportContext;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
@@ -396,8 +397,9 @@ final class SchedulerProviderTest extends TestCase
 
         return new KernelContext(
             new IncomingEnvelope(
-                uuid(), '', [], new FirstEmptyCommand(), []
+                '', [], new FirstEmptyCommand(), []
             ),
+            TransportContext::messageReceived(),
             $sender,
             $logger
         );

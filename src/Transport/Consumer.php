@@ -21,7 +21,7 @@ interface Consumer
     /**
      * Waiting for new messages from the broker
      *
-     * @param callable $messageProcessor static function (IncomingEnvelope $incomingEnvelope): void {}
+     * @param callable $messageProcessor static function (IncomingEnvelope $incomingEnvelope, TransportContext $context): void {}
      *
      * @return void
      */
