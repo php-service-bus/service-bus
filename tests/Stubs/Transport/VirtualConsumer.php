@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 
 use function Amp\asyncCall;
+use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
@@ -60,7 +61,7 @@ final class VirtualConsumer implements Consumer
                 $headers
             );
 
-            asyncCall($messageProcessor, $envelope, TransportContext::messageReceived());
+            asyncCall($messageProcessor, $envelope, TransportContext::messageReceived(uuid()));
         }
     }
 }

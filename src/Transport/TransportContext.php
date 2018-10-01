@@ -28,27 +28,35 @@ final class TransportContext
     private $id;
 
     /**
+     * Consumer ID
+     *
+     * @var string
+     */
+    private $consumerId;
+
+    /**
      * @var int
      */
     private $receivedAt;
 
     /**
-     * @param array $headers
+     * @param string $consumerId
      *
      * @return self
      */
-    public static function messageReceived(): self
+    public static function messageReceived(string $consumerId): self
     {
-        return new self();
+        return new self($consumerId);
     }
 
     /**
-     * Close constructor
+     * @param string $consumerId
      */
-    private function __construct()
+    private function __construct(string $consumerId)
     {
         $this->id         = uuid();
         $this->receivedAt = \microtime(true) * 10000;
+        $this->consumerId = $consumerId;
     }
 
     /**
@@ -65,5 +73,13 @@ final class TransportContext
     public function receivedAt(): int
     {
         return $this->receivedAt;
+    }
+
+    /**
+     * @return string
+     */
+    public function consumerId(): string
+    {
+        return $this->consumerId;
     }
 }

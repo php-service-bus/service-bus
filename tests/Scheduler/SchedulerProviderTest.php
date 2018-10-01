@@ -399,7 +399,7 @@ final class SchedulerProviderTest extends TestCase
             new IncomingEnvelope(
                 '', [], new FirstEmptyCommand(), []
             ),
-            TransportContext::messageReceived(),
+            TransportContext::messageReceived(uuid()),
             $sender,
             $logger
         );

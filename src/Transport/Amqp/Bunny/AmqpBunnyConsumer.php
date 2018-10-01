@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
 use function Amp\asyncCall;
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use Amp\Success;
 use Bunny\Channel;
@@ -106,11 +107,13 @@ final class AmqpBunnyConsumer implements Consumer
                 yield $this->channel->consume(
                     function(BunnyMessage $envelope, Channel $channel) use ($messageProcessor, $logger): \Generator
                     {
-                        $context = TransportContext::messageReceived();
+                        $context = TransportContext::messageReceived($this->consumerTag);
 
                         if(self::STOP_MESSAGE_CONTENT !== $envelope->content)
                         {
-                            yield $this->process($envelope, $context, $channel, $logger, $messageProcessor);
+                            yield new Coroutine(
+                                $this->process($envelope, $context, $channel, $logger, $messageProcessor)
+                            );
                         }
                         else
                         {
@@ -119,7 +122,9 @@ final class AmqpBunnyConsumer implements Consumer
                             $this->cancelSubscription('Received stop message command');
                         }
 
-                        yield $this->checkCycleActivity();
+                        yield new Coroutine(
+                            $this->checkCycleActivity()
+                        );
                     },
                     (string) $this->listenQueue, $this->consumerTag
                 );
@@ -136,7 +141,7 @@ final class AmqpBunnyConsumer implements Consumer
      * @param callable        $messageProcessor static function (IncomingEnvelope $incomingEnvelope, TransportContext
      *                                          $context): void {}
      *
-     * @return Promise<null>
+     * @return \Generator<null>
      */
     private function process(
         BunnyMessage $envelope,
@@ -144,39 +149,30 @@ final class AmqpBunnyConsumer implements Consumer
         Channel $channel,
         LoggerInterface $logger,
         callable $messageProcessor
-    ): Promise
+    ): \Generator
     {
-        $decoder = $this->messageDecoder;
+        try
+        {
+            yield call(
+                $messageProcessor,
+                static::transformEnvelope($envelope, $this->messageDecoder),
+                $context
+            );
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(BunnyMessage $envelope, TransportContext $context) use ($messageProcessor, $channel, $logger, $decoder): \Generator
-            {
-                try
-                {
-                    yield call(
-                        $messageProcessor,
-                        static::transformEnvelope($envelope, $decoder),
-                        $context
-                    );
+            yield self::acknowledge($channel, $envelope, $logger);
+        }
+        catch(DecodeMessageFailed $exception)
+        {
+            self::logDecodeFailed($context->id(), $envelope, $exception, $logger);
 
-                    yield self::acknowledge($channel, $envelope, $logger);
-                }
-                catch(DecodeMessageFailed $exception)
-                {
-                    self::logDecodeFailed($context->id(), $envelope, $exception, $logger);
+            yield self::acknowledge($channel, $envelope, $logger);
+        }
+        catch(\Throwable $throwable)
+        {
+            self::logThrowable($context->id(), $envelope, $throwable, $logger);
 
-                    yield self::acknowledge($channel, $envelope, $logger);
-                }
-                catch(\Throwable $throwable)
-                {
-                    self::logThrowable($context->id(), $envelope, $throwable, $logger);
-
-                    self::reject($channel, $envelope, $logger, true);
-                }
-            },
-            $envelope, $context
-        );
+            self::reject($channel, $envelope, $logger, true);
+        }
     }
 
     /**
@@ -285,40 +281,28 @@ final class AmqpBunnyConsumer implements Consumer
     /**
      * If a command was issued to stop the loop, perform this
      *
-     * @return Promise<null>
+     * @return \Generator<null>
      */
-    private function checkCycleActivity(): Promise
+    private function checkCycleActivity(): \Generator
     {
-        if(null === $this->cancelSubscriptionReason)
+        if(null !== $this->cancelSubscriptionReason)
         {
-            return new Success();
-        }
+            $this->logger->info(
+                'Cancel subscription with reason: "{cancelSubscriptionReason}"', [
+                    'cancelSubscriptionReason' => $this->cancelSubscriptionReason,
+                    'consumerTag'              => $this->consumerTag
+                ]
+            );
 
-        $channel = $this->channel;
-        $logger  = $this->logger;
-
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(string $consumerTag, string $reason) use ($channel, $logger): \Generator
+            try
             {
-                $logger->info(
-                    'Cancel subscription with reason: "{cancelSubscriptionReason}"', [
-                        'cancelSubscriptionReason' => $reason,
-                        'consumerTag'              => $consumerTag
-                    ]
-                );
-
-                try
-                {
-                    yield $channel->cancel($consumerTag, false);
-                }
-                catch(\Throwable $throwable)
-                {
-                    /** Not interested */
-                }
-            },
-            $this->consumerTag, $this->cancelSubscriptionReason
-        );
+                yield $this->channel->cancel($this->consumerTag, false);
+            }
+            catch(\Throwable $throwable)
+            {
+                /** Not interested */
+            }
+        }
     }
 
     /**
