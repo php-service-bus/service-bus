@@ -85,6 +85,7 @@ final class ServiceBusKernel
 
     /**
      * Enable watch for event loop blocking
+     * DO NOT USE IN PRODUCTION environment
      *
      * @return self
      */
