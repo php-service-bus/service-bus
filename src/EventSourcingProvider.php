@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use function Desperado\ServiceBus\Common\createWithoutConstructor;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
@@ -119,7 +118,9 @@ final class EventSourcingProvider
 
                     $aggregate = self::restoreStream($aggregate, $storedEventStream, $transformer);
 
-                    return yield new Success($aggregate);
+                    unset($storedEventStream, $loadedSnapshot, $fromStreamVersion);
+
+                    return $aggregate;
                 }
                 catch(\Throwable $throwable)
                 {
@@ -182,7 +183,7 @@ final class EventSourcingProvider
                         yield $snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
                     }
 
-                    return yield new Success();
+                    unset($eventStream, $receivedEvents, $loadedSnapshot, $afterSave);
                 }
                 catch(NonUniqueStreamId $exception)
                 {
@@ -205,7 +206,7 @@ final class EventSourcingProvider
     /**
      * Restore the aggregate from the event stream/Add missing events to the aggregate from the snapshot
      *
-     * @param Aggregate                      $aggregate
+     * @param Aggregate                           $aggregate
      * @param StoredAggregateEventStream|null     $storedEventStream
      * @param AggregateEventStreamDataTransformer $transformer
      *
@@ -231,6 +232,8 @@ final class EventSourcingProvider
             }
 
             invokeReflectionMethod($aggregate, 'appendStream', $eventStream);
+
+            unset($eventStream);
         }
 
         return $aggregate;

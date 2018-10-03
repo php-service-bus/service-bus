@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Index\Storage\Sql;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Index\Storage\IndexesStorage;
 use function Desperado\ServiceBus\Storage\fetchOne;
 use function Desperado\ServiceBus\Storage\SQL\insertQuery;
@@ -59,14 +58,17 @@ final class SqlIndexesStorage implements IndexesStorage
                     ->andWhere(equalsCriteria('value_key', $valueKey))
                     ->compile();
 
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+
                 /** @var array<string, mixed>|null $result */
-                $result = yield fetchOne(
-                    yield $adapter->execute($query->sql(), $query->params())
-                );
+                $result = yield fetchOne($resultSet);
+
+                unset($resultSet);
 
                 if(null !== $result && true === \is_array($result))
                 {
-                    return yield new Success($result['value_data']);
+                    return $result['value_data'];
                 }
             },
             $indexKey, $valueKey
@@ -91,7 +93,10 @@ final class SqlIndexesStorage implements IndexesStorage
                     'value_data' => $value
                 ])->compile();
 
-                yield $adapter->execute($query->sql(), $query->params());
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+
+                unset($resultSet, $query);
 
             },
             $indexKey, $valueKey, $value
@@ -109,12 +114,16 @@ final class SqlIndexesStorage implements IndexesStorage
         return call(
             static function(string $indexKey, string $valueKey) use ($adapter): \Generator
             {
-                $query = deleteQuery('event_sourcing_indexes')
+                $deleteQuery = deleteQuery('event_sourcing_indexes')
                     ->where(equalsCriteria('index_tag', $indexKey))
-                    ->andWhere(equalsCriteria('value_key', $valueKey))
-                    ->compile();
+                    ->andWhere(equalsCriteria('value_key', $valueKey));
 
-                yield $adapter->execute($query->sql(), $query->params());
+                $compiledQuery = $deleteQuery->compile();
+
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+
+                unset($resultSet, $deleteQuery, $compiledQuery);
 
             }, $indexKey, $valueKey
         );
@@ -137,7 +146,10 @@ final class SqlIndexesStorage implements IndexesStorage
                     ->andWhere(equalsCriteria('value_key', $valueKey))
                     ->compile();
 
-                yield $adapter->execute($query->sql(), $query->params());
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+
+                unset($resultSet, $query);
 
             }, $indexKey, $valueKey, $value
         );

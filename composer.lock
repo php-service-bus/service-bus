@@ -571,12 +571,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/postgres.git",
-                "reference": "4e2ca3760817ace288e2dc72c56741fb27467c3b"
+                "reference": "964ec8759b68326c240411d88fc5ff0808b966e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/postgres/zipball/4e2ca3760817ace288e2dc72c56741fb27467c3b",
-                "reference": "4e2ca3760817ace288e2dc72c56741fb27467c3b",
+                "url": "https://api.github.com/repos/amphp/postgres/zipball/964ec8759b68326c240411d88fc5ff0808b966e6",
+                "reference": "964ec8759b68326c240411d88fc5ff0808b966e6",
                 "shasum": ""
             },
             "require": {
@@ -621,7 +621,7 @@
                 "postgre",
                 "postgresql"
             ],
-            "time": "2018-09-26 17:47:08"
+            "time": "2018-10-02 03:58:35"
         },
         {
             "name": "amphp/process",
@@ -680,16 +680,16 @@
         },
         {
             "name": "amphp/socket",
-            "version": "v0.10.9",
+            "version": "v0.10.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/socket.git",
-                "reference": "6e9686b62b87c2cad235139a44be5121fe34edbb"
+                "reference": "efbe8fb64cf0ddcb4034076ebf1e64920c1259e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/socket/zipball/6e9686b62b87c2cad235139a44be5121fe34edbb",
-                "reference": "6e9686b62b87c2cad235139a44be5121fe34edbb",
+                "url": "https://api.github.com/repos/amphp/socket/zipball/efbe8fb64cf0ddcb4034076ebf1e64920c1259e2",
+                "reference": "efbe8fb64cf0ddcb4034076ebf1e64920c1259e2",
                 "shasum": ""
             },
             "require": {
@@ -743,7 +743,7 @@
                 "tcp",
                 "tls"
             ],
-            "time": "2018-05-01 21:14:10"
+            "time": "2018-10-03 09:32:18"
         },
         {
             "name": "amphp/sql",

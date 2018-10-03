@@ -219,7 +219,7 @@ final class ServiceBusKernel
         $logger     = $this->kernelContainer->get(LoggerInterface::class);
         $messageBus = $this->messageBus;
 
-        return static function(IncomingEnvelope $envelope, TransportContext $context) use ($messagePublisher, $messageBus, $logger): \Generator
+        return static function(IncomingEnvelope $envelope, TransportContext $context) use ($messagePublisher, $messageBus, $logger)
         {
             self::beforeDispatch($envelope, $context, $logger);
 
@@ -280,6 +280,8 @@ final class ServiceBusKernel
                 try
                 {
                     yield $publisher->send($destination, $outboundEnvelope);
+
+                    unset($outboundEnvelope);
                 }
                 catch(\Throwable $throwable)
                 {

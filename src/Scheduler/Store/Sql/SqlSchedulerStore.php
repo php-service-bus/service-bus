@@ -16,7 +16,6 @@ namespace Desperado\ServiceBus\Scheduler\Store\Sql;
 use function Amp\asyncCall;
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use function Desperado\ServiceBus\Common\datetimeToString;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
@@ -50,7 +49,6 @@ final class SqlSchedulerStore implements SchedulerStore
         $this->adapter = $adapter;
     }
 
-
     /**
      * @inheritDoc
      */
@@ -79,9 +77,10 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     $compiledQuery = $insertQuery->compile();
 
-                    yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                    unset($compiledQuery);
+                    unset($insertQuery, $compiledQuery, $resultSet);
 
                     /** Receive next operation and notification about the scheduled job  */
 
@@ -91,6 +90,8 @@ final class SqlSchedulerStore implements SchedulerStore
                     asyncCall($postAdd, $operation, $nextOperation);
 
                     yield $transaction->commit();
+
+                    unset($nextOperation, $transaction, $insertQuery, $compiledQuery, $resultSet);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -125,9 +126,10 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     $compiledQuery = $deleteQuery->compile();
 
-                    yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                    unset($deleteQuery, $compiledQuery);
+                    unset($deleteQuery, $compiledQuery, $resultSet);
 
                     /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
                     $nextOperation = yield self::fetchNextOperation($transaction);
@@ -135,6 +137,8 @@ final class SqlSchedulerStore implements SchedulerStore
                     asyncCall($postRemove, $nextOperation);
 
                     yield $transaction->commit();
+
+                    unset($transaction, $deleteQuery, $compiledQuery, $resultSet, $nextOperation);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -180,9 +184,10 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     $compiledQuery = $deleteQuery->compile();
 
-                    yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                    unset($deleteQuery, $compiledQuery);
+                    unset($deleteQuery, $compiledQuery, $resultSet);
 
                     /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
                     $nextOperation = yield self::fetchNextOperation($transaction);
@@ -190,6 +195,8 @@ final class SqlSchedulerStore implements SchedulerStore
                     asyncCall($postExtract, $operation, $nextOperation);
 
                     yield $transaction->commit();
+
+                    unset($transaction, $deleteQuery, $compiledQuery, $resultSet, $nextOperation);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -221,12 +228,13 @@ final class SqlSchedulerStore implements SchedulerStore
 
                 $compiledQuery = $selectQuery->compile();
 
-                /** @var array|null $result */
-                $result = yield fetchOne(
-                    yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params())
-                );
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                unset($compiledQuery, $selectQuery);
+                /** @var array|null $result */
+                $result = yield fetchOne($resultSet);
+
+                unset($selectQuery, $compiledQuery, $resultSet);
 
                 if(true === \is_array($result) && 0 !== \count($result))
                 {
@@ -239,20 +247,17 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     $compiledQuery = $updateQuery->compile();
 
-                    /** @var \Desperado\ServiceBus\Storage\ResultSet $updateResultSet */
-                    $updateResultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    $resultSet    = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+                    $affectedRows = $resultSet->affectedRows();
 
-                    unset($compiledQuery, $updateQuery);
+                    unset($updateQuery, $compiledQuery, $resultSet);
 
-                    if(0 !== $updateResultSet->affectedRows())
+                    if(0 !== $affectedRows)
                     {
-                        return yield new Success(
-                            NextScheduledOperation::fromRow($result)
-                        );
+                        return NextScheduledOperation::fromRow($result);
                     }
                 }
-
-                return yield new Success(null);
             }
         );
     }
@@ -277,12 +282,13 @@ final class SqlSchedulerStore implements SchedulerStore
 
                 $compiledQuery = $selectQuery->compile();
 
-                /** @var array|null $result */
-                $result = yield fetchOne(
-                    yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params())
-                );
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                unset($selectQuery, $compiledQuery);
+                /** @var array|null $result */
+                $result = yield fetchOne($resultSet);
+
+                unset($selectQuery, $compiledQuery, $resultSet);
 
                 if(true === \is_array($result) && 0 !== \count($result))
                 {
@@ -291,7 +297,7 @@ final class SqlSchedulerStore implements SchedulerStore
                     $operation = ScheduledOperation::restoreFromRow($result);
                 }
 
-                return yield new Success($operation);
+                return $operation;
             },
             $id
         );

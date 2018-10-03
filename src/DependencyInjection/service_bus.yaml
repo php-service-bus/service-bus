@@ -38,6 +38,7 @@ services:
     class: Desperado\ServiceBus\Transport\Amqp\Bunny\AmqpBunny
     arguments:
       $amqpConfiguration: '@Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration'
+      $amqpQoSConfiguration: null
       $messageEncoder: null
       $messageDecoder: null
       $logger: '@Psr\Log\LoggerInterface'
@@ -135,9 +136,9 @@ services:
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: ['container.service_locator']
     arguments:
-    - Desperado\ServiceBus\Transport\Transport: '@Desperado\ServiceBus\Transport\Transport'
-      Desperado\ServiceBus\MessageBus\MessageBusBuilder: '@Desperado\ServiceBus\MessageBus\MessageBusBuilder'
-      Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes: '@Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes'
-      Desperado\ServiceBus\Application\TransportConfigurator: '@Desperado\ServiceBus\Application\TransportConfigurator'
-      Psr\Log\LoggerInterface: '@Psr\Log\LoggerInterface'
-      Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector: '@Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector'
+      - Desperado\ServiceBus\Transport\Transport: '@Desperado\ServiceBus\Transport\Transport'
+        Desperado\ServiceBus\MessageBus\MessageBusBuilder: '@Desperado\ServiceBus\MessageBus\MessageBusBuilder'
+        Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes: '@Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes'
+        Desperado\ServiceBus\Application\TransportConfigurator: '@Desperado\ServiceBus\Application\TransportConfigurator'
+        Psr\Log\LoggerInterface: '@Psr\Log\LoggerInterface'
+        Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector: '@Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector'

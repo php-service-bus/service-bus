@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Storage;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Storage\Exceptions\OneResultExpected;
 
 /**
@@ -40,7 +39,7 @@ function fetchAll(ResultSet $iterator): Promise
                 $array[] = $iterator->getCurrent();
             }
 
-            return yield new Success($array);
+            return $array;
         },
         $iterator
     );
@@ -69,7 +68,7 @@ function fetchOne(ResultSet $iterator): Promise
             {
                 $endElement = \end($collection);
 
-                return yield new Success(false !== $endElement ? $endElement : null);
+                return false !== $endElement ? $endElement : null;
             }
 
             throw new OneResultExpected(

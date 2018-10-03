@@ -28,7 +28,7 @@ final class VirtualOutboundEnvelope implements OutboundEnvelope
     /**
      * @var array
      */
-    private $headers = [];
+    private $headers;
 
     /**
      * @param string $body
@@ -36,7 +36,7 @@ final class VirtualOutboundEnvelope implements OutboundEnvelope
      */
     public function __construct(string $body, array $headers)
     {
-        $this->body = $body;
+        $this->body    = $body;
         $this->headers = $headers;
     }
 
@@ -162,17 +162,17 @@ final class VirtualOutboundEnvelope implements OutboundEnvelope
 
     public function clientId(): ?string
     {
-
+        return null;
     }
 
     public function appId(): ?string
     {
-
+        return null;
     }
 
     public function expirationTime(): ?int
     {
-
+        return null;
     }
 
     public function priority(): int

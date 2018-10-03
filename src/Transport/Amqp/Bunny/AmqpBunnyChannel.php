@@ -15,9 +15,7 @@ namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
 use function Amp\asyncCall;
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Promise;
-use Amp\Success;
 use Bunny\Channel;
 use Bunny\ChannelModeEnum;
 use Bunny\ChannelStateEnum;
@@ -75,7 +73,7 @@ final class AmqpBunnyChannel extends Channel
 
                 $this->deliverCallbacks[$response->consumerTag] = $callback;
 
-                return yield new Success($response);
+                return $response;
             },
             $callback, $queue, $consumerTag, $noLocal, $noAck, $exclusive, $nowait, $arguments
         );
@@ -101,10 +99,8 @@ final class AmqpBunnyChannel extends Channel
         return call(
             function(string $body, array $headers, string $exchange, string $routingKey, bool $mandatory, bool $immediate): \Generator
             {
-                return yield new Success(
-                    yield $this->getClient()->publish(
-                        $this->getChannelId(), $body, $headers, $exchange, $routingKey, $mandatory, $immediate
-                    )
+                return yield $this->getClient()->publish(
+                    $this->getChannelId(), $body, $headers, $exchange, $routingKey, $mandatory, $immediate
                 );
             },
             $body, $headers, $exchange, $routingKey, $mandatory, $immediate
@@ -141,7 +137,7 @@ final class AmqpBunnyChannel extends Channel
                     $this->addAckListener($callback);
                 }
 
-                return yield new Success($response);
+                return $response;
             },
             $callback, $nowait
         );
@@ -165,12 +161,12 @@ final class AmqpBunnyChannel extends Channel
 
                 if($response instanceof AmqpProtocol\MethodBasicGetEmptyFrame)
                 {
-                    return yield new Success();
+                    return null;
                 }
 
                 if($response instanceof AmqpProtocol\MethodBasicGetOkFrame)
                 {
-                    return yield new Coroutine($this->getMessage($response));
+                    return yield $this->getMessage($response);
                 }
 
                 throw new \LogicException('This statement should never be reached.');
@@ -185,61 +181,68 @@ final class AmqpBunnyChannel extends Channel
      * @psalm-suppress ImplementedReturnTypeMismatch
      * @psalm-suppress InvalidReturnType
      *
-     * @return \Generator<\Bunny\Message|bool>
+     * @return Promise<\Bunny\Message|bool>
      */
-    private function getMessage(AmqpProtocol\MethodBasicGetOkFrame $frame): \Generator
+    private function getMessage(AmqpProtocol\MethodBasicGetOkFrame $frame): Promise
     {
-        $this->state = ChannelStateEnum::AWAITING_HEADER;
+        $amqpClient = $this->getClient();
 
-        /** @var AmqpProtocol\ContentHeaderFrame $headerFrame */
-        $headerFrame = yield $this->getClient()->awaitContentHeader($this->getChannelId());
-
-        $this->headerFrame       = $headerFrame;
-        $this->bodySizeRemaining = $headerFrame->bodySize;
-        $this->state             = ChannelStateEnum::AWAITING_BODY;
-
-        while($this->bodySizeRemaining > 0)
-        {
-            /** @var AmqpProtocol\ContentBodyFrame $bodyFrame */
-            $bodyFrame = yield $this->getClient()->awaitContentBody($this->getChannelId());
-
-            $this->bodyBuffer->append($bodyFrame->payload);
-            $this->bodySizeRemaining -= $bodyFrame->payloadSize;
-
-            if(0 > $this->bodySizeRemaining)
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            function(AmqpProtocol\MethodBasicGetOkFrame $frame) use ($amqpClient): \Generator
             {
-                $this->state = ChannelStateEnum::ERROR;
+                $this->state = ChannelStateEnum::AWAITING_HEADER;
 
-                $errorMessage = \sprintf('Body overflow, received %s more bytes.', -$this->bodySizeRemaining);
+                /** @var AmqpProtocol\ContentHeaderFrame $headerFrame */
+                $headerFrame = yield $this->getClient()->awaitContentHeader($this->getChannelId());
 
-                yield $this->client->disconnect(
-                    Constants::STATUS_SYNTAX_ERROR,
-                    $errorMessage
+                $this->headerFrame       = $headerFrame;
+                $this->bodySizeRemaining = $headerFrame->bodySize;
+                $this->state             = ChannelStateEnum::AWAITING_BODY;
 
+                while($this->bodySizeRemaining > 0)
+                {
+                    /** @var AmqpProtocol\ContentBodyFrame $bodyFrame */
+                    $bodyFrame = yield $amqpClient->awaitContentBody($this->getChannelId());
+
+                    $this->bodyBuffer->append($bodyFrame->payload);
+                    $this->bodySizeRemaining -= $bodyFrame->payloadSize;
+
+                    if(0 > $this->bodySizeRemaining)
+                    {
+                        $this->state = ChannelStateEnum::ERROR;
+
+                        $errorMessage = \sprintf('Body overflow, received %s more bytes.', -$this->bodySizeRemaining);
+
+                        yield $this->client->disconnect(
+                            Constants::STATUS_SYNTAX_ERROR,
+                            $errorMessage
+
+                        );
+
+                        throw new ChannelException($errorMessage);
+                    }
+                }
+
+                unset($bodyFrame);
+
+                $this->state = ChannelStateEnum::READY;
+                /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
+                $this->headerFrame = null;
+
+                return new Message(
+                    '',
+                    (string) $frame->deliveryTag,
+                    $frame->redelivered,
+                    $frame->exchange,
+                    $frame->routingKey,
+                    $headerFrame->toArray(),
+                    $this->bodyBuffer->consume($this->bodyBuffer->getLength())
                 );
-
-                throw new ChannelException($errorMessage);
-            }
-        }
-
-        $this->state = ChannelStateEnum::READY;
-
-        $message = new Message(
-            '',
-            (string) $frame->deliveryTag,
-            $frame->redelivered,
-            $frame->exchange,
-            $frame->routingKey,
-            $this->headerFrame->toArray(),
-            $this->bodyBuffer->consume($this->bodyBuffer->getLength())
+            },
+            $frame
         );
-
-        /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
-        $this->headerFrame = null;
-
-        return $message;
     }
-
 
     /**
      * @inheritdoc
@@ -293,11 +296,15 @@ final class AmqpBunnyChannel extends Channel
             $content
         );
 
+        $returnFrame = $this->returnFrame;
+
         foreach($this->returnCallbacks as $callback)
         {
             /** @psalm-suppress InvalidArgument */
-            asyncCall($callback, $message, $this->returnFrame);
+            asyncCall($callback, $message, $returnFrame);
         }
+
+        unset($returnFrame);
 
         /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
         $this->returnFrame = null;

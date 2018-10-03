@@ -17,6 +17,7 @@ use function Amp\call;
 use Amp\Promise;
 use function Amp\Promise\wait;
 use Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration;
+use Desperado\ServiceBus\Transport\Amqp\AmqpQoSConfiguration;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\Exceptions\ConnectionFail;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\JsonMessageDecoder;
@@ -77,6 +78,7 @@ final class AmqpBunny implements Transport
      */
     public function __construct(
         AmqpConnectionConfiguration $amqpConfiguration,
+        AmqpQoSConfiguration $amqpQoSConfiguration = null,
         TransportMessageEncoder $messageEncoder = null,
         TransportMessageDecoder $messageDecoder = null,
         LoggerInterface $logger = null
@@ -84,11 +86,13 @@ final class AmqpBunny implements Transport
     {
         $this->messageEncoder = $messageEncoder ?? new JsonMessageEncoder();
         $this->messageDecoder = $messageDecoder ?? new JsonMessageDecoder();
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger         = $logger ?? new NullLogger();
 
         $this->client = new AmqpBunnyClient($amqpConfiguration, $logger);
 
-        $this->connectImmediately();
+        $this->connectImmediately(
+            $amqpQoSConfiguration ?? new AmqpQoSConfiguration()
+        );
 
         $this->channelConfigurator = new AmqpBunnyChannelConfigurator($this->channel, $this->logger);
     }
@@ -176,16 +180,18 @@ final class AmqpBunny implements Transport
     }
 
     /**
+     * @param AmqpQoSConfiguration $amqpQoSConfiguration
+     *
      * @return void
      *
      * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
      */
-    private function connectImmediately(): void
+    private function connectImmediately(AmqpQoSConfiguration $amqpQoSConfiguration): void
     {
         try
         {
             $promise = call(
-                function(): \Generator
+                function(AmqpQoSConfiguration $amqpQoSConfiguration): \Generator
                 {
                     yield $this->client->connect();
 
@@ -193,7 +199,14 @@ final class AmqpBunny implements Transport
                     $channel = yield $this->client->channel();
 
                     $this->channel = $channel;
-                }
+
+                    yield $channel->qos(
+                        $amqpQoSConfiguration->qosSize(),
+                        $amqpQoSConfiguration->qosCount(),
+                        $amqpQoSConfiguration->isGlobal()
+                    );
+                },
+                $amqpQoSConfiguration
             );
 
             /** force promise resolve */

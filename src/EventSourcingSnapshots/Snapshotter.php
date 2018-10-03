@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\EventSourcingSnapshots;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
 use Desperado\ServiceBus\EventSourcing\AggregateSnapshot;
@@ -99,16 +98,16 @@ final class Snapshotter
                             \unserialize($storedSnapshot->payload(), ['allowed_classes' => true]),
                             $storedSnapshot->version()
                         );
-                    }
 
-                    return yield new Success($snapshot);
+                        unset($storedSnapshot);
+                    }
                 }
                 catch(\Throwable $throwable)
                 {
                     $logger->error($throwable->getMessage(), ['e' => $throwable]);
                 }
 
-                return yield new Success($snapshot);
+                return $snapshot;
             },
             $id
         );
@@ -151,8 +150,6 @@ final class Snapshotter
                 {
                     $logger->error($throwable->getMessage(), ['e' => $throwable]);
                 }
-
-                return yield new Success();
             },
             $snapshot
         );

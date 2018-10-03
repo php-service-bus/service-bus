@@ -16,7 +16,6 @@ namespace Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL;
 use Amp\Postgres\Transaction as AmpTransaction;
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Storage\TransactionAdapter;
 
 /**
@@ -37,11 +36,6 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
     public function __construct(AmpTransaction $transaction)
     {
         $this->transaction = $transaction;
-    }
-
-    public function __destruct()
-    {
-        $this->transaction->close();
     }
 
     /**
@@ -65,9 +59,7 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
 
                     unset($statement);
 
-                    return yield new Success(
-                        new AmpPostgreSQLResultSet($result)
-                    );
+                    return new AmpPostgreSQLResultSet($result);
                 }
                     // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)

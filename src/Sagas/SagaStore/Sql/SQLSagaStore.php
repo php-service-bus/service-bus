@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Sagas\SagaStore\Sql;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
@@ -67,9 +66,12 @@ final class SQLSagaStore implements SagasStore
                     'closed_at'        => $storedSaga->formatClosedAt()
                 ])->compile();
 
-                yield $adapter->execute($query->sql(), $query->params());
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
 
                 yield call($afterSaveHandler);
+
+                unset($resultSet, $query);
             },
             $storedSaga
         );
@@ -101,11 +103,14 @@ final class SQLSagaStore implements SagasStore
                         ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass()))
                         ->compile();
 
-                    yield $transaction->execute($query->sql(), $query->params());
+                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    $resultSet = yield $transaction->execute($query->sql(), $query->params());
 
                     yield call($afterSaveHandler);
 
                     yield $transaction->commit();
+
+                    unset($transaction, $resultSet, $query);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -135,16 +140,19 @@ final class SQLSagaStore implements SagasStore
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
                     ->compile();
 
-                $iterator = yield $adapter->execute($query->sql(), $query->params());
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
 
                 /** @var array|null $result */
-                $result = yield fetchOne($iterator);
+                $result = yield fetchOne($resultSet);
+
+                unset($query, $resultSet);
 
                 if(null !== $result && true === isset($result['payload']))
                 {
                     $result['payload'] = $adapter->unescapeBinary($result['payload']);
 
-                    return yield new Success(StoredSaga::fromRow($result));
+                    return StoredSaga::fromRow($result);
                 }
             },
             $id

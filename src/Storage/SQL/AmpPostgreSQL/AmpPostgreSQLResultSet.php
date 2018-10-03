@@ -43,6 +43,11 @@ class AmpPostgreSQLResultSet implements ResultSet
         $this->originalResultSet = $originalResultSet;
     }
 
+    public function __destruct()
+    {
+        unset($this->originalResultSet);
+    }
+
     /**
      * @inheritdoc
      */

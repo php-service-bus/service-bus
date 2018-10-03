@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
 use function Desperado\ServiceBus\Storage\fetchOne;
 use function Desperado\ServiceBus\Storage\SQL\insertQuery;
@@ -62,7 +61,10 @@ final class SqlSnapshotStore implements SnapshotStore
                     'created_at'         => $aggregateSnapshot->createdAt()
                 ])->compile();
 
-                yield $adapter->execute($query->sql(), $query->params());
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+
+                unset($query, $resultSet);
             },
             $aggregateSnapshot
         );
@@ -87,10 +89,11 @@ final class SqlSnapshotStore implements SnapshotStore
                     ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)))
                     ->compile();
 
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+
                 /** @var array|null $data */
-                $data = yield fetchOne(
-                    yield $adapter->execute($query->sql(), $query->params())
-                );
+                $data = yield fetchOne($resultSet);
 
                 if(true === \is_array($data) && 0 !== \count($data))
                 {
@@ -106,7 +109,9 @@ final class SqlSnapshotStore implements SnapshotStore
                     );
                 }
 
-                return yield new Success($storedSnapshot);
+                unset($resultSet, $data, $query);
+
+                return $storedSnapshot;
             },
             $id
         );
@@ -129,7 +134,10 @@ final class SqlSnapshotStore implements SnapshotStore
                     ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)))
                     ->compile();
 
-                yield $adapter->execute($query->sql(), $query->params());
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+
+                unset($resultSet, $query);
             },
             $id
         );

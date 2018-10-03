@@ -388,6 +388,7 @@ final class SchedulerProviderTest extends TestCase
      */
     private function createKernelContext(): KernelContext
     {
+
         $sender = function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope): void
         {
             $this->kernelContextMessages [] = $message;
