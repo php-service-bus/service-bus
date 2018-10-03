@@ -24,7 +24,6 @@ use Amp\Failure;
 use function Amp\File\open;
 use Amp\File\StatCache;
 use Amp\Promise;
-use Amp\Success;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Infrastructure\HttpClient\Data\HttpRequest;
 use Desperado\ServiceBus\Infrastructure\HttpClient\HttpClient;
@@ -109,7 +108,7 @@ final class ArtaxHttpClient implements HttpClient
 
                 StatCache::clear($tmpDirectoryPath);
 
-                return yield new Success($destinationFilePath);
+                return $destinationFilePath;
             },
             $filePath, $destinationDirectory, $fileName
         );
@@ -183,7 +182,7 @@ final class ArtaxHttpClient implements HttpClient
 
                     self::logResponse($logger, $response, $requestId);
 
-                    return yield new Success($response);
+                    return $response;
                 }
                 catch(\Throwable $throwable)
                 {
@@ -210,15 +209,13 @@ final class ArtaxHttpClient implements HttpClient
                 /** @psalm-suppress InvalidCast */
                 $responseBody = (string) yield $response->getBody();
 
-                $result = new Psr7Response(
+                return new Psr7Response(
                     $response->getStatus(),
                     $response->getHeaders(),
                     $responseBody,
                     $response->getProtocolVersion(),
                     $response->getReason()
                 );
-
-                return yield new Success($result);
             },
             $response
         );

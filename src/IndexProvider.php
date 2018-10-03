@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Index\IndexKey;
 use Desperado\ServiceBus\Index\Storage\IndexesStorage;
 use Desperado\ServiceBus\Index\IndexValue;
@@ -64,7 +63,7 @@ final class IndexProvider
 
                 if(null !== $value && true === \is_scalar($value))
                 {
-                    return yield new Success(IndexValue::create($value));
+                    return IndexValue::create($value);
                 }
             },
             $indexKey
@@ -96,12 +95,7 @@ final class IndexProvider
                     $indexKey->valueKey()
                 );
 
-                if(null !== $value && true === \is_scalar($value))
-                {
-                    return yield new Success(true);
-                }
-
-                return yield new Success(false);
+                return null !== $value && true === \is_scalar($value);
             },
             $indexKey
         );
@@ -135,11 +129,11 @@ final class IndexProvider
                         $value->value()
                     );
 
-                    return yield new Success(true);
+                    return true;
                 }
                 catch(UniqueConstraintViolationCheckFailed $exception)
                 {
-                    return yield new Success(false);
+                    return false;
                 }
             },
             $indexKey, $value

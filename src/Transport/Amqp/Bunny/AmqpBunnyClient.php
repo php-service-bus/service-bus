@@ -19,7 +19,6 @@ use Amp\Deferred;
 use Amp\Failure;
 use Amp\Loop;
 use Amp\Promise;
-use Amp\Success;
 use Bunny\AbstractClient;
 use Bunny\Protocol as AmqpProtocol;
 use Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration;
@@ -130,7 +129,7 @@ final class AmqpBunnyClient extends Client
             {
                 if($this->state === ClientStateEnum::DISCONNECTING)
                 {
-                    return yield new Success();
+                    return null;
                 }
 
                 if($this->state !== ClientStateEnum::CONNECTED)
@@ -157,8 +156,6 @@ final class AmqpBunnyClient extends Client
                 $this->cancelHeartbeatWatcher();
                 $this->closeStream();
                 $this->init();
-
-                return yield new Success();
             },
             $replyCode, $replyText
         );
@@ -185,11 +182,10 @@ final class AmqpBunnyClient extends Client
 
                     yield $this->channelOpen($channelId);
 
-                    return yield new Success($this->channels[$channelId]);
+                    return $this->channels[$channelId];
                 }
                 catch(\Throwable $throwable)
                 {
-
                     throw new ClientException('channel.open unexpected response', $throwable->getCode(), $throwable);
                 }
             }
@@ -273,9 +269,7 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
-                return yield new Success(
-                    yield $this->awaitConsumeOk($channel)
-                );
+                return yield $this->awaitConsumeOk($channel);
             },
             $channel, $queue, $consumerTag, $noLocal, $noAck, $exclusive, $nowait, $arguments
         );
@@ -307,16 +301,12 @@ final class AmqpBunnyClient extends Client
 
                 if(true === $nowait)
                 {
-                    return yield new Success(
-                        yield $this->flushWriteBuffer()
-                    );
+                    return yield $this->flushWriteBuffer();
                 }
 
                 yield $this->flushWriteBuffer();
 
-                return yield new Success(
-                    yield $this->awaitCancelOk($channel)
-                );
+                return yield $this->awaitCancelOk($channel);
             },
             $channel, $consumerTag, $nowait
         );
@@ -349,11 +339,42 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
-                return yield new Success(
-                    yield $this->awaitGetOk($channel)
-                );
+                return yield $this->awaitGetOk($channel);
             },
             $channel, $queue, $noAck
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType
+     *
+     * @return Promise<\Bunny\Protocol\MethodBasicQosOkFrame>
+     */
+    public function qos($channel, $prefetchSize = 0, $prefetchCount = 0, $global = false): Promise
+    {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            function(int $channel, int $prefetchSize, int $prefetchCount, bool $global): \Generator
+            {
+                $buffer = $this->getWriteBuffer();
+
+                $buffer->appendUint8(1);
+                $buffer->appendUint16($channel);
+                $buffer->appendUint32(11);
+                $buffer->appendUint16(60);
+                $buffer->appendUint16(10);
+                $buffer->appendInt32($prefetchSize);
+                $buffer->appendInt16($prefetchCount);
+                $this->getWriter()->appendBits([$global], $buffer);
+                $buffer->appendUint8(206);
+
+                yield $this->flushWriteBuffer();
+
+                return yield $this->awaitQosOk($channel);
+            },
+            $channel, $prefetchSize, $prefetchCount, $global
         );
     }
 
@@ -385,9 +406,7 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
-                return yield new Success(
-                    yield $this->awaitConnectionOpenOk()
-                );
+                return yield $this->awaitConnectionOpenOk();
             },
             $virtualHost, $capabilities, $insist
         );
@@ -421,9 +440,7 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
-                return yield new Success(
-                    yield $this->awaitConnectionCloseOk()
-                );
+                return yield $this->awaitConnectionCloseOk();
             },
             $replyCode, $replyText, $closeClassId, $closeMethodId
         );
@@ -484,9 +501,7 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
-                return yield new Success(
-                    $this->awaitChannelFlowOk($channel)
-                );
+                return yield $this->awaitChannelFlowOk($channel);
             },
             $channel, $active
         );
@@ -518,47 +533,12 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
-                return yield new Success(
-                    yield $this->awaitAccessRequestOk($channel)
-                );
+                return yield $this->awaitAccessRequestOk($channel);
             },
             $channel, $realm, $exclusive, $passive, $active, $write, $read
         );
     }
 
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType
-     *
-     * @return Promise<\Bunny\Protocol\MethodBasicQosOkFrame>
-     */
-    public function qos($channel, $prefetchSize = 0, $prefetchCount = 0, $global = false): Promise
-    {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            function(int $channel, int $prefetchSize, int $prefetchCount, bool $global): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(11);
-                $buffer->appendUint16(60);
-                $buffer->appendUint16(10);
-                $buffer->appendInt32($prefetchSize);
-                $buffer->appendInt16($prefetchCount);
-                $this->getWriter()->appendBits([$global], $buffer);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                return yield new Success(
-                    yield $this->awaitQosOk($channel)
-                );
-            },
-            $channel, $prefetchSize, $prefetchCount, $global
-        );
-    }
 
     /**
      * @inheritdoc
@@ -607,9 +587,7 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
-                return yield new Success(
-                    yield $this->awaitExchangeDeclareOk($channel)
-                );
+                return yield $this->awaitExchangeDeclareOk($channel);
             },
             $channel, $exchange, $exchangeType, $passive, $durable, $autoDelete, $internal, $nowait, $arguments
         );
@@ -642,9 +620,7 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
-                return yield new Success(
-                    yield $this->awaitExchangeDeleteOk($channel)
-                );
+                return yield $this->awaitExchangeDeleteOk($channel);
             },
             $channel, $exchange, $ifUnused, $nowait
         );
@@ -1107,6 +1083,53 @@ final class AmqpBunnyClient extends Client
     /**
      * @inheritdoc
      *
+     * @psalm-suppress MissingParamType
+     * @psalm-suppress ImplementedReturnTypeMismatch
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitQosOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodBasicQosOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
      * @return Promise<null>
      */
     public function onDataAvailable(): Promise
@@ -1183,7 +1206,7 @@ final class AmqpBunnyClient extends Client
             {
                 if(true === \is_bool($awaitResult))
                 {
-                    return yield new Success($awaitResult);
+                    return $awaitResult;
                 }
 
                 if($awaitResult instanceof \Generator)
@@ -1196,7 +1219,7 @@ final class AmqpBunnyClient extends Client
                     return yield $awaitResult;
                 }
 
-                return yield new Success($awaitResult);
+                return $awaitResult;
             },
             $awaitResult
         );

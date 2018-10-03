@@ -66,6 +66,8 @@ final class MessageBus
 
                     yield $task($message, $context);
                 }
+
+                unset($message, $messageClass);
             },
             $context
         );

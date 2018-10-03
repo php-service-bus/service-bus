@@ -35,6 +35,7 @@ use Desperado\ServiceBus\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
+use Desperado\ServiceBus\Transport\TransportContext;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
@@ -387,6 +388,7 @@ final class SchedulerProviderTest extends TestCase
      */
     private function createKernelContext(): KernelContext
     {
+
         $sender = function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope): void
         {
             $this->kernelContextMessages [] = $message;
@@ -396,8 +398,9 @@ final class SchedulerProviderTest extends TestCase
 
         return new KernelContext(
             new IncomingEnvelope(
-                uuid(), '', [], new FirstEmptyCommand(), []
+                '', [], new FirstEmptyCommand(), []
             ),
+            TransportContext::messageReceived(uuid()),
             $sender,
             $logger
         );

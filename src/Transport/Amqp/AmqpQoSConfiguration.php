@@ -19,7 +19,7 @@ namespace Desperado\ServiceBus\Transport\Amqp;
 final class AmqpQoSConfiguration
 {
     private const DEFAULT_QOS_PRE_FETCH_SIZE  = 0;
-    private const DEFAULT_QOS_PRE_FETCH_COUNT = 5;
+    private const DEFAULT_QOS_PRE_FETCH_COUNT = 100;
     private const DEFAULT_QOS_GLOBAL          = false;
 
     /**

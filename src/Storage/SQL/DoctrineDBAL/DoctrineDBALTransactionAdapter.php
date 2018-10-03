@@ -74,13 +74,11 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
         $connection = $this->connection;
 
         return call(
-            static function() use ($connection): \Generator
+            static function() use ($connection): void
             {
                 try
                 {
                     $connection->commit();
-
-                    return yield new Success();
                 }
                     // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)
@@ -100,13 +98,11 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
         $connection = $this->connection;
 
         return call(
-            static function() use ($connection): \Generator
+            static function() use ($connection): void
             {
                 try
                 {
                     $connection->rollBack();
-
-                    return yield new Success();
                 }
                     // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)

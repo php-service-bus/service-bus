@@ -13,10 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
-use function Amp\asyncCall;
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
 use function Desperado\ServiceBus\Common\uuid;
@@ -25,6 +23,7 @@ use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
 use Desperado\ServiceBus\Transport\Marshal\Exceptions\DecodeMessageFailed;
+use Desperado\ServiceBus\Transport\TransportContext;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -33,7 +32,8 @@ use Psr\Log\NullLogger;
  */
 final class AmqpBunnyConsumer implements Consumer
 {
-    public const STOP_MESSAGE_CONTENT = 'quit';
+    /** Maximum number of messages to be executed simultaneously */
+    private const MAX_PROCESSED_MESSAGES_COUNT = 50;
 
     /**
      * @var AmqpQueue
@@ -65,11 +65,11 @@ final class AmqpBunnyConsumer implements Consumer
     private $consumerTag;
 
     /**
-     * Reason for end of subscription. If specified, the next cycle will stop the cycle
+     * Current in progress messages
      *
-     * @var string|null
+     * @var array<string, bool>
      */
-    private $cancelSubscriptionReason;
+    private static $messagesInProcess = [];
 
     /**
      * @param AmqpQueue               $listenQueue
@@ -95,77 +95,53 @@ final class AmqpBunnyConsumer implements Consumer
      */
     public function listen(callable $messageProcessor): void
     {
-        $this->consumerTag = \sha1(uuid());
+        $consumerTag = $this->consumerTag = \sha1(uuid());
 
-        asyncCall(
-            function() use ($messageProcessor): \Generator
+        $logger  = $this->logger;
+        $decoder = $this->messageDecoder;
+        $channel = $this->channel;
+
+        $channel->consume(
+            static function(BunnyMessage $envelope, Channel $channel) use ($consumerTag, $messageProcessor, $decoder, $logger): \Generator
             {
-                $logger = $this->logger;
+                $context     = TransportContext::messageReceived($consumerTag);
+                $operationId = $context->id();
 
-                yield $this->channel->consume(
-                    function(BunnyMessage $envelope, Channel $channel) use ($messageProcessor, $logger): \Generator
+                $inProgressCount = \count(static::$messagesInProcess);
+
+                if(self::MAX_PROCESSED_MESSAGES_COUNT >= $inProgressCount)
+                {
+                    static::$messagesInProcess[$operationId] = true;
+
+                    try
                     {
-                        if(self::STOP_MESSAGE_CONTENT !== $envelope->content)
-                        {
-                            yield $this->process($envelope, $channel, $logger, $messageProcessor);
-                        }
-                        else
-                        {
-                            yield static::acknowledge($channel, $envelope, $logger);
+                        $transformedEnvelope = static::transformEnvelope($envelope, $decoder);
 
-                            $this->cancelSubscription('Received stop message command');
-                        }
+                        yield call($messageProcessor, $transformedEnvelope, $context);
 
-                        yield $this->checkCycleActivity();
-                    },
-                    (string) $this->listenQueue, $this->consumerTag
-                );
-            }
-        );
-    }
+                        unset($transformedEnvelope);
 
-    /**
-     * Handle message
-     *
-     * @param BunnyMessage    $envelope
-     * @param Channel         $channel
-     * @param LoggerInterface $logger
-     * @param callable        $messageProcessor static function (IncomingEnvelope $incomingEnvelope): void {}
-     *
-     * @return Promise<null>
-     */
-    private function process(BunnyMessage $envelope, Channel $channel, LoggerInterface $logger, callable $messageProcessor): Promise
-    {
-        $operationId = uuid();
-        $decoder     = $this->messageDecoder;
+                        yield self::acknowledge($channel, $envelope, $logger);
+                    }
+                    catch(DecodeMessageFailed $exception)
+                    {
+                        self::logDecodeFailed($operationId, $envelope, $exception, $logger);
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(string $operationId, BunnyMessage $envelope) use ($messageProcessor, $channel, $logger, $decoder): \Generator
-            {
-                try
-                {
-                    yield call(
-                        $messageProcessor,
-                        static::transformEnvelope($operationId, $envelope, $decoder)
-                    );
+                        yield self::acknowledge($channel, $envelope, $logger);
+                    }
+                    catch(\Throwable $throwable)
+                    {
+                        self::logThrowable($operationId, $envelope, $throwable, $logger);
 
-                    yield self::acknowledge($channel, $envelope, $logger);
+                        yield self::reject($channel, $envelope, $logger, true);
+                    }
+
+                    unset(static::$messagesInProcess[$operationId]);
                 }
-                catch(DecodeMessageFailed $exception)
-                {
-                    self::logDecodeFailed($operationId, $envelope, $exception, $logger);
 
-                    yield self::acknowledge($channel, $envelope, $logger);
-                }
-                catch(\Throwable $throwable)
-                {
-                    self::logThrowable($operationId, $envelope, $throwable, $logger);
-
-                    self::reject($channel, $envelope, $logger, true);
-                }
+                unset($context, $operationId);
             },
-            $operationId, $envelope
+            (string) $this->listenQueue, $this->consumerTag
         );
     }
 
@@ -239,23 +215,17 @@ final class AmqpBunnyConsumer implements Consumer
     /**
      * Create incoming message envelope
      *
-     * @param string                  $operationId
      * @param BunnyMessage            $envelope
      * @param TransportMessageDecoder $decoder
      *
      * @return IncomingEnvelope
      */
-    private static function transformEnvelope(
-        string $operationId,
-        BunnyMessage $envelope,
-        TransportMessageDecoder $decoder
-    ): IncomingEnvelope
+    private static function transformEnvelope(BunnyMessage $envelope, TransportMessageDecoder $decoder): IncomingEnvelope
     {
         $body         = $envelope->content;
         $unserialized = $decoder->unserialize($body);
 
         return new IncomingEnvelope(
-            $operationId,
             $body,
             $unserialized['message'],
             $decoder->denormalize(
@@ -263,57 +233,6 @@ final class AmqpBunnyConsumer implements Consumer
                 $unserialized['message']
             ),
             $envelope->headers
-        );
-    }
-
-    /**
-     * Mark subscription as canceled
-     *
-     * @param string $reason
-     *
-     * @return void
-     */
-    private function cancelSubscription(string $reason): void
-    {
-        $this->cancelSubscriptionReason = $reason;
-    }
-
-    /**
-     * If a command was issued to stop the loop, perform this
-     *
-     * @return Promise<null>
-     */
-    private function checkCycleActivity(): Promise
-    {
-        if(null === $this->cancelSubscriptionReason)
-        {
-            return new Success();
-        }
-
-        $channel = $this->channel;
-        $logger  = $this->logger;
-
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(string $consumerTag, string $reason) use ($channel, $logger): \Generator
-            {
-                $logger->info(
-                    'Cancel subscription with reason: "{cancelSubscriptionReason}"', [
-                        'cancelSubscriptionReason' => $reason,
-                        'consumerTag'              => $consumerTag
-                    ]
-                );
-
-                try
-                {
-                    yield $channel->cancel($consumerTag, false);
-                }
-                catch(\Throwable $throwable)
-                {
-                    /** Not interested */
-                }
-            },
-            $this->consumerTag, $this->cancelSubscriptionReason
         );
     }
 
@@ -332,7 +251,6 @@ final class AmqpBunnyConsumer implements Consumer
         LoggerInterface $logger
     ): void
     {
-
         $logger->error(
             'Error processing message: "{throwableMessage}"', [
                 'throwableMessage'  => $throwable->getMessage(),

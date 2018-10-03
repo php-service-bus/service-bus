@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\MessageBus\Processor;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\MessageBus\Contracts\MessageValidationFailed;
@@ -81,7 +80,7 @@ final class ValidationMessageProcessor implements Processor
                         self::createFailedEvent($message, $context, $violations)
                     );
 
-                    return yield new Success();
+                    return null;
                 }
 
                 return yield $processor($message, $context);

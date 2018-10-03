@@ -19,7 +19,6 @@ use function Amp\Postgres\pool;
 use Amp\Postgres\Pool;
 use Amp\Promise;
 use Amp\Sql\Transaction;
-use Amp\Success;
 use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\StorageConfiguration;
 
@@ -79,14 +78,15 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
                     /** @var \Amp\Sql\Statement $statement */
                     $statement = yield $connection->prepare($queryString);
 
-                    /** @psalm-suppress UndefinedClass Class or interface Amp\Postgres\TupleResult does not exist */
-                    $result = new AmpPostgreSQLResultSet(
+                    $resultSet = new AmpPostgreSQLResultSet(
                         yield $statement->execute($parameters)
                     );
 
                     $connection->close();
 
-                    return $result;
+                    unset($connection, $statement);
+
+                    return $resultSet;
                 }
                 catch(\Throwable $throwable)
                 {
@@ -119,10 +119,8 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
             {
                 try
                 {
-                    return yield new Success(
-                        new AmpPostgreSQLTransactionAdapter(
-                            yield $connectionsPool->beginTransaction(Transaction::ISOLATION_COMMITTED)
-                        )
+                    return new AmpPostgreSQLTransactionAdapter(
+                        yield $connectionsPool->beginTransaction(Transaction::ISOLATION_COMMITTED)
                     );
                 }
                     // @codeCoverageIgnoreStart

@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
@@ -81,7 +80,7 @@ final class SchedulerProvider
                 {
                     yield $store->add(
                         $operation,
-                        static function(ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
+                        static function(ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context)
                         {
                             yield $context->delivery(
                                 OperationScheduled::create(
@@ -251,8 +250,6 @@ final class SchedulerProvider
                             ]
                         );
                     }
-
-                    return yield new Success();
                 }
                 catch(\Throwable $throwable)
                 {

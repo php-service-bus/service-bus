@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
@@ -96,7 +95,9 @@ final class SagaProvider
 
                     yield self::doStore($this->store, $saga, $context, true);
 
-                    return yield new Success($saga);
+                    unset($sagaClass, $sagaMetaData, $expireDate);
+
+                    return $saga;
                 }
                 catch(UniqueConstraintViolationCheckFailed $exception)
                 {
@@ -131,10 +132,7 @@ final class SagaProvider
             {
                 try
                 {
-                    /** @var Saga|null $saga */
-                    $saga = yield self::doLoad($this->store, $id);
-
-                    return yield new Success($saga);
+                    return yield self::doLoad($this->store, $id);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -173,7 +171,9 @@ final class SagaProvider
                     {
                         yield self::doStore($this->store, $saga, $context, false);
 
-                        return yield new Success();
+                        unset($existsSaga);
+
+                        return;
                     }
 
                     throw new \RuntimeException(
@@ -214,9 +214,11 @@ final class SagaProvider
                 if(null !== $savedSaga)
                 {
                     $saga = \unserialize(\base64_decode($savedSaga->payload()), ['allowed_classes' => true]);
+
+                    unset($savedSaga);
                 }
 
-                return yield new Success($saga);
+                return $saga;
             },
             $id
         );
@@ -249,7 +251,7 @@ final class SagaProvider
                 /** @var array<int, string> $commands */
                 $commands = invokeReflectionMethod($saga, 'firedCommands');
                 /** @var array<int, string> $events */
-                $events   = invokeReflectionMethod($saga, 'raisedEvents');
+                $events = invokeReflectionMethod($saga, 'raisedEvents');
 
                 /** @var \DateTimeImmutable|null $closedAt */
                 $closedAt = readReflectionPropertyValue($saga, 'closedAt');
@@ -276,7 +278,7 @@ final class SagaProvider
                     ? yield $store->save($savedSaga, $contextHandler)
                     : yield $store->update($savedSaga, $contextHandler);
 
-                return yield new Success();
+                unset($commands, $events, $closedAt, $state, $savedSaga, $contextHandler);
             },
             $saga,
             $context,

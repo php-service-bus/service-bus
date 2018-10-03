@@ -29,6 +29,7 @@ use Desperado\ServiceBus\Transport\OutboundEnvelope;
 use Desperado\ServiceBus\Transport\Publisher;
 use Desperado\ServiceBus\Transport\Queue;
 use Desperado\ServiceBus\Transport\Transport;
+use Desperado\ServiceBus\Transport\TransportContext;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -85,6 +86,7 @@ final class ServiceBusKernel
 
     /**
      * Enable watch for event loop blocking
+     * DO NOT USE IN PRODUCTION environment
      *
      * @return self
      */
@@ -217,24 +219,24 @@ final class ServiceBusKernel
         $logger     = $this->kernelContainer->get(LoggerInterface::class);
         $messageBus = $this->messageBus;
 
-        return static function(IncomingEnvelope $envelope) use ($messagePublisher, $messageBus, $logger): \Generator
+        return static function(IncomingEnvelope $envelope, TransportContext $context) use ($messagePublisher, $messageBus, $logger)
         {
-            self::beforeDispatch($envelope, $logger);
+            self::beforeDispatch($envelope, $context, $logger);
 
             try
             {
                 yield $messageBus->dispatch(
-                    new KernelContext($envelope, $messagePublisher, $logger)
+                    new KernelContext($envelope, $context, $messagePublisher, $logger)
                 );
             }
             catch(NoMessageHandlersFound $exception)
             {
-                $logger->debug($exception->getMessage(), ['operationId' => $envelope->operationId()]);
+                $logger->debug($exception->getMessage(), ['operationId' => $context->id()]);
             }
             catch(\Throwable $throwable)
             {
                 $logger->critical($throwable->getMessage(), [
-                    'operationId' => $envelope->operationId(),
+                    'operationId' => $context->id(),
                     'file'        => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
                 ]);
                 /** @todo: retry message? */
@@ -253,7 +255,7 @@ final class ServiceBusKernel
         $messageRoutes = $this->kernelContainer->get(OutboundMessageRoutes::class);
         $logger        = $this->kernelContainer->get(LoggerInterface::class);
 
-        return static function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope) use (
+        return static function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope, TransportContext $transportContext) use (
             $publisher, $messageRoutes, $logger
         ): \Generator
         {
@@ -264,7 +266,7 @@ final class ServiceBusKernel
             {
                 $outboundEnvelope = self::createOutboundEnvelope(
                     $publisher,
-                    $incomingEnvelope->operationId(),
+                    $transportContext->id(),
                     $message,
                     \array_merge([
                         'x-message-class'         => $messageClass,
@@ -278,6 +280,8 @@ final class ServiceBusKernel
                 try
                 {
                     yield $publisher->send($destination, $outboundEnvelope);
+
+                    unset($outboundEnvelope);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -318,15 +322,16 @@ final class ServiceBusKernel
 
     /**
      * @param IncomingEnvelope $envelope
+     * @param TransportContext $context
      * @param LoggerInterface  $logger
      *
      * @return void
      */
-    private static function beforeDispatch(IncomingEnvelope $envelope, LoggerInterface $logger): void
+    private static function beforeDispatch(IncomingEnvelope $envelope, TransportContext $context, LoggerInterface $logger): void
     {
         $logger->debug('Dispatching the message "{messageClass}"', [
                 'messageClass' => \get_class($envelope->denormalized()),
-                'operationId'  => $envelope->operationId(),
+                'operationId'  => $context->id(),
             ]
         );
 
@@ -336,7 +341,7 @@ final class ServiceBusKernel
                     'rawMessagePayload'        => $envelope->requestBody(),
                     'normalizedMessagePayload' => $envelope->normalized(),
                     'headers'                  => $envelope->headers(),
-                    'operationId'              => $envelope->operationId()
+                    'operationId'              => $context->id()
                 ]
             );
         }

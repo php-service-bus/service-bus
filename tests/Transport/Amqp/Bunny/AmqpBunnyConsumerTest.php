@@ -25,6 +25,7 @@ use Desperado\ServiceBus\Transport\Amqp\AmqpQueue;
 use Desperado\ServiceBus\Transport\Amqp\Bunny\AmqpBunny;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Desperado\ServiceBus\Transport\QueueBind;
+use Desperado\ServiceBus\Transport\TransportContext;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -109,12 +110,12 @@ final class AmqpBunnyConsumerTest extends TestCase
         $this->transport
             ->createConsumer(AmqpQueue::default('qwerty.message'))
             ->listen(
-                function(IncomingEnvelope $incomingEnvelope)
+                function(IncomingEnvelope $incomingEnvelope, TransportContext $transportContext)
                 {
                     try
                     {
-                        static::assertNotEmpty($incomingEnvelope->operationId());
-                        static::assertTrue(Uuid::isValid($incomingEnvelope->operationId()));
+                        static::assertNotEmpty($transportContext->id());
+                        static::assertTrue(Uuid::isValid($transportContext->id()));
 
                         static::assertNotEmpty($incomingEnvelope->headers());
                         static::assertCount(3, $incomingEnvelope->headers());

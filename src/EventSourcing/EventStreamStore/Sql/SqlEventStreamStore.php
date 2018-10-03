@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed;
 use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
@@ -74,6 +73,8 @@ final class SqlEventStreamStore implements AggregateStore
                     yield call($afterSaveHandler);
 
                     yield $transaction->commit();
+
+                    unset($transaction);
                 }
                 catch(UniqueConstraintViolationCheckFailed $exception)
                 {
@@ -116,6 +117,8 @@ final class SqlEventStreamStore implements AggregateStore
                     yield call($afterSaveHandler);
 
                     yield $transaction->commit();
+
+                    unset($transaction);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -160,7 +163,9 @@ final class SqlEventStreamStore implements AggregateStore
                     $aggregateEventStream = self::restoreEventStream($adapter, $streamData, $streamEventsData);
                 }
 
-                return yield new Success($aggregateEventStream);
+                unset($streamData, $streamEventsData);
+
+                return $aggregateEventStream;
             },
             $id, $fromVersion, $toVersion
         );
@@ -183,7 +188,10 @@ final class SqlEventStreamStore implements AggregateStore
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
                     ->compile();
 
-                yield $adapter->execute($query->sql(), $query->params());
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+
+                unset($resultSet);
             },
             $id
         );
@@ -219,7 +227,10 @@ final class SqlEventStreamStore implements AggregateStore
                     'closed_at'        => $eventsStream->closedAt()
                 ])->compile();
 
-                yield $transaction->execute($query->sql(), $query->params());
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $transaction->execute($query->sql(), $query->params());
+
+                unset($resultSet);
             },
             $eventsStream
         );
@@ -256,6 +267,8 @@ final class SqlEventStreamStore implements AggregateStore
                         self::collectSaveEventQueryParameters($eventsStream)
                     );
                 }
+
+                unset($eventsCount);
             },
             $eventsStream
         );
@@ -364,11 +377,14 @@ final class SqlEventStreamStore implements AggregateStore
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
                     ->compile();
 
-                $data = yield fetchOne(
-                    yield $adapter->execute($query->sql(), $query->params())
-                );
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($query->sql(), $query->params());
 
-                return yield new Success($data);
+                $data = yield fetchOne($resultSet);
+
+                unset($resultSet);
+
+                return $data;
             },
             $adapter,
             $id
@@ -403,24 +419,25 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StorageAdapter $adapter, string $streamId, int $fromVersion, ?int $toVersion): \Generator
             {
-                $query = selectQuery('event_store_stream_events')
+                $selectQuery = selectQuery('event_store_stream_events')
                     ->where(field('stream_id')->eq($streamId))
                     ->andWhere(field('playhead')->gte($fromVersion));
 
                 if(null !== $toVersion && $fromVersion < $toVersion)
                 {
-                    $query->andWhere(field('playhead')->lte($toVersion));
+                    $selectQuery->andWhere(field('playhead')->lte($toVersion));
                 }
 
-                $query = $query->compile();
+                $compiledQuery = $selectQuery->compile();
 
-                /** @var \Latitude\QueryBuilder\Query $query */
+                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                return yield new Success(
-                    yield fetchAll(
-                        yield $adapter->execute($query->sql(), $query->params())
-                    )
-                );
+                $result = yield fetchAll($resultSet);
+
+                unset($resultSet);
+
+                return $result;
             },
             $adapter,
             $streamId,

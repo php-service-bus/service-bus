@@ -22,6 +22,7 @@ use Desperado\ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
  */
 final class KernelTestService
 {
+
     /**
      * @CommandHandler()
      *
@@ -33,6 +34,7 @@ final class KernelTestService
      * @throws \RuntimeException
      */
     public function handleWithThrowable(
+        /** @noinspection PhpUnusedParameterInspection */
         TriggerThrowableCommand $command,
         KernelContext $context
     ): void
@@ -49,6 +51,7 @@ final class KernelTestService
      * @return \Generator
      */
     public function handleWithSuccessResponse(
+        /** @noinspection PhpUnusedParameterInspection */
         TriggerResponseEventCommand $command,
         KernelContext $context
     ): \Generator
@@ -65,6 +68,7 @@ final class KernelTestService
      * @return \Generator
      */
     public function deliveryFailed(
+        /** @noinspection PhpUnusedParameterInspection */
         TriggerFailedResponseMessageSendCommand $command,
         KernelContext $context
     ): \Generator

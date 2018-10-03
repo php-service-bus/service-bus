@@ -14,12 +14,11 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 
 use function Amp\asyncCall;
-use function Amp\call;
-use Amp\Promise;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
+use Desperado\ServiceBus\Transport\TransportContext;
 
 /**
  *
@@ -53,7 +52,6 @@ final class VirtualConsumer implements Consumer
             $unserialized = $this->messageDecoder->unserialize($messagePayload);
 
             $envelope = new IncomingEnvelope(
-                uuid(),
                 $messagePayload,
                 $unserialized['message'],
                 $this->messageDecoder->denormalize(
@@ -63,7 +61,7 @@ final class VirtualConsumer implements Consumer
                 $headers
             );
 
-            asyncCall($messageProcessor, $envelope);
+            asyncCall($messageProcessor, $envelope, TransportContext::messageReceived(uuid()));
         }
     }
 }

@@ -16,7 +16,6 @@ namespace Desperado\ServiceBus\Tests\Transport\Marshal;
 use Desperado\ServiceBus\Tests\Stubs\Messages\CommandWithPayload;
 use Desperado\ServiceBus\Transport\Marshal\Decoder\JsonMessageDecoder;
 use Desperado\ServiceBus\Transport\Marshal\Encoder\JsonMessageEncoder;
-use Desperado\ServiceBus\Transport\Marshal\MessageDTO;
 use PHPUnit\Framework\TestCase;
 
 /**

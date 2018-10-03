@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Sagas\Configuration;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
@@ -76,7 +75,7 @@ final class SagaEventListenerProcessor
      * @param Event                  $event
      * @param MessageDeliveryContext $context
      *
-     * @return Promise
+     * @return Promise<bool>
      */
     public function execute(Event $event, MessageDeliveryContext $context): Promise
     {
@@ -101,7 +100,7 @@ final class SagaEventListenerProcessor
 
                     yield $sagaProvider->save($saga, $context);
 
-                    return yield new Success();
+                    return true;
                 }
 
                 $logger->info('Saga with identifier "{sagaId}:{sagaClass}" not found', [
@@ -110,7 +109,7 @@ final class SagaEventListenerProcessor
                     ]
                 );
 
-                return yield new Success();
+                return true;
             },
             $event,
             $context
