@@ -107,7 +107,7 @@ final class AmqpBunnyConsumer implements Consumer
                 $context     = TransportContext::messageReceived($consumerTag);
                 $operationId = $context->id();
 
-                $inProgressCount = \count(static::$messagesInProcess);
+                $inProgressCount = \count(self::$messagesInProcess);
 
                 if(self::MAX_PROCESSED_MESSAGES_COUNT >= $inProgressCount)
                 {
@@ -115,7 +115,7 @@ final class AmqpBunnyConsumer implements Consumer
 
                     try
                     {
-                        $transformedEnvelope = static::transformEnvelope($envelope, $decoder);
+                        $transformedEnvelope = self::transformEnvelope($envelope, $decoder);
 
                         yield call($messageProcessor, $transformedEnvelope, $context);
 
@@ -136,7 +136,7 @@ final class AmqpBunnyConsumer implements Consumer
                         yield self::reject($channel, $envelope, $logger, true);
                     }
 
-                    unset(static::$messagesInProcess[$operationId]);
+                    unset(self::$messagesInProcess[$operationId]);
                 }
 
                 unset($context, $operationId);
