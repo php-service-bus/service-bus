@@ -224,6 +224,8 @@ final class AmqpBunnyClient extends Client
 
                     $this->addHeartbeatTimer();
                 }
+
+                unset($currentTime, $lastWrite, $nextHeartbeat);
             }
         );
     }
@@ -269,6 +271,8 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
+                unset($buffer, $frame);
+
                 return yield $this->awaitConsumeOk($channel);
             },
             $channel, $queue, $consumerTag, $noLocal, $noAck, $exclusive, $nowait, $arguments
@@ -306,6 +310,8 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
+                unset($buffer);
+
                 return yield $this->awaitCancelOk($channel);
             },
             $channel, $consumerTag, $nowait
@@ -339,6 +345,8 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
+                unset($buffer);
+
                 return yield $this->awaitGetOk($channel);
             },
             $channel, $queue, $noAck
@@ -371,6 +379,8 @@ final class AmqpBunnyClient extends Client
                 $buffer->appendUint8(206);
 
                 yield $this->flushWriteBuffer();
+
+                unset($buffer);
 
                 return yield $this->awaitQosOk($channel);
             },
@@ -406,6 +416,8 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
+                unset($buffer);
+
                 return yield $this->awaitConnectionOpenOk();
             },
             $virtualHost, $capabilities, $insist
@@ -440,6 +452,8 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
+                unset($buffer);
+
                 return yield $this->awaitConnectionCloseOk();
             },
             $replyCode, $replyText, $closeClassId, $closeMethodId
@@ -471,6 +485,8 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
+                unset($buffer);
+
                 return $this->awaitChannelOpenOk($channel);
             },
             $channel, $outOfBand
@@ -500,6 +516,8 @@ final class AmqpBunnyClient extends Client
                 $buffer->appendUint8(206);
 
                 yield $this->flushWriteBuffer();
+
+                unset($buffer);
 
                 return yield $this->awaitChannelFlowOk($channel);
             },
@@ -532,6 +550,8 @@ final class AmqpBunnyClient extends Client
                 $buffer->appendUint8(206);
 
                 yield $this->flushWriteBuffer();
+
+                unset($buffer);
 
                 return yield $this->awaitAccessRequestOk($channel);
             },
@@ -587,6 +607,8 @@ final class AmqpBunnyClient extends Client
 
                 yield $this->flushWriteBuffer();
 
+                unset($buffer, $frame);
+
                 return yield $this->awaitExchangeDeclareOk($channel);
             },
             $channel, $exchange, $exchangeType, $passive, $durable, $autoDelete, $internal, $nowait, $arguments
@@ -619,6 +641,8 @@ final class AmqpBunnyClient extends Client
                 $buffer->appendUint8(206);
 
                 yield $this->flushWriteBuffer();
+
+                unset($buffer);
 
                 return yield $this->awaitExchangeDeleteOk($channel);
             },
@@ -1154,9 +1178,11 @@ final class AmqpBunnyClient extends Client
                             /** CONTINUE WHILE LOOP */
                             continue 2;
                         }
+
+                        unset($awaitResult);
                     }
 
-                    if($frame->channel === 0)
+                    if(0 === $frame->channel)
                     {
                         $this->onFrameReceived($frame);
                     }
@@ -1171,6 +1197,8 @@ final class AmqpBunnyClient extends Client
 
                         $this->channels[$frame->channel]->onFrameReceived($frame);
                     }
+
+                    unset($frame);
                 }
             }
         );
