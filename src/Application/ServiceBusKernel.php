@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
+use function Amp\asyncCall;
 use Amp\Loop;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector;
@@ -24,6 +25,7 @@ use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ContextArgumentReso
 use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\MessageArgumentResolver;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes;
+use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Desperado\ServiceBus\Transport\OutboundEnvelope;
 use Desperado\ServiceBus\Transport\Publisher;
@@ -38,8 +40,9 @@ use Psr\Log\LoggerInterface;
  */
 final class ServiceBusKernel
 {
-    private const KERNEL_LOCATOR_INDEX = 'service_bus.kernel_locator';
-    private const SERVICES_LOCATOR     = 'service_bus.services_locator';
+    private const KERNEL_LOCATOR_INDEX       = 'service_bus.kernel_locator';
+    private const SERVICES_LOCATOR           = 'service_bus.services_locator';
+    private const GARBAGE_COLLECTOR_INTERVAL = 600000;
 
     /**
      * Custom service locator for application kernel only
@@ -52,6 +55,11 @@ final class ServiceBusKernel
      * @var MessageBus
      */
     private $messageBus;
+
+    /**
+     * @var Consumer
+     */
+    private $consumer;
 
     /**
      * Logging is forced off for all levels
@@ -121,12 +129,37 @@ final class ServiceBusKernel
             $this->createMessageSender()
         );
 
-        /** @var \Desperado\ServiceBus\Transport\Consumer $consumer */
-        $consumer = $this->kernelContainer->get(Transport::class)->createConsumer($queue);
+        $this->consumer = $this->kernelContainer->get(Transport::class)->createConsumer($queue);
 
-        $consumer->listen($messageProcessor);
+        $this->enableGarbageCollector();
+        $this->consumer->listen($messageProcessor);
 
         Loop::run();
+    }
+
+    /**
+     * @param int $interval
+     *
+     * @return void
+     */
+    public function stop(int $interval): void
+    {
+        asyncCall(
+            function(): \Generator
+            {
+                yield $this->consumer->stop();
+            }
+        );
+
+        $this->kernelContainer->get(LoggerInterface::class)->info('stop after 10 sec');
+
+        Loop::delay(
+            10000,
+            function()
+            {
+                Loop::stop();
+            }
+        );
     }
 
     /**
@@ -413,6 +446,23 @@ final class ServiceBusKernel
                 ]
             );
         }
+    }
+
+    /**
+     * @return void
+     */
+    private function enableGarbageCollector(): void
+    {
+        $logger = $this->kernelContainer->get(LoggerInterface::class);
+
+        Loop::repeat(
+            self::GARBAGE_COLLECTOR_INTERVAL,
+            static function() use ($logger): void
+            {
+                $logger->debug('Forces collection of any existing garbage cycles', ['cycles' => \gc_collect_cycles()]);
+                $logger->debug('Reclaims memory used by the Zend Engine memory manager', ['bytes' => \gc_mem_caches()]);
+            }
+        );
     }
 
     /**
