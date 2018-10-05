@@ -221,8 +221,6 @@ final class AmqpBunnyClient extends Client
                     $this->writer->appendFrame(new HeartbeatFrame(), $this->writeBuffer);
 
                     yield $this->flushWriteBuffer();
-
-                    $this->addHeartbeatTimer();
                 }
 
                 unset($currentTime, $lastWrite, $nextHeartbeat);
