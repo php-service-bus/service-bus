@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2 - 2018-10-05
+
+### Fixed
+- The bug with the heartbeat timer has been fixed
+
+
 ## 1.2.1 - 2018-10-03
 
 ### Added

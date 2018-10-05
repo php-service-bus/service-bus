@@ -113,7 +113,9 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
             {
                 try
                 {
-                    return yield $transaction->rollback();
+                    yield $transaction->rollback();
+
+                    unset($transaction);
                 }
                     // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)

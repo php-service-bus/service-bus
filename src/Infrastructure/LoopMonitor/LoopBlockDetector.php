@@ -121,6 +121,8 @@ final class LoopBlockDetector
             $traceData['lockTime'] = 0 !== $blockInterval ? $blockInterval / 1000 : 0;
 
             $logger->error('A lock event loop has been detected. Blocking time: {lockTime} seconds', $traceData);
+
+            unset($traceData, $trace, $traceData, $i);
         };
     }
 }
