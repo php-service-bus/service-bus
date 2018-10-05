@@ -38,8 +38,9 @@ use Psr\Log\LoggerInterface;
  */
 final class ServiceBusKernel
 {
-    private const KERNEL_LOCATOR_INDEX = 'service_bus.kernel_locator';
-    private const SERVICES_LOCATOR     = 'service_bus.services_locator';
+    private const KERNEL_LOCATOR_INDEX       = 'service_bus.kernel_locator';
+    private const SERVICES_LOCATOR           = 'service_bus.services_locator';
+    private const GARBAGE_COLLECTOR_INTERVAL = 600000;
 
     /**
      * Custom service locator for application kernel only
@@ -124,6 +125,7 @@ final class ServiceBusKernel
         /** @var \Desperado\ServiceBus\Transport\Consumer $consumer */
         $consumer = $this->kernelContainer->get(Transport::class)->createConsumer($queue);
 
+        $this->enableGarbageCollector();
         $consumer->listen($messageProcessor);
 
         Loop::run();
@@ -413,6 +415,23 @@ final class ServiceBusKernel
                 ]
             );
         }
+    }
+
+    /**
+     * @return void
+     */
+    private function enableGarbageCollector(): void
+    {
+        $logger = $this->kernelContainer->get(LoggerInterface::class);
+
+        Loop::repeat(
+            self::GARBAGE_COLLECTOR_INTERVAL,
+            static function() use ($logger): void
+            {
+                $logger->debug('Forces collection of any existing garbage cycles', ['cycles' => \gc_collect_cycles()]);
+                $logger->debug('Reclaims memory used by the Zend Engine memory manager', ['bytes' => \gc_mem_caches()]);
+            }
+        );
     }
 
     /**
