@@ -150,11 +150,9 @@ final class ServiceBusKernel
                 yield $this->consumer->stop();
             }
         );
-
-        $this->kernelContainer->get(LoggerInterface::class)->info('stop after 10 sec');
-
+        
         Loop::delay(
-            10000,
+            $interval,
             function()
             {
                 Loop::stop();
