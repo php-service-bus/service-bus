@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
+use function Amp\asyncCall;
 use Amp\Loop;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector;
@@ -24,6 +25,7 @@ use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ContextArgumentReso
 use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\MessageArgumentResolver;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes;
+use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
 use Desperado\ServiceBus\Transport\OutboundEnvelope;
 use Desperado\ServiceBus\Transport\Publisher;
@@ -53,6 +55,11 @@ final class ServiceBusKernel
      * @var MessageBus
      */
     private $messageBus;
+
+    /**
+     * @var Consumer
+     */
+    private $consumer;
 
     /**
      * Logging is forced off for all levels
@@ -122,13 +129,37 @@ final class ServiceBusKernel
             $this->createMessageSender()
         );
 
-        /** @var \Desperado\ServiceBus\Transport\Consumer $consumer */
-        $consumer = $this->kernelContainer->get(Transport::class)->createConsumer($queue);
+        $this->consumer = $this->kernelContainer->get(Transport::class)->createConsumer($queue);
 
         $this->enableGarbageCollector();
-        $consumer->listen($messageProcessor);
+        $this->consumer->listen($messageProcessor);
 
         Loop::run();
+    }
+
+    /**
+     * @param int $interval
+     *
+     * @return void
+     */
+    public function stop(int $interval): void
+    {
+        asyncCall(
+            function(): \Generator
+            {
+                yield $this->consumer->stop();
+            }
+        );
+
+        $this->kernelContainer->get(LoggerInterface::class)->info('stop after 10 sec');
+
+        Loop::delay(
+            10000,
+            function()
+            {
+                Loop::stop();
+            }
+        );
     }
 
     /**

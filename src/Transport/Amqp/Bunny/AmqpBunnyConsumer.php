@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
 use function Amp\call;
+use Amp\Loop;
 use Amp\Promise;
 use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
@@ -34,6 +35,7 @@ final class AmqpBunnyConsumer implements Consumer
 {
     /** Maximum number of messages to be executed simultaneously */
     private const MAX_PROCESSED_MESSAGES_COUNT = 50;
+
 
     /**
      * @var AmqpQueue
@@ -142,6 +144,27 @@ final class AmqpBunnyConsumer implements Consumer
                 unset($context, $operationId);
             },
             (string) $this->listenQueue, $this->consumerTag
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function stop(): Promise
+    {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            function(): \Generator
+            {
+                yield $this->channel->cancel($this->consumerTag, false);
+
+                $this->logger->info('Subscription canceled', [
+                        'queue'       => (string) $this->listenQueue,
+                        'consumerTag' => $this->consumerTag
+                    ]
+                );
+
+            }
         );
     }
 

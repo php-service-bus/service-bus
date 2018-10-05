@@ -14,6 +14,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 
 use function Amp\asyncCall;
+use Amp\Promise;
+use Amp\Success;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
@@ -63,5 +65,13 @@ final class VirtualConsumer implements Consumer
 
             asyncCall($messageProcessor, $envelope, TransportContext::messageReceived(uuid()));
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function stop(): Promise
+    {
+        return new Success();
     }
 }

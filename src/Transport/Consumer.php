@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Transport;
 
+use Amp\Promise;
+
 /**
  * Subscriber to new messages from the broker
  */
@@ -26,4 +28,11 @@ interface Consumer
      * @return void
      */
     public function listen(callable $messageProcessor): void;
+
+    /**
+     * Cancel subscription
+     *
+     * @return Promise<null>
+     */
+    public function stop(): Promise;
 }
