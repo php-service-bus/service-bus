@@ -79,8 +79,8 @@ use Desperado\ServiceBus\Application\Bootstrap;
 use Desperado\ServiceBus\Application\ServiceBusKernel;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
-use Desperado\ServiceBus\Transport\AmqpExt\AmqpQueue;
-use Desperado\ServiceBus\Transport\AmqpExt\AmqpTopic;
+use Desperado\ServiceBus\Transport\Amqp\AmqpExchange;
+use Desperado\ServiceBus\Transport\Amqp\AmqpQueue;
 use Desperado\ServiceBus\Transport\QueueBind;
 use ServiceBusDemo\App\ServiceBusDemoExtension;
 use Symfony\Component\Debug\Debug;
@@ -110,7 +110,7 @@ try
 
     /** Main exchange and queue binds */
 
-    $mainTopic = AmqpTopic::direct((string) \getenv('TRANSPORT_TOPIC'), true);
+    $mainTopic = AmqpExchange::direct((string) \getenv('TRANSPORT_TOPIC'), true);
     $mainQueue = AmqpQueue::default((string) \getenv('TRANSPORT_QUEUE'), true);
 
     $transportConfigurator
@@ -125,7 +125,9 @@ try
         )
     );
 
-    $kernel->listen($mainQueue);
+    $kernel
+      ->useDefaultStopSignalHandler()
+      ->listen($mainQueue);
 }
 catch(\Throwable $throwable)
 {
