@@ -73,8 +73,6 @@ final class SqlEventStreamStore implements AggregateStore
                     yield call($afterSaveHandler);
 
                     yield $transaction->commit();
-
-                    unset($transaction);
                 }
                 catch(UniqueConstraintViolationCheckFailed $exception)
                 {
@@ -90,6 +88,10 @@ final class SqlEventStreamStore implements AggregateStore
                     yield $transaction->rollback();
 
                     throw new SaveStreamFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                }
+                finally
+                {
+                    unset($transaction);
                 }
             },
             $aggregateEventStream
@@ -117,14 +119,16 @@ final class SqlEventStreamStore implements AggregateStore
                     yield call($afterSaveHandler);
 
                     yield $transaction->commit();
-
-                    unset($transaction);
                 }
                 catch(\Throwable $throwable)
                 {
                     yield $transaction->rollback();
 
                     throw $throwable;
+                }
+                finally
+                {
+                    unset($transaction);
                 }
             },
             $aggregateEventStream

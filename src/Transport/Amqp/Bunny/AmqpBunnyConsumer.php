@@ -118,6 +118,7 @@ final class AmqpBunnyConsumer implements Consumer
                     {
                         $transformedEnvelope = self::transformEnvelope($envelope, $decoder);
 
+                        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
                         yield call($messageProcessor, $transformedEnvelope, $context);
 
                         unset($transformedEnvelope);

@@ -172,6 +172,7 @@ final class ServiceBusKernel
     {
         $logger = $this->kernelContainer->get(LoggerInterface::class);
 
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         asyncCall(
             function(int $interval) use ($logger): \Generator
             {
@@ -282,7 +283,7 @@ final class ServiceBusKernel
         $logger     = $this->kernelContainer->get(LoggerInterface::class);
         $messageBus = $this->messageBus;
 
-        return static function(IncomingEnvelope $envelope, TransportContext $context) use ($messagePublisher, $messageBus, $logger)
+        return static function(IncomingEnvelope $envelope, TransportContext $context) use ($messagePublisher, $messageBus, $logger): \Generator
         {
             self::beforeDispatch($envelope, $context, $logger);
 

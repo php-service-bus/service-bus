@@ -115,6 +115,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
 
         /** @psalm-suppress InvalidArgument */
         return call(
+            /** @psalm-suppress InvalidReturnType */
             static function() use ($connectionsPool): \Generator
             {
                 try

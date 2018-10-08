@@ -30,6 +30,7 @@ function fetchAll(ResultSet $iterator): Promise
 {
     /** @psalm-suppress InvalidArgument */
     return call(
+         /** @psalm-suppress InvalidReturnType */
         static function(ResultSet $iterator): \Generator
         {
             $array = [];

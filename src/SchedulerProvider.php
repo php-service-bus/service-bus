@@ -80,7 +80,7 @@ final class SchedulerProvider
                 {
                     yield $store->add(
                         $operation,
-                        static function(ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context)
+                        static function(ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
                         {
                             yield $context->delivery(
                                 OperationScheduled::create(
