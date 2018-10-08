@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.3 - 2018-10-08
+
+### Added
+- Added forced collection of links and freeing memory (1 time per hour)
+- Added processing "2" signal (Now the subscription will be canceled, and the daemon will stop working after 10 seconds (by default))
+
+### Moved
+- ./docker directory moved to ./tests/docker 
+
+### Fixed
+- Optimized RAM usage
+
+
 ## 1.2.2 - 2018-10-05
 
 ### Fixed
