@@ -45,6 +45,13 @@
 - [bindQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L155): Привязывает очередь к exchange
 - [bindTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L140): Привязывает exchange к exchange
 
+#### Конфигурация кернела
+- [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L101): Включить определение блокировки чем-либо эвент лупа
+- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L128):  Использовать обработчик для сигнала SIGINT(2) по умолчанию
+- [listen()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L152): Запуск приложения и подписка на сообщения
+- [stop()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L174): Остановить приложение через N миллисекунд
+
+
 #### Создание схемы базы данных
 **Важно**: при старте приложения не создаётся схема базы данных. Это отдано на откуп пользователям.
 Доступные для SQL фикстуры:

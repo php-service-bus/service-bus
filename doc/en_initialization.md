@@ -2,6 +2,7 @@ Table of contents
 * [The list of environment variables](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#the-list-of-environment-variables)
 * [Initialization](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#initialization)
 * [Transport Configuration](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#transport-configuration)
+* [Kernel configuration](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#kernel-configuration)
 * [Creation of database schema](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#creation-of-database-schema)
 * [Initialization demon example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_initialization.md#initialization-demon-example)
 
@@ -45,6 +46,12 @@ For the configuration of the transport layer is responsible [ServiceBusKernel](h
 - [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L120): Creates an exchange (if it does not exist)
 - [bindQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L155): bind a queue to exchange
 - [bindTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L140): bind exchange to exchange
+
+#### Kernel configuration
+- [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L101): Enable detection of blocking event loop
+- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L128): Use default handler for SIGINT(2) signal 
+- [listen()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L152): Starting the application and subscribing to messages 
+- [stop()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L174): Stop application after N milliseconds
 
 #### Creation of database schema
 **Important**: at the application initiation, a database scheme is not created. This is for the users to do.
