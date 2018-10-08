@@ -160,7 +160,10 @@ final class ServiceBusKernel
         $this->enableGarbageCollector();
         $this->consumer->listen($messageProcessor);
 
-        Loop::run();
+        if(false === \defined('PHPUNIT_TESTING'))
+        {
+            Loop::run();
+        }
     }
 
     /**

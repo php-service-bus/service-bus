@@ -133,11 +133,7 @@ final class AmqpBunnyConsumerTest extends TestCase
                         echo $throwable->getMessage(), \PHP_EOL;
                         exit(1);
                     }
-
-                    yield $this->transport->close();
                 }
             );
-
-        Loop::run();
     }
 }
