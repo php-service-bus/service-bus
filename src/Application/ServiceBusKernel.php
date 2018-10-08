@@ -117,6 +117,32 @@ final class ServiceBusKernel
     }
 
     /**
+     * Use default handler for signal "SIGINT"
+     *
+     * @param int $stopDelay
+     *
+     * @return self
+     *
+     * @throws Loop\UnsupportedFeatureException
+     */
+    public function useDefaultStopSignalHandler(int $stopDelay = 10000): self
+    {
+        $logger = $this->kernelContainer->get(LoggerInterface::class);
+
+        Loop::onSignal(
+            \SIGINT,
+            function() use ($stopDelay, $logger): void
+            {
+                $logger->info('A signal SIGINT(2) was received');
+
+                $this->stop($stopDelay);
+            }
+        );
+
+        return $this;
+    }
+
+    /**
      * Start message listen
      *
      * @param Queue $queue
@@ -144,21 +170,25 @@ final class ServiceBusKernel
      */
     public function stop(int $interval): void
     {
+        $logger = $this->kernelContainer->get(LoggerInterface::class);
+
         asyncCall(
-            function(): \Generator
+            function(int $interval) use ($logger): \Generator
             {
                 yield $this->consumer->stop();
-            }
-        );
 
-        $this->kernelContainer->get(LoggerInterface::class)->info('stop after 10 sec');
+                $logger->info('Handler will stop after {duration} seconds', ['duration' => $interval / 1000]);
 
-        Loop::delay(
-            10000,
-            function()
-            {
-                Loop::stop();
-            }
+                Loop::delay(
+                    $interval,
+                    static function() use ($logger): void
+                    {
+                        $logger->info('The event loop has been stopped');
+                        Loop::stop();
+                    }
+                );
+            },
+            $interval
         );
     }
 

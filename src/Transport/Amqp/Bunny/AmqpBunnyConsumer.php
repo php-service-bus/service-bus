@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
 use function Amp\call;
-use Amp\Loop;
 use Amp\Promise;
 use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
