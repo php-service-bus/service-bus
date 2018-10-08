@@ -122,7 +122,7 @@ final class LoopBlockDetector
 
             $logger->error('A lock event loop has been detected. Blocking time: {lockTime} seconds', $traceData);
 
-            unset($traceData, $trace, $traceData, $i);
+            unset($traceData, $trace, $i);
         };
     }
 }

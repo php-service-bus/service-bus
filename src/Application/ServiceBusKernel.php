@@ -117,6 +117,32 @@ final class ServiceBusKernel
     }
 
     /**
+     * Use default handler for signal "SIGINT"
+     *
+     * @param int $stopDelay
+     *
+     * @return self
+     *
+     * @throws Loop\UnsupportedFeatureException
+     */
+    public function useDefaultStopSignalHandler(int $stopDelay = 10000): self
+    {
+        $logger = $this->kernelContainer->get(LoggerInterface::class);
+
+        Loop::onSignal(
+            \SIGINT,
+            function() use ($stopDelay, $logger): void
+            {
+                $logger->info('A signal SIGINT(2) was received');
+
+                $this->stop($stopDelay);
+            }
+        );
+
+        return $this;
+    }
+
+    /**
      * Start message listen
      *
      * @param Queue $queue
@@ -134,7 +160,10 @@ final class ServiceBusKernel
         $this->enableGarbageCollector();
         $this->consumer->listen($messageProcessor);
 
-        Loop::run();
+        if(false === \defined('PHPUNIT_TESTING'))
+        {
+            Loop::run();
+        }
     }
 
     /**
@@ -144,19 +173,26 @@ final class ServiceBusKernel
      */
     public function stop(int $interval): void
     {
+        $logger = $this->kernelContainer->get(LoggerInterface::class);
+
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         asyncCall(
-            function(): \Generator
+            function(int $interval) use ($logger): \Generator
             {
                 yield $this->consumer->stop();
-            }
-        );
-        
-        Loop::delay(
-            $interval,
-            function()
-            {
-                Loop::stop();
-            }
+
+                $logger->info('Handler will stop after {duration} seconds', ['duration' => $interval / 1000]);
+
+                Loop::delay(
+                    $interval,
+                    static function() use ($logger): void
+                    {
+                        $logger->info('The event loop has been stopped');
+                        Loop::stop();
+                    }
+                );
+            },
+            $interval
         );
     }
 
@@ -250,7 +286,7 @@ final class ServiceBusKernel
         $logger     = $this->kernelContainer->get(LoggerInterface::class);
         $messageBus = $this->messageBus;
 
-        return static function(IncomingEnvelope $envelope, TransportContext $context) use ($messagePublisher, $messageBus, $logger)
+        return static function(IncomingEnvelope $envelope, TransportContext $context) use ($messagePublisher, $messageBus, $logger): \Generator
         {
             self::beforeDispatch($envelope, $context, $logger);
 

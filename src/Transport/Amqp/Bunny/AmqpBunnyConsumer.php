@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 
 use function Amp\call;
-use Amp\Loop;
 use Amp\Promise;
 use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
@@ -119,6 +118,7 @@ final class AmqpBunnyConsumer implements Consumer
                     {
                         $transformedEnvelope = self::transformEnvelope($envelope, $decoder);
 
+                        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
                         yield call($messageProcessor, $transformedEnvelope, $context);
 
                         unset($transformedEnvelope);

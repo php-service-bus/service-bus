@@ -190,6 +190,7 @@ final class AmqpBunny implements Transport
     {
         try
         {
+            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
             $promise = call(
                 function(AmqpQoSConfiguration $amqpQoSConfiguration): \Generator
                 {

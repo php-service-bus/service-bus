@@ -204,6 +204,7 @@ final class ArtaxHttpClient implements HttpClient
     {
         /** @psalm-suppress InvalidArgument */
         return call(
+            /** @psalm-suppress InvalidReturnType */
             static function(Response $response): \Generator
             {
                 /** @psalm-suppress InvalidCast */

@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus;
 
 use function Amp\call;
 use Amp\Promise;
+use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
@@ -279,6 +280,8 @@ final class SagaProvider
                     : yield $store->update($savedSaga, $contextHandler);
 
                 unset($commands, $events, $closedAt, $state, $savedSaga, $contextHandler);
+
+                return yield new Success();
             },
             $saga,
             $context,

@@ -94,29 +94,34 @@ final class SQLSagaStore implements SagasStore
                 try
                 {
                     /** @psalm-suppress ImplicitToStringCast */
-                    $query = updateQuery('sagas_store', [
+                    $updateQuery = updateQuery('sagas_store', [
                         'payload'   => $storedSaga->payload(),
                         'state_id'  => $storedSaga->status(),
                         'closed_at' => $storedSaga->formatClosedAt()
                     ])
                         ->where(equalsCriteria('id', $storedSaga->id()))
-                        ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass()))
-                        ->compile();
+                        ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass()));
+
+                    $compiledQuery = $updateQuery->compile();
 
                     /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
-                    $resultSet = yield $transaction->execute($query->sql(), $query->params());
+                    $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
                     yield call($afterSaveHandler);
 
                     yield $transaction->commit();
 
-                    unset($transaction, $resultSet, $query);
+                    unset($resultSet, $updateQuery, $compiledQuery);
                 }
                 catch(\Throwable $throwable)
                 {
                     yield $transaction->rollback();
 
                     throw $throwable;
+                }
+                finally
+                {
+                    unset($transaction);
                 }
             },
             $storedSaga

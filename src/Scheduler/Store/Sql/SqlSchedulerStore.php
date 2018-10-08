@@ -91,13 +91,17 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     yield $transaction->commit();
 
-                    unset($nextOperation, $transaction, $insertQuery, $compiledQuery, $resultSet);
+                    unset($nextOperation);
                 }
                 catch(\Throwable $throwable)
                 {
                     yield $transaction->rollback();
 
                     throw $throwable;
+                }
+                finally
+                {
+                    unset($transaction);
                 }
             },
             $operation, $postAdd
@@ -138,13 +142,17 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     yield $transaction->commit();
 
-                    unset($transaction, $deleteQuery, $compiledQuery, $resultSet, $nextOperation);
+                    unset($nextOperation);
                 }
                 catch(\Throwable $throwable)
                 {
                     yield $transaction->rollback();
 
                     throw $throwable;
+                }
+                finally
+                {
+                    unset($transaction);
                 }
             },
             $id, $postRemove
@@ -196,13 +204,17 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     yield $transaction->commit();
 
-                    unset($transaction, $deleteQuery, $compiledQuery, $resultSet, $nextOperation);
+                    unset($nextOperation);
                 }
                 catch(\Throwable $throwable)
                 {
                     yield $transaction->rollback();
 
                     throw $throwable;
+                }
+                finally
+                {
+                    unset($transaction);
                 }
             },
             $id, $postExtract
