@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0
+
+### Added
+
+### Removed
+- TransactionAdapter::rollback() No longer throws exceptions
+### Fixed
+
+
 ## 1.2.3 - 2018-10-08
 
 ### Added

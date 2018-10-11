@@ -51,10 +51,6 @@ interface TransactionAdapter
      * Rollback transaction
      *
      * @return Promise<null>
-     *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
      */
     public function rollback(): Promise;
 }

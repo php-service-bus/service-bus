@@ -120,7 +120,7 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
                     // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)
                 {
-                    throw AmpExceptionConvert::do($throwable);
+                    /** We will not throw an exception */
                 }
                 // @codeCoverageIgnoreEnd
             }

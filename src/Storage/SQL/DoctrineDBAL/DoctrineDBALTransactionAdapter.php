@@ -97,6 +97,7 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
     {
         $connection = $this->connection;
 
+        /** @psalm-suppress InvalidArgument */
         return call(
             static function() use ($connection): void
             {
@@ -107,7 +108,7 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
                     // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)
                 {
-                    throw DoctrineDBALExceptionConvert::do($throwable);
+                    /** We will not throw an exception */
                 }
                 // @codeCoverageIgnoreEnd
             }
