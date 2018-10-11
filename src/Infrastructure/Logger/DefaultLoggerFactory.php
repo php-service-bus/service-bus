@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Logger;
+namespace Desperado\ServiceBus\Infrastructure\Logger;
 
 use Desperado\ServiceBus\Environment;
 use Monolog\Logger;

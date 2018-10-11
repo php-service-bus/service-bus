@@ -6,7 +6,9 @@
 
 ### Removed
 - TransactionAdapter::rollback() No longer throws exceptions
-### Fixed
+
+### Moved
+- ```Desperado\ServiceBus\Logger``` to ```Desperado\ServiceBus\Infrastructure\Logger```
 
 
 ## 1.2.3 - 2018-10-08

@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Logger;
+namespace Desperado\ServiceBus\Tests\Infrastructure\Logger;
 
 use Desperado\ServiceBus\Environment;
-use Desperado\ServiceBus\Logger\DefaultLoggerFactory;
+use Desperado\ServiceBus\Infrastructure\Logger\DefaultLoggerFactory;
 use PHPUnit\Framework\TestCase;
 
 /**

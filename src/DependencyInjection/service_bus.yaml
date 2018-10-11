@@ -14,11 +14,11 @@ services:
       $environment: '%service_bus.environment%'
 
   #  Create default logger instance factory
-  Desperado\ServiceBus\Logger\DefaultLoggerFactory:
+  Desperado\ServiceBus\Infrastructure\Logger\DefaultLoggerFactory:
 
   # Default logger instance
   Psr\Log\LoggerInterface:
-    factory: 'Desperado\ServiceBus\Logger\DefaultLoggerFactory:build'
+    factory: 'Desperado\ServiceBus\Infrastructure\Logger\DefaultLoggerFactory:build'
     arguments:
       $entryPointName: '%service_bus.entry_point%'
       $environment: '@Desperado\ServiceBus\Environment'
