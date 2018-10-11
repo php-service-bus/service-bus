@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Transport;
 use function Desperado\ServiceBus\Common\uuid;
 
 /**
- *
+ * The context of the received message
  */
 final class TransportContext
 {
@@ -35,6 +35,8 @@ final class TransportContext
     private $consumerId;
 
     /**
+     * Date of receipt of the message
+     *
      * @var int
      */
     private $receivedAt;
@@ -50,16 +52,8 @@ final class TransportContext
     }
 
     /**
-     * @param string $consumerId
-     */
-    private function __construct(string $consumerId)
-    {
-        $this->id         = uuid();
-        $this->receivedAt = \microtime(true) * 10000;
-        $this->consumerId = $consumerId;
-    }
-
-    /**
+     * Get assigned message id
+     *
      * @return string
      */
     public function id(): string
@@ -68,6 +62,8 @@ final class TransportContext
     }
 
     /**
+     * Get the time of receiving of message
+     *
      * @return int
      */
     public function receivedAt(): int
@@ -76,10 +72,22 @@ final class TransportContext
     }
 
     /**
+     * Get consumer id
+     *
      * @return string
      */
     public function consumerId(): string
     {
         return $this->consumerId;
+    }
+
+    /**
+     * @param string $consumerId
+     */
+    private function __construct(string $consumerId)
+    {
+        $this->id         = uuid();
+        $this->receivedAt = \microtime(true) * 10000;
+        $this->consumerId = $consumerId;
     }
 }

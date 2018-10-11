@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Transport;
 use Amp\Promise;
 
 /**
- *
+ * Message transport interface
  */
 interface Transport
 {
@@ -26,8 +26,7 @@ interface Transport
      * @param Topic $topic
      *
      * @return void
-
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\CreateTopicFailed
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\CreateTopicFailed Failed to create topic
      */
     public function createTopic(Topic $topic): void;
 
@@ -38,7 +37,7 @@ interface Transport
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed Failed topic bind
      */
     public function bindTopic(TopicBind $to): void;
 
@@ -49,7 +48,7 @@ interface Transport
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\CreateQueueFailed
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\CreateQueueFailed Failed to create queue
      */
     public function createQueue(Queue $queue): void;
 
@@ -60,7 +59,7 @@ interface Transport
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed
+     * @throws \Desperado\ServiceBus\Transport\Exceptions\BindFailed Failed queue bind
      */
     public function bindQueue(QueueBind $to): void;
 

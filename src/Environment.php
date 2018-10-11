@@ -36,44 +36,43 @@ final class Environment
     private $environment;
 
     /**
+     * Creating a test environment
+     *
      * @return self
      */
     public static function test(): self
     {
-        $self              = new self();
-        $self->environment = self::ENVIRONMENT_TESTING;
-
-        return $self;
+        return new self(self::ENVIRONMENT_TESTING);
     }
 
     /**
+     * Creating a develop environment
+     *
      * @return self
      */
     public static function dev(): self
     {
-        $self              = new self();
-        $self->environment = self::ENVIRONMENT_SANDBOX;
-
-        return $self;
+        return new self(self::ENVIRONMENT_SANDBOX);
     }
 
     /**
+     * Creating a production environment
+     *
      * @return self
      */
     public static function prod(): self
     {
-        $self              = new self();
-        $self->environment = self::ENVIRONMENT_PRODUCTION;
-
-        return $self;
+        return new self(self::ENVIRONMENT_PRODUCTION);
     }
 
     /**
+     * Creating the specified environment
+     *
      * @param string $environment
      *
      * @return Environment
      *
-     * @throws \LogicException
+     * @throws \LogicException The value of the environment is not specified, or is incorrect
      */
     public static function create(string $environment): self
     {
@@ -81,10 +80,7 @@ final class Environment
 
         self::validateEnvironment($environment);
 
-        $self              = new self();
-        $self->environment = $environment;
-
-        return $self;
+        return new self($environment);
     }
 
     /**
@@ -156,7 +152,7 @@ final class Environment
      *
      * @return void
      *
-     * @throws \LogicException
+     * @throws \LogicException The value of the environment is not specified, or is incorrect
      */
     private static function validateEnvironment(string $specifiedEnvironment): void
     {
@@ -174,10 +170,10 @@ final class Environment
     }
 
     /**
-     * Close constructor
+     * @param string $environment
      */
-    private function __construct()
+    private function __construct(string $environment)
     {
-
+        $this->environment = $environment;
     }
 }

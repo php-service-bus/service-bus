@@ -19,29 +19,35 @@ namespace Desperado\ServiceBus\Transport;
 final class QueueBind
 {
     /**
+     * Source queue
+     *
      * @var Queue
      */
     private $queue;
 
     /**
+     * The topic to which the binding is going
+     *
      * @var Topic
      */
     private $topic;
 
     /**
+     * Binding Key
+     *
      * @var string|null
      */
     private $routingKey;
 
     /**
-     * @param Queue       $queue
-     * @param Topic       $topic
-     * @param string|null $routingKey
+     * @param Queue       $queue      Source queue
+     * @param Topic       $topic      The topic to which the binding is going
+     * @param string|null $routingKey Binding Key
      */
     public function __construct(Queue $queue, Topic $topic, ?string $routingKey = null)
     {
-        $this->queue = $queue;
-        $this->topic = $topic;
+        $this->queue      = $queue;
+        $this->topic      = $topic;
         $this->routingKey = $routingKey;
     }
 

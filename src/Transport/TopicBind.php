@@ -19,30 +19,36 @@ namespace Desperado\ServiceBus\Transport;
 final class TopicBind
 {
     /**
+     * Source topic
+     *
      * @var Topic
      */
     private $sourceTopic;
 
     /**
+     * The topic to which the binding is going
+     *
      * @var Topic
      */
     private $destinationTopic;
 
     /**
+     * Binding Key
+     *
      * @var string|null
      */
     private $routingKey;
 
     /**
-     * @param Topic       $sourceTopic
-     * @param Topic       $destinationTopic
-     * @param string|null $routingKey
+     * @param Topic       $sourceTopic      Source topic
+     * @param Topic       $destinationTopic The topic to which the binding is going
+     * @param string|null $routingKey       Binding Key
      */
     public function __construct(Topic $sourceTopic, Topic $destinationTopic, ?string $routingKey = null)
     {
-        $this->sourceTopic = $sourceTopic;
+        $this->sourceTopic      = $sourceTopic;
         $this->destinationTopic = $destinationTopic;
-        $this->routingKey = $routingKey;
+        $this->routingKey       = $routingKey;
     }
 
     /**
