@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Storage;
 use Amp\Promise;
 
 /**
- * TransactionAdapter
+ * Storage adapters Interface
  */
 interface TransactionAdapter
 {
@@ -24,14 +24,14 @@ interface TransactionAdapter
      * Execute query
      *
      * @param string $queryString
-     * @param array  $parameters
+     * @param array  $parameters Key\value query parameters (prepared statement)
      *
      * @return Promise<\Desperado\ServiceBus\Storage\ResultSet>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed Could not connect to database
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed Duplicate entry
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed Operation Errors
      */
     public function execute(string $queryString, array $parameters = []): Promise;
 
@@ -40,10 +40,10 @@ interface TransactionAdapter
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed Could not connect to database
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed Operation Errors
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed Duplicate entry
      */
     public function commit(): Promise;
 

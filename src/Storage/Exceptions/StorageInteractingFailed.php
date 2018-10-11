@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Storage\Exceptions;
 use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 
 /**
- * Base storage exception
+ * Basic type of interaction errors
  */
 class StorageInteractingFailed extends \RuntimeException implements ServiceBusExceptionMarker
 {

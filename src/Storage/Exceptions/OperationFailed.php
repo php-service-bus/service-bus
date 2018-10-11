@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Storage\Exceptions;
 
 /**
- *
+ * Operation Errors
  */
 final class OperationFailed extends StorageInteractingFailed
 {

@@ -27,6 +27,8 @@ final class StorageAdapterFactory
     ];
 
     /**
+     * Creating inMemory adapter (only for testing)
+     *
      * @return DoctrineDBALAdapter
      */
     public static function inMemory(): DoctrineDBALAdapter
@@ -40,12 +42,14 @@ final class StorageAdapterFactory
      * @psalm-suppress MoreSpecificReturnType
      * @psalm-suppress LessSpecificReturnStatement
      *
-     * @param string $adapter
-     * @param string $connectionDSN
+     * @param string $adapter @see StorageAdapterFactory::SUPPORTED
+     * @param string $connectionDSN DSN examples:
+     *                              - inMemory: sqlite:///:memory:
+     *                              - AsyncPostgreSQL: pgsql://user:password@host:port/database
      *
      * @return StorageAdapter
      *
-     * @throws \LogicException
+     * @throws \LogicException Unsupported adapter specified
      */
     public static function create(string $adapter, string $connectionDSN): StorageAdapter
     {

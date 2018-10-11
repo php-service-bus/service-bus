@@ -19,18 +19,19 @@ use Desperado\ServiceBus\Storage\Exceptions\OneResultExpected;
 
 /**
  * Collect iterator data
+ * Not recommended for use on large amounts of data
  *
  * @param ResultSet $iterator
  *
  * @return Promise<array|null>
  *
- * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
+ * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed Error getting operation result
  */
 function fetchAll(ResultSet $iterator): Promise
 {
     /** @psalm-suppress InvalidArgument */
     return call(
-         /** @psalm-suppress InvalidReturnType */
+    /** @psalm-suppress InvalidReturnType */
         static function(ResultSet $iterator): \Generator
         {
             $array = [];
@@ -53,8 +54,8 @@ function fetchAll(ResultSet $iterator): Promise
  *
  * @return Promise<array|null>
  *
- * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
- * @throws \Desperado\ServiceBus\Storage\Exceptions\OneResultExpected
+ * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed Error getting operation result
+ * @throws \Desperado\ServiceBus\Storage\Exceptions\OneResultExpected The result must contain only 1 row
  */
 function fetchOne(ResultSet $iterator): Promise
 {
@@ -68,6 +69,8 @@ function fetchOne(ResultSet $iterator): Promise
             if(0 === $resultsCount || 1 === $resultsCount)
             {
                 $endElement = \end($collection);
+
+                unset($collection);
 
                 return false !== $endElement ? $endElement : null;
             }

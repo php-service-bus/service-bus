@@ -28,9 +28,9 @@ interface StorageAdapter
      *
      * @return Promise<\Desperado\ServiceBus\Storage\ResultSet>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed Could not connect to database
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed Operation Errors
      */
     public function execute(string $queryString, array $parameters = []): Promise;
 
@@ -46,10 +46,10 @@ interface StorageAdapter
      *
      * @return Promise<\Desperado\ServiceBus\Storage\TransactionAdapter>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\TransactionNotSupported
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed Could not connect to database
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed Operation Errors
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\TransactionNotSupported The adapter does not support transactions
      */
     public function transaction(): Promise;
 

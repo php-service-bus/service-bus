@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Storage\Exceptions;
 
 /**
- *
+ * Duplicate entry
  */
 final class UniqueConstraintViolationCheckFailed extends StorageInteractingFailed
 {

@@ -35,10 +35,6 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
     private $pool;
 
     /**
-     * DSN example:
-     *
-     * user=root password=qwerty host=localhost port=5342 dbname=test options='--client_encoding=UTF8'
-     *
      * @param StorageConfiguration $configuration
      *
      * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed

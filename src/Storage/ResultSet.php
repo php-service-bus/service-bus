@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Storage;
 use Amp\Promise;
 
 /**
- *
+ * The result of the operation
  */
 interface ResultSet
 {
@@ -28,9 +28,9 @@ interface ResultSet
      * Succeeds with true if an emitted value is available by calling getCurrent() or false if the iterator has
      * resolved. If the iterator fails, the returned promise will fail with the same exception.
      *
-     * @return Promise
+     * @return Promise<bool>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed Error getting operation result
      */
     public function advance(): Promise;
 
@@ -41,7 +41,7 @@ interface ResultSet
      *
      * @return mixed Value emitted from the iterator
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed Error getting operation result
      */
     public function getCurrent(int $rowType = ResultSet::FETCH_ASSOC);
 
@@ -52,7 +52,7 @@ interface ResultSet
      *
      * @return string|int|null
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed Error getting operation result
      */
     public function lastInsertId(?string $sequence = null);
 
@@ -61,7 +61,7 @@ interface ResultSet
      *
      * @return int
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed
+     * @throws \Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed Error getting operation result
      */
     public function affectedRows(): int;
 }

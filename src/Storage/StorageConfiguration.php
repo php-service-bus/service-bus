@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Storage;
 
 /**
- *
+ * Adapter configuration for storage
  */
 final class StorageConfiguration
 {
@@ -81,9 +81,10 @@ final class StorageConfiguration
      */
     private $queryParameters = [];
 
-
     /**
-     * @param string $connectionDSN
+     * @param string $connectionDSN DSN examples:
+     *                              - inMemory: sqlite:///:memory:
+     *                              - AsyncPostgreSQL: pgsql://user:password@host:port/database
      *
      * @return self
      */

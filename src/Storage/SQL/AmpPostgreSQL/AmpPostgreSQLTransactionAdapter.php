@@ -38,6 +38,16 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
         $this->transaction = $transaction;
     }
 
+    public function __destruct()
+    {
+        if(null !== $this->transaction)
+        {
+            $this->transaction->close();
+
+            unset($this->transaction);
+        }
+    }
+
     /**
      * @inheritdoc
      */
