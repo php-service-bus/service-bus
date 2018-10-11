@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Marshal\Converters;
+namespace Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\Extensions;
 
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Convert snake_case to lowerCamelCase
  */
-final class SymfonyPropertyNameConverter implements NameConverterInterface
+final class PropertyNameConverter implements NameConverterInterface
 {
     /**
      * @inheritdoc

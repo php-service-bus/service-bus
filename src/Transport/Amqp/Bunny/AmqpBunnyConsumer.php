@@ -18,11 +18,11 @@ use Amp\Promise;
 use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
 use function Desperado\ServiceBus\Common\uuid;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageDecoder;
 use Desperado\ServiceBus\Transport\Amqp\AmqpQueue;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
-use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
-use Desperado\ServiceBus\Transport\Marshal\Exceptions\DecodeMessageFailed;
 use Desperado\ServiceBus\Transport\TransportContext;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -49,7 +49,7 @@ final class AmqpBunnyConsumer implements Consumer
     /**
      * Restore the message object from string
      *
-     * @var TransportMessageDecoder
+     * @var MessageDecoder
      */
     private $messageDecoder;
 
@@ -73,15 +73,15 @@ final class AmqpBunnyConsumer implements Consumer
     private static $messagesInProcess = [];
 
     /**
-     * @param AmqpQueue               $listenQueue
-     * @param Channel                 $channel
-     * @param TransportMessageDecoder $messageDecoder
-     * @param LoggerInterface|null    $logger
+     * @param AmqpQueue            $listenQueue
+     * @param Channel              $channel
+     * @param MessageDecoder       $messageDecoder
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         AmqpQueue $listenQueue,
         Channel $channel,
-        TransportMessageDecoder $messageDecoder,
+        MessageDecoder $messageDecoder,
         LoggerInterface $logger = null
     )
     {
@@ -238,23 +238,18 @@ final class AmqpBunnyConsumer implements Consumer
     /**
      * Create incoming message envelope
      *
-     * @param BunnyMessage            $envelope
-     * @param TransportMessageDecoder $decoder
+     * @param BunnyMessage   $envelope
+     * @param MessageDecoder $decoder
      *
      * @return IncomingEnvelope
      */
-    private static function transformEnvelope(BunnyMessage $envelope, TransportMessageDecoder $decoder): IncomingEnvelope
+    private static function transformEnvelope(BunnyMessage $envelope, MessageDecoder $decoder): IncomingEnvelope
     {
-        $body         = $envelope->content;
-        $unserialized = $decoder->unserialize($body);
+        $body = $envelope->content;
 
         return new IncomingEnvelope(
             $body,
-            $unserialized['message'],
-            $decoder->denormalize(
-                $unserialized['namespace'],
-                $unserialized['message']
-            ),
+            $decoder->decode($body),
             $envelope->headers
         );
     }

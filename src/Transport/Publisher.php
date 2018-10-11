@@ -30,7 +30,7 @@ interface Publisher
      *
      * @return OutboundEnvelope
      *
-     * @throws \Desperado\ServiceBus\Transport\Marshal\Exceptions\EncodeMessageFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\EncodeMessageFailed
      */
     public function createEnvelope(Message $message, array $headers = []): OutboundEnvelope;
 

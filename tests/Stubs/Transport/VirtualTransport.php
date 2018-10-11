@@ -15,11 +15,10 @@ namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 
 use Amp\Promise;
 use Amp\Success;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageDecoder;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
 use Desperado\ServiceBus\Transport\Consumer;
-use Desperado\ServiceBus\Transport\Marshal\Decoder\JsonMessageDecoder;
-use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
-use Desperado\ServiceBus\Transport\Marshal\Encoder\JsonMessageEncoder;
-use Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder;
 use Desperado\ServiceBus\Transport\Publisher;
 use Desperado\ServiceBus\Transport\Queue;
 use Desperado\ServiceBus\Transport\QueueBind;
@@ -35,27 +34,28 @@ class VirtualTransport implements Transport
     /**
      * Restore the message object from string
      *
-     * @var TransportMessageEncoder
+     * @var MessageEncoder
      */
     private $messageEncoder;
 
     /**
      * Restore the message object from string
      *
-     * @var TransportMessageDecoder
+     * @var MessageDecoder
      */
     private $messageDecoder;
 
     /**
-     * @param TransportMessageDecoder|null $messageDecoder
+     * @param MessageEncoder|null $messageEncoder
+     * @param MessageDecoder|null $messageDecoder
      */
     public function __construct(
-        TransportMessageEncoder $messageEncoder = null,
-        TransportMessageDecoder $messageDecoder = null
+        MessageEncoder $messageEncoder = null,
+        MessageDecoder $messageDecoder = null
     )
     {
-        $this->messageEncoder = $messageEncoder ?? new JsonMessageEncoder();
-        $this->messageDecoder = $messageDecoder ?? new JsonMessageDecoder();
+        $this->messageEncoder = $messageEncoder ?? new SymfonyMessageSerializer();
+        $this->messageDecoder = $messageDecoder ?? new SymfonyMessageSerializer();
     }
 
     /**

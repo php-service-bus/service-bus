@@ -16,14 +16,13 @@ namespace Desperado\ServiceBus\Transport\Amqp\Bunny;
 use function Amp\call;
 use Amp\Promise;
 use function Amp\Promise\wait;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageDecoder;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
 use Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration;
 use Desperado\ServiceBus\Transport\Amqp\AmqpQoSConfiguration;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\Exceptions\ConnectionFail;
-use Desperado\ServiceBus\Transport\Marshal\Decoder\JsonMessageDecoder;
-use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
-use Desperado\ServiceBus\Transport\Marshal\Encoder\JsonMessageEncoder;
-use Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder;
 use Desperado\ServiceBus\Transport\Publisher;
 use Desperado\ServiceBus\Transport\Queue;
 use Desperado\ServiceBus\Transport\QueueBind;
@@ -54,12 +53,12 @@ final class AmqpBunny implements Transport
     private $logger;
 
     /**
-     * @var TransportMessageDecoder
+     * @var MessageDecoder
      */
     private $messageDecoder;
 
     /**
-     * @var TransportMessageEncoder
+     * @var MessageEncoder
      */
     private $messageEncoder;
 
@@ -70,8 +69,8 @@ final class AmqpBunny implements Transport
 
     /**
      * @param AmqpConnectionConfiguration  $amqpConfiguration
-     * @param TransportMessageEncoder|null $messageEncoder
-     * @param TransportMessageDecoder|null $messageDecoder
+     * @param MessageEncoder|null $messageEncoder
+     * @param MessageDecoder|null $messageDecoder
      * @param LoggerInterface|null         $logger
      *
      * @throws \Desperado\ServiceBus\Transport\Exceptions\ConnectionFail
@@ -79,13 +78,13 @@ final class AmqpBunny implements Transport
     public function __construct(
         AmqpConnectionConfiguration $amqpConfiguration,
         AmqpQoSConfiguration $amqpQoSConfiguration = null,
-        TransportMessageEncoder $messageEncoder = null,
-        TransportMessageDecoder $messageDecoder = null,
+        MessageEncoder $messageEncoder = null,
+        MessageDecoder $messageDecoder = null,
         LoggerInterface $logger = null
     )
     {
-        $this->messageEncoder = $messageEncoder ?? new JsonMessageEncoder();
-        $this->messageDecoder = $messageDecoder ?? new JsonMessageDecoder();
+        $this->messageEncoder = $messageEncoder ?? new SymfonyMessageSerializer();
+        $this->messageDecoder = $messageDecoder ?? new SymfonyMessageSerializer();
         $this->logger         = $logger ?? new NullLogger();
 
         $this->client = new AmqpBunnyClient($amqpConfiguration, $logger);

@@ -187,15 +187,16 @@ final class SqlEventStreamStore implements AggregateStore
             static function(AggregateId $id) use ($adapter): \Generator
             {
                 /** @psalm-suppress ImplicitToStringCast */
-                $query = updateQuery('event_store_stream', ['closed_at' => \date('Y-m-d H:i:s')])
+                $updateQuery = updateQuery('event_store_stream', ['closed_at' => \date('Y-m-d H:i:s')])
                     ->where(equalsCriteria('id', $id))
-                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
-                    ->compile();
+                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)));
+
+                $compiledQuery = $updateQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                unset($resultSet);
+                unset($resultSet, $updateQuery, $resultSet);
             },
             $id
         );
@@ -223,18 +224,20 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StoredAggregateEventStream $eventsStream) use ($transaction): \Generator
             {
-                $query = insertQuery('event_store_stream', [
+                $insertQuery = insertQuery('event_store_stream', [
                     'id'               => $eventsStream->aggregateId(),
                     'identifier_class' => $eventsStream->getAggregateIdClass(),
                     'aggregate_class'  => $eventsStream->aggregateClass(),
                     'created_at'       => $eventsStream->createdAt(),
                     'closed_at'        => $eventsStream->closedAt()
-                ])->compile();
+                ]);
+
+                $compiledQuery = $insertQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
-                $resultSet = yield $transaction->execute($query->sql(), $query->params());
+                $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                unset($resultSet);
+                unset($resultSet, $insertQuery, $compiledQuery);
             },
             $eventsStream
         );
@@ -376,17 +379,18 @@ final class SqlEventStreamStore implements AggregateStore
             static function(StorageAdapter $adapter, AggregateId $id): \Generator
             {
                 /** @psalm-suppress ImplicitToStringCast */
-                $query = selectQuery('event_store_stream')
+                $selectQuery = selectQuery('event_store_stream')
                     ->where(equalsCriteria('id', $id))
-                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
-                    ->compile();
+                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)));
+
+                $compiledQuery = $selectQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
                 $data = yield fetchOne($resultSet);
 
-                unset($resultSet);
+                unset($resultSet, $selectQuery, $compiledQuery);
 
                 return $data;
             },

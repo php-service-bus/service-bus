@@ -103,7 +103,8 @@ final class ValidationMessageProcessor implements Processor
         ConstraintViolationList $violationList
     ): MessageValidationFailed
     {
-        $event = MessageValidationFailed::create($message, $context->incomingEnvelope()->normalized());
+        /** @fix me */
+        $event = MessageValidationFailed::create($message, []);
 
         foreach($violationList as $violation)
         {

@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Marshal\Normalizer\Extensions;
+namespace Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\Extensions;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

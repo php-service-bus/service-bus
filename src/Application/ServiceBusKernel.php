@@ -406,7 +406,6 @@ final class ServiceBusKernel
         {
             $logger->debug('Incoming message payload: "{rawMessagePayload}"', [
                     'rawMessagePayload'        => $envelope->requestBody(),
-                    'normalizedMessagePayload' => $envelope->normalized(),
                     'headers'                  => $envelope->headers(),
                     'operationId'              => $context->id()
                 ]

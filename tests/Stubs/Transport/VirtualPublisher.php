@@ -16,8 +16,8 @@ namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;
 use Desperado\ServiceBus\OutboundMessage\Destination;
-use Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder;
 use Desperado\ServiceBus\Transport\OutboundEnvelope;
 use Desperado\ServiceBus\Transport\Publisher;
 
@@ -27,14 +27,14 @@ use Desperado\ServiceBus\Transport\Publisher;
 final class VirtualPublisher implements Publisher
 {
     /**
-     * @var TransportMessageEncoder
+     * @var MessageEncoder
      */
     private $messageEncoder;
 
     /**
-     * @param TransportMessageEncoder $messageEncoder
+     * @param MessageEncoder $messageEncoder
      */
-    public function __construct(TransportMessageEncoder $messageEncoder)
+    public function __construct(MessageEncoder $messageEncoder)
     {
         $this->messageEncoder = $messageEncoder;
     }

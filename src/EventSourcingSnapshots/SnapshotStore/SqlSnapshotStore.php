@@ -129,15 +129,16 @@ final class SqlSnapshotStore implements SnapshotStore
             static function(AggregateId $id) use ($adapter): \Generator
             {
                 /** @psalm-suppress ImplicitToStringCast */
-                $query = deleteQuery('event_store_snapshots')
+                $deleteQuery = deleteQuery('event_store_snapshots')
                     ->where(equalsCriteria('id', $id))
-                    ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)))
-                    ->compile();
+                    ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)));
+
+                $compiledQuery = $deleteQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                unset($resultSet, $query);
+                unset($resultSet, $compiledQuery, $deleteQuery);
             },
             $id
         );

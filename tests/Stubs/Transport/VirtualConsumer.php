@@ -17,9 +17,9 @@ use function Amp\asyncCall;
 use Amp\Promise;
 use Amp\Success;
 use function Desperado\ServiceBus\Common\uuid;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageDecoder;
 use Desperado\ServiceBus\Transport\Consumer;
 use Desperado\ServiceBus\Transport\IncomingEnvelope;
-use Desperado\ServiceBus\Transport\Marshal\Decoder\TransportMessageDecoder;
 use Desperado\ServiceBus\Transport\TransportContext;
 
 /**
@@ -30,14 +30,14 @@ final class VirtualConsumer implements Consumer
     /**
      * Restore the message object from string
      *
-     * @var TransportMessageDecoder
+     * @var MessageDecoder
      */
     private $messageDecoder;
 
     /**
-     * @param TransportMessageDecoder $messageDecoder
+     * @param MessageDecoder $messageDecoder
      */
-    public function __construct(TransportMessageDecoder $messageDecoder)
+    public function __construct(MessageDecoder $messageDecoder)
     {
         $this->messageDecoder = $messageDecoder;
     }
@@ -51,15 +51,9 @@ final class VirtualConsumer implements Consumer
         {
             [$messagePayload, $headers] = VirtualTransportBuffer::instance()->extract();
 
-            $unserialized = $this->messageDecoder->unserialize($messagePayload);
-
             $envelope = new IncomingEnvelope(
                 $messagePayload,
-                $unserialized['message'],
-                $this->messageDecoder->denormalize(
-                    $unserialized['namespace'],
-                    $unserialized['message']
-                ),
+                $this->messageDecoder->decode($messagePayload),
                 $headers
             );
 

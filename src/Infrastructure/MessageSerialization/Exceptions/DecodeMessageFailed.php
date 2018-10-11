@@ -11,12 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Transport\Marshal\Exceptions;
+namespace Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions;
+
+use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 
 /**
- * An error occurred during the deserialization of the message
+ *
  */
-final class DecodeMessageFailed extends \RuntimeException implements SerializationFail
+final class DecodeMessageFailed extends \RuntimeException implements ServiceBusExceptionMarker
 {
 
 }

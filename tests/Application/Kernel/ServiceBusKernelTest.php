@@ -19,6 +19,7 @@ use Desperado\ServiceBus\Application\ServiceBusKernel;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use function Desperado\ServiceBus\Common\removeDirectory;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\FailedMessageSendMarkerEvent;
@@ -33,7 +34,6 @@ use Desperado\ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
 use Desperado\ServiceBus\Tests\Stubs\Transport\VirtualQueue;
 use Desperado\ServiceBus\Tests\Stubs\Transport\VirtualTopic;
 use Desperado\ServiceBus\Tests\Stubs\Transport\VirtualTransportBuffer;
-use Desperado\ServiceBus\Transport\Marshal\Encoder\JsonMessageEncoder;
 use Desperado\ServiceBus\Transport\QueueBind;
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
@@ -285,7 +285,7 @@ final class ServiceBusKernelTest extends TestCase
      */
     private function sendMessage(Message $message, array $headers = []): void
     {
-        $encoder = new JsonMessageEncoder();
+        $encoder = new SymfonyMessageSerializer();
 
         VirtualTransportBuffer::instance()->add(
             $encoder->encode($message),

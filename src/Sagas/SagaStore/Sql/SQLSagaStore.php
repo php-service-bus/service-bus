@@ -170,11 +170,14 @@ final class SQLSagaStore implements SagasStore
     public function remove(SagaId $id): Promise
     {
         /** @psalm-suppress ImplicitToStringCast */
-        $query = deleteQuery('sagas_store')
+        $deleteQuery = deleteQuery('sagas_store')
             ->where(equalsCriteria('id', $id))
-            ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
-            ->compile();
+            ->andWhere(equalsCriteria('identifier_class', \get_class($id)));
 
-        return $this->adapter->execute($query->sql(), $query->params());
+        $compiledQuery = $deleteQuery->compile();
+
+        unset($deleteQuery);
+
+        return $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
     }
 }

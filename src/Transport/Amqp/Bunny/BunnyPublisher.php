@@ -17,10 +17,10 @@ use function Amp\call;
 use Amp\Promise;
 use Bunny\Channel;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;
 use Desperado\ServiceBus\OutboundMessage\Destination;
 use Desperado\ServiceBus\Transport\Amqp\AmqpOutboundEnvelope;
 use Desperado\ServiceBus\Transport\Exceptions\MessageSendFailed;
-use Desperado\ServiceBus\Transport\Marshal\Encoder\TransportMessageEncoder;
 use Desperado\ServiceBus\Transport\OutboundEnvelope;
 use Desperado\ServiceBus\Transport\Publisher;
 
@@ -37,15 +37,15 @@ final class BunnyPublisher implements Publisher
     /**
      * Message encoder
      *
-     * @var TransportMessageEncoder
+     * @var MessageEncoder
      */
     private $encoder;
 
     /**
      * @param Channel                 $channel
-     * @param TransportMessageEncoder $encoder
+     * @param MessageEncoder $encoder
      */
-    public function __construct(Channel $channel, TransportMessageEncoder $encoder)
+    public function __construct(Channel $channel, MessageEncoder $encoder)
     {
         $this->channel = $channel;
         $this->encoder = $encoder;

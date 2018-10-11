@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Transport\Marshal\Encoder;
+namespace Desperado\ServiceBus\Infrastructure\MessageSerialization;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 
 /**
- * Serializing the message object
+ * Encoding a message into a string
  */
-interface TransportMessageEncoder
+interface MessageEncoder
 {
     /**
      * Encode message to string
@@ -27,8 +27,7 @@ interface TransportMessageEncoder
      *
      * @return string
      *
-     * @throws \Desperado\ServiceBus\Transport\Marshal\Exceptions\EncodeMessageFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\EncodeMessageFailed
      */
     public function encode(Message $message): string;
-
 }

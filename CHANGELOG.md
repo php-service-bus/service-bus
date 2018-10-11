@@ -3,9 +3,12 @@
 ## 1.3.0
 
 ### Added
+- ```Desperado\ServiceBus\Infrastructure\MessageSerialization\*``` (New unified interface for serializing messages)
 
 ### Removed
 - TransactionAdapter::rollback() No longer throws exceptions
+- ```Desperado\ServiceBus\Marshal\*``` and ```Desperado\ServiceBus\Transport\Marshal\*``` (Instead, now used Desperado\ServiceBus\Infrastructure\MessageSerialization\*)
+
 
 ### Moved
 - ```Desperado\ServiceBus\Logger``` to ```Desperado\ServiceBus\Infrastructure\Logger```

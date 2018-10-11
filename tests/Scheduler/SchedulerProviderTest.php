@@ -398,7 +398,7 @@ final class SchedulerProviderTest extends TestCase
 
         return new KernelContext(
             new IncomingEnvelope(
-                '', [], new FirstEmptyCommand(), []
+                '', new FirstEmptyCommand(), []
             ),
             TransportContext::messageReceived(uuid()),
             $sender,
