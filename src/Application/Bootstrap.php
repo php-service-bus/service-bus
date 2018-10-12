@@ -128,13 +128,13 @@ final class Bootstrap
     }
 
     /**
-     * Use amqp-ext transport
+     * Use RabbitMQ transport
      *
      * @param string $connectionDSN
      *
      * @return $this
      */
-    public function useAmqpExtTransport(string $connectionDSN): self
+    public function useRabbitMqTransport(string $connectionDSN): self
     {
         $this->containerBuilder->addParameters(['service_bus.transport.dsn' => $connectionDSN]);
 

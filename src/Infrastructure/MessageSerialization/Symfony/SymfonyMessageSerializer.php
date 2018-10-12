@@ -53,20 +53,19 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
     public function __construct()
     {
         $this->serializer = new Serializer\Serializer([
-            new Serializer\Normalizer\DateTimeNormalizer(
-                'c',
-                new \DateTimeZone('UTC')
-            ),
-            new Serializer\Normalizer\ArrayDenormalizer(),
-            new PropertyNormalizerWrapper(
-                null,
-                new PropertyNameConverter(),
-                new PhpDocExtractor()
-            ),
-            new EmptyDataDenormalizer(),
-            new EmptyDataNormalizer()
-        ],
-            [new Serializer\Encoder\JsonEncoder()]
+                new Serializer\Normalizer\DateTimeNormalizer(
+                    'c',
+                    new \DateTimeZone('UTC')
+                ),
+                new Serializer\Normalizer\ArrayDenormalizer(),
+                new PropertyNormalizerWrapper(
+                    null,
+                    new PropertyNameConverter(),
+                    new PhpDocExtractor()
+                ),
+                new EmptyDataDenormalizer(),
+                new EmptyDataNormalizer()
+            ]
         );
     }
 

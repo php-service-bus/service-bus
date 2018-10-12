@@ -13,25 +13,18 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
-use function Amp\asyncCall;
+use function Amp\call;
 use Amp\Loop;
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Amp\Promise;
 use Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector;
-use Desperado\ServiceBus\MessageBus\Exceptions\NoMessageHandlersFound;
+use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
+use Desperado\ServiceBus\Infrastructure\Transport\Queue;
+use Desperado\ServiceBus\Infrastructure\Transport\Transport;
 use Desperado\ServiceBus\MessageBus\MessageBus;
 use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
 use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ContainerArgumentResolver;
 use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ContextArgumentResolver;
 use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\MessageArgumentResolver;
-use Desperado\ServiceBus\OutboundMessage\Destination;
-use Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes;
-use Desperado\ServiceBus\Transport\Consumer;
-use Desperado\ServiceBus\Transport\IncomingEnvelope;
-use Desperado\ServiceBus\Transport\OutboundEnvelope;
-use Desperado\ServiceBus\Transport\Publisher;
-use Desperado\ServiceBus\Transport\Queue;
-use Desperado\ServiceBus\Transport\Transport;
-use Desperado\ServiceBus\Transport\TransportContext;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -40,9 +33,8 @@ use Psr\Log\LoggerInterface;
  */
 final class ServiceBusKernel
 {
-    private const KERNEL_LOCATOR_INDEX       = 'service_bus.kernel_locator';
-    private const SERVICES_LOCATOR           = 'service_bus.services_locator';
-    private const GARBAGE_COLLECTOR_INTERVAL = 600000;
+    private const KERNEL_LOCATOR_INDEX = 'service_bus.kernel_locator';
+    private const SERVICES_LOCATOR     = 'service_bus.services_locator';
 
     /**
      * Custom service locator for application kernel only
@@ -57,16 +49,21 @@ final class ServiceBusKernel
     private $messageBus;
 
     /**
-     * @var Consumer
+     * @var Transport
      */
-    private $consumer;
+    private $transport;
+
+    /**
+     * @var Queue|null
+     */
+    private $listenQueue;
 
     /**
      * Logging is forced off for all levels
      *
      * @var bool
      */
-    private static $payloadLoggingForciblyDisabled;
+    private static $payloadLoggingForciblyDisabled = false;
 
     /**
      * @param ContainerInterface $container
@@ -75,21 +72,10 @@ final class ServiceBusKernel
      */
     public function __construct(ContainerInterface $container)
     {
-        static::$payloadLoggingForciblyDisabled = false;
-
         $this->kernelContainer = $container->get(self::KERNEL_LOCATOR_INDEX);
+        $this->transport       = $this->kernelContainer->get(Transport::class);
 
         $this->messageBus = $this->buildMessageBus($container);
-    }
-
-    /**
-     * Receive transport configurator
-     *
-     * @return TransportConfigurator
-     */
-    public function transportConfigurator(): TransportConfigurator
-    {
-        return $this->kernelContainer->get(TransportConfigurator::class);
     }
 
     /**
@@ -107,7 +93,7 @@ final class ServiceBusKernel
 
     /**
      * By default, messages are logged with a level of "debug"
-     * Logging can be forcibly disabled for all levels
+     * Logging payload can be forcibly disabled for all levels
      *
      * @return void
      */
@@ -147,23 +133,29 @@ final class ServiceBusKernel
      *
      * @param Queue $queue
      *
-     * @return void
+     * @return Promise<null>
      */
-    public function listen(Queue $queue): void
+    public function listen(Queue $queue): Promise
     {
-        $messageProcessor = $this->createMessageProcessor(
-            $this->createMessageSender()
+        $this->listenQueue = $queue;
+
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            function(Queue $queue): \Generator
+            {
+                /** @var \Amp\Iterator $iterator */
+                $iterator = yield $this->transport->consume($queue);
+
+                while(yield $iterator->advance())
+                {
+                    /** @var IncomingPackage $package */
+                    $package = $iterator->getCurrent();
+
+                    yield $package->ack();
+                }
+            },
+            $queue
         );
-
-        $this->consumer = $this->kernelContainer->get(Transport::class)->createConsumer($queue);
-
-        $this->enableGarbageCollector();
-        $this->consumer->listen($messageProcessor);
-
-        if(false === \defined('PHPUNIT_TESTING'))
-        {
-            Loop::run();
-        }
     }
 
     /**
@@ -173,13 +165,13 @@ final class ServiceBusKernel
      */
     public function stop(int $interval): void
     {
+        /** @var LoggerInterface $logger */
         $logger = $this->kernelContainer->get(LoggerInterface::class);
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        asyncCall(
-            function(int $interval) use ($logger): \Generator
+        Loop::defer(
+            function() use ($interval, $logger): \Generator
             {
-                yield $this->consumer->stop();
+                yield $this->transport->stop($this->listenQueue);
 
                 $logger->info('Handler will stop after {duration} seconds', ['duration' => $interval / 1000]);
 
@@ -188,11 +180,11 @@ final class ServiceBusKernel
                     static function() use ($logger): void
                     {
                         $logger->info('The event loop has been stopped');
+
                         Loop::stop();
                     }
                 );
-            },
-            $interval
+            }
         );
     }
 
@@ -273,229 +265,6 @@ final class ServiceBusKernel
         {
             $messageBusBuilder->addSaga($sagaClass, ...$resolvers);
         }
-    }
-
-
-    /**
-     * @param callable $messagePublisher
-     *
-     * @return callable function(IncomingEnvelope $envelope): \Generator
-     */
-    private function createMessageProcessor(callable $messagePublisher): callable
-    {
-        $logger     = $this->kernelContainer->get(LoggerInterface::class);
-        $messageBus = $this->messageBus;
-
-        return static function(IncomingEnvelope $envelope, TransportContext $context) use ($messagePublisher, $messageBus, $logger): \Generator
-        {
-            self::beforeDispatch($envelope, $context, $logger);
-
-            try
-            {
-                yield $messageBus->dispatch(
-                    new KernelContext($envelope, $context, $messagePublisher, $logger)
-                );
-            }
-            catch(NoMessageHandlersFound $exception)
-            {
-                $logger->debug($exception->getMessage(), ['operationId' => $context->id()]);
-            }
-            catch(\Throwable $throwable)
-            {
-                $logger->critical($throwable->getMessage(), [
-                    'operationId' => $context->id(),
-                    'file'        => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-                ]);
-                /** @todo: retry message? */
-            }
-        };
-    }
-
-    /**
-     * Create publish message processor
-     *
-     * @return callable function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope): Promise {}
-     */
-    private function createMessageSender(): callable
-    {
-        $publisher     = $this->kernelContainer->get(Transport::class)->createPublisher();
-        $messageRoutes = $this->kernelContainer->get(OutboundMessageRoutes::class);
-        $logger        = $this->kernelContainer->get(LoggerInterface::class);
-
-        return static function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope, TransportContext $transportContext) use (
-            $publisher, $messageRoutes, $logger
-        ): \Generator
-        {
-            $messageClass = \get_class($message);
-            $destinations = $messageRoutes->destinationsFor($messageClass);
-
-            foreach($destinations as $destination)
-            {
-                $outboundEnvelope = self::createOutboundEnvelope(
-                    $publisher,
-                    $transportContext->id(),
-                    $message,
-                    \array_merge([
-                        'x-message-class'         => $messageClass,
-                        'x-created-after-message' => \get_class($incomingEnvelope->denormalized()),
-                        'x-hostname'              => \gethostname()
-                    ], $headers)
-                );
-
-                self::beforeMessageSend($logger, $messageClass, $destination, $outboundEnvelope);
-
-                try
-                {
-                    yield $publisher->send($destination, $outboundEnvelope);
-
-                    unset($outboundEnvelope);
-                }
-                catch(\Throwable $throwable)
-                {
-
-                    self::onSendMessageFailed($outboundEnvelope, $messageClass, $throwable, $logger);
-                }
-            }
-
-            unset($messageClass, $destinations);
-        };
-    }
-
-    /**
-     * Create outbound message package
-     *
-     * @param Publisher $publisher
-     * @param string    $operationId
-     * @param Message   $message
-     * @param array     $headers
-     *
-     * @return OutboundEnvelope
-     */
-    private static function createOutboundEnvelope(
-        Publisher $publisher,
-        string $operationId,
-        Message $message,
-        array $headers
-    ): OutboundEnvelope
-    {
-        $envelope = $publisher->createEnvelope($message, $headers);
-
-        $envelope->setupMessageId($operationId);
-        $envelope->makeMandatory();
-        $envelope->makePersistent();
-
-        return $envelope;
-    }
-
-    /**
-     * @param IncomingEnvelope $envelope
-     * @param TransportContext $context
-     * @param LoggerInterface  $logger
-     *
-     * @return void
-     */
-    private static function beforeDispatch(IncomingEnvelope $envelope, TransportContext $context, LoggerInterface $logger): void
-    {
-        $logger->debug('Dispatching the message "{messageClass}"', [
-                'messageClass' => \get_class($envelope->denormalized()),
-                'operationId'  => $context->id(),
-            ]
-        );
-
-        if(false === static::$payloadLoggingForciblyDisabled)
-        {
-            $logger->debug('Incoming message payload: "{rawMessagePayload}"', [
-                    'rawMessagePayload'        => $envelope->requestBody(),
-                    'headers'                  => $envelope->headers(),
-                    'operationId'              => $context->id()
-                ]
-            );
-        }
-    }
-
-    /**
-     * @param OutboundEnvelope $outboundEnvelope
-     * @param string           $messageClass
-     * @param \Throwable       $throwable
-     * @param LoggerInterface  $logger
-     *
-     * @return void
-     */
-    private static function onSendMessageFailed(
-        OutboundEnvelope $outboundEnvelope,
-        string $messageClass,
-        \Throwable $throwable,
-        LoggerInterface $logger
-    ): void
-    {
-        $logger->critical(
-            'Error sending message "{messageClass}" to broker: "{throwableMessage}"', [
-                'messageClass'     => $messageClass,
-                'throwableMessage' => $throwable->getMessage(),
-                'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-            ]
-        );
-
-        if(false === static::$payloadLoggingForciblyDisabled)
-        {
-            $logger->debug('The body of the unsent message: {rawMessagePayload}', [
-                    'rawMessagePayload' => $outboundEnvelope->messageContent(),
-                    'headers'           => $outboundEnvelope->headers()
-                ]
-            );
-        }
-    }
-
-    /**
-     * @param LoggerInterface  $logger
-     * @param string           $messageClass
-     * @param Destination      $destination
-     * @param OutboundEnvelope $outboundEnvelope
-     *
-     * @return void
-     */
-    private static function beforeMessageSend(
-        LoggerInterface $logger,
-        string $messageClass,
-        Destination $destination,
-        OutboundEnvelope $outboundEnvelope
-    ): void
-    {
-        $logger->debug(
-            'Sending a "{messageClass}" message to "{destinationTopic}/{destinationRoutingKey}"', [
-                'messageClass'          => $messageClass,
-                'destinationTopic'      => $destination->topicName(),
-                'destinationRoutingKey' => $destination->routingKey(),
-                'headers'               => $outboundEnvelope->headers()
-            ]
-        );
-
-        if(false === static::$payloadLoggingForciblyDisabled)
-        {
-            $logger->debug(
-                'Sending message: "{rawMessagePayload}"', [
-                    'rawMessagePayload' => $outboundEnvelope->messageContent(),
-                    'headers'           => $outboundEnvelope->headers()
-                ]
-            );
-        }
-    }
-
-    /**
-     * @return void
-     */
-    private function enableGarbageCollector(): void
-    {
-        $logger = $this->kernelContainer->get(LoggerInterface::class);
-
-        Loop::repeat(
-            self::GARBAGE_COLLECTOR_INTERVAL,
-            static function() use ($logger): void
-            {
-                $logger->debug('Forces collection of any existing garbage cycles', ['cycles' => \gc_collect_cycles()]);
-                $logger->debug('Reclaims memory used by the Zend Engine memory manager', ['bytes' => \gc_mem_caches()]);
-            }
-        );
     }
 
     /**

@@ -29,25 +29,18 @@ services:
       $logger: '@Psr\Log\LoggerInterface'
 
   # Transport configuration
-  Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration:
+  Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpConnectionConfiguration:
     arguments:
       $connectionDSN: '%service_bus.transport.dsn%'
 
   # Messages transport
-  Desperado\ServiceBus\Transport\Transport:
-    class: Desperado\ServiceBus\Transport\Amqp\Bunny\AmqpBunny
+  Desperado\ServiceBus\Infrastructure\Transport\Transport:
+    public: true
+    class: Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyRabbitMqTransport
     arguments:
-      $amqpConfiguration: '@Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration'
-      $amqpQoSConfiguration: null
-      $messageEncoder: null
-      $messageDecoder: null
+      $connectionConfig: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpConnectionConfiguration'
+      $qosConfig: null
       $logger: '@Psr\Log\LoggerInterface'
-
-  # Transport configuration for starting a subscription
-  Desperado\ServiceBus\Application\TransportConfigurator:
-    arguments:
-      $transport: '@Desperado\ServiceBus\Transport\Transport'
-      $outboundMessagesRoutes: '@Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes'
 
   # Storage adapter factory
   Desperado\ServiceBus\Storage\StorageAdapterFactory:
@@ -136,9 +129,8 @@ services:
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: ['container.service_locator']
     arguments:
-      - Desperado\ServiceBus\Transport\Transport: '@Desperado\ServiceBus\Transport\Transport'
+      - Desperado\ServiceBus\Infrastructure\Transport\Transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
         Desperado\ServiceBus\MessageBus\MessageBusBuilder: '@Desperado\ServiceBus\MessageBus\MessageBusBuilder'
         Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes: '@Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes'
-        Desperado\ServiceBus\Application\TransportConfigurator: '@Desperado\ServiceBus\Application\TransportConfigurator'
         Psr\Log\LoggerInterface: '@Psr\Log\LoggerInterface'
         Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector: '@Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector'
