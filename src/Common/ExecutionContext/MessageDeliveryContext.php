@@ -17,6 +17,7 @@ use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\Infrastructure\Transport\SendOptions;
 
 /**
  *
@@ -39,20 +40,20 @@ interface MessageDeliveryContext
      *
      * @noinspection PhpDocSignatureInspection
      *
-     * @param Command            headers
-     * @param array $headers
+     * @param Command     headers
+     * @param SendOptions $options
      *
      * @return Promise<null>
      */
-    public function send(Command $command, array $headers = []): Promise;
+    public function send(Command $command, SendOptions $options): Promise;
 
     /**
      * Publish event with specified headers
      *
-     * @param Event $event
-     * @param array $headers
+     * @param Event       $event
+     * @param SendOptions $options
      *
      * @return Promise<null>
      */
-    public function publish(Event $event, array $headers = []): Promise;
+    public function publish(Event $event, SendOptions $options): Promise;
 }

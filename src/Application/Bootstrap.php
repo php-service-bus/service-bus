@@ -20,12 +20,12 @@ use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use Desperado\ServiceBus\DependencyInjection\Extensions\SchedulerExtension;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  *
@@ -245,7 +245,7 @@ final class Bootstrap
         /**
          * @noinspection ForgottenDebugOutputInspection
          *
-         * @todo: remove SymfonyDebug
+         * @todo         : remove SymfonyDebug
          *
          * It is necessary for the correct handling of mistakes concealed by the "@"
          */

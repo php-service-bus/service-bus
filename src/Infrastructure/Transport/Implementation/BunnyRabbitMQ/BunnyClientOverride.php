@@ -86,6 +86,7 @@ final class BunnyClientOverride extends Client
     )
     {
         $this->connectConfig = $connectConfig;
+        /** @todo: configure channel */
         $this->qosConfig     = $qosConfig;
 
         $parameters = [

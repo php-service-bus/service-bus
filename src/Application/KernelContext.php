@@ -13,16 +13,15 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
-use function Amp\asyncCall;
-use function Amp\call;
 use Amp\Promise;
+use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
-use Desperado\ServiceBus\Transport\IncomingEnvelope;
-use Desperado\ServiceBus\Transport\TransportContext;
+use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
+use Desperado\ServiceBus\Infrastructure\Transport\SendOptions;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -32,21 +31,9 @@ use Psr\Log\LogLevel;
 final class KernelContext implements MessageDeliveryContext, LoggingInContext
 {
     /**
-     * @var TransportContext
+     * @var IncomingPackage
      */
-    private $transportContext;
-
-    /**
-     * Send message handler
-     *
-     * @var callable
-     */
-    private $messagePublisher;
-
-    /**
-     * @var IncomingEnvelope
-     */
-    private $incomingEnvelope;
+    private $incomingPackage;
 
     /**
      * @var LoggerInterface
@@ -54,23 +41,64 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     private $logger;
 
     /**
-     * @param IncomingEnvelope $incomingEnvelope
-     * @param TransportContext $transportContext
-     * @param callable         $messagePublisher function(Message $message, array $headers, IncomingEnvelope
-     *                                           $incomingEnvelope): Promise {}
-     * @param LoggerInterface  $logger
+     * Is the received message correct?
+     *
+     * @var bool
      */
-    public function __construct(
-        IncomingEnvelope $incomingEnvelope,
-        TransportContext $transportContext,
-        callable $messagePublisher,
-        LoggerInterface $logger
-    )
+    private $isValidMessage = true;
+
+    /**
+     * List of validate violations
+     *
+     * [
+     *    'propertyPath' => [
+     *        0 => 'some message',
+     *        ....
+     *    ]
+     * ]
+     *
+     * @var array<string, array<int, string>>
+     */
+    private $violations = [];
+
+    /**
+     * @param IncomingPackage $incomingPackage
+     * @param callable        $messagePublisher  function(Message $message, array $headers, IncomingEnvelope
+     *                                           $incomingEnvelope): Promise {}
+     * @param LoggerInterface $logger
+     */
+    public function __construct(IncomingPackage $incomingPackage, LoggerInterface $logger)
     {
-        $this->incomingEnvelope = $incomingEnvelope;
-        $this->transportContext = $transportContext;
-        $this->messagePublisher = $messagePublisher;
-        $this->logger           = $logger;
+        $this->incomingPackage = $incomingPackage;
+        $this->logger          = $logger;
+    }
+
+    /**
+     * Is the received message correct?
+     * If validation is not enabled in the handler parameters, it always returns true
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return $this->isValidMessage;
+    }
+
+    /**
+     * If the message is incorrect, returns a list of violations
+     *
+     * [
+     *    'propertyPath' => [
+     *        0 => 'some message',
+     *        ....
+     *    ]
+     * ]
+     *
+     * @return array<string, array<int, string>>
+     */
+    public function violations(): array
+    {
+        return $this->violations;
     }
 
     /**
@@ -78,72 +106,31 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
      */
     public function delivery(Message ...$messages): Promise
     {
-        return $this->processSendMessages($messages, []);
+        return new Success();
     }
 
     /**
      * @inheritDoc
      */
-    public function send(Command $command, array $headers = []): Promise
+    public function send(Command $command, SendOptions $options): Promise
     {
-        return $this->processSendMessages([$command], $headers);
+        return new Success();
     }
 
     /**
      * @inheritDoc
      */
-    public function publish(Event $event, array $headers = []): Promise
+    public function publish(Event $event, SendOptions $options): Promise
     {
-        return $this->processSendMessages([$event], $headers);
-    }
-
-    /**
-     * Execute messages sent
-     *
-     * @param array $messages
-     * @param array $headers
-     *
-     * @return Promise<null>
-     */
-    private function processSendMessages(array $messages, array $headers): Promise
-    {
-        $messagePublisher = $this->messagePublisher;
-        $incomingEnvelope = $this->incomingEnvelope;
-        $transportContext = $this->transportContext;
-
-        /** @psalm-suppress InvalidArgument */
-        return call(
-            static function(array $messages, array $headers) use ($messagePublisher, $incomingEnvelope, $transportContext): void
-            {
-                foreach($messages as $message)
-                {
-                    asyncCall($messagePublisher, $message, $headers, $incomingEnvelope, $transportContext);
-                }
-            },
-            $messages, $headers
-        );
-    }
-
-    /**
-     * Receive incoming envelope
-     *
-     * @return IncomingEnvelope
-     */
-    public function incomingEnvelope(): IncomingEnvelope
-    {
-        return $this->incomingEnvelope;
+        return new Success();
     }
 
     /**
      * @inheritdoc
      */
-    public function logContextMessage(
-        string $logMessage,
-        array $extra = [],
-        string $level = LogLevel::INFO
-    ): void
+    public function logContextMessage(string $logMessage, array $extra = [], string $level = LogLevel::INFO): void
     {
-        $extra = \array_merge_recursive($extra, ['operationId' => $this->transportContext->id()]);
+        $extra = \array_merge_recursive($extra, ['operationId' => $this->incomingPackage->id()]);
 
         $this->logger->log($level, $logMessage, $extra);
     }
@@ -151,16 +138,40 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritdoc
      */
-    public function logContextThrowable(
-        \Throwable $throwable,
-        string $level = LogLevel::ERROR,
-        array $extra = []
-    ): void
+    public function logContextThrowable(\Throwable $throwable, string $level = LogLevel::ERROR, array $extra = []): void
     {
         $extra = \array_merge_recursive(
             $extra, ['throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())]
         );
 
         $this->logContextMessage($throwable->getMessage(), $extra, $level);
+    }
+
+    /**
+     * Receive incoming operation id
+     *
+     * @return string
+     */
+    public function operationId(): string
+    {
+        return $this->incomingPackage->id();
+    }
+
+    /**
+     * Message failed validation
+     * Called by infrastructure components
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
+     *
+     * @see          MessageValidationExecutor
+     *
+     * @param array $violations
+     *
+     * @return void
+     */
+    private function validationFailed(array $violations): void
+    {
+        $this->isValidMessage = false;
+        $this->violations     = $violations;
     }
 }

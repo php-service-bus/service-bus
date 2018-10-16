@@ -23,7 +23,6 @@ use Bunny\Constants;
 use Bunny\Exception\ChannelException;
 use Bunny\Message;
 use Bunny\Protocol as AmqpProtocol;
-use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpQoSConfiguration;
 
 /**
  * The library (jakubkulhan/bunny) architecture does not allow to expand its functionality correctly

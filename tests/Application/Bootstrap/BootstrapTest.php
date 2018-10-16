@@ -72,7 +72,7 @@ final class BootstrapTest extends TestCase
         $bootstrap->importParameters(['qwerty' => 'root']);
 
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
-        $bootstrap->useAmqpExtTransport(\getenv('TRANSPORT_CONNECTION_DSN'));
+        $bootstrap->useRabbitMqTransport(\getenv('TRANSPORT_CONNECTION_DSN'));
 
         /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $bootstrap->boot();
@@ -102,7 +102,7 @@ final class BootstrapTest extends TestCase
         $bootstrap->importParameters(['qwerty1' => 'root1']);
 
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
-        $bootstrap->useAmqpExtTransport(\getenv('TRANSPORT_CONNECTION_DSN'));
+        $bootstrap->useRabbitMqTransport(\getenv('TRANSPORT_CONNECTION_DSN'));
 
         /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $bootstrap->boot();

@@ -13,93 +13,86 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
-use function Amp\call;
 use Amp\Loop;
-use Amp\Promise;
-use Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector;
-use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
-use Desperado\ServiceBus\Infrastructure\Transport\Queue;
+use Desperado\ServiceBus\Common\Contract\Messages\Command;
+use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
-use Desperado\ServiceBus\MessageBus\MessageBus;
-use Desperado\ServiceBus\MessageBus\MessageBusBuilder;
-use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ContainerArgumentResolver;
-use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ContextArgumentResolver;
-use Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\MessageArgumentResolver;
-use Psr\Container\ContainerInterface;
+use Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
+use Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Service bus application kernel
  */
 final class ServiceBusKernel
 {
-    private const KERNEL_LOCATOR_INDEX = 'service_bus.kernel_locator';
-    private const SERVICES_LOCATOR     = 'service_bus.services_locator';
-
     /**
-     * Custom service locator for application kernel only
+     * DIC
      *
      * @var ContainerInterface
      */
-    private $kernelContainer;
+    private $container;
 
     /**
-     * @var MessageBus
+     * Application entry point
+     *
+     * @var EntryPoint
      */
-    private $messageBus;
+    private $entryPoint;
 
     /**
+     * Messages transport interface
+     *
      * @var Transport
      */
     private $transport;
 
     /**
-     * @var Queue|null
-     */
-    private $listenQueue;
-
-    /**
-     * Logging is forced off for all levels
-     *
-     * @var bool
-     */
-    private static $payloadLoggingForciblyDisabled = false;
-
-    /**
-     * @param ContainerInterface $container
+     * @param ContainerInterface $globalContainer
      *
      * @throws \Throwable
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $globalContainer)
     {
-        $this->kernelContainer = $container->get(self::KERNEL_LOCATOR_INDEX);
-        $this->transport       = $this->kernelContainer->get(Transport::class);
+        $this->container = $globalContainer;
 
-        $this->messageBus = $this->buildMessageBus($container);
+        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+
+        $this->transport  = $serviceLocator->get(Transport::class);
+        $this->entryPoint = $serviceLocator->get(EntryPoint::class);
     }
 
     /**
      * Enable watch for event loop blocking
      * DO NOT USE IN PRODUCTION environment
      *
-     * @return self
+     * @return $this
      */
     public function monitorLoopBlock(): self
     {
-        $this->kernelContainer->get(LoopBlockDetector::class)->listen();
+        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+
+        $serviceLocator->get(LoopBlockWatcher::class)->run();
 
         return $this;
     }
 
     /**
-     * By default, messages are logged with a level of "debug"
-     * Logging payload can be forcibly disabled for all levels
+     * Enable periodic forced launch of the garbage collector
      *
-     * @return void
+     * @return $this
      */
-    public function disableMessagesPayloadLogging(): void
+    public function enableGarbageCleaning(): self
     {
-        static::$payloadLoggingForciblyDisabled = true;
+        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+
+        $serviceLocator->get(GarbageCollectorWatcher::class)->run();
+
+        return $this;
     }
 
     /**
@@ -107,13 +100,13 @@ final class ServiceBusKernel
      *
      * @param int $stopDelay
      *
-     * @return self
+     * @return $this
      *
      * @throws Loop\UnsupportedFeatureException
      */
     public function useDefaultStopSignalHandler(int $stopDelay = 10000): self
     {
-        $logger = $this->kernelContainer->get(LoggerInterface::class);
+        $logger = $this->container->get(LoggerInterface::class);
 
         Loop::onSignal(
             \SIGINT,
@@ -121,7 +114,14 @@ final class ServiceBusKernel
             {
                 $logger->info('A signal SIGINT(2) was received');
 
-                $this->stop($stopDelay);
+                if(null !== $this->entryPoint)
+                {
+                    $this->entryPoint->stop($stopDelay);
+
+                    return;
+                }
+
+                Loop::stop();
             }
         );
 
@@ -129,154 +129,57 @@ final class ServiceBusKernel
     }
 
     /**
-     * Start message listen
+     * Register command handler
+     * For 1 command there can be only 1 handler
      *
-     * @param Queue $queue
+     * @param Command|string $command Command object or class
+     * @param callable       $handler
      *
-     * @return Promise<null>
+     * @return $this
+     *
+     * @throws \Desperado\ServiceBus\MessageRouter\Exceptions\InvalidCommandClassSpecified
+     * @throws \Desperado\ServiceBus\MessageRouter\Exceptions\MultipleCommandHandlersNotAllowed
      */
-    public function listen(Queue $queue): Promise
+    public function registerCommandHandler($command, callable $handler): self
     {
-        $this->listenQueue = $queue;
+        $this->entryPoint->registerCommandHandler($command, $handler);
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            function(Queue $queue): \Generator
-            {
-                /** @var \Amp\Iterator $iterator */
-                $iterator = yield $this->transport->consume($queue);
-
-                while(yield $iterator->advance())
-                {
-                    /** @var IncomingPackage $package */
-                    $package = $iterator->getCurrent();
-
-                    yield $package->ack();
-                }
-            },
-            $queue
-        );
+        return $this;
     }
 
     /**
-     * @param int $interval
+     * Add event listener
+     * For each event there can be many listeners
      *
-     * @return void
+     * @param Event|string $event Event object or class
+     * @param callable     $handler
+     *
+     * @return $this
+     *
+     * @throws \Desperado\ServiceBus\MessageRouter\Exceptions\InvalidEventClassSpecified
      */
-    public function stop(int $interval): void
+    public function registerEventListener($event, callable $handler): self
     {
-        /** @var LoggerInterface $logger */
-        $logger = $this->kernelContainer->get(LoggerInterface::class);
+        $this->entryPoint->registerEventListener($event, $handler);
 
-        Loop::defer(
-            function() use ($interval, $logger): \Generator
-            {
-                yield $this->transport->stop($this->listenQueue);
-
-                $logger->info('Handler will stop after {duration} seconds', ['duration' => $interval / 1000]);
-
-                Loop::delay(
-                    $interval,
-                    static function() use ($logger): void
-                    {
-                        $logger->info('The event loop has been stopped');
-
-                        Loop::stop();
-                    }
-                );
-            }
-        );
+        return $this;
     }
 
     /**
-     * @param ContainerInterface $globalContainer
-     *
-     * @return MessageBus
+     * @return Transport
+     */
+    public function transport(): Transport
+    {
+        return $this->transport;
+    }
+
+    /**
+     * @return EntryPoint
      *
      * @throws \Throwable
      */
-    private function buildMessageBus(ContainerInterface $globalContainer): MessageBus
+    public function entryPoint(): EntryPoint
     {
-        /** @var \Symfony\Component\DependencyInjection\Container $globalContainer */
-
-        /** @var MessageBusBuilder $messagesBusBuilder */
-        $messagesBusBuilder = $this->kernelContainer->get(MessageBusBuilder::class);
-
-        /** @psalm-suppress UndefinedMethod */
-        $this->registerServices(
-            $globalContainer->getParameter('service_bus.services_map'),
-            $messagesBusBuilder,
-            $globalContainer->get(self::SERVICES_LOCATOR)
-        );
-
-        /** @psalm-suppress UndefinedMethod */
-        $this->registerSagas(
-            $globalContainer->getParameter('service_bus.sagas'),
-            $messagesBusBuilder
-        );
-
-        return $messagesBusBuilder->compile();
-    }
-
-    /**
-     * Register event\command handlers from services
-     *
-     * @param array<mixed, string> $serviceIds
-     * @param MessageBusBuilder    $messagesBusBuilder
-     * @param ContainerInterface   $servicesLocator
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    private function registerServices(
-        array $serviceIds,
-        MessageBusBuilder $messagesBusBuilder,
-        ContainerInterface $servicesLocator
-    ): void
-    {
-        $resolvers   = self::createDefaultResolvers();
-        $resolvers[] = new ContainerArgumentResolver($servicesLocator);
-
-        foreach($serviceIds as $serviceId)
-        {
-            $messagesBusBuilder->addService(
-                $servicesLocator->get(\sprintf('%s_service', $serviceId)),
-                ...$resolvers
-            );
-        }
-    }
-
-    /**
-     * Register sagas listeners
-     *
-     * @param array             $sagas
-     * @param MessageBusBuilder $messageBusBuilder
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    private function registerSagas(array $sagas, MessageBusBuilder $messageBusBuilder): void
-    {
-        $resolvers = self::createDefaultResolvers();
-
-        foreach($sagas as $sagaClass)
-        {
-            $messageBusBuilder->addSaga($sagaClass, ...$resolvers);
-        }
-    }
-
-    /**
-     * Create default argument resolvers
-     *
-     * @return array<mixed, \Desperado\ServiceBus\MessageBus\MessageHandler\Resolvers\ArgumentResolver>
-     */
-    private static function createDefaultResolvers(): array
-    {
-        return [
-            new ContextArgumentResolver(),
-            new MessageArgumentResolver()
-        ];
+        return $this->entryPoint;
     }
 }

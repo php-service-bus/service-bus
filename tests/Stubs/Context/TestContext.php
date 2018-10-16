@@ -20,6 +20,7 @@ use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
+use Desperado\ServiceBus\Infrastructure\Transport\SendOptions;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -64,7 +65,7 @@ final class TestContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritDoc
      */
-    public function send(Command $command, array $headers = []): Promise
+    public function send(Command $command, SendOptions $options): Promise
     {
         $this->messages[] = $command;
 
@@ -74,7 +75,7 @@ final class TestContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritDoc
      */
-    public function publish(Event $event, array $headers = []): Promise
+    public function publish(Event $event, SendOptions $options): Promise
     {
         $this->messages[] = $event;
 
@@ -84,11 +85,7 @@ final class TestContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritDoc
      */
-    public function logContextMessage(
-        string $logMessage,
-        array $extra = [],
-        string $level = LogLevel::INFO
-    ): void
+    public function logContextMessage(string $logMessage, array $extra = [], string $level = LogLevel::INFO): void
     {
         $this->logger->log($level, $logMessage, $extra);
     }
@@ -96,11 +93,7 @@ final class TestContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritDoc
      */
-    public function logContextThrowable(
-        \Throwable $throwable,
-        string $level = LogLevel::ERROR,
-        array $extra = []
-    ): void
+    public function logContextThrowable(\Throwable $throwable, string $level = LogLevel::ERROR, array $extra = []): void
     {
         $this->logContextMessage($throwable->getMessage());
     }

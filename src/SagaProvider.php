@@ -313,7 +313,7 @@ final class SagaProvider
      *
      * @noinspection PhpUnusedPrivateMethodInspection
      *
-     * @see          MessageBusBuilder::addSaga
+     * @see          MessageRoutesConfigurator::configure()
      *
      * @param string       $sagaClass
      * @param SagaMetadata $metadata

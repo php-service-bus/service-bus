@@ -14,13 +14,13 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\DependencyInjection\ContainerBuilder;
 
 use Desperado\ServiceBus\Environment;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Symfony DI container builder
