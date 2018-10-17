@@ -186,9 +186,9 @@ final class BunnyRabbitMqTransport implements Transport
                 $consumer = new BunnyConsumer($queue, $channel, $this->logger);
 
                 $consumer->listen(
-                    static function(BunnyIncomingPackage $incomingPackage) use ($emitter): void
+                    static function(BunnyIncomingPackage $incomingPackage) use ($emitter): \Generator
                     {
-                        $emitter->emit($incomingPackage);
+                        yield $emitter->emit($incomingPackage);
                     }
                 );
 
@@ -211,7 +211,7 @@ final class BunnyRabbitMqTransport implements Transport
         $channel  = $this->channel;
         $deferred = new Deferred();
 
-        $watcher = Loop::defer(
+        Loop::defer(
             static function() use ($channel, $outboundPackage, $deferred): \Generator
             {
                 try
@@ -244,8 +244,6 @@ final class BunnyRabbitMqTransport implements Transport
                 }
             }
         );
-
-        Loop::unreference($watcher);
 
         return $deferred->promise();
     }

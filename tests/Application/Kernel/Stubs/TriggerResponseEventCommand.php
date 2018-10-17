@@ -11,14 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\Stubs\Transport;
+namespace Desperado\ServiceBus\Tests\Application\Kernel\Stubs;
 
-use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
+use Desperado\ServiceBus\Common\Contract\Messages\Command;
 
 /**
  *
  */
-final class VirtualDestination implements TransportLevelDestination
+final class TriggerResponseEventCommand implements Command
 {
 
 }

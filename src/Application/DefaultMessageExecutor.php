@@ -43,14 +43,15 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     public function process(Message $message, KernelContext $context, array $handlers): Promise
     {
+        $logger   = $this->logger;
         $deferred = new Deferred();
 
-        $watcherId = Loop::defer(
-            static function() use (&$watcherId, $deferred, $message, $context, $handlers): \Generator
+        Loop::defer(
+            static function() use ($deferred, $message, $context, $handlers, $logger): \Generator
             {
                 if(0 === \count($handlers))
                 {
-                    $this->logger->debug('There are no handlers configured for the message "{messageClass}"', [
+                    $logger->debug('There are no handlers configured for the message "{messageClass}"', [
                         'messageClass' => \get_class($message),
                         'operationId'  => $context->operationId()
                     ]);
@@ -95,12 +96,8 @@ final class DefaultMessageExecutor implements MessageExecutor
                 {
                     $deferred->resolve();
                 }
-
-                Loop::cancel($watcherId);
             }
         );
-
-        Loop::unreference($watcherId);
 
         return $deferred->promise();
     }

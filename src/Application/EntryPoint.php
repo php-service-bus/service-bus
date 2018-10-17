@@ -142,17 +142,20 @@ final class EntryPoint
     public function listen(Queue $queue): Promise
     {
         $this->listenQueue = $queue;
-        $transport         = $this->transport;
-        $logger            = $this->logger;
 
+        $transport      = $this->transport;
+        $logger         = $this->logger;
         $decoder        = $this->messageDecoder;
         $router         = $this->messagesRouter;
         $executor       = $this->messageExecutor;
         $endpointRouter = $this->endpointRouter;
 
+        /** Hack for phpunit tests */
+        $isTestCall = (bool) (int) \getenv('SERVICE_BUS_TESTING');
+
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Queue $queue) use ($transport, $decoder, $executor, $router, $logger, $endpointRouter): \Generator
+            static function(Queue $queue) use ($transport, $decoder, $executor, $router, $logger, $endpointRouter, $isTestCall): \Generator
             {
                 /** @var \Amp\Iterator $iterator */
                 $iterator = yield $transport->consume($queue);
@@ -195,6 +198,12 @@ final class EntryPoint
                     }
 
                     unset($package);
+
+                    /** Hack for phpunit tests */
+                    if(true === $isTestCall)
+                    {
+                        break;
+                    }
                 }
             },
             $queue

@@ -86,8 +86,8 @@ final class ApplicationTransportEndpoint implements Endpoint
 
         $destination = $this->destination;
 
-        $watcherId = Loop::defer(
-            static function() use (&$watcherId, $deferred, $message, $options, $transport, $encoder, $destination): \Generator
+         Loop::defer(
+            static function() use ($deferred, $message, $options, $transport, $encoder, $destination): \Generator
             {
                 try
                 {
@@ -97,19 +97,15 @@ final class ApplicationTransportEndpoint implements Endpoint
                     yield $transport->send($package);
 
                     $deferred->resolve();
+
+                    unset($encoded, $package);
                 }
                 catch(\Throwable $throwable)
                 {
                     $deferred->resolve($throwable);
                 }
-                finally
-                {
-                    Loop::cancel($watcherId);
-                }
             }
         );
-
-        Loop::unreference($watcherId);
 
         return $deferred->promise();
     }

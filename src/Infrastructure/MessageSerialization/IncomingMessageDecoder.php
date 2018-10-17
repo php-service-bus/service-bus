@@ -56,8 +56,8 @@ final class IncomingMessageDecoder
         $decodersContainer = $this->decodersContainer;
         $deferred          = new Deferred();
 
-        $watcherId = Loop::defer(
-            static function() use ($package, $decodersContainer, $deferred, &$watcherId): \Generator
+        Loop::defer(
+            static function() use ($package, $decodersContainer, $deferred): \Generator
             {
                 try
                 {
@@ -87,14 +87,8 @@ final class IncomingMessageDecoder
                 {
                     $deferred->fail($throwable);
                 }
-                finally
-                {
-                    Loop::cancel($watcherId);
-                }
             }
         );
-
-        Loop::unreference($watcherId);
 
         return $deferred->promise();
     }
