@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3f661912cdfa49dc859e651ac8e5b1e5",
-    "content-hash": "81c9d3e99d1837f0488268e4be0ba951",
+    "hash": "3308f4279311782cd7c143c61a2f808c",
+    "content-hash": "c8a85ed9c7cd18cb06b4193ad76edd75",
     "packages": [
         {
             "name": "amphp/amp",
@@ -569,21 +569,23 @@
         },
         {
             "name": "amphp/postgres",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/postgres.git",
-                "reference": "964ec8759b68326c240411d88fc5ff0808b966e6"
+                "reference": "6306f4f13e2dff8cf7dd348a8698ab6e6a39a1b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/postgres/zipball/964ec8759b68326c240411d88fc5ff0808b966e6",
-                "reference": "964ec8759b68326c240411d88fc5ff0808b966e6",
+                "url": "https://api.github.com/repos/amphp/postgres/zipball/6306f4f13e2dff8cf7dd348a8698ab6e6a39a1b9",
+                "reference": "6306f4f13e2dff8cf7dd348a8698ab6e6a39a1b9",
                 "shasum": ""
             },
             "require": {
                 "amphp/amp": "^2",
-                "amphp/sql": "dev-master",
+                "amphp/sql": "^1",
+                "amphp/sql-common": "^1",
+                "cash/lrucache": "^1",
                 "php": "^7.0"
             },
             "require-dev": {
@@ -623,7 +625,7 @@
                 "postgre",
                 "postgresql"
             ],
-            "time": "2018-10-02 03:58:35"
+            "time": "2018-10-14 15:48:07"
         },
         {
             "name": "amphp/process",
@@ -749,16 +751,16 @@
         },
         {
             "name": "amphp/sql",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/sql.git",
-                "reference": "a87c1e65f4198b05f748ccea91242c4b090a0e65"
+                "reference": "fcd359de3e64c8600a5fda9b00d37a8b85e91ed0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/sql/zipball/a87c1e65f4198b05f748ccea91242c4b090a0e65",
-                "reference": "a87c1e65f4198b05f748ccea91242c4b090a0e65",
+                "url": "https://api.github.com/repos/amphp/sql/zipball/fcd359de3e64c8600a5fda9b00d37a8b85e91ed0",
+                "reference": "fcd359de3e64c8600a5fda9b00d37a8b85e91ed0",
                 "shasum": ""
             },
             "require": {
@@ -789,7 +791,52 @@
                 "db",
                 "sql"
             ],
-            "time": "2018-10-05 19:34:18"
+            "time": "2018-10-13 14:23:15"
+        },
+        {
+            "name": "amphp/sql-common",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/amphp/sql-common.git",
+                "reference": "62d60b641d3623ff4470d869dc0363d09e99afbe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/amphp/sql-common/zipball/62d60b641d3623ff4470d869dc0363d09e99afbe",
+                "reference": "62d60b641d3623ff4470d869dc0363d09e99afbe",
+                "shasum": ""
+            },
+            "require": {
+                "amphp/amp": "^2",
+                "amphp/sql": "^1",
+                "php": ">=7"
+            },
+            "require-dev": {
+                "amphp/php-cs-fixer-config": "dev-master",
+                "amphp/phpunit-util": "^1",
+                "phpunit/phpunit": "^6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Amp\\Sql\\Common\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Common classes for non-blocking SQL implementations.",
+            "homepage": "http://amphp.org",
+            "keywords": [
+                "async",
+                "asynchronous",
+                "database",
+                "db",
+                "sql"
+            ],
+            "time": "2018-10-14 15:12:24"
         },
         {
             "name": "amphp/sync",
@@ -986,6 +1033,47 @@
                 "reactphp"
             ],
             "time": "2018-08-15 13:25:32"
+        },
+        {
+            "name": "cash/lrucache",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cash/LRUCache.git",
+                "reference": "4fa4c6834cec59690b43526c4da41d6153026289"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cash/LRUCache/zipball/4fa4c6834cec59690b43526c4da41d6153026289",
+                "reference": "4fa4c6834cec59690b43526c4da41d6153026289",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "cash": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cash Costello",
+                    "email": "cash.costello@gmail.com"
+                }
+            ],
+            "description": "An efficient memory-based Least Recently Used (LRU) cache",
+            "homepage": "https://github.com/cash/LRUCache",
+            "keywords": [
+                "cache",
+                "lru"
+            ],
+            "time": "2013-09-20 18:59:12"
         },
         {
             "name": "daverandom/libdns",
@@ -3817,16 +3905,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "6.0.8",
+            "version": "6.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "848f78b3309780fef7ec8c4666b7ab4e6b09b22f"
+                "reference": "0685fb6a43aed1b2e09804d1aaf17144c82861f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/848f78b3309780fef7ec8c4666b7ab4e6b09b22f",
-                "reference": "848f78b3309780fef7ec8c4666b7ab4e6b09b22f",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/0685fb6a43aed1b2e09804d1aaf17144c82861f8",
+                "reference": "0685fb6a43aed1b2e09804d1aaf17144c82861f8",
                 "shasum": ""
             },
             "require": {
@@ -3850,7 +3938,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "6.0-dev"
+                    "dev-master": "6.1-dev"
                 }
             },
             "autoload": {
@@ -3876,7 +3964,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-10-04 03:41:23"
+            "time": "2018-10-16 05:37:37"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -4824,9 +4912,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "amphp/postgres": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

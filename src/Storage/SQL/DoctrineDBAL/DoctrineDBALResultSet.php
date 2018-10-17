@@ -96,7 +96,7 @@ final class DoctrineDBALResultSet implements ResultSet
     /**
      * @inheritdoc
      */
-    public function getCurrent(int $rowType = ResultSet::FETCH_ASSOC)
+    public function getCurrent(): ?array
     {
         if(null !== $this->currentRow)
         {

@@ -15,12 +15,12 @@ namespace Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL;
 
 use Amp\Postgres\PgSqlCommandResult;
 use Amp\Promise;
-use Amp\Sql\PooledResultSet;
 use Amp\Success;
 use Desperado\ServiceBus\Storage\Exceptions\ResultSetIterationFailed;
 use Desperado\ServiceBus\Storage\ResultSet;
 use Amp\Postgres\PgSqlResultSet;
 use Amp\Sql\ResultSet as AmpResultSet;
+use Amp\Postgres\PooledResultSet;
 
 /**
  *
@@ -73,11 +73,11 @@ class AmpPostgreSQLResultSet implements ResultSet
     /**
      * @inheritdoc
      */
-    public function getCurrent(int $rowType = ResultSet::FETCH_ASSOC)
+    public function getCurrent(): ?array
     {
         try
         {
-            return $this->originalResultSet->getCurrent($rowType);
+            return $this->originalResultSet->getCurrent();
         }
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)

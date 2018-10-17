@@ -43,7 +43,7 @@
     "amphp/log": "^1",
     "amphp/file": "^0.3",
     "amphp/artax": "^3.0",
-    "amphp/postgres": "dev-master",
+    "amphp/postgres": "^1.0",
     "ramsey/uuid": "^3.7",
     "symfony/serializer": "^v4.1",
     "symfony/property-info": "^v4.1",
