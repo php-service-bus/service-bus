@@ -39,19 +39,17 @@ Available methods:
 - [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L94): Enable scheduler support. [Read more](https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md)
 
 #### Transport Configuration
-For the configuration of the transport layer is responsible [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), in which is available [TransportConfigurator](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php)
-- [addDefaultDestinations()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L61): Registers the default message delivery route
-- [registerCustomMessageDestinations()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L80): Registers a specific delivery route for the message
-- [addQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L99): Creates a new queue (if it does not exist)
-- [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L120): Creates an exchange (if it does not exist)
-- [bindQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L155): bind a queue to exchange
-- [bindTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L140): bind exchange to exchange
+For the configuration of the transport layer is responsible [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), in which is available [transport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L188)
+- [createQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L52): Creates a new queue (if it does not exist)
+- [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L37): Creates an exchange (if it does not exist)
 
 #### Kernel configuration
-- [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L101): Enable detection of blocking event loop
-- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L128): Use default handler for SIGINT(2) signal 
-- [listen()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L152): Starting the application and subscribing to messages 
-- [stop()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L174): Stop application after N milliseconds
+- [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L75): Enable detection of blocking event loop
+- [enableGarbageCleaning()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L90): Periodically force a garbage collector
+- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109): Use default handler for SIGINT(2) signal 
+- [registerCommandHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L145): Add command handler
+- [registerEventListener()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L163): Add event listener
+- [registerEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L177): Adds a entry point to which messages can be sent (by default already registered 1: application transport)
 
 #### Creation of database schema
 **Important**: at the application initiation, a database scheme is not created. This is for the users to do.
@@ -69,69 +67,60 @@ Available for SQL fixture::
 #### Initialization demon example
 
 ```php
+#!/usr/bin/env php
 <?php
 
 declare(strict_types = 1);
 
-namespace DocumentProcessing\Bin;
+namespace ServiceBusDemo\Bin;
 
+use Amp\Loop;
 use Desperado\ServiceBus\Application\Bootstrap;
 use Desperado\ServiceBus\Application\ServiceBusKernel;
-use Desperado\ServiceBus\OutboundMessage\Destination;
-use Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
-use Desperado\ServiceBus\Transport\Amqp\AmqpExchange;
-use Desperado\ServiceBus\Transport\Amqp\AmqpQueue;
-use Desperado\ServiceBus\Transport\QueueBind;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpExchange;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpQueue;
+use Desperado\ServiceBus\Infrastructure\Transport\QueueBind;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use ServiceBusDemo\App\ServiceBusDemoExtension;
-use Symfony\Component\Debug\Debug;
 
-include __DIR__ . '/vendor/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
-try
-{
-    /** @noinspection ForgottenDebugOutputInspection */
-    Debug::enable();
+/** @var \Symfony\Component\DependencyInjection\Container $container */
+$container = Bootstrap::withDotEnv(__DIR__ . '/../.env')
+    ->useRabbitMqTransport((string) \getenv('TRANSPORT_CONNECTION_DSN'))
+    ->useSqlStorage(AmpPostgreSQLAdapter::class, (string) \getenv('DATABASE_CONNECTION_DSN'))
+    ->useCustomCacheDirectory(__DIR__ . '/../cache')
+    ->addExtensions(new ServiceBusDemoExtension())
+    ->importParameters([
+        'app.log_level' => (string) \getenv('LOG_LEVEL')
+    ])
+    ->enableAutoImportMessageHandlers([__DIR__ . '/../src'])
+    ->enableAutoImportSagas([__DIR__ . '/../src'])
+    ->boot();
 
-    $container = Bootstrap::withDotEnv(__DIR__ . '/.env')
-        ->useAmqpExtTransport((string) \getenv('TRANSPORT_CONNECTION_DSN'))
-        ->useSqlStorage(AmpPostgreSQLAdapter::class, (string) \getenv('DATABASE_CONNECTION_DSN'))
-        ->useCustomCacheDirectory(__DIR__ . '/cache')
-        ->addExtensions(new ServiceBusDemoExtension())
-        ->importParameters([
-            'app.log_level' => (string) \getenv('LOG_LEVEL')
-        ])
-        ->enableAutoImportMessageHandlers([__DIR__ . '/src'])
-        ->enableAutoImportSagas([__DIR__ . '/src'])
-        ->boot();
+$kernel = new ServiceBusKernel($container);
 
-    $kernel = new ServiceBusKernel($container);
+Loop::run(
+    static function() use ($kernel): \Generator
+    {
+        $mainExchange = AmqpExchange::direct((string) \getenv('TRANSPORT_TOPIC'), true);
+        $mainQueue    = AmqpQueue::default((string) \getenv('TRANSPORT_QUEUE'), true);
 
-    $transportConfigurator = $kernel->transportConfigurator();
+        yield $kernel
+            ->transport()
+            ->createQueue(
+                $mainQueue,
+                new QueueBind($mainExchange,
+                    (string) \getenv('TRANSPORT_ROUTING_KEY'))
+            );
 
-    /** Main exchange and queue binds */
+        $kernel
+            ->monitorLoopBlock()
+            ->enableGarbageCleaning()
+            ->useDefaultStopSignalHandler();
 
-    $mainTopic = AmqpExchange::direct((string) \getenv('TRANSPORT_TOPIC'), true);
-    $mainQueue = AmqpQueue::default((string) \getenv('TRANSPORT_QUEUE'), true);
-
-    $transportConfigurator
-        ->createTopic($mainTopic)
-        ->addQueue($mainQueue)
-        ->bindQueue(new QueueBind($mainQueue, $mainTopic, (string) \getenv('TRANSPORT_ROUTING_KEY')));
-
-    $transportConfigurator->addDefaultDestinations(
-        new Destination(
-            (string) \getenv('SENDER_DESTINATION_TOPIC'),
-            (string) \getenv('SENDER_DESTINATION_TOPIC_ROUTING_KEY')
-        )
-    );
-
-    $kernel
-      ->useDefaultStopSignalHandler()
-      ->listen($mainQueue);
-}
-catch(\Throwable $throwable)
-{
-    echo $throwable->getMessage(), \PHP_EOL, $throwable->getFile() . ':' . $throwable->getLine(), \PHP_EOL;
-}
+        yield $kernel->entryPoint()->listen($mainQueue);
+    }
+);
 
 ```
