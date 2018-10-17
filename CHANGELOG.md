@@ -3,9 +3,10 @@
 ## 2.0.0
 - *[Transport]* Fully redesigned transport level
 - *[Storage]* Desperado\ServiceBus\Storage\ResultSet::getCurrent() now aow always returns an array or null
-- *[Storage]* Everything related to working with the database is transferred to Desperado\ServiceBus\Infrastructure
+- *[Structure]* Everything related to working with the database is transferred to Desperado\ServiceBus\Infrastructure
 - *[Message delivery]* Added endpoint support
 - *[Initialization]* Initial application initialization changed
+- *[Structure]* AnnotationsReader moved to Desperado\ServiceBus\Infrastructure
 
 ## 1.2.3 - 2018-10-08
 - *[Optimization]* Added forced collection of links and freeing memory (1 time per hour)

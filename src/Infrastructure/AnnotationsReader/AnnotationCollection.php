@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\AnnotationsReader;
+namespace Desperado\ServiceBus\Infrastructure\AnnotationsReader;
 
 /**
  * Annotations collection
@@ -21,7 +21,7 @@ final class AnnotationCollection implements \Countable, \IteratorAggregate
     /**
      * Annotations VO
      *
-     * @var array<string, \Desperado\ServiceBus\AnnotationsReader\Annotation>
+     * @var array<string, \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation>
      */
     private $collection = [];
 
@@ -36,7 +36,7 @@ final class AnnotationCollection implements \Countable, \IteratorAggregate
     /**
      * Push multiple annotations
      *
-     * @param array<mixed, \Desperado\ServiceBus\AnnotationsReader\Annotation> $annotations
+     * @param array<mixed, \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation> $annotations
      *
      * @return void
      */
@@ -63,7 +63,7 @@ final class AnnotationCollection implements \Countable, \IteratorAggregate
     /**
      * Map collection data
      *
-     * @param callable<\Desperado\ServiceBus\AnnotationsReader\Annotation> $callable
+     * @param callable<\Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation> $callable
      *
      * @return AnnotationCollection
      */
@@ -75,7 +75,7 @@ final class AnnotationCollection implements \Countable, \IteratorAggregate
     /**
      * Filter collection data
      *
-     * @param callable<\Desperado\ServiceBus\AnnotationsReader\Annotation> $callable
+     * @param callable<\Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation> $callable
      *
      * @return AnnotationCollection
      */

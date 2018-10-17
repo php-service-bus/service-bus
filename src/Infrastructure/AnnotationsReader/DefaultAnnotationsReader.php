@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\AnnotationsReader;
+namespace Desperado\ServiceBus\Infrastructure\AnnotationsReader;
 
 use Doctrine\Common\Annotations as DoctrineAnnotations;
 
@@ -30,7 +30,7 @@ final class DefaultAnnotationsReader implements AnnotationsReader
     /**
      * @param DoctrineAnnotations\Reader|null $reader
      *
-     * @throws \Desperado\ServiceBus\AnnotationsReader\ReadAnnotationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\AnnotationsReader\ReadAnnotationFailed
      */
     public function __construct(DoctrineAnnotations\Reader $reader = null)
     {

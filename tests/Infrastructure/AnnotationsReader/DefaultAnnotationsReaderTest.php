@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\AnnotationsReader;
+namespace Desperado\ServiceBus\Tests\Infrastructure\AnnotationsReader;
 
-use Desperado\ServiceBus\AnnotationsReader\DefaultAnnotationsReader;
-use Desperado\ServiceBus\Tests\AnnotationsReader\Stubs\ClassWithCorrectAnnotations;
-use Desperado\ServiceBus\Tests\AnnotationsReader\Stubs\ClassWithIncorrectAnnotation;
-use Desperado\ServiceBus\Tests\AnnotationsReader\Stubs\TestClassLevelAnnotation;
-use Desperado\ServiceBus\Tests\AnnotationsReader\Stubs\TestMethodLevelAnnotation;
+use Desperado\ServiceBus\Infrastructure\AnnotationsReader\DefaultAnnotationsReader;
+use Desperado\ServiceBus\Tests\Infrastructure\AnnotationsReader\Stubs\ClassWithCorrectAnnotations;
+use Desperado\ServiceBus\Tests\Infrastructure\AnnotationsReader\Stubs\ClassWithIncorrectAnnotation;
+use Desperado\ServiceBus\Tests\Infrastructure\AnnotationsReader\Stubs\TestClassLevelAnnotation;
+use Desperado\ServiceBus\Tests\Infrastructure\AnnotationsReader\Stubs\TestMethodLevelAnnotation;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -61,7 +61,7 @@ final class DefaultAnnotationsReaderTest extends TestCase
 
         foreach($classLevelAnnotations as $annotation)
         {
-            /** @var \Desperado\ServiceBus\AnnotationsReader\Annotation $annotation */
+            /** @var \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation $annotation */
 
             static::assertNull($annotation->reflectionMethod());
             static::assertEquals(ClassWithCorrectAnnotations::class, $annotation->containingClass());
@@ -73,7 +73,7 @@ final class DefaultAnnotationsReaderTest extends TestCase
 
         foreach($methodLevelAnnotations as $annotation)
         {
-            /** @var \Desperado\ServiceBus\AnnotationsReader\Annotation $annotation */
+            /** @var \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation $annotation */
 
             static::assertNotNull($annotation->reflectionMethod());
             static::assertEquals(ClassWithCorrectAnnotations::class, $annotation->containingClass());
@@ -86,7 +86,7 @@ final class DefaultAnnotationsReaderTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Desperado\ServiceBus\AnnotationsReader\ReadAnnotationFailed
+     * @expectedException \Desperado\ServiceBus\Infrastructure\AnnotationsReader\ReadAnnotationFailed
      *
      * @return void
      */
@@ -97,7 +97,7 @@ final class DefaultAnnotationsReaderTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Desperado\ServiceBus\AnnotationsReader\ReadAnnotationFailed
+     * @expectedException \Desperado\ServiceBus\Infrastructure\AnnotationsReader\ReadAnnotationFailed
      *
      * @return void
      */

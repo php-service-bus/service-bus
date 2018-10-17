@@ -13,10 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Services\Configuration;
 
-use Desperado\ServiceBus\AnnotationsReader\Annotation;
-use Desperado\ServiceBus\AnnotationsReader\AnnotationCollection;
-use Desperado\ServiceBus\AnnotationsReader\AnnotationsReader;
-use Desperado\ServiceBus\AnnotationsReader\DefaultAnnotationsReader;
+use Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation;
+use Desperado\ServiceBus\Infrastructure\AnnotationsReader\AnnotationCollection;
+use Desperado\ServiceBus\Infrastructure\AnnotationsReader\AnnotationsReader;
+use Desperado\ServiceBus\Infrastructure\AnnotationsReader\DefaultAnnotationsReader;
 use Desperado\ServiceBus\MessageHandlers\Handler;
 use Desperado\ServiceBus\MessageHandlers\HandlerCollection;
 use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
@@ -52,7 +52,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         foreach($this->loadMethodLevelAnnotations($service) as $annotation)
         {
             /**
-             * @var \Desperado\ServiceBus\AnnotationsReader\Annotation $annotation
+             * @var \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation $annotation
              * @var CommandHandler|EventListener                       $handlerAnnotation
              */
             $handlerAnnotation = $annotation->annotationObject();

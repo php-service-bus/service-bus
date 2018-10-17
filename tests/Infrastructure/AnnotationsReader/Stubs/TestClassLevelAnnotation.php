@@ -11,13 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\AnnotationsReader\Stubs;
+namespace Desperado\ServiceBus\Tests\Infrastructure\AnnotationsReader\Stubs;
 
 /**
  * @Annotation
- * @Target("METHOD")
+ * @Target("CLASS")
  */
-final class TestMethodLevelAnnotation
+final class TestClassLevelAnnotation
 {
     /**
      * @var string

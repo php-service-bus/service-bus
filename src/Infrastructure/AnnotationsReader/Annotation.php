@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\AnnotationsReader;
+namespace Desperado\ServiceBus\Infrastructure\AnnotationsReader;
 
 /**
  * Annotation data

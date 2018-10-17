@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\AnnotationsReader\Stubs;
+namespace Desperado\ServiceBus\Tests\Infrastructure\AnnotationsReader\Stubs;
 
 /**
  * @fthrfthrfth

@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\AnnotationsReader;
+namespace Desperado\ServiceBus\Infrastructure\AnnotationsReader;
 
 /**
  * Annotation extractor
@@ -25,7 +25,7 @@ interface AnnotationsReader
      *
      * @return AnnotationCollection
      *
-     * @throws \Desperado\ServiceBus\AnnotationsReader\ReadAnnotationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\AnnotationsReader\ReadAnnotationFailed
      */
     public function extract(string $class): AnnotationCollection;
 }
