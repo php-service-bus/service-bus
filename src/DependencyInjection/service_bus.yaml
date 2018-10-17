@@ -193,7 +193,6 @@ services:
       $transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
       $messageDecoder: '@Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder'
       $endpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
-      $defaultMessageRecipient: '@Desperado\ServiceBus\Endpoint\MessageRecipient'
       $messageExecutor: null
       $messagesRouter: '@Desperado\ServiceBus\MessageRouter\Router'
       $logger: '@Psr\Log\LoggerInterface'
