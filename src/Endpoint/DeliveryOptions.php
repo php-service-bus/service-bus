@@ -19,18 +19,11 @@ namespace Desperado\ServiceBus\Endpoint;
 final class DeliveryOptions
 {
     /**
-     * Point to which the message will be sent
-     *
-     * @var MessageRecipient
-     */
-    private $recipient;
-
-    /**
      * Headers bag
      *
      * @var array<string, string>
      */
-    private $headers = [];
+    private $headers;
 
     /**
      * The message must be stored in the broker
@@ -61,19 +54,11 @@ final class DeliveryOptions
     private $expiredAfter;
 
     /**
-     * @param MessageRecipient $recipient
+     * @param array<string, string> $headers
      */
-    public function __construct(MessageRecipient $recipient)
+    public function __construct(array $headers = [])
     {
-        $this->recipient = $recipient;
-    }
-
-    /**
-     * @return MessageRecipient
-     */
-    public function recipient(): MessageRecipient
-    {
-        return $this->recipient;
+        $this->headers = $headers;
     }
 
     /**

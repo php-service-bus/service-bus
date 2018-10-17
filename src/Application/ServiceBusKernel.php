@@ -17,7 +17,7 @@ use Amp\Loop;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Endpoint\Endpoint;
-use Desperado\ServiceBus\Endpoint\EndpointRegistry;
+use Desperado\ServiceBus\Endpoint\EndpointRouter;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
 use Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
@@ -168,18 +168,21 @@ final class ServiceBusKernel
     }
 
     /**
-     * Adding a new endpoint to send messages
+     * Adding a new endpoint to send message
+     * By default, messages will be sent to the application transport. If a different option is specified for the
+     * message, it will be sent only to it
      *
+     * @param string   $messageClass
      * @param Endpoint $endpoint
      *
      * @return void
      */
-    public function registerEndpoint(Endpoint $endpoint): void
+    public function registerMessageCustomEndpoint(string $messageClass, Endpoint $endpoint): void
     {
         /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
-        $serviceLocator->get(EndpointRegistry::class)->add($endpoint);
+        $serviceLocator->get(EndpointRouter::class)->add($messageClass, $endpoint);
     }
 
     /**

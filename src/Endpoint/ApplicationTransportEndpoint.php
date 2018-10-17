@@ -77,14 +77,6 @@ final class ApplicationTransportEndpoint implements Endpoint
     /**
      * @inheritDoc
      */
-    public function defaultDestination(): TransportLevelDestination
-    {
-        return $this->destination;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function delivery(Message $message, DeliveryOptions $options): Promise
     {
         $deferred = new Deferred();
@@ -92,13 +84,15 @@ final class ApplicationTransportEndpoint implements Endpoint
         $transport = $this->transport;
         $encoder   = $this->encoder;
 
+        $destination = $this->destination;
+
         $watcherId = Loop::defer(
-            static function() use (&$watcherId, $deferred, $message, $options, $transport, $encoder): \Generator
+            static function() use (&$watcherId, $deferred, $message, $options, $transport, $encoder, $destination): \Generator
             {
                 try
                 {
                     $encoded = $encoder->encode($message);
-                    $package = self::createPackage($encoded, $options);
+                    $package = self::createPackage($encoded, $options, $destination);
 
                     yield $transport->send($package);
 
@@ -123,17 +117,22 @@ final class ApplicationTransportEndpoint implements Endpoint
     /**
      * Create outbound package with specified parameters
      *
-     * @param string          $payload
-     * @param DeliveryOptions $options
+     * @param string                        $payload
+     * @param DeliveryOptions               $options
+     * @param AmqpTransportLevelDestination $destination
      *
      * @return OutboundPackage
      */
-    private static function createPackage(string $payload, DeliveryOptions $options): OutboundPackage
+    private static function createPackage(
+        string $payload,
+        DeliveryOptions $options,
+        AmqpTransportLevelDestination $destination
+    ): OutboundPackage
     {
         $package = new OutboundPackage(
             new InMemoryStream($payload),
             $options->headers(),
-            $options->recipient()->transportDestination()
+            $destination
         );
 
         $package->setExpiredAfter($options->expiredAfter());

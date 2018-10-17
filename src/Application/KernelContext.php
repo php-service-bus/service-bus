@@ -13,13 +13,13 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
+use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use Desperado\ServiceBus\Endpoint\DeliveryOptions;
-use Desperado\ServiceBus\Endpoint\EndpointRegistry;
-use Desperado\ServiceBus\Endpoint\MessageRecipient;
+use Desperado\ServiceBus\Endpoint\EndpointRouter;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -40,19 +40,11 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     private $logger;
 
     /**
-     * Endpoints to which messages will be sent
+     * Outbound message routing
      *
-     * @var EndpointRegistry
+     * @var EndpointRouter
      */
-    private $endpointRegistry;
-
-    /**
-     * Default message recipient
-     * Used to send using the self::delivery() method
-     *
-     * @var MessageRecipient
-     */
-    private $defaultRecipient;
+    private $endpointRouter;
 
     /**
      * Is the received message correct?
@@ -76,22 +68,19 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     private $violations = [];
 
     /**
-     * @param IncomingPackage  $incomingPackage
-     * @param MessageRecipient $defaultRecipient
-     * @param EndpointRegistry $endpointRegistry
-     * @param LoggerInterface  $logger
+     * @param IncomingPackage $incomingPackage
+     * @param EndpointRouter  $endpointRouter
+     * @param LoggerInterface $logger
      */
     public function __construct(
         IncomingPackage $incomingPackage,
-        MessageRecipient $defaultRecipient,
-        EndpointRegistry $endpointRegistry,
+        EndpointRouter $endpointRouter,
         LoggerInterface $logger
     )
     {
-        $this->incomingPackage  = $incomingPackage;
-        $this->defaultRecipient = $defaultRecipient;
-        $this->endpointRegistry = $endpointRegistry;
-        $this->logger           = $logger;
+        $this->incomingPackage = $incomingPackage;
+        $this->endpointRouter  = $endpointRouter;
+        $this->logger          = $logger;
     }
 
     /**
@@ -127,11 +116,22 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
      */
     public function delivery(Message $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
-        $options = $deliveryOptions ?? new DeliveryOptions($this->defaultRecipient);
+        $messageClass = \get_class($message);
+        $endpoints    = $this->endpointRouter->route($messageClass);
 
-        return $this->endpointRegistry
-            ->extract($options->recipient()->endpointName())
-            ->delivery($message, $options);
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(Message $message, DeliveryOptions $options) use ($endpoints): \Generator
+            {
+                foreach($endpoints as $endpoint)
+                {
+                    /** @var \Desperado\ServiceBus\Endpoint\Endpoint $endpoint */
+
+                    yield $endpoint->delivery($message, $options);
+                }
+            },
+            $message, $deliveryOptions ?? new DeliveryOptions()
+        );
     }
 
     /**

@@ -18,8 +18,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
-use Desperado\ServiceBus\Endpoint\EndpointRegistry;
-use Desperado\ServiceBus\Endpoint\MessageRecipient;
+use Desperado\ServiceBus\Endpoint\EndpointRouter;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
@@ -62,18 +61,11 @@ final class EntryPoint
     private $messageDecoder;
 
     /**
-     * Endpoints to which messages will be sent
+     * Outbound message routing
      *
-     * @var EndpointRegistry
+     * @var EndpointRouter
      */
-    private $endpointRegistry;
-
-    /**
-     * Point to which the message will be sent by default
-     *
-     * @var MessageRecipient
-     */
-    private $defaultRecipient;
+    private $endpointRouter;
 
     /**
      * @var LoggerInterface
@@ -83,7 +75,7 @@ final class EntryPoint
     /**
      * @param Transport              $transport
      * @param IncomingMessageDecoder $messageDecoder
-     * @param EndpointRegistry       $endpointRegistry
+     * @param EndpointRouter         $endpointRouter
      * @param MessageExecutor        $messageExecutor
      * @param Router|null            $messagesRouter
      * @param LoggerInterface|null   $logger
@@ -91,8 +83,7 @@ final class EntryPoint
     public function __construct(
         Transport $transport,
         IncomingMessageDecoder $messageDecoder,
-        EndpointRegistry $endpointRegistry,
-        MessageRecipient $defaultMessageRecipient,
+        EndpointRouter $endpointRouter,
         MessageExecutor $messageExecutor = null,
         ?Router $messagesRouter = null,
         ?LoggerInterface $logger = null
@@ -100,12 +91,11 @@ final class EntryPoint
     {
         $this->logger = $logger ?? new NullLogger();
 
-        $this->transport        = $transport;
-        $this->messageDecoder   = $messageDecoder;
-        $this->endpointRegistry = $endpointRegistry;
-        $this->defaultRecipient = $defaultMessageRecipient;
-        $this->messageExecutor  = $messageExecutor ?? new DefaultMessageExecutor($this->logger);
-        $this->messagesRouter   = $messagesRouter ?? new Router();
+        $this->transport       = $transport;
+        $this->messageDecoder  = $messageDecoder;
+        $this->endpointRouter  = $endpointRouter;
+        $this->messageExecutor = $messageExecutor ?? new DefaultMessageExecutor($this->logger);
+        $this->messagesRouter  = $messagesRouter ?? new Router();
 
     }
 
@@ -155,16 +145,14 @@ final class EntryPoint
         $transport         = $this->transport;
         $logger            = $this->logger;
 
-        $decoder  = $this->messageDecoder;
-        $router   = $this->messagesRouter;
-        $executor = $this->messageExecutor;
-
-        $defaultRecipient = $this->defaultRecipient;
-        $endpointsRegistry = $this->endpointRegistry;
+        $decoder        = $this->messageDecoder;
+        $router         = $this->messagesRouter;
+        $executor       = $this->messageExecutor;
+        $endpointRouter = $this->endpointRouter;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Queue $queue) use ($transport, $decoder, $executor, $router, $logger, $defaultRecipient, $endpointsRegistry): \Generator
+            static function(Queue $queue) use ($transport, $decoder, $executor, $router, $logger, $endpointRouter): \Generator
             {
                 /** @var \Amp\Iterator $iterator */
                 $iterator = yield $transport->consume($queue);
@@ -180,12 +168,7 @@ final class EntryPoint
                         $message  = yield $decoder->decode($package);
                         $handlers = $router->match($message);
 
-                        $context = new KernelContext(
-                            $package,
-                            $defaultRecipient,
-                            $endpointsRegistry,
-                            $logger
-                        );
+                        $context = new KernelContext($package, $endpointRouter, $logger);
 
                         $logger->debug('Handle message "{messageClass}"', [
                                 'messageClass' => \get_class($message),

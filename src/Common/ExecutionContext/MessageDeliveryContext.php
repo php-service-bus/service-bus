@@ -30,8 +30,6 @@ interface MessageDeliveryContext
      * @param Message $message
      *
      * @return Promise<null>
-     *
-     * @throws \Desperado\ServiceBus\Endpoint\Exceptions\NotRegisteredEndpoint Endpoint is not registered
      */
     public function delivery(Message $message, ?DeliveryOptions $options = null): Promise;
 }

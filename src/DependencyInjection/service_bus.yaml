@@ -168,7 +168,7 @@ services:
       - Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader: '@Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader'
         Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader: '@Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader'
         Desperado\ServiceBus\SagaProvider: '@Desperado\ServiceBus\SagaProvider'
-        Desperado\ServiceBus\Endpoint\EndpointRegistry: '@Desperado\ServiceBus\Endpoint\EndpointRegistry'
+        Desperado\ServiceBus\Endpoint\EndpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
 
   # Message routes configurator
   service_bus.message_routes_configurator:
@@ -192,7 +192,7 @@ services:
     arguments:
       $transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
       $messageDecoder: '@Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder'
-      $endpointRegistry: '@Desperado\ServiceBus\Endpoint\EndpointRegistry'
+      $endpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
       $defaultMessageRecipient: '@Desperado\ServiceBus\Endpoint\MessageRecipient'
       $messageExecutor: null
       $messagesRouter: '@Desperado\ServiceBus\MessageRouter\Router'
@@ -230,7 +230,7 @@ services:
       $endpointName: 'application'
       $transportDestination: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination'
 
-  # List of all endpoints to send messages
-  Desperado\ServiceBus\Endpoint\EndpointRegistry:
+  # Outbound message routing
+  Desperado\ServiceBus\Endpoint\EndpointRouter:
     arguments:
       $defaultEndpoint: '@Desperado\ServiceBus\Endpoint\ApplicationTransportEndpoint'

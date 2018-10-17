@@ -29,13 +29,6 @@ interface Endpoint
     public function name(): string;
 
     /**
-     *  Where the message will be sent within the specific transport by default
-     *
-     * @return TransportLevelDestination
-     */
-    public function defaultDestination(): TransportLevelDestination;
-
-    /**
      * Send message to endpoint
      *
      * @param Message         $message
