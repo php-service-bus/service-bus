@@ -223,12 +223,6 @@ services:
       $destination: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination'
       $encoder: null
 
-  # Default message recipient
-  Desperado\ServiceBus\Endpoint\MessageRecipient:
-    arguments:
-      $endpointName: 'application'
-      $transportDestination: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination'
-
   # Outbound message routing
   Desperado\ServiceBus\Endpoint\EndpointRouter:
     arguments:
