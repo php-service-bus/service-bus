@@ -47,8 +47,7 @@
 - [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109):  Использовать обработчик для сигнала SIGINT(2) по умолчанию
 - [registerCommandHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L145): Добавить обработчик команды
 - [registerEventListener()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L163): Добавить слушатель события
-- [registerEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L177): Добавляет точку, в которую могут отправляться сообщения (по умолчанию уже зарегистрирована 1: транспорт приложения)
-
+- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L177): Указания специфичного маршрута доставки сообщения
 - [listen()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L152): Запуск приложения и подписка на сообщения
 - [stop()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L174): Остановить приложение через N миллисекунд
 

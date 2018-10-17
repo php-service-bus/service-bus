@@ -168,7 +168,7 @@ final class ServiceBusKernel
     }
 
     /**
-     * Adding a new endpoint to send message
+     * Apply specific route to deliver a message
      * By default, messages will be sent to the application transport. If a different option is specified for the
      * message, it will be sent only to it
      *

@@ -49,7 +49,7 @@ For the configuration of the transport layer is responsible [ServiceBusKernel](h
 - [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109): Use default handler for SIGINT(2) signal 
 - [registerCommandHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L145): Add command handler
 - [registerEventListener()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L163): Add event listener
-- [registerEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L177): Adds a entry point to which messages can be sent (by default already registered 1: application transport)
+- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L177): Apply specific route to deliver a message
 
 #### Creation of database schema
 **Important**: at the application initiation, a database scheme is not created. This is for the users to do.
