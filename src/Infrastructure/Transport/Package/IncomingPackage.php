@@ -15,7 +15,7 @@ namespace Desperado\ServiceBus\Infrastructure\Transport\Package;
 
 use Amp\ByteStream\InputStream;
 use Amp\Promise;
-use Desperado\ServiceBus\OutboundMessage\Destination;
+use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
 
 /**
  *
@@ -39,9 +39,9 @@ interface IncomingPackage
     /**
      * The source from which the message was received
      *
-     * @return Destination
+     * @return TransportLevelDestination
      */
-    public function origin(): Destination;
+    public function origin(): TransportLevelDestination;
 
     /**
      * Receive message body

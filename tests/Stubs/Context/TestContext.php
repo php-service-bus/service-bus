@@ -15,12 +15,10 @@ namespace Desperado\ServiceBus\Tests\Stubs\Context;
 
 use Amp\Promise;
 use Amp\Success;
-use Desperado\ServiceBus\Common\Contract\Messages\Command;
-use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
-use Desperado\ServiceBus\Infrastructure\Transport\SendOptions;
+use Desperado\ServiceBus\Endpoint\DeliveryOptions;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -55,29 +53,9 @@ final class TestContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritdoc
      */
-    public function delivery(Message ...$messages): Promise
+    public function delivery(Message $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
-        $this->messages = \array_merge($messages, $this->messages);
-
-        return new Success();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function send(Command $command, SendOptions $options): Promise
-    {
-        $this->messages[] = $command;
-
-        return new Success();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function publish(Event $event, SendOptions $options): Promise
-    {
-        $this->messages[] = $event;
+        $this->messages[] = $message;
 
         return new Success();
     }

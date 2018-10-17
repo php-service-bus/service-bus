@@ -14,14 +14,13 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Application;
 
 use Amp\Promise;
-use Amp\Success;
-use Desperado\ServiceBus\Common\Contract\Messages\Command;
-use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
+use Desperado\ServiceBus\Endpoint\DeliveryOptions;
+use Desperado\ServiceBus\Endpoint\EndpointRegistry;
+use Desperado\ServiceBus\Endpoint\MessageRecipient;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
-use Desperado\ServiceBus\Infrastructure\Transport\SendOptions;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -39,6 +38,21 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
      * @var LoggerInterface
      */
     private $logger;
+
+    /**
+     * Endpoints to which messages will be sent
+     *
+     * @var EndpointRegistry
+     */
+    private $endpointRegistry;
+
+    /**
+     * Default message recipient
+     * Used to send using the self::delivery() method
+     *
+     * @var MessageRecipient
+     */
+    private $defaultRecipient;
 
     /**
      * Is the received message correct?
@@ -62,15 +76,22 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     private $violations = [];
 
     /**
-     * @param IncomingPackage $incomingPackage
-     * @param callable        $messagePublisher  function(Message $message, array $headers, IncomingEnvelope
-     *                                           $incomingEnvelope): Promise {}
-     * @param LoggerInterface $logger
+     * @param IncomingPackage  $incomingPackage
+     * @param MessageRecipient $defaultRecipient
+     * @param EndpointRegistry $endpointRegistry
+     * @param LoggerInterface  $logger
      */
-    public function __construct(IncomingPackage $incomingPackage, LoggerInterface $logger)
+    public function __construct(
+        IncomingPackage $incomingPackage,
+        MessageRecipient $defaultRecipient,
+        EndpointRegistry $endpointRegistry,
+        LoggerInterface $logger
+    )
     {
-        $this->incomingPackage = $incomingPackage;
-        $this->logger          = $logger;
+        $this->incomingPackage  = $incomingPackage;
+        $this->defaultRecipient = $defaultRecipient;
+        $this->endpointRegistry = $endpointRegistry;
+        $this->logger           = $logger;
     }
 
     /**
@@ -104,25 +125,13 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritdoc
      */
-    public function delivery(Message ...$messages): Promise
+    public function delivery(Message $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
-        return new Success();
-    }
+        $options = $deliveryOptions ?? new DeliveryOptions($this->defaultRecipient);
 
-    /**
-     * @inheritDoc
-     */
-    public function send(Command $command, SendOptions $options): Promise
-    {
-        return new Success();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function publish(Event $event, SendOptions $options): Promise
-    {
-        return new Success();
+        return $this->endpointRegistry
+            ->extract($options->recipient()->endpointName())
+            ->delivery($message, $options);
     }
 
     /**

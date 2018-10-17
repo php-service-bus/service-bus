@@ -86,8 +86,7 @@ final class BunnyClientOverride extends Client
     )
     {
         $this->connectConfig = $connectConfig;
-        /** @todo: configure channel */
-        $this->qosConfig     = $qosConfig;
+        $this->qosConfig = $qosConfig;
 
         $parameters = [
             'async'     => true,
@@ -1040,6 +1039,13 @@ final class BunnyClientOverride extends Client
                 if($frame instanceof AmqpProtocol\MethodChannelOpenOkFrame && $frame->channel === $channel)
                 {
                     $deferred->resolve($frame);
+
+                    yield $this->qos(
+                        $frame->channel,
+                        $this->qosConfig->qosSize(),
+                        $this->qosConfig->qosCount(),
+                        $this->qosConfig->isGlobal()
+                    );
 
                     return true;
                 }

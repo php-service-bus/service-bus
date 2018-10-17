@@ -15,17 +15,12 @@ namespace Desperado\ServiceBus\Tests\Scheduler;
 
 use Amp\Coroutine;
 use function Amp\Promise\wait;
-use Desperado\ServiceBus\Application\KernelContext;
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
-use Desperado\ServiceBus\Scheduler\Messages\Command\EmitSchedulerOperation;
 use Desperado\ServiceBus\Scheduler\Messages\Event\OperationScheduled;
 use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationCanceled;
-use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationEmitted;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
-use Desperado\ServiceBus\Scheduler\SchedulerListener;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
 use Desperado\ServiceBus\Scheduler\Store\Sql\SqlSchedulerStore;
 use Desperado\ServiceBus\SchedulerProvider;
@@ -34,10 +29,7 @@ use Desperado\ServiceBus\Storage\StorageAdapter;
 use Desperado\ServiceBus\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
-use Desperado\ServiceBus\Transport\IncomingEnvelope;
-use Desperado\ServiceBus\Transport\TransportContext;
 use Monolog\Handler\TestHandler;
-use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -240,7 +232,7 @@ final class SchedulerProviderTest extends TestCase
             static::assertCount(2, $messages);
 
             /** @var SchedulerOperationCanceled $message */
-            $message = \reset($messages);
+            $message = \end($messages);
 
             static::assertInstanceOf(SchedulerOperationCanceled::class, $message);
         };

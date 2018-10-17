@@ -11,17 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\OutboundMessage\Exceptions;
+namespace Desperado\ServiceBus\Endpoint\Exceptions;
 
 use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 
 /**
- *
+ * Requested an unregistered endpoint to send messages
  */
-final class EmptyDestinationTopicSpecified extends \InvalidArgumentException implements ServiceBusExceptionMarker
+final class NotRegisteredEndpoint extends \LogicException implements ServiceBusExceptionMarker
 {
-    public function __construct()
-    {
-        parent::__construct('Topic name must be specified');
-    }
+
 }

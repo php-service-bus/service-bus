@@ -1,12 +1,17 @@
 parameters:
   service_bus.sagas_map: []
   service_bus.services_map: []
+  service_bus.default_destination_topic: ''
+  service_bus.default_destination_key: ''
 
 services:
   _defaults:
     autowire: false
     autoconfigure: false
     public: false
+
+  # @see TaggedMessageHandlersCompilerPass
+  service_bus.services_locator:
 
   # Application environment
   Desperado\ServiceBus\Environment:
@@ -163,6 +168,7 @@ services:
       - Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader: '@Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader'
         Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader: '@Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader'
         Desperado\ServiceBus\SagaProvider: '@Desperado\ServiceBus\SagaProvider'
+        Desperado\ServiceBus\Endpoint\EndpointRegistry: '@Desperado\ServiceBus\Endpoint\EndpointRegistry'
 
   # Message routes configurator
   service_bus.message_routes_configurator:
@@ -186,6 +192,8 @@ services:
     arguments:
       $transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
       $messageDecoder: '@Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder'
+      $endpointRegistry: '@Desperado\ServiceBus\Endpoint\EndpointRegistry'
+      $defaultMessageRecipient: '@Desperado\ServiceBus\Endpoint\MessageRecipient'
       $messageExecutor: null
       $messagesRouter: '@Desperado\ServiceBus\MessageRouter\Router'
       $logger: '@Psr\Log\LoggerInterface'
@@ -202,3 +210,27 @@ services:
       # see TaggedMessageHandlersCompilerPass::process
       $serviceLocator: '@service_bus.services_locator'
     tags: ['service_bus_argument_resolver']
+
+  # Which exchange (and with which key) the message will be sent to
+  Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination:
+    arguments:
+      $exchange: '%service_bus.default_destination_topic%'
+      $routingKey: '%service_bus.default_destination_key%'
+
+  # Application level transport endpoint
+  Desperado\ServiceBus\Endpoint\ApplicationTransportEndpoint:
+    arguments:
+      $transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
+      $destination: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination'
+      $encoder: null
+
+  # Default message recipient
+  Desperado\ServiceBus\Endpoint\MessageRecipient:
+    arguments:
+      $endpointName: 'application'
+      $transportDestination: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination'
+
+  # List of all endpoints to send messages
+  Desperado\ServiceBus\Endpoint\EndpointRegistry:
+    arguments:
+      $defaultEndpoint: '@Desperado\ServiceBus\Endpoint\ApplicationTransportEndpoint'

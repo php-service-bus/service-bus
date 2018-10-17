@@ -315,7 +315,7 @@ final class SagaEventListenerProcessorTest extends TestCase
             static::assertNotEmpty($messages);
 
             /** @var SecondEventWithKey $responseEvent */
-            $responseEvent = $messages[0];
+            $responseEvent = $messages[1];
 
             static::assertEquals((string) $id, $responseEvent->key());
         };

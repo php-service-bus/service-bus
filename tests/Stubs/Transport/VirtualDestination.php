@@ -11,12 +11,14 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Infrastructure\Transport;
+namespace Desperado\ServiceBus\Tests\Stubs\Transport;
+
+use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
 
 /**
- * Sent message options
+ *
  */
-final class SendOptions
+final class VirtualDestination implements TransportLevelDestination
 {
 
 }

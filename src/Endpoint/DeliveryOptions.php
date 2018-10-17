@@ -11,36 +11,26 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Infrastructure\Transport\Package;
-
-use Amp\ByteStream\InputStream;
-use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
+namespace Desperado\ServiceBus\Endpoint;
 
 /**
- * Outbound package
+ * Sent message options
  */
-final class OutboundPackage
+final class DeliveryOptions
 {
     /**
-     * Message body
+     * Point to which the message will be sent
      *
-     * @var InputStream
+     * @var MessageRecipient
      */
-    private $payload;
+    private $recipient;
 
     /**
-     * Message headers
+     * Headers bag
      *
      * @var array<string, string>
      */
-    private $headers;
-
-    /**
-     * Message destination
-     *
-     * @var TransportLevelDestination
-     */
-    private $destination;
+    private $headers = [];
 
     /**
      * The message must be stored in the broker
@@ -71,15 +61,19 @@ final class OutboundPackage
     private $expiredAfter;
 
     /**
-     * @param InputStream               $payload
-     * @param array                     $headers
-     * @param TransportLevelDestination $destination
+     * @param MessageRecipient $recipient
      */
-    public function __construct(InputStream $payload, array $headers, TransportLevelDestination $destination)
+    public function __construct(MessageRecipient $recipient)
     {
-        $this->payload     = $payload;
-        $this->headers     = $headers;
-        $this->destination = $destination;
+        $this->recipient = $recipient;
+    }
+
+    /**
+     * @return MessageRecipient
+     */
+    public function recipient(): MessageRecipient
+    {
+        return $this->recipient;
     }
 
     /**
@@ -115,26 +109,6 @@ final class OutboundPackage
     }
 
     /**
-     * To whom the message will be sent
-     *
-     * @return TransportLevelDestination
-     */
-    public function destination(): TransportLevelDestination
-    {
-        return $this->destination;
-    }
-
-    /**
-     * Receive message body
-     *
-     * @return InputStream
-     */
-    public function payload(): InputStream
-    {
-        return $this->payload;
-    }
-
-    /**
      * Receive message headers
      *
      * @return array
@@ -145,50 +119,66 @@ final class OutboundPackage
     }
 
     /**
-     * Save message in broker
+     * Add headers to sent
      *
-     * @param bool $isPersistent
+     * @param array<string, string> $headers
      *
-     * @return void
+     * @return $this
      */
-    public function setIsPersistent(bool $isPersistent): void
+    public function withHeaders(array $headers): self
     {
-        $this->isPersistent = $isPersistent;
+        $this->headers = $headers;
+
+        return $this;
     }
 
     /**
      * When publishing a message, the message must be routed to a valid queue. If it is not, an error will be returned
      *
-     * @param bool $isMandatory
-     *
-     * @return void
+     * @return $this
      */
-    public function setIsMandatory(bool $isMandatory): void
+    public function makeMandatory(): self
     {
-        $this->isMandatory = $isMandatory;
+        $this->isMandatory = true;
+
+        return $this;
     }
 
     /**
      * When publishing a message, mark this message for immediate processing by the broker (High priority message)
      *
-     * @param bool $isImmediate
-     *
-     * @return void
+     * @return $this
      */
-    public function setIsImmediate(bool $isImmediate): void
+    public function makeImmediate(): self
     {
-        $this->isImmediate = $isImmediate;
+        $this->isImmediate = true;
+
+        return $this;
     }
 
     /**
      * Setup message TTL
      *
-     * @param int|null $expiredAfter
+     * @param int $milliseconds
      *
-     * @return void
+     * @return $this
      */
-    public function setExpiredAfter(?int $expiredAfter): void
+    public function makeExpiredAfter(int $milliseconds): self
     {
-        $this->expiredAfter = $expiredAfter;
+        $this->expiredAfter = $milliseconds;
+
+        return $this;
+    }
+
+    /**
+     * Save message in broker
+     *
+     * @return $this
+     */
+    public function makePersistent(): self
+    {
+        $this->isPersistent = true;
+
+        return $this;
     }
 }

@@ -19,11 +19,12 @@ use function Amp\call;
 use Amp\Promise;
 use Bunny\Message as BunnyEnvelope;
 use function Desperado\ServiceBus\Common\uuid;
+use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
 use Desperado\ServiceBus\Infrastructure\Transport\Exceptions\AcknowledgeFailed;
 use Desperado\ServiceBus\Infrastructure\Transport\Exceptions\NotAcknowledgeFailed;
 use Desperado\ServiceBus\Infrastructure\Transport\Exceptions\RejectFailed;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
-use Desperado\ServiceBus\OutboundMessage\Destination;
 
 /**
  *
@@ -89,9 +90,9 @@ final class BunnyIncomingPackage implements IncomingPackage
     /**
      * @inheritDoc
      */
-    public function origin(): Destination
+    public function origin(): TransportLevelDestination
     {
-        return new Destination(
+        return new AmqpTransportLevelDestination(
             $this->originMessage->exchange,
             $this->originMessage->routingKey
         );

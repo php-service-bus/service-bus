@@ -14,10 +14,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Common\ExecutionContext;
 
 use Amp\Promise;
-use Desperado\ServiceBus\Common\Contract\Messages\Command;
-use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\Infrastructure\Transport\SendOptions;
+use Desperado\ServiceBus\Endpoint\DeliveryOptions;
 
 /**
  *
@@ -29,31 +27,11 @@ interface MessageDeliveryContext
      *
      * @noinspection PhpDocSignatureInspection
      *
-     * @param Message ...$messages
+     * @param Message $message
      *
      * @return Promise<null>
+     *
+     * @throws \Desperado\ServiceBus\Endpoint\Exceptions\NotRegisteredEndpoint Endpoint is not registered
      */
-    public function delivery(Message ...$messages): Promise;
-
-    /**
-     * Send command with specified options
-     *
-     * @noinspection PhpDocSignatureInspection
-     *
-     * @param Command     headers
-     * @param SendOptions $options
-     *
-     * @return Promise<null>
-     */
-    public function send(Command $command, SendOptions $options): Promise;
-
-    /**
-     * Publish event with specified headers
-     *
-     * @param Event       $event
-     * @param SendOptions $options
-     *
-     * @return Promise<null>
-     */
-    public function publish(Event $event, SendOptions $options): Promise;
+    public function delivery(Message $message, ?DeliveryOptions $options = null): Promise;
 }

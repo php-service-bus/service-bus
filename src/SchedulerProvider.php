@@ -19,6 +19,10 @@ use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
+use Desperado\ServiceBus\Endpoint\ApplicationTransportEndpoint;
+use Desperado\ServiceBus\Endpoint\DeliveryOptions;
+use Desperado\ServiceBus\Endpoint\MessageRecipient;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Exceptions\DuplicateScheduledJob;
@@ -243,11 +247,20 @@ final class SchedulerProvider
                 {
                     if(null !== $nextOperation)
                     {
-                        /** Send a message that will return after a specified time interval */
-                        yield $context->send(
-                            EmitSchedulerOperation::create($nextOperation->id()), [
-                                'x-delay' => self::calculateExecutionDelay($nextOperation)
-                            ]
+                        $options = new DeliveryOptions(
+                            new MessageRecipient(
+                                ApplicationTransportEndpoint::ENDPOINT_NAME,
+                                /** @todo: fix me */
+                                new AmqpTransportLevelDestination('', '')
+                            )
+                        );
+
+                        $options->makeExpiredAfter(self::calculateExecutionDelay($nextOperation));
+
+                        /** Message will return after a specified time interval */
+                        yield $context->delivery(
+                            EmitSchedulerOperation::create($nextOperation->id()),
+                            $options
                         );
                     }
                 }

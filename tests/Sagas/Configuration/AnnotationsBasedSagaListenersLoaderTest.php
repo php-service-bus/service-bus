@@ -117,7 +117,7 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
 
         foreach($result as $messageHandler)
         {
-            /** @var \Desperado\ServiceBus\MessageBus\MessageHandler\Handler $messageHandler */
+            /** @var \Desperado\ServiceBus\MessageHandlers\Handler $messageHandler */
             static::assertFalse($messageHandler->isCommandHandler());
             static::assertTrue($messageHandler->hasReturnDeclaration());
 

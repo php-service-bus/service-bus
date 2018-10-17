@@ -16,6 +16,8 @@ namespace Desperado\ServiceBus\Application;
 use Amp\Loop;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
+use Desperado\ServiceBus\Endpoint\Endpoint;
+use Desperado\ServiceBus\Endpoint\EndpointRegistry;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
 use Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
@@ -163,6 +165,21 @@ final class ServiceBusKernel
         $this->entryPoint->registerEventListener($event, $handler);
 
         return $this;
+    }
+
+    /**
+     * Adding a new endpoint to send messages
+     *
+     * @param Endpoint $endpoint
+     *
+     * @return void
+     */
+    public function registerEndpoint(Endpoint $endpoint): void
+    {
+        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+
+        $serviceLocator->get(EndpointRegistry::class)->add($endpoint);
     }
 
     /**

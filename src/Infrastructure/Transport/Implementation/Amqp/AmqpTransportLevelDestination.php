@@ -11,50 +11,44 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\OutboundMessage;
+namespace Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp;
+
+use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
 
 /**
- * Information about where to send a message
+ * Which exchange (and with which key) the message will be sent to
  */
-final class Destination
+final class AmqpTransportLevelDestination implements TransportLevelDestination
 {
     /**
-     * Topic name
-     *
-     * @var string|null
+     * @var string
      */
-    private $topic;
+    private $exchange;
 
     /**
-     * Topic\queue routing key
-     *
      * @var string|null
      */
     private $routingKey;
 
     /**
-     * @param string|null $topic
+     * @param string      $exchange
      * @param string|null $routingKey
      */
-    public function __construct(?string $topic, ?string $routingKey)
+    public function __construct(string $exchange, ?string $routingKey)
     {
-        $this->topic      = $topic;
+        $this->exchange   = $exchange;
         $this->routingKey = $routingKey;
     }
 
     /**
-     * Receive topic name
-     *
-     * @return string|null
+     * @return string
      */
-    public function topicName(): ?string
+    public function exchange(): string
     {
-        return $this->topic;
+        return $this->exchange;
     }
 
     /**
-     * Receive routing key
-     *
      * @return string|null
      */
     public function routingKey(): ?string

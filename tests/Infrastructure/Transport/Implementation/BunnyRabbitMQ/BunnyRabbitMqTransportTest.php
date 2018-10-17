@@ -20,12 +20,12 @@ use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpConnectionConfiguration;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpExchange;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpQueue;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyIncomingPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyRabbitMqTransport;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\QueueBind;
 use Desperado\ServiceBus\Infrastructure\Transport\TopicBind;
-use Desperado\ServiceBus\OutboundMessage\Destination;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -173,11 +173,12 @@ final class BunnyRabbitMqTransportTest extends TestCase
                 new OutboundPackage(
                     new InMemoryStream('somePayload'),
                     ['key' => 'value'],
-                    new Destination('consume', 'consume')
+                    new AmqpTransportLevelDestination('consume', 'consume')
                 )
             )
         );
 
+        /** @noinspection LoopWhichDoesNotLoopInspection */
         while(wait($iterator->advance()))
         {
             /** @var BunnyIncomingPackage $package */

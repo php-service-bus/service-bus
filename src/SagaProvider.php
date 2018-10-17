@@ -17,6 +17,7 @@ use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
@@ -271,8 +272,13 @@ final class SagaProvider
 
                 $contextHandler = static function() use ($context, $commands, $events): \Generator
                 {
-                    yield $context->delivery(... $commands);
-                    yield $context->delivery(... $events);
+                    $messages = \array_merge($commands, $events);
+
+                    foreach($messages as $message)
+                    {
+                        /** @var Message $message */
+                        yield $context->delivery($message);
+                    }
                 };
 
                 true === $isNew

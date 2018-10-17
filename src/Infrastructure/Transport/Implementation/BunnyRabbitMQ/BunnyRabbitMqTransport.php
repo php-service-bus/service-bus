@@ -216,6 +216,7 @@ final class BunnyRabbitMqTransport implements Transport
             {
                 try
                 {
+                    /** @var \Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination $destination */
                     $destination = $outboundPackage->destination();
                     $headers     = \array_merge($outboundPackage->headers(), [
                         'delivery-mode' => true === $outboundPackage->isPersistent() ? self::AMQP_DURABLE : null,
@@ -225,7 +226,7 @@ final class BunnyRabbitMqTransport implements Transport
                     yield $channel->publish(
                         yield $outboundPackage->payload()->read(),
                         \array_filter($headers),
-                        $destination->topicName(),
+                        $destination->exchange(),
                         $destination->routingKey(),
                         $outboundPackage->isMandatory(),
                         $outboundPackage->isImmediate()

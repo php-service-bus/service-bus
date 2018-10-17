@@ -166,7 +166,10 @@ final class EventSourcingProvider
 
                     $afterSave = static function() use ($context, $receivedEvents): \Generator
                     {
-                        yield $context->delivery(... $receivedEvents);
+                        foreach($receivedEvents as $event)
+                        {
+                            yield $context->delivery($event);
+                        }
                     };
 
                     $storedEventStream = $transformer->streamToStoredRepresentation($eventStream);

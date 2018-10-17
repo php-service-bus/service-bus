@@ -18,8 +18,8 @@ use Amp\ByteStream\InputStream;
 use Amp\Promise;
 use Amp\Success;
 use function Desperado\ServiceBus\Common\uuid;
+use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
-use Desperado\ServiceBus\OutboundMessage\Destination;
 
 /**
  *
@@ -65,9 +65,9 @@ final class VirtualIncomingPackage implements IncomingPackage
     /**
      * @inheritDoc
      */
-    public function origin(): Destination
+    public function origin(): TransportLevelDestination
     {
-        return new Destination('virtual', 'virtual');
+        return new VirtualDestination();
     }
 
     /**
