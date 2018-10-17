@@ -148,6 +148,7 @@ services:
         Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
         Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
         Desperado\ServiceBus\Application\EntryPoint: '@Desperado\ServiceBus\Application\EntryPoint'
+        Desperado\ServiceBus\Endpoint\EndpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
 
   # Incoming message decoder
   Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder:
@@ -168,7 +169,6 @@ services:
       - Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader: '@Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader'
         Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader: '@Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader'
         Desperado\ServiceBus\SagaProvider: '@Desperado\ServiceBus\SagaProvider'
-        Desperado\ServiceBus\Endpoint\EndpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
 
   # Message routes configurator
   service_bus.message_routes_configurator:

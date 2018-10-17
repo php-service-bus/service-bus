@@ -182,7 +182,7 @@ final class ServiceBusKernel
         /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
-        $serviceLocator->get(EndpointRouter::class)->add($messageClass, $endpoint);
+        $serviceLocator->get(EndpointRouter::class)->registerRoute($messageClass, $endpoint);
     }
 
     /**

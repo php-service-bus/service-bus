@@ -247,20 +247,10 @@ final class SchedulerProvider
                 {
                     if(null !== $nextOperation)
                     {
-                        $options = new DeliveryOptions(
-                            new MessageRecipient(
-                                ApplicationTransportEndpoint::ENDPOINT_NAME,
-                                /** @todo: fix me */
-                                new AmqpTransportLevelDestination('', '')
-                            )
-                        );
-
-                        $options->makeExpiredAfter(self::calculateExecutionDelay($nextOperation));
-
                         /** Message will return after a specified time interval */
                         yield $context->delivery(
                             EmitSchedulerOperation::create($nextOperation->id()),
-                            $options
+                            new DeliveryOptions(['x-delay' => self::calculateExecutionDelay($nextOperation)])
                         );
                     }
                 }
