@@ -16,12 +16,12 @@ namespace Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore;
 use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
-use function Desperado\ServiceBus\Storage\fetchOne;
-use function Desperado\ServiceBus\Storage\SQL\insertQuery;
-use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
-use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
-use function Desperado\ServiceBus\Storage\SQL\selectQuery;
-use Desperado\ServiceBus\Storage\StorageAdapter;
+use function Desperado\ServiceBus\Infrastructure\Storage\fetchOne;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\insertQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\deleteQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\equalsCriteria;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\selectQuery;
+use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
 
 /**
  * Snapshots storage
@@ -61,7 +61,7 @@ final class SqlSnapshotStore implements SnapshotStore
                     'created_at'         => $aggregateSnapshot->createdAt()
                 ])->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($query->sql(), $query->params());
 
                 unset($query, $resultSet);
@@ -89,7 +89,7 @@ final class SqlSnapshotStore implements SnapshotStore
                     ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)))
                     ->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($query->sql(), $query->params());
 
                 /** @var array|null $data */
@@ -135,7 +135,7 @@ final class SqlSnapshotStore implements SnapshotStore
 
                 $compiledQuery = $deleteQuery->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
                 unset($resultSet, $compiledQuery, $deleteQuery);

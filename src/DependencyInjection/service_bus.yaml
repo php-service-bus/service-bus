@@ -54,11 +54,11 @@ services:
       $logger: '@Psr\Log\LoggerInterface'
 
   # Storage adapter factory
-  Desperado\ServiceBus\Storage\StorageAdapterFactory:
+  Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory:
 
   # Storage adapter
-  Desperado\ServiceBus\Storage\StorageAdapter:
-    factory: 'Desperado\ServiceBus\Storage\StorageAdapterFactory:create'
+  Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter:
+    factory: 'Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory:create'
     arguments:
       $adapter: '%service_bus.storage.adapter%'
       $connectionDSN: '%service_bus.storage.dsn%'
@@ -67,7 +67,7 @@ services:
   Desperado\ServiceBus\Sagas\SagaStore\SagasStore:
     class: Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore
     arguments:
-      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+      $adapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
   # Sagas provider
   Desperado\ServiceBus\SagaProvider:
@@ -101,13 +101,13 @@ services:
   Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore:
     class: Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql\SqlEventStreamStore
     arguments:
-      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+      $adapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
   # Snapshots store
   Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore:
     class: Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SqlSnapshotStore
     arguments:
-      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+      $adapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
   # Snapshots trigger
   Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotTrigger:

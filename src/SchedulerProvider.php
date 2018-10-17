@@ -34,7 +34,7 @@ use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationCanceled;
 use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationEmitted;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
-use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
+use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
 
 /**
  *

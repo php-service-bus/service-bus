@@ -22,14 +22,14 @@ use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Exceptions\ScheduledOperationNotFound;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
-use function Desperado\ServiceBus\Storage\fetchOne;
-use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
-use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
-use function Desperado\ServiceBus\Storage\SQL\insertQuery;
-use function Desperado\ServiceBus\Storage\SQL\selectQuery;
-use function Desperado\ServiceBus\Storage\SQL\updateQuery;
-use Desperado\ServiceBus\Storage\StorageAdapter;
-use Desperado\ServiceBus\Storage\TransactionAdapter;
+use function Desperado\ServiceBus\Infrastructure\Storage\fetchOne;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\deleteQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\equalsCriteria;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\insertQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\selectQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\updateQuery;
+use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
+use Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter;
 
 /**
  *
@@ -60,7 +60,7 @@ final class SqlSchedulerStore implements SchedulerStore
         return call(
             static function(ScheduledOperation $operation, callable $postAdd) use ($adapter): \Generator
             {
-                /** @var \Desperado\ServiceBus\Storage\TransactionAdapter $transaction */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
                 $transaction = yield $adapter->transaction();
 
                 try
@@ -77,7 +77,7 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     $compiledQuery = $insertQuery->compile();
 
-                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                     $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
                     unset($insertQuery, $compiledQuery, $resultSet);
@@ -119,7 +119,7 @@ final class SqlSchedulerStore implements SchedulerStore
         return call(
             static function(ScheduledOperationId $id, callable $postRemove) use ($adapter): \Generator
             {
-                /** @var \Desperado\ServiceBus\Storage\TransactionAdapter $transaction */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
                 $transaction = yield $adapter->transaction();
 
                 try
@@ -130,7 +130,7 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     $compiledQuery = $deleteQuery->compile();
 
-                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                     $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
                     unset($deleteQuery, $compiledQuery, $resultSet);
@@ -181,7 +181,7 @@ final class SqlSchedulerStore implements SchedulerStore
                     );
                 }
 
-                /** @var \Desperado\ServiceBus\Storage\TransactionAdapter $transaction */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
                 $transaction = yield $adapter->transaction();
 
                 try
@@ -192,7 +192,7 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     $compiledQuery = $deleteQuery->compile();
 
-                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                     $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
                     unset($deleteQuery, $compiledQuery, $resultSet);
@@ -240,7 +240,7 @@ final class SqlSchedulerStore implements SchedulerStore
 
                 $compiledQuery = $selectQuery->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
                 /** @var array|null $result */
@@ -259,7 +259,7 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     $compiledQuery = $updateQuery->compile();
 
-                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                     $resultSet    = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
                     $affectedRows = $resultSet->affectedRows();
 
@@ -294,7 +294,7 @@ final class SqlSchedulerStore implements SchedulerStore
 
                 $compiledQuery = $selectQuery->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
                 /** @var array|null $result */

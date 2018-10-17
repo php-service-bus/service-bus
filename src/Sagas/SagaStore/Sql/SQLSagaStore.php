@@ -18,13 +18,13 @@ use Amp\Promise;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
-use function Desperado\ServiceBus\Storage\fetchOne;
-use function Desperado\ServiceBus\Storage\SQL\insertQuery;
-use function Desperado\ServiceBus\Storage\SQL\deleteQuery;
-use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
-use function Desperado\ServiceBus\Storage\SQL\selectQuery;
-use function Desperado\ServiceBus\Storage\SQL\updateQuery;
-use Desperado\ServiceBus\Storage\StorageAdapter;
+use function Desperado\ServiceBus\Infrastructure\Storage\fetchOne;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\insertQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\deleteQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\equalsCriteria;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\selectQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\updateQuery;
+use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
 
 /**
  * Sql sagas storage
@@ -66,7 +66,7 @@ final class SQLSagaStore implements SagasStore
                     'closed_at'        => $storedSaga->formatClosedAt()
                 ])->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($query->sql(), $query->params());
 
                 yield call($afterSaveHandler);
@@ -88,7 +88,7 @@ final class SQLSagaStore implements SagasStore
         return call(
             static function(StoredSaga $storedSaga) use ($adapter, $afterSaveHandler): \Generator
             {
-                /** @var \Desperado\ServiceBus\Storage\TransactionAdapter $transaction */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
                 $transaction = yield $adapter->transaction();
 
                 try
@@ -104,7 +104,7 @@ final class SQLSagaStore implements SagasStore
 
                     $compiledQuery = $updateQuery->compile();
 
-                    /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                    /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                     $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
                     yield call($afterSaveHandler);
@@ -145,7 +145,7 @@ final class SQLSagaStore implements SagasStore
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)))
                     ->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($query->sql(), $query->params());
 
                 /** @var array|null $result */

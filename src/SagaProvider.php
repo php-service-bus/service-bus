@@ -32,7 +32,7 @@ use Desperado\ServiceBus\Sagas\Saga;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
-use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
+use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
 
 /**
  * Saga provider
@@ -239,10 +239,10 @@ final class SagaProvider
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     private function doStore(SagasStore $store, Saga $saga, MessageDeliveryContext $context, bool $isNew): Promise
     {

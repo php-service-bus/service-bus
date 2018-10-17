@@ -17,7 +17,7 @@ use Desperado\ServiceBus\Application\Bootstrap;
 use function Desperado\ServiceBus\Common\removeDirectory;
 use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
-use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use PHPUnit\Framework\TestCase;
 
 /**

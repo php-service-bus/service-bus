@@ -26,7 +26,7 @@ use Desperado\ServiceBus\Sagas\Configuration\SagaListenerOptions;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
-use Desperado\ServiceBus\Storage\StorageAdapterFactory;
+use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;

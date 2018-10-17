@@ -17,21 +17,21 @@ use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed;
-use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
 use function Latitude\QueryBuilder\field;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStream;
-use function Desperado\ServiceBus\Storage\fetchAll;
-use function Desperado\ServiceBus\Storage\fetchOne;
-use function Desperado\ServiceBus\Storage\SQL\insertQuery;
-use function Desperado\ServiceBus\Storage\SQL\equalsCriteria;
-use function Desperado\ServiceBus\Storage\SQL\selectQuery;
-use function Desperado\ServiceBus\Storage\SQL\updateQuery;
-use Desperado\ServiceBus\Storage\StorageAdapter;
-use Desperado\ServiceBus\Storage\TransactionAdapter;
+use function Desperado\ServiceBus\Infrastructure\Storage\fetchAll;
+use function Desperado\ServiceBus\Infrastructure\Storage\fetchOne;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\insertQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\equalsCriteria;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\selectQuery;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\updateQuery;
+use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
+use Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter;
+use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
 
 /**
  * Events storage backend (SQL-based)
@@ -62,7 +62,7 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StoredAggregateEventStream $eventsStream) use ($adapter, $afterSaveHandler): \Generator
             {
-                /** @var \Desperado\ServiceBus\Storage\TransactionAdapter $transaction */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
                 $transaction = yield $adapter->transaction();
 
                 try
@@ -109,7 +109,7 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StoredAggregateEventStream $eventsStream) use ($adapter, $afterSaveHandler): \Generator
             {
-                /** @var \Desperado\ServiceBus\Storage\TransactionAdapter $transaction */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
                 $transaction = yield $adapter->transaction();
 
                 try
@@ -193,7 +193,7 @@ final class SqlEventStreamStore implements AggregateStore
 
                 $compiledQuery = $updateQuery->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
                 unset($resultSet, $updateQuery, $resultSet);
@@ -213,10 +213,10 @@ final class SqlEventStreamStore implements AggregateStore
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     private static function doSaveStream(TransactionAdapter $transaction, StoredAggregateEventStream $eventsStream): Promise
     {
@@ -234,7 +234,7 @@ final class SqlEventStreamStore implements AggregateStore
 
                 $compiledQuery = $insertQuery->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
                 unset($resultSet, $insertQuery, $compiledQuery);
@@ -254,10 +254,10 @@ final class SqlEventStreamStore implements AggregateStore
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     private static function doSaveEvents(TransactionAdapter $transaction, StoredAggregateEventStream $eventsStream): Promise
     {
@@ -368,9 +368,9 @@ final class SqlEventStreamStore implements AggregateStore
      *
      * @return Promise<array<mixed, mixed>>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     private static function doLoadStream(StorageAdapter $adapter, AggregateId $id): Promise
     {
@@ -385,7 +385,7 @@ final class SqlEventStreamStore implements AggregateStore
 
                 $compiledQuery = $selectQuery->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
                 $data = yield fetchOne($resultSet);
@@ -412,9 +412,9 @@ final class SqlEventStreamStore implements AggregateStore
      *
      * @return Promise<array<mixed, array>>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     private static function doLoadStreamEvents(
         StorageAdapter $adapter,
@@ -438,7 +438,7 @@ final class SqlEventStreamStore implements AggregateStore
 
                 $compiledQuery = $selectQuery->compile();
 
-                /** @var \Desperado\ServiceBus\Storage\ResultSet $resultSet */
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
                 $result = yield fetchAll($resultSet);

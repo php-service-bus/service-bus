@@ -16,9 +16,9 @@
       "Desperado\\ServiceBus\\": "src/"
     },
     "files": [
-      "src/Storage/functions.php",
+      "src/Infrastructure/Storage/functions.php",
       "src/DependencyInjection/Compiler/functions.php",
-      "src/Storage/SQL/queryBuilderFunctions.php",
+      "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
       "src/Common/reflectionFunctions.php"
@@ -29,9 +29,9 @@
       "Desperado\\ServiceBus\\Tests\\": "tests/"
     },
     "files": [
-      "src/Storage/functions.php",
+      "src/Infrastructure/Storage/functions.php",
       "src/DependencyInjection/Compiler/functions.php",
-      "src/Storage/SQL/queryBuilderFunctions.php",
+      "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
       "src/Common/reflectionFunctions.php"

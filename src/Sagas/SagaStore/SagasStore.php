@@ -33,10 +33,10 @@ interface SagasStore
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function save(StoredSaga $savedSaga, callable $afterSaveHandler): Promise;
 
@@ -52,9 +52,9 @@ interface SagasStore
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function update(StoredSaga $savedSaga, callable $afterSaveHandler): Promise;
 
@@ -68,9 +68,9 @@ interface SagasStore
      *
      * @return Promise<\Desperado\ServiceBus\Sagas\SagaStore\StoredSaga|null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      * @throws \Desperado\ServiceBus\Sagas\SagaStore\Exceptions\RestoreSagaFailed
      */
     public function load(SagaId $id): Promise;
@@ -85,9 +85,9 @@ interface SagasStore
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function remove(SagaId $id): Promise;
 }
