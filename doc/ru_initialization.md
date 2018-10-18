@@ -27,17 +27,17 @@
 Помимо всего прочего, доступны следующие методы:
 - [enableAutoImportSagas()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L80): Сканирует файлы проекта и автоматически регистрирует все найденные саги
 - [enableAutoImportMessageHandlers()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L112): Сканирует файлы проекта и автоматически регистрирует все найденные обработчики сообщений
-- [useAmqpExtTransport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L136): Конфигурирует RabbitMQ транспорт
-- [useSqlStorage()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L156): Конфигурация SQL базы данных
-- [useCustomCacheDirectory()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L174): Если не указан, то будет использоваться директория по умолчанию (sys_get_temp_dir)
-- [importParameters()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L188): Импортирует параметры в DI-контейнер
-- [addExtensions()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L200): Регистрирует пользовательский [Extension](https://symfony.com/doc/current/bundles/extension.html) в DI-контейнере
-- [addCompilerPasses()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L214): Регистрирует пользовательский [CompilerPass](https://symfony.com/doc/current/service_container/compiler_passes.html)
-- [boot()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L122): Компилирует DI-контейнер
-- [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L94): Включает поддержку планировщика. [Подробнее](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_scheduler.md)
+- [useRabbitMqTransport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L139): Конфигурирует RabbitMQ транспорт
+- [useSqlStorage()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L167): Конфигурация SQL базы данных
+- [useCustomCacheDirectory()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L185): Если не указан, то будет использоваться директория по умолчанию (sys_get_temp_dir)
+- [importParameters()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L199): Импортирует параметры в DI-контейнер
+- [addExtensions()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L211): Регистрирует пользовательский [Extension](https://symfony.com/doc/current/bundles/extension.html) в DI-контейнере
+- [addCompilerPasses()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L225): Регистрирует пользовательский [CompilerPass](https://symfony.com/doc/current/service_container/compiler_passes.html)
+- [boot()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L123): Компилирует DI-контейнер
+- [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L95): Включает поддержку планировщика. [Подробнее](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_scheduler.md)
 
 #### Конфигурация транспорта
-За конфигурацию транспортного уровня отвечает [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), в котором доступен [transport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L188)
+За конфигурацию транспортного уровня отвечает [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), в котором доступен [transport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L194)
 - [createQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L52): Создаёт новую очередь (если не существует)
 - [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L37): Создаёт exchange (если не существует)
 
@@ -45,11 +45,9 @@
 - [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L75): Включить определение блокировки чем-либо эвент лупа
 - [enableGarbageCleaning()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L90): Периодически принудительно вызывает сборщик мусора
 - [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109):  Использовать обработчик для сигнала SIGINT(2) по умолчанию
-- [registerCommandHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L145): Добавить обработчик команды
-- [registerEventListener()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L163): Добавить слушатель события
-- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L177): Указания специфичного маршрута доставки сообщения
-- [listen()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L152): Запуск приложения и подписка на сообщения
-- [stop()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L174): Остановить приложение через N миллисекунд
+- [registerCommandHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L148): Добавить обработчик команды
+- [registerEventListener()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L166): Добавить слушатель события
+- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L183): Указания специфичного маршрута доставки сообщения
 
 
 #### Создание схемы базы данных

@@ -33,7 +33,7 @@ Basically, it is suitable for development of distributed applications. By using 
 
 #### Requirements
   - PHP 7.2
-  - RabbitMQ (You can implement  [Transport](https://github.com/mmasiukevich/service-bus/blob/master/src/Transport/Transport.php) interface)
+  - RabbitMQ (You can implement  [Transport](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php) interface)
   - PostgreSQL [Learn more about adapters](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_storages.md)
 
 

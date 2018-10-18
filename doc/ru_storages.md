@@ -50,10 +50,10 @@
 Для упрощения работы с SQL используется библиотека [shadowhand/latitude](https://github.com/shadowhand/latitude). 
 В рамках приложения поверх неё реализовано несколько функций-помошников:
 
-* [queryBuilder()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/queryBuilderFunctions.php#L29): Создаёт объект билдера запроса для указанного адаптера (по умолчанию PostgreSQL)
-* [equalsCriteria()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/queryBuilderFunctions.php#L42): Условие равенства
-* [notEqualsCriteria()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/queryBuilderFunctions.php#L60): Условия неравенства
-* [selectQuery()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/queryBuilderFunctions.php#L78): Создаёт объект билдера SELECT запроса для PostgreSQL
-* [updateQuery()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/queryBuilderFunctions.php#L91): Создаёт объект билдера UPDATE запроса для PostgreSQL
-* [deleteQuery()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/queryBuilderFunctions.php#L103): Создаёт объект билдера DELETE запроса для PostgreSQL
-* [insertQuery()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/queryBuilderFunctions.php#L116): Создаёт объект билдера INSERT запроса для PostgreSQL
+* [queryBuilder()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/queryBuilderFunctions.php#L32): Создаёт объект билдера запроса для указанного адаптера (по умолчанию PostgreSQL)
+* [equalsCriteria()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/queryBuilderFunctions.php#L45): Условие равенства
+* [notEqualsCriteria()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/queryBuilderFunctions.php#L63): Условия неравенства
+* [selectQuery()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/queryBuilderFunctions.php#L83): Создаёт объект билдера SELECT запроса для PostgreSQL
+* [updateQuery()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/queryBuilderFunctions.php#L96): Создаёт объект билдера UPDATE запроса для PostgreSQL
+* [deleteQuery()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/queryBuilderFunctions.php#L108): Создаёт объект билдера DELETE запроса для PostgreSQL
+* [insertQuery()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/queryBuilderFunctions.php#L121): Создаёт объект билдера INSERT запроса для PostgreSQL
