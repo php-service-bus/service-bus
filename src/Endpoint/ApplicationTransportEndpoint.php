@@ -15,8 +15,6 @@ namespace Desperado\ServiceBus\Endpoint;
 
 use Amp\ByteStream\InMemoryStream;
 use function Amp\call;
-use Amp\Deferred;
-use Amp\Loop;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;

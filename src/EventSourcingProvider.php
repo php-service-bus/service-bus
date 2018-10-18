@@ -164,19 +164,11 @@ final class EventSourcingProvider
                     $eventStream    = invokeReflectionMethod($aggregate, 'makeStream');
                     $receivedEvents = $eventStream->originEvents();
 
-                    $afterSave = static function() use ($context, $receivedEvents): \Generator
-                    {
-                        foreach($receivedEvents as $event)
-                        {
-                            yield $context->delivery($event);
-                        }
-                    };
-
                     $storedEventStream = $transformer->streamToStoredRepresentation($eventStream);
 
                     true === self::isNewEventStream($receivedEvents)
-                        ? yield $storage->saveStream($storedEventStream, $afterSave)
-                        : yield $storage->appendStream($storedEventStream, $afterSave);
+                        ? yield $storage->saveStream($storedEventStream)
+                        : yield $storage->appendStream($storedEventStream);
 
                     /** @var AggregateSnapshot|null $loadedSnapshot */
                     $loadedSnapshot = yield $snapshotter->load($aggregate->id());
@@ -186,7 +178,12 @@ final class EventSourcingProvider
                         yield $snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
                     }
 
-                    unset($eventStream, $receivedEvents, $loadedSnapshot, $afterSave);
+                    foreach($receivedEvents as $event)
+                    {
+                        yield $context->delivery($event);
+                    }
+
+                    unset($eventStream, $receivedEvents, $loadedSnapshot);
                 }
                 catch(NonUniqueStreamId $exception)
                 {

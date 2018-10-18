@@ -54,13 +54,13 @@ final class SqlEventStreamStore implements AggregateStore
     /**
      * @inheritdoc
      */
-    public function saveStream(StoredAggregateEventStream $aggregateEventStream, callable $afterSaveHandler): Promise
+    public function saveStream(StoredAggregateEventStream $aggregateEventStream): Promise
     {
         $adapter = $this->adapter;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(StoredAggregateEventStream $eventsStream) use ($adapter, $afterSaveHandler): \Generator
+            static function(StoredAggregateEventStream $eventsStream) use ($adapter): \Generator
             {
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
                 $transaction = yield $adapter->transaction();
@@ -69,8 +69,6 @@ final class SqlEventStreamStore implements AggregateStore
                 {
                     yield self::doSaveStream($transaction, $eventsStream);
                     yield self::doSaveEvents($transaction, $eventsStream);
-
-                    yield call($afterSaveHandler);
 
                     yield $transaction->commit();
                 }
@@ -101,13 +99,13 @@ final class SqlEventStreamStore implements AggregateStore
     /**
      * @inheritdoc
      */
-    public function appendStream(StoredAggregateEventStream $aggregateEventStream, callable $afterSaveHandler): promise
+    public function appendStream(StoredAggregateEventStream $aggregateEventStream): promise
     {
         $adapter = $this->adapter;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(StoredAggregateEventStream $eventsStream) use ($adapter, $afterSaveHandler): \Generator
+            static function(StoredAggregateEventStream $eventsStream) use ($adapter): \Generator
             {
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
                 $transaction = yield $adapter->transaction();
@@ -115,8 +113,6 @@ final class SqlEventStreamStore implements AggregateStore
                 try
                 {
                     yield self::doSaveEvents($transaction, $eventsStream);
-
-                    yield call($afterSaveHandler);
 
                     yield $transaction->commit();
                 }
