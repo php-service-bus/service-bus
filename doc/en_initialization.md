@@ -87,7 +87,11 @@ include __DIR__ . '/../vendor/autoload.php';
 
 /** @var \Symfony\Component\DependencyInjection\Container $container */
 $container = Bootstrap::withDotEnv(__DIR__ . '/../.env')
-    ->useRabbitMqTransport((string) \getenv('TRANSPORT_CONNECTION_DSN'))
+    ->useRabbitMqTransport(
+        (string) \getenv('TRANSPORT_CONNECTION_DSN'),
+        (string) \getenv('TRANSPORT_TOPIC'),
+        (string) \getenv('TRANSPORT_ROUTING_KEY')
+    )
     ->useSqlStorage(AmpPostgreSQLAdapter::class, (string) \getenv('DATABASE_CONNECTION_DSN'))
     ->useCustomCacheDirectory(__DIR__ . '/../cache')
     ->addExtensions(new ServiceBusDemoExtension())
