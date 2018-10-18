@@ -102,9 +102,11 @@ final class MessageValidationExecutor implements MessageExecutor
         {
             invokeReflectionMethod($context, 'validationFailed', $errors);
         }
+            // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
             /** No exceptions can happen */
         }
+        // @codeCoverageIgnoreEnd
     }
 }

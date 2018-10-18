@@ -32,6 +32,7 @@ use Desperado\ServiceBus\Infrastructure\Transport\QueueBind;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\KernelTestExtension;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerResponseEventCommand;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommand;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\WithValidationCommand;
 use Desperado\ServiceBus\Tests\Stubs\Messages\CommandWithPayload;
 use Desperado\ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
 use Monolog\Handler\TestHandler;
@@ -232,6 +233,39 @@ final class ServiceBusKernelTest extends TestCase
         \reset($records);
 
         static::assertEquals('test exception message', $messageEntry['message']);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function withFailedValidation(): void
+    {
+        $this->sendMessage(new WithValidationCommand(''));
+
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
+
+        $records = $this->logHandler->getRecords();
+
+        $messageEntry = \end($records);
+        \reset($records);
+
+        static::assertFalse($messageEntry['context']['isValid']);
+        static::assertEquals(['This value should not be blank.'], $messageEntry['context']['violations']['value']);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function enableWatchers(): void
+    {
+        $this->kernel->monitorLoopBlock();
+        $this->kernel->enableGarbageCleaning();
     }
 
     /**
