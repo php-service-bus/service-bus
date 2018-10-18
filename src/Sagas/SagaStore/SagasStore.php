@@ -25,8 +25,6 @@ interface SagasStore
      * Save the new saga
      *
      * @param StoredSaga $savedSaga
-     * @param callable   $afterSaveHandler The handler is called after the data is saved. If transactions are supported,
-     *                                     it will be called before the commit
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
@@ -38,14 +36,12 @@ interface SagasStore
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function save(StoredSaga $savedSaga, callable $afterSaveHandler): Promise;
+    public function save(StoredSaga $savedSaga): Promise;
 
     /**
      * Update the status of an existing saga
      *
      * @param StoredSaga $savedSaga
-     * @param callable   $afterSaveHandler The handler is called after the data is saved. If transactions are supported,
-     *                                     it will be called before the commit
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
@@ -56,7 +52,7 @@ interface SagasStore
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function update(StoredSaga $savedSaga, callable $afterSaveHandler): Promise;
+    public function update(StoredSaga $savedSaga): Promise;
 
     /**
      * Load saga

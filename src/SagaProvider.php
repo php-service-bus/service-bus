@@ -270,22 +270,19 @@ final class SagaProvider
                     $closedAt
                 );
 
-                $contextHandler = static function() use ($context, $commands, $events): \Generator
-                {
-                    $messages = \array_merge($commands, $events);
-
-                    foreach($messages as $message)
-                    {
-                        /** @var Message $message */
-                        yield $context->delivery($message);
-                    }
-                };
-
                 true === $isNew
-                    ? yield $store->save($savedSaga, $contextHandler)
-                    : yield $store->update($savedSaga, $contextHandler);
+                    ? yield $store->save($savedSaga)
+                    : yield $store->update($savedSaga);
 
-                unset($commands, $events, $closedAt, $state, $savedSaga, $contextHandler);
+                $messages = \array_merge($commands, $events);
+
+                foreach($messages as $message)
+                {
+                    /** @var Message $message */
+                    yield $context->delivery($message);
+                }
+
+                unset($commands, $events, $messages, $closedAt, $state, $savedSaga, $contextHandler);
 
                 return yield new Success();
             },

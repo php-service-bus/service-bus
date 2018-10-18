@@ -47,13 +47,13 @@ final class SQLSagaStore implements SagasStore
     /**
      * @inheritdoc
      */
-    public function save(StoredSaga $storedSaga, callable $afterSaveHandler): Promise
+    public function save(StoredSaga $storedSaga): Promise
     {
         $adapter = $this->adapter;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(StoredSaga $storedSaga) use ($adapter, $afterSaveHandler): \Generator
+            static function(StoredSaga $storedSaga) use ($adapter): \Generator
             {
                 $query = insertQuery('sagas_store', [
                     'id'               => $storedSaga->id(),
@@ -69,8 +69,6 @@ final class SQLSagaStore implements SagasStore
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($query->sql(), $query->params());
 
-                yield call($afterSaveHandler);
-
                 unset($resultSet, $query);
             },
             $storedSaga
@@ -80,49 +78,29 @@ final class SQLSagaStore implements SagasStore
     /**
      * @inheritdoc
      */
-    public function update(StoredSaga $storedSaga, callable $afterSaveHandler): Promise
+    public function update(StoredSaga $storedSaga): Promise
     {
         $adapter = $this->adapter;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(StoredSaga $storedSaga) use ($adapter, $afterSaveHandler): \Generator
+            static function(StoredSaga $storedSaga) use ($adapter): \Generator
             {
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
-                $transaction = yield $adapter->transaction();
+                /** @psalm-suppress ImplicitToStringCast */
+                $updateQuery = updateQuery('sagas_store', [
+                    'payload'   => $storedSaga->payload(),
+                    'state_id'  => $storedSaga->status(),
+                    'closed_at' => $storedSaga->formatClosedAt()
+                ])
+                    ->where(equalsCriteria('id', $storedSaga->id()))
+                    ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass()));
 
-                try
-                {
-                    /** @psalm-suppress ImplicitToStringCast */
-                    $updateQuery = updateQuery('sagas_store', [
-                        'payload'   => $storedSaga->payload(),
-                        'state_id'  => $storedSaga->status(),
-                        'closed_at' => $storedSaga->formatClosedAt()
-                    ])
-                        ->where(equalsCriteria('id', $storedSaga->id()))
-                        ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass()));
+                $compiledQuery = $updateQuery->compile();
 
-                    $compiledQuery = $updateQuery->compile();
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                    /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                    $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
-
-                    yield call($afterSaveHandler);
-
-                    yield $transaction->commit();
-
-                    unset($resultSet, $updateQuery, $compiledQuery);
-                }
-                catch(\Throwable $throwable)
-                {
-                    yield $transaction->rollback();
-
-                    throw $throwable;
-                }
-                finally
-                {
-                    unset($transaction);
-                }
+                unset($resultSet, $updateQuery, $compiledQuery);
             },
             $storedSaga
         );
