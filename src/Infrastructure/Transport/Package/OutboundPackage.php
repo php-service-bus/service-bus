@@ -71,6 +71,13 @@ final class OutboundPackage
     private $expiredAfter;
 
     /**
+     * Trace operation id
+     *
+     * @var string|null
+     */
+    private $traceId;
+
+    /**
      * @param InputStream               $payload
      * @param array                     $headers
      * @param TransportLevelDestination $destination
@@ -142,6 +149,28 @@ final class OutboundPackage
     public function headers(): array
     {
         return $this->headers;
+    }
+
+    /**
+     * Receive trace id
+     *
+     * @return string|null
+     */
+    public function traceId(): ?string
+    {
+        return $this->traceId;
+    }
+
+    /**
+     * Apply trace id
+     *
+     * @param string $id
+     *
+     * @return void
+     */
+    public function withTraceId(string $id): void
+    {
+        $this->traceId = $id;
     }
 
     /**

@@ -30,7 +30,7 @@ final class DeliveryOptions
      *
      * @var bool
      */
-    private $isPersistent = false;
+    private $isPersistent = true;
 
     /**
      * The message must be sent to the existing recipient
@@ -52,6 +52,13 @@ final class DeliveryOptions
      * @var int|null
      */
     private $expiredAfter;
+
+    /**
+     * Trace operation id
+     *
+     * @var string|null
+     */
+    private $traceId;
 
     /**
      * @param array<string, string> $headers
@@ -104,6 +111,29 @@ final class DeliveryOptions
     }
 
     /**
+     * Receive trace id
+     *
+     * @return string|null
+     */
+    public function traceId(): ?string
+    {
+        return $this->traceId;
+    }
+
+    /**
+     * Apply trace id
+     * By default, the incoming message ID will be assigned
+     *
+     * @param string $id
+     *
+     * @return void
+     */
+    public function withCustomTraceId(string $id): void
+    {
+        $this->traceId = $id;
+    }
+
+    /**
      * Add headers to sent
      *
      * @param array<string, string> $headers
@@ -112,7 +142,7 @@ final class DeliveryOptions
      */
     public function withHeaders(array $headers): self
     {
-        $this->headers = $headers;
+        $this->headers = \array_merge($this->headers, $headers);
 
         return $this;
     }

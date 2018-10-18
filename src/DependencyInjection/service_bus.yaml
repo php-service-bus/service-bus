@@ -3,7 +3,6 @@ parameters:
   service_bus.services_map: []
   service_bus.default_destination_topic: ''
   service_bus.default_destination_key: ''
-
 services:
   _defaults:
     autowire: false

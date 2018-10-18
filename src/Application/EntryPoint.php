@@ -151,7 +151,7 @@ final class EntryPoint
         $endpointRouter = $this->endpointRouter;
 
         /** Hack for phpunit tests */
-        $isTestCall = (bool) (int) \getenv('SERVICE_BUS_TESTING');
+        $isTestCall = 'phpunitTests' === (string) \getenv('SERVICE_BUS_TESTING');
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
@@ -168,7 +168,13 @@ final class EntryPoint
                     try
                     {
                         /** @var \Desperado\ServiceBus\Common\Contract\Messages\Message $message */
-                        $message  = yield $decoder->decode($package);
+                        $message = yield $decoder->decode($package);
+
+                        $logger->debug('Dispatch "{messageClass}" message', [
+                            'operationId'  => $package->id(),
+                            'messageClass' => \get_class($message)
+                        ]);
+
                         $handlers = $router->match($message);
 
                         $context = new KernelContext($package, $endpointRouter, $logger);
@@ -179,9 +185,8 @@ final class EntryPoint
                             ]
                         );
 
-                        yield $executor->process($message, $context, $handlers);
-
                         yield $package->ack();
+                        yield $executor->process($message, $context, $handlers);
 
                         unset($handlers, $message, $context);
                     }

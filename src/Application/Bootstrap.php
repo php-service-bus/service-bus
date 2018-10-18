@@ -130,13 +130,23 @@ final class Bootstrap
     /**
      * Use RabbitMQ transport
      *
-     * @param string $connectionDSN
+     * @param string      $connectionDSN
+     * @param string      $endpointExchange
+     * @param string|null $endpointRoutingKey
      *
      * @return $this
      */
-    public function useRabbitMqTransport(string $connectionDSN): self
+    public function useRabbitMqTransport(
+        string $connectionDSN,
+        string $endpointExchange,
+        ?string $endpointRoutingKey
+    ): self
     {
-        $this->containerBuilder->addParameters(['service_bus.transport.dsn' => $connectionDSN]);
+        $this->containerBuilder->addParameters([
+            'service_bus.transport.dsn'             => $connectionDSN,
+            'service_bus.default_destination_topic' => $endpointExchange,
+            'service_bus.default_destination_key'   => $endpointRoutingKey
+        ]);
 
         return $this;
     }

@@ -144,6 +144,12 @@ final class BunnyConsumer
                 {
                     $package = BunnyIncomingPackage::received($channel, $envelope);
 
+                    $logger->debug('New message received', [
+                        'operationId'       => $package->id(),
+                        'rawMessagePayload' => $envelope->content,
+                        'rawMessageHeaders' => $envelope->headers
+                    ]);
+
                     asyncCall($onMessageReceived, $package);
 
                     unset($package);

@@ -183,9 +183,10 @@ final class ContainerBuilder
      */
     public function build(): ContainerInterface
     {
-        $containerParameters                            = \iterator_to_array($this->parameters);
-        $containerParameters['service_bus.environment'] = (string) $this->environment;
-        $containerParameters['service_bus.entry_point'] = $this->entryPointName;
+        $this->parameters->add('service_bus.environment', (string) $this->environment);
+        $this->parameters->add('service_bus.entry_point', $this->entryPointName);
+
+        $containerParameters = \iterator_to_array($this->parameters);
 
         $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($containerParameters));
 

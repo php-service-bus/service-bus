@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Endpoint;
 
 use Amp\ByteStream\InMemoryStream;
+use function Amp\call;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
@@ -79,35 +80,22 @@ final class ApplicationTransportEndpoint implements Endpoint
      */
     public function delivery(Message $message, DeliveryOptions $options): Promise
     {
-        $deferred = new Deferred();
-
         $transport = $this->transport;
         $encoder   = $this->encoder;
 
-        $destination = $this->destination;
-
-         Loop::defer(
-            static function() use ($deferred, $message, $options, $transport, $encoder, $destination): \Generator
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+           static function(Message $message, DeliveryOptions $options, AmqpTransportLevelDestination $destination) use ($transport, $encoder)
             {
-                try
-                {
-                    $encoded = $encoder->encode($message);
-                    $package = self::createPackage($encoded, $options, $destination);
+                $encoded = $encoder->encode($message);
+                $package = self::createPackage($encoded, $options, $destination);
 
-                    yield $transport->send($package);
+                yield $transport->send($package);
 
-                    $deferred->resolve();
-
-                    unset($encoded, $package);
-                }
-                catch(\Throwable $throwable)
-                {
-                    $deferred->resolve($throwable);
-                }
-            }
+                unset($encoded, $package);
+            },
+            $message, $options, $this->destination
         );
-
-        return $deferred->promise();
     }
 
     /**
@@ -131,10 +119,14 @@ final class ApplicationTransportEndpoint implements Endpoint
             $destination
         );
 
+        /** @var string $operationId */
+        $operationId = $options->traceId();
+
         $package->setExpiredAfter($options->expiredAfter());
         $package->setIsImmediate($options->isImmediate());
         $package->setIsMandatory($options->isMandatory());
         $package->setIsPersistent($options->isPersistent());
+        $package->withTraceId($operationId);
 
         return $package;
     }

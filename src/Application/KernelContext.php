@@ -118,19 +118,37 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     {
         $messageClass = \get_class($message);
         $endpoints    = $this->endpointRouter->route($messageClass);
+        $logger       = $this->logger;
+        $operationId  = $this->incomingPackage->id();
+
+        $options = $deliveryOptions ?? new DeliveryOptions();
+
+        if(null === $options->traceId())
+        {
+            $options->withCustomTraceId($operationId);
+        }
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Message $message, DeliveryOptions $options) use ($endpoints): \Generator
+            static function(Message $message, DeliveryOptions $options) use ($endpoints, $logger, $operationId): \Generator
             {
                 foreach($endpoints as $endpoint)
                 {
                     /** @var \Desperado\ServiceBus\Endpoint\Endpoint $endpoint */
 
+                    /** @noinspection DisconnectedForeachInstructionInspection */
+                    $logger->debug(
+                        'Send message "{messageClass}" to "{entryPoint}" entry point', [
+                            'operationId'  => $operationId,
+                            'messageClass' => \get_class($message),
+                            'entryPoint'   => $endpoint->name()
+                        ]
+                    );
+
                     yield $endpoint->delivery($message, $options);
                 }
             },
-            $message, $deliveryOptions ?? new DeliveryOptions()
+            $message, $options
         );
     }
 

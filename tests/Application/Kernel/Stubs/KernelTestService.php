@@ -62,23 +62,6 @@ final class KernelTestService
     /**
      * @CommandHandler()
      *
-     * @param TriggerFailedResponseMessageSendCommand $command
-     * @param KernelContext                           $context
-     *
-     * @return \Generator
-     */
-    public function deliveryFailed(
-        /** @noinspection PhpUnusedParameterInspection */
-        TriggerFailedResponseMessageSendCommand $command,
-        KernelContext $context
-    ): \Generator
-    {
-        yield $context->delivery(new FailedMessageSendMarkerEvent());
-    }
-
-    /**
-     * @CommandHandler()
-     *
      * @param SecondEmptyCommand $command
      * @param KernelContext      $context
      *

@@ -18,8 +18,8 @@ use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompi
 use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use Desperado\ServiceBus\SagaProvider;
-use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\MessageHandlerService;
 use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\SomeTestService;
 use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\TestCompilerPass;

@@ -30,7 +30,10 @@ use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransp
 use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\QueueBind;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\KernelTestExtension;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerResponseEventCommand;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommand;
 use Desperado\ServiceBus\Tests\Stubs\Messages\CommandWithPayload;
+use Desperado\ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -81,7 +84,11 @@ final class ServiceBusKernelTest extends TestCase
         $bootstrap->useCustomCacheDirectory($this->cacheDirectory);
         $bootstrap->addExtensions(new ServiceBusExtension(), new KernelTestExtension());
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
-        $bootstrap->useRabbitMqTransport(\getenv('TRANSPORT_CONNECTION_DSN'));
+        $bootstrap->useRabbitMqTransport(
+            \getenv('TRANSPORT_CONNECTION_DSN'),
+            'test_topic',
+            'tests'
+        );
 
         $this->container = $bootstrap->boot();
 
@@ -138,7 +145,7 @@ final class ServiceBusKernelTest extends TestCase
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
-        static::assertCount(4, $records);
+        static::assertCount(7, $records);
 
         $latest = \end($records);
 
@@ -146,6 +153,85 @@ final class ServiceBusKernelTest extends TestCase
             'There are no handlers configured for the message "{messageClass}"',
             $latest['message']
         );
+
+        static::assertEquals($latest['context']['messageClass'], CommandWithPayload::class);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function listenFailedMessageExecution(): void
+    {
+        $this->sendMessage(new TriggerThrowableCommand());
+
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
+
+        $records = $this->logHandler->getRecords();
+
+        static::assertNotEmpty($records);
+        static::assertCount(8, $records);
+
+        $latest = \end($records);
+        \reset($records);
+
+        static::assertEquals('Execution completed with errors', $latest['message']);
+
+        $previous = $records[\count($records) - 2];
+
+        static::assertEquals(
+            'When executing the message "{messageClass}" errors occurred: "{throwableMessage}"',
+            $previous['message']
+        );
+
+        static::assertEquals(TriggerThrowableCommand::class, $previous['context']['messageClass']);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function successExecutionWithResponseMessage(): void
+    {
+        $this->sendMessage(new TriggerResponseEventCommand());
+
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
+
+        $records = $this->logHandler->getRecords();
+
+        $latest = \end($records);
+
+        static::assertEquals('Publish message to "{rabbitMqExchange}" with routing key "{rabbitMqRoutingKey}"', $latest['message']);
+        static::assertEquals('test_topic', $latest['context']['rabbitMqExchange']);
+        static::assertEquals('tests', $latest['context']['rabbitMqRoutingKey']);
+        static::assertEquals(['delivery-mode' => 2], $latest['context']['headers']);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function contextLogging(): void
+    {
+        $this->sendMessage(new SecondEmptyCommand());
+
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
+
+        $records = $this->logHandler->getRecords();
+
+        $messageEntry = \end($records);
+        \reset($records);
+
+        static::assertEquals('test exception message', $messageEntry['message']);
     }
 
     /**

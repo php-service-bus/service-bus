@@ -49,10 +49,12 @@ final class DefaultMessageExecutor implements MessageExecutor
         Loop::defer(
             static function() use ($deferred, $message, $context, $handlers, $logger): \Generator
             {
+                $messageClass = \get_class($message);
+
                 if(0 === \count($handlers))
                 {
                     $logger->debug('There are no handlers configured for the message "{messageClass}"', [
-                        'messageClass' => \get_class($message),
+                        'messageClass' => $messageClass,
                         'operationId'  => $context->operationId()
                     ]);
 
@@ -61,7 +63,7 @@ final class DefaultMessageExecutor implements MessageExecutor
                     return;
                 }
 
-                $errors = [];
+                $errors = 0;
 
                 foreach($handlers as $handler)
                 {
@@ -73,29 +75,22 @@ final class DefaultMessageExecutor implements MessageExecutor
                     }
                     catch(\Throwable $throwable)
                     {
-                        $errors[] = \sprintf(
-                            '%s (%s:%d)',
-                            $throwable->getMessage(), $throwable->getFile(), $throwable->getLine()
+                        $errors++;
+
+                        $logger->error(
+                            'When executing the message "{messageClass}" errors occurred: "{throwableMessage}"', [
+                                'operationId'    => $context->operationId(),
+                                'messageClass'   => $messageClass,
+                                'throwableMessage' => $throwable->getMessage(),
+                                'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                            ]
                         );
                     }
                 }
 
-                if(0 !== \count($errors))
-                {
-                    $deferred->fail(
-                        new \RuntimeException(
-                            \sprintf(
-                                'When executing the message "%s" errors occurred: %s',
-                                \get_class($message),
-                                \implode('; ', $errors)
-                            )
-                        )
-                    );
-                }
-                else
-                {
-                    $deferred->resolve();
-                }
+                0 !== $errors
+                    ? $deferred->fail(new \RuntimeException('Execution completed with errors'))
+                    : $deferred->resolve();
             }
         );
 

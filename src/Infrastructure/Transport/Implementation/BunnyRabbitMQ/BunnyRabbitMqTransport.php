@@ -209,22 +209,36 @@ final class BunnyRabbitMqTransport implements Transport
     public function send(OutboundPackage $outboundPackage): Promise
     {
         $channel  = $this->channel;
+        $logger   = $this->logger;
         $deferred = new Deferred();
 
         Loop::defer(
-            static function() use ($channel, $outboundPackage, $deferred): \Generator
+            static function() use ($channel, $outboundPackage, $logger, $deferred): \Generator
             {
                 try
                 {
                     /** @var \Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination $destination */
                     $destination = $outboundPackage->destination();
-                    $headers     = \array_merge($outboundPackage->headers(), [
+                    $headers     = \array_filter(\array_merge($outboundPackage->headers(), [
                         'delivery-mode' => true === $outboundPackage->isPersistent() ? self::AMQP_DURABLE : null,
                         'expiration'    => $outboundPackage->expiredAfter()
+                    ]));
+
+                    $content = yield $outboundPackage->payload()->read();
+
+                    $logger->debug('Publish message to "{rabbitMqExchange}" with routing key "{rabbitMqRoutingKey}"', [
+                        'operationId'        => $outboundPackage->traceId(),
+                        'rabbitMqExchange'   => $destination->exchange(),
+                        'rabbitMqRoutingKey' => $destination->routingKey(),
+                        'content'            => $content,
+                        'headers'            => $headers,
+                        'isMandatory'        => $outboundPackage->isMandatory(),
+                        'isImmediate'        => $outboundPackage->isImmediate(),
+                        'expiredAt'          => $outboundPackage->expiredAfter()
                     ]);
 
                     yield $channel->publish(
-                        yield $outboundPackage->payload()->read(),
+                        $content,
                         \array_filter($headers),
                         $destination->exchange(),
                         $destination->routingKey(),
