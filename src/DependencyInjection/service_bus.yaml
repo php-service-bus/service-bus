@@ -148,6 +148,7 @@ services:
         Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
         Desperado\ServiceBus\Application\EntryPoint: '@Desperado\ServiceBus\Application\EntryPoint'
         Desperado\ServiceBus\Endpoint\EndpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
+        Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
   # Incoming message decoder
   Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder:
