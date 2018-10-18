@@ -380,11 +380,11 @@ final class BunnyRabbitMqTransport implements Transport
             {
                 /** @var \Desperado\ServiceBus\Infrastructure\Transport\TopicBind $bind */
 
-                /** @var AmqpExchange $destinationExchange */
-                $destinationExchange = $bind->topic();
+                /** @var AmqpExchange $bindedExchange */
+                $sourceExchange = $bind->topic();
 
-                yield new Coroutine(self::doCreateExchange($channel, $destinationExchange));
-                yield $channel->exchangeBind((string) $exchange, (string) $destinationExchange, $bind->routingKey());
+                yield new Coroutine(self::doCreateExchange($channel, $sourceExchange));
+                yield $channel->exchangeBind((string) $sourceExchange, (string) $exchange, $bind->routingKey());
             }
         }
         catch(\Throwable $throwable)
