@@ -60,6 +60,7 @@ final class SchedulerListener
 
             return $promise;
         }
+            // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
             $context->logContextMessage(
@@ -72,6 +73,7 @@ final class SchedulerListener
         }
 
         return new Success();
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -175,6 +177,7 @@ final class SchedulerListener
 
                 return $promise;
             }
+                // @codeCoverageIgnoreStart
             catch(\Throwable $throwable)
             {
                 return new Failure($throwable);
@@ -184,5 +187,6 @@ final class SchedulerListener
         return new Failure(
             new \LogicException('Invalid event type specified')
         );
+        // @codeCoverageIgnoreEnd
     }
 }

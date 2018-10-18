@@ -60,24 +60,7 @@ final class KernelTestService
     }
 
     /**
-     * @CommandHandler()
-     *
-     * @param TriggerFailedResponseMessageSendCommand $command
-     * @param KernelContext                           $context
-     *
-     * @return \Generator
-     */
-    public function deliveryFailed(
-        /** @noinspection PhpUnusedParameterInspection */
-        TriggerFailedResponseMessageSendCommand $command,
-        KernelContext $context
-    ): \Generator
-    {
-        yield $context->delivery(new FailedMessageSendMarkerEvent());
-    }
-
-    /**
-     * @CommandHandler()
+     * @CommandHandler(validate=true)
      *
      * @param SecondEmptyCommand $command
      * @param KernelContext      $context
@@ -91,5 +74,24 @@ final class KernelTestService
     {
         $context->logContextMessage('Test message', ['qwerty' => \get_class($command)]);
         $context->logContextThrowable(new \RuntimeException('test exception message'));
+    }
+
+    /**
+     * @CommandHandler(validate=true)
+     *
+     * @param WithValidationCommand $command
+     * @param KernelContext         $context
+     *
+     * @return void
+     */
+    public function withFailedValidation(
+        WithValidationCommand $command,
+        KernelContext $context
+    ): void
+    {
+        $context->logContextMessage(\get_class($command), [
+            'isValid'    => $context->isValid(),
+            'violations' => $context->violations()
+        ]);
     }
 }

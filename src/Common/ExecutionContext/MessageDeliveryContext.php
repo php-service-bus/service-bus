@@ -14,9 +14,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Common\ExecutionContext;
 
 use Amp\Promise;
-use Desperado\ServiceBus\Common\Contract\Messages\Command;
-use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use Desperado\ServiceBus\Endpoint\DeliveryOptions;
 
 /**
  *
@@ -28,31 +27,9 @@ interface MessageDeliveryContext
      *
      * @noinspection PhpDocSignatureInspection
      *
-     * @param Message ...$messages
+     * @param Message $message
      *
      * @return Promise<null>
      */
-    public function delivery(Message ...$messages): Promise;
-
-    /**
-     * Send command with specified options
-     *
-     * @noinspection PhpDocSignatureInspection
-     *
-     * @param Command            headers
-     * @param array $headers
-     *
-     * @return Promise<null>
-     */
-    public function send(Command $command, array $headers = []): Promise;
-
-    /**
-     * Publish event with specified headers
-     *
-     * @param Event $event
-     * @param array $headers
-     *
-     * @return Promise<null>
-     */
-    public function publish(Event $event, array $headers = []): Promise;
+    public function delivery(Message $message, ?DeliveryOptions $options = null): Promise;
 }

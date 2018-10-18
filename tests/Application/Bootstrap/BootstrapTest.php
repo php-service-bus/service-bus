@@ -17,7 +17,7 @@ use Desperado\ServiceBus\Application\Bootstrap;
 use function Desperado\ServiceBus\Common\removeDirectory;
 use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
-use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -72,7 +72,12 @@ final class BootstrapTest extends TestCase
         $bootstrap->importParameters(['qwerty' => 'root']);
 
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
-        $bootstrap->useAmqpExtTransport(\getenv('TRANSPORT_CONNECTION_DSN'));
+
+        $bootstrap->useRabbitMqTransport(
+            \getenv('TRANSPORT_CONNECTION_DSN'),
+            '',
+            ''
+        );
 
         /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $bootstrap->boot();
@@ -102,7 +107,9 @@ final class BootstrapTest extends TestCase
         $bootstrap->importParameters(['qwerty1' => 'root1']);
 
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
-        $bootstrap->useAmqpExtTransport(\getenv('TRANSPORT_CONNECTION_DSN'));
+        $bootstrap->useRabbitMqTransport(
+            \getenv('TRANSPORT_CONNECTION_DSN'), '',''
+        );
 
         /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $bootstrap->boot();

@@ -13,28 +13,28 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Application\Kernel;
 
-use Amp\Loop;
+use Amp\ByteStream\InMemoryStream;
+use function Amp\Promise\wait;
+use Bunny\Channel;
 use Desperado\ServiceBus\Application\Bootstrap;
 use Desperado\ServiceBus\Application\ServiceBusKernel;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use function Desperado\ServiceBus\Common\removeDirectory;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
-use Desperado\ServiceBus\OutboundMessage\Destination;
-use Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
-use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\FailedMessageSendMarkerEvent;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpExchange;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpQueue;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination;
+use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
+use Desperado\ServiceBus\Infrastructure\Transport\QueueBind;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\KernelTestExtension;
-use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\SuccessResponseEvent;
-use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerFailedResponseMessageSendCommand;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerResponseEventCommand;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommand;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\WithValidationCommand;
 use Desperado\ServiceBus\Tests\Stubs\Messages\CommandWithPayload;
-use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
 use Desperado\ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
-use Desperado\ServiceBus\Tests\Stubs\Transport\VirtualQueue;
-use Desperado\ServiceBus\Tests\Stubs\Transport\VirtualTopic;
-use Desperado\ServiceBus\Tests\Stubs\Transport\VirtualTransportBuffer;
-use Desperado\ServiceBus\Transport\Marshal\Encoder\JsonMessageEncoder;
-use Desperado\ServiceBus\Transport\QueueBind;
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -85,24 +85,20 @@ final class ServiceBusKernelTest extends TestCase
         $bootstrap->useCustomCacheDirectory($this->cacheDirectory);
         $bootstrap->addExtensions(new ServiceBusExtension(), new KernelTestExtension());
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
+        $bootstrap->useRabbitMqTransport(
+            \getenv('TRANSPORT_CONNECTION_DSN'),
+            'test_topic',
+            'tests'
+        );
 
         $this->container = $bootstrap->boot();
 
         $this->kernel = new ServiceBusKernel($this->container);
 
-        $topic = new VirtualTopic('test_topic');
-        $queue = new VirtualQueue('test_queue');
+        $topic = AmqpExchange::direct('test_topic');
+        $queue = new AmqpQueue('test_queue');
 
-        $defaultOutboundDestination = new Destination('test_topic', 'test_key');
-        $customOutboundDestination  = new Destination('custom_test_topic', 'custom_test_key');
-
-        $this->kernel
-            ->transportConfigurator()
-            ->createTopic($topic)
-            ->addQueue($queue)
-            ->bindQueue(new QueueBind($queue, $topic, 'test_key'))
-            ->addDefaultDestinations($defaultOutboundDestination)
-            ->registerCustomMessageDestinations(FirstEmptyEvent::class, $customOutboundDestination);
+        wait($this->kernel->transport()->createQueue($queue, new QueueBind($topic, 'tests')));
 
         $this->logHandler = $this->container->get(TestHandler::class);
     }
@@ -114,11 +110,24 @@ final class ServiceBusKernelTest extends TestCase
     {
         parent::tearDown();
 
-        VirtualTransportBuffer::reset();
+        try
+        {
+            /** @var Channel $channel */
+            $channel = readReflectionPropertyValue($this->kernel->transport(), 'channel');
 
-        removeDirectory($this->cacheDirectory);
+            wait($channel->exchangeDelete('test_topic'));
+            wait($channel->queueDelete('test_queue'));
 
-        unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
+            wait($this->kernel->transport()->disconnect());
+
+            removeDirectory($this->cacheDirectory);
+
+            unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
+        }
+        catch(\Throwable $throwable)
+        {
+
+        }
     }
 
     /**
@@ -132,19 +141,21 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new CommandWithPayload('payload'));
 
-        $this->kernel->listen(new VirtualQueue('test_queue'));
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
 
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
-        static::assertCount(4, $records);
+        static::assertCount(7, $records);
 
         $latest = \end($records);
 
         static::assertEquals(
-            'There are no handlers configured for the message "Desperado\\ServiceBus\\Tests\\Stubs\\Messages\\CommandWithPayload"',
+            'There are no handlers configured for the message "{messageClass}"',
             $latest['message']
         );
+
+        static::assertEquals($latest['context']['messageClass'], CommandWithPayload::class);
     }
 
     /**
@@ -158,19 +169,26 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new TriggerThrowableCommand());
 
-        $this->kernel->disableMessagesPayloadLogging();
-        $this->kernel->listen(new VirtualQueue('test_queue'));
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
+
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
-        static::assertCount(3, $records);
+        static::assertCount(8, $records);
 
         $latest = \end($records);
+        \reset($records);
+
+        static::assertEquals('Execution completed with errors', $latest['message']);
+
+        $previous = $records[\count($records) - 2];
 
         static::assertEquals(
-            'Desperado\\ServiceBus\\Tests\\Application\\Kernel\\Stubs\\KernelTestService::handleWithThrowable',
-            $latest['message']
+            'When executing the message "{messageClass}" errors occurred: "{throwableMessage}"',
+            $previous['message']
         );
+
+        static::assertEquals(TriggerThrowableCommand::class, $previous['context']['messageClass']);
     }
 
     /**
@@ -184,70 +202,16 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new TriggerResponseEventCommand());
 
-        $this->kernel->disableMessagesPayloadLogging();
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
 
-        $this->kernel->listen(new VirtualQueue('test_queue'));
         $records = $this->logHandler->getRecords();
-
-        static::assertNotEmpty($records);
-        static::assertCount(3, $records);
 
         $latest = \end($records);
 
-        static::assertEquals(
-            'Sending a "{messageClass}" message to "{destinationTopic}/{destinationRoutingKey}"',
-            $latest['message']
-        );
-
-        static::assertEquals(
-            [
-                'messageClass'          => SuccessResponseEvent::class,
-                'destinationTopic'      => 'test_topic',
-                'destinationRoutingKey' => 'test_key',
-                'headers'               => [
-                    'x-message-class'         => SuccessResponseEvent::class,
-                    'x-created-after-message' => TriggerResponseEventCommand::class,
-                    'x-hostname'              => \gethostname()
-                ]
-            ],
-            $latest['context']
-        );
-    }
-
-    /**
-     * @test
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function failedResponseDelivery(): void
-    {
-        $this->sendMessage(new TriggerFailedResponseMessageSendCommand());
-
-        $this->kernel->listen(new VirtualQueue('test_queue'));
-        $records = $this->logHandler->getRecords();
-
-        static::assertNotEmpty($records);
-        static::assertCount(7, $records);
-
-        $messageEntry = $records[\count($records) - 2];
-
-        /** @see VirtualPublisher::send() */
-        static::assertEquals(
-            'Error sending message "{messageClass}" to broker: "{throwableMessage}"',
-            $messageEntry['message']
-        );
-
-        unset($messageEntry['context']['throwablePoint']);
-
-        static::assertEquals(
-            [
-                'messageClass'     => FailedMessageSendMarkerEvent::class,
-                'throwableMessage' => 'shit happens'
-            ],
-            $messageEntry['context']
-        );
+        static::assertEquals('Publish message to "{rabbitMqExchange}" with routing key "{rabbitMqRoutingKey}"', $latest['message']);
+        static::assertEquals('test_topic', $latest['context']['rabbitMqExchange']);
+        static::assertEquals('tests', $latest['context']['rabbitMqRoutingKey']);
+        static::assertEquals(['delivery-mode' => 2], $latest['context']['headers']);
     }
 
     /**
@@ -261,20 +225,50 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new SecondEmptyCommand());
 
-        $this->kernel->listen(new VirtualQueue('test_queue'));
-        $records = $this->logHandler->getRecords();
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
 
-        static::assertNotEmpty($records);
-        static::assertCount(5, $records);
+        $records = $this->logHandler->getRecords();
 
         $messageEntry = \end($records);
         \reset($records);
 
         static::assertEquals('test exception message', $messageEntry['message']);
+    }
 
-        $messageEntry = $records[\count($records) - 2];
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function withFailedValidation(): void
+    {
+        $this->sendMessage(new WithValidationCommand(''));
 
-        static::assertEquals('Test message', $messageEntry['message']);
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
+
+        $records = $this->logHandler->getRecords();
+
+        $messageEntry = \end($records);
+        \reset($records);
+
+        static::assertFalse($messageEntry['context']['isValid']);
+        static::assertEquals(['This value should not be blank.'], $messageEntry['context']['violations']['value']);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function enableWatchers(): void
+    {
+        $this->kernel->monitorLoopBlock();
+        $this->kernel->enableGarbageCleaning();
+        $this->kernel->useDefaultStopSignalHandler();
     }
 
     /**
@@ -282,14 +276,21 @@ final class ServiceBusKernelTest extends TestCase
      * @param array   $headers
      *
      * @return void
+     *
+     * @throws \Throwable
      */
     private function sendMessage(Message $message, array $headers = []): void
     {
-        $encoder = new JsonMessageEncoder();
+        $encoder = new SymfonyMessageSerializer();
 
-        VirtualTransportBuffer::instance()->add(
-            $encoder->encode($message),
-            $headers
+        $promise = $this->kernel->transport()->send(
+            new OutboundPackage(
+                new InMemoryStream($encoder->encode($message)),
+                $headers,
+                new AmqpTransportLevelDestination('test_topic', 'tests')
+            )
         );
+
+        wait($promise);
     }
 }

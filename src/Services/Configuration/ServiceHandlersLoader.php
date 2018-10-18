@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Services\Configuration;
 
-use Desperado\ServiceBus\MessageBus\MessageHandler\HandlerCollection;
+use Desperado\ServiceBus\MessageHandlers\HandlerCollection;
 
 /**
  * Retrieving a list of message handlers for the specified object
@@ -26,8 +26,6 @@ interface ServiceHandlersLoader
      * @param object $service
      *
      * @return HandlerCollection
-     *
-     * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
      */
     public function load(object $service): HandlerCollection;
 }

@@ -20,12 +20,12 @@ use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use Desperado\ServiceBus\DependencyInjection\Extensions\SchedulerExtension;
 use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  *
@@ -128,15 +128,25 @@ final class Bootstrap
     }
 
     /**
-     * Use amqp-ext transport
+     * Use RabbitMQ transport
      *
-     * @param string $connectionDSN
+     * @param string      $connectionDSN
+     * @param string      $endpointExchange
+     * @param string|null $endpointRoutingKey
      *
      * @return $this
      */
-    public function useAmqpExtTransport(string $connectionDSN): self
+    public function useRabbitMqTransport(
+        string $connectionDSN,
+        string $endpointExchange,
+        ?string $endpointRoutingKey
+    ): self
     {
-        $this->containerBuilder->addParameters(['service_bus.transport.dsn' => $connectionDSN]);
+        $this->containerBuilder->addParameters([
+            'service_bus.transport.dsn'             => $connectionDSN,
+            'service_bus.default_destination_topic' => $endpointExchange,
+            'service_bus.default_destination_key'   => $endpointRoutingKey
+        ]);
 
         return $this;
     }
@@ -245,7 +255,7 @@ final class Bootstrap
         /**
          * @noinspection ForgottenDebugOutputInspection
          *
-         * @todo: remove SymfonyDebug
+         * @todo         : remove SymfonyDebug
          *
          * It is necessary for the correct handling of mistakes concealed by the "@"
          */

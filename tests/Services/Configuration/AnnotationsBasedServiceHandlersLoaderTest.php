@@ -79,7 +79,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              */
             public function firstEventListener(FirstEmptyEvent $event, TestContext $context): Promise
             {
-                return new Success();
+                return new Success([$event, $context]);
             }
 
             /**
@@ -92,7 +92,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              */
             public function secondEventListener(FirstEmptyEvent $event, TestContext $context): \Generator
             {
-                yield from [];
+                yield from [$event, $context];
             }
 
             /**
@@ -116,7 +116,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
 
         foreach($handlers as $handler)
         {
-            /** @var \Desperado\ServiceBus\MessageBus\MessageHandler\Handler $handler */
+            /** @var \Desperado\ServiceBus\MessageHandlers\Handler $handler */
 
             $options = $handler->options();
 

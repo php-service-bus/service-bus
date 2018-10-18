@@ -19,8 +19,8 @@ use Desperado\ServiceBus\Index\IndexKey;
 use Desperado\ServiceBus\Index\IndexValue;
 use Desperado\ServiceBus\Index\Storage\Sql\SqlIndexesStorage;
 use Desperado\ServiceBus\IndexProvider;
-use Desperado\ServiceBus\Storage\StorageAdapter;
-use Desperado\ServiceBus\Storage\StorageAdapterFactory;
+use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
+use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -37,7 +37,7 @@ final class ImportSagasCompilerPassTest extends TestCase
         $compiler->process($containerBuilder);
 
         /** @var array<int, string> $registeredSagas */
-        $registeredSagas = $containerBuilder->getParameter('service_bus.sagas');
+        $registeredSagas = $containerBuilder->getParameter('service_bus.sagas_map');
 
         static::assertNotEmpty($registeredSagas);
         static::assertCount(2, $registeredSagas);

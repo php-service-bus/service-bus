@@ -7,13 +7,6 @@ services:
     arguments:
       $level: debug
 
-  Desperado\ServiceBus\Transport\Transport:
-    class: Desperado\ServiceBus\Tests\Stubs\Transport\VirtualTransport
-    public: true
-    arguments:
-      $messageEncoder: null
-      $messageDecoder: null
-
   Psr\Log\LoggerInterface:
     class: Monolog\Logger
     arguments:

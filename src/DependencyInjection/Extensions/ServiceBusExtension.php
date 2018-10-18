@@ -32,5 +32,10 @@ final class ServiceBusExtension extends Extension
     {
         $loader = new YamlFileLoader($container, new FileLocator());
         $loader->load(__DIR__ . '/../service_bus.yaml');
+
+        foreach($configs as $key => $value)
+        {
+            $container->setParameter($key, $value);
+        }
     }
 }

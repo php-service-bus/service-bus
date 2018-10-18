@@ -1,11 +1,16 @@
 parameters:
-  service_bus.sagas: []
-
+  service_bus.sagas_map: []
+  service_bus.services_map: []
+  service_bus.default_destination_topic: ''
+  service_bus.default_destination_key: ''
 services:
   _defaults:
     autowire: false
     autoconfigure: false
     public: false
+
+  # @see TaggedMessageHandlersCompilerPass
+  service_bus.services_locator:
 
   # Application environment
   Desperado\ServiceBus\Environment:
@@ -13,48 +18,46 @@ services:
     arguments:
       $environment: '%service_bus.environment%'
 
-  #  Create default logger instance factory
-  Desperado\ServiceBus\Logger\DefaultLoggerFactory:
+  # Create default logger instance factory
+  Desperado\ServiceBus\Infrastructure\Logger\DefaultLoggerFactory:
 
   # Default logger instance
   Psr\Log\LoggerInterface:
-    factory: 'Desperado\ServiceBus\Logger\DefaultLoggerFactory:build'
+    factory: 'Desperado\ServiceBus\Infrastructure\Logger\DefaultLoggerFactory:build'
     arguments:
       $entryPointName: '%service_bus.entry_point%'
       $environment: '@Desperado\ServiceBus\Environment'
 
   # Detect blocking ticks in an event loop
-  Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector:
+  Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher:
     arguments:
       $logger: '@Psr\Log\LoggerInterface'
 
+  # Periodic forced launch of the garbage collector
+  Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher:
+    arguments:
+      $interval: 600000
+      $logger: '@Psr\Log\LoggerInterface'
+
   # Transport configuration
-  Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration:
+  Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpConnectionConfiguration:
     arguments:
       $connectionDSN: '%service_bus.transport.dsn%'
 
   # Messages transport
-  Desperado\ServiceBus\Transport\Transport:
-    class: Desperado\ServiceBus\Transport\Amqp\Bunny\AmqpBunny
+  Desperado\ServiceBus\Infrastructure\Transport\Transport:
+    class: Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyRabbitMqTransport
     arguments:
-      $amqpConfiguration: '@Desperado\ServiceBus\Transport\Amqp\AmqpConnectionConfiguration'
-      $amqpQoSConfiguration: null
-      $messageEncoder: null
-      $messageDecoder: null
+      $connectionConfig: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpConnectionConfiguration'
+      $qosConfig: null
       $logger: '@Psr\Log\LoggerInterface'
 
-  # Transport configuration for starting a subscription
-  Desperado\ServiceBus\Application\TransportConfigurator:
-    arguments:
-      $transport: '@Desperado\ServiceBus\Transport\Transport'
-      $outboundMessagesRoutes: '@Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes'
-
   # Storage adapter factory
-  Desperado\ServiceBus\Storage\StorageAdapterFactory:
+  Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory:
 
   # Storage adapter
-  Desperado\ServiceBus\Storage\StorageAdapter:
-    factory: 'Desperado\ServiceBus\Storage\StorageAdapterFactory:create'
+  Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter:
+    factory: 'Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory:create'
     arguments:
       $adapter: '%service_bus.storage.adapter%'
       $connectionDSN: '%service_bus.storage.dsn%'
@@ -63,7 +66,7 @@ services:
   Desperado\ServiceBus\Sagas\SagaStore\SagasStore:
     class: Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore
     arguments:
-      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+      $adapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
   # Sagas provider
   Desperado\ServiceBus\SagaProvider:
@@ -97,13 +100,13 @@ services:
   Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore:
     class: Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql\SqlEventStreamStore
     arguments:
-      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+      $adapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
   # Snapshots store
   Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore:
     class: Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SqlSnapshotStore
     arguments:
-      $adapter: '@Desperado\ServiceBus\Storage\StorageAdapter'
+      $adapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
   # Snapshots trigger
   Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotTrigger:
@@ -122,23 +125,105 @@ services:
       $storage: '@Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore'
       $snapshotter: '@Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter'
 
-  # Message bus builder
-  Desperado\ServiceBus\MessageBus\MessageBusBuilder:
-    arguments:
-      $sagasConfigurationLoader: '@Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader'
-      $servicesConfigurationLoader: '@Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader'
-      $sagaProvider: '@Desperado\ServiceBus\SagaProvider'
-      $logger: '@Psr\Log\LoggerInterface'
+  # Symfony serializer message decoder
+  Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageDecoder:
+    class: Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer
 
-  # ServiceBusKernel locator
-  service_bus.kernel_locator:
+  # Incoming message decoder
+  service_bus.decoder_locator:
+    class: Symfony\Component\DependencyInjection\ServiceLocator
+    tags: ['container.service_locator']
+    arguments:
+      - 'service_bus.default_encoder': '@Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageDecoder'
+
+  # Internal kernel locator
+  service_bus.public_services_locator:
     public: true
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: ['container.service_locator']
     arguments:
-      - Desperado\ServiceBus\Transport\Transport: '@Desperado\ServiceBus\Transport\Transport'
-        Desperado\ServiceBus\MessageBus\MessageBusBuilder: '@Desperado\ServiceBus\MessageBus\MessageBusBuilder'
-        Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes: '@Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes'
-        Desperado\ServiceBus\Application\TransportConfigurator: '@Desperado\ServiceBus\Application\TransportConfigurator'
-        Psr\Log\LoggerInterface: '@Psr\Log\LoggerInterface'
-        Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector: '@Desperado\ServiceBus\Infrastructure\LoopMonitor\LoopBlockDetector'
+      - Psr\Log\LoggerInterface: '@Psr\Log\LoggerInterface'
+        Desperado\ServiceBus\Infrastructure\Transport\Transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
+        Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
+        Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
+        Desperado\ServiceBus\Application\EntryPoint: '@Desperado\ServiceBus\Application\EntryPoint'
+        Desperado\ServiceBus\Endpoint\EndpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
+        Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
+
+  # Incoming message decoder
+  Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder:
+    arguments:
+      $decodersContainer: '@service_bus.decoder_locator'
+
+  # Execution of the messages
+  Desperado\ServiceBus\Application\MessageExecutor:
+    class: Desperado\ServiceBus\Application\DefaultMessageExecutor
+    arguments:
+      $logger: '@Psr\Log\LoggerInterface'
+
+  # Isolated service locator for routing configuration
+  service_bus.routing_configuration_locator:
+    class: Symfony\Component\DependencyInjection\ServiceLocator
+    tags: ['container.service_locator']
+    arguments:
+      - Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader: '@Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader'
+        Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader: '@Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader'
+        Desperado\ServiceBus\SagaProvider: '@Desperado\ServiceBus\SagaProvider'
+
+  # Message routes configurator
+  service_bus.message_routes_configurator:
+    class: Desperado\ServiceBus\DependencyInjection\Configurator\MessageRoutesConfigurator
+    arguments:
+      $servicesList: '%service_bus.services_map%'
+      $sagasList: '%service_bus.sagas_map%'
+      $routingServiceLocator: '@service_bus.routing_configuration_locator'
+      $servicesServiceLocator: '@service_bus.services_locator'
+      $argumentResolvers:
+        - '@Desperado\ServiceBus\ArgumentResolvers\MessageArgumentResolver'
+        - '@Desperado\ServiceBus\ArgumentResolvers\ContextArgumentResolver'
+        - '@Desperado\ServiceBus\ArgumentResolvers\ContainerArgumentResolver'
+
+  # Incoming messages router
+  Desperado\ServiceBus\MessageRouter\Router:
+    configurator: ['@service_bus.message_routes_configurator', configure]
+
+  # Application entry point
+  Desperado\ServiceBus\Application\EntryPoint:
+    arguments:
+      $transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
+      $messageDecoder: '@Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder'
+      $endpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
+      $messageExecutor: null
+      $messagesRouter: '@Desperado\ServiceBus\MessageRouter\Router'
+      $logger: '@Psr\Log\LoggerInterface'
+
+  # Passing message to arguments
+  Desperado\ServiceBus\ArgumentResolvers\MessageArgumentResolver:
+
+  # Passing context to arguments
+  Desperado\ServiceBus\ArgumentResolvers\ContextArgumentResolver:
+
+  # Autowiring of registered services in arguments
+  Desperado\ServiceBus\ArgumentResolvers\ContainerArgumentResolver:
+    arguments:
+      # see TaggedMessageHandlersCompilerPass::process
+      $serviceLocator: '@service_bus.services_locator'
+    tags: ['service_bus_argument_resolver']
+
+  # Which exchange (and with which key) the message will be sent to
+  Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination:
+    arguments:
+      $exchange: '%service_bus.default_destination_topic%'
+      $routingKey: '%service_bus.default_destination_key%'
+
+  # Application level transport endpoint
+  Desperado\ServiceBus\Endpoint\ApplicationTransportEndpoint:
+    arguments:
+      $transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
+      $destination: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination'
+      $encoder: null
+
+  # Outbound message routing
+  Desperado\ServiceBus\Endpoint\EndpointRouter:
+    arguments:
+      $defaultEndpoint: '@Desperado\ServiceBus\Endpoint\ApplicationTransportEndpoint'

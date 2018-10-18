@@ -17,6 +17,7 @@ use function Amp\call;
 use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
@@ -31,7 +32,7 @@ use Desperado\ServiceBus\Sagas\Saga;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
-use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
+use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
 
 /**
  * Saga provider
@@ -238,10 +239,10 @@ final class SagaProvider
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     private function doStore(SagasStore $store, Saga $saga, MessageDeliveryContext $context, bool $isNew): Promise
     {
@@ -269,17 +270,19 @@ final class SagaProvider
                     $closedAt
                 );
 
-                $contextHandler = static function() use ($context, $commands, $events): \Generator
-                {
-                    yield $context->delivery(... $commands);
-                    yield $context->delivery(... $events);
-                };
-
                 true === $isNew
-                    ? yield $store->save($savedSaga, $contextHandler)
-                    : yield $store->update($savedSaga, $contextHandler);
+                    ? yield $store->save($savedSaga)
+                    : yield $store->update($savedSaga);
 
-                unset($commands, $events, $closedAt, $state, $savedSaga, $contextHandler);
+                $messages = \array_merge($commands, $events);
+
+                foreach($messages as $message)
+                {
+                    /** @var Message $message */
+                    yield $context->delivery($message);
+                }
+
+                unset($commands, $events, $messages, $closedAt, $state, $savedSaga, $contextHandler);
 
                 return yield new Success();
             },
@@ -313,7 +316,7 @@ final class SagaProvider
      *
      * @noinspection PhpUnusedPrivateMethodInspection
      *
-     * @see          MessageBusBuilder::addSaga
+     * @see          MessageRoutesConfigurator::configure()
      *
      * @param string       $sagaClass
      * @param SagaMetadata $metadata

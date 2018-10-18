@@ -37,17 +37,17 @@
 - [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L94): Включает поддержку планировщика. [Подробнее](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_scheduler.md)
 
 #### Конфигурация транспорта
-За конфигурацию транспортного уровня отвечает [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), в котором доступен [TransportConfigurator](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php)
-- [addDefaultDestinations()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L61): Регистрация маршрута доставки сообщений по умолчанию
-- [registerCustomMessageDestinations()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L80): Регистрирует специфичный маршрут доставки для сообщения
-- [addQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L99): Создаёт новую очередь (если не существует)
-- [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L120): Создаёт exchange (если не существует)
-- [bindQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L155): Привязывает очередь к exchange
-- [bindTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/TransportConfigurator.php#L140): Привязывает exchange к exchange
+За конфигурацию транспортного уровня отвечает [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), в котором доступен [transport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L188)
+- [createQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L52): Создаёт новую очередь (если не существует)
+- [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L37): Создаёт exchange (если не существует)
 
 #### Конфигурация кернела
-- [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L101): Включить определение блокировки чем-либо эвент лупа
-- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L128):  Использовать обработчик для сигнала SIGINT(2) по умолчанию
+- [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L75): Включить определение блокировки чем-либо эвент лупа
+- [enableGarbageCleaning()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L90): Периодически принудительно вызывает сборщик мусора
+- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109):  Использовать обработчик для сигнала SIGINT(2) по умолчанию
+- [registerCommandHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L145): Добавить обработчик команды
+- [registerEventListener()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L163): Добавить слушатель события
+- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L177): Указания специфичного маршрута доставки сообщения
 - [listen()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L152): Запуск приложения и подписка на сообщения
 - [stop()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L174): Остановить приложение через N миллисекунд
 
@@ -73,65 +73,59 @@
 
 declare(strict_types = 1);
 
-namespace DocumentProcessing\Bin;
+namespace ServiceBusDemo\Bin;
 
+use Amp\Loop;
 use Desperado\ServiceBus\Application\Bootstrap;
 use Desperado\ServiceBus\Application\ServiceBusKernel;
-use Desperado\ServiceBus\OutboundMessage\Destination;
-use Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
-use Desperado\ServiceBus\Transport\Amqp\AmqpExchange;
-use Desperado\ServiceBus\Transport\Amqp\AmqpQueue;
-use Desperado\ServiceBus\Transport\QueueBind;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpExchange;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpQueue;
+use Desperado\ServiceBus\Infrastructure\Transport\QueueBind;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use ServiceBusDemo\App\ServiceBusDemoExtension;
-use Symfony\Component\Debug\Debug;
 
-include __DIR__ . '/vendor/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
-try
-{
-    /** @noinspection ForgottenDebugOutputInspection */
-    Debug::enable();
+/** @var \Symfony\Component\DependencyInjection\Container $container */
+$container = Bootstrap::withDotEnv(__DIR__ . '/../.env')
+    ->useRabbitMqTransport(
+        (string) \getenv('TRANSPORT_CONNECTION_DSN'),
+        (string) \getenv('TRANSPORT_TOPIC'),
+        (string) \getenv('TRANSPORT_ROUTING_KEY')
+    )
+    ->useSqlStorage(AmpPostgreSQLAdapter::class, (string) \getenv('DATABASE_CONNECTION_DSN'))
+    ->useCustomCacheDirectory(__DIR__ . '/../cache')
+    ->addExtensions(new ServiceBusDemoExtension())
+    ->importParameters([
+        'app.log_level' => (string) \getenv('LOG_LEVEL')
+    ])
+    ->enableAutoImportMessageHandlers([__DIR__ . '/../src'])
+    ->enableAutoImportSagas([__DIR__ . '/../src'])
+    ->boot();
 
-    $container = Bootstrap::withDotEnv(__DIR__ . '/.env')
-        ->useAmqpExtTransport((string) \getenv('TRANSPORT_CONNECTION_DSN'))
-        ->useSqlStorage(AmpPostgreSQLAdapter::class, (string) \getenv('DATABASE_CONNECTION_DSN'))
-        ->useCustomCacheDirectory(__DIR__ . '/cache')
-        ->addExtensions(new ServiceBusDemoExtension())
-        ->importParameters([
-            'app.log_level' => (string) \getenv('LOG_LEVEL')
-        ])
-        ->enableAutoImportMessageHandlers([__DIR__ . '/src'])
-        ->enableAutoImportSagas([__DIR__ . '/src'])
-        ->boot();
+$kernel = new ServiceBusKernel($container);
 
-    $kernel = new ServiceBusKernel($container);
+Loop::run(
+    static function() use ($kernel): \Generator
+    {
+        $mainExchange = AmqpExchange::direct((string) \getenv('TRANSPORT_TOPIC'), true);
+        $mainQueue    = AmqpQueue::default((string) \getenv('TRANSPORT_QUEUE'), true);
 
-    $transportConfigurator = $kernel->transportConfigurator();
+        yield $kernel
+            ->transport()
+            ->createQueue(
+                $mainQueue,
+                new QueueBind($mainExchange,
+                    (string) \getenv('TRANSPORT_ROUTING_KEY'))
+            );
 
-    /** Main exchange and queue binds */
+        $kernel
+            ->monitorLoopBlock()
+            ->enableGarbageCleaning()
+            ->useDefaultStopSignalHandler();
 
-    $mainTopic = AmqpExchange::direct((string) \getenv('TRANSPORT_TOPIC'), true);
-    $mainQueue = AmqpQueue::default((string) \getenv('TRANSPORT_QUEUE'), true);
-
-    $transportConfigurator
-        ->createTopic($mainTopic)
-        ->addQueue($mainQueue)
-        ->bindQueue(new QueueBind($mainQueue, $mainTopic, (string) \getenv('TRANSPORT_ROUTING_KEY')));
-
-    $transportConfigurator->addDefaultDestinations(
-        new Destination(
-            (string) \getenv('SENDER_DESTINATION_TOPIC'),
-            (string) \getenv('SENDER_DESTINATION_TOPIC_ROUTING_KEY')
-        )
-    );
-
-    $kernel
-      ->useDefaultStopSignalHandler()
-      ->listen($mainQueue);
-}
-catch(\Throwable $throwable)
-{
-    echo $throwable->getMessage(), \PHP_EOL, $throwable->getFile() . ':' . $throwable->getLine(), \PHP_EOL;
-}
+        yield $kernel->entryPoint()->listen($mainQueue);
+    }
+);
 
 ```
