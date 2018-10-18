@@ -8,22 +8,30 @@
 На данный момент планировщик работает **только** с [RabbitMQ](https://www.rabbitmq.com/) с установленным [rabbitmq-delayed-message-exchange](https://github.com/rabbitmq/rabbitmq-delayed-message-exchange) плагином.
 
 #### Конфигурация
-Во время [инициализации демона](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_initialization.md) у объекта класс [Bootstrap](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php) необходимо вызвать метод [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L94). 
+Во время [инициализации демона](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_initialization.md) у объекта класс [Bootstrap](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php) необходимо вызвать метод [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L95). 
 Данный метод регистрирует сервисы, необходимые для работы планировщика, а так же добавляет 4 обработчика для сообщений.
 
 Помимо всего прочего необходимо дополнительно сконфигурировать транспортный уровень:
 
 ```php
-    $schedulerTopic = AmqpTopic::delayed('scheduler');
+        yield $transport->createTopic(
+            AmqpExchange::delayed((string) \getenv('SCHEDULER_TOPIC')),
+            new TopicBind(
+                $mainExchange,
+                \getenv('TRANSPORT_ROUTING_KEY')
+            )
+        );
 
-    $transportConfigurator
-        ->createTopic($schedulerTopic)
-        ->bindTopic(new TopicBind($mainTopic, $schedulerTopic, (string) \getenv('TRANSPORT_ROUTING_KEY')));
-
-    $transportConfigurator->registerCustomMessageDestinations(
-        EmitSchedulerOperation::class,
-        new Destination('scheduler', (string) \getenv('TRANSPORT_ROUTING_KEY'))
-    ); 
+        $kernel->registerMessageCustomEndpoint(
+            EmitSchedulerOperation::class,
+            new ApplicationTransportEndpoint(
+                $transport,
+                new AmqpTransportLevelDestination(
+                    (string) \getenv('SCHEDULER_TOPIC'),
+                    \getenv('TRANSPORT_ROUTING_KEY')
+                )
+            )
+        ); 
 ```
 В примере мы создаём exchange с типом ```x-delayed-message``` под названием ```scheduler``` (вы можете назвать его как угодно), затем добавляем маршрут для сообщений в наш основной exchange.
 И указывает маршрут для события о добавлении нового задания планировщика (данное сообщение обрабатывается фреймворком автоматически, подписывать на него нельзя).
@@ -62,4 +70,4 @@
 В данном примере команда ```SomeDelayedCommand``` будет выполнена через 2 минуты.
 
 #### Отмена команды
-Если по каким-либо причинам вам необходимо отменить выполнение запланированной команды, то нужно вызвать метод [cancel()](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php#L95) класса [SchedulerProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php), передав в него идентификатор, с которым задание было создано (в примере выше это ```$delayedOperationId```)
+Если по каким-либо причинам вам необходимо отменить выполнение запланированной команды, то нужно вызвать метод [cancel()](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php#L138) класса [SchedulerProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php), передав в него идентификатор, с которым задание было создано (в примере выше это ```$delayedOperationId```)
