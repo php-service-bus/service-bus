@@ -261,11 +261,14 @@ final class ServiceBusKernelTest extends TestCase
      * @test
      *
      * @return void
+     *
+     * @throws \Throwable
      */
     public function enableWatchers(): void
     {
         $this->kernel->monitorLoopBlock();
         $this->kernel->enableGarbageCleaning();
+        $this->kernel->useDefaultStopSignalHandler();
     }
 
     /**

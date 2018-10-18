@@ -108,7 +108,10 @@ final class ServiceBusKernel
      */
     public function useDefaultStopSignalHandler(int $stopDelay = 10000): self
     {
-        $logger = $this->container->get(LoggerInterface::class);
+        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+
+        $logger = $serviceLocator->get(LoggerInterface::class);
 
         Loop::onSignal(
             \SIGINT,
