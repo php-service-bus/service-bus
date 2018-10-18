@@ -14,13 +14,13 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\DependencyInjection\ContainerBuilder;
 
 use Desperado\ServiceBus\Environment;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Symfony DI container builder
@@ -183,9 +183,10 @@ final class ContainerBuilder
      */
     public function build(): ContainerInterface
     {
-        $containerParameters                            = \iterator_to_array($this->parameters);
-        $containerParameters['service_bus.environment'] = (string) $this->environment;
-        $containerParameters['service_bus.entry_point'] = $this->entryPointName;
+        $this->parameters->add('service_bus.environment', (string) $this->environment);
+        $this->parameters->add('service_bus.entry_point', $this->entryPointName);
+
+        $containerParameters = \iterator_to_array($this->parameters);
 
         $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($containerParameters));
 

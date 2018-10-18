@@ -26,9 +26,6 @@ interface AggregateStore
      * Save new event stream
      *
      * @param StoredAggregateEventStream $aggregateEventStream
-     * @param callable                   $afterSaveHandler  The handler is called after the data is saved. If
-     *                                                      transactions are supported, it will be called before the
-     *                                                      commit
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
@@ -38,15 +35,12 @@ interface AggregateStore
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed
      */
-    public function saveStream(StoredAggregateEventStream $aggregateEventStream, callable $afterSaveHandler): Promise;
+    public function saveStream(StoredAggregateEventStream $aggregateEventStream): Promise;
 
     /**
      * Append events to exists stream
      *
      * @param StoredAggregateEventStream $aggregateEventStream
-     * @param callable                   $afterSaveHandler  The handler is called after the data is saved. If
-     *                                                      transactions are supported, it will be called before the
-     *                                                      commit
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
@@ -55,7 +49,7 @@ interface AggregateStore
      *
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed
      */
-    public function appendStream(StoredAggregateEventStream $aggregateEventStream, callable $afterSaveHandler): promise;
+    public function appendStream(StoredAggregateEventStream $aggregateEventStream): promise;
 
     /**
      * Load event stream

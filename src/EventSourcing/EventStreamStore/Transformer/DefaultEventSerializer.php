@@ -14,12 +14,9 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
-use Desperado\ServiceBus\Marshal\Denormalizer\Denormalizer;
-use Desperado\ServiceBus\Marshal\Denormalizer\SymfonyPropertyDenormalizer;
-use Desperado\ServiceBus\Marshal\Normalizer\Normalizer;
-use Desperado\ServiceBus\Marshal\Normalizer\SymfonyPropertyNormalizer;
-use Desperado\ServiceBus\Marshal\Serializer\ArraySerializer;
-use Desperado\ServiceBus\Marshal\Serializer\SymfonyJsonSerializer;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageDecoder;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
 
 /**
  *
@@ -27,34 +24,23 @@ use Desperado\ServiceBus\Marshal\Serializer\SymfonyJsonSerializer;
 final class DefaultEventSerializer implements AggregateEventSerializer
 {
     /**
-     * @var ArraySerializer
+     * @var MessageEncoder
      */
-    private $serializer;
+    private $encoder;
 
     /**
-     * @var Normalizer
+     * @var MessageDecoder
      */
-    private $normalizer;
+    private $decoder;
 
     /**
-     * @var Denormalizer
+     * @param MessageEncoder|null $encoder
+     * @param MessageDecoder|null $decoder
      */
-    private $denormalizer;
-
-    /**
-     * @param ArraySerializer|null $serializer
-     * @param Normalizer|null      $normalizer
-     * @param Denormalizer|null    $denormalizer
-     */
-    public function __construct(
-        ArraySerializer $serializer = null,
-        Normalizer $normalizer = null,
-        Denormalizer $denormalizer = null
-    )
+    public function __construct(?MessageEncoder $encoder = null, ?MessageDecoder $decoder = null)
     {
-        $this->serializer   = $serializer ?? new SymfonyJsonSerializer();
-        $this->normalizer   = $normalizer ?? new SymfonyPropertyNormalizer();
-        $this->denormalizer = $denormalizer ?? new SymfonyPropertyDenormalizer();
+        $this->encoder = $encoder ?? new SymfonyMessageSerializer();
+        $this->decoder = $decoder ?? new SymfonyMessageSerializer();
     }
 
     /**
@@ -62,9 +48,7 @@ final class DefaultEventSerializer implements AggregateEventSerializer
      */
     public function serialize(Event $event): string
     {
-        return $this->serializer->serialize(
-            $this->normalizer->normalize($event)
-        );
+        return $this->encoder->encode($event);
     }
 
     /**
@@ -76,9 +60,6 @@ final class DefaultEventSerializer implements AggregateEventSerializer
     public function unserialize(string $eventClass, string $payload): Event
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->denormalizer->denormalize(
-            $eventClass,
-            $this->serializer->unserialize($payload)
-        );
+        return $this->decoder->decode($payload);
     }
 }

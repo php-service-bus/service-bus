@@ -15,11 +15,10 @@ namespace Desperado\ServiceBus\Tests\Stubs\Context;
 
 use Amp\Promise;
 use Amp\Success;
-use Desperado\ServiceBus\Common\Contract\Messages\Command;
-use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
+use Desperado\ServiceBus\Endpoint\DeliveryOptions;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -54,9 +53,9 @@ final class TestContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritdoc
      */
-    public function delivery(Message ...$messages): Promise
+    public function delivery(Message $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
-        $this->messages = \array_merge($messages, $this->messages);
+        $this->messages[] = $message;
 
         return new Success();
     }
@@ -64,31 +63,7 @@ final class TestContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritDoc
      */
-    public function send(Command $command, array $headers = []): Promise
-    {
-        $this->messages[] = $command;
-
-        return new Success();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function publish(Event $event, array $headers = []): Promise
-    {
-        $this->messages[] = $event;
-
-        return new Success();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function logContextMessage(
-        string $logMessage,
-        array $extra = [],
-        string $level = LogLevel::INFO
-    ): void
+    public function logContextMessage(string $logMessage, array $extra = [], string $level = LogLevel::INFO): void
     {
         $this->logger->log($level, $logMessage, $extra);
     }
@@ -96,11 +71,7 @@ final class TestContext implements MessageDeliveryContext, LoggingInContext
     /**
      * @inheritDoc
      */
-    public function logContextThrowable(
-        \Throwable $throwable,
-        string $level = LogLevel::ERROR,
-        array $extra = []
-    ): void
+    public function logContextThrowable(\Throwable $throwable, string $level = LogLevel::ERROR, array $extra = []): void
     {
         $this->logContextMessage($throwable->getMessage());
     }

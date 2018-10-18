@@ -16,9 +16,9 @@
       "Desperado\\ServiceBus\\": "src/"
     },
     "files": [
-      "src/Storage/functions.php",
+      "src/Infrastructure/Storage/functions.php",
       "src/DependencyInjection/Compiler/functions.php",
-      "src/Storage/SQL/queryBuilderFunctions.php",
+      "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
       "src/Common/reflectionFunctions.php"
@@ -29,9 +29,9 @@
       "Desperado\\ServiceBus\\Tests\\": "tests/"
     },
     "files": [
-      "src/Storage/functions.php",
+      "src/Infrastructure/Storage/functions.php",
       "src/DependencyInjection/Compiler/functions.php",
-      "src/Storage/SQL/queryBuilderFunctions.php",
+      "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
       "src/Common/commonFunctions.php",
       "src/Common/datetimeFunctions.php",
       "src/Common/reflectionFunctions.php"
@@ -43,7 +43,7 @@
     "amphp/log": "^1",
     "amphp/file": "^0.3",
     "amphp/artax": "^3.0",
-    "amphp/postgres": "dev-master",
+    "amphp/postgres": "^1.0",
     "ramsey/uuid": "^3.7",
     "symfony/serializer": "^v4.1",
     "symfony/property-info": "^v4.1",

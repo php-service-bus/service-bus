@@ -11,7 +11,7 @@
 
 Пул соединений с базой данных это набор заранее открытых соединений с базой данных используемый для предоставления соединения в тот момент, когда оно требуется. 
 Используются для повышения производительности при работе с базами данных. Помимо ускорения работы с базой данных, решается проблема с вложенными транзакциями.
-Из 2х представленных адаптеров пул соединений поддерживает только [AmpPostgreSQLAdapter](). 
+Из 2х представленных адаптеров пул соединений поддерживает только [AmpPostgreSQLAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/AmpPostgreSQL/AmpPostgreSQLAdapter.php). 
 Если вкратце, то работает это так:
 
 Есть коллекция соединений. При необходимости выполнить запрос, соединение извлекается (другие его уже получить не смогут), выполняется операция и затем оно возвращается в коллекцию, доступным для последующей работы.
@@ -21,7 +21,7 @@
 Цель данного интерфейса - уницифировать различные решения (как блокирующие, так и неблокирующие).
 
 #### Адаптер для работы с PostgreSQL
-[Неблокирующий адаптер](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/AmpPostgreSQL/AmpPostgreSQLAdapter.php), который поддерживает пул соединений. Реализовано на базе [Async Postgres client ](https://github.com/amphp/postgres)
+[Неблокирующий адаптер](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/AmpPostgreSQL/AmpPostgreSQLAdapter.php), который поддерживает пул соединений. Реализовано на базе [Async Postgres client ](https://github.com/amphp/postgres)
 По умолчанию кол-во соединений равно 100, время жизни неиспользуемого соденинения равно 60 секундам (по истечении которых соединение будет закрыто и удалено из пула). Если при получении соединения в пуле не оказалось доступных, то будет создано новое. По завершению выполнения добавится в коллекцию на общих условиях.
 
 #### Адаптер для работы с DoctrineDBAL
@@ -29,22 +29,22 @@
 Не поддерживает пул соединений
 
 #### Транзакции
-Транзакции представлены в виде интерфейса [TransactionAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/TransactionAdapter.php)
-Для адаптера [AmpPostgreSQLAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/AmpPostgreSQL/AmpPostgreSQLAdapter.php) используется уровень изоляции [Read Committed](https://postgrespro.com/docs/postgrespro/9.5/transaction-iso#xact-read-committed). Каждая транзакция выполняется в рамках своего подключения к базе данных (получается из пула соединений). 
-В [DoctrineDBALAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/SQL/DoctrineDBAL/DoctrineDBALAdapter.php) реализованы только в целях совместимости и, опять-таки, для тестирования. Уровень изоляции зависит от значения по умолчанию у выбранного драйвера
+Транзакции представлены в виде интерфейса [TransactionAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/TransactionAdapter.php)
+Для адаптера [AmpPostgreSQLAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/AmpPostgreSQL/AmpPostgreSQLAdapter.php) используется уровень изоляции [Read Committed](https://postgrespro.com/docs/postgrespro/9.5/transaction-iso#xact-read-committed). Каждая транзакция выполняется в рамках своего подключения к базе данных (получается из пула соединений). 
+В [DoctrineDBALAdapter](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/SQL/DoctrineDBAL/DoctrineDBALAdapter.php) реализованы только в целях совместимости и, опять-таки, для тестирования. Уровень изоляции зависит от значения по умолчанию у выбранного драйвера
 
 #### ResultSet
 
-Для работы с результатом выполнения [execute()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/StorageAdapter.php#L35) используется [ResultSet](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php)
+Для работы с результатом выполнения [execute()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/StorageAdapter.php#L35) используется [ResultSet](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/ResultSet.php)
 По сути представляет собой итератор с несколькими дополнительными методами:
 
-* [advance()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L37): возвращает true, если в итераторе есть значение, которое можно получить в методе [getCurrent()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L46)
-* [getCurrent()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L46): возвращает текущий элемент
-* [lastInsertId()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L57): Возвращает идентификатор последней добавленной записи
+* [advance()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/ResultSet.php#L31): возвращает true, если в итераторе есть значение, которое можно получить в методе [getCurrent()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/ResultSet.php#L40)
+* [getCurrent()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/ResultSet.php#L40): возвращает текущий элемент
+* [lastInsertId()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/ResultSet.php#L51): Возвращает идентификатор последней добавленной записи
   * Для PostgreSQL необходимо воспользоваться конструкцией [RETURNING](https://www.postgresql.org/docs/9.1/static/sql-insert.html), вернув поле ```id``` (именование важно)
-* [rowsCount](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/ResultSet.php#L66): Возвращает кол-во строк, которое было затронуто операциями INSERT/UPDATE/DELETE
+* [affectedRows](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/ResultSet.php#L60): Возвращает кол-во строк, которое было затронуто операциями INSERT/UPDATE/DELETE
 
-Для упрощения работы с результатом есть вспомогательные функции, которые позволяют получить результат в виде массива:  [fetchOne()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/functions.php#L59), и [fetchAll()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/functions.php#L30)
+Для упрощения работы с результатом есть вспомогательные функции, которые позволяют получить результат в виде массива:  [fetchOne()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/functions.php#L60), и [fetchAll()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/functions.php#L30)
 
 #### QueryBuilder
 Для упрощения работы с SQL используется библиотека [shadowhand/latitude](https://github.com/shadowhand/latitude). 

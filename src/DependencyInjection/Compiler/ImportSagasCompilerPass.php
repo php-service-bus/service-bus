@@ -92,12 +92,12 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
     {
         if(0 !== \count($foundSagas))
         {
-            $registeredSagas = true === $container->hasParameter('service_bus.sagas')
-                ? $container->getParameter('service_bus.sagas')
+            $registeredSagas = true === $container->hasParameter('service_bus.sagas_map')
+                ? $container->getParameter('service_bus.sagas_map')
                 : [];
 
             $container->setParameter(
-                'service_bus.sagas',
+                'service_bus.sagas_map',
                 \array_merge($registeredSagas, $foundSagas)
             );
         }

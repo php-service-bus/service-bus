@@ -27,7 +27,7 @@ class SagasStoreStub implements SagasStore
     /**
      * @inheritdoc
      */
-    public function save(StoredSaga $savedSaga, callable $afterSaveHandler): Promise
+    public function save(StoredSaga $savedSaga): Promise
     {
         return new Success();
     }
@@ -35,7 +35,7 @@ class SagasStoreStub implements SagasStore
     /**
      * @inheritdoc
      */
-    public function update(StoredSaga $savedSaga, callable $afterSaveHandler): Promise
+    public function update(StoredSaga $savedSaga): Promise
     {
         return new Success();
     }

@@ -31,10 +31,10 @@ interface SnapshotStore
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      */
     public function save(StoredAggregateSnapshot $aggregateSnapshot): Promise;
 
@@ -48,9 +48,9 @@ interface SnapshotStore
      *
      * @return Promise<\Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\StoredAggregateSnapshot|null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function load(AggregateId $id): Promise;
 
@@ -64,9 +64,9 @@ interface SnapshotStore
      *
      * @return Promise<null>
      *
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\OperationFailed
-     * @throws \Desperado\ServiceBus\Storage\Exceptions\StorageInteractingFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function remove(AggregateId $id): Promise;
 }

@@ -15,29 +15,21 @@ namespace Desperado\ServiceBus\Tests\Scheduler;
 
 use Amp\Coroutine;
 use function Amp\Promise\wait;
-use Desperado\ServiceBus\Application\KernelContext;
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
-use Desperado\ServiceBus\Scheduler\Messages\Command\EmitSchedulerOperation;
 use Desperado\ServiceBus\Scheduler\Messages\Event\OperationScheduled;
 use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationCanceled;
-use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationEmitted;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
-use Desperado\ServiceBus\Scheduler\SchedulerListener;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
 use Desperado\ServiceBus\Scheduler\Store\Sql\SqlSchedulerStore;
 use Desperado\ServiceBus\SchedulerProvider;
-use function Desperado\ServiceBus\Storage\fetchAll;
-use Desperado\ServiceBus\Storage\StorageAdapter;
-use Desperado\ServiceBus\Storage\StorageAdapterFactory;
+use function Desperado\ServiceBus\Infrastructure\Storage\fetchAll;
+use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
+use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
-use Desperado\ServiceBus\Transport\IncomingEnvelope;
-use Desperado\ServiceBus\Transport\TransportContext;
 use Monolog\Handler\TestHandler;
-use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -240,7 +232,7 @@ final class SchedulerProviderTest extends TestCase
             static::assertCount(2, $messages);
 
             /** @var SchedulerOperationCanceled $message */
-            $message = \reset($messages);
+            $message = \end($messages);
 
             static::assertInstanceOf(SchedulerOperationCanceled::class, $message);
         };
@@ -276,133 +268,5 @@ final class SchedulerProviderTest extends TestCase
         };
 
         wait(new Coroutine($handler($this)));
-    }
-
-    /**
-     * @test
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function emitNextExistsJob(): void
-    {
-        $kernelContext = $this->createKernelContext();
-
-        $handler = static function(SchedulerProviderTest $self) use ($kernelContext): \Generator
-        {
-            $service = new SchedulerListener();
-            $context = new TestContext();
-
-            $executionDate = new \DateTimeImmutable('+10 seconds');
-
-            $id = ScheduledOperationId::new();
-
-            yield $self->provider->schedule($id, new FirstEmptyCommand(), $executionDate, $context);
-
-            yield new Coroutine(
-                $service->whenOperationScheduled(
-                    $context->messages[0],
-                    $kernelContext,
-                    $self->provider
-                )
-            );
-
-            static::assertCount(1, $self->kernelContextMessages);
-            static::assertInstanceOf(EmitSchedulerOperation::class, $self->kernelContextMessages[0]);
-
-            /** @var \Desperado\ServiceBus\Scheduler\Messages\Command\EmitSchedulerOperation $emitCommand */
-            $emitCommand = $self->kernelContextMessages[0];
-
-            yield $service->handleEmit(
-                $emitCommand,
-                $kernelContext,
-                $self->provider
-            );
-
-            $records = $self->testLogHandler->getRecords();
-
-            $record = \reset($records);
-
-            static::assertEquals(
-                'The delayed "{messageClass}" command has been sent to the transport',
-                $record['message']
-            );
-        };
-
-        wait(new Coroutine($handler($this)));
-    }
-
-    /**
-     * @test
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function emitNextUnExistsJob(): void
-    {
-        $kernelContext = $this->createKernelContext();
-
-        $handler = static function(SchedulerProviderTest $self) use ($kernelContext): \Generator
-        {
-            $service = new SchedulerListener();
-
-            $id = ScheduledOperationId::new();
-
-            yield new Coroutine(
-                $service->whenSchedulerOperationEmitted(
-                    SchedulerOperationEmitted::create(
-                        $id,
-                        new NextScheduledOperation($id, new \DateTimeImmutable('NOW'))
-                    ),
-                    $kernelContext,
-                    $self->provider
-                )
-            );
-
-            /** @var \Desperado\ServiceBus\Scheduler\Messages\Command\EmitSchedulerOperation $emitCommand */
-            $emitCommand = $self->kernelContextMessages[0];
-
-            yield $service->handleEmit(
-                $emitCommand,
-                $kernelContext,
-                $self->provider
-            );
-
-            $records = $self->testLogHandler->getRecords();
-
-            static::assertNotEmpty($records);
-            static::assertCount(1, $records);
-
-            $expectedMessage = \sprintf('Operation with ID "%s" not found', $id);
-
-            static::assertEquals($expectedMessage, $records[0]['message']);
-        };
-
-        wait(new Coroutine($handler($this)));
-    }
-
-    /**
-     * @return KernelContext
-     */
-    private function createKernelContext(): KernelContext
-    {
-
-        $sender = function(Message $message, array $headers, IncomingEnvelope $incomingEnvelope): void
-        {
-            $this->kernelContextMessages [] = $message;
-        };
-
-        $logger = new Logger('tests', [$this->testLogHandler]);
-
-        return new KernelContext(
-            new IncomingEnvelope(
-                '', [], new FirstEmptyCommand(), []
-            ),
-            TransportContext::messageReceived(uuid()),
-            $sender,
-            $logger
-        );
     }
 }

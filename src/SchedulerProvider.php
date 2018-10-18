@@ -19,6 +19,7 @@ use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
+use Desperado\ServiceBus\Endpoint\DeliveryOptions;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Exceptions\DuplicateScheduledJob;
@@ -30,7 +31,8 @@ use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationCanceled;
 use Desperado\ServiceBus\Scheduler\Messages\Event\SchedulerOperationEmitted;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 use Desperado\ServiceBus\Scheduler\Store\SchedulerStore;
-use Desperado\ServiceBus\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
+use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
+use Psr\Log\LogLevel;
 
 /**
  *
@@ -92,6 +94,14 @@ final class SchedulerProvider
                             );
                         }
                     );
+
+                    if($context instanceof LoggingInContext)
+                    {
+                        $context->logContextMessage('Operation "{messageClass}" scheduled', [
+                                'messageClass' => \get_class($operation->command())
+                            ]
+                        );
+                    }
                 }
                 catch(UniqueConstraintViolationCheckFailed $exception)
                 {
@@ -243,12 +253,31 @@ final class SchedulerProvider
                 {
                     if(null !== $nextOperation)
                     {
-                        /** Send a message that will return after a specified time interval */
-                        yield $context->send(
-                            EmitSchedulerOperation::create($nextOperation->id()), [
-                                'x-delay' => self::calculateExecutionDelay($nextOperation)
-                            ]
+                        $id    = $nextOperation->id();
+                        $delay = self::calculateExecutionDelay($nextOperation);
+
+                        /** Message will return after a specified time interval */
+                        yield $context->delivery(
+                            EmitSchedulerOperation::create($id),
+                            new DeliveryOptions(['x-delay' => $delay])
                         );
+
+                        if($context instanceof LoggingInContext)
+                        {
+                            $context->logContextMessage(
+                                'Scheduled operation with identifier "{scheduledOperationId}" will be executed in "{scheduledOperationDelay}" seconds', [
+                                    'scheduledOperationId'    => $id,
+                                    'scheduledOperationDelay' => $delay / 1000
+                                ]
+                            );
+                        }
+
+                        return;
+                    }
+
+                    if($context instanceof LoggingInContext)
+                    {
+                        $context->logContextMessage('Next operation not specified', [], LogLevel::DEBUG);
                     }
                 }
                 catch(\Throwable $throwable)
@@ -278,12 +307,6 @@ final class SchedulerProvider
 
         /** @noinspection UnnecessaryCastingInspection */
         $executionDelay = $nextScheduledOperation->time()->getTimestamp() - $currentDate->getTimestamp();
-
-        if(0 > $executionDelay)
-        {
-            /** @var int $executionDelay */
-            $executionDelay = \abs($executionDelay);
-        }
 
         return $executionDelay * 1000;
     }
