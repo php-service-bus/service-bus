@@ -172,7 +172,7 @@ final class AmqpConnectionConfiguration
         $queryParts      = self::parseQuery($queryString);
 
         return [
-            'scheme'    => (string) ($connectionParts['scheme'] ?? self::DEFAULT_HOST),
+            'scheme'    => (string) ($connectionParts['scheme'] ?? self::DEFAULT_SCHEMA),
             'host'      => (string) ($connectionParts['host'] ?? self::DEFAULT_HOST),
             'port'      => (int) ($connectionParts['port'] ?? self::DEFAULT_PORT),
             'user'      => (string) ($connectionParts['user'] ?? self::DEFAULT_USERNAME),
