@@ -179,7 +179,7 @@ final class AmqpConnectionConfiguration
             'password'  => (string) ($connectionParts['password'] ?? self::DEFAULT_PASSWORD),
             'timeout'   => (float) ($queryParts['timeout'] ?? self::DEFAULT_TIMEOUT),
             'vhost'     => (string) ($queryParts['vhost'] ?? self::DEFAULT_VIRTUAL_HOST),
-            'heartbeat' => (float) $queryParts['heartbeat'] ?? self::DEFAULT_HEARTBEAT_INTERVAL,
+            'heartbeat' => (float) ($queryParts['heartbeat'] ?? self::DEFAULT_HEARTBEAT_INTERVAL),
         ];
     }
 
