@@ -182,11 +182,7 @@ final class EventSourcingProvider
                         yield $snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
                     }
 
-                    /** @var Event $event */
-                    foreach($receivedEvents as $event)
-                    {
-                        yield $context->delivery($event);
-                    }
+                    yield self::publishEvents($receivedEvents, $context);
 
                     unset($eventStream, $receivedEvents, $loadedSnapshot);
                 }
@@ -205,6 +201,30 @@ final class EventSourcingProvider
             },
             $aggregate,
             $context
+        );
+    }
+
+    /**
+     * Send events to transport
+     *
+     * @param array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events
+     * @param MessageDeliveryContext                                           $context
+     *
+     * @return Promise It does not return any result
+     */
+    private static function publishEvents(array $events, MessageDeliveryContext $context): Promise
+    {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(array $events) use ($context): \Generator
+            {
+                /** @var Event $event */
+                foreach($events as $event)
+                {
+                    yield $context->delivery($event);
+                }
+            },
+            $events
         );
     }
 

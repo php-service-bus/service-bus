@@ -119,7 +119,7 @@ final class AggregateEventStream
     /**
      * Receive original events collection
      *
-     * @return array
+     * @return array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event>
      */
     public function originEvents(): array
     {
