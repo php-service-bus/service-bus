@@ -146,7 +146,7 @@ services:
         Desperado\ServiceBus\Infrastructure\Transport\Transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
         Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
         Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
-        Desperado\ServiceBus\Application\EntryPoint: '@Desperado\ServiceBus\Application\EntryPoint'
+        Desperado\ServiceBus\EntryPoint\EntryPoint: '@Desperado\ServiceBus\EntryPoint\EntryPoint'
         Desperado\ServiceBus\Endpoint\EndpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
         Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
@@ -154,12 +154,6 @@ services:
   Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder:
     arguments:
       $decodersContainer: '@service_bus.decoder_locator'
-
-  # Execution of the messages
-  Desperado\ServiceBus\Application\MessageExecutor:
-    class: Desperado\ServiceBus\Application\DefaultMessageExecutor
-    arguments:
-      $logger: '@Psr\Log\LoggerInterface'
 
   # Isolated service locator for routing configuration
   service_bus.routing_configuration_locator:
@@ -188,12 +182,11 @@ services:
     configurator: ['@service_bus.message_routes_configurator', configure]
 
   # Application entry point
-  Desperado\ServiceBus\Application\EntryPoint:
+  Desperado\ServiceBus\EntryPoint\EntryPoint:
     arguments:
       $transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
       $messageDecoder: '@Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder'
       $endpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
-      $messageExecutor: null
       $messagesRouter: '@Desperado\ServiceBus\MessageRouter\Router'
       $logger: '@Psr\Log\LoggerInterface'
 
