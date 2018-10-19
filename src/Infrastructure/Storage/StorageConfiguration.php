@@ -99,13 +99,19 @@ final class StorageConfiguration
         \parse_str($queryString, $self->queryParameters);
 
         $self->originalDSN  = $connectionDSN;
-        $self->scheme       = isset($parsedDSN['scheme']) ? (string) $parsedDSN['scheme'] : null;
-        $self->host         = isset($parsedDSN['host']) ? (string) $parsedDSN['host'] : null;
-        $self->port         = isset($parsedDSN['port']) ? (int) $parsedDSN['port'] : null;
-        $self->username     = isset($parsedDSN['user']) ? (string) $parsedDSN['user'] : null;
-        $self->password     = isset($parsedDSN['pass']) ? (string) $parsedDSN['pass'] : null;
-        $self->databaseName = isset($parsedDSN['path']) ? \ltrim((string) $parsedDSN['path'], '/') : null;
-        $self->encoding     = isset($self->queryParameters['charset']) ? (string) $self->queryParameters['charset'] : 'UTF-8';
+        /** @psalm-suppress MixedAssignment */
+        $self->scheme       = $parsedDSN['scheme'] ?? null;
+        /** @psalm-suppress MixedAssignment */
+        $self->host         = $parsedDSN['host'] ?? null;
+        /** @psalm-suppress MixedAssignment */
+        $self->port         = $parsedDSN['port'] ?? null;
+        /** @psalm-suppress MixedAssignment */
+        $self->username     = $parsedDSN['user'] ?? null;
+        /** @psalm-suppress MixedAssignment */
+        $self->password     = $parsedDSN['pass'] ?? null;
+        $self->databaseName = $parsedDSN['path'] ? \ltrim((string) $parsedDSN['path'], '/') : null;
+        /** @psalm-suppress MixedAssignment */
+        $self->encoding     = $self->queryParameters['charset'] ?? 'UTF-8';
 
         return $self;
     }
