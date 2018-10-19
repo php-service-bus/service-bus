@@ -33,8 +33,8 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
     private $excludedFiles;
 
     /**
-     * @param array $directories
-     * @param array $excludedFiles
+     * @param array<mixed, string> $directories
+     * @param array<mixed, string> $excludedFiles
      */
     public function __construct(array $directories, array $excludedFiles)
     {
@@ -83,8 +83,8 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @param array            $foundSagas
+     * @param ContainerBuilder     $container
+     * @param array<mixed, string> $foundSagas
      *
      * @return void
      */
@@ -92,6 +92,7 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
     {
         if(0 !== \count($foundSagas))
         {
+            /** @var array<mixed, string> $registeredSagas */
             $registeredSagas = true === $container->hasParameter('service_bus.sagas_map')
                 ? $container->getParameter('service_bus.sagas_map')
                 : [];

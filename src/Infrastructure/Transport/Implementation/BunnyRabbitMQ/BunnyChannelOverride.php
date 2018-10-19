@@ -33,9 +33,11 @@ use Bunny\Protocol as AmqpProtocol;
  */
 final class BunnyChannelOverride extends Channel
 {
-   /**
+    /**
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MixedArgument
      *
      * @param callable $callback
      * @param string   $queue
@@ -83,6 +85,8 @@ final class BunnyChannelOverride extends Channel
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MixedArgument
      *
      * @return Promise<bool>
      */
@@ -109,6 +113,8 @@ final class BunnyChannelOverride extends Channel
 
     /**
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MixedArgument
      *
      * @inheritdoc
      *
@@ -127,6 +133,7 @@ final class BunnyChannelOverride extends Channel
                     );
                 }
 
+                /** @var AmqpProtocol\MethodConfirmSelectOkFrame $response */
                 $response = yield $this->getClient()->confirmSelect($this->getChannelId(), $nowait);
 
                 $this->mode        = ChannelModeEnum::CONFIRM;
@@ -147,6 +154,8 @@ final class BunnyChannelOverride extends Channel
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MixedArgument
      *
      * @return Promise<\Bunny\Message|bool>
      */
@@ -180,6 +189,7 @@ final class BunnyChannelOverride extends Channel
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
      * @psalm-suppress InvalidReturnType
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Message|bool>
      */

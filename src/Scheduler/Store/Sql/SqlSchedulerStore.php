@@ -65,9 +65,11 @@ final class SqlSchedulerStore implements SchedulerStore
 
                 try
                 {
-                    /** Save new entry */
-
-                    /** @psalm-suppress ImplicitToStringCast */
+                    /**
+                     * @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery
+                     *
+                     * @psalm-suppress ImplicitToStringCast
+                     */
                     $insertQuery = insertQuery('scheduler_registry', [
                         'id'              => (string) $operation->id(),
                         'processing_date' => datetimeToString($operation->date()),
@@ -75,6 +77,7 @@ final class SqlSchedulerStore implements SchedulerStore
                         'is_sent'         => (int) $operation->isSent()
                     ]);
 
+                    /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                     $compiledQuery = $insertQuery->compile();
 
                     /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
@@ -124,10 +127,15 @@ final class SqlSchedulerStore implements SchedulerStore
 
                 try
                 {
-                    /** @psalm-suppress ImplicitToStringCast */
+                    /**
+                     * @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery
+                     *
+                     * @psalm-suppress ImplicitToStringCast
+                     */
                     $deleteQuery = deleteQuery('scheduler_registry')
                         ->where(equalsCriteria('id', $id));
 
+                    /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                     $compiledQuery = $deleteQuery->compile();
 
                     /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
@@ -186,10 +194,15 @@ final class SqlSchedulerStore implements SchedulerStore
 
                 try
                 {
-                    /** @psalm-suppress ImplicitToStringCast */
+                    /**
+                     * @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery
+                     *
+                     * @psalm-suppress ImplicitToStringCast
+                     */
                     $deleteQuery = deleteQuery('scheduler_registry')
                         ->where(equalsCriteria('id', $id));
 
+                    /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                     $compiledQuery = $deleteQuery->compile();
 
                     /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
@@ -224,6 +237,8 @@ final class SqlSchedulerStore implements SchedulerStore
     /**
      * @param TransactionAdapter $transaction
      *
+     * @psalm-suppress MixedTypeCoercion
+     *
      * @return Promise<\Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null>
      */
     private static function fetchNextOperation(TransactionAdapter $transaction): Promise
@@ -238,6 +253,7 @@ final class SqlSchedulerStore implements SchedulerStore
                     ->orderBy('processing_date', 'ASC')
                     ->limit(1);
 
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                 $compiledQuery = $selectQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
@@ -254,9 +270,10 @@ final class SqlSchedulerStore implements SchedulerStore
 
                     /** @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery */
                     $updateQuery = updateQuery('scheduler_registry', ['is_sent' => 1])
-                        ->where(equalsCriteria('id', $result['id']))
+                        ->where(equalsCriteria('id', (string) $result['id']))
                         ->andWhere(equalsCriteria('is_sent', 0));
 
+                    /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                     $compiledQuery = $updateQuery->compile();
 
                     /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
@@ -278,6 +295,8 @@ final class SqlSchedulerStore implements SchedulerStore
      * @param StorageAdapter       $adapter
      * @param ScheduledOperationId $id
      *
+     * @psalm-suppress MixedTypeCoercion
+     *
      * @return Promise<\Desperado\ServiceBus\Scheduler\Data\ScheduledOperation|null>
      */
     private static function doLoadOperation(StorageAdapter $adapter, ScheduledOperationId $id): Promise
@@ -288,16 +307,21 @@ final class SqlSchedulerStore implements SchedulerStore
             {
                 $operation = null;
 
-                /** @psalm-suppress ImplicitToStringCast */
+                /**
+                 * @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery
+                 *
+                 * @psalm-suppress ImplicitToStringCast
+                 */
                 $selectQuery = selectQuery('scheduler_registry')
                     ->where(equalsCriteria('id', $id));
 
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                 $compiledQuery = $selectQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                /** @var array|null $result */
+                /** @var array{processing_date:string, command:string, id:string, is_sent:bool}|null $result */
                 $result = yield fetchOne($resultSet);
 
                 unset($selectQuery, $compiledQuery, $resultSet);

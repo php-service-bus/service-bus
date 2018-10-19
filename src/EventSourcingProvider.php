@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus;
 
 use function Amp\call;
 use Amp\Promise;
+use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\createWithoutConstructor;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
@@ -86,6 +87,7 @@ final class EventSourcingProvider
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion
      *
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\LoadStreamFailed
      */
@@ -143,8 +145,9 @@ final class EventSourcingProvider
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion
      *
-     * @return Promise<void>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed
@@ -161,6 +164,7 @@ final class EventSourcingProvider
             {
                 try
                 {
+                    /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEventStream $eventStream */
                     $eventStream    = invokeReflectionMethod($aggregate, 'makeStream');
                     $receivedEvents = $eventStream->originEvents();
 
@@ -178,6 +182,7 @@ final class EventSourcingProvider
                         yield $snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
                     }
 
+                    /** @var Event $event */
                     foreach($receivedEvents as $event)
                     {
                         yield $context->delivery($event);
@@ -243,12 +248,13 @@ final class EventSourcingProvider
      * If there is an aggregate creation event in the event stream, then it was not stored in the database (usually the
      * event is the first)
      *
-     * @param array $events
+     * @param array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events
      *
      * @return bool
      */
     private static function isNewEventStream(array $events): bool
     {
+        /** @var Event $event */
         foreach($events as $event)
         {
             if($event instanceof AggregateCreated)

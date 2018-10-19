@@ -28,12 +28,12 @@ final class HandlerOptions
     /**
      * Validation groups
      *
-     * @var array
+     * @var array<int, string>
      */
     private $validationGroups = [];
 
     /**
-     * @param array $validationGroups
+     * @param array<int, string> $validationGroups
      *
      * @return void
      */
@@ -56,7 +56,7 @@ final class HandlerOptions
     /**
      * Receive validation groups
      *
-     * @return array
+     * @return array<int, string>
      */
     public function validationGroups(): array
     {

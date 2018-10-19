@@ -212,10 +212,9 @@ abstract class Aggregate
 
         $this->id = $aggregateEventsStream->id();
 
+        /** @var AggregateEvent $aggregateEvent */
         foreach($aggregateEventsStream->events() as $aggregateEvent)
         {
-            /** @var AggregateEvent $aggregateEvent */
-
             $this->applyEvent($aggregateEvent->event());
 
             /** @noinspection DisconnectedForeachInstructionInspection */

@@ -60,7 +60,10 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     public function __invoke(Message $message, KernelContext $context): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument
+         */
         return call(
             $this->closure,
             ...self::collectArguments($this->arguments, $this->argumentResolvers, $message, $context)
@@ -86,16 +89,15 @@ final class DefaultMessageExecutor implements MessageExecutor
     {
         $preparedArguments = [];
 
+        /** @var \Desperado\ServiceBus\MessageHandlers\HandlerArgument $argument */
         foreach($arguments as $argument)
         {
-            /** @var \Desperado\ServiceBus\MessageHandlers\HandlerArgument $argument */
-
+            /** @var \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver $argumentResolver */
             foreach($resolvers as $argumentResolver)
             {
-                /** @var \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver $argumentResolver */
-
                 if(true === $argumentResolver->supports($argument))
                 {
+                    /** @psalm-suppress MixedAssignment */
                     $preparedArguments[] = $argumentResolver->resolve($message, $context, $argument);
                 }
             }

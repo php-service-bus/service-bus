@@ -32,6 +32,7 @@ final class ContainerParameterCollection implements \IteratorAggregate
      */
     public function push(array $parameters): void
     {
+        /** @psalm-suppress MixedAssignment */
         foreach($parameters as $key => $value)
         {
             $this->add($key, $value);
@@ -46,6 +47,7 @@ final class ContainerParameterCollection implements \IteratorAggregate
      */
     public function add(string $key, $value): void
     {
+        /** @psalm-suppress MixedAssignment */
         $this->collection[$key] = $value;
     }
 

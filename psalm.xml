@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <psalm
-        totallyTyped="false"
+        totallyTyped="true"
+        useDocblockTypes="true"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="https://getpsalm.org/schema/config"
         xsi:schemaLocation="https://getpsalm.org/schema/config"
@@ -26,6 +27,7 @@
         <InvalidDocblock errorLevel="info"/>
         <MisplacedRequiredParam errorLevel="info"/>
 
+        <PropertyNotSetInConstructor errorLevel="suppress"/>
         <PropertyNotSetInConstructor errorLevel="suppress"/>
         <MissingConstructor errorLevel="info"/>
         <MissingClosureParamType errorLevel="info"/>

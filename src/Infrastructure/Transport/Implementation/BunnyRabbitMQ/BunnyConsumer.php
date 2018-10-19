@@ -80,7 +80,7 @@ final class BunnyConsumer
      *
      * @param callable $onMessageReceived function(BunnyIncomingPackage $package) {...}
      *
-     * @return Promise<null>
+     * @return Promise<\Bunny\Protocol\MethodBasicConsumeOkFrame>
      */
     public function listen(callable $onMessageReceived): Promise
     {
@@ -93,14 +93,14 @@ final class BunnyConsumer
         ]);
 
         return $this->channel->consume(
-            self::createMessageHandler($logger, $onMessageReceived), $queueName, $this->tag
+            self::createMessageHandler($logger, $onMessageReceived), $queueName, (string) $this->tag
         );
     }
 
     /**
      * Stop watching the queue
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function stop(): Promise
     {
@@ -150,6 +150,7 @@ final class BunnyConsumer
                         'rawMessageHeaders' => $envelope->headers
                     ]);
 
+                    /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
                     asyncCall($onMessageReceived, $package);
 
                     unset($package);

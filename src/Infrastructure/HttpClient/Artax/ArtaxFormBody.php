@@ -86,8 +86,10 @@ final class ArtaxFormBody implements FormBody
      */
     public function addMultiple(array $fields): void
     {
+        /** @var string|float|int|InputFilePath $value */
         foreach($fields as $key => $value)
         {
+            /** @psalm-suppress MixedArgument */
             $value instanceof InputFilePath
                 ? $this->addFile($key, $value)
                 : $this->addField($key, $value);

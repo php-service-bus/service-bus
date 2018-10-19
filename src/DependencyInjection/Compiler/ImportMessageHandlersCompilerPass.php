@@ -32,8 +32,8 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     private $excludedFiles;
 
     /**
-     * @param array $directories
-     * @param array $excludedFiles
+     * @param array<mixed, string> $directories
+     * @param array<mixed, string> $excludedFiles
      */
     public function __construct(array $directories, array $excludedFiles)
     {

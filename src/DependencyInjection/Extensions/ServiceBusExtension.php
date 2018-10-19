@@ -26,6 +26,11 @@ final class ServiceBusExtension extends Extension
     /**
      * @inheritdoc
      *
+     * @psalm-suppress MoreSpecificImplementedParamType
+     *
+     * @param array<string, mixed> $configs
+     * @param ContainerBuilder     $container
+     *
      * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
@@ -33,6 +38,7 @@ final class ServiceBusExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator());
         $loader->load(__DIR__ . '/../service_bus.yaml');
 
+        /** @psalm-suppress MixedAssignment */
         foreach($configs as $key => $value)
         {
             $container->setParameter($key, $value);

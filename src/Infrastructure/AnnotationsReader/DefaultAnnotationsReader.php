@@ -81,7 +81,7 @@ final class DefaultAnnotationsReader implements AnnotationsReader
      *
      * @param \ReflectionClass $class
      *
-     * @return Annotation[]
+     * @return array<mixed, \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation>
      */
     private function loadClassLevelAnnotations(\ReflectionClass $class): array
     {
@@ -99,7 +99,7 @@ final class DefaultAnnotationsReader implements AnnotationsReader
      *
      * @param \ReflectionClass $class
      *
-     * @return Annotation[]
+     * @return array<mixed, \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation>
      */
     private function loadMethodLevelAnnotations(\ReflectionClass $class): array
     {
@@ -109,6 +109,7 @@ final class DefaultAnnotationsReader implements AnnotationsReader
         {
             $methodAnnotations = $this->reader->getMethodAnnotations($method);
 
+            /** @var object $methodAnnotation */
             foreach($methodAnnotations as $methodAnnotation)
             {
                 $annotations[] = Annotation::methodLevel($method, $methodAnnotation, $class->getName());

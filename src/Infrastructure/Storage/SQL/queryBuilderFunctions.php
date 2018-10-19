@@ -113,7 +113,7 @@ function deleteQuery(string $fromTable): DeleteQuery
 /**
  * Create insert query
  *
- * @param string $toTable
+ * @param string                      $toTable
  * @param array<string, mixed>|object $toInsert
  *
  * @return InsertQuery
@@ -140,7 +140,7 @@ function insertQuery(string $toTable, $toInsert): InsertQuery
  *
  * @param object $object
  *
- * @return array<mixed, mixed>
+ * @return array<string, int|float|null|string>
  *
  * @throws \LogicException
  */
@@ -148,6 +148,7 @@ function castObjectToArray(object $object): array
 {
     $result = [];
 
+    /** @var int|float|null|string|object $value */
     foreach(getObjectVars($object) as $key => $value)
     {
         $result[toSnakeCase($key)] = cast($key, $value);
@@ -161,21 +162,28 @@ function castObjectToArray(object $object): array
  *
  * @param object $object
  *
- * @return array<mixed, mixed>
+ * @return array<string, int|float|null|string|object>
  */
 function getObjectVars(object $object): array
 {
     $closure = \Closure::bind(
         function(): array
         {
-            /** @psalm-suppress InvalidScope */
+            /**
+             * @var object $this
+             *
+             * @psalm-suppress InvalidScope
+             */
             return \get_object_vars($this);
         },
         $object,
         $object
     );
 
-    return $closure();
+    /** @var array<string, int|float|null|string|object> $vars */
+    $vars = $closure();
+
+    return $vars;
 }
 
 /**
@@ -191,10 +199,9 @@ function toSnakeCase(string $string): string
 }
 
 /**
- * @param string $key
- * @param mixed  $value
+ * @param string                       $key
+ * @param int|float|null|string|object $value
  *
- * @psalm-return scalar|null
  * @return int|float|null|string
  *
  * @throws \LogicException
@@ -206,6 +213,7 @@ function cast(string $key, $value)
         return $value;
     }
 
+    /** @psalm-suppress RedundantConditionGivenDocblockType */
     if(true === \is_object($value))
     {
         return castObjectToString($value);

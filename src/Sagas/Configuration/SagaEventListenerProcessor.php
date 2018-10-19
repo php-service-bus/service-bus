@@ -75,6 +75,8 @@ final class SagaEventListenerProcessor
      * @param Event                  $event
      * @param MessageDeliveryContext $context
      *
+     * @psalm-suppress MixedTypeCoercion
+     *
      * @return Promise<bool>
      */
     public function execute(Event $event, MessageDeliveryContext $context): Promise
@@ -147,11 +149,14 @@ final class SagaEventListenerProcessor
 
             if('' !== $propertyValue)
             {
-                return self::identifierInstantiator(
+                /** @var SagaId $id */
+                $id = self::identifierInstantiator(
                     $identifierClass,
                     $propertyValue,
                     $sagaListenerOptions->sagaClass()
                 );
+
+                return $id;
             }
 
             throw IncorrectIdentifierFieldSpecified::empty($event, $propertyName);

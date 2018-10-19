@@ -45,7 +45,7 @@ final class AggregateEventStream
     /**
      * Origin event collection
      *
-     * @var array<mixed, \Desperado\ServiceBus\Common\Contract\Messages\Event>
+     * @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event>
      */
     private $originEvents;
 
@@ -149,7 +149,7 @@ final class AggregateEventStream
     /**
      * @param array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent> $events
      *
-     * @return array
+     * @return array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent>
      */
     private static function sortEvents(array $events): array
     {
@@ -170,7 +170,7 @@ final class AggregateEventStream
     /**
      * @param array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent> $events
      *
-     * @return array<mixed, \Desperado\ServiceBus\Common\Contract\Messages\Event>
+     * @return array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event>
      */
     private static function extractOriginEvents(array $events): array
     {

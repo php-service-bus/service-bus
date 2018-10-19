@@ -19,14 +19,14 @@ namespace Desperado\ServiceBus\Infrastructure\AnnotationsReader;
 final class AnnotationCollection implements \Countable, \IteratorAggregate
 {
     /**
-     * Annotations VO
+     * Annotations
      *
-     * @var array<string, \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation>
+     * @var array<mixed, \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation>
      */
     private $collection = [];
 
     /**
-     * @param array $annotations
+     * @param array<mixed, \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation> $annotations
      */
     public function __construct(array $annotations = [])
     {
@@ -61,27 +61,18 @@ final class AnnotationCollection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Map collection data
-     *
-     * @param callable<\Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation> $callable
-     *
-     * @return AnnotationCollection
-     */
-    public function map(callable $callable): AnnotationCollection
-    {
-        return new AnnotationCollection(\array_map($callable, $this->collection));
-    }
-
-    /**
      * Filter collection data
      *
-     * @param callable<\Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation> $callable
+     * @param callable $callable function(Annotation $annotation): ?Annotation {}
      *
      * @return AnnotationCollection
      */
     public function filter(callable $callable): AnnotationCollection
     {
-        return new AnnotationCollection(\array_filter($this->collection, $callable));
+        /** @var array<mixed, \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation> $annotations */
+        $annotations = \array_filter($this->collection, $callable);
+
+        return new AnnotationCollection($annotations);
     }
 
     /**

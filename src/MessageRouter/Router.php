@@ -29,7 +29,7 @@ final class Router implements \Countable
     /**
      * Event listeners
      *
-     * @var array<string, array<string, \Desperado\ServiceBus\MessageExecutor\MessageExecutor>>
+     * @var array<string, array<string|int, \Desperado\ServiceBus\MessageExecutor\MessageExecutor>>
      */
     private $eventListenersMap = [];
 

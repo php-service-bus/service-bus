@@ -25,12 +25,10 @@ use Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDeco
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\Queue;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
-use Desperado\ServiceBus\MessageExecutor\MessageExecutor;
 use Desperado\ServiceBus\MessageRouter\Router;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
-use function React\Promise\all;
 
 /**
  *
@@ -99,7 +97,7 @@ final class EntryPoint
      *
      * @param Queue $queue
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function listen(Queue $queue): Promise
     {
@@ -147,7 +145,7 @@ final class EntryPoint
                         yield $package->ack();
                         yield self::process($router, $message, $context);
 
-                        unset($handlers, $message, $context);
+                        unset($message, $context);
                     }
                     catch(\Throwable $throwable)
                     {
@@ -181,7 +179,7 @@ final class EntryPoint
      * @param Message       $message
      * @param KernelContext $context
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     private static function process(Router $router, Message $message, KernelContext $context): Promise
     {
@@ -209,8 +207,13 @@ final class EntryPoint
 
                     foreach($executors as $executor)
                     {
-                        /** @var \Desperado\ServiceBus\MessageExecutor\MessageExecutor $executor */
+                        /**
+                         * @see \Desperado\ServiceBus\MessageExecutor\MessageExecutor::__invoke
+                         *
+                         * @var callable $executor
+                         */
 
+                        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
                         yield call($executor, $message, $context);
                     }
 
@@ -238,6 +241,13 @@ final class EntryPoint
         Loop::defer(
             function() use ($interval): \Generator
             {
+                if(null === $this->listenQueue)
+                {
+                    Loop::stop();
+
+                    return;
+                }
+
                 yield $this->transport->stop($this->listenQueue);
 
                 $this->logger->info('Handler will stop after {duration} seconds', ['duration' => $interval / 1000]);

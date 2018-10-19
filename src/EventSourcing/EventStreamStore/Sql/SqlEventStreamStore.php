@@ -148,14 +148,14 @@ final class SqlEventStreamStore implements AggregateStore
             {
                 $aggregateEventStream = null;
 
-                /** @var array|null $streamData */
+                /** @var array<string, string>|null $streamData */
                 $streamData = yield self::doLoadStream($adapter, $id);
 
                 if(null !== $streamData)
                 {
                     $streamEventsData = yield self::doLoadStreamEvents(
                         $adapter,
-                        $streamData['id'],
+                        (string) $streamData['id'],
                         $fromVersion,
                         $toVersion
                     );
@@ -182,17 +182,22 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(AggregateId $id) use ($adapter): \Generator
             {
-                /** @psalm-suppress ImplicitToStringCast */
+                /**
+                 * @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery
+                 *
+                 * @psalm-suppress ImplicitToStringCast
+                 */
                 $updateQuery = updateQuery('event_store_stream', ['closed_at' => \date('Y-m-d H:i:s')])
                     ->where(equalsCriteria('id', $id))
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)));
 
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                 $compiledQuery = $updateQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                unset($resultSet, $updateQuery, $resultSet);
+                unset($resultSet, $updateQuery);
             },
             $id
         );
@@ -207,7 +212,7 @@ final class SqlEventStreamStore implements AggregateStore
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
@@ -220,6 +225,7 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StoredAggregateEventStream $eventsStream) use ($transaction): \Generator
             {
+                /** @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery */
                 $insertQuery = insertQuery('event_store_stream', [
                     'id'               => $eventsStream->aggregateId(),
                     'identifier_class' => $eventsStream->getAggregateIdClass(),
@@ -228,6 +234,7 @@ final class SqlEventStreamStore implements AggregateStore
                     'closed_at'        => $eventsStream->closedAt()
                 ]);
 
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                 $compiledQuery = $insertQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
@@ -245,7 +252,7 @@ final class SqlEventStreamStore implements AggregateStore
      * @param TransactionAdapter         $transaction
      * @param StoredAggregateEventStream $eventsStream
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
@@ -307,10 +314,9 @@ final class SqlEventStreamStore implements AggregateStore
         $queryParameters = [];
         $rowSetIndex     = 0;
 
+        /** @var array<int, string|int> $parameters */
         foreach(self::prepareEventRows($eventsStream) as $parameters)
         {
-            /** @var array $parameters */
-
             foreach($parameters as $parameter)
             {
                 $queryParameters[$rowSetIndex] = $parameter;
@@ -327,7 +333,7 @@ final class SqlEventStreamStore implements AggregateStore
      *
      * @param StoredAggregateEventStream $eventsStream
      *
-     * @return array
+     * @return array<int, array<int, string|int>>
      */
     private static function prepareEventRows(StoredAggregateEventStream $eventsStream): array
     {
@@ -361,8 +367,9 @@ final class SqlEventStreamStore implements AggregateStore
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion
      *
-     * @return Promise<array<mixed, mixed>>
+     * @return Promise<array<string, string>|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
@@ -374,16 +381,22 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StorageAdapter $adapter, AggregateId $id): \Generator
             {
-                /** @psalm-suppress ImplicitToStringCast */
+                /**
+                 * @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery
+                 *
+                 * @psalm-suppress ImplicitToStringCast
+                 */
                 $selectQuery = selectQuery('event_store_stream')
                     ->where(equalsCriteria('id', $id))
                     ->andWhere(equalsCriteria('identifier_class', \get_class($id)));
 
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                 $compiledQuery = $selectQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
                 $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
+                /** @var array<string, string>|null $data */
                 $data = yield fetchOne($resultSet);
 
                 unset($resultSet, $selectQuery, $compiledQuery);
@@ -405,8 +418,9 @@ final class SqlEventStreamStore implements AggregateStore
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion
      *
-     * @return Promise<array<mixed, array>>
+     * @return Promise<array<int, array>>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
@@ -423,6 +437,7 @@ final class SqlEventStreamStore implements AggregateStore
         return call(
             static function(StorageAdapter $adapter, string $streamId, int $fromVersion, ?int $toVersion): \Generator
             {
+                /** @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery */
                 $selectQuery = selectQuery('event_store_stream_events')
                     ->where(field('stream_id')->eq($streamId))
                     ->andWhere(field('playhead')->gte($fromVersion));
@@ -432,6 +447,7 @@ final class SqlEventStreamStore implements AggregateStore
                     $selectQuery->andWhere(field('playhead')->lte($toVersion));
                 }
 
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                 $compiledQuery = $selectQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
@@ -453,9 +469,9 @@ final class SqlEventStreamStore implements AggregateStore
     /**
      * Transform events stream array data to stored representation
      *
-     * @param StorageAdapter $adapter
-     * @param array          $streamData
-     * @param array|null     $streamEventsData
+     * @param StorageAdapter         $adapter
+     * @param array<string, string>  $streamData
+     * @param array<int, array>|null $streamEventsData
      *
      * @return StoredAggregateEventStream
      */
@@ -489,6 +505,7 @@ final class SqlEventStreamStore implements AggregateStore
 
         if(true === \is_array($eventsData) && 0 !== \count($eventsData))
         {
+            /** @var array<string, string> $eventRow */
             foreach($eventsData as $eventRow)
             {
                 $playhead = (int) $eventRow['playhead'];

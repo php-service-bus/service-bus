@@ -94,16 +94,18 @@ final class StorageConfiguration
         $parsedDSN   = \parse_url($preparedDSN);
         $self        = new self();
 
-        \parse_str($parsedDSN['query'] ?? 'charset=UTF-8', $self->queryParameters);
+        $queryString = (string) ($parsedDSN['query'] ?? 'charset=UTF-8');
+
+        \parse_str($queryString, $self->queryParameters);
 
         $self->originalDSN  = $connectionDSN;
-        $self->scheme       = $parsedDSN['scheme'] ?? null;
-        $self->host         = $parsedDSN['host'] ?? null;
-        $self->port         = $parsedDSN['port'] ?? null;
-        $self->username     = $parsedDSN['user'] ?? null;
-        $self->password     = $parsedDSN['pass'] ?? null;
-        $self->databaseName = isset($parsedDSN['path']) ? \ltrim($parsedDSN['path'], '/') : null;
-        $self->encoding     = $self->queryParameters['charset'] ?? 'UTF-8';
+        $self->scheme       = isset($parsedDSN['scheme']) ? (string) $parsedDSN['scheme'] : null;
+        $self->host         = isset($parsedDSN['host']) ? (string) $parsedDSN['host'] : null;
+        $self->port         = isset($parsedDSN['port']) ? (int) $parsedDSN['port'] : null;
+        $self->username     = isset($parsedDSN['user']) ? (string) $parsedDSN['user'] : null;
+        $self->password     = isset($parsedDSN['pass']) ? (string) $parsedDSN['pass'] : null;
+        $self->databaseName = isset($parsedDSN['path']) ? \ltrim((string) $parsedDSN['path'], '/') : null;
+        $self->encoding     = isset($self->queryParameters['charset']) ? (string) $self->queryParameters['charset'] : 'UTF-8';
 
         return $self;
     }

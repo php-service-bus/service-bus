@@ -53,8 +53,10 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
             if(false === $isSuccess)
             {
                 // @codeCoverageIgnoreStart
-                /** Driver-specific error message */
-                throw new \RuntimeException($this->connection->errorInfo()[2]);
+                /** @var string $message Driver-specific error message */
+                $message = $this->connection->errorInfo()[2];
+
+                throw new \RuntimeException($message);
                 // @codeCoverageIgnoreEnd
             }
 

@@ -44,18 +44,19 @@ final class IncomingMessageDecoder
     /**
      * @param IncomingPackage $package
      *
+     * @psalm-suppress MixedTypeCoercion
+     *
      * @return Promise<\Desperado\ServiceBus\Common\Contract\Messages\Message>
      *
      * @throws \LogicException Could not find encoder in the service container
-     * @throws \Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed Error while
-     *                                                                                                  decoding
-     *                                                                                                  message
+     * @throws \Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed
      */
     public function decode(IncomingPackage $package): Promise
     {
         $decodersContainer = $this->decodersContainer;
         $deferred          = new Deferred();
 
+        /** @psalm-suppress InvalidReturnType */
         Loop::defer(
             static function() use ($package, $decodersContainer, $deferred): \Generator
             {
@@ -63,25 +64,28 @@ final class IncomingMessageDecoder
                 {
                     $encoderKey = self::extractEncoderKey($package->headers());
 
-                    if(true === $decodersContainer->has($encoderKey))
+                    if(false === $decodersContainer->has($encoderKey))
                     {
-                        /** @var MessageDecoder $encoder */
-                        $encoder = $decodersContainer->get($encoderKey);
-
-                        $deferred->resolve(
-                            $encoder->decode(
-                                yield $package->payload()->read()
+                        $deferred->fail(
+                            new \LogicException(
+                                \sprintf('Could not find encoder "%s" in the service container', $encoderKey)
                             )
                         );
-
-                        unset($encoder, $result);
 
                         return;
                     }
 
-                    throw new \LogicException(
-                        \sprintf('Could not find encoder "%s" in the service container', $encoderKey)
+                    /** @var MessageDecoder $encoder */
+                    $encoder = $decodersContainer->get($encoderKey);
+
+                    /** @var string $payload */
+                    $payload = yield $package->payload()->read();
+
+                    $deferred->resolve(
+                        $encoder->decode($payload)
                     );
+
+                    unset($encoder, $payload);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -100,6 +104,9 @@ final class IncomingMessageDecoder
      */
     private static function extractEncoderKey(array $headers): string
     {
-        return $headers[self::HEADERS_ENCODER_KEY] ?? self::DEFAULT_ENCODER;
+        /** @var string $encoderKey */
+        $encoderKey = $headers[self::HEADERS_ENCODER_KEY] ?? self::DEFAULT_ENCODER;
+
+        return $encoderKey;
     }
 }

@@ -34,7 +34,7 @@ interface Endpoint
      * @param Message         $message
      * @param DeliveryOptions $options
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function delivery(Message $message, DeliveryOptions $options): Promise;
 }

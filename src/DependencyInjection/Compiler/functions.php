@@ -41,10 +41,10 @@ function extractNamespaceFromFile(string $filePath): ?string
 /**
  * Search for files matching the specified regular expression
  *
- * @param array  $directories
+ * @param array<mixed, string>  $directories
  * @param string $regExp
  *
- * @return \Generator<\SplFileInfo>
+ * @return \Generator<mixed, \SplFileInfo>
  */
 function searchFiles(array $directories, string $regExp): \Generator
 {
@@ -57,6 +57,7 @@ function searchFiles(array $directories, string $regExp): \Generator
             $regExp
         );
 
+        /** @var \SplFileInfo $file */
         foreach($regexIterator as $file)
         {
             yield $file;

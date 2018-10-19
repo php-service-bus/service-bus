@@ -28,7 +28,7 @@ interface SchedulerStore
      * @param ScheduledOperationId $id
      * @param callable             $postExtract function(ScheduledOperation $operation) {}
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\ScheduledOperationNotFound
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
@@ -57,7 +57,7 @@ interface SchedulerStore
      * @param ScheduledOperation $operation
      * @param callable           $postAdd function(ScheduledOperation $operation, ?NextScheduledOperation) {}
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed

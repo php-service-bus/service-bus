@@ -31,7 +31,7 @@ final class OutboundPackage
     /**
      * Message headers
      *
-     * @var array<string, string>
+     * @var array<string, string|int|float>
      */
     private $headers;
 
@@ -78,9 +78,9 @@ final class OutboundPackage
     private $traceId;
 
     /**
-     * @param InputStream               $payload
-     * @param array                     $headers
-     * @param TransportLevelDestination $destination
+     * @param InputStream                     $payload
+     * @param array<string, string|int|float> $headers
+     * @param TransportLevelDestination       $destination
      */
     public function __construct(InputStream $payload, array $headers, TransportLevelDestination $destination)
     {
@@ -144,7 +144,7 @@ final class OutboundPackage
     /**
      * Receive message headers
      *
-     * @return array
+     * @return array<string, string|int|float>
      */
     public function headers(): array
     {

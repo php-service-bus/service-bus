@@ -66,7 +66,7 @@ final class ScheduledOperation
     }
 
     /**
-     * @param array<string, string> $data
+     * @param array{processing_date:string, command:string, id:string, is_sent:bool} $data
      *
      * @return ScheduledOperation
      */

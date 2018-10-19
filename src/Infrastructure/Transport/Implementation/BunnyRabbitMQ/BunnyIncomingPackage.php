@@ -119,6 +119,7 @@ final class BunnyIncomingPackage implements IncomingPackage
      */
     public function ack(): Promise
     {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             function(): \Generator
             {
@@ -139,6 +140,7 @@ final class BunnyIncomingPackage implements IncomingPackage
      */
     public function nack(bool $requeue, ?string $withReason = null): Promise
     {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             function(bool $requeue): \Generator
             {
@@ -160,6 +162,7 @@ final class BunnyIncomingPackage implements IncomingPackage
      */
     public function reject(bool $requeue, ?string $withReason = null): Promise
     {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             function(bool $requeue): \Generator
             {
@@ -182,6 +185,6 @@ final class BunnyIncomingPackage implements IncomingPackage
     private function __construct()
     {
         $this->id   = uuid();
-        $this->time = \microtime(true);
+        $this->time = (float) \microtime(true);
     }
 }

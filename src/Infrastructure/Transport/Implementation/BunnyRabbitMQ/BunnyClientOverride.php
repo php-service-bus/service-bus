@@ -86,7 +86,7 @@ final class BunnyClientOverride extends Client
     )
     {
         $this->connectConfig = $connectConfig;
-        $this->qosConfig = $qosConfig;
+        $this->qosConfig     = $qosConfig;
 
         $parameters = [
             'async'     => true,
@@ -109,7 +109,7 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function connect(): Promise
     {
@@ -131,8 +131,9 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedArgument
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function disconnect($replyCode = 0, $replyText = ''): Promise
     {
@@ -178,6 +179,7 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyChannelOverride>
      */
@@ -208,7 +210,7 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function onHeartbeat(): Promise
     {
@@ -216,6 +218,7 @@ final class BunnyClientOverride extends Client
         return call(
             function(): \Generator
             {
+                /** @var float $currentTime */
                 $currentTime = \microtime(true);
 
                 /** @var float|null $lastWrite */
@@ -225,6 +228,8 @@ final class BunnyClientOverride extends Client
                 {
                     $lastWrite = $currentTime;
                 }
+
+                /** @var float $lastWrite */
 
                 /** @var float $nextHeartbeat */
                 $nextHeartbeat = $lastWrite + $this->connectConfig->heartbeatInterval();
@@ -245,6 +250,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodBasicConsumeOkFrame>
      */
@@ -294,6 +301,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<bool|\Bunny\Protocol\MethodBasicCancelOkFrame>
      */
@@ -333,6 +342,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodBasicGetOkFrame>
      */
@@ -368,6 +379,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodBasicQosOkFrame>
      */
@@ -403,6 +416,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodConnectionOpenOkFrame>
      */
@@ -439,6 +454,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodConnectionCloseOkFrame>
      */
@@ -475,6 +492,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodChannelOpenOkFrame>
      */
@@ -508,6 +527,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodChannelFlowOkFrame>
      */
@@ -540,6 +561,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodAccessRequestOkFrame>
      */
@@ -575,6 +598,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodExchangeDeclareOkFrame>
      */
@@ -630,6 +655,8 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\MethodExchangeDeleteOkFrame>
      */
@@ -666,6 +693,7 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<bool>
      */
@@ -713,6 +741,8 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -759,6 +789,8 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -805,6 +837,8 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
      * @psalm-suppress MissingParamType
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -850,6 +884,7 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -886,6 +921,7 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -923,6 +959,7 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -960,6 +997,7 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -988,6 +1026,7 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1026,6 +1065,8 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1080,6 +1121,8 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1127,6 +1170,8 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress MissingParamType
      * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress MixedArgument
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1172,7 +1217,7 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function onDataAvailable(): Promise
     {
@@ -1186,18 +1231,22 @@ final class BunnyClientOverride extends Client
                 {
                     foreach($this->awaitCallbacks as $k => $callback)
                     {
+                        /** @var bool|Promise|ReactPromise|\Generator $executionResult */
+                        $executionResult = $callback($frame);
 
                         /** @var bool $awaitResult */
-                        $awaitResult = yield self::adaptAwaitResult($callback($frame));
+                        $awaitResult = yield self::adaptAwaitResult($executionResult);
 
                         if(true === $awaitResult)
                         {
+                            /** @psalm-suppress MixedArrayOffset */
                             unset($this->awaitCallbacks[$k]);
+
                             /** CONTINUE WHILE LOOP */
                             continue 2;
                         }
 
-                        unset($awaitResult);
+                        unset($awaitResult, $executionResult);
                     }
 
                     if(0 === $frame->channel)
@@ -1240,6 +1289,8 @@ final class BunnyClientOverride extends Client
 
     /**
      * @param bool|Promise|ReactPromise|\Generator $awaitResult
+     *
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<bool>
      */

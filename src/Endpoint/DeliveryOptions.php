@@ -21,7 +21,7 @@ final class DeliveryOptions
     /**
      * Headers bag
      *
-     * @var array<string, string>
+     * @var array<string, string|int|float>
      */
     private $headers;
 
@@ -61,7 +61,7 @@ final class DeliveryOptions
     private $traceId;
 
     /**
-     * @param array<string, string> $headers
+     * @param array<string, string|int|float> $headers
      */
     public function __construct(array $headers = [])
     {
@@ -103,7 +103,7 @@ final class DeliveryOptions
     /**
      * Receive message headers
      *
-     * @return array
+     * @return array<string, string|int|float>
      */
     public function headers(): array
     {

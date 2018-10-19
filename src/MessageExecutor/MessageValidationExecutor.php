@@ -38,13 +38,13 @@ final class MessageValidationExecutor implements MessageExecutor
     private $validator;
 
     /**
-     * @var array<mixed, string>
+     * @var array<int, string>
      */
     private $validationGroups;
 
     /**
-     * @param MessageExecutor $processor
-     * @param array           $validationGroups
+     * @param MessageExecutor    $processor
+     * @param array<int, string> $validationGroups
      */
     public function __construct(MessageExecutor $executor, array $validationGroups)
     {
@@ -91,10 +91,9 @@ final class MessageValidationExecutor implements MessageExecutor
     {
         $errors = [];
 
+        /** @var \Symfony\Component\Validator\ConstraintViolation $violation */
         foreach($violations as $violation)
         {
-            /** @var \Symfony\Component\Validator\ConstraintViolation $violation */
-
             $errors[$violation->getPropertyPath()][] = $violation->getMessage();
         }
 
