@@ -36,6 +36,7 @@ final class SagaEventListener implements SagaAnnotationMarker
      */
     public function __construct(array $data)
     {
+        /** @var string|null $value */
         foreach($data as $key => $value)
         {
             if(false === \property_exists($this, $key))

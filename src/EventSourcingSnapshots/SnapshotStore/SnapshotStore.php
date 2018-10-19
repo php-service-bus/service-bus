@@ -29,7 +29,7 @@ interface SnapshotStore
      *
      * @param StoredAggregateSnapshot $aggregateSnapshot
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
@@ -62,7 +62,7 @@ interface SnapshotStore
      *
      * @param AggregateId $id
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed

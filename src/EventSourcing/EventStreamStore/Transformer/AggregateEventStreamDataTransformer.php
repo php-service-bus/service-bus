@@ -50,17 +50,20 @@ final class AggregateEventStreamDataTransformer
      */
     public function streamToStoredRepresentation(AggregateEventStream $aggregateEvent): StoredAggregateEventStream
     {
+        /** @var array<int, \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent> $preparedEvents */
+        $preparedEvents = \array_map(
+            function(AggregateEvent $aggregateEvent): StoredAggregateEvent
+            {
+                return $this->eventToStoredRepresentation($aggregateEvent);
+            },
+            $aggregateEvent->events()
+        );
+
         return new StoredAggregateEventStream(
             (string) $aggregateEvent->id(),
             \get_class($aggregateEvent->id()),
             $aggregateEvent->aggregateClass(),
-            \array_map(
-                function(AggregateEvent $aggregateEvent): StoredAggregateEvent
-                {
-                    return $this->eventToStoredRepresentation($aggregateEvent);
-                },
-                $aggregateEvent->events()
-            ),
+            $preparedEvents,
             (string) datetimeToString($aggregateEvent->createdAt()),
             datetimeToString($aggregateEvent->closedAt())
         );
@@ -87,15 +90,14 @@ final class AggregateEventStreamDataTransformer
         /** @var \DateTimeImmutable|null $closedAt */
         $closedAt = datetimeInstantiator($storedAggregateEventsStream->closedAt());
 
+        /** @var AggregateId $id */
+        $id = self::identifierInstantiator(
+            $storedAggregateEventsStream->getAggregateIdClass(),
+            $storedAggregateEventsStream->aggregateId()
+        );
+
         return new AggregateEventStream(
-            self::identifierInstantiator(
-                $storedAggregateEventsStream->getAggregateIdClass(),
-                $storedAggregateEventsStream->aggregateId()
-            ),
-            $storedAggregateEventsStream->aggregateClass(),
-            $events,
-            $createdAt,
-            $closedAt
+            $id, $storedAggregateEventsStream->aggregateClass(), $events, $createdAt, $closedAt
         );
     }
 

@@ -44,7 +44,7 @@ final class MessageRoutesConfigurator
     private $sagasList;
 
     /**
-     * @var array<mixed, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver>
+     * @var array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver>
      */
     private $argumentResolvers;
 
@@ -63,10 +63,10 @@ final class MessageRoutesConfigurator
     private $routingServiceLocator;
 
     /**
-     * @param array<mixed, string>                                                   $servicesList
-     * @param array<mixed, string>                                                   $sagasList
-     * @param ServiceLocator                                                         $routingServiceLocator
-     * @param array<mixed, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
+     * @param array<mixed, string>                                                    $servicesList
+     * @param array<mixed, string>                                                    $sagasList
+     * @param ServiceLocator                                                          $routingServiceLocator
+     * @param array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
      */
     public function __construct(
         array $servicesList,
@@ -116,10 +116,9 @@ final class MessageRoutesConfigurator
         {
             $sagaConfiguration = $sagasConfigurationExtractor->load($sagaClass);
 
+            /** @var \Desperado\ServiceBus\MessageHandlers\Handler $handler */
             foreach($sagaConfiguration->handlerCollection() as $handler)
             {
-                /** @var \Desperado\ServiceBus\MessageHandlers\Handler $handler */
-
                 $router->registerListener(
                     (string) $handler->messageClass(),
                     new DefaultMessageExecutor($handler->toClosure(), $handler->arguments(), $this->argumentResolvers)
@@ -152,10 +151,9 @@ final class MessageRoutesConfigurator
             /** @var object $serviceObject */
             $serviceObject = $this->servicesServiceLocator->get(\sprintf('%s_service', $serviceId));
 
+            /** @var \Desperado\ServiceBus\MessageHandlers\Handler $handler */
             foreach($serviceConfigurationExtractor->load($serviceObject) as $handler)
             {
-                /** @var \Desperado\ServiceBus\MessageHandlers\Handler $handler */
-
                 self::assertMessageClassSpecifiedInArguments($serviceObject, $handler);
 
                 $messageExecutor = new DefaultMessageExecutor(

@@ -192,7 +192,7 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
      *
      * @see          MessageValidationExecutor
      *
-     * @param array $violations
+     * @param array<string, array<int, string>> $violations
      *
      * @return void
      */

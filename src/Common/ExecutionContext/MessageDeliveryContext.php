@@ -29,7 +29,7 @@ interface MessageDeliveryContext
      *
      * @param Message $message
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function delivery(Message $message, ?DeliveryOptions $options = null): Promise;
 }

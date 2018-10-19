@@ -49,12 +49,10 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     {
         $collection = new HandlerCollection();
 
+        /** @var \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation $annotation */
         foreach($this->loadMethodLevelAnnotations($service) as $annotation)
         {
-            /**
-             * @var \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation $annotation
-             * @var CommandHandler|EventListener                       $handlerAnnotation
-             */
+            /** @var CommandHandler|EventListener $handlerAnnotation */
             $handlerAnnotation = $annotation->annotationObject();
 
             /** @var \ReflectionMethod $handlerReflectionMethod */
@@ -62,12 +60,16 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
 
             $factoryMethod = $handlerAnnotation instanceof CommandHandler ? 'commandHandler' : 'eventListener';
 
-            $collection->push(
-                Handler::{$factoryMethod}(
-                    $this->createOptions($handlerAnnotation),
-                    $handlerReflectionMethod
-                )
+            /**
+             * @var Handler                      $handler
+             * @var CommandHandler|EventListener $handlerAnnotation
+             */
+            $handler = Handler::{$factoryMethod}(
+                $this->createOptions($handlerAnnotation),
+                $handlerReflectionMethod
             );
+
+            $collection->push($handler);
         }
 
         return $collection;

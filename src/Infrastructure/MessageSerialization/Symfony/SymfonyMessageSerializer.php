@@ -80,10 +80,13 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
 
             self::validateUnserializedData($data);
 
-            return $this->serializer->denormalize(
+            /** @var Message $object */
+            $object = $this->serializer->denormalize(
                 $data['message'],
                 $data['namespace']
             );
+
+            return $object;
         }
         catch(\Throwable $throwable)
         {
@@ -158,7 +161,7 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
     /**
      * @param string $json
      *
-     * @return array
+     * @return array<mixed, mixed>
      *
      * @throws \RuntimeException When json_decode failed
      */
@@ -167,6 +170,7 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
         /** Clear last error */
         \json_last_error();
 
+        /** @var array<mixed, mixed> $decoded */
         $decoded = \json_decode($json, true);
 
         self::throwExceptionIfJsonError();
@@ -217,7 +221,7 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
         }
 
         /** Let's check if the specified class exists */
-        if('' === $data['namespace'] || false === \class_exists($data['namespace']))
+        if('' === $data['namespace'] || false === \class_exists((string) $data['namespace']))
         {
             throw new \UnexpectedValueException(
                 \sprintf('Class "%s" not found', $data['namespace'])

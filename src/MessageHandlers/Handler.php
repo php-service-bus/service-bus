@@ -135,13 +135,15 @@ final class Handler
     {
         if(null !== $this->preparedMessageClass)
         {
-            return $this->preparedMessageClass;
+            /** @var string $preparedMessageClass */
+            $preparedMessageClass = $this->preparedMessageClass;
+
+            return $preparedMessageClass;
         }
 
+        /** @var HandlerArgument $argument */
         foreach($this->arguments() as $argument)
         {
-            /** @var HandlerArgument $argument */
-
             if(true === $argument->isA(Message::class))
             {
                 return $argument->className();

@@ -119,7 +119,7 @@ final class ContainerBuilder
     }
 
     /**
-     * @param array $parameters
+     * @param array<string, mixed> $parameters
      *
      * @return void
      */
@@ -171,6 +171,7 @@ final class ContainerBuilder
          */
         include_once $this->getContainerClassPath();
 
+        /** @var string $containerClassName */
         $containerClassName = $this->getContainerClassName();
 
         return new $containerClassName();
@@ -190,15 +191,15 @@ final class ContainerBuilder
 
         $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($containerParameters));
 
+        /** @var Extension $extension */
         foreach($this->extensions as $extension)
         {
-            /** @var Extension $extension */
             $extension->load($containerParameters, $containerBuilder);
         }
 
+        /** @var CompilerPassInterface $compilerPass */
         foreach($this->compilerPasses as $compilerPass)
         {
-            /** @var CompilerPassInterface $compilerPass */
             $containerBuilder->addCompilerPass($compilerPass);
         }
 

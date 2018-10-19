@@ -25,7 +25,7 @@ interface FormBody
     /**
      * Create from form parameters
      *
-     * @param array $fields
+     * @param array<string, string|array<string, string>> $fields
      *
      * @return static
      */
@@ -54,7 +54,7 @@ interface FormBody
     /**
      * Add multiple fields/files
      *
-     * @param array $fields
+     * @param array<string, string|int|float|InputFilePath> $fields
      *
      * @return void
      */

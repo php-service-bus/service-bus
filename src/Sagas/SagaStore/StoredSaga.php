@@ -143,8 +143,11 @@ final class StoredSaga
             /** @var \DateTimeImmutable|null $closedAtDateTime */
             $closedAtDateTime = datetimeInstantiator($closedAt);
 
+            /** @var SagaId $sagaId */
+            $sagaId = self::identifierInstantiator($idClass, $id, $sagaClass);
+
             return self::create(
-                self::identifierInstantiator($idClass, $id, $sagaClass),
+                $sagaId,
                 SagaStatus::create($status),
                 $payload,
                 new \DateTimeImmutable($createdAt),
@@ -159,7 +162,9 @@ final class StoredSaga
     }
 
     /**
-     * @param array $rowData
+     * @param array{id:string, identifier_class:string, saga_class:string, payload:string, state_id:string,
+     *                                                  created_at:string, expiration_date:string,
+     *                                                  closed_at:string|null} $rowData
      *
      * @return self
      *

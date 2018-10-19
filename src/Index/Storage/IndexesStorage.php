@@ -24,7 +24,7 @@ interface IndexesStorage
      * @param string $indexKey
      * @param string $valueKey
      *
-     * @return Promise<mixed|null>
+     * @return Promise<string|int|float|boolean|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
@@ -37,7 +37,7 @@ interface IndexesStorage
      * @param string $valueKey
      * @param mixed  $value
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
@@ -49,7 +49,7 @@ interface IndexesStorage
      * @param string $indexKey
      * @param string $valueKey
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
@@ -62,7 +62,7 @@ interface IndexesStorage
      * @param string $valueKey
      * @param mixed  $value
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed

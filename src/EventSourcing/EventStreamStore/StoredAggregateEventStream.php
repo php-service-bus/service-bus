@@ -42,7 +42,7 @@ final class StoredAggregateEventStream
     /**
      * Stored events data
      *
-     * @var array<mixed, \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent>
+     * @var array<int, \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent>
      */
     private $storedAggregateEvents;
 
@@ -61,12 +61,12 @@ final class StoredAggregateEventStream
     private $closedAt;
 
     /**
-     * @param string      $aggregateId
-     * @param string      $aggregateIdClass
-     * @param string      $aggregateClass
-     * @param array       $storedAggregateEvents
-     * @param string      $createdAt
-     * @param string|null $closedAt
+     * @param string                                                                                $aggregateId
+     * @param string                                                                                $aggregateIdClass
+     * @param string                                                                                $aggregateClass
+     * @param array<int, \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent> $storedAggregateEvents
+     * @param string                                                                                $createdAt
+     * @param string|null                                                                           $closedAt
      */
     public function __construct(
         string $aggregateId,
@@ -118,7 +118,7 @@ final class StoredAggregateEventStream
     /**
      * Receive stored events
      *
-     * @return array<mixed, \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent>
+     * @return array<int, \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent>
      */
     public function aggregateEvents(): array
     {

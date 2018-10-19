@@ -61,8 +61,13 @@ final class ServiceBusKernel
         /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
-        $this->transport  = $serviceLocator->get(Transport::class);
-        $this->entryPoint = $serviceLocator->get(EntryPoint::class);
+        /** @var Transport $transport */
+        $transport = $serviceLocator->get(Transport::class);
+        /** @var EntryPoint $entryPoint */
+        $entryPoint = $serviceLocator->get(EntryPoint::class);
+
+        $this->transport  = $transport;
+        $this->entryPoint = $entryPoint;
     }
 
     /**
@@ -73,10 +78,10 @@ final class ServiceBusKernel
      */
     public function monitorLoopBlock(): self
     {
-        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
-        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+        /** @var LoopBlockWatcher $loopBlockWatcher */
+        $loopBlockWatcher = $this->getKernelContainerService(LoopBlockWatcher::class);
 
-        $serviceLocator->get(LoopBlockWatcher::class)->run();
+        $loopBlockWatcher->run();
 
         return $this;
     }
@@ -88,10 +93,10 @@ final class ServiceBusKernel
      */
     public function enableGarbageCleaning(): self
     {
-        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
-        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+        /** @var GarbageCollectorWatcher $garbageCollectorWatcher */
+        $garbageCollectorWatcher = $this->getKernelContainerService(GarbageCollectorWatcher::class);
 
-        $serviceLocator->get(GarbageCollectorWatcher::class)->run();
+        $garbageCollectorWatcher->run();
 
         return $this;
     }
@@ -107,10 +112,8 @@ final class ServiceBusKernel
      */
     public function useDefaultStopSignalHandler(int $stopDelay = 10000): self
     {
-        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
-        $serviceLocator = $this->container->get('service_bus.public_services_locator');
-
-        $logger = $serviceLocator->get(LoggerInterface::class);
+        /** @var LoggerInterface $logger */
+        $logger = $this->getKernelContainerService(LoggerInterface::class);
 
         Loop::onSignal(
             \SIGINT,
@@ -118,14 +121,7 @@ final class ServiceBusKernel
             {
                 $logger->info('A signal SIGINT(2) was received');
 
-                if(null !== $this->entryPoint)
-                {
-                    $this->entryPoint->stop($stopDelay);
-
-                    return;
-                }
-
-                Loop::stop();
+                $this->entryPoint->stop($stopDelay);
             }
         );
 
@@ -144,10 +140,10 @@ final class ServiceBusKernel
      */
     public function registerMessageCustomEndpoint(string $messageClass, Endpoint $endpoint): void
     {
-        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
-        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+        /** @var EndpointRouter $entryPointRouter */
+        $entryPointRouter = $this->getKernelContainerService(EndpointRouter::class);
 
-        $serviceLocator->get(EndpointRouter::class)->registerRoute($messageClass, $endpoint);
+        $entryPointRouter->registerRoute($messageClass, $endpoint);
     }
 
     /**
@@ -166,5 +162,21 @@ final class ServiceBusKernel
     public function entryPoint(): EntryPoint
     {
         return $this->entryPoint;
+    }
+
+    /**
+     * @param string $service
+     *
+     * @return object
+     */
+    private function getKernelContainerService(string $service): object
+    {
+        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+
+        /** @var object $object */
+        $object = $serviceLocator->get($service);
+
+        return $object;
     }
 }

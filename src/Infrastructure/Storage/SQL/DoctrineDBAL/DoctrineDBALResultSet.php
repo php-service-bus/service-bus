@@ -27,7 +27,7 @@ final class DoctrineDBALResultSet implements ResultSet
     /**
      * Last row emitted
      *
-     * @var array|null
+     * @var array<mixed, mixed>|null
      */
     private $currentRow;
 
@@ -103,7 +103,10 @@ final class DoctrineDBALResultSet implements ResultSet
             return $this->currentRow;
         }
 
-        return $this->currentRow = $this->fetchResult[$this->currentPosition - 1] ?? null;
+        /** @var array<mixed, mixed>|null $data */
+        $data = $this->fetchResult[$this->currentPosition - 1] ?? null;
+
+        return $this->currentRow = $data;
     }
 
     /**

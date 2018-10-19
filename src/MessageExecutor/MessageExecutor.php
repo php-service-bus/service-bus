@@ -28,7 +28,7 @@ interface MessageExecutor
      * @param Message       $message
      * @param KernelContext $context
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Throwable
      */

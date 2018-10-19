@@ -83,7 +83,7 @@ final class ApplicationTransportEndpoint implements Endpoint
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-           static function(Message $message, DeliveryOptions $options, AmqpTransportLevelDestination $destination) use ($transport, $encoder)
+            static function(Message $message, DeliveryOptions $options, AmqpTransportLevelDestination $destination) use ($transport, $encoder): \Generator
             {
                 $encoded = $encoder->encode($message);
                 $package = self::createPackage($encoded, $options, $destination);

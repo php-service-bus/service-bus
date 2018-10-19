@@ -23,9 +23,12 @@ use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OneResultExpected;
  *
  * @param ResultSet $iterator
  *
- * @return Promise<array|null>
+ * @psalm-suppress MixedTypeCoercion
  *
- * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ResultSetIterationFailed Error getting operation result
+ * @return Promise<array<int, mixed>|null>
+ *
+ * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ResultSetIterationFailed Error getting operation
+ *                                                                                          result
  */
 function fetchAll(ResultSet $iterator): Promise
 {
@@ -52,9 +55,12 @@ function fetchAll(ResultSet $iterator): Promise
  *
  * @param ResultSet $iterator
  *
- * @return Promise<array|null>
+ * @psalm-suppress MixedTypeCoercion
  *
- * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ResultSetIterationFailed Error getting operation result
+ * @return Promise<array<string, mixed>|null>
+ *
+ * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ResultSetIterationFailed Error getting operation
+ *                                                                                          result
  * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OneResultExpected The result must contain only 1 row
  */
 function fetchOne(ResultSet $iterator): Promise
@@ -68,6 +74,7 @@ function fetchOne(ResultSet $iterator): Promise
 
             if(0 === $resultsCount || 1 === $resultsCount)
             {
+                /** @var bool|array $endElement */
                 $endElement = \end($collection);
 
                 unset($collection);

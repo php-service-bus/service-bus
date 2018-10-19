@@ -53,18 +53,21 @@ final class SqlIndexesStorage implements IndexesStorage
         return call(
             static function(string $indexKey, string $valueKey) use ($adapter): \Generator
             {
-                $query = selectQuery('event_sourcing_indexes')
+                /** @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery */
+                $selectQuery = selectQuery('event_sourcing_indexes')
                     ->where(equalsCriteria('index_tag', $indexKey))
-                    ->andWhere(equalsCriteria('value_key', $valueKey))
-                    ->compile();
+                    ->andWhere(equalsCriteria('value_key', $valueKey));
+
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $selectQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
                 /** @var array<string, mixed>|null $result */
                 $result = yield fetchOne($resultSet);
 
-                unset($resultSet);
+                unset($resultSet, $selectQuery, $compiledQuery);
 
                 if(null !== $result && true === \is_array($result))
                 {
@@ -82,21 +85,28 @@ final class SqlIndexesStorage implements IndexesStorage
     {
         $adapter = $this->adapter;
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress InvalidArgument
+         */
         return call(
-        /** @psalm-suppress MissingClosureParamType */
+            /** @psalm-suppress MissingClosureParamType */
             static function(string $indexKey, string $valueKey, $value) use ($adapter): \Generator
             {
-                $query = insertQuery('event_sourcing_indexes', [
+                /** @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery */
+                $insertQuery = insertQuery('event_sourcing_indexes', [
                     'index_tag'  => $indexKey,
                     'value_key'  => $valueKey,
                     'value_data' => $value
-                ])->compile();
+                ]);
+
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $insertQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                unset($resultSet, $query);
+                unset($resultSet, $insertQuery, $compiledQuery);
 
             },
             $indexKey, $valueKey, $value
@@ -114,10 +124,12 @@ final class SqlIndexesStorage implements IndexesStorage
         return call(
             static function(string $indexKey, string $valueKey) use ($adapter): \Generator
             {
+                /** @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery */
                 $deleteQuery = deleteQuery('event_sourcing_indexes')
                     ->where(equalsCriteria('index_tag', $indexKey))
                     ->andWhere(equalsCriteria('value_key', $valueKey));
 
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                 $compiledQuery = $deleteQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
@@ -136,20 +148,26 @@ final class SqlIndexesStorage implements IndexesStorage
     {
         $adapter = $this->adapter;
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress InvalidArgument
+         */
         return call(
         /** @psalm-suppress MissingClosureParamType */
             static function(string $indexKey, string $valueKey, $value) use ($adapter): \Generator
             {
-                $query = updateQuery('event_sourcing_indexes', ['value_data' => $value])
+                /** @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery */
+                $updateQuery = updateQuery('event_sourcing_indexes', ['value_data' => $value])
                     ->where(equalsCriteria('index_tag', $indexKey))
-                    ->andWhere(equalsCriteria('value_key', $valueKey))
-                    ->compile();
+                    ->andWhere(equalsCriteria('value_key', $valueKey));
+
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $updateQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                unset($resultSet, $query);
+                unset($resultSet, $updateQuery, $compiledQuery);
 
             }, $indexKey, $valueKey, $value
         );

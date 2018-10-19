@@ -41,7 +41,11 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
      */
     public function __construct(StorageConfiguration $configuration)
     {
-        $queryData  = $configuration->queryParameters();
+        $queryData = $configuration->queryParameters();
+
+        $maxConnectionsCount = (int) ($queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS);
+        $idleTimeout         = (int) ($queryData['idle_timeout'] ?? Pool::DEFAULT_IDLE_TIMEOUT);
+
         $this->pool = pool(
             new ConnectionConfig(
                 $configuration->host(),
@@ -50,8 +54,9 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
                 $configuration->password(),
                 $configuration->databaseName()
             ),
-            $queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS,
-            $queryData['idle_timeout'] ?? Pool::DEFAULT_IDLE_TIMEOUT
+            $maxConnectionsCount,
+            $idleTimeout
+
         );
     }
 
@@ -111,7 +116,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
 
         /** @psalm-suppress InvalidArgument */
         return call(
-            /** @psalm-suppress InvalidReturnType */
+        /** @psalm-suppress InvalidReturnType */
             static function() use ($connectionsPool): \Generator
             {
                 try
@@ -135,6 +140,13 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
      */
     public function unescapeBinary($payload): string
     {
+        if(true === \is_resource($payload))
+        {
+            $payload = \stream_get_contents($payload, -1, 0);
+        }
+
+        /** @var string $payload */
+
         /** @noinspection PhpComposerExtensionStubsInspection */
         return \pg_unescape_bytea($payload);
     }

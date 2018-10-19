@@ -33,7 +33,7 @@ interface ResultSet
     /**
      * Gets the last emitted value or throws an exception if the iterator has completed
      *
-     * @return array|null Value emitted from the iterator
+     * @return array<mixed, mixed>|null Value emitted from the iterator
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ResultSetIterationFailed Error getting operation result
      */

@@ -52,19 +52,23 @@ final class SqlSnapshotStore implements SnapshotStore
         return call(
             static function(StoredAggregateSnapshot $aggregateSnapshot) use ($adapter): \Generator
             {
-                $query = insertQuery('event_store_snapshots', [
+                /** @var \Latitude\QueryBuilder\Query\InsertQuery $query */
+                $insertQuery = insertQuery('event_store_snapshots', [
                     'id'                 => $aggregateSnapshot->aggregateId(),
                     'aggregate_id_class' => $aggregateSnapshot->aggregateIdClass(),
                     'aggregate_class'    => $aggregateSnapshot->aggregateClass(),
                     'version'            => $aggregateSnapshot->version(),
                     'payload'            => $aggregateSnapshot->payload(),
                     'created_at'         => $aggregateSnapshot->createdAt()
-                ])->compile();
+                ]);
+
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $insertQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                unset($query, $resultSet);
+                unset($insertQuery, $compiledQuery, $resultSet);
             },
             $aggregateSnapshot
         );
@@ -83,22 +87,26 @@ final class SqlSnapshotStore implements SnapshotStore
             {
                 $storedSnapshot = null;
 
-                /** @psalm-suppress ImplicitToStringCast */
-                $query = selectQuery('event_store_snapshots')
+                /**
+                 * @var \Latitude\QueryBuilder\Query\SelectQuery $query
+                 *
+                 * @psalm-suppress ImplicitToStringCast
+                 */
+                $selectQuery = selectQuery('event_store_snapshots')
                     ->where(equalsCriteria('id', $id))
-                    ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)))
-                    ->compile();
+                    ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)));
+
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $selectQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($query->sql(), $query->params());
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                /** @var array|null $data */
+                /** @var array<string, string>|null $data */
                 $data = yield fetchOne($resultSet);
 
                 if(true === \is_array($data) && 0 !== \count($data))
                 {
-                    $data['payload'] = \stream_get_contents($data['payload'], -1, 0);
-
                     $storedSnapshot = new StoredAggregateSnapshot(
                         $data['id'],
                         $data['aggregate_id_class'],
@@ -109,7 +117,7 @@ final class SqlSnapshotStore implements SnapshotStore
                     );
                 }
 
-                unset($resultSet, $data, $query);
+                unset($resultSet, $data, $selectQuery, $compiledQuery);
 
                 return $storedSnapshot;
             },
@@ -128,11 +136,16 @@ final class SqlSnapshotStore implements SnapshotStore
         return call(
             static function(AggregateId $id) use ($adapter): \Generator
             {
-                /** @psalm-suppress ImplicitToStringCast */
+                /**
+                 * @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery
+                 *
+                 * @psalm-suppress ImplicitToStringCast
+                 */
                 $deleteQuery = deleteQuery('event_store_snapshots')
                     ->where(equalsCriteria('id', $id))
                     ->andWhere(equalsCriteria('aggregate_id_class', \get_class($id)));
 
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
                 $compiledQuery = $deleteQuery->compile();
 
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */

@@ -80,7 +80,7 @@ final class BunnyRabbitMqTransport implements Transport
     private $isConnected = false;
 
     /**
-     * @var BunnyConsumer|null
+     * @var array<string, \Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyConsumer>
      */
     private $consumers;
 
@@ -123,7 +123,10 @@ final class BunnyRabbitMqTransport implements Transport
                 {
                     yield $this->client->connect();
 
-                    $this->channel     = yield $this->client->channel();
+                    /** @var BunnyChannelOverride $channel */
+                    $channel = yield $this->client->channel();
+
+                    $this->channel     = $channel;
                     $this->isConnected = true;
 
                     $this->logger->info('Connected to {transportHost}:{transportPort}', [
@@ -131,6 +134,8 @@ final class BunnyRabbitMqTransport implements Transport
                             'transportPort' => $this->connectionConfig->port()
                         ]
                     );
+
+                    unset($channel);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -208,6 +213,7 @@ final class BunnyRabbitMqTransport implements Transport
      */
     public function send(OutboundPackage $outboundPackage): Promise
     {
+        /** @var BunnyChannelOverride $channel */
         $channel  = $this->channel;
         $logger   = $this->logger;
         $deferred = new Deferred();
@@ -304,6 +310,7 @@ final class BunnyRabbitMqTransport implements Transport
                 $channel = $this->channel;
 
                 yield new Coroutine(self::doCreateExchange($channel, $exchange));
+                /** @psalm-suppress MixedTypeCoercion */
                 yield new Coroutine(self::doBindExchange($channel, $exchange, $binds));
 
                 unset($channel);
@@ -329,6 +336,7 @@ final class BunnyRabbitMqTransport implements Transport
                 $channel = $this->channel;
 
                 yield new Coroutine(self::doCreateQueue($channel, $queue));
+                /** @psalm-suppress MixedTypeCoercion */
                 yield new Coroutine(self::doBindQueue($channel, $queue, $binds));
 
                 unset($channel);
@@ -343,7 +351,7 @@ final class BunnyRabbitMqTransport implements Transport
      * @param BunnyChannelOverride $channel
      * @param AmqpExchange         $exchange
      *
-     * @return \Generator<null>
+     * @return \Generator
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\CreateTopicFailed
      */
@@ -370,7 +378,7 @@ final class BunnyRabbitMqTransport implements Transport
      * @param AmqpExchange                                                           $exchange
      * @param array<mixed, \Desperado\ServiceBus\Infrastructure\Transport\TopicBind> $binds
      *
-     * @return \Generator<null>
+     * @return \Generator
      */
     private static function doBindExchange(BunnyChannelOverride $channel, AmqpExchange $exchange, array $binds): \Generator
     {
@@ -384,7 +392,7 @@ final class BunnyRabbitMqTransport implements Transport
                 $sourceExchange = $bind->topic();
 
                 yield new Coroutine(self::doCreateExchange($channel, $sourceExchange));
-                yield $channel->exchangeBind((string) $sourceExchange, (string) $exchange, $bind->routingKey());
+                yield $channel->exchangeBind((string) $sourceExchange, (string) $exchange, (string) $bind->routingKey());
             }
         }
         catch(\Throwable $throwable)
@@ -399,7 +407,7 @@ final class BunnyRabbitMqTransport implements Transport
      * @param BunnyChannelOverride $channel
      * @param AmqpQueue            $queue
      *
-     * @return \Generator<null>
+     * @return \Generator
      */
     private static function doCreateQueue(BunnyChannelOverride $channel, AmqpQueue $queue): \Generator
     {
@@ -423,7 +431,7 @@ final class BunnyRabbitMqTransport implements Transport
      * @param AmqpQueue                                                              $queue
      * @param array<mixed, \Desperado\ServiceBus\Infrastructure\Transport\QueueBind> $binds
      *
-     * @return \Generator<null>
+     * @return \Generator
      */
     private static function doBindQueue(BunnyChannelOverride $channel, AmqpQueue $queue, array $binds): \Generator
     {
@@ -438,7 +446,7 @@ final class BunnyRabbitMqTransport implements Transport
 
                 yield new Coroutine(self::doCreateExchange($channel, $destinationExchange));
 
-                yield $channel->queueBind((string) $queue, (string) $destinationExchange, $bind->routingKey());
+                yield $channel->queueBind((string) $queue, (string) $destinationExchange, (string) $bind->routingKey());
             }
         }
         catch(\Throwable $throwable)

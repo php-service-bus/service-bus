@@ -34,18 +34,16 @@ final class AmqpConnectionConfiguration
      *
      * Created from array with keys:
      *
-     * [
-     *     'scheme'    => 'amqp',
-     *     'user'      => 'guest',
-     *     'password'  => 'guest',
-     *     'host'      => 'localhost',
-     *     'port'      => 5672,
-     *     'vhost'     => '/',
-     *     'timeout'   => 1б,
-     *     'heartbeat' => 60.0
-     * ]
-     *
-     * @var array
+     * @var array{
+     *    scheme:string,
+     *    user:string,
+     *    password:string,
+     *    host:string,
+     *    port:int,
+     *    vhost:string,
+     *    timeout:float,
+     *    heartbeat:float
+     * }
      */
     private $data;
 
@@ -161,24 +159,27 @@ final class AmqpConnectionConfiguration
     /**
      * @param string $connectionDSN
      *
-     * @return array
+     * @return array{scheme:string, user:string, password:string, host:string, port:int, vhost:string, timeout:float,
+     *                              heartbeat:float}
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\InvalidConnectionParameters Incorrect DSN
      */
     private static function extractConnectionParameters(string $connectionDSN): array
     {
+        $queryString = (string) ($connectionParts['query'] ?? '');
+
         $connectionParts = self::parseUrl($connectionDSN);
-        $queryParts      = self::parseQuery($connectionParts['query'] ?? '');
+        $queryParts      = self::parseQuery($queryString);
 
         return [
-            'scheme'    => $connectionParts['scheme'] ?? self::DEFAULT_SCHEMA,
-            'host'      => $connectionParts['host'] ?? self::DEFAULT_HOST,
-            'port'      => $connectionParts['port'] ?? self::DEFAULT_PORT,
-            'user'      => $connectionParts['user'] ?? self::DEFAULT_USERNAME,
-            'password'  => $connectionParts['pass'] ?? self::DEFAULT_PASSWORD,
-            'timeout'   => $queryParts['timeout'] ?? self::DEFAULT_TIMEOUT,
-            'vhost'     => $queryParts['vhost'] ?? self::DEFAULT_VIRTUAL_HOST,
-            'heartbeat' => $queryParts['heartbeat'] ?? self::DEFAULT_HEARTBEAT_INTERVAL,
+            'scheme'    => isset($connectionParts['scheme']) ? (string) $connectionParts['scheme'] : self::DEFAULT_SCHEMA,
+            'host'      => isset($connectionParts['host']) ? (string) $connectionParts['host'] : self::DEFAULT_HOST,
+            'port'      => isset($connectionParts['port']) ? (int) $connectionParts['port'] : self::DEFAULT_PORT,
+            'user'      => isset($connectionParts['user']) ? (string) $connectionParts['user'] : self::DEFAULT_USERNAME,
+            'password'  => isset($connectionParts['pass']) ? (string) $connectionParts['pass'] : self::DEFAULT_PASSWORD,
+            'timeout'   => isset($queryParts['timeout']) ? (float) $connectionParts['timeout'] : self::DEFAULT_TIMEOUT,
+            'vhost'     => isset($queryParts['vhost']) ? (string) $connectionParts['vhost'] : self::DEFAULT_VIRTUAL_HOST,
+            'heartbeat' => isset($queryParts['heartbeat']) ? (float) $connectionParts['heartbeat'] : self::DEFAULT_HEARTBEAT_INTERVAL,
         ];
     }
 
@@ -215,7 +216,9 @@ final class AmqpConnectionConfiguration
      *
      * @param string $query
      *
-     * @return array
+     * @psalm-suppress MixedTypeCoercion
+     *
+     * @return array<string, string|int|float>
      */
     private static function parseQuery(string $query): array
     {

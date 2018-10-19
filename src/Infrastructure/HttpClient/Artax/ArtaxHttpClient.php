@@ -157,6 +157,8 @@ final class ArtaxHttpClient implements HttpClient
     }
 
     /**
+     * @psalm-suppress MixedTypeCoercion
+     *
      * @param Client          $client
      * @param Request         $request
      * @param LoggerInterface $logger
@@ -196,6 +198,8 @@ final class ArtaxHttpClient implements HttpClient
     }
 
     /**
+     * @psalm-suppress MixedTypeCoercion
+     *
      * @param Response $response
      *
      * @return Promise<\GuzzleHttp\Psr7\Response>

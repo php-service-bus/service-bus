@@ -127,10 +127,9 @@ final class AnnotationsBasedSagaConfigurationLoader implements SagaConfiguration
             }
         );
 
+        /** @var Annotation $methodAnnotation */
         foreach($methodAnnotations as $methodAnnotation)
         {
-            /** @var Annotation $methodAnnotation */
-
             $handlerCollection->push($this->createSagaEventHandler($methodAnnotation, $sagaMetadata));
         }
     }
@@ -251,10 +250,9 @@ final class AnnotationsBasedSagaConfigurationLoader implements SagaConfiguration
      */
     private static function searchSagaHeader(string $sagaClass, AnnotationCollection $annotationCollection): SagaHeader
     {
+        /** @var \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation $annotation */
         foreach($annotationCollection->classLevelAnnotations() as $annotation)
         {
-            /** @var \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation $annotation */
-
             $annotationObject = $annotation->annotationObject();
 
             if($annotationObject instanceof SagaHeader)

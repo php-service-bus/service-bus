@@ -60,7 +60,7 @@ interface IncomingPackage
     /**
      * Acks given message
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\AcknowledgeFailed
      */
@@ -72,7 +72,7 @@ interface IncomingPackage
      * @param bool        $requeue    Send back to the queue
      * @param null|string $withReason Reason for refusal
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\NotAcknowledgeFailed
      */
@@ -84,7 +84,7 @@ interface IncomingPackage
      * @param bool        $requeue    Send back to the queue
      * @param null|string $withReason Reason for refusal
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\RejectFailed
      */

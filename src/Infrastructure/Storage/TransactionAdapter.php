@@ -38,7 +38,7 @@ interface TransactionAdapter
     /**
      * Commit transaction
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed Could not connect to database
@@ -50,7 +50,7 @@ interface TransactionAdapter
     /**
      * Rollback transaction
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function rollback(): Promise;
 }

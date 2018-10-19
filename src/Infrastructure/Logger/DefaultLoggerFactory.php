@@ -80,7 +80,7 @@ final class DefaultLoggerFactory
     /**
      * Get processors
      *
-     * @return array
+     * @return array<mixed, callable>
      */
     private function getProcessors(): array
     {

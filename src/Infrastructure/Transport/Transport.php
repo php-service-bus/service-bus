@@ -28,7 +28,7 @@ interface Transport
      * @param Topic     $topic
      * @param TopicBind ...$binds
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\ConnectionFail Connection refused
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\CreateTopicFailed Failed to create topic
@@ -43,7 +43,7 @@ interface Transport
      * @param Queue     $queue
      * @param QueueBind ...$binds
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\ConnectionFail Connection refused
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\CreateQueueFailed Failed to create queue
@@ -65,7 +65,7 @@ interface Transport
      *
      * @param Queue $queue
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function stop(Queue $queue): Promise;
 
@@ -74,14 +74,14 @@ interface Transport
      *
      * @param OutboundPackage $outboundPackage
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function send(OutboundPackage $outboundPackage): Promise;
 
     /**
      * Connect to broker
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\ConnectionFail Connection refused
      */
@@ -90,7 +90,7 @@ interface Transport
     /**
      * Close connection
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function disconnect(): Promise;
 }

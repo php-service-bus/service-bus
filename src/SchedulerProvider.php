@@ -60,7 +60,7 @@ final class SchedulerProvider
      * @param \DateTimeImmutable     $executionDate
      * @param MessageDeliveryContext $context
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\DuplicateScheduledJob
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
@@ -131,7 +131,7 @@ final class SchedulerProvider
      * @param MessageDeliveryContext $context
      * @param string|null            $reason
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
      */
@@ -177,7 +177,7 @@ final class SchedulerProvider
      * @param ScheduledOperationId   $id
      * @param MessageDeliveryContext $context
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
      */
@@ -239,7 +239,7 @@ final class SchedulerProvider
      * @param NextScheduledOperation|null $nextOperation
      * @param MessageDeliveryContext      $context
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
      */
@@ -315,7 +315,7 @@ final class SchedulerProvider
      * @param ScheduledOperation     $operation
      * @param MessageDeliveryContext $context
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     private static function processSendCommand(ScheduledOperation $operation, MessageDeliveryContext $context): Promise
     {

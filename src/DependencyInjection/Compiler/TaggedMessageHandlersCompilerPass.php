@@ -36,7 +36,10 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
         $servicesReference = [];
         $serviceIds        = [];
 
-        foreach($container->findTaggedServiceIds('service_bus.service') as $id => $tags)
+        /** @var array<string, array<mixed, string>> $taggedServices */
+        $taggedServices = $container->findTaggedServiceIds('service_bus.service');
+
+        foreach($taggedServices as $id => $tags)
         {
             $serviceClass = $container->getDefinition($id)->getClass();
 

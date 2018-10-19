@@ -73,6 +73,7 @@ final class Snapshotter
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Desperado\ServiceBus\EventSourcing\AggregateSnapshot|null>
      */
@@ -94,12 +95,12 @@ final class Snapshotter
 
                     if(null !== $storedSnapshot)
                     {
-                        $snapshot = new AggregateSnapshot(
-                            \unserialize($storedSnapshot->payload(), ['allowed_classes' => true]),
-                            $storedSnapshot->version()
-                        );
+                        /** @var Aggregate $aggregate */
+                        $aggregate = \unserialize($storedSnapshot->payload(), ['allowed_classes' => true]);
 
-                        unset($storedSnapshot);
+                        $snapshot = new AggregateSnapshot($aggregate, $storedSnapshot->version());
+
+                        unset($storedSnapshot, $aggregate);
                     }
                 }
                 catch(\Throwable $throwable)
@@ -121,7 +122,7 @@ final class Snapshotter
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function store(AggregateSnapshot $snapshot): Promise
     {

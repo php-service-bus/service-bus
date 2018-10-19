@@ -33,7 +33,7 @@ final class CommandHandler implements ServicesAnnotationsMarker
     /**
      * Validation groups
      *
-     * @var array
+     * @var array<int, string>
      */
     private $groups = [];
 
@@ -44,6 +44,10 @@ final class CommandHandler implements ServicesAnnotationsMarker
      */
     public function __construct(array $data)
     {
+        /**
+         * @var string     $property
+         * @var array|bool $value
+         */
         foreach($data as $property => $value)
         {
             if(false === \property_exists($this, $property))
@@ -70,7 +74,7 @@ final class CommandHandler implements ServicesAnnotationsMarker
     /**
      * Receive validation groups
      *
-     * @return array
+     * @return array<int, string>
      */
     public function validationGroups(): array
     {

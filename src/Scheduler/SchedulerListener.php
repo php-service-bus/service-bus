@@ -41,7 +41,7 @@ final class SchedulerListener
      * @param KernelContext          $context
      * @param SchedulerProvider      $schedulerProvider
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     public function handleEmit(
         EmitSchedulerOperation $command,
@@ -85,7 +85,7 @@ final class SchedulerListener
      * @param KernelContext             $context
      * @param SchedulerProvider         $schedulerProvider
      *
-     * @return \Generator<int, \Amp\Promise<null>
+     * @return \Generator
      */
     public function whenSchedulerOperationEmitted(
         SchedulerOperationEmitted $event,
@@ -106,7 +106,7 @@ final class SchedulerListener
      * @param SchedulerProvider          $schedulerProvider
      *
      *
-     * @return \Generator<int, \Amp\Promise<null>
+     * @return \Generator
      */
     public function whenSchedulerOperationCanceled(
         SchedulerOperationCanceled $event,
@@ -126,7 +126,7 @@ final class SchedulerListener
      * @param KernelContext      $context
      * @param SchedulerProvider  $schedulerProvider
      *
-     * @return \Generator<int, \Amp\Promise<null>
+     * @return \Generator
      */
     public function whenOperationScheduled(
         OperationScheduled $event,
@@ -144,7 +144,7 @@ final class SchedulerListener
      * @param SchedulerProvider $schedulerProvider
      * @param KernelContext     $context
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      */
     private static function processNextOperationEmit(
         Event $event,

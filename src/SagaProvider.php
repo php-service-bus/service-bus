@@ -33,7 +33,7 @@ use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
-
+use Latitude\QueryBuilder\Query;
 /**
  * Saga provider
  */
@@ -70,6 +70,7 @@ final class SagaProvider
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Desperado\ServiceBus\Sagas\Saga>
      *
@@ -121,6 +122,7 @@ final class SagaProvider
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Desperado\ServiceBus\Sagas\Saga|null>
      *
@@ -154,7 +156,7 @@ final class SagaProvider
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed
      */
@@ -197,6 +199,8 @@ final class SagaProvider
     }
 
     /**
+     * @psalm-suppress MixedTypeCoercion
+     *
      * @param SagasStore $store
      * @param SagaId     $id
      *
@@ -215,6 +219,7 @@ final class SagaProvider
 
                 if(null !== $savedSaga)
                 {
+                    /** @var Saga $saga */
                     $saga = \unserialize(\base64_decode($savedSaga->payload()), ['allowed_classes' => true]);
 
                     unset($savedSaga);
@@ -237,7 +242,7 @@ final class SagaProvider
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
@@ -250,9 +255,10 @@ final class SagaProvider
         return call(
             static function(Saga $saga, MessageDeliveryContext $context, bool $isNew) use ($store): \Generator
             {
-                /** @var array<int, string> $commands */
+                /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Command> $commands */
                 $commands = invokeReflectionMethod($saga, 'firedCommands');
-                /** @var array<int, string> $events */
+
+                /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events */
                 $events = invokeReflectionMethod($saga, 'raisedEvents');
 
                 /** @var \DateTimeImmutable|null $closedAt */
@@ -262,27 +268,24 @@ final class SagaProvider
                 $state = readReflectionPropertyValue($saga, 'status');
 
                 $savedSaga = StoredSaga::create(
-                    $saga->id(),
-                    $state,
-                    \base64_encode(\serialize($saga)),
-                    $saga->createdAt(),
-                    $saga->expireDate(),
-                    $closedAt
+                    $saga->id(), $state, \base64_encode(\serialize($saga)), $saga->createdAt(),
+                    $saga->expireDate(), $closedAt
                 );
 
                 true === $isNew
                     ? yield $store->save($savedSaga)
                     : yield $store->update($savedSaga);
 
+                /** @var array<mixed, \Desperado\ServiceBus\Common\Contract\Messages\Message> $messages */
                 $messages = \array_merge($commands, $events);
 
+                /** @var Message $message */
                 foreach($messages as $message)
                 {
-                    /** @var Message $message */
                     yield $context->delivery($message);
                 }
 
-                unset($commands, $events, $messages, $closedAt, $state, $savedSaga, $contextHandler);
+                unset($commands, $events, $messages, $closedAt, $state, $savedSaga);
 
                 return yield new Success();
             },

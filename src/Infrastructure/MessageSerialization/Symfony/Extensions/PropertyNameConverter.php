@@ -38,7 +38,7 @@ final class PropertyNameConverter implements NameConverterInterface
             '/_(.?)/',
             static function(array $matches): string
             {
-                return \ucfirst($matches[1]);
+                return \ucfirst((string) $matches[1]);
             },
             $propertyName
         );

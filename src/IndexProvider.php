@@ -41,6 +41,8 @@ final class IndexProvider
     /**
      * @param IndexKey $indexKey
      *
+     * @psalm-suppress MixedTypeCoercion
+     *
      * @return Promise<\Desperado\ServiceBus\Index\IndexValue|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
@@ -55,13 +57,13 @@ final class IndexProvider
         return call(
             static function(IndexKey $indexKey) use ($storage): \Generator
             {
-                /** @var mixed $value */
+                /** @var string|int|float|boolean|null $value */
                 $value = yield $storage->find(
                     $indexKey->indexName(),
                     $indexKey->valueKey()
                 );
 
-                if(null !== $value && true === \is_scalar($value))
+                if(true === \is_scalar($value))
                 {
                     return IndexValue::create($value);
                 }
@@ -74,6 +76,8 @@ final class IndexProvider
      * Is there a value in the index
      *
      * @param IndexKey $indexKey
+     *
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<bool>
      *
@@ -89,13 +93,13 @@ final class IndexProvider
         return call(
             static function(IndexKey $indexKey) use ($storage): \Generator
             {
-                /** @var mixed $value */
+                /** @var string|int|float|boolean|null $value */
                 $value = yield $storage->find(
                     $indexKey->indexName(),
                     $indexKey->valueKey()
                 );
 
-                return null !== $value && true === \is_scalar($value);
+                return true === \is_scalar($value);
             },
             $indexKey
         );
@@ -106,6 +110,8 @@ final class IndexProvider
      *
      * @param IndexKey   $indexKey
      * @param IndexValue $value
+     *
+     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<bool>
      *
@@ -145,7 +151,7 @@ final class IndexProvider
      *
      * @param IndexKey $indexKey
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
@@ -162,7 +168,7 @@ final class IndexProvider
      * @param IndexKey   $indexKey
      * @param IndexValue $value
      *
-     * @return Promise<null>
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed

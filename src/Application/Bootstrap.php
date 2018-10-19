@@ -73,8 +73,8 @@ final class Bootstrap
      * Note: All files containing user-defined functions must be excluded
      * Note: Increases start time because of the need to scan files
      *
-     * @param array $directories
-     * @param array $excludedFiles
+     * @param array<mixed, string> $directories
+     * @param array<mixed, string> $excludedFiles
      *
      * @return $this
      */
@@ -105,8 +105,8 @@ final class Bootstrap
      * Note: All files containing user-defined functions must be excluded
      * Note: Increases start time because of the need to scan files
      *
-     * @param array $directories
-     * @param array $excludedFiles
+     * @param array<mixed, string> $directories
+     * @param array<mixed, string> $excludedFiles
      *
      * @return $this
      */
@@ -192,7 +192,7 @@ final class Bootstrap
     /**
      * Import parameters to container
      *
-     * @param array $parameters
+     * @param array<string, mixed> $parameters
      *
      * @return $this
      */

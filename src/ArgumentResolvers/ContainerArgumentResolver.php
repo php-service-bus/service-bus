@@ -51,6 +51,9 @@ final class ContainerArgumentResolver implements ArgumentResolver
      */
     public function resolve(Message $message, MessageDeliveryContext $context, HandlerArgument $argument): object
     {
-        return $this->serviceLocator->get((string) $argument->className());
+        /** @var object $object */
+        $object = $this->serviceLocator->get((string) $argument->className());
+
+        return $object;
     }
 }
