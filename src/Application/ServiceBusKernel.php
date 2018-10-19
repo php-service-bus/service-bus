@@ -14,10 +14,9 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Application;
 
 use Amp\Loop;
-use Desperado\ServiceBus\Common\Contract\Messages\Command;
-use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\Endpoint\Endpoint;
 use Desperado\ServiceBus\Endpoint\EndpointRouter;
+use Desperado\ServiceBus\EntryPoint\EntryPoint;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
 use Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
@@ -129,43 +128,6 @@ final class ServiceBusKernel
                 Loop::stop();
             }
         );
-
-        return $this;
-    }
-
-    /**
-     * Register command handler
-     * For 1 command there can be only 1 handler
-     *
-     * @param Command|string $command Command object or class
-     * @param callable       $handler
-     *
-     * @return $this
-     *
-     * @throws \Desperado\ServiceBus\MessageRouter\Exceptions\InvalidCommandClassSpecified
-     * @throws \Desperado\ServiceBus\MessageRouter\Exceptions\MultipleCommandHandlersNotAllowed
-     */
-    public function registerCommandHandler($command, callable $handler): self
-    {
-        $this->entryPoint->registerCommandHandler($command, $handler);
-
-        return $this;
-    }
-
-    /**
-     * Add event listener
-     * For each event there can be many listeners
-     *
-     * @param Event|string $event Event object or class
-     * @param callable     $handler
-     *
-     * @return $this
-     *
-     * @throws \Desperado\ServiceBus\MessageRouter\Exceptions\InvalidEventClassSpecified
-     */
-    public function registerEventListener($event, callable $handler): self
-    {
-        $this->entryPoint->registerEventListener($event, $handler);
 
         return $this;
     }
