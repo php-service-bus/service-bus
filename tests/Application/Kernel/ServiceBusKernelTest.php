@@ -30,6 +30,7 @@ use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransp
 use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\QueueBind;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\KernelTestExtension;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\KernelTestService;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerResponseEventCommand;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommand;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\WithValidationCommand;
@@ -174,21 +175,12 @@ final class ServiceBusKernelTest extends TestCase
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
-        static::assertCount(8, $records);
+        static::assertCount(7, $records);
 
         $latest = \end($records);
         \reset($records);
 
-        static::assertEquals('Execution completed with errors', $latest['message']);
-
-        $previous = $records[\count($records) - 2];
-
-        static::assertEquals(
-            'When executing the message "{messageClass}" errors occurred: "{throwableMessage}"',
-            $previous['message']
-        );
-
-        static::assertEquals(TriggerThrowableCommand::class, $previous['context']['messageClass']);
+        static::assertEquals(\sprintf('%s::handleWithThrowable', KernelTestService::class), $latest['message']);
     }
 
     /**

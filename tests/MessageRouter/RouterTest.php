@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\MessageRouter;
 
+use Desperado\ServiceBus\MessageExecutor\DefaultMessageExecutor;
+use Desperado\ServiceBus\MessageHandlers\HandlerArgumentCollection;
 use Desperado\ServiceBus\MessageRouter\Router;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
@@ -34,9 +36,16 @@ final class RouterTest extends TestCase
     {
         (new Router())->registerListener(
             '',
-            static function(): void
-            {
-            }
+            new DefaultMessageExecutor(
+                \Closure::fromCallable(
+                    function()
+                    {
+
+                    }
+                ),
+                new HandlerArgumentCollection(),
+                []
+            )
         );
     }
 
@@ -51,9 +60,16 @@ final class RouterTest extends TestCase
     {
         (new Router())->registerListener(
             'SomeEventClass',
-            static function(): void
-            {
-            }
+            new DefaultMessageExecutor(
+                \Closure::fromCallable(
+                    function()
+                    {
+
+                    }
+                ),
+                new HandlerArgumentCollection(),
+                []
+            )
         );
     }
 
@@ -68,9 +84,16 @@ final class RouterTest extends TestCase
     {
         (new Router())->registerHandler(
             '',
-            static function(): void
-            {
-            }
+            new DefaultMessageExecutor(
+                \Closure::fromCallable(
+                    function()
+                    {
+
+                    }
+                ),
+                new HandlerArgumentCollection(),
+                []
+            )
         );
     }
 
@@ -85,9 +108,16 @@ final class RouterTest extends TestCase
     {
         (new Router())->registerHandler(
             'SomeCommandClass',
-            static function(): void
-            {
-            }
+            new DefaultMessageExecutor(
+                \Closure::fromCallable(
+                    function()
+                    {
+
+                    }
+                ),
+                new HandlerArgumentCollection(),
+                []
+            )
         );
     }
 
@@ -102,10 +132,17 @@ final class RouterTest extends TestCase
     public function duplicateCommand(): void
     {
         $router  = new Router();
-        $handler = static function(): void
-        {
 
-        };
+        $handler = new DefaultMessageExecutor(
+            \Closure::fromCallable(
+                function()
+                {
+
+                }
+            ),
+            new HandlerArgumentCollection(),
+            []
+        );
 
         $router->registerHandler(FirstEmptyCommand::class, $handler);
         $router->registerHandler(FirstEmptyCommand::class, $handler);
@@ -118,10 +155,16 @@ final class RouterTest extends TestCase
      */
     public function successRegister(): void
     {
-        $handler = static function(): void
-        {
+        $handler = new DefaultMessageExecutor(
+            \Closure::fromCallable(
+                function()
+                {
 
-        };
+                }
+            ),
+            new HandlerArgumentCollection(),
+            []
+        );
 
         $router = new Router();
 

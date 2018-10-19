@@ -62,7 +62,8 @@
     "kelunik/loop-block": "^1.0",
     "react/promise": "v2.7.0",
     "bunny/bunny": "0.4.1",
-    "symfony/debug": "^4.1"
+    "symfony/debug": "^4.1",
+    "amphp/parallel": "^0.2.5"
   },
   "require-dev": {
     "doctrine/dbal": "^v2.6",
