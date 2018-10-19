@@ -172,14 +172,14 @@ final class AmqpConnectionConfiguration
         $queryParts      = self::parseQuery($queryString);
 
         return [
-            'scheme'    => isset($connectionParts['scheme']) ? (string) $connectionParts['scheme'] : self::DEFAULT_SCHEMA,
-            'host'      => isset($connectionParts['host']) ? (string) $connectionParts['host'] : self::DEFAULT_HOST,
-            'port'      => isset($connectionParts['port']) ? (int) $connectionParts['port'] : self::DEFAULT_PORT,
-            'user'      => isset($connectionParts['user']) ? (string) $connectionParts['user'] : self::DEFAULT_USERNAME,
-            'password'  => isset($connectionParts['pass']) ? (string) $connectionParts['pass'] : self::DEFAULT_PASSWORD,
-            'timeout'   => isset($queryParts['timeout']) ? (float) $connectionParts['timeout'] : self::DEFAULT_TIMEOUT,
-            'vhost'     => isset($queryParts['vhost']) ? (string) $connectionParts['vhost'] : self::DEFAULT_VIRTUAL_HOST,
-            'heartbeat' => isset($queryParts['heartbeat']) ? (float) $connectionParts['heartbeat'] : self::DEFAULT_HEARTBEAT_INTERVAL,
+            'scheme'    => (string) ($connectionParts['scheme'] ?? self::DEFAULT_SCHEMA),
+            'host'      => (string) ($connectionParts['host'] ?? self::DEFAULT_HOST),
+            'port'      => (int) ($connectionParts['port'] ?? self::DEFAULT_PORT),
+            'user'      => (string) ($connectionParts['user'] ?? self::DEFAULT_USERNAME),
+            'password'  => (string) ($connectionParts['password'] ?? self::DEFAULT_PASSWORD),
+            'timeout'   => (float) ($queryParts['timeout'] ?? self::DEFAULT_TIMEOUT),
+            'vhost'     => (string) ($queryParts['vhost'] ?? self::DEFAULT_VIRTUAL_HOST),
+            'heartbeat' => (float) ($queryParts['heartbeat'] ?? self::DEFAULT_HEARTBEAT_INTERVAL),
         ];
     }
 
