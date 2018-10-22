@@ -30,4 +30,15 @@ interface MessageEncoder
      * @throws \Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\EncodeMessageFailed
      */
     public function encode(Message $message): string;
+
+    /**
+     * Convert object to array
+     *
+     * @param object $message
+     *
+     * @return array<string, mixed>
+     *
+     * @throws \UnexpectedValueException Unexpected normalize result
+     */
+    public function normalize(object $message): array;
 }

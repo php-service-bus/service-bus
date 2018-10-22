@@ -30,4 +30,14 @@ interface MessageDecoder
      * @throws \Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed
      */
     public function decode(string $serializedMessage): Message;
+
+    /**
+     * Convert array to specified object
+     *
+     * @param array<string, mixed> $payload
+     * @param string               $class
+     *
+     * @return object
+     */
+    public function denormalize(array $payload, string $class): object;
 }

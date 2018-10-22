@@ -81,10 +81,7 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
             self::validateUnserializedData($data);
 
             /** @var Message $object */
-            $object = $this->serializer->denormalize(
-                $data['message'],
-                $data['namespace']
-            );
+            $object = $this->denormalize($data['message'], $data['namespace']);
 
             return $object;
         }
@@ -110,13 +107,23 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
     }
 
     /**
-     * @param Message $message
-     *
-     * @return array
-     *
-     * @throws \UnexpectedValueException Unexpected normalize result
+     * @inheritdoc
      */
-    private function normalize(Message $message): array
+    public function denormalize(array $payload, string $class): object
+    {
+        /** @var object $object */
+        $object = $this->serializer->denormalize(
+            $payload,
+            $class
+        );
+
+        return $object;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function normalize(object $message): array
     {
         $data = $this->serializer->normalize($message);
 
@@ -161,7 +168,7 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
     /**
      * @param string $json
      *
-     * @return array<mixed, mixed>
+     * @return array{message:array<string, mixed>, namespace:string}
      *
      * @throws \RuntimeException When json_decode failed
      */
@@ -170,7 +177,7 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
         /** Clear last error */
         \json_last_error();
 
-        /** @var array<mixed, mixed> $decoded */
+        /** @var array{message:array<string, mixed>, namespace:string} $decoded */
         $decoded = \json_decode($json, true);
 
         self::throwExceptionIfJsonError();
