@@ -1262,7 +1262,10 @@ final class BunnyClientOverride extends Client
                             );
                         }
 
-                        $this->channels[$frame->channel]->onFrameReceived($frame);
+                        if(false === ($frame instanceof AmqpProtocol\MethodChannelCloseFrame))
+                        {
+                            $this->channels[$frame->channel]->onFrameReceived($frame);
+                        }
                     }
 
                     unset($frame);

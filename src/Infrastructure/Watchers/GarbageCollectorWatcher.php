@@ -71,7 +71,7 @@ final class GarbageCollectorWatcher
             $this->interval,
             static function() use ($logger): void
             {
-                $logger->info('Forces collection of any existing garbage cycles', ['mom' => \gc_collect_cycles()]);
+                $logger->info('Forces collection of any existing garbage cycles', ['number' => \gc_collect_cycles()]);
                 $logger->info(
                     'Reclaims memory used by the Zend Engine memory manager',
                     ['bytes' => self::formatBytes(\gc_mem_caches())]

@@ -44,8 +44,9 @@
 #### Конфигурация кернела
 - [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L75): Включить определение блокировки чем-либо эвент лупа
 - [enableGarbageCleaning()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L90): Периодически принудительно вызывает сборщик мусора
-- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109):  Использовать обработчик для сигнала SIGINT(2) по умолчанию
-- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L145): Указания специфичного маршрута доставки сообщения
+- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109):  Использовать обработчик для сигналов SIGINT/SIGTERM по умолчанию
+- [stopAfter()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L147): Завершить работу демона через N секунд
+- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L175): Указания специфичного маршрута доставки сообщения
 
 
 #### Создание схемы базы данных
@@ -118,7 +119,8 @@ Loop::run(
         $kernel
             ->monitorLoopBlock()
             ->enableGarbageCleaning()
-            ->useDefaultStopSignalHandler();
+            ->useDefaultStopSignalHandler()
+            ->stopAfter(30);
 
         yield $kernel->entryPoint()->listen($mainQueue);
     }

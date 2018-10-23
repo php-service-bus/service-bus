@@ -232,11 +232,11 @@ final class EntryPoint
     }
 
     /**
-     * @param int $interval
+     * @param int $interval The delay before the completion (in seconds)
      *
      * @return void
      */
-    public function stop(int $interval): void
+    public function stop(int $interval = 10): void
     {
         Loop::defer(
             function() use ($interval): \Generator
@@ -250,10 +250,10 @@ final class EntryPoint
 
                 yield $this->transport->stop($this->listenQueue);
 
-                $this->logger->info('Handler will stop after {duration} seconds', ['duration' => $interval / 1000]);
+                $this->logger->info('Handler will stop after {duration} seconds', ['duration' => $interval]);
 
                 Loop::delay(
-                    $interval,
+                    $interval * 1000,
                     function(): void
                     {
                         $this->logger->info('The event loop has been stopped');
