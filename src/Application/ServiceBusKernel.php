@@ -18,6 +18,7 @@ use Desperado\ServiceBus\Endpoint\Endpoint;
 use Desperado\ServiceBus\Endpoint\EndpointRouter;
 use Desperado\ServiceBus\EntryPoint\EntryPoint;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
+use Desperado\ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 use Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
 use Psr\Log\LoggerInterface;
@@ -114,6 +115,8 @@ final class ServiceBusKernel
      */
     public function useDefaultStopSignalHandler(int $stopDelay = 10, array $signals = [\SIGINT, \SIGTERM]): self
     {
+        $stopDelay = 0 >= $stopDelay ? 1 : $stopDelay;
+
         /** @var LoggerInterface $logger */
         $logger = $this->getKernelContainerService(LoggerInterface::class);
 
@@ -146,6 +149,8 @@ final class ServiceBusKernel
      */
     public function stopAfter(int $seconds): self
     {
+        $seconds = 0 >= $seconds ? 1 : $seconds;
+
         Loop::delay(
             $seconds * 1000,
             function() use ($seconds): void
@@ -156,6 +161,44 @@ final class ServiceBusKernel
                 $logger->info('The demon\'s lifetime has expired ({lifetime} seconds)', ['lifetime' => $seconds]);
 
                 $this->entryPoint->stop();
+            }
+        );
+
+        return $this;
+    }
+
+    /**
+     * Enable file change monitoring. If the application files have been modified, quit
+     *
+     * @param int $checkInterval Hash check interval (in seconds)
+     * @param int $stopDelay     The delay before the completion (in seconds)
+     *
+     * @return self
+     */
+    public function stopWhenFilesChange(string $directoryPath, int $checkInterval = 30, int $stopDelay = 5): self
+    {
+        $checkInterval = 0 >= $checkInterval ? 1 : $checkInterval;
+        $watcher       = new FileChangesWatcher($directoryPath);
+
+        Loop::repeat(
+            $checkInterval * 1000,
+            function() use ($watcher, $stopDelay): \Generator
+            {
+                /** @var bool $changed */
+                $changed = yield $watcher->compare();
+
+                if(true === $changed)
+                {
+                    /** @var LoggerInterface $logger */
+                    $logger = $this->getKernelContainerService(LoggerInterface::class);
+
+                    $logger->info(
+                        'Application files have been changed. Shut down after {delay} seconds',
+                        ['delay' => $stopDelay]
+                    );
+
+                    $this->entryPoint->stop($stopDelay);
+                }
             }
         );
 
