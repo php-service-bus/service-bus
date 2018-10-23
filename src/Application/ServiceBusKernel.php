@@ -102,26 +102,60 @@ final class ServiceBusKernel
     }
 
     /**
-     * Use default handler for signal "SIGINT"
+     * Use default handler for signal "SIGINT" and "SIGTERM"
      *
-     * @param int $stopDelay
+     * @param int               $stopDelay The delay before the completion (in seconds)
+     * @param array<mixed, int> $signals   Processed signals
      *
      * @return $this
      *
-     * @throws Loop\UnsupportedFeatureException
+     * @throws Loop\UnsupportedFeatureException This might happen if ext-pcntl is missing and the loop driver doesn't
+     *                                          support another way to dispatch signals
      */
-    public function useDefaultStopSignalHandler(int $stopDelay = 10000): self
+    public function useDefaultStopSignalHandler(int $stopDelay = 10, array $signals = [\SIGINT, \SIGTERM]): self
     {
         /** @var LoggerInterface $logger */
         $logger = $this->getKernelContainerService(LoggerInterface::class);
 
-        Loop::onSignal(
-            \SIGINT,
-            function() use ($stopDelay, $logger): void
-            {
-                $logger->info('A signal SIGINT(2) was received');
+        $handler = function(string $watcherId, int $signalId) use ($stopDelay, $logger): void
+        {
+            $logger->info(
+                'A signal "{signalId}" was received', [
+                    'signalId'  => $signalId,
+                    'watcherId' => $watcherId
+                ]
+            );
 
-                $this->entryPoint->stop($stopDelay);
+            $this->entryPoint->stop($stopDelay);
+        };
+
+        foreach($signals as $signal)
+        {
+            Loop::onSignal($signal, $handler);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Shut down after N seconds
+     *
+     * @param int $seconds
+     *
+     * @return self
+     */
+    public function stopAfter(int $seconds): self
+    {
+        Loop::delay(
+            $seconds * 1000,
+            function() use ($seconds): void
+            {
+                /** @var LoggerInterface $logger */
+                $logger = $this->getKernelContainerService(LoggerInterface::class);
+
+                $logger->info('The demon\'s lifetime has expired ({lifetime} seconds)', ['lifetime' => $seconds]);
+
+                $this->entryPoint->stop();
             }
         );
 
