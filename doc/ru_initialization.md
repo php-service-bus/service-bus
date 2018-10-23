@@ -37,17 +37,17 @@
 - [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L95): Включает поддержку планировщика. [Подробнее](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_scheduler.md)
 
 #### Конфигурация транспорта
-За конфигурацию транспортного уровня отвечает [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), в котором доступен [transport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L156)
+За конфигурацию транспортного уровня отвечает [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), в котором доступен [transport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L229)
 - [createQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L52): Создаёт новую очередь (если не существует)
 - [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L37): Создаёт exchange (если не существует)
 
 #### Конфигурация кернела
-- [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L75): Включить определение блокировки чем-либо эвент лупа
-- [enableGarbageCleaning()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L90): Периодически принудительно вызывает сборщик мусора
-- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109):  Использовать обработчик для сигналов SIGINT/SIGTERM по умолчанию
-- [stopAfter()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L147): Завершить работу демона через N секунд
-- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L175): Указания специфичного маршрута доставки сообщения
-
+- [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L80): Включить определение блокировки чем-либо эвент лупа
+- [enableGarbageCleaning()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L95): Периодически принудительно вызывает сборщик мусора
+- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L116):  Использовать обработчик для сигналов SIGINT/SIGTERM по умолчанию
+- [stopAfter()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L150): Завершить работу демона через N секунд
+- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L218): Указания специфичного маршрута доставки сообщения
+- [stopWhenFilesChange()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L178):
 
 #### Создание схемы базы данных
 **Важно**: при старте приложения не создаётся схема базы данных. Это отдано на откуп пользователям.
