@@ -41,6 +41,8 @@ final class DefaultAnnotationsReader implements AnnotationsReader
             DoctrineAnnotations\AnnotationRegistry::registerLoader('class_exists');
 
             $this->reader = $reader ?? new DoctrineAnnotations\AnnotationReader();
+
+            DoctrineAnnotations\AnnotationReader::addGlobalIgnoredName('psalm');
         }
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
