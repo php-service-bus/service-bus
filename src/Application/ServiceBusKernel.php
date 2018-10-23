@@ -175,7 +175,7 @@ final class ServiceBusKernel
      *
      * @return self
      */
-    public function stopWhenFilesChange(string $directoryPath, int $checkInterval, int $stopDelay = 5): self
+    public function stopWhenFilesChange(string $directoryPath, int $checkInterval = 30, int $stopDelay = 5): self
     {
         $checkInterval = 0 >= $checkInterval ? 1 : $checkInterval;
         $watcher       = new FileChangesWatcher($directoryPath);
