@@ -46,8 +46,9 @@ For the configuration of the transport layer is responsible [ServiceBusKernel](h
 #### Kernel configuration
 - [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L75): Enable detection of blocking event loop
 - [enableGarbageCleaning()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L90): Periodically force a garbage collector
-- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109): Use default handler for SIGINT(2) signal 
-- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L145): Apply specific route to deliver a message
+- [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L109): Use default handler for SIGINT/SIGTERM signals
+- [stopAfter()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L147): Shut down the daemon after N seconds
+- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L175): Apply specific route to deliver a message
 
 #### Creation of database schema
 **Important**: at the application initiation, a database scheme is not created. This is for the users to do.
@@ -119,7 +120,8 @@ Loop::run(
         $kernel
             ->monitorLoopBlock()
             ->enableGarbageCleaning()
-            ->useDefaultStopSignalHandler();
+            ->useDefaultStopSignalHandler()
+            ->stopAfter(30);
 
         yield $kernel->entryPoint()->listen($mainQueue);
     }
