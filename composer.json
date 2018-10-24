@@ -53,7 +53,7 @@
     "symfony/config": "v4.1",
     "symfony/dotenv": "^4.1",
     "symfony/yaml": "v4.1",
-    "symfony/validator": "v40.1",
+    "symfony/validator": "v4.1",
     "phpdocumentor/reflection-docblock": "^4.0",
     "doctrine/annotations": "v1.6.0",
     "doctrine/cache": "v1.8.0",
