@@ -261,6 +261,8 @@ final class ServiceBusKernelTest extends TestCase
         $this->kernel->monitorLoopBlock();
         $this->kernel->enableGarbageCleaning();
         $this->kernel->useDefaultStopSignalHandler();
+        $this->kernel->stopAfter(60);
+        $this->kernel->stopWhenFilesChange(__DIR__);
     }
 
     /**
