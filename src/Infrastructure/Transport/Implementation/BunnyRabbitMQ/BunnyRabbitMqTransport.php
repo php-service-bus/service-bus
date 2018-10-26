@@ -213,7 +213,7 @@ final class BunnyRabbitMqTransport implements Transport
      */
     public function send(OutboundPackage $outboundPackage): Promise
     {
-        /** @var BunnyChannelOverride $channel */
+        /** @var BunnyChannelOverride|null $channel */
         $channel  = $this->channel;
         $logger   = $this->logger;
         $deferred = new Deferred();
@@ -223,6 +223,13 @@ final class BunnyRabbitMqTransport implements Transport
             {
                 try
                 {
+                    if(null === $channel)
+                    {
+                        throw new ConnectionFail(
+                            'There is no active connection to the message broker. You must call the connect method'
+                        );
+                    }
+
                     /** @var \Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination $destination */
                     $destination = $outboundPackage->destination();
                     $headers     = \array_filter(\array_merge($outboundPackage->headers(), [

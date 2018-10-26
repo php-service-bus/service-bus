@@ -75,6 +75,8 @@ interface Transport
      * @param OutboundPackage $outboundPackage
      *
      * @return Promise It does not return any result
+     *
+     * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\SendMessageFailed Failed to send message
      */
     public function send(OutboundPackage $outboundPackage): Promise;
 

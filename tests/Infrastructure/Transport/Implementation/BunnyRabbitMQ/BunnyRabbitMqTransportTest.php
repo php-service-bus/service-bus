@@ -57,16 +57,19 @@ final class BunnyRabbitMqTransportTest extends TestCase
     {
         parent::tearDown();
 
-        /** @var Channel $channel */
+        /** @var Channel|null $channel */
         $channel = readReflectionPropertyValue($this->transport, 'channel');
 
-        wait($channel->exchangeDelete('createExchange'));
-        wait($channel->queueDelete('createQueue'));
+        if(null !== $channel)
+        {
+            wait($channel->exchangeDelete('createExchange'));
+            wait($channel->queueDelete('createQueue'));
 
-        wait($channel->exchangeDelete('createExchange2'));
-        wait($channel->queueDelete('createQueue2'));
+            wait($channel->exchangeDelete('createExchange2'));
+            wait($channel->queueDelete('createQueue2'));
 
-        wait($this->transport->disconnect());
+            wait($this->transport->disconnect());
+        }
     }
 
     /**
@@ -190,5 +193,27 @@ final class BunnyRabbitMqTransportTest extends TestCase
 
             break;
         }
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\SendMessageFailed
+     * @expectedExceptionMessage There is no active connection to the message broker. You must call the connect method
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function sendMessageWithoutConnection(): void
+    {
+        wait(
+            $this->transport->send(
+                new OutboundPackage(
+                    new InMemoryStream('somePayload'),
+                    ['key' => 'value'],
+                    new AmqpTransportLevelDestination('consume', 'consume')
+                )
+            )
+        );
     }
 }

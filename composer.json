@@ -39,12 +39,14 @@
   },
   "require": {
     "php": ">=7.2",
+
     "amphp/amp": "^2.0",
     "amphp/log": "^1",
     "amphp/file": "^0.3",
     "amphp/artax": "^3.0",
+    "amphp/parallel": "^0.2.5",
     "amphp/postgres": "^1.0",
-    "ramsey/uuid": "^3.7",
+
     "symfony/serializer": "^v4.1",
     "symfony/property-info": "^v4.1",
     "symfony/property-access": "^v4.1",
@@ -54,16 +56,17 @@
     "symfony/dotenv": "^4.1",
     "symfony/yaml": "v4.1",
     "symfony/validator": "v4.1",
-    "phpdocumentor/reflection-docblock": "^4.0",
+    "symfony/debug": "^4.1",
+
     "doctrine/annotations": "v1.6.0",
     "doctrine/cache": "v1.8.0",
-    "guzzlehttp/psr7": "1.4.2",
     "latitude/latitude": "^3.1",
+    "phpdocumentor/reflection-docblock": "^4.0",
+    "guzzlehttp/psr7": "1.4.2",
     "kelunik/loop-block": "^1.0",
     "react/promise": "v2.7.0",
     "bunny/bunny": "0.4.1",
-    "symfony/debug": "^4.1",
-    "amphp/parallel": "^0.2.5"
+    "ramsey/uuid": "^3.7"
   },
   "require-dev": {
     "doctrine/dbal": "^v2.6",
