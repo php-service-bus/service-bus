@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\EventSourcing\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class EmptyAggregateIdentifierNotAllowed extends \RuntimeException implements ServiceBusExceptionMarker
+final class EmptyAggregateIdentifierNotAllowed extends \RuntimeException
 {
     public function __construct()
     {

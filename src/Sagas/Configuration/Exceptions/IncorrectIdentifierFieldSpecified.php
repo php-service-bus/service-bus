@@ -14,12 +14,11 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Sagas\Configuration\Exceptions;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 
 /**
  * A property that contains an identifier was not found
  */
-final class IncorrectIdentifierFieldSpecified extends \RuntimeException implements ServiceBusExceptionMarker
+final class IncorrectIdentifierFieldSpecified extends \RuntimeException
 {
     /**
      * @param Event  $event

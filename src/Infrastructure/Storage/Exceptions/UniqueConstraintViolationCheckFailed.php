@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Infrastructure\Storage\Exceptions;
 /**
  * Duplicate entry
  */
-final class UniqueConstraintViolationCheckFailed extends StorageInteractingFailed
+final class UniqueConstraintViolationCheckFailed extends \InvalidArgumentException
 {
 
 }

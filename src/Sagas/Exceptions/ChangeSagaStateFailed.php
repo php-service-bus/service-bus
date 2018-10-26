@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class ChangeSagaStateFailed extends \RuntimeException implements ServiceBusExceptionMarker
+final class ChangeSagaStateFailed extends \RuntimeException
 {
 
 }

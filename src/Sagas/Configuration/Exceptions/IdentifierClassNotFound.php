@@ -14,12 +14,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Configuration\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  * Identifier class not found
  */
-final class IdentifierClassNotFound extends \RuntimeException implements ServiceBusExceptionMarker
+final class IdentifierClassNotFound extends \RuntimeException
 {
     /**
      * @param string $specifiedClass

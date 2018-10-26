@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  * Incorrect saga status indicated
  */
-class InvalidSagaStatus extends \InvalidArgumentException implements ServiceBusExceptionMarker
+class InvalidSagaStatus extends \InvalidArgumentException
 {
     /**
      * @param string $status

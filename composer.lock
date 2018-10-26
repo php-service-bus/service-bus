@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "02d064d4705b747c7634ae1292239466",
-    "content-hash": "e467ef27c877a13f125a24969e741f08",
+    "hash": "68d38e53e009f4db50ac952d3f7387f6",
+    "content-hash": "9e7514d1fbc404551fe854073dc9a616",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1466,6 +1466,50 @@
             ],
             "description": "Detect blocking ticks in the Amp event loop.",
             "time": "2017-06-15 17:41:23"
+        },
+        {
+            "name": "kelunik/retry",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kelunik/retry.git",
+                "reference": "106de2477890199c062fd0df0223257983a8e990"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kelunik/retry/zipball/106de2477890199c062fd0df0223257983a8e990",
+                "reference": "106de2477890199c062fd0df0223257983a8e990",
+                "shasum": ""
+            },
+            "require": {
+                "amphp/amp": "^2"
+            },
+            "require-dev": {
+                "amphp/socket": "^0.10.2",
+                "friendsofphp/php-cs-fixer": "^2.3",
+                "phpunit/phpunit": "^6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kelunik\\Retry\\": "src"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Niklas Keller",
+                    "email": "me@kelunik.com"
+                }
+            ],
+            "description": "A tiny library for retrying failed operations.",
+            "time": "2017-09-22 11:48:40"
         },
         {
             "name": "latitude/latitude",

@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL;
 
 use Amp\Postgres\QueryExecutionError;
 use Amp\Sql\ConnectionException;
-use Amp\Sql\FailureException;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions as InternalExceptions;
 
 /**
@@ -28,9 +27,9 @@ final class AmpExceptionConvert
      *
      * @param \Throwable $throwable
      *
-     * @return InternalExceptions\StorageInteractingFailed
+     * @return InternalExceptions\UniqueConstraintViolationCheckFailed|InternalExceptions\ConnectionFailed|InternalExceptions\StorageInteractingFailed
      */
-    public static function do(\Throwable $throwable): InternalExceptions\StorageInteractingFailed
+    public static function do(\Throwable $throwable): \Throwable
     {
         if(
             $throwable instanceof QueryExecutionError &&
@@ -52,17 +51,6 @@ final class AmpExceptionConvert
                 $throwable
             );
         }
-
-        // @codeCoverageIgnoreStart
-        if($throwable instanceof FailureException)
-        {
-            return new InternalExceptions\OperationFailed(
-                $throwable->getMessage(),
-                $throwable->getCode(),
-                $throwable);
-        }
-
-        // @codeCoverageIgnoreEnd
 
         return new InternalExceptions\StorageInteractingFailed(
             $throwable->getMessage(),

@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Infrastructure\Storage\Exceptions;
 /**
  *
  */
-final class TransactionNotSupported extends StorageInteractingFailed
+final class TransactionNotSupported extends \LogicException
 {
 
 }

@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Infrastructure\Storage\Exceptions;
 /**
  *
  */
-final class ResultSetIterationFailed extends StorageInteractingFailed
+final class ResultSetIterationFailed extends \RuntimeException
 {
 
 }

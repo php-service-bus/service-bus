@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Scheduler\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class ScheduledOperationNotFound extends \InvalidArgumentException implements ServiceBusExceptionMarker
+final class ScheduledOperationNotFound extends \InvalidArgumentException
 {
 
 }

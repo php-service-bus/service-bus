@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class EncodeMessageFailed extends \RuntimeException implements ServiceBusExceptionMarker
+final class EncodeMessageFailed extends \RuntimeException
 {
 
 }

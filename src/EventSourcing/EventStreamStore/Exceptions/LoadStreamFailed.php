@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class LoadStreamFailed extends \RuntimeException implements ServiceBusExceptionMarker
+final class LoadStreamFailed extends \RuntimeException
 {
 
 }

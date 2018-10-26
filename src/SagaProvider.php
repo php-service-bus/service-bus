@@ -15,13 +15,14 @@ namespace Desperado\ServiceBus;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
+use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed;
+use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Exceptions\DuplicateSagaId;
 use Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed;
@@ -33,12 +34,17 @@ use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
-use Latitude\QueryBuilder\Query;
+use Kelunik\Retry\ConstantBackoff;
+use function Kelunik\Retry\retry;
+
 /**
  * Saga provider
  */
 final class SagaProvider
 {
+    private const SAVE_SAGA_RETRY_COUNT = 5;
+    private const SAVE_SAGA_RETRY_DELAY = 2000;
+
     /**
      * Sagas store
      *
@@ -246,7 +252,6 @@ final class SagaProvider
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     private function doStore(SagasStore $store, Saga $saga, MessageDeliveryContext $context, bool $isNew): Promise
@@ -272,9 +277,17 @@ final class SagaProvider
                     $saga->expireDate(), $closedAt
                 );
 
-                true === $isNew
-                    ? yield $store->save($savedSaga)
-                    : yield $store->update($savedSaga);
+                yield retry(
+                    self::SAVE_SAGA_RETRY_COUNT,
+                    static function() use ($store, $savedSaga, $isNew): \Generator
+                    {
+                        true === $isNew
+                            ? yield $store->save($savedSaga)
+                            : yield $store->update($savedSaga);
+                    },
+                    [ConnectionFailed::class, StorageInteractingFailed::class],
+                    new ConstantBackoff(self::SAVE_SAGA_RETRY_DELAY)
+                );
 
                 /** @var array<mixed, \Desperado\ServiceBus\Common\Contract\Messages\Message> $messages */
                 $messages = \array_merge($commands, $events);
@@ -286,8 +299,6 @@ final class SagaProvider
                 }
 
                 unset($commands, $events, $messages, $closedAt, $state, $savedSaga);
-
-                return yield new Success();
             },
             $saga,
             $context,

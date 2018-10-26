@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Configuration\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class InvalidSagaConfiguration extends \InvalidArgumentException implements ServiceBusExceptionMarker
+final class InvalidSagaConfiguration extends \InvalidArgumentException
 {
 
 }

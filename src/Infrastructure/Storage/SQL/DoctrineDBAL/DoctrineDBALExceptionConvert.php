@@ -26,9 +26,9 @@ final class DoctrineDBALExceptionConvert
      *
      * @param \Throwable $throwable
      *
-     * @return InternalExceptions\StorageInteractingFailed
+     * @return InternalExceptions\ConnectionFailed|InternalExceptions\UniqueConstraintViolationCheckFailed|InternalExceptions\StorageInteractingFailed
      */
-    public static function do(\Throwable $throwable): InternalExceptions\StorageInteractingFailed
+    public static function do(\Throwable $throwable): \Throwable
     {
         $message = \str_replace(\PHP_EOL, '', $throwable->getMessage());
 

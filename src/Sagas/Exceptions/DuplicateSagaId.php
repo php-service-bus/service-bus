@@ -13,13 +13,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 use Desperado\ServiceBus\Sagas\SagaId;
 
 /**
  *
  */
-final class DuplicateSagaId extends \InvalidArgumentException implements ServiceBusExceptionMarker
+final class DuplicateSagaId extends \InvalidArgumentException
 {
     /**
      * @param SagaId $id
