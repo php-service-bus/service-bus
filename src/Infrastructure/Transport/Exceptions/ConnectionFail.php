@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\Transport\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  * Error connecting to the broker
  */
-final class ConnectionFail extends \RuntimeException implements ServiceBusExceptionMarker
+final class ConnectionFail extends \RuntimeException
 {
 
 }

@@ -32,7 +32,6 @@ interface SchedulerStore
      *
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\ScheduledOperationNotFound
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function extract(ScheduledOperationId $id, callable $postExtract): Promise;
@@ -46,7 +45,6 @@ interface SchedulerStore
      * @return Promise<bool>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function remove(ScheduledOperationId $id, callable $postRemove): Promise;
@@ -61,7 +59,6 @@ interface SchedulerStore
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function add(ScheduledOperation $operation, callable $postAdd): Promise;

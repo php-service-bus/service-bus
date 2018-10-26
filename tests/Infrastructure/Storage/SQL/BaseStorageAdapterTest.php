@@ -16,6 +16,7 @@ namespace Desperado\ServiceBus\Tests\Infrastructure\Storage\SQL;
 use Amp\Coroutine;
 use Amp\Promise;
 use function Amp\Promise\wait;
+use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OneResultExpected;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchAll;
@@ -307,7 +308,7 @@ abstract class BaseStorageAdapterTest extends TestCase
             catch(\Throwable $throwable)
             {
                 /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertInstanceOf(StorageInteractingFailed::class, $throwable);
+                $self->assertInstanceOf(OneResultExpected::class, $throwable);
                 /** @noinspection StaticInvocationViaThisInspection */
                 $self->assertEquals(
                     'A single record was requested, but the result of the query execution contains several ("2")',

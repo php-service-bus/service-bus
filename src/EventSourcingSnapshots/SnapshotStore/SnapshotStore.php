@@ -32,7 +32,6 @@ interface SnapshotStore
      * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      */
@@ -49,7 +48,6 @@ interface SnapshotStore
      * @return Promise<\Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\StoredAggregateSnapshot|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function load(AggregateId $id): Promise;
@@ -65,7 +63,6 @@ interface SnapshotStore
      * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function remove(AggregateId $id): Promise;

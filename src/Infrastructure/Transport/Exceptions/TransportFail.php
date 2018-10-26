@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\Transport\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  * Transport level exception marker
  */
-interface TransportFail extends ServiceBusExceptionMarker
+interface TransportFail
 {
 
 }

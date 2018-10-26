@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\MessageRouter\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class MultipleCommandHandlersNotAllowed extends \LogicException implements ServiceBusExceptionMarker
+final class MultipleCommandHandlersNotAllowed extends \LogicException
 {
 
 }

@@ -31,7 +31,6 @@ interface TransactionAdapter
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed Could not connect to database
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed Duplicate entry
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed Operation Errors
      */
     public function execute(string $queryString, array $parameters = []): Promise;
 
@@ -42,7 +41,6 @@ interface TransactionAdapter
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed Could not connect to database
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed Operation Errors
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed Duplicate entry
      */
     public function commit(): Promise;

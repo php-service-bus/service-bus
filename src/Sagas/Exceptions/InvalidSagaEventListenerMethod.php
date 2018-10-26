@@ -14,12 +14,11 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Sagas\Exceptions;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
 
 /**
  *
  */
-final class InvalidSagaEventListenerMethod extends \RuntimeException implements ServiceBusExceptionMarker
+final class InvalidSagaEventListenerMethod extends \RuntimeException
 {
     /**
      * @param \ReflectionMethod $reflectionMethod

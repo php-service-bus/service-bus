@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Index\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class IndexNameCantBeEmpty extends \InvalidArgumentException implements ServiceBusExceptionMarker
+final class IndexNameCantBeEmpty extends \InvalidArgumentException
 {
 
 }

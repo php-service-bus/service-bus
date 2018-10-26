@@ -37,6 +37,8 @@ final class DoctrineDBALAdapter implements StorageAdapter
     private $connection;
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection
+     *
      * @param StorageConfiguration $configuration
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
@@ -53,6 +55,7 @@ final class DoctrineDBALAdapter implements StorageAdapter
         }
         catch(\Throwable $throwable)
         {
+            /** @noinspection PhpUnhandledExceptionInspection */
             throw DoctrineDBALExceptionConvert::do($throwable);
         }
     }

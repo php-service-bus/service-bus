@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  * The class of the saga in the identifier differs from the saga to which it was transmitted
  */
-final class InvalidSagaIdentifier extends \RuntimeException implements ServiceBusExceptionMarker
+final class InvalidSagaIdentifier extends \RuntimeException
 {
 
 }

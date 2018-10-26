@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  * Attempt to add a stream with an existing identifier
  */
-final class NonUniqueStreamId extends \RuntimeException implements ServiceBusExceptionMarker
+final class NonUniqueStreamId extends \RuntimeException
 {
     /**
      * @param string $id

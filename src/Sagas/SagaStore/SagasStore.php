@@ -33,7 +33,6 @@ interface SagasStore
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function save(StoredSaga $savedSaga): Promise;
@@ -49,7 +48,6 @@ interface SagasStore
      * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function update(StoredSaga $savedSaga): Promise;
@@ -65,7 +63,6 @@ interface SagasStore
      * @return Promise<\Desperado\ServiceBus\Sagas\SagaStore\StoredSaga|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      * @throws \Desperado\ServiceBus\Sagas\SagaStore\Exceptions\RestoreSagaFailed
      */
@@ -82,7 +79,6 @@ interface SagasStore
      * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function remove(SagaId $id): Promise;

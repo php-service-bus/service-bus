@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\Storage\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
- * Basic type of interaction errors
+ *
  */
-class StorageInteractingFailed extends \RuntimeException implements ServiceBusExceptionMarker
+final class StorageInteractingFailed extends \RuntimeException
 {
 
 }

@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Infrastructure\Storage\Exceptions;
 /**
  * Error connecting to storage
  */
-final class ConnectionFailed extends StorageInteractingFailed
+final class ConnectionFailed extends \RuntimeException
 {
 
 }

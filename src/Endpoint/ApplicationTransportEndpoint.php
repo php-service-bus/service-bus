@@ -33,6 +33,7 @@ final class ApplicationTransportEndpoint implements Endpoint
 {
     public const  ENDPOINT_NAME        = 'application';
     private const DELIVERY_RETRY_COUNT = 5;
+    private const DELIVERY_RETRY_DELAY = 2000;
 
     /**
      * @var Transport
@@ -99,7 +100,7 @@ final class ApplicationTransportEndpoint implements Endpoint
                         yield $transport->send($package);
                     },
                     [SendMessageFailed::class],
-                    new ConstantBackoff(2000)
+                    new ConstantBackoff(self::DELIVERY_RETRY_DELAY)
                 );
 
                 unset($encoded, $package);

@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Scheduler\Exceptions;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class EmptyScheduledOperationIdentifierNotAllowed extends \RuntimeException implements ServiceBusExceptionMarker
+final class EmptyScheduledOperationIdentifierNotAllowed extends \RuntimeException
 {
     public function __construct()
     {

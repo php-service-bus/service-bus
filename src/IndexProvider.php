@@ -46,7 +46,6 @@ final class IndexProvider
      * @return Promise<\Desperado\ServiceBus\Index\IndexValue|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function get(IndexKey $indexKey): Promise
@@ -82,7 +81,6 @@ final class IndexProvider
      * @return Promise<bool>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function has(IndexKey $indexKey): Promise
@@ -116,7 +114,6 @@ final class IndexProvider
      * @return Promise<bool>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function add(IndexKey $indexKey, IndexValue $value): Promise
@@ -154,7 +151,6 @@ final class IndexProvider
      * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function remove(IndexKey $indexKey): Promise
@@ -171,7 +167,6 @@ final class IndexProvider
      * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function update(IndexKey $indexKey, IndexValue $value): Promise

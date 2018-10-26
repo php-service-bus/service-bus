@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Infrastructure\Storage\Exceptions;
 /**
  *
  */
-final class OneResultExpected extends StorageInteractingFailed
+final class OneResultExpected extends \LogicException
 {
 
 }

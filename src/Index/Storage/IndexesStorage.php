@@ -27,7 +27,6 @@ interface IndexesStorage
      * @return Promise<string|int|float|boolean|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function find(string $indexKey, string $valueKey): Promise;
@@ -40,7 +39,6 @@ interface IndexesStorage
      * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function add(string $indexKey, string $valueKey, $value): Promise;
@@ -52,7 +50,6 @@ interface IndexesStorage
      * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function delete(string $indexKey, string $valueKey): Promise;
@@ -65,7 +62,6 @@ interface IndexesStorage
      * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OperationFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function update(string $indexKey, string $valueKey, $value): Promise;

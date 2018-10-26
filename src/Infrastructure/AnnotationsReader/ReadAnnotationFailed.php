@@ -13,12 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\AnnotationsReader;
 
-use Desperado\ServiceBus\Common\Exceptions\ServiceBusExceptionMarker;
-
 /**
  *
  */
-final class ReadAnnotationFailed extends \RuntimeException implements ServiceBusExceptionMarker
+final class ReadAnnotationFailed extends \RuntimeException
 {
 
 }
