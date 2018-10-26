@@ -62,6 +62,17 @@ services:
       $adapter: '%service_bus.storage.adapter%'
       $connectionDSN: '%service_bus.storage.dsn%'
 
+  # Indexes storage
+  Desperado\ServiceBus\Index\Storage\IndexesStorage:
+    class: Desperado\ServiceBus\Index\Storage\Sql\SqlIndexesStorage
+    arguments:
+      $adapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
+
+  # Indexes provider
+  Desperado\ServiceBus\IndexProvider:
+    arguments:
+      $storage: '@Desperado\ServiceBus\Index\Storage\IndexesStorage'
+
   # Sagas store
   Desperado\ServiceBus\Sagas\SagaStore\SagasStore:
     class: Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore

@@ -1,4 +1,4 @@
-CREATE TABLE event_sourcing_indexes
+CREATE TABLE IF NOT EXISTS event_sourcing_indexes
 (
     index_tag varchar NOT NULL,
     value_key varchar NOT NULL,
