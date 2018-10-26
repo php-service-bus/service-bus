@@ -19,16 +19,20 @@ use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
+use Desperado\ServiceBus\Infrastructure\Transport\Exceptions\SendMessageFailed;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
+use Kelunik\Retry\ConstantBackoff;
+use function Kelunik\Retry\retry;
 
 /**
  * Application level transport endpoint
  */
 final class ApplicationTransportEndpoint implements Endpoint
 {
-    public const ENDPOINT_NAME = 'application';
+    public const  ENDPOINT_NAME        = 'application';
+    private const DELIVERY_RETRY_COUNT = 5;
 
     /**
      * @var Transport
@@ -88,7 +92,15 @@ final class ApplicationTransportEndpoint implements Endpoint
                 $encoded = $encoder->encode($message);
                 $package = self::createPackage($encoded, $options, $destination);
 
-                yield $transport->send($package);
+                yield retry(
+                    self::DELIVERY_RETRY_COUNT,
+                    static function() use ($transport, $package): \Generator
+                    {
+                        yield $transport->send($package);
+                    },
+                    [SendMessageFailed::class],
+                    new ConstantBackoff(2000)
+                );
 
                 unset($encoded, $package);
             },

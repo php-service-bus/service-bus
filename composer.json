@@ -47,6 +47,9 @@
     "amphp/parallel": "^0.2.5",
     "amphp/postgres": "^1.0",
 
+    "kelunik/retry": "^v1.0",
+    "kelunik/loop-block": "^1.0",
+
     "symfony/serializer": "^v4.1",
     "symfony/property-info": "^v4.1",
     "symfony/property-access": "^v4.1",
@@ -60,10 +63,11 @@
 
     "doctrine/annotations": "v1.6.0",
     "doctrine/cache": "v1.8.0",
+
     "latitude/latitude": "^3.1",
+
     "phpdocumentor/reflection-docblock": "^4.0",
     "guzzlehttp/psr7": "1.4.2",
-    "kelunik/loop-block": "^1.0",
     "react/promise": "v2.7.0",
     "bunny/bunny": "0.4.1",
     "ramsey/uuid": "^3.7"
