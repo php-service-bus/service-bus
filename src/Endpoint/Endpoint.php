@@ -35,6 +35,8 @@ interface Endpoint
      * @param DeliveryOptions $options
      *
      * @return Promise It does not return any result
+     *
+     * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\SendMessageFailed Failed to send message
      */
     public function delivery(Message $message, DeliveryOptions $options): Promise;
 }
