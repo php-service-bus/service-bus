@@ -58,7 +58,7 @@ final class SqlSnapshotStore implements SnapshotStore
                     'aggregate_id_class' => $aggregateSnapshot->aggregateIdClass(),
                     'aggregate_class'    => $aggregateSnapshot->aggregateClass(),
                     'version'            => $aggregateSnapshot->version(),
-                    'payload'            => $aggregateSnapshot->payload(),
+                    'payload'            => \base64_encode($aggregateSnapshot->payload()),
                     'created_at'         => $aggregateSnapshot->createdAt()
                 ]);
 
@@ -112,7 +112,7 @@ final class SqlSnapshotStore implements SnapshotStore
                         $data['aggregate_id_class'],
                         $data['aggregate_class'],
                         (int) $data['version'],
-                        $adapter->unescapeBinary($data['payload']),
+                        \base64_decode($adapter->unescapeBinary($data['payload'])),
                         $data['created_at']
                     );
                 }
