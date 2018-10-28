@@ -153,6 +153,7 @@ final class BunnyConsumer
 
                     $logger->debug('New message received', [
                         'packageId'         => $package->id(),
+                        'traceId'           => $package->traceId(),
                         'rawMessagePayload' => $envelope->content,
                         'rawMessageHeaders' => $envelope->headers
                     ]);

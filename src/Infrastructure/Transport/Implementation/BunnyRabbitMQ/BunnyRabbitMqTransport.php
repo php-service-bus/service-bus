@@ -381,7 +381,6 @@ final class BunnyRabbitMqTransport implements Transport
      * Bind exchange to another exchange(s)
      *
      * @param BunnyChannelOverride                                                   $channel
-     * @param LoggerInterface                                                        $logger
      * @param AmqpExchange                                                           $exchange
      * @param array<mixed, \Desperado\ServiceBus\Infrastructure\Transport\TopicBind> $binds
      *

@@ -67,7 +67,7 @@ final class ServiceBusKernel
         /** @var EntryPoint $entryPoint */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
-        $this->transport  = $transport;
+        $this->transport = $transport;
         $this->entryPoint = $entryPoint;
     }
 
@@ -170,15 +170,16 @@ final class ServiceBusKernel
     /**
      * Enable file change monitoring. If the application files have been modified, quit
      *
-     * @param int $checkInterval Hash check interval (in seconds)
-     * @param int $stopDelay     The delay before the completion (in seconds)
+     * @param string $directoryPath
+     * @param int    $checkInterval Hash check interval (in seconds)
+     * @param int    $stopDelay     The delay before the completion (in seconds)
      *
      * @return self
      */
     public function stopWhenFilesChange(string $directoryPath, int $checkInterval = 30, int $stopDelay = 5): self
     {
         $checkInterval = 0 >= $checkInterval ? 1 : $checkInterval;
-        $watcher       = new FileChangesWatcher($directoryPath);
+        $watcher = new FileChangesWatcher($directoryPath);
 
         Loop::repeat(
             $checkInterval * 1000,

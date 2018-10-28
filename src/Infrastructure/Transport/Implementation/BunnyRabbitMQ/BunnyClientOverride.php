@@ -75,7 +75,7 @@ final class BunnyClientOverride extends Client
     /**
      * @noinspection PhpMissingParentConstructorInspection
      *
-     * @param AmqpConnectionConfiguration $configuration
+     * @param AmqpConnectionConfiguration $connectConfig
      * @param AmqpQoSConfiguration        $qosConfig
      * @param LoggerInterface|null        $log
      */

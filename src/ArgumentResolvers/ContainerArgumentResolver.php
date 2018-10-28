@@ -29,7 +29,7 @@ final class ContainerArgumentResolver implements ArgumentResolver
     private $serviceLocator;
 
     /**
-     * @param ServiceLocator $container
+     * @param ServiceLocator $serviceLocator
      */
     public function __construct(ServiceLocator $serviceLocator)
     {
