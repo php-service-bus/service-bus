@@ -33,9 +33,8 @@ final class TopicBind
     private $routingKey;
 
     /**
-     * @param Topic       $sourceTopic      Source topic
-     * @param Topic       $destinationTopic The topic to which the binding is going
-     * @param string|null $routingKey       Binding Key
+     * @param Topic       $destinationTopic
+     * @param string|null $routingKey
      */
     public function __construct(Topic $destinationTopic, ?string $routingKey = null)
     {

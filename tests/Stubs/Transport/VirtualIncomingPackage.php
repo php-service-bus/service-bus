@@ -100,4 +100,11 @@ final class VirtualIncomingPackage implements IncomingPackage
         return new Success();
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function traceId(): string
+    {
+        return uuid();
+    }
 }

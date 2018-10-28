@@ -27,6 +27,7 @@ use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\QueueBind;
 use Desperado\ServiceBus\Infrastructure\Transport\TopicBind;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 /**
  *
@@ -189,7 +190,8 @@ final class BunnyRabbitMqTransportTest extends TestCase
 
             static::assertInstanceOf(BunnyIncomingPackage::class, $package);
             static::assertEquals('somePayload', wait($package->payload()->read()));
-            static::assertEquals(['key' => 'value'], $package->headers());
+            static::assertCount(2, $package->headers());
+            static::assertTrue(Uuid::isValid($package->traceId()));
 
             break;
         }

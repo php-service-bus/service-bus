@@ -25,6 +25,7 @@ use Desperado\ServiceBus\Infrastructure\Transport\Exceptions\NotAcknowledgeFaile
 use Desperado\ServiceBus\Infrastructure\Transport\Exceptions\RejectFailed;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
+use Desperado\ServiceBus\Infrastructure\Transport\Transport;
 
 /**
  *
@@ -65,7 +66,7 @@ final class BunnyIncomingPackage implements IncomingPackage
     {
         $self = new self();
 
-        $self->channel       = $channel;
+        $self->channel = $channel;
         $self->originMessage = $message;
 
         return $self;
@@ -180,11 +181,23 @@ final class BunnyIncomingPackage implements IncomingPackage
     }
 
     /**
-     * @param $id
+     * @inheritdoc
      */
+    public function traceId(): string
+    {
+        /**
+         * @see BunnyConsumer::createMessageHandler#144
+         *
+         * @var string $traceId
+         */
+        $traceId = (string) $this->originMessage->headers[Transport::SERVICE_BUS_TRACE_HEADER];
+
+        return $traceId;
+    }
+
     private function __construct()
     {
-        $this->id   = uuid();
+        $this->id = uuid();
         $this->time = (float) \microtime(true);
     }
 }
