@@ -151,10 +151,6 @@ final class EntryPoint
                     }
                     catch(\Throwable $throwable)
                     {
-                        $throwable instanceof DecodeMessageFailed
-                            ? yield $package->reject(false)
-                            : yield $package->reject(true);
-
                         $logger->critical($throwable->getMessage(), [
                             'packageId'      => $package->id(),
                             'traceId'        => $package->traceId(),
