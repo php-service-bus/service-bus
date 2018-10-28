@@ -96,7 +96,7 @@ final class BunnyRabbitMqTransport implements Transport
     )
     {
         $this->connectionConfig = $connectionConfig;
-        $this->logger           = $logger ?? new NullLogger();
+        $this->logger = $logger ?? new NullLogger();
 
         $this->client = new BunnyClientOverride(
             $this->connectionConfig,
@@ -126,7 +126,7 @@ final class BunnyRabbitMqTransport implements Transport
                     /** @var BunnyChannelOverride $channel */
                     $channel = yield $this->client->channel();
 
-                    $this->channel     = $channel;
+                    $this->channel = $channel;
                     $this->isConnected = true;
 
                     $this->logger->info('Connected to {transportHost}:{transportPort}', [
@@ -187,7 +187,7 @@ final class BunnyRabbitMqTransport implements Transport
                 /** @var BunnyChannelOverride $channel */
                 $channel = $this->channel;
 
-                $emitter  = new Emitter();
+                $emitter = new Emitter();
                 $consumer = new BunnyConsumer($queue, $channel, $this->logger);
 
                 $consumer->listen(
@@ -214,8 +214,8 @@ final class BunnyRabbitMqTransport implements Transport
     public function send(OutboundPackage $outboundPackage): Promise
     {
         /** @var BunnyChannelOverride|null $channel */
-        $channel  = $this->channel;
-        $logger   = $this->logger;
+        $channel = $this->channel;
+        $logger = $this->logger;
         $deferred = new Deferred();
 
         Loop::defer(
@@ -232,7 +232,7 @@ final class BunnyRabbitMqTransport implements Transport
 
                     /** @var \Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination $destination */
                     $destination = $outboundPackage->destination();
-                    $headers     = \array_filter(\array_merge($outboundPackage->headers(), [
+                    $headers = \array_filter(\array_merge($outboundPackage->headers(), [
                         'delivery-mode' => true === $outboundPackage->isPersistent() ? self::AMQP_DURABLE : null,
                         'expiration'    => $outboundPackage->expiredAfter()
                     ]));
@@ -240,7 +240,7 @@ final class BunnyRabbitMqTransport implements Transport
                     $content = yield $outboundPackage->payload()->read();
 
                     $logger->debug('Publish message to "{rabbitMqExchange}" with routing key "{rabbitMqRoutingKey}"', [
-                        'operationId'        => $outboundPackage->traceId(),
+                        'traceId'            => $outboundPackage->traceId(),
                         'rabbitMqExchange'   => $destination->exchange(),
                         'rabbitMqRoutingKey' => $destination->routingKey(),
                         'content'            => $content,

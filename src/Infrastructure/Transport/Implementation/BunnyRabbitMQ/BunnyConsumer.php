@@ -18,6 +18,7 @@ use function Amp\call;
 use Amp\Promise;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpQueue;
+use Desperado\ServiceBus\Infrastructure\Transport\Transport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Bunny\Message as BunnyEnvelope;
@@ -70,9 +71,9 @@ final class BunnyConsumer
     {
         $this->tag = uuid();
 
-        $this->queue   = $queue;
+        $this->queue = $queue;
         $this->channel = $channel;
-        $this->logger  = $logger ?? new NullLogger();
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
@@ -85,7 +86,7 @@ final class BunnyConsumer
     public function listen(callable $onMessageReceived): Promise
     {
         $queueName = (string) $this->queue;
-        $logger    = $this->logger;
+        $logger = $this->logger;
 
         $logger->info('Creates new consumer on channel for queue "{queue}" with tag "{consumerTag}"', [
             'queue' => $queueName,
@@ -140,12 +141,18 @@ final class BunnyConsumer
             {
                 self::$messagesInProcess[$id] = true;
 
+                /** Trace ID */
+                if(false === isset($envelope->headers[Transport::SERVICE_BUS_TRACE_HEADER]))
+                {
+                    $envelope->headers[Transport::SERVICE_BUS_TRACE_HEADER] = uuid();
+                }
+
                 try
                 {
                     $package = BunnyIncomingPackage::received($channel, $envelope);
 
                     $logger->debug('New message received', [
-                        'operationId'       => $package->id(),
+                        'packageId'         => $package->id(),
                         'rawMessagePayload' => $envelope->content,
                         'rawMessageHeaders' => $envelope->headers
                     ]);

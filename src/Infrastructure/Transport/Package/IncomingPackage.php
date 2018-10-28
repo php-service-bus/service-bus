@@ -89,4 +89,11 @@ interface IncomingPackage
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\RejectFailed
      */
     public function reject(bool $requeue, ?string $withReason = null): Promise;
+
+    /**
+     * Receive trace id
+     *
+     * @return string
+     */
+    public function traceId(): string;
 }
