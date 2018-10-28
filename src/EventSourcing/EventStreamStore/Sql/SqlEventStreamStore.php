@@ -509,7 +509,7 @@ final class SqlEventStreamStore implements AggregateStore
                 $events[$playhead] = new StoredAggregateEvent(
                     $eventRow['id'],
                     $playhead,
-                    $adapter->unescapeBinary(\base64_decode($eventRow['payload'])),
+                    \base64_decode($adapter->unescapeBinary($eventRow['payload'])),
                     $eventRow['event_class'],
                     $eventRow['occured_at'],
                     $eventRow['recorded_at']
