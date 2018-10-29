@@ -51,6 +51,14 @@ final class TestContext implements MessageDeliveryContext, LoggingInContext
     }
 
     /**
+     * @return TestHandler
+     */
+    public function testLogHandler(): TestHandler
+    {
+        return $this->testLogHandler;
+    }
+
+    /**
      * @inheritdoc
      */
     public function delivery(Message $message, ?DeliveryOptions $deliveryOptions = null): Promise

@@ -37,7 +37,6 @@ use Desperado\ServiceBus\Tests\Stubs\Sagas\IncorrectSagaId;
 use Desperado\ServiceBus\Tests\Stubs\Sagas\SagasStoreStub;
 use Desperado\ServiceBus\Tests\Stubs\Sagas\TestSagaId;
 use Monolog\Handler\TestHandler;
-use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Desperado\ServiceBus\Sagas\Configuration\SagaEventListenerProcessor;
 
@@ -208,9 +207,6 @@ final class SagaEventListenerProcessorTest extends TestCase
                 ->method('load')
                 ->willReturn(new Success(null));
 
-            $testLogHandler = new TestHandler();
-            $logger         = new Logger('testing', [$testLogHandler]);
-
             /** @var SagasStoreStub $sagaStoreMock */
 
             $processor = new SagaEventListenerProcessor(
@@ -222,13 +218,13 @@ final class SagaEventListenerProcessorTest extends TestCase
                         '+1 year'
                     )
                 ),
-                new SagaProvider($sagaStoreMock),
-                $logger
+                new SagaProvider($sagaStoreMock)
             );
 
-            yield $processor->execute(
-                new FirstEventWithKey(uuid()), new TestContext()
-            );
+            $context = new TestContext();
+            $testLogHandler = $context->testLogHandler();
+
+            yield $processor->execute(new FirstEventWithKey(uuid()), $context);
 
             static::assertTrue($testLogHandler->hasRecords(200));
             static::assertCount(1, $testLogHandler->getRecords());
@@ -289,7 +285,6 @@ final class SagaEventListenerProcessorTest extends TestCase
             /** @var SagasStoreStub $sagaStoreMock */
 
             $testLogHandler = new TestHandler();
-            $logger         = new Logger('testing', [$testLogHandler]);
 
             $processor = new SagaEventListenerProcessor(
                 SagaListenerOptions::withGlobalOptions(
@@ -300,8 +295,7 @@ final class SagaEventListenerProcessorTest extends TestCase
                         '+1 year'
                     )
                 ),
-                $sagaProvider,
-                $logger
+                $sagaProvider
             );
 
             yield $processor->execute(new FirstEventWithKey((string) $id), $context);

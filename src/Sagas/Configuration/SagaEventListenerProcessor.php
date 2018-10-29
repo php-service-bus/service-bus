@@ -16,6 +16,7 @@ namespace Desperado\ServiceBus\Sagas\Configuration;
 use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
+use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
@@ -24,8 +25,6 @@ use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound;
 use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier;
 use Desperado\ServiceBus\Sagas\SagaId;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 /**
  * Virtual service (is created for each message) for consistent work with message handlers
@@ -47,26 +46,16 @@ final class SagaEventListenerProcessor
     private $sagaProvider;
 
     /**
-     * Logger
-     *
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @param SagaListenerOptions  $sagaListenerOptions
      * @param SagaProvider         $sagaProvider
-     * @param LoggerInterface|null $logger
      */
     public function __construct(
         SagaListenerOptions $sagaListenerOptions,
-        SagaProvider $sagaProvider,
-        LoggerInterface $logger = null
+        SagaProvider $sagaProvider
     )
     {
         $this->sagaListenerOptions = $sagaListenerOptions;
         $this->sagaProvider        = $sagaProvider;
-        $this->logger              = $logger ?? new NullLogger();
     }
 
     /**
@@ -83,12 +72,11 @@ final class SagaEventListenerProcessor
     {
         $sagaListenerOptions = $this->sagaListenerOptions;
         $sagaProvider        = $this->sagaProvider;
-        $logger              = $this->logger;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function(Event $event, MessageDeliveryContext $context) use (
-                $sagaListenerOptions, $sagaProvider, $logger
+                $sagaListenerOptions, $sagaProvider
             ): \Generator
             {
                 $id = self::searchSagaIdentifier($event, $sagaListenerOptions);
@@ -105,11 +93,14 @@ final class SagaEventListenerProcessor
                     return true;
                 }
 
-                $logger->info('Saga with identifier "{sagaId}:{sagaClass}" not found', [
-                        'sagaId'    => (string) $id,
-                        'sagaClass' => \get_class($id)
-                    ]
-                );
+                if($context instanceof LoggingInContext)
+                {
+                    $context->logContextMessage('Saga with identifier "{sagaId}:{sagaClass}" not found', [
+                            'sagaId'    => (string) $id,
+                            'sagaClass' => \get_class($id),
+                        ]
+                    );
+                }
 
                 return true;
             },
