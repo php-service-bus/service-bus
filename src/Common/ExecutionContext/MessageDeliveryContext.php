@@ -27,7 +27,8 @@ interface MessageDeliveryContext
      *
      * @noinspection PhpDocSignatureInspection
      *
-     * @param Message $message
+     * @param Message              $message
+     * @param DeliveryOptions|null $options
      *
      * @return Promise It does not return any result
      */

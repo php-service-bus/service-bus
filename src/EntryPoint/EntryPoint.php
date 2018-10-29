@@ -20,7 +20,6 @@ use Amp\Promise;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Endpoint\EndpointRouter;
-use Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\Queue;
@@ -86,7 +85,7 @@ final class EntryPoint
     {
         $this->logger = $logger ?? new NullLogger();
 
-        $this->transport      = $transport;
+        $this->transport = $transport;
         $this->messageDecoder = $messageDecoder;
         $this->endpointRouter = $endpointRouter;
         $this->messagesRouter = $messagesRouter ?? new Router();
@@ -103,10 +102,10 @@ final class EntryPoint
     {
         $this->listenQueue = $queue;
 
-        $transport      = $this->transport;
-        $logger         = $this->logger;
-        $decoder        = $this->messageDecoder;
-        $router         = $this->messagesRouter;
+        $transport = $this->transport;
+        $logger = $this->logger;
+        $decoder = $this->messageDecoder;
+        $router = $this->messagesRouter;
         $endpointRouter = $this->endpointRouter;
 
         /** Hack for phpunit tests */
@@ -130,7 +129,8 @@ final class EntryPoint
                         $message = yield $decoder->decode($package);
 
                         $logger->debug('Dispatch "{messageClass}" message', [
-                            'operationId'  => $package->id(),
+                            'packageId'    => $package->id(),
+                            'traceId'      => $package->traceId(),
                             'messageClass' => \get_class($message)
                         ]);
 
@@ -138,7 +138,8 @@ final class EntryPoint
 
                         $logger->debug('Handle message "{messageClass}"', [
                                 'messageClass' => \get_class($message),
-                                'operationId'  => $package->id()
+                                'packageId'    => $package->id(),
+                                'traceId'      => $package->traceId(),
                             ]
                         );
 
@@ -149,12 +150,9 @@ final class EntryPoint
                     }
                     catch(\Throwable $throwable)
                     {
-                        $throwable instanceof DecodeMessageFailed
-                            ? yield $package->reject(false)
-                            : yield $package->reject(true);
-
                         $logger->critical($throwable->getMessage(), [
-                            'operationId'    => $package->id(),
+                            'packageId'      => $package->id(),
+                            'traceId'        => $package->traceId(),
                             'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
                         ]);
                     }
@@ -190,7 +188,7 @@ final class EntryPoint
             {
                 try
                 {
-                    $executors    = $router->match($message);
+                    $executors = $router->match($message);
                     $messageClass = \get_class($message);
 
                     if(0 === \count($executors))

@@ -21,6 +21,8 @@ use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
  */
 interface Transport
 {
+    public const SERVICE_BUS_TRACE_HEADER = 'service-bus-trace-id';
+
     /**
      * Create topic and bind them
      * If the topic to which we binds does not exist, it will be created
@@ -53,6 +55,8 @@ interface Transport
 
     /**
      * Consume to queue
+     *
+     * @param Queue $queue
      *
      * @return Promise<\Amp\Iterator<\Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage>>
      *

@@ -79,8 +79,8 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     )
     {
         $this->incomingPackage = $incomingPackage;
-        $this->endpointRouter  = $endpointRouter;
-        $this->logger          = $logger;
+        $this->endpointRouter = $endpointRouter;
+        $this->logger = $logger;
     }
 
     /**
@@ -117,20 +117,21 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     public function delivery(Message $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
         $messageClass = \get_class($message);
-        $endpoints    = $this->endpointRouter->route($messageClass);
-        $logger       = $this->logger;
-        $operationId  = $this->incomingPackage->id();
+        $endpoints = $this->endpointRouter->route($messageClass);
+        $logger = $this->logger;
+
+        $traceId = $this->incomingPackage->traceId();
 
         $options = $deliveryOptions ?? new DeliveryOptions();
 
         if(null === $options->traceId())
         {
-            $options->withCustomTraceId($operationId);
+            $options->withCustomTraceId($traceId);
         }
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Message $message, DeliveryOptions $options) use ($endpoints, $logger, $operationId): \Generator
+            static function(Message $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): \Generator
             {
                 foreach($endpoints as $endpoint)
                 {
@@ -139,7 +140,7 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
                     /** @noinspection DisconnectedForeachInstructionInspection */
                     $logger->debug(
                         'Send message "{messageClass}" to "{entryPoint}" entry point', [
-                            'operationId'  => $operationId,
+                            'traceId'      => $traceId,
                             'messageClass' => \get_class($message),
                             'entryPoint'   => $endpoint->name()
                         ]
@@ -157,7 +158,12 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
      */
     public function logContextMessage(string $logMessage, array $extra = [], string $level = LogLevel::INFO): void
     {
-        $extra = \array_merge_recursive($extra, ['operationId' => $this->incomingPackage->id()]);
+        $extra = \array_merge_recursive(
+            $extra, [
+                'traceId'   => $this->incomingPackage->traceId(),
+                'packageId' => $this->incomingPackage->id()
+            ]
+        );
 
         $this->logger->log($level, $logMessage, $extra);
     }
@@ -185,6 +191,16 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     }
 
     /**
+     * Receive trace message id
+     *
+     * @return string
+     */
+    public function traceId(): string
+    {
+        return $this->incomingPackage->traceId();
+    }
+
+    /**
      * Message failed validation
      * Called by infrastructure components
      *
@@ -199,6 +215,6 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
     private function validationFailed(array $violations): void
     {
         $this->isValidMessage = false;
-        $this->violations     = $violations;
+        $this->violations = $violations;
     }
 }
