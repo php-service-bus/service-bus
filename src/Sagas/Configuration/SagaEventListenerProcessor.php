@@ -46,13 +46,10 @@ final class SagaEventListenerProcessor
     private $sagaProvider;
 
     /**
-     * @param SagaListenerOptions  $sagaListenerOptions
-     * @param SagaProvider         $sagaProvider
+     * @param SagaListenerOptions $sagaListenerOptions
+     * @param SagaProvider        $sagaProvider
      */
-    public function __construct(
-        SagaListenerOptions $sagaListenerOptions,
-        SagaProvider $sagaProvider
-    )
+    public function __construct(SagaListenerOptions $sagaListenerOptions, SagaProvider $sagaProvider)
     {
         $this->sagaListenerOptions = $sagaListenerOptions;
         $this->sagaProvider        = $sagaProvider;
