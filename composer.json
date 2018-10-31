@@ -44,7 +44,7 @@
     "amphp/log": "^1",
     "amphp/file": "^0.3",
     "amphp/artax": "^3.0",
-    "amphp/parallel": "^0.2.5",
+    "amphp/parallel": "^1",
     "amphp/postgres": "^1",
 
     "kelunik/retry": "^v1.0",
