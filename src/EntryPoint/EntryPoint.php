@@ -20,7 +20,6 @@ use Amp\Promise;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Endpoint\EndpointRouter;
-use Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\Queue;

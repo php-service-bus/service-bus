@@ -26,8 +26,6 @@ use Desperado\ServiceBus\Sagas\Annotations\SagaEventListener;
 use Desperado\ServiceBus\Sagas\Annotations\SagaHeader;
 use Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration;
 use Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaEventListenerMethod;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 /**
  * Annotations based saga listeners loader
@@ -45,24 +43,13 @@ final class AnnotationsBasedSagaConfigurationLoader implements SagaConfiguration
     private $sagaProvider;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @param SagaProvider           $sagaProvider
      * @param AnnotationsReader|null $annotationReader
-     * @param LoggerInterface|null   $logger
      */
-    public function __construct(
-        SagaProvider $sagaProvider,
-        AnnotationsReader $annotationReader = null,
-        LoggerInterface $logger = null
-    )
+    public function __construct(SagaProvider $sagaProvider, AnnotationsReader $annotationReader = null)
     {
         $this->sagaProvider     = $sagaProvider;
         $this->annotationReader = $annotationReader ?? new DefaultAnnotationsReader();
-        $this->logger           = $logger ?? new NullLogger();
     }
 
     /**
@@ -157,7 +144,7 @@ final class AnnotationsBasedSagaConfigurationLoader implements SagaConfiguration
             )
             : SagaListenerOptions::withGlobalOptions($sagaMetadata);
 
-        $handlerService          = new SagaEventListenerProcessor($listenerOptions, $this->sagaProvider, $this->logger);
+        $handlerService          = new SagaEventListenerProcessor($listenerOptions, $this->sagaProvider);
         $handlerReflectionMethod = new \ReflectionMethod($handlerService, 'execute');
 
         /** @var \ReflectionMethod $eventListenerReflectionMethod */

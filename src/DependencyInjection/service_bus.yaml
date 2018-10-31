@@ -90,7 +90,6 @@ services:
     arguments:
       $sagaProvider: '@Desperado\ServiceBus\SagaProvider'
       $annotationReader: null
-      $logger: '@Psr\Log\LoggerInterface'
 
   # Retrieving a list of message handlers for the specified object
   Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader:

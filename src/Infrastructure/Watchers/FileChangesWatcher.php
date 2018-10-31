@@ -102,7 +102,7 @@ final class FileChangesWatcher
                 )
             );
 
-            $process->start();
+            yield $process->start();
 
             /** @var string $bufferContent */
             $bufferContent = yield buffer($process->getStdout());
