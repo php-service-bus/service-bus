@@ -63,8 +63,8 @@ final class MessageRoutesConfigurator
     private $routingServiceLocator;
 
     /**
-     * @param array                                                                   $servicesList
-     * @param array                                                                   $sagasList
+     * @param array<mixed, string>                                                    $servicesList
+     * @param array<mixed, string>                                                    $sagasList
      * @param ServiceLocator                                                          $routingServiceLocator
      * @param ServiceLocator                                                          $servicesServiceLocator
      * @param array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
@@ -77,11 +77,11 @@ final class MessageRoutesConfigurator
         array $argumentResolvers
     )
     {
-        $this->servicesList = $servicesList;
-        $this->sagasList = $sagasList;
-        $this->routingServiceLocator = $routingServiceLocator;
+        $this->servicesList           = $servicesList;
+        $this->sagasList              = $sagasList;
+        $this->routingServiceLocator  = $routingServiceLocator;
         $this->servicesServiceLocator = $servicesServiceLocator;
-        $this->argumentResolvers = $argumentResolvers;
+        $this->argumentResolvers      = $argumentResolvers;
     }
 
     /**
