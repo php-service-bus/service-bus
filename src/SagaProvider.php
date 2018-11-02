@@ -279,7 +279,7 @@ final class SagaProvider
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      * @throws \Throwable Reflection errors
      */
-    private function doStore(SagasStore $store, Saga $saga, MessageDeliveryContext $context, bool $isNew): \Generator
+    private static function doStore(SagasStore $store, Saga $saga, MessageDeliveryContext $context, bool $isNew): \Generator
     {
         /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Command> $commands */
         $commands = invokeReflectionMethod($saga, 'firedCommands');

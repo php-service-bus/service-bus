@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
@@ -80,7 +81,7 @@ final class SchedulerProvider
             {
                 try
                 {
-                    yield $store->add(
+                    $generator = $store->add(
                         $operation,
                         static function(ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
                         {
@@ -94,6 +95,8 @@ final class SchedulerProvider
                             );
                         }
                     );
+
+                    yield new Coroutine($generator);
 
                     if($context instanceof LoggingInContext)
                     {
@@ -145,7 +148,7 @@ final class SchedulerProvider
             {
                 try
                 {
-                    yield $store->remove(
+                    $generator = $store->remove(
                         $id,
                         static function(?NextScheduledOperation $nextOperation) use ($id, $reason, $context): \Generator
                         {
@@ -154,6 +157,8 @@ final class SchedulerProvider
                             );
                         }
                     );
+
+                    yield new Coroutine($generator);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -185,7 +190,7 @@ final class SchedulerProvider
     {
         try
         {
-            yield $this->store->extract(
+            $generator = $this->store->extract(
                 $id,
                 static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
                 {
@@ -199,6 +204,8 @@ final class SchedulerProvider
                     }
                 }
             );
+
+            yield new Coroutine($generator);
         }
         catch(ScheduledOperationNotFound $exception)
         {
