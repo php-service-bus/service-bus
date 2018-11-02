@@ -254,8 +254,6 @@ final class SagaProvider
         {
             /** @var Saga $saga */
             $saga = \unserialize(\base64_decode($savedSaga->payload()), ['allowed_classes' => true]);
-
-            unset($savedSaga);
         }
 
         return $saga;
@@ -341,8 +339,6 @@ final class SagaProvider
 
         if(true === $currentStatus->inProgress())
         {
-            unset($currentStatus);
-
             invokeReflectionMethod($saga, 'makeExpired');
 
             yield $this->save($saga, $context);
