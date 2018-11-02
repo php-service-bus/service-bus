@@ -17,6 +17,8 @@ use Desperado\ServiceBus\Infrastructure\HttpClient\FormBody;
 
 /**
  * Http request data
+ *
+ * @codeCoverageIgnore
  */
 final class HttpRequest
 {

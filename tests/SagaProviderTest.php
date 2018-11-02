@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Tests;
 
 use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\writeReflectionPropertyValue;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
@@ -57,17 +58,24 @@ final class SagaProviderTest extends TestCase
     {
         parent::setUp();
 
-        $this->adapter  = StorageAdapterFactory::inMemory();
+        $this->adapter  = StorageAdapterFactory::create(
+            AmpPostgreSQLAdapter::class,
+            (string) \getenv('TEST_POSTGRES_DSN')
+        );
         $this->store    = new SQLSagaStore($this->adapter);
         $this->provider = new SagaProvider($this->store);
     }
 
     /**
      * @inheritdoc
+     *
+     * @throws \Throwable
      */
     protected function tearDown(): void
     {
         parent::tearDown();
+
+        wait($this->adapter->execute('DROP TABLE IF EXISTS sagas_store'));
 
         unset($this->provider, $this->store, $this->adapter);
     }
@@ -190,21 +198,6 @@ final class SagaProviderTest extends TestCase
         );
 
         wait($promise);
-    }
-
-    /**
-     * @test
-     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function loadWithoutSchema(): void
-    {
-        $sagaId = TestSagaId::new(CorrectSaga::class);
-
-        wait($this->provider->obtain($sagaId, new TestContext()));
     }
 
     /**

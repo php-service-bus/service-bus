@@ -18,7 +18,6 @@ use Desperado\ServiceBus\Sagas\SagaStatus;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
-use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Stubs\Sagas\CorrectSaga;
 use Desperado\ServiceBus\Tests\Stubs\Sagas\TestSagaId;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 /**
  *
  */
-final class SQLSagaStoreTest extends TestCase
+abstract class SQLSagaStoreTestCase extends TestCase
 {
     /**
      * @var StorageAdapter
@@ -45,7 +44,7 @@ final class SQLSagaStoreTest extends TestCase
     {
         parent::setUp();
 
-        $this->adapter = StorageAdapterFactory::inMemory();
+        $this->adapter = static::adapter();
         $this->store   = new SQLSagaStore($this->adapter);
     }
 
@@ -58,6 +57,11 @@ final class SQLSagaStoreTest extends TestCase
 
         unset($this->store);
     }
+
+    /**
+     * @return StorageAdapter
+     */
+    abstract protected function adapter(): StorageAdapter;
 
     /**
      * @test
