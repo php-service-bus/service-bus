@@ -13,12 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Infrastructure\Storage\SQL;
 
-use Amp\Coroutine;
 use Amp\Promise;
 use function Amp\Promise\wait;
-use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OneResultExpected;
-use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed;
-use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchAll;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchOne;
 use Desperado\ServiceBus\Infrastructure\Storage\ResultSet;
@@ -89,38 +85,27 @@ abstract class BaseStorageAdapterTest extends TestCase
      */
     public function unescapeBinary(): void
     {
-        $handler = static function(BaseStorageAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter = static::getAdapter();
+        $adapter = static::getAdapter();
 
-                $data = \sha1(\random_bytes(256));
+        $data = \sha1(\random_bytes(256));
 
-                yield $adapter->execute(
-                    'INSERT INTO storage_test_table (id, identifier_class, payload) VALUES (?, ?, ?), (?, ?, ?)',
-                    [
-                        '77961031-fd0f-4946-b439-dfc2902b961a', 'SomeIdentifierClass', $data,
-                        '81c3f1d1-1f75-478e-8bc6-2bb02cd381be', 'SomeIdentifierClass2', \sha1(\random_bytes(256))
-                    ]
-                );
+        $promise = $adapter->execute(
+            'INSERT INTO storage_test_table (id, identifier_class, payload) VALUES (?, ?, ?), (?, ?, ?)',
+            [
+                '77961031-fd0f-4946-b439-dfc2902b961a', 'SomeIdentifierClass', $data,
+                '81c3f1d1-1f75-478e-8bc6-2bb02cd381be', 'SomeIdentifierClass2', \sha1(\random_bytes(256))
+            ]
+        );
 
-                /** @var ResultSet $iterator */
-                $iterator = yield $adapter->execute('SELECT * from storage_test_table WHERE id = ?', ['77961031-fd0f-4946-b439-dfc2902b961a']);
-                $result   = yield fetchAll($iterator);
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertCount(1, $result);
+        wait($promise);
 
-                static::assertEquals($data, $adapter->unescapeBinary($result[0]['payload']));
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->fail($throwable->getMessage());
-            }
-        };
+        /** @var ResultSet $iterator */
+        $iterator = wait($adapter->execute('SELECT * from storage_test_table WHERE id = ?', ['77961031-fd0f-4946-b439-dfc2902b961a']));
+        $result   = wait(fetchAll($iterator));
 
-        wait(new Coroutine($handler($this)));
+        /** @noinspection StaticInvocationViaThisInspection */
+        static::assertCount(1, $result);
+        static::assertEquals($data, $adapter->unescapeBinary($result[0]['payload']));
     }
 
     /**
@@ -132,27 +117,16 @@ abstract class BaseStorageAdapterTest extends TestCase
      */
     public function resultSet(): void
     {
-        $handler = static function(BaseStorageAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter = static::getAdapter();
-                yield self::importSagasFixtures($adapter);
-                /** @var ResultSet $iterator */
-                $iterator = yield $adapter->execute('SELECT * from storage_test_table');
-                $result   = yield fetchAll($iterator);
+        $adapter = static::getAdapter();
 
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertCount(2, $result);
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->fail($throwable->getMessage());
-            }
-        };
+        wait(self::importSagasFixtures($adapter));
 
-        wait(new Coroutine($handler($this)));
+        /** @var ResultSet $iterator */
+        $iterator = wait($adapter->execute('SELECT * from storage_test_table'));
+        $result   = wait(fetchAll($iterator));
+
+        /** @noinspection StaticInvocationViaThisInspection */
+        static::assertCount(2, $result);
     }
 
     /**
@@ -164,29 +138,18 @@ abstract class BaseStorageAdapterTest extends TestCase
      */
     public function emptyResultSet(): void
     {
-        $handler = static function(BaseStorageAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter  = static::getAdapter();
-                $iterator = yield $adapter->execute('SELECT * from storage_test_table');
-                $result   = yield fetchAll($iterator);
+        $adapter = static::getAdapter();
 
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertEmpty($result);
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->fail($throwable->getMessage());
-            }
-        };
+        $iterator = wait($adapter->execute('SELECT * from storage_test_table'));
+        $result   = wait(fetchAll($iterator));
 
-        wait(new Coroutine($handler($this)));
+        /** @noinspection StaticInvocationViaThisInspection */
+        static::assertEmpty($result);
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      *
      * @return void
      *
@@ -194,22 +157,7 @@ abstract class BaseStorageAdapterTest extends TestCase
      */
     public function failedQuery(): void
     {
-        $handler = static function(BaseStorageAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter = static::getAdapter();
-
-                yield $adapter->execute('SELECT abube from storage_test_table');
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertInstanceOf(StorageInteractingFailed::class, $throwable);
-            }
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait(static::getAdapter()->execute('SELECT abube from storage_test_table'));
     }
 
     /**
@@ -221,32 +169,25 @@ abstract class BaseStorageAdapterTest extends TestCase
      */
     public function findOne(): void
     {
-        $handler = static function(BaseStorageAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter = static::getAdapter();
-                yield self::importSagasFixtures($adapter);
-                /** @var ResultSet $iterator */
-                $iterator = yield $adapter->execute(
-                    'SELECT * from storage_test_table WHERE identifier_class = ?',
-                    ['SomeIdentifierClass2']
-                );
-                $result   = yield fetchOne($iterator);
+        $adapter = static::getAdapter();
 
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertArrayHasKey('identifier_class', $result);
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertEquals('SomeIdentifierClass2', $result['identifier_class']);
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->fail($throwable->getMessage());
-            }
-        };
+        wait(self::importSagasFixtures($adapter));
 
-        wait(new Coroutine($handler($this)));
+        /** @var ResultSet $iterator */
+        $iterator = wait(
+            $adapter->execute(
+                'SELECT * from storage_test_table WHERE identifier_class = ?',
+                ['SomeIdentifierClass2']
+            )
+        );
+
+        $result = wait(fetchOne($iterator));
+
+        /** @noinspection StaticInvocationViaThisInspection */
+        static::assertArrayHasKey('identifier_class', $result);
+
+        /** @noinspection StaticInvocationViaThisInspection */
+        static::assertEquals('SomeIdentifierClass2', $result['identifier_class']);
     }
 
     /**
@@ -258,33 +199,27 @@ abstract class BaseStorageAdapterTest extends TestCase
      */
     public function findOneWhenEmptySet(): void
     {
-        $handler = static function(BaseStorageAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter = static::getAdapter();
-                /** @var ResultSet $iterator */
-                $iterator = yield $adapter->execute(
-                    'SELECT * from storage_test_table WHERE identifier_class = ?',
-                    ['SomeIdentifierClass2']
-                );
-                $result   = yield fetchOne($iterator);
+        $adapter = static::getAdapter();
 
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertEmpty($result);
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->fail($throwable->getMessage());
-            }
-        };
+        /** @var ResultSet $iterator */
+        $iterator = wait(
+            $adapter->execute(
+                'SELECT * from storage_test_table WHERE identifier_class = ?',
+                ['SomeIdentifierClass2']
+            )
+        );
 
-        wait(new Coroutine($handler($this)));
+        $result = wait(fetchOne($iterator));
+
+        /** @noinspection StaticInvocationViaThisInspection */
+        static::assertEmpty($result);
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OneResultExpected
+     * @expectedExceptionMessage A single record was requested, but the result of the query execution contains several
+     *                           ("2")
      *
      * @return void
      *
@@ -292,36 +227,19 @@ abstract class BaseStorageAdapterTest extends TestCase
      */
     public function findOneWhenWrongSet(): void
     {
-        $handler = static function(BaseStorageAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter = static::getAdapter();
-                yield self::importSagasFixtures($adapter);
-                /** @var ResultSet $iterator */
-                $iterator = yield $adapter->execute('SELECT * from storage_test_table');
-                yield fetchOne($iterator);
+        $adapter = static::getAdapter();
 
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->fail('Exception expected');
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertInstanceOf(OneResultExpected::class, $throwable);
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertEquals(
-                    'A single record was requested, but the result of the query execution contains several ("2")',
-                    $throwable->getMessage()
-                );
-            }
-        };
+        wait(self::importSagasFixtures($adapter));
 
-        wait(new Coroutine($handler($this)));
+        /** @var ResultSet $iterator */
+        $iterator = wait($adapter->execute('SELECT * from storage_test_table'));
+
+        wait(fetchOne($iterator));
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      *
      * @return void
      *
@@ -329,28 +247,17 @@ abstract class BaseStorageAdapterTest extends TestCase
      */
     public function uniqueKeyCheckFailed(): void
     {
-        $handler = static function(BaseStorageAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter = static::getAdapter();
+        $adapter = static::getAdapter();
 
-                yield $adapter->execute(
-                    'INSERT INTO storage_test_table (id, identifier_class) VALUES (?, ?), (?, ?)',
-                    [
-                        '77961031-fd0f-4946-b439-dfc2902b961a', 'SomeIdentifierClass',
-                        '77961031-fd0f-4946-b439-dfc2902b961a', 'SomeIdentifierClass'
-                    ]
-                );
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->assertInstanceOf(UniqueConstraintViolationCheckFailed::class, $throwable);
-            }
-        };
+        $promise = $adapter->execute(
+            'INSERT INTO storage_test_table (id, identifier_class) VALUES (?, ?), (?, ?)',
+            [
+                '77961031-fd0f-4946-b439-dfc2902b961a', 'SomeIdentifierClass',
+                '77961031-fd0f-4946-b439-dfc2902b961a', 'SomeIdentifierClass'
+            ]
+        );
 
-        wait(new Coroutine($handler($this)));
+        wait($promise);
     }
 
     /**
@@ -362,60 +269,53 @@ abstract class BaseStorageAdapterTest extends TestCase
      */
     public function rowsCount(): void
     {
-        $handler = static function(BaseStorageAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter = static::getAdapter();
+        $adapter = static::getAdapter();
 
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
-                $result = yield $adapter->execute(
-                    'INSERT INTO storage_test_table (id, identifier_class) VALUES (?, ?), (?, ?)',
-                    [
-                        '77961031-fd0f-4946-b439-dfc2902b961a', 'SomeIdentifierClass',
-                        '77961031-fd0f-4946-b439-dfc2902b961d', 'SomeIdentifierClass'
-                    ]
-                );
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
+        $result = wait(
+            $adapter->execute(
+                'INSERT INTO storage_test_table (id, identifier_class) VALUES (?, ?), (?, ?)',
+                [
+                    '77961031-fd0f-4946-b439-dfc2902b961a', 'SomeIdentifierClass',
+                    '77961031-fd0f-4946-b439-dfc2902b961d', 'SomeIdentifierClass'
+                ]
+            )
+        );
 
-                static::assertSame(2, $result->affectedRows());
+        static::assertSame(2, $result->affectedRows());
 
-                unset($result);
+        unset($result);
 
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
-                $result = yield $adapter->execute(
-                    'DELETE FROM storage_test_table where id = \'77961031-fd0f-4946-b439-dfc2902b961d\''
-                );
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
+        $result = wait(
+            $adapter->execute(
+                'DELETE FROM storage_test_table where id = \'77961031-fd0f-4946-b439-dfc2902b961d\''
+            )
+        );
 
-                static::assertSame(1, $result->affectedRows());
+        static::assertSame(1, $result->affectedRows());
 
-                unset($result);
+        unset($result);
 
-                yield $adapter->execute('DELETE FROM storage_test_table');
+        wait($adapter->execute('DELETE FROM storage_test_table'));
 
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
-                $result = yield $adapter->execute('DELETE FROM storage_test_table');
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
+        $result = wait($adapter->execute('DELETE FROM storage_test_table'));
 
-                static::assertSame(0, $result->affectedRows());
+        static::assertSame(0, $result->affectedRows());
 
-                unset($result);
+        unset($result);
 
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
-                $result = yield $adapter->execute(
-                    'SELECT * FROM storage_test_table where id = \'77961031-fd0f-4946-b439-dfc2902b961d\''
-                );
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
+        $result = wait(
+            $adapter->execute(
+                'SELECT * FROM storage_test_table where id = \'77961031-fd0f-4946-b439-dfc2902b961d\''
+            )
+        );
 
-                static::assertSame(0, $result->affectedRows());
+        static::assertSame(0, $result->affectedRows());
 
-                unset($result);
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->fail($throwable->getMessage());
-            }
-        };
-
-        wait(new Coroutine($handler($this)));
+        unset($result);
     }
 
     /**

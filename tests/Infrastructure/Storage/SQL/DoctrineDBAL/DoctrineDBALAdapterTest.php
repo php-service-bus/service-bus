@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Infrastructure\Storage\SQL\DoctrineDBAL;
 
-use Amp\Coroutine;
 use function Amp\Promise\wait;
 use Desperado\ServiceBus\Infrastructure\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
@@ -69,30 +68,17 @@ final class DoctrineDBALAdapterTest extends BaseStorageAdapterTest
      */
     public function lastInsertId(): void
     {
-        $handler = static function(DoctrineDBALAdapterTest $self): \Generator
-        {
-            try
-            {
-                $adapter = static::getAdapter();
+        $adapter = static::getAdapter();
 
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
-                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')');
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
+        $result = wait($adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')'));
 
-                static::assertEquals('1', $result->lastInsertId());
+        static::assertEquals('1', $result->lastInsertId());
 
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
-                $result = yield $adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')');
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
+        $result = wait($adapter->execute('INSERT INTO test_ai (value) VALUES (\'qwerty\')'));
 
-                static::assertEquals('2', $result->lastInsertId());
-            }
-            catch(\Throwable $throwable)
-            {
-                /** @noinspection StaticInvocationViaThisInspection */
-                $self->fail($throwable->getMessage());
-            }
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertEquals('2', $result->lastInsertId());
     }
 
     /**

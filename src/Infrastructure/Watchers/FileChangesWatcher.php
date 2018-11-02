@@ -87,6 +87,8 @@ final class FileChangesWatcher
     /**
      * Execute calculate hashes
      *
+     * @psalm-suppress InvalidReturnType
+     *
      * @param string $directory
      *
      * @return \Generator<string>

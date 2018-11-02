@@ -152,6 +152,7 @@ final class QueryBuilderFunctionsTest extends TestCase
      */
     public function castNonScalarType(): void
     {
+        /** @noinspection PhpParamsInspection */
         cast('key', []);
     }
 

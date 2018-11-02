@@ -13,14 +13,10 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests;
 
-use Amp\Coroutine;
 use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\writeReflectionPropertyValue;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
-use Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed;
-use Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed;
-use Desperado\ServiceBus\Sagas\Exceptions\StartSagaFailed;
 use Desperado\ServiceBus\Sagas\Saga;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
@@ -84,19 +80,16 @@ final class SagaProviderTest extends TestCase
      */
     public function saveNotExistsSaga(): void
     {
-        $handler = static function(SagaProviderTest $self): \Generator
-        {
-            yield $self->adapter->execute(
-                (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
-            );
+        $promise = $this->adapter->execute(
+            (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
+        );
 
-            $id   = TestSagaId::new(CorrectSaga::class);
-            $saga = new CorrectSaga($id);
+        wait($promise);
 
-            yield $self->provider->save($saga, new TestContext());
-        };
+        $id   = TestSagaId::new(CorrectSaga::class);
+        $saga = new CorrectSaga($id);
 
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->save($saga, new TestContext()));
     }
 
     /**
@@ -108,43 +101,40 @@ final class SagaProviderTest extends TestCase
      */
     public function flow(): void
     {
-        $handler = static function(SagaProviderTest $self): \Generator
-        {
-            yield $self->adapter->execute(
-                (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
-            );
+        $promise = $this->adapter->execute(
+            (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
+        );
 
-            $id = TestSagaId::new(CorrectSaga::class);
+        wait($promise);
 
-            $context = new TestContext();
+        $id = TestSagaId::new(CorrectSaga::class);
 
-            writeReflectionPropertyValue(
-                $self->provider,
-                'sagaMetaDataCollection',
-                [
-                    CorrectSaga::class => new SagaMetadata(
-                        CorrectSaga::class,
-                        TestSagaId::class,
-                        'requestId',
-                        '+1 year'
-                    )
-                ]
-            );
+        $context = new TestContext();
 
-            /** @var CorrectSaga $saga */
-            $saga = yield $self->provider->start($id, new FirstEmptyCommand(), $context);
+        writeReflectionPropertyValue(
+            $this->provider,
+            'sagaMetaDataCollection',
+            [
+                CorrectSaga::class => new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    'requestId',
+                    '+1 year'
+                )
+            ]
+        );
 
-            static::assertInstanceOf(Saga::class, $saga);
-            static::assertCount(1, $context->messages);
+        /** @var CorrectSaga $saga */
+        $saga = wait($this->provider->start($id, new FirstEmptyCommand(), $context));
 
-            yield $self->provider->save($saga, $context);
+        static::assertInstanceOf(Saga::class, $saga);
+        static::assertCount(1, $context->messages);
 
-            $loadedSaga = yield $self->provider->obtain($id);
+        wait($this->provider->save($saga, $context));
 
-            static::assertInstanceOf(Saga::class, $loadedSaga);
-        };
+        $loadedSaga = wait($this->provider->obtain($id));
 
-        wait(new Coroutine($handler($this)));
+        static::assertInstanceOf(Saga::class, $loadedSaga);
     }
 
     /**
@@ -157,36 +147,34 @@ final class SagaProviderTest extends TestCase
      */
     public function saveDuplicateSaga(): void
     {
-        $handler = static function(SagaProviderTest $self): \Generator
-        {
-            yield $self->adapter->execute(
-                (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
-            );
+        $promise = $this->adapter->execute(
+            (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
+        );
 
-            $id = TestSagaId::new(CorrectSaga::class);
+        wait($promise);
 
-            writeReflectionPropertyValue(
-                $self->provider,
-                'sagaMetaDataCollection',
-                [
-                    CorrectSaga::class => new SagaMetadata(
-                        CorrectSaga::class,
-                        TestSagaId::class,
-                        'requestId',
-                        '+1 year'
-                    )
-                ]
-            );
+        $id = TestSagaId::new(CorrectSaga::class);
 
-            yield $self->provider->start($id, new FirstEmptyCommand(), new TestContext());
-            yield $self->provider->start($id, new FirstEmptyCommand(), new TestContext());
-        };
+        writeReflectionPropertyValue(
+            $this->provider,
+            'sagaMetaDataCollection',
+            [
+                CorrectSaga::class => new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    'requestId',
+                    '+1 year'
+                )
+            ]
+        );
 
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->start($id, new FirstEmptyCommand(), new TestContext()));
+        wait($this->provider->start($id, new FirstEmptyCommand(), new TestContext()));
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed
      *
      * @return void
      *
@@ -194,21 +182,17 @@ final class SagaProviderTest extends TestCase
      */
     public function saveWithoutSchema(): void
     {
-        $handler = static function(SagaProviderTest $self): \Generator
-        {
-            $self->expectException(SaveSagaFailed::class);
+        $promise = $this->provider->save(
+            new CorrectSaga(TestSagaId::new(CorrectSaga::class)),
+            new TestContext()
+        );
 
-            yield $self->provider->save(
-                new CorrectSaga(TestSagaId::new(CorrectSaga::class)),
-                new TestContext()
-            );
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($promise);
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed
      *
      * @return void
      *
@@ -216,20 +200,14 @@ final class SagaProviderTest extends TestCase
      */
     public function loadWithoutSchema(): void
     {
-        $handler = static function(SagaProviderTest $self): \Generator
-        {
-            $self->expectException(LoadSagaFailed::class);
+        $sagaId = TestSagaId::new(CorrectSaga::class);
 
-            $sagaId = TestSagaId::new(CorrectSaga::class);
-
-            yield $self->provider->obtain($sagaId);
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->obtain($sagaId));
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\StartSagaFailed
      *
      * @return void
      *
@@ -237,20 +215,14 @@ final class SagaProviderTest extends TestCase
      */
     public function startWithoutSchema(): void
     {
-        $handler = static function(SagaProviderTest $self): \Generator
-        {
-            $self->expectException(StartSagaFailed::class);
+        $sagaId = TestSagaId::new(CorrectSaga::class);
 
-            $sagaId = TestSagaId::new(CorrectSaga::class);
-
-            yield $self->provider->start($sagaId, new FirstEmptyCommand(), new TestContext());
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->start($sagaId, new FirstEmptyCommand(), new TestContext()));
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed
      *
      * @return void
      *
@@ -258,21 +230,18 @@ final class SagaProviderTest extends TestCase
      */
     public function saveUnStartedSaga(): void
     {
-        $handler = static function(SagaProviderTest $self): \Generator
-        {
-            $self->expectException(SaveSagaFailed::class);
+        $promise = $this->adapter->execute(
+            (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
+        );
 
-            yield $self->adapter->execute(
-                (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
-            );
+        wait($promise);
 
-            yield $self->provider->save(
-                new CorrectSaga(TestSagaId::new(CorrectSaga::class)),
-                new TestContext()
-            );
-        };
+        $promise = $this->provider->save(
+            new CorrectSaga(TestSagaId::new(CorrectSaga::class)),
+            new TestContext()
+        );
 
-        wait(new Coroutine($handler($this)));
+        wait($promise);
     }
 
     /**
@@ -286,28 +255,23 @@ final class SagaProviderTest extends TestCase
      */
     public function startWithWrongExpirationInterval(): void
     {
-        $handler = static function(SagaProviderTest $self): \Generator
-        {
-            $id = TestSagaId::new(CorrectSaga::class);
+        $id = TestSagaId::new(CorrectSaga::class);
 
-            $context = new TestContext();
+        $context = new TestContext();
 
-            writeReflectionPropertyValue(
-                $self->provider,
-                'sagaMetaDataCollection',
-                [
-                    CorrectSaga::class => new SagaMetadata(
-                        CorrectSaga::class,
-                        TestSagaId::class,
-                        'requestId',
-                        '-1 year'
-                    )
-                ]
-            );
+        writeReflectionPropertyValue(
+            $this->provider,
+            'sagaMetaDataCollection',
+            [
+                CorrectSaga::class => new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    'requestId',
+                    '-1 year'
+                )
+            ]
+        );
 
-            yield $self->provider->start($id, new FirstEmptyCommand(), $context);
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->start($id, new FirstEmptyCommand(), $context));
     }
 }

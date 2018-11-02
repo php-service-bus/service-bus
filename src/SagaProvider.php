@@ -281,9 +281,12 @@ final class SagaProvider
                     self::SAVE_SAGA_RETRY_COUNT,
                     static function() use ($store, $savedSaga, $isNew): \Generator
                     {
-                        true === $isNew
-                            ? yield $store->save($savedSaga)
-                            : yield $store->update($savedSaga);
+                        /** @var Promise $promise */
+                        $promise = true === $isNew
+                            ? $store->save($savedSaga)
+                            : $store->update($savedSaga);
+
+                        yield $promise;
                     },
                     [ConnectionFailed::class, StorageInteractingFailed::class],
                     new ConstantBackoff(self::SAVE_SAGA_RETRY_DELAY)

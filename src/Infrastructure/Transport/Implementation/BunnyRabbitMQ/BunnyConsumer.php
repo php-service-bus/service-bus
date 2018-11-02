@@ -71,9 +71,9 @@ final class BunnyConsumer
     {
         $this->tag = uuid();
 
-        $this->queue = $queue;
+        $this->queue   = $queue;
         $this->channel = $channel;
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger  = $logger ?? new NullLogger();
     }
 
     /**
@@ -86,11 +86,11 @@ final class BunnyConsumer
     public function listen(callable $onMessageReceived): Promise
     {
         $queueName = (string) $this->queue;
-        $logger = $this->logger;
+        $logger    = $this->logger;
 
         $logger->info('Creates new consumer on channel for queue "{queue}" with tag "{consumerTag}"', [
-            'queue' => $queueName,
-            'tag'   => $this->tag
+            'queue'       => $queueName,
+            'consumerTag' => $this->tag
         ]);
 
         return $this->channel->consume(

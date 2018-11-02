@@ -13,18 +13,14 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Sagas\Configuration;
 
-use Amp\Coroutine;
 use function Amp\Promise\wait;
 use Amp\Success;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use function Desperado\ServiceBus\Common\uuid;
 use function Desperado\ServiceBus\Common\writeReflectionPropertyValue;
 use Desperado\ServiceBus\SagaProvider;
-use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound;
-use Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified;
 use Desperado\ServiceBus\Sagas\Configuration\SagaListenerOptions;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
-use Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
@@ -47,6 +43,9 @@ final class SagaEventListenerProcessorTest extends TestCase
 {
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified
+     * @expectedExceptionMessage A property that contains an identifier ("") was not found in class
+     *                           "Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent"
      *
      * @return void
      *
@@ -54,34 +53,27 @@ final class SagaEventListenerProcessorTest extends TestCase
      */
     public function withWrongContainingIdentifierProperty(): void
     {
-        $handler = static function(SagaEventListenerProcessorTest $self): \Generator
-        {
-            $self->expectException(IncorrectIdentifierFieldSpecified::class);
-            $self->expectExceptionMessage(
-                'A property that contains an identifier ("") was not found in class '
-                . '"Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent"'
-            );
+        $processor = new SagaEventListenerProcessor(
+            SagaListenerOptions::withGlobalOptions(
+                new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    '',
+                    '+1 year'
+                )
+            ),
+            new SagaProvider(new SagasStoreStub())
+        );
 
-            $processor = new SagaEventListenerProcessor(
-                SagaListenerOptions::withGlobalOptions(
-                    new SagaMetadata(
-                        CorrectSaga::class,
-                        TestSagaId::class,
-                        '',
-                        '+1 year'
-                    )
-                ),
-                new SagaProvider(new SagasStoreStub())
-            );
-
-            yield $processor->execute(new FirstEmptyEvent(), new TestContext());
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($processor->execute(new FirstEmptyEvent(), new TestContext()));
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IncorrectIdentifierFieldSpecified
+     * @expectedExceptionMessage The value of the "key" property of the
+     *                           "Desperado\ServiceBus\Tests\Stubs\Messages\FirstEventWithKey" event can not be empty,
+     *                           since it is the saga id
      *
      * @return void
      *
@@ -89,35 +81,26 @@ final class SagaEventListenerProcessorTest extends TestCase
      */
     public function withEmptyContainingIdentifierProperty(): void
     {
-        $handler = static function(SagaEventListenerProcessorTest $self): \Generator
-        {
-            $self->expectException(IncorrectIdentifierFieldSpecified::class);
-            $self->expectExceptionMessage(
-                'The value of the "key" property of the '
-                . '"Desperado\ServiceBus\Tests\Stubs\Messages\FirstEventWithKey" event can not '
-                . 'be empty, since it is the saga id'
-            );
+        $processor = new SagaEventListenerProcessor(
+            SagaListenerOptions::withGlobalOptions(
+                new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    'key',
+                    '+1 year'
+                )
+            ),
+            new SagaProvider(new SagasStoreStub())
+        );
 
-            $processor = new SagaEventListenerProcessor(
-                SagaListenerOptions::withGlobalOptions(
-                    new SagaMetadata(
-                        CorrectSaga::class,
-                        TestSagaId::class,
-                        'key',
-                        '+1 year'
-                    )
-                ),
-                new SagaProvider(new SagasStoreStub())
-            );
-
-            yield $processor->execute(new FirstEventWithKey(''), new TestContext());
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($processor->execute(new FirstEventWithKey(''), new TestContext()));
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\InvalidSagaIdentifier
+     * @expectedExceptionMessage Saga identifier mus be type of "Desperado\ServiceBus\Sagas\SagaId".
+     *                           "Desperado\ServiceBus\Tests\Stubs\Sagas\IncorrectSagaId" type specified
      *
      * @return void
      *
@@ -125,34 +108,26 @@ final class SagaEventListenerProcessorTest extends TestCase
      */
     public function withWrongSagaIdType(): void
     {
-        $handler = static function(SagaEventListenerProcessorTest $self): \Generator
-        {
-            $self->expectException(InvalidSagaIdentifier::class);
-            $self->expectExceptionMessage(
-                'Saga identifier mus be type of "Desperado\ServiceBus\Sagas\SagaId". '
-                . '"Desperado\ServiceBus\Tests\Stubs\Sagas\IncorrectSagaId" type specified'
-            );
+        $processor = new SagaEventListenerProcessor(
+            SagaListenerOptions::withGlobalOptions(
+                new SagaMetadata(
+                    CorrectSaga::class,
+                    IncorrectSagaId::class,
+                    'key',
+                    '+1 year'
+                )
+            ),
+            new SagaProvider(new SagasStoreStub())
+        );
 
-            $processor = new SagaEventListenerProcessor(
-                SagaListenerOptions::withGlobalOptions(
-                    new SagaMetadata(
-                        CorrectSaga::class,
-                        IncorrectSagaId::class,
-                        'key',
-                        '+1 year'
-                    )
-                ),
-                new SagaProvider(new SagasStoreStub())
-            );
-
-            yield $processor->execute(new FirstEventWithKey('root'), new TestContext());
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($processor->execute(new FirstEventWithKey('root'), new TestContext()));
     }
 
     /**
      * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Configuration\Exceptions\IdentifierClassNotFound
+     * @expectedExceptionMessage Identifier class "Desperado\ServiceBus\Tests\Sagas\Configuration\SomeUnExistsClass"
+     *                           specified in the saga "Desperado\ServiceBus\Tests\Stubs\Sagas\\CorrectSaga" not found
      *
      * @return void
      *
@@ -160,32 +135,20 @@ final class SagaEventListenerProcessorTest extends TestCase
      */
     public function withUnExistsSagaId(): void
     {
-        $handler = static function(SagaEventListenerProcessorTest $self): \Generator
-        {
-            $self->expectException(IdentifierClassNotFound::class);
-            $self->expectExceptionMessage(
-                'Identifier class "Desperado\ServiceBus\Tests\Sagas\Configuration\SomeUnExistsClass" '
-                . 'specified in the saga "Desperado\ServiceBus\Tests\Stubs\Sagas\\CorrectSaga" '
-                . 'not found'
-            );
+        /** @noinspection PhpUndefinedClassInspection */
+        $processor = new SagaEventListenerProcessor(
+            SagaListenerOptions::withGlobalOptions(
+                new SagaMetadata(
+                    CorrectSaga::class,
+                    SomeUnExistsClass::class,
+                    'key',
+                    '+1 year'
+                )
+            ),
+            new SagaProvider(new SagasStoreStub())
+        );
 
-            /** @noinspection PhpUndefinedClassInspection */
-            $processor = new SagaEventListenerProcessor(
-                SagaListenerOptions::withGlobalOptions(
-                    new SagaMetadata(
-                        CorrectSaga::class,
-                        SomeUnExistsClass::class,
-                        'key',
-                        '+1 year'
-                    )
-                ),
-                new SagaProvider(new SagasStoreStub())
-            );
-
-            yield $processor->execute(new FirstEventWithKey(uuid()), new TestContext());
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($processor->execute(new FirstEventWithKey(uuid()), new TestContext()));
     }
 
     /**
@@ -197,48 +160,43 @@ final class SagaEventListenerProcessorTest extends TestCase
      */
     public function executeWithUnExistsSaga(): void
     {
-        $handler = static function(SagaEventListenerProcessorTest $self): \Generator
-        {
-            $sagaStoreMock = $self->getMockBuilder(SagasStoreStub::class)
-                ->setMethods(['load'])
-                ->getMock();
+        $sagaStoreMock = $this->getMockBuilder(SagasStoreStub::class)
+            ->setMethods(['load'])
+            ->getMock();
 
-            $sagaStoreMock
-                ->method('load')
-                ->willReturn(new Success(null));
+        $sagaStoreMock
+            ->method('load')
+            ->willReturn(new Success(null));
 
-            /** @var SagasStoreStub $sagaStoreMock */
+        /** @var SagasStoreStub $sagaStoreMock */
 
-            $processor = new SagaEventListenerProcessor(
-                SagaListenerOptions::withGlobalOptions(
-                    new SagaMetadata(
-                        CorrectSaga::class,
-                        TestSagaId::class,
-                        'key',
-                        '+1 year'
-                    )
-                ),
-                new SagaProvider($sagaStoreMock)
-            );
+        $processor = new SagaEventListenerProcessor(
+            SagaListenerOptions::withGlobalOptions(
+                new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    'key',
+                    '+1 year'
+                )
+            ),
+            new SagaProvider($sagaStoreMock)
+        );
 
-            $context = new TestContext();
-            $testLogHandler = $context->testLogHandler();
+        $context        = new TestContext();
+        $testLogHandler = $context->testLogHandler();
 
-            yield $processor->execute(new FirstEventWithKey(uuid()), $context);
+        wait($processor->execute(new FirstEventWithKey(uuid()), $context));
 
-            static::assertTrue($testLogHandler->hasRecords(200));
-            static::assertCount(1, $testLogHandler->getRecords());
+        static::assertTrue($testLogHandler->hasRecords(200));
+        static::assertCount(1, $testLogHandler->getRecords());
 
-            /** @var array $record */
-            $record = $testLogHandler->getRecords()[0];
+        /** @var array $record */
+        $record = $testLogHandler->getRecords()[0];
 
-            static::assertEquals(
-                'Saga with identifier "{sagaId}:{sagaClass}" not found',
-                $record['message']
-            );
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertEquals(
+            'Saga with identifier "{sagaId}:{sagaClass}" not found',
+            $record['message']
+        );
     }
 
     /**
@@ -250,70 +208,67 @@ final class SagaEventListenerProcessorTest extends TestCase
      */
     public function successTransition(): void
     {
-        $handler = static function(): \Generator
-        {
-            $adapter = StorageAdapterFactory::inMemory();
+        $adapter = StorageAdapterFactory::inMemory();
 
-            yield $adapter->execute(
+        wait(
+            $adapter->execute(
                 \file_get_contents(__DIR__ . '/../../../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
-            );
+            )
+        );
 
-            $context = new TestContext();
+        $context = new TestContext();
 
-            $id = TestSagaId::new(CorrectSaga::class);
+        $id = TestSagaId::new(CorrectSaga::class);
 
-            $sagaProvider = new SagaProvider(new SQLSagaStore($adapter));
+        $sagaProvider = new SagaProvider(new SQLSagaStore($adapter));
 
-            writeReflectionPropertyValue(
-                $sagaProvider,
-                'sagaMetaDataCollection',
-                [
-                    CorrectSaga::class => new SagaMetadata(
-                        CorrectSaga::class,
-                        TestSagaId::class,
-                        'key',
-                        '+1 year'
-                    )
-                ]
-            );
+        writeReflectionPropertyValue(
+            $sagaProvider,
+            'sagaMetaDataCollection',
+            [
+                CorrectSaga::class => new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    'key',
+                    '+1 year'
+                )
+            ]
+        );
 
-            /** @var CorrectSaga $saga */
-            $saga = yield $sagaProvider->start($id, new FirstEmptyCommand(), $context);
+        /** @var CorrectSaga $saga */
+        $saga = wait($sagaProvider->start($id, new FirstEmptyCommand(), $context));
 
-            yield $sagaProvider->save($saga, $context);
+        wait($sagaProvider->save($saga, $context));
 
-            /** @var SagasStoreStub $sagaStoreMock */
+        /** @var SagasStoreStub $sagaStoreMock */
 
-            $testLogHandler = new TestHandler();
+        $testLogHandler = new TestHandler();
 
-            $processor = new SagaEventListenerProcessor(
-                SagaListenerOptions::withGlobalOptions(
-                    new SagaMetadata(
-                        CorrectSaga::class,
-                        TestSagaId::class,
-                        'key',
-                        '+1 year'
-                    )
-                ),
-                $sagaProvider
-            );
+        $processor = new SagaEventListenerProcessor(
+            SagaListenerOptions::withGlobalOptions(
+                new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    'key',
+                    '+1 year'
+                )
+            ),
+            $sagaProvider
+        );
 
-            yield $processor->execute(new FirstEventWithKey((string) $id), $context);
+        wait($processor->execute(new FirstEventWithKey((string) $id), $context));
 
-            static::assertFalse($testLogHandler->hasRecords(200));
+        static::assertFalse($testLogHandler->hasRecords(200));
 
-            /** @var array $messages */
-            $messages = readReflectionPropertyValue($context, 'messages');
+        /** @var array $messages */
+        $messages = readReflectionPropertyValue($context, 'messages');
 
-            static::assertInternalType('array', $messages);
-            static::assertNotEmpty($messages);
+        static::assertInternalType('array', $messages);
+        static::assertNotEmpty($messages);
 
-            /** @var SecondEventWithKey $responseEvent */
-            $responseEvent = $messages[1];
+        /** @var SecondEventWithKey $responseEvent */
+        $responseEvent = $messages[1];
 
-            static::assertEquals((string) $id, $responseEvent->key());
-        };
-
-        wait(new Coroutine($handler()));
+        static::assertEquals((string) $id, $responseEvent->key());
     }
 }
