@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Scheduler;
 
+use Amp\Coroutine;
 use Amp\Failure;
 use Amp\Promise;
 use Amp\Success;
@@ -54,11 +55,11 @@ final class SchedulerListener
             /**
              * @see SchedulerProvider::emit()
              *
-             * @var Promise $promise
+             * @var \Generator $generator
              */
-            $promise = invokeReflectionMethod($schedulerProvider, 'emit', $command->id(), $context);
+            $generator = invokeReflectionMethod($schedulerProvider, 'emit', $command->id(), $context);
 
-            return $promise;
+            return new Coroutine($generator);
         }
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
@@ -166,16 +167,16 @@ final class SchedulerListener
                 /**
                  * @see SchedulerProvider::emitNextOperation()
                  *
-                 * @var Promise $promise
+                 * @var \Generator $promise
                  */
-                $promise = invokeReflectionMethod(
+                $generator = invokeReflectionMethod(
                     $schedulerProvider,
                     'emitNextOperation',
                     $event->nextOperation(),
                     $context
                 );
 
-                return $promise;
+                return new Coroutine($generator);
             }
                 // @codeCoverageIgnoreStart
             catch(\Throwable $throwable)

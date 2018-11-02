@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 
-use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Endpoint\DeliveryOptions;
@@ -35,8 +34,8 @@ final class VirtualTransportEndpoint implements Endpoint
     /**
      * @inheritDoc
      */
-    public function delivery(Message $message, DeliveryOptions $options): Promise
+    public function delivery(Message $message, DeliveryOptions $options): \Generator
     {
-        return new Success($message);
+        return yield new Success($message);
     }
 }

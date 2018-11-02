@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
@@ -80,7 +81,7 @@ final class SchedulerProvider
             {
                 try
                 {
-                    yield $store->add(
+                    $generator = $store->add(
                         $operation,
                         static function(ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
                         {
@@ -94,6 +95,8 @@ final class SchedulerProvider
                             );
                         }
                     );
+
+                    yield new Coroutine($generator);
 
                     if($context instanceof LoggingInContext)
                     {
@@ -145,7 +148,7 @@ final class SchedulerProvider
             {
                 try
                 {
-                    yield $store->remove(
+                    $generator = $store->remove(
                         $id,
                         static function(?NextScheduledOperation $nextOperation) use ($id, $reason, $context): \Generator
                         {
@@ -154,6 +157,8 @@ final class SchedulerProvider
                             );
                         }
                     );
+
+                    yield new Coroutine($generator);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -177,57 +182,50 @@ final class SchedulerProvider
      * @param ScheduledOperationId   $id
      * @param MessageDeliveryContext $context
      *
-     * @return Promise It does not return any result
+     * @return \Generator It does not return any result
      *
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
      */
-    private function emit(ScheduledOperationId $id, MessageDeliveryContext $context): Promise
+    private function emit(ScheduledOperationId $id, MessageDeliveryContext $context): \Generator
     {
-        $store = $this->store;
-
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(ScheduledOperationId $id) use ($store, $context): \Generator
-            {
-                try
+        try
+        {
+            $generator = $this->store->extract(
+                $id,
+                static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
                 {
-                    yield $store->extract(
-                        $id,
-                        static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
-                        {
-                            if(null !== $operation)
-                            {
-                                yield self::processSendCommand($operation, $context);
-
-                                yield $context->delivery(
-                                    SchedulerOperationEmitted::create($operation->id(), $nextOperation)
-                                );
-                            }
-                        }
-                    );
-                }
-                catch(ScheduledOperationNotFound $exception)
-                {
-                    if($context instanceof LoggingInContext)
+                    if(null !== $operation)
                     {
-                        $context->logContextThrowable($exception);
-                    }
+                        yield self::processSendCommand($operation, $context);
 
-                    yield $context->delivery(
-                        SchedulerOperationEmitted::create($id, null)
-                    );
+                        yield $context->delivery(
+                            SchedulerOperationEmitted::create($operation->id(), $nextOperation)
+                        );
+                    }
                 }
-                catch(\Throwable $throwable)
-                {
-                    throw new SchedulerFailure(
-                        $throwable->getMessage(),
-                        $throwable->getCode(),
-                        $throwable
-                    );
-                }
-            },
-            $id
-        );
+            );
+
+            yield new Coroutine($generator);
+        }
+        catch(ScheduledOperationNotFound $exception)
+        {
+            if($context instanceof LoggingInContext)
+            {
+                $context->logContextThrowable($exception);
+            }
+
+            yield $context->delivery(
+                SchedulerOperationEmitted::create($id, null)
+            );
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new SchedulerFailure(
+                $throwable->getMessage(),
+                $throwable->getCode(),
+                $throwable
+            );
+        }
     }
 
     /**
@@ -239,58 +237,51 @@ final class SchedulerProvider
      * @param NextScheduledOperation|null $nextOperation
      * @param MessageDeliveryContext      $context
      *
-     * @return Promise It does not return any result
+     * @return \Generator It does not return any result
      *
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\SchedulerFailure
      */
-    private function emitNextOperation(?NextScheduledOperation $nextOperation, MessageDeliveryContext $context): Promise
+    private function emitNextOperation(?NextScheduledOperation $nextOperation, MessageDeliveryContext $context): \Generator
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(?NextScheduledOperation $nextOperation) use ($context): \Generator
+        try
+        {
+            if(null !== $nextOperation)
             {
-                try
+                $id    = $nextOperation->id();
+                $delay = self::calculateExecutionDelay($nextOperation);
+
+                /** Message will return after a specified time interval */
+                yield $context->delivery(
+                    EmitSchedulerOperation::create($id),
+                    new DeliveryOptions(['x-delay' => $delay])
+                );
+
+                if($context instanceof LoggingInContext)
                 {
-                    if(null !== $nextOperation)
-                    {
-                        $id    = $nextOperation->id();
-                        $delay = self::calculateExecutionDelay($nextOperation);
-
-                        /** Message will return after a specified time interval */
-                        yield $context->delivery(
-                            EmitSchedulerOperation::create($id),
-                            new DeliveryOptions(['x-delay' => $delay])
-                        );
-
-                        if($context instanceof LoggingInContext)
-                        {
-                            $context->logContextMessage(
-                                'Scheduled operation with identifier "{scheduledOperationId}" will be executed in "{scheduledOperationDelay}" seconds', [
-                                    'scheduledOperationId'    => $id,
-                                    'scheduledOperationDelay' => $delay / 1000
-                                ]
-                            );
-                        }
-
-                        return;
-                    }
-
-                    if($context instanceof LoggingInContext)
-                    {
-                        $context->logContextMessage('Next operation not specified', [], LogLevel::DEBUG);
-                    }
-                }
-                catch(\Throwable $throwable)
-                {
-                    throw new SchedulerFailure(
-                        $throwable->getMessage(),
-                        $throwable->getCode(),
-                        $throwable
+                    $context->logContextMessage(
+                        'Scheduled operation with identifier "{scheduledOperationId}" will be executed in "{scheduledOperationDelay}" seconds', [
+                            'scheduledOperationId'    => $id,
+                            'scheduledOperationDelay' => $delay / 1000
+                        ]
                     );
                 }
-            },
-            $nextOperation
-        );
+
+                return null;
+            }
+
+            if($context instanceof LoggingInContext)
+            {
+                $context->logContextMessage('Next operation not specified', [], LogLevel::DEBUG);
+            }
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new SchedulerFailure(
+                $throwable->getMessage(),
+                $throwable->getCode(),
+                $throwable
+            );
+        }
     }
 
     /**

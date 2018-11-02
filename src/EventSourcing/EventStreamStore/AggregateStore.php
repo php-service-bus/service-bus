@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\EventSourcing\EventStreamStore;
 
-use Amp\Promise;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
 
@@ -30,12 +29,12 @@ interface AggregateStore
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise It does not return any result
+     * @return \Generator It does not return any result
      *
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed
      */
-    public function saveStream(StoredAggregateEventStream $aggregateEventStream): Promise;
+    public function saveStream(StoredAggregateEventStream $aggregateEventStream): \Generator;
 
     /**
      * Append events to exists stream
@@ -45,11 +44,11 @@ interface AggregateStore
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise It does not return any result
+     * @return \Generator It does not return any result
      *
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed
      */
-    public function appendStream(StoredAggregateEventStream $aggregateEventStream): promise;
+    public function appendStream(StoredAggregateEventStream $aggregateEventStream): \Generator;
 
     /**
      * Load event stream
@@ -57,13 +56,11 @@ interface AggregateStore
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise<\Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStream|null>
-     *
      * @param AggregateId $id
      * @param int         $fromVersion
      * @param int|null    $toVersion
      *
-     * @return Promise It does not return any result
+     * @return \Generator<\Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStream|null>
      *
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\LoadStreamFailed
      */
@@ -71,7 +68,7 @@ interface AggregateStore
         AggregateId $id,
         int $fromVersion = Aggregate::START_PLAYHEAD_INDEX,
         ?int $toVersion = null
-    ): Promise;
+    ): \Generator;
 
     /**
      * Marks stream closed
@@ -81,9 +78,9 @@ interface AggregateStore
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
-     * @return Promise It does not return any result
+     * @return \Generator It does not return any result
      *
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\CloseStreamFailed
      */
-    public function closeStream(AggregateId $id): Promise;
+    public function closeStream(AggregateId $id): \Generator;
 }

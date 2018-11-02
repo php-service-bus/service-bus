@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Application;
 
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Common\ExecutionContext\LoggingInContext;
@@ -146,7 +147,7 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
                         ]
                     );
 
-                    yield $endpoint->delivery($message, $options);
+                    yield new Coroutine($endpoint->delivery($message, $options));
                 }
             },
             $message, $options

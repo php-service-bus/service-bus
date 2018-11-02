@@ -158,7 +158,7 @@ final class SagaEventListenerProcessorTest extends TestCase
      *
      * @throws \Throwable
      */
-    public function executeWithUnExistsSaga(): void
+    public function executeWithUnExistsSaga(): \Generator
     {
         $sagaStoreMock = $this->getMockBuilder(SagasStoreStub::class)
             ->setMethods(['load'])
@@ -166,7 +166,7 @@ final class SagaEventListenerProcessorTest extends TestCase
 
         $sagaStoreMock
             ->method('load')
-            ->willReturn(new Success(null));
+            ->willReturn(yield new Success(null));
 
         /** @var SagasStoreStub $sagaStoreMock */
 

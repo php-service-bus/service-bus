@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Scheduler\Store;
 
-use Amp\Promise;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 
@@ -28,13 +27,13 @@ interface SchedulerStore
      * @param ScheduledOperationId $id
      * @param callable             $postExtract function(ScheduledOperation $operation) {}
      *
-     * @return Promise It does not return any result
+     * @return \Generator It does not return any result
      *
      * @throws \Desperado\ServiceBus\Scheduler\Exceptions\ScheduledOperationNotFound
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function extract(ScheduledOperationId $id, callable $postExtract): Promise;
+    public function extract(ScheduledOperationId $id, callable $postExtract): \Generator;
 
     /**
      * Remove operation
@@ -42,12 +41,12 @@ interface SchedulerStore
      * @param ScheduledOperationId $id
      * @param callable             $postRemove function(?NextScheduledOperation){}
      *
-     * @return Promise<bool>
+     * @return \Generator<bool>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function remove(ScheduledOperationId $id, callable $postRemove): Promise;
+    public function remove(ScheduledOperationId $id, callable $postRemove): \Generator;
 
     /**
      * Save new operation
@@ -55,11 +54,11 @@ interface SchedulerStore
      * @param ScheduledOperation $operation
      * @param callable           $postAdd function(ScheduledOperation $operation, ?NextScheduledOperation) {}
      *
-     * @return Promise It does not return any result
+     * @return \Generator It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function add(ScheduledOperation $operation, callable $postAdd): Promise;
+    public function add(ScheduledOperation $operation, callable $postAdd): \Generator;
 }
