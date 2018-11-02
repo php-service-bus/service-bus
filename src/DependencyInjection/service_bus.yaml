@@ -103,9 +103,6 @@ services:
       $transferTimeout: 5000
       $logger: '@Psr\Log\LoggerInterface'
 
-  # Routes to which messages will be sent (Directions are indicated in the context of the current transport)
-  Desperado\ServiceBus\OutboundMessage\OutboundMessageRoutes:
-
   # Aggregates (event stream) store
   Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore:
     class: Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql\SqlEventStreamStore
