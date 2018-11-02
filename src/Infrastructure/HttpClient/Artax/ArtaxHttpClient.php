@@ -33,6 +33,8 @@ use Psr\Log\NullLogger;
 
 /**
  * Artax (amphp-based) http client
+ *
+ * @codeCoverageIgnore
  */
 final class ArtaxHttpClient implements HttpClient
 {

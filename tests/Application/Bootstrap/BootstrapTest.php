@@ -70,6 +70,9 @@ final class BootstrapTest extends TestCase
         $bootstrap->addExtensions(new ServiceBusExtension());
         $bootstrap->addCompilerPasses(new TaggedMessageHandlersCompilerPass());
         $bootstrap->importParameters(['qwerty' => 'root']);
+        $bootstrap->enableAutoImportSagas([__DIR__]);
+        $bootstrap->enableAutoImportMessageHandlers([__DIR__]);
+        $bootstrap->enableScheduler();
 
         $bootstrap->useSqlStorage(DoctrineDBALAdapter::class, \getenv('DATABASE_CONNECTION_DSN'));
 

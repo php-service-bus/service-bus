@@ -25,6 +25,7 @@ use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
 use Desperado\ServiceBus\Sagas\Exceptions\DuplicateSagaId;
+use Desperado\ServiceBus\Sagas\Exceptions\ExpiredSagaLoaded;
 use Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed;
 use Desperado\ServiceBus\Sagas\Exceptions\SagaMetaDataNotFound;
 use Desperado\ServiceBus\Sagas\Exceptions\SaveSagaFailed;
@@ -124,7 +125,8 @@ final class SagaProvider
     /**
      * Load saga
      *
-     * @param SagaId $id
+     * @param SagaId                 $id
+     * @param MessageDeliveryContext $context
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
@@ -133,16 +135,54 @@ final class SagaProvider
      * @return Promise<\Desperado\ServiceBus\Sagas\Saga|null>
      *
      * @throws \Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed
+     * @throws \Desperado\ServiceBus\Sagas\Exceptions\ExpiredSagaLoaded
      */
-    public function obtain(SagaId $id): Promise
+    public function obtain(SagaId $id, MessageDeliveryContext $context): Promise
     {
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            function(SagaId $id): \Generator
+            function(SagaId $id) use ($context): \Generator
             {
                 try
                 {
-                    return yield self::doLoad($this->store, $id);
+                    /** @var \DateTimeImmutable $currentDatetime */
+                    $currentDatetime = datetimeInstantiator('NOW');
+
+                    /** @var Saga|null $saga */
+                    $saga = yield self::doLoad($this->store, $id);
+
+                    if(null === $saga)
+                    {
+                        return null;
+                    }
+
+                    /** Non-expired saga */
+                    if($saga->expireDate() > $currentDatetime)
+                    {
+                        unset($currentDatetime);
+
+                        return $saga;
+                    }
+
+                    /** @var \Desperado\ServiceBus\Sagas\SagaStatus $currentStatus */
+                    $currentStatus = readReflectionPropertyValue($saga, 'status');
+
+                    if(true === $currentStatus->inProgress())
+                    {
+                        unset($currentStatus);
+
+                        invokeReflectionMethod($saga, 'makeExpired');
+
+                        yield $this->save($saga, $context);
+                    }
+
+                    unset($saga);
+
+                    throw new ExpiredSagaLoaded($id);
+                }
+                catch(ExpiredSagaLoaded $exception)
+                {
+                    throw $exception;
                 }
                 catch(\Throwable $throwable)
                 {

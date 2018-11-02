@@ -21,15 +21,14 @@ use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\Contract\AggregateCreated;
 use Desperado\ServiceBus\EventSourcing\EventStream\AggregateEventStream;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore;
-use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\LoadStreamFailed;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId;
-use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql\SqlEventStreamStore;
 use Desperado\ServiceBus\EventSourcingProvider;
 use Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore;
 use Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SqlSnapshotStore;
 use Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter;
 use Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotVersionTrigger;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
 use Desperado\ServiceBus\Tests\Stubs\Context\TestContext;
@@ -72,7 +71,10 @@ final class EventSourcingProviderTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->adapter = StorageAdapterFactory::inMemory();
+        $this->adapter = StorageAdapterFactory::create(
+            AmpPostgreSQLAdapter::class,
+            (string) \getenv('TEST_POSTGRES_DSN')
+        );
         $this->store   = new SqlEventStreamStore($this->adapter);
 
         $this->snapshotterStorage = new SqlSnapshotStore($this->adapter);
@@ -91,10 +93,14 @@ final class EventSourcingProviderTest extends TestCase
 
     /**
      * @inheritdoc
+     *
+     * @throws \Throwable
      */
     protected function tearDown(): void
     {
         parent::tearDown();
+
+        wait($this->adapter->execute('TRUNCATE TABLE event_store_stream CASCADE'));
 
         unset($this->adapter, $this->store, $this->provider, $this->snapshotter, $this->snapshotterStorage);
     }
@@ -197,20 +203,6 @@ final class EventSourcingProviderTest extends TestCase
      *
      * @throws \Throwable
      */
-    public function loadStreamFailed(): void
-    {
-        $this->expectException(LoadStreamFailed::class);
-
-        wait($this->provider->load(TestAggregateId::new()));
-    }
-
-    /**
-     * @test
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
     public function saveDuplicateAggregate(): void
     {
         wait(static::createSchema($this->adapter));
@@ -223,20 +215,6 @@ final class EventSourcingProviderTest extends TestCase
 
         wait($this->provider->save(new TestAggregate($id), $context));
         wait($this->provider->save(new TestAggregate($id), $context));
-    }
-
-    /**
-     * @test
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function saveWithoutSchema(): void
-    {
-        $this->expectException(SaveStreamFailed::class);
-
-        wait($this->provider->save(new TestAggregate(TestAggregateId::new()), new TestContext()));
     }
 
     /**
