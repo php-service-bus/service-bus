@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
@@ -164,17 +165,7 @@ final class SagaProvider
                         return $saga;
                     }
 
-                    /** @var \Desperado\ServiceBus\Sagas\SagaStatus $currentStatus */
-                    $currentStatus = readReflectionPropertyValue($saga, 'status');
-
-                    if(true === $currentStatus->inProgress())
-                    {
-                        unset($currentStatus);
-
-                        invokeReflectionMethod($saga, 'makeExpired');
-
-                        yield $this->save($saga, $context);
-                    }
+                    yield new Coroutine($this->doCloseExpired($saga, $context));
 
                     unset($saga);
 
@@ -347,6 +338,32 @@ final class SagaProvider
             $context,
             $isNew
         );
+    }
+
+    /**
+     * Close expired saga
+     *
+     * @param Saga                   $saga
+     * @param MessageDeliveryContext $context
+     *
+     * @return \Generator It does not return any result
+     *
+     * @throws \ReflectionException
+     * @throws \Throwable
+     */
+    private function doCloseExpired(Saga $saga, MessageDeliveryContext $context): \Generator
+    {
+        /** @var \Desperado\ServiceBus\Sagas\SagaStatus $currentStatus */
+        $currentStatus = readReflectionPropertyValue($saga, 'status');
+
+        if(true === $currentStatus->inProgress())
+        {
+            unset($currentStatus);
+
+            invokeReflectionMethod($saga, 'makeExpired');
+
+            yield $this->save($saga, $context);
+        }
     }
 
     /**
