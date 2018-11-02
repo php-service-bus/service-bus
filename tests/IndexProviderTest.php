@@ -18,6 +18,7 @@ use Desperado\ServiceBus\Index\IndexKey;
 use Desperado\ServiceBus\Index\IndexValue;
 use Desperado\ServiceBus\Index\Storage\Sql\SqlIndexesStorage;
 use Desperado\ServiceBus\IndexProvider;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
 use PHPUnit\Framework\TestCase;
@@ -51,7 +52,10 @@ final class IndexProviderTest extends TestCase
     {
         parent::setUp();
 
-        $this->adapter = StorageAdapterFactory::inMemory();
+        $this->adapter = StorageAdapterFactory::create(
+            AmpPostgreSQLAdapter::class,
+            (string) \getenv('TEST_POSTGRES_DSN')
+        );
         $this->storage = new SqlIndexesStorage($this->adapter);
         $this->indexer = new IndexProvider($this->storage);
 
@@ -64,10 +68,14 @@ final class IndexProviderTest extends TestCase
 
     /**
      * @inheritdoc
+     *
+     * @throws \Throwable
      */
     protected function tearDown(): void
     {
         parent::tearDown();
+
+        wait($this->adapter->execute('DROP TABLE event_sourcing_indexes'));
 
         unset($this->storage, $this->adapter, $this->indexer);
     }

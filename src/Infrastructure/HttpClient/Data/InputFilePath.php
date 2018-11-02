@@ -15,6 +15,8 @@ namespace Desperado\ServiceBus\Infrastructure\HttpClient\Data;
 
 /**
  * Input file path
+ *
+ * @codeCoverageIgnore
  */
 final class InputFilePath
 {

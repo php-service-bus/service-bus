@@ -79,7 +79,7 @@ final class SagaEventListenerProcessor
                 $id = self::searchSagaIdentifier($event, $sagaListenerOptions);
 
                 /** @var \Desperado\ServiceBus\Sagas\Saga|null $saga */
-                $saga = yield $sagaProvider->obtain($id);
+                $saga = yield $sagaProvider->obtain($id, $context);
 
                 if(null !== $saga)
                 {

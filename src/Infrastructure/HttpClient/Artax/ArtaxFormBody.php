@@ -21,6 +21,8 @@ use Desperado\ServiceBus\Infrastructure\HttpClient\FormBody;
 
 /**
  * Artax form body implementation
+ *
+ * @codeCoverageIgnore
  */
 final class ArtaxFormBody implements FormBody
 {
@@ -48,6 +50,7 @@ final class ArtaxFormBody implements FormBody
     public function __construct()
     {
         $this->isMultipart = false;
+
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->boundary = \bin2hex(\random_bytes(16));
         $this->original = new AmpFormBody($this->boundary);

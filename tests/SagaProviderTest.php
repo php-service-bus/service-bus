@@ -15,8 +15,11 @@ namespace Desperado\ServiceBus\Tests;
 
 use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\writeReflectionPropertyValue;
+use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
+use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
+use Desperado\ServiceBus\Sagas\Exceptions\ExpiredSagaLoaded;
 use Desperado\ServiceBus\Sagas\Saga;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
@@ -55,17 +58,24 @@ final class SagaProviderTest extends TestCase
     {
         parent::setUp();
 
-        $this->adapter  = StorageAdapterFactory::inMemory();
+        $this->adapter  = StorageAdapterFactory::create(
+            AmpPostgreSQLAdapter::class,
+            (string) \getenv('TEST_POSTGRES_DSN')
+        );
         $this->store    = new SQLSagaStore($this->adapter);
         $this->provider = new SagaProvider($this->store);
     }
 
     /**
      * @inheritdoc
+     *
+     * @throws \Throwable
      */
     protected function tearDown(): void
     {
         parent::tearDown();
+
+        wait($this->adapter->execute('DROP TABLE IF EXISTS sagas_store'));
 
         unset($this->provider, $this->store, $this->adapter);
     }
@@ -132,7 +142,7 @@ final class SagaProviderTest extends TestCase
 
         wait($this->provider->save($saga, $context));
 
-        $loadedSaga = wait($this->provider->obtain($id));
+        $loadedSaga = wait($this->provider->obtain($id, $context));
 
         static::assertInstanceOf(Saga::class, $loadedSaga);
     }
@@ -188,21 +198,6 @@ final class SagaProviderTest extends TestCase
         );
 
         wait($promise);
-    }
-
-    /**
-     * @test
-     * @expectedException \Desperado\ServiceBus\Sagas\Exceptions\LoadSagaFailed
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function loadWithoutSchema(): void
-    {
-        $sagaId = TestSagaId::new(CorrectSaga::class);
-
-        wait($this->provider->obtain($sagaId));
     }
 
     /**
@@ -273,5 +268,59 @@ final class SagaProviderTest extends TestCase
         );
 
         wait($this->provider->start($id, new FirstEmptyCommand(), $context));
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function loadExpiredSaga(): void
+    {
+        $promise = $this->adapter->execute(
+            (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
+        );
+
+        wait($promise);
+
+        $id = TestSagaId::new(CorrectSaga::class);
+
+        $context = new TestContext();
+
+        writeReflectionPropertyValue(
+            $this->provider,
+            'sagaMetaDataCollection',
+            [
+                CorrectSaga::class => new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    'requestId',
+                    '+1 second'
+                )
+            ]
+        );
+
+        wait($this->provider->start($id, new FirstEmptyCommand(), $context));
+
+        sleep(1);
+
+        try
+        {
+            wait($this->provider->obtain($id, $context));
+
+            $this->fail('Exception expected');
+        }
+        catch(\Throwable $throwable)
+        {
+            static::assertInstanceOf(ExpiredSagaLoaded::class, $throwable);
+        }
+
+        /** @var \Desperado\ServiceBus\Sagas\Contract\SagaClosed $latest */
+        $latest = \end($context->messages);
+
+        static::assertTrue(\is_object($latest));
+        static::assertInstanceOf(SagaClosed::class, $latest);
     }
 }

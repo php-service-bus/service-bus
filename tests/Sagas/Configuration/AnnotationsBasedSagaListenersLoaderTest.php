@@ -16,6 +16,8 @@ namespace Desperado\ServiceBus\Tests\Sagas\Configuration;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\AnnotationsBasedSagaConfigurationLoader;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithIncorrectEventListenerClass;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithInvalidListenerArg;
+use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithMultipleListenerArgs;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithToManyArguments;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithUnExistsEventListenerClass;
 use Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWrongIdClassSpecified;
@@ -164,5 +166,36 @@ final class AnnotationsBasedSagaListenersLoaderTest extends TestCase
     {
         (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
             ->load(SagaWithIncorrectEventListenerClass::class);
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
+     * @expectedExceptionMessage There are too many arguments for the
+     *                           "Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithMultipleListenerArgs:onSomeEvent"
+     *                           method. A subscriber can only accept an argument: the class of the event he listens to
+     *
+     * @return void
+     */
+    public function sagaWithMultipleListenerArgs(): void
+    {
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
+            ->load(SagaWithMultipleListenerArgs::class);
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
+     * @expectedExceptionMessage The event handler
+     *                           "Desperado\ServiceBus\Tests\Sagas\Configuration\ConfigurationStubs\SagaWithInvalidListenerArg:onSomeEvent"
+     *                           should take as the first argument an object that implements the
+     *                           "Desperado\ServiceBus\Common\Contract\Messages\Event"
+     *
+     * @return void
+     */
+    public function sagaWithInvalidListenerArgument(): void
+    {
+        (new AnnotationsBasedSagaConfigurationLoader($this->sagaProvider))
+            ->load(SagaWithInvalidListenerArg::class);
     }
 }
