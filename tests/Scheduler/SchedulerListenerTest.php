@@ -153,13 +153,13 @@ final class SchedulerListenerTest extends TestCase
      */
     public function whenUnExistsOperationEmitted(): void
     {
-        $promise = (new SchedulerListener())->whenSchedulerOperationEmitted(
+        $generator = (new SchedulerListener())->whenSchedulerOperationEmitted(
             SchedulerOperationEmitted::create(ScheduledOperationId::new()),
             $this->context,
             $this->schedulerProvider
         );
 
-        wait(new Coroutine($promise));
+        wait(new Coroutine($generator));
 
         static::assertEquals('Next operation not specified', $this->logHandler->getRecords()[0]['message']);
     }
@@ -173,13 +173,13 @@ final class SchedulerListenerTest extends TestCase
      */
     public function whenSchedulerOperationCanceled(): void
     {
-        $promise = (new SchedulerListener())->whenSchedulerOperationCanceled(
+        $generator = (new SchedulerListener())->whenSchedulerOperationCanceled(
             SchedulerOperationCanceled::create(ScheduledOperationId::new(), 'reason', null),
             $this->context,
             $this->schedulerProvider
         );
 
-        wait(new Coroutine($promise));
+        wait(new Coroutine($generator));
 
         static::assertEquals('Next operation not specified', $this->logHandler->getRecords()[0]['message']);
     }
@@ -193,13 +193,13 @@ final class SchedulerListenerTest extends TestCase
      */
     public function whenOperationScheduled(): void
     {
-        $promise = (new SchedulerListener())->whenOperationScheduled(
+        $generator = (new SchedulerListener())->whenOperationScheduled(
             OperationScheduled::create(ScheduledOperationId::new(), new FirstEmptyCommand(), new \DateTimeImmutable(), null),
             $this->context,
             $this->schedulerProvider
         );
 
-        wait(new Coroutine($promise));
+        wait(new Coroutine($generator));
 
         static::assertEquals('Next operation not specified', $this->logHandler->getRecords()[0]['message']);
     }

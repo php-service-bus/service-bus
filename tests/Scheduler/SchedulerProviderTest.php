@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Scheduler;
 
-use Amp\Coroutine;
 use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
@@ -106,17 +105,14 @@ final class SchedulerProviderTest extends TestCase
      */
     public function scheduleWWithWrongDate(): void
     {
-        $handler = static function(SchedulerProviderTest $self): \Generator
-        {
-            yield $self->provider->schedule(
+        wait(
+            $this->provider->schedule(
                 new ScheduledOperationId(uuid()),
                 new FirstEmptyCommand(),
                 new \DateTimeImmutable('-10 minutes'),
                 new TestContext()
-            );
-        };
-
-        wait(new Coroutine($handler($this)));
+            )
+        );
     }
 
     /**
@@ -128,54 +124,51 @@ final class SchedulerProviderTest extends TestCase
      */
     public function schedule(): void
     {
-        $handler = static function(SchedulerProviderTest $self): \Generator
-        {
-            $executionDate = new \DateTimeImmutable('+10 seconds');
-            $context       = new TestContext();
-            $id            = new ScheduledOperationId(uuid());
+        $executionDate = new \DateTimeImmutable('+10 seconds');
+        $context       = new TestContext();
+        $id            = new ScheduledOperationId(uuid());
 
-            yield $self->provider->schedule($id, new FirstEmptyCommand(), $executionDate, $context);
+        wait($this->provider->schedule($id, new FirstEmptyCommand(), $executionDate, $context));
 
-            /** @var array $rows */
-            $rows = yield fetchAll(
-                yield $self->adapter->execute('SELECT * FROM scheduler_registry')
-            );
+        /** @var array $rows */
+        $rows = wait(
+            fetchAll(
+                wait($this->adapter->execute('SELECT * FROM scheduler_registry'))
+            )
+        );
 
-            static::assertNotNull($rows);
-            static::assertNotEmpty($rows);
-            static::assertCount(1, $rows);
+        static::assertNotNull($rows);
+        static::assertNotEmpty($rows);
+        static::assertCount(1, $rows);
 
-            $rowData = \end($rows);
+        $rowData = \end($rows);
 
-            $operation = ScheduledOperation::restoreFromRow($rowData);
+        $operation = ScheduledOperation::restoreFromRow($rowData);
 
-            static::assertEquals($id, $operation->id());
-            static::assertEquals($executionDate->format('c'), $operation->date()->format('c'));
-            static::assertTrue($operation->isSent());
+        static::assertEquals($id, $operation->id());
+        static::assertEquals($executionDate->format('c'), $operation->date()->format('c'));
+        static::assertTrue($operation->isSent());
 
-            $messages = $context->messages;
+        $messages = $context->messages;
 
-            static::assertCount(1, $messages);
+        static::assertCount(1, $messages);
 
-            /** @var \Desperado\ServiceBus\Scheduler\Messages\Event\OperationScheduled $message */
-            $message = \end($messages);
+        /** @var \Desperado\ServiceBus\Scheduler\Messages\Event\OperationScheduled $message */
+        $message = \end($messages);
 
-            static::assertInstanceOf(OperationScheduled::class, $message);
-            static::assertEquals(FirstEmptyCommand::class, $message->commandNamespace());
-            static::assertTrue($message->hasNextOperation());
-            static::assertEquals($executionDate->format('c'), $message->executionDate()->format('c'));
+        static::assertInstanceOf(OperationScheduled::class, $message);
+        static::assertEquals(FirstEmptyCommand::class, $message->commandNamespace());
+        static::assertTrue($message->hasNextOperation());
+        static::assertEquals($executionDate->format('c'), $message->executionDate()->format('c'));
 
-            static::assertNotNull($message->nextOperation());
+        static::assertNotNull($message->nextOperation());
 
-            /** @var NextScheduledOperation $nextOperation */
-            $nextOperation = $message->nextOperation();
+        /** @var NextScheduledOperation $nextOperation */
+        $nextOperation = $message->nextOperation();
 
-            static::assertInstanceOf(NextScheduledOperation::class, $nextOperation);
-            static::assertEquals($id, $nextOperation->id());
-            static::assertEquals($executionDate->format('c'), $nextOperation->time()->format('c'));
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertInstanceOf(NextScheduledOperation::class, $nextOperation);
+        static::assertEquals($id, $nextOperation->id());
+        static::assertEquals($executionDate->format('c'), $nextOperation->time()->format('c'));
     }
 
     /**
@@ -188,17 +181,12 @@ final class SchedulerProviderTest extends TestCase
      */
     public function scheduleDuplicate(): void
     {
-        $handler = static function(SchedulerProviderTest $self): \Generator
-        {
-            $executionDate = new \DateTimeImmutable('+10 seconds');
-            $context       = new TestContext();
-            $id            = new ScheduledOperationId(uuid());
+        $executionDate = new \DateTimeImmutable('+10 seconds');
+        $context       = new TestContext();
+        $id            = new ScheduledOperationId(uuid());
 
-            yield $self->provider->schedule($id, new FirstEmptyCommand(), $executionDate, $context);
-            yield $self->provider->schedule($id, new FirstEmptyCommand(), $executionDate, $context);
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->schedule($id, new FirstEmptyCommand(), $executionDate, $context));
+        wait($this->provider->schedule($id, new FirstEmptyCommand(), $executionDate, $context));
     }
 
     /**
@@ -210,34 +198,31 @@ final class SchedulerProviderTest extends TestCase
      */
     public function successCancel(): void
     {
-        $handler = static function(SchedulerProviderTest $self): \Generator
-        {
-            $executionDate = new \DateTimeImmutable('+10 seconds');
-            $context       = new TestContext();
-            $id            = new ScheduledOperationId(uuid());
+        $executionDate = new \DateTimeImmutable('+10 seconds');
+        $context       = new TestContext();
+        $id            = new ScheduledOperationId(uuid());
 
-            yield $self->provider->schedule($id, new FirstEmptyCommand(), $executionDate, $context);
-            yield $self->provider->cancel($id, $context, 'test reason');
+        wait($this->provider->schedule($id, new FirstEmptyCommand(), $executionDate, $context));
+        wait($this->provider->cancel($id, $context, 'test reason'));
 
-            /** @var array $rows */
-            $rows = yield fetchAll(
-                yield $self->adapter->execute('SELECT * FROM scheduler_registry')
-            );
+        /** @var array $rows */
+        $rows = wait(
+            fetchAll(
+                wait($this->adapter->execute('SELECT * FROM scheduler_registry'))
+            )
+        );
 
-            static::assertCount(0, $rows);
+        static::assertCount(0, $rows);
 
-            $messages = $context->messages;
+        $messages = $context->messages;
 
-            static::assertNotEmpty($messages);
-            static::assertCount(2, $messages);
+        static::assertNotEmpty($messages);
+        static::assertCount(2, $messages);
 
-            /** @var SchedulerOperationCanceled $message */
-            $message = \end($messages);
+        /** @var SchedulerOperationCanceled $message */
+        $message = \end($messages);
 
-            static::assertInstanceOf(SchedulerOperationCanceled::class, $message);
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertInstanceOf(SchedulerOperationCanceled::class, $message);
     }
 
     /**
@@ -249,24 +234,19 @@ final class SchedulerProviderTest extends TestCase
      */
     public function cancelUnExistsJob(): void
     {
-        $handler = static function(SchedulerProviderTest $self): \Generator
-        {
-            $context = new TestContext();
-            $id      = new ScheduledOperationId(uuid());
+        $context = new TestContext();
+        $id      = new ScheduledOperationId(uuid());
 
-            yield $self->provider->cancel($id, $context, 'test reason');
+        wait($this->provider->cancel($id, $context, 'test reason')) ;
 
-            $messages = $context->messages;
+        $messages = $context->messages;
 
-            static::assertNotEmpty($messages);
-            static::assertCount(1, $messages);
+        static::assertNotEmpty($messages);
+        static::assertCount(1, $messages);
 
-            /** @var SchedulerOperationCanceled $message */
-            $message = \reset($messages);
+        /** @var SchedulerOperationCanceled $message */
+        $message = \reset($messages);
 
-            static::assertInstanceOf(SchedulerOperationCanceled::class, $message);
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertInstanceOf(SchedulerOperationCanceled::class, $message);
     }
 }

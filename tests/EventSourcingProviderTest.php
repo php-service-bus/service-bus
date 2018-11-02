@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests;
 
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Promise;
 use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
@@ -109,43 +108,38 @@ final class EventSourcingProviderTest extends TestCase
      */
     public function flow(): void
     {
-        $handler = static function(EventSourcingProviderTest $self): \Generator
-        {
-            yield self::createSchema($self->adapter);
+        wait(self::createSchema($this->adapter));
 
-            $context = new TestContext();
+        $context = new TestContext();
 
-            $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new());
 
-            yield $self->provider->save($aggregate, $context);
+        wait($this->provider->save($aggregate, $context));
 
-            $toPublish = $context->messages;
+        $toPublish = $context->messages;
 
-            static::assertCount(1, $toPublish);
+        static::assertCount(1, $toPublish);
 
-            /** @var AggregateCreated $event */
-            $event = \end($toPublish);
+        /** @var AggregateCreated $event */
+        $event = \end($toPublish);
 
-            static::assertInstanceOf(AggregateCreated::class, $event);
+        static::assertInstanceOf(AggregateCreated::class, $event);
 
-            $loadedAggregate = yield $self->provider->load($aggregate->id());
+        $loadedAggregate = wait($this->provider->load($aggregate->id()));
 
-            static::assertNotNull($loadedAggregate);
-            static::assertInstanceOf(Aggregate::class, $loadedAggregate);
+        static::assertNotNull($loadedAggregate);
+        static::assertInstanceOf(Aggregate::class, $loadedAggregate);
 
-            /** @var Aggregate $loadedAggregate */
+        /** @var Aggregate $loadedAggregate */
 
-            static::assertEquals(1, $loadedAggregate->version());
+        static::assertEquals(1, $loadedAggregate->version());
 
-            /** @var AggregateEventStream $stream */
-            $stream = invokeReflectionMethod($loadedAggregate, 'makeStream');
+        /** @var AggregateEventStream $stream */
+        $stream = invokeReflectionMethod($loadedAggregate, 'makeStream');
 
-            static::assertCount(0, $stream->events());
+        static::assertCount(0, $stream->events());
 
-            yield $self->provider->save($loadedAggregate, $context);
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->save($loadedAggregate, $context));
     }
 
     /**
@@ -157,50 +151,44 @@ final class EventSourcingProviderTest extends TestCase
      */
     public function loadWithSnapshot(): void
     {
-        $handler = static function(EventSourcingProviderTest $self): \Generator
-        {
-            yield self::createSchema($self->adapter);
+        wait(self::createSchema($this->adapter));
 
-            $context = new TestContext();
+        $context = new TestContext();
 
-            $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new());
 
-            yield $self->provider->save($aggregate, $context);
+        wait($this->provider->save($aggregate, $context));
 
-            $toPublish = $context->messages;
+        $toPublish = $context->messages;
 
-            static::assertCount(1, $toPublish);
+        static::assertCount(1, $toPublish);
 
-            /** first action */
-            $aggregate->firstAction('qwerty');
+        /** first action */
+        $aggregate->firstAction('qwerty');
 
-            yield $self->provider->save($aggregate, $context);
+        wait($this->provider->save($aggregate, $context));
 
-            $toPublish = $context->messages;
+        $toPublish = $context->messages;
 
-            static::assertCount(2, $toPublish);
+        static::assertCount(2, $toPublish);
 
-            /** second action  */
-            $aggregate->secondAction('root');
+        /** second action  */
+        $aggregate->secondAction('root');
 
-            yield $self->provider->save($aggregate, $context);
+        wait($this->provider->save($aggregate, $context));
 
-            $toPublish = $context->messages;
+        $toPublish = $context->messages;
 
-            static::assertCount(3, $toPublish);
+        static::assertCount(3, $toPublish);
 
 
-            /** assert values */
-            static::assertNotNull($aggregate->firstValue());
-            static::assertNotNull($aggregate->secondValue());
+        /** assert values */
+        static::assertNotNull($aggregate->firstValue());
+        static::assertNotNull($aggregate->secondValue());
 
-            static::assertEquals('qwerty', $aggregate->firstValue());
-            static::assertEquals('root', $aggregate->secondValue());
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertEquals('qwerty', $aggregate->firstValue());
+        static::assertEquals('root', $aggregate->secondValue());
     }
-
 
     /**
      * @test
@@ -211,14 +199,9 @@ final class EventSourcingProviderTest extends TestCase
      */
     public function loadStreamFailed(): void
     {
-        $handler = static function(EventSourcingProviderTest $self): \Generator
-        {
-            $self->expectException(LoadStreamFailed::class);
+        $this->expectException(LoadStreamFailed::class);
 
-            yield $self->provider->load(TestAggregateId::new());
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->load(TestAggregateId::new()));
     }
 
     /**
@@ -230,21 +213,16 @@ final class EventSourcingProviderTest extends TestCase
      */
     public function saveDuplicateAggregate(): void
     {
-        $handler = static function(EventSourcingProviderTest $self): \Generator
-        {
-            yield static::createSchema($self->adapter);
+        wait(static::createSchema($this->adapter));
 
-            $context = new TestContext();
+        $context = new TestContext();
 
-            $id = TestAggregateId::new();
+        $id = TestAggregateId::new();
 
-            $self->expectException(NonUniqueStreamId::class);
+        $this->expectException(NonUniqueStreamId::class);
 
-            yield $self->provider->save(new TestAggregate($id), $context);
-            yield $self->provider->save(new TestAggregate($id), $context);
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->save(new TestAggregate($id), $context));
+        wait($this->provider->save(new TestAggregate($id), $context));
     }
 
     /**
@@ -256,14 +234,9 @@ final class EventSourcingProviderTest extends TestCase
      */
     public function saveWithoutSchema(): void
     {
-        $handler = static function(EventSourcingProviderTest $self): \Generator
-        {
-            $self->expectException(SaveStreamFailed::class);
+        $this->expectException(SaveStreamFailed::class);
 
-            yield $self->provider->save(new TestAggregate(TestAggregateId::new()), new TestContext());
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($this->provider->save(new TestAggregate(TestAggregateId::new()), new TestContext()));
     }
 
     /**
@@ -275,35 +248,30 @@ final class EventSourcingProviderTest extends TestCase
      */
     public function loadWithoutSnapshot(): void
     {
-        $handler = static function(EventSourcingProviderTest $self): \Generator
-        {
-            $provider = new EventSourcingProvider(
-                $self->store,
-                new Snapshotter(
-                    $self->snapshotterStorage,
-                    new SnapshotVersionTrigger(100500)
-                )
-            );
+        $provider = new EventSourcingProvider(
+            $this->store,
+            new Snapshotter(
+                $this->snapshotterStorage,
+                new SnapshotVersionTrigger(100500)
+            )
+        );
 
-            yield self::createSchema($self->adapter);
+        wait(self::createSchema($this->adapter));
 
-            $context = new TestContext();
+        $context = new TestContext();
 
-            $id = TestAggregateId::new();
+        $id = TestAggregateId::new();
 
-            $aggregate = new TestAggregate($id);
+        $aggregate = new TestAggregate($id);
 
-            yield $provider->save($aggregate, $context);
+        wait($provider->save($aggregate, $context));
 
-            yield $self->snapshotterStorage->remove($id);
+        wait($this->snapshotterStorage->remove($id));
 
-            /** @var \Desperado\ServiceBus\EventSourcing\Aggregate|null $aggregate */
-            $aggregate = yield $provider->load($id);
+        /** @var \Desperado\ServiceBus\EventSourcing\Aggregate|null $aggregate */
+        $aggregate = wait($provider->load($id));
 
-            static::assertNotNull($aggregate);
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertNotNull($aggregate);
     }
 
     /**

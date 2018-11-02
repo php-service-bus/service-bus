@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Infrastructure\Storage\SQL\AmpPostgreSQL;
 
-use Amp\Coroutine;
 use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\uuid;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchAll;
@@ -78,40 +77,30 @@ final class AmpPostgreSQLTransactionAdapterTest extends TestCase
      */
     public function simpleTransaction(): void
     {
-        $handler = static function(AmpPostgreSQLTransactionAdapterTest $self): \Generator
-        {
-            /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
-            $transaction = yield $self->adapter->transaction();
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
+        $transaction = wait($this->adapter->transaction());
 
-            try
-            {
-                yield $self->adapter->execute(
-                    'INSERT INTO test_result_set (id, value) VALUES (?,?), (?,?)', [
-                        uuid(), 'value1',
-                        uuid(), 'value2'
-                    ]
-                );
+        wait(
+            $this->adapter->execute(
+                'INSERT INTO test_result_set (id, value) VALUES (?,?), (?,?)', [
+                    uuid(), 'value1',
+                    uuid(), 'value2'
+                ]
+            )
+        );
 
-                yield $transaction->commit();
+        wait($transaction->commit());
 
-                /** check results */
+        /** check results */
 
-                $result = yield fetchAll(
-                    yield $self->adapter->execute('SELECT * FROM test_result_set')
-                );
+        $result = wait(
+            fetchAll(
+                wait($this->adapter->execute('SELECT * FROM test_result_set'))
+            )
+        );
 
-                static::assertNotEmpty($result);
-                static::assertCount(2, $result);
-            }
-            catch(\Throwable $throwable)
-            {
-                yield $transaction->rollback();
-
-                static::fail($throwable->getMessage());
-            }
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertNotEmpty($result);
+        static::assertCount(2, $result);
     }
 
     /**
@@ -123,39 +112,25 @@ final class AmpPostgreSQLTransactionAdapterTest extends TestCase
      */
     public function transactionWithReadData(): void
     {
-        $handler = static function(AmpPostgreSQLTransactionAdapterTest $self): \Generator
-        {
-            $uuid = uuid();
+        $uuid = uuid();
 
-            $query = insertQuery('test_result_set', ['id' => $uuid, 'value' => 'value2'])->compile();
+        $query = insertQuery('test_result_set', ['id' => $uuid, 'value' => 'value2'])->compile();
 
-            yield $self->adapter->execute($query->sql(), $query->params());
+        wait($this->adapter->execute($query->sql(), $query->params()));
 
-            /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
-            $transaction = yield $self->adapter->transaction();
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
+        $transaction = wait($this->adapter->transaction());
 
-            try
-            {
-                $query = selectQuery('test_result_set')
-                    ->where(equalsCriteria('id', $uuid))
-                    ->compile();
+        $query = selectQuery('test_result_set')
+            ->where(equalsCriteria('id', $uuid))
+            ->compile();
 
-                $someReadData = yield fetchOne(yield $transaction->execute($query->sql(), $query->params()));
+        $someReadData = wait(fetchOne(wait($transaction->execute($query->sql(), $query->params()))));
 
-                static::assertNotEmpty($someReadData);
-                static::assertCount(2, $someReadData);
+        static::assertNotEmpty($someReadData);
+        static::assertCount(2, $someReadData);
 
-                yield $transaction->commit();
-            }
-            catch(\Throwable $throwable)
-            {
-                yield $transaction->rollback();
-
-                static::fail($throwable->getMessage());
-            }
-        };
-
-        wait(new Coroutine($handler($this)));
+        wait($transaction->commit());
     }
 
     /**
@@ -167,25 +142,20 @@ final class AmpPostgreSQLTransactionAdapterTest extends TestCase
      */
     public function rollback(): void
     {
-        $handler = static function(AmpPostgreSQLTransactionAdapterTest $self): \Generator
-        {
-            /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
-            $transaction = yield $self->adapter->transaction();
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
+        $transaction = wait($this->adapter->transaction());
 
-            $query = insertQuery('test_result_set', ['id' => uuid(), 'value' => 'value2'])->compile();
+        $query = insertQuery('test_result_set', ['id' => uuid(), 'value' => 'value2'])->compile();
 
-            yield $transaction->execute($query->sql(), $query->params());
-            yield $transaction->rollback();
+        wait($transaction->execute($query->sql(), $query->params()));
+        wait($transaction->rollback());
 
-            $query = selectQuery('test_result_set')->compile();
+        $query = selectQuery('test_result_set')->compile();
 
-            /** @var array $collection */
-            $collection = yield fetchAll(yield $self->adapter->execute($query->sql(), $query->params()));
+        /** @var array $collection */
+        $collection = wait(fetchAll(wait($this->adapter->execute($query->sql(), $query->params()))));
 
-            static::assertInternalType('array', $collection);
-            static::assertCount(0, $collection);
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertInternalType('array', $collection);
+        static::assertCount(0, $collection);
     }
 }

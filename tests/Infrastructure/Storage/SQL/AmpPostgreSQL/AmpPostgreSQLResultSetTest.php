@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Infrastructure\Storage\SQL\AmpPostgreSQL;
 
-use Amp\Coroutine;
 use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\uuid;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchAll;
@@ -75,33 +74,36 @@ final class AmpPostgreSQLResultSetTest extends TestCase
      */
     public function fetchOne(): void
     {
-        $handler = static function(AmpPostgreSQLResultSetTest $self): \Generator
-        {
-            $uuid1 = uuid();
-            $uuid2 = uuid();
+        $uuid1 = uuid();
+        $uuid2 = uuid();
 
-            yield $self->adapter->execute(
-                'INSERT INTO test_result_set (id, value) VALUES (?,?), (?,?)', [
-                    $uuid1, 'value1',
-                    $uuid2, 'value2'
-                ]
-            );
+        $promise = $this->adapter->execute(
+            'INSERT INTO test_result_set (id, value) VALUES (?,?), (?,?)', [
+                $uuid1, 'value1',
+                $uuid2, 'value2'
+            ]
+        );
 
-            $result = yield fetchOne(
-                yield $self->adapter->execute(\sprintf('SELECT * FROM test_result_set WHERE id = \'%s\'', $uuid2))
-            );
+        wait($promise);
 
-            static::assertNotEmpty($result);
-            static:: assertEquals(['id' => $uuid2, 'value' => 'value2'], $result);
+        $result = wait(
+            fetchOne(
+                wait($this->adapter->execute(\sprintf('SELECT * FROM test_result_set WHERE id = \'%s\'', $uuid2)))
+            )
+        );
 
-            $result = yield fetchOne(
-                yield $self->adapter->execute('SELECT * FROM test_result_set WHERE id = \'b4141f6e-a461-11e8-98d0-529269fb1459\'')
-            );
+        static::assertNotEmpty($result);
+        static:: assertEquals(['id' => $uuid2, 'value' => 'value2'], $result);
 
-            static::assertNull($result);
-        };
+        $result = wait(
+            fetchOne(
+                wait(
+                    $this->adapter->execute('SELECT * FROM test_result_set WHERE id = \'b4141f6e-a461-11e8-98d0-529269fb1459\'')
+                )
+            )
+        );
 
-        wait(new Coroutine($handler($this)));
+        static::assertNull($result);
     }
 
     /**
@@ -113,24 +115,23 @@ final class AmpPostgreSQLResultSetTest extends TestCase
      */
     public function fetchAll(): void
     {
-        $handler = static function(AmpPostgreSQLResultSetTest $self): \Generator
-        {
-            yield $self->adapter->execute(
-                'INSERT INTO test_result_set (id, value) VALUES (?,?), (?,?)', [
-                    uuid(), 'value1',
-                    uuid(), 'value2'
-                ]
-            );
+        $promise = $this->adapter->execute(
+            'INSERT INTO test_result_set (id, value) VALUES (?,?), (?,?)', [
+                uuid(), 'value1',
+                uuid(), 'value2'
+            ]
+        );
 
-            $result = yield fetchAll(
-                yield $self->adapter->execute('SELECT * FROM test_result_set')
-            );
+        wait($promise);
 
-            static::assertNotEmpty($result);
-            static::assertCount(2, $result);
-        };
+        $result = wait(
+            fetchAll(
+                wait($this->adapter->execute('SELECT * FROM test_result_set'))
+            )
+        );
 
-        wait(new Coroutine($handler($this)));
+        static::assertNotEmpty($result);
+        static::assertCount(2, $result);
     }
 
     /**
@@ -142,17 +143,14 @@ final class AmpPostgreSQLResultSetTest extends TestCase
      */
     public function fetchAllWithEmptySet(): void
     {
-        $handler = static function(AmpPostgreSQLResultSetTest $self): \Generator
-        {
-            $result = yield fetchAll(
-                yield $self->adapter->execute('SELECT * FROM test_result_set')
-            );
+        $result = wait(
+            fetchAll(
+                wait($this->adapter->execute('SELECT * FROM test_result_set'))
+            )
+        );
 
-            static::assertInternalType('array', $result);
-            static::assertEmpty($result);
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertInternalType('array', $result);
+        static::assertEmpty($result);
     }
 
     /**
@@ -164,28 +162,25 @@ final class AmpPostgreSQLResultSetTest extends TestCase
      */
     public function multipleGetCurrentRow(): void
     {
-        $handler = static function(AmpPostgreSQLResultSetTest $self): \Generator
+        $promise = $this->adapter->execute(
+            'INSERT INTO test_result_set (id, value) VALUES (?,?), (?,?)', [
+                uuid(), 'value1',
+                uuid(), 'value2'
+            ]
+        );
+
+        wait($promise);
+
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
+        $result = wait($this->adapter->execute('SELECT * FROM test_result_set'));
+
+        while(wait($result->advance()))
         {
-            yield $self->adapter->execute(
-                'INSERT INTO test_result_set (id, value) VALUES (?,?), (?,?)', [
-                    uuid(), 'value1',
-                    uuid(), 'value2'
-                ]
-            );
+            $row     = $result->getCurrent();
+            $rowCopy = $result->getCurrent();
 
-            /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
-            $result = yield $self->adapter->execute('SELECT * FROM test_result_set');
-
-            while(yield $result->advance())
-            {
-                $row     = $result->getCurrent();
-                $rowCopy = $result->getCurrent();
-
-                static::assertEquals($row, $rowCopy);
-            }
-        };
-
-        wait(new Coroutine($handler($this)));
+            static::assertEquals($row, $rowCopy);
+        }
     }
 
     /**
@@ -197,19 +192,14 @@ final class AmpPostgreSQLResultSetTest extends TestCase
      */
     public function executeCommand(): void
     {
-        $handler = static function(AmpPostgreSQLResultSetTest $self): \Generator
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
+        $result = wait($this->adapter->execute('DELETE FROM test_result_set'));
+
+        while(wait($result->advance()))
         {
-            /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $result */
-            $result = yield $self->adapter->execute('DELETE FROM test_result_set');
+            static::fail('Non empty cycle');
+        }
 
-            while(yield $result->advance())
-            {
-                static::fail('Non empty cycle');
-            }
-
-            static::assertNull($result->lastInsertId());
-        };
-
-        wait(new Coroutine($handler($this)));
+        static::assertNull($result->lastInsertId());
     }
 }
