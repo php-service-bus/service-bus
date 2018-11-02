@@ -323,6 +323,21 @@ abstract class Saga
     }
 
     /**
+     * Change saga status to expired
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
+     *
+     * @see SagaStatus::STATUS_EXPIRED
+     *
+     * @return void
+     */
+    private function makeExpired(): void
+    {
+        $this->doChangeState(SagaStatus::expired());
+        $this->doClose('expired');
+    }
+
+    /**
      * Close saga
      *
      * @param string|null $withReason

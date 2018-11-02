@@ -17,6 +17,8 @@ use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\writeReflectionPropertyValue;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
+use Desperado\ServiceBus\Sagas\Contract\SagaClosed;
+use Desperado\ServiceBus\Sagas\Exceptions\ExpiredSagaLoaded;
 use Desperado\ServiceBus\Sagas\Saga;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
@@ -132,7 +134,7 @@ final class SagaProviderTest extends TestCase
 
         wait($this->provider->save($saga, $context));
 
-        $loadedSaga = wait($this->provider->obtain($id));
+        $loadedSaga = wait($this->provider->obtain($id, $context));
 
         static::assertInstanceOf(Saga::class, $loadedSaga);
     }
@@ -202,7 +204,7 @@ final class SagaProviderTest extends TestCase
     {
         $sagaId = TestSagaId::new(CorrectSaga::class);
 
-        wait($this->provider->obtain($sagaId));
+        wait($this->provider->obtain($sagaId, new TestContext()));
     }
 
     /**
@@ -273,5 +275,59 @@ final class SagaProviderTest extends TestCase
         );
 
         wait($this->provider->start($id, new FirstEmptyCommand(), $context));
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function loadExpiredSaga(): void
+    {
+        $promise = $this->adapter->execute(
+            (string) \file_get_contents(__DIR__ . '/../src/Sagas/SagaStore/Sql/schema/sagas_store.sql')
+        );
+
+        wait($promise);
+
+        $id = TestSagaId::new(CorrectSaga::class);
+
+        $context = new TestContext();
+
+        writeReflectionPropertyValue(
+            $this->provider,
+            'sagaMetaDataCollection',
+            [
+                CorrectSaga::class => new SagaMetadata(
+                    CorrectSaga::class,
+                    TestSagaId::class,
+                    'requestId',
+                    '+1 second'
+                )
+            ]
+        );
+
+        wait($this->provider->start($id, new FirstEmptyCommand(), $context));
+
+        sleep(1);
+
+        try
+        {
+            wait($this->provider->obtain($id, $context));
+
+            $this->fail('Exception expected');
+        }
+        catch(\Throwable $throwable)
+        {
+            static::assertInstanceOf(ExpiredSagaLoaded::class, $throwable);
+        }
+
+        /** @var \Desperado\ServiceBus\Sagas\Contract\SagaClosed $latest */
+        $latest = \end($context->messages);
+
+        static::assertTrue(\is_object($latest));
+        static::assertInstanceOf(SagaClosed::class, $latest);
     }
 }
