@@ -14,8 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Endpoint;
 
 use Amp\ByteStream\InMemoryStream;
-use function Amp\call;
-use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
@@ -81,31 +79,21 @@ final class ApplicationTransportEndpoint implements Endpoint
     /**
      * @inheritDoc
      */
-    public function delivery(Message $message, DeliveryOptions $options): Promise
+    public function delivery(Message $message, DeliveryOptions $options): \Generator
     {
         $transport = $this->transport;
-        $encoder   = $this->encoder;
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(Message $message, DeliveryOptions $options, AmqpTransportLevelDestination $destination) use ($transport, $encoder): \Generator
+        $encoded = $this->encoder->encode($message);
+        $package = self::createPackage($encoded, $options, $this->destination);
+
+        yield retry(
+            self::DELIVERY_RETRY_COUNT,
+            static function() use ($transport, $package): \Generator
             {
-                $encoded = $encoder->encode($message);
-                $package = self::createPackage($encoded, $options, $destination);
-
-                yield retry(
-                    self::DELIVERY_RETRY_COUNT,
-                    static function() use ($transport, $package): \Generator
-                    {
-                        yield $transport->send($package);
-                    },
-                    [SendMessageFailed::class],
-                    new ConstantBackoff(self::DELIVERY_RETRY_DELAY)
-                );
-
-                unset($encoded, $package);
+                yield $transport->send($package);
             },
-            $message, $options, $this->destination
+            [SendMessageFailed::class],
+            new ConstantBackoff(self::DELIVERY_RETRY_DELAY)
         );
     }
 

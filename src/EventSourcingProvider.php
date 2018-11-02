@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\createWithoutConstructor;
@@ -116,7 +117,7 @@ final class EventSourcingProvider
                     }
 
                     /** @var StoredAggregateEventStream|null $storedEventStream */
-                    $storedEventStream = yield $storage->loadStream($id, $fromStreamVersion);
+                    $storedEventStream = yield new Coroutine($storage->loadStream($id, $fromStreamVersion));
 
                     $aggregate = self::restoreStream($aggregate, $storedEventStream, $transformer);
 
@@ -171,8 +172,8 @@ final class EventSourcingProvider
                     $storedEventStream = $transformer->streamToStoredRepresentation($eventStream);
 
                     true === self::isNewEventStream($receivedEvents)
-                        ? yield $storage->saveStream($storedEventStream)
-                        : yield $storage->appendStream($storedEventStream);
+                        ? yield new Coroutine($storage->saveStream($storedEventStream))
+                        : yield new Coroutine($storage->appendStream($storedEventStream));
 
                     /** @var AggregateSnapshot|null $loadedSnapshot */
                     $loadedSnapshot = yield $snapshotter->load($aggregate->id());
@@ -182,7 +183,7 @@ final class EventSourcingProvider
                         yield $snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
                     }
 
-                    yield self::publishEvents($receivedEvents, $context);
+                    yield new Coroutine(self::publishEvents($receivedEvents, $context));
 
                     unset($eventStream, $receivedEvents, $loadedSnapshot);
                 }
@@ -210,22 +211,15 @@ final class EventSourcingProvider
      * @param array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event> $events
      * @param MessageDeliveryContext                                           $context
      *
-     * @return Promise It does not return any result
+     * @return \Generator It does not return any result
      */
-    private static function publishEvents(array $events, MessageDeliveryContext $context): Promise
+    private static function publishEvents(array $events, MessageDeliveryContext $context): \Generator
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(array $events) use ($context): \Generator
-            {
-                /** @var Event $event */
-                foreach($events as $event)
-                {
-                    yield $context->delivery($event);
-                }
-            },
-            $events
-        );
+        /** @var Event $event */
+        foreach($events as $event)
+        {
+            yield $context->delivery($event);
+        }
     }
 
     /**

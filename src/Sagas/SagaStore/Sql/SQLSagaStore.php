@@ -13,8 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\SagaStore\Sql;
 
-use function Amp\call;
-use Amp\Promise;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
@@ -47,129 +45,96 @@ final class SQLSagaStore implements SagasStore
     /**
      * @inheritdoc
      */
-    public function save(StoredSaga $storedSaga): Promise
+    public function save(StoredSaga $storedSaga): \Generator
     {
-        $adapter = $this->adapter;
+        /** @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery */
+        $insertQuery = insertQuery('sagas_store', [
+            'id'               => $storedSaga->id(),
+            'identifier_class' => $storedSaga->idClass(),
+            'saga_class'       => $storedSaga->sagaClass(),
+            'payload'          => $storedSaga->payload(),
+            'state_id'         => $storedSaga->status(),
+            'created_at'       => $storedSaga->formatCreatedAt(),
+            'expiration_date'  => $storedSaga->formatExpirationDate(),
+            'closed_at'        => $storedSaga->formatClosedAt()
+        ]);
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(StoredSaga $storedSaga) use ($adapter): \Generator
-            {
-                /** @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery */
-                $insertQuery = insertQuery('sagas_store', [
-                    'id'               => $storedSaga->id(),
-                    'identifier_class' => $storedSaga->idClass(),
-                    'saga_class'       => $storedSaga->sagaClass(),
-                    'payload'          => $storedSaga->payload(),
-                    'state_id'         => $storedSaga->status(),
-                    'created_at'       => $storedSaga->formatCreatedAt(),
-                    'expiration_date'  => $storedSaga->formatExpirationDate(),
-                    'closed_at'        => $storedSaga->formatClosedAt()
-                ]);
+        /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+        $compiledQuery = $insertQuery->compile();
 
-                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-                $compiledQuery = $insertQuery->compile();
-
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
-
-                unset($resultSet, $compiledQuery, $insertQuery);
-            },
-            $storedSaga
-        );
+        yield $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
     }
 
     /**
      * @inheritdoc
      */
-    public function update(StoredSaga $storedSaga): Promise
+    public function update(StoredSaga $storedSaga): \Generator
     {
-        $adapter = $this->adapter;
+        /**
+         * @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery
+         *
+         * @psalm-suppress ImplicitToStringCast
+         */
+        $updateQuery = updateQuery('sagas_store', [
+            'payload'   => $storedSaga->payload(),
+            'state_id'  => $storedSaga->status(),
+            'closed_at' => $storedSaga->formatClosedAt()
+        ])
+            ->where(equalsCriteria('id', $storedSaga->id()))
+            ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass()));
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(StoredSaga $storedSaga) use ($adapter): \Generator
-            {
-                /**
-                 * @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery
-                 *
-                 * @psalm-suppress ImplicitToStringCast
-                 */
-                $updateQuery = updateQuery('sagas_store', [
-                    'payload'   => $storedSaga->payload(),
-                    'state_id'  => $storedSaga->status(),
-                    'closed_at' => $storedSaga->formatClosedAt()
-                ])
-                    ->where(equalsCriteria('id', $storedSaga->id()))
-                    ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass()));
+        /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+        $compiledQuery = $updateQuery->compile();
 
-                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-                $compiledQuery = $updateQuery->compile();
-
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
-
-                unset($resultSet, $updateQuery, $compiledQuery);
-            },
-            $storedSaga
-        );
+        yield $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
     }
 
     /**
      * @inheritdoc
      */
-    public function load(SagaId $id): Promise
+    public function load(SagaId $id): \Generator
     {
-        $adapter = $this->adapter;
+        /**
+         * @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery
+         *
+         * @psalm-suppress ImplicitToStringCast
+         */
+        $selectQuery = selectQuery('sagas_store')
+            ->where(equalsCriteria('id', $id))
+            ->andWhere(equalsCriteria('identifier_class', \get_class($id)));
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(SagaId $id) use ($adapter): \Generator
-            {
-                /**
-                 * @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery
-                 *
-                 * @psalm-suppress ImplicitToStringCast
-                 */
-                $selectQuery = selectQuery('sagas_store')
-                    ->where(equalsCriteria('id', $id))
-                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)));
+        /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+        $compiledQuery = $selectQuery->compile();
 
-                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-                $compiledQuery = $selectQuery->compile();
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+        $resultSet = yield $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+        /** @var array|null $result */
+        $result = yield fetchOne($resultSet);
 
-                /** @var array|null $result */
-                $result = yield fetchOne($resultSet);
+        unset($selectQuery, $compiledQuery, $resultSet);
 
-                unset($selectQuery, $compiledQuery, $resultSet);
+        if(null !== $result && true === isset($result['payload']))
+        {
+            /**
+             * @var array{
+             *     id:string,
+             *     identifier_class:string,
+             *     saga_class:string,
+             *     payload:string,
+             *     state_id:string,
+             *     created_at:string,
+             *     expiration_date:string,
+             *     closed_at:string|null
+             * } $result
+             *
+             * @psalm-suppress MixedArgument
+             */
 
-                if(null !== $result && true === isset($result['payload']))
-                {
-                    /**
-                     * @var array{
-                     *     id:string,
-                     *     identifier_class:string,
-                     *     saga_class:string,
-                     *     payload:string,
-                     *     state_id:string,
-                     *     created_at:string,
-                     *     expiration_date:string,
-                     *     closed_at:string|null
-                     * } $result
-                     *
-                     * @psalm-suppress MixedArgument
-                     */
+            $result['payload'] = $this->adapter->unescapeBinary($result['payload']);
 
-                    $result['payload'] = $adapter->unescapeBinary($result['payload']);
-
-                    return StoredSaga::fromRow($result);
-                }
-            },
-            $id
-        );
+            return StoredSaga::fromRow($result);
+        }
     }
 
     /**
@@ -177,7 +142,7 @@ final class SQLSagaStore implements SagasStore
      *
      * @inheritdoc
      */
-    public function remove(SagaId $id): Promise
+    public function remove(SagaId $id): \Generator
     {
         /**
          * @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery
@@ -191,6 +156,6 @@ final class SQLSagaStore implements SagasStore
         /** @var \Latitude\QueryBuilder\Query $compiledQuery */
         $compiledQuery = $deleteQuery->compile();
 
-        return $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+        return yield $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
     }
 }
