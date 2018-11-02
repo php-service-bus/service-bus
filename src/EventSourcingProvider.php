@@ -251,8 +251,6 @@ final class EventSourcingProvider
             }
 
             invokeReflectionMethod($aggregate, 'appendStream', $eventStream);
-
-            unset($eventStream);
         }
 
         return $aggregate;
