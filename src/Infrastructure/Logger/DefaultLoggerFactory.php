@@ -71,7 +71,7 @@ final class DefaultLoggerFactory
      */
     private function getHandlers(string $logLevel): array
     {
-        $logStreamHandler = new StreamHandler(new ResourceOutputStream(\STDOUT), $logLevel);
+        $logStreamHandler = new StreamHandler(new ResourceOutputStream(\STDOUT, 65000), $logLevel);
         $logStreamHandler->setFormatter(new ConsoleFormatter());
 
         return [$logStreamHandler];
