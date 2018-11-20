@@ -11,6 +11,7 @@ services:
 
   # @see TaggedMessageHandlersCompilerPass
   service_bus.services_locator:
+    public: true
 
   # Application environment
   Desperado\ServiceBus\Environment:
@@ -22,7 +23,8 @@ services:
   Desperado\ServiceBus\Infrastructure\Logger\DefaultLoggerFactory:
 
   # Default logger instance
-  Psr\Log\LoggerInterface:
+  service_bus.logger:
+    class: Psr\Log\LoggerInterface
     factory: 'Desperado\ServiceBus\Infrastructure\Logger\DefaultLoggerFactory:build'
     arguments:
       $entryPointName: '%service_bus.entry_point%'
@@ -31,13 +33,13 @@ services:
   # Detect blocking ticks in an event loop
   Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher:
     arguments:
-      $logger: '@Psr\Log\LoggerInterface'
+      $logger: '@service_bus.logger'
 
   # Periodic forced launch of the garbage collector
   Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher:
     arguments:
       $interval: 600000
-      $logger: '@Psr\Log\LoggerInterface'
+      $logger: '@service_bus.logger'
 
   # Transport configuration
   Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpConnectionConfiguration:
@@ -50,7 +52,7 @@ services:
     arguments:
       $connectionConfig: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpConnectionConfiguration'
       $qosConfig: null
-      $logger: '@Psr\Log\LoggerInterface'
+      $logger: '@service_bus.logger'
 
   # Storage adapter factory
   Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory:
@@ -101,7 +103,7 @@ services:
     arguments:
       $handler: null
       $transferTimeout: 5000
-      $logger: '@Psr\Log\LoggerInterface'
+      $logger: '@service_bus.logger'
 
   # Aggregates (event stream) store
   Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore:
@@ -124,7 +126,7 @@ services:
     arguments:
       $storage: '@Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore'
       $trigger: '@Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotTrigger'
-      $logger: '@Psr\Log\LoggerInterface'
+      $logger: '@service_bus.logger'
 
   # Event sourcing provider
   Desperado\ServiceBus\EventSourcingProvider:
@@ -149,7 +151,7 @@ services:
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: ['container.service_locator']
     arguments:
-      - Psr\Log\LoggerInterface: '@Psr\Log\LoggerInterface'
+      - service_bus.logger: '@service_bus.logger'
         Desperado\ServiceBus\Infrastructure\Transport\Transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
         Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
         Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
@@ -195,7 +197,7 @@ services:
       $messageDecoder: '@Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder'
       $endpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
       $messagesRouter: '@Desperado\ServiceBus\MessageRouter\Router'
-      $logger: '@Psr\Log\LoggerInterface'
+      $logger: '@service_bus.logger'
 
   # Passing message to arguments
   Desperado\ServiceBus\ArgumentResolvers\MessageArgumentResolver:

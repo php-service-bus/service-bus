@@ -67,7 +67,7 @@ final class ServiceBusKernel
         /** @var EntryPoint $entryPoint */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
-        $this->transport = $transport;
+        $this->transport  = $transport;
         $this->entryPoint = $entryPoint;
     }
 
@@ -118,7 +118,7 @@ final class ServiceBusKernel
         $stopDelay = 0 >= $stopDelay ? 1 : $stopDelay;
 
         /** @var LoggerInterface $logger */
-        $logger = $this->getKernelContainerService(LoggerInterface::class);
+        $logger = $this->getKernelContainerService('service_bus.logger');
 
         $handler = function(string $watcherId, int $signalId) use ($stopDelay, $logger): void
         {
@@ -156,7 +156,7 @@ final class ServiceBusKernel
             function() use ($seconds): void
             {
                 /** @var LoggerInterface $logger */
-                $logger = $this->getKernelContainerService(LoggerInterface::class);
+                $logger = $this->getKernelContainerService('service_bus.logger');
 
                 $logger->info('The demon\'s lifetime has expired ({lifetime} seconds)', ['lifetime' => $seconds]);
 
@@ -179,7 +179,7 @@ final class ServiceBusKernel
     public function stopWhenFilesChange(string $directoryPath, int $checkInterval = 30, int $stopDelay = 5): self
     {
         $checkInterval = 0 >= $checkInterval ? 1 : $checkInterval;
-        $watcher = new FileChangesWatcher($directoryPath);
+        $watcher       = new FileChangesWatcher($directoryPath);
 
         Loop::repeat(
             $checkInterval * 1000,
@@ -191,7 +191,7 @@ final class ServiceBusKernel
                 if(true === $changed)
                 {
                     /** @var LoggerInterface $logger */
-                    $logger = $this->getKernelContainerService(LoggerInterface::class);
+                    $logger = $this->getKernelContainerService('service_bus.logger');
 
                     $logger->info(
                         'Application files have been changed. Shut down after {delay} seconds',

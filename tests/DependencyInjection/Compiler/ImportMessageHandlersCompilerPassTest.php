@@ -38,7 +38,11 @@ final class ImportMessageHandlersCompilerPassTest extends TestCase
 
         $containerBuilder->register(SchedulerProvider::class);
 
-        (new ImportMessageHandlersCompilerPass([__DIR__ . '/../../../src'], []))->process($containerBuilder);
+        $containerBuilder->setParameter('service_bus.auto_import.handlers_enabled', true);
+        $containerBuilder->setParameter('service_bus.auto_import.handlers_directories', [__DIR__ . '/../../../src']);
+        $containerBuilder->setParameter('service_bus.auto_import.handlers_excluded', []);
+
+        (new ImportMessageHandlersCompilerPass())->process($containerBuilder);
         (new TaggedMessageHandlersCompilerPass())->process($containerBuilder);
 
         static::assertTrue($containerBuilder->has('service_bus.services_locator'));

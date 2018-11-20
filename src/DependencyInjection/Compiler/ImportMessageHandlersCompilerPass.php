@@ -22,43 +22,24 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 {
     /**
-     * @var array<mixed, string>
-     */
-    private $directories;
-
-    /**
-     * @var array<mixed, string>
-     */
-    private $excludedFiles;
-
-    /**
-     * @param array<mixed, string> $directories
-     * @param array<mixed, string> $excludedFiles
-     */
-    public function __construct(array $directories, array $excludedFiles)
-    {
-        $this->directories   = $directories;
-        $this->excludedFiles = \array_merge($excludedFiles, [
-            __FILE__,
-            __DIR__ . '/../../../src/Storage/functions.php',
-            __DIR__ . '/../../../src/DependencyInjection/Compiler/functions.php',
-            __DIR__ . '/../../../src/Storage/SQL/queryBuilderFunctions.php',
-            __DIR__ . '/../../../src/Common/commonFunctions.php',
-            __DIR__ . '/../../../src/Common/datetimeFunctions.php',
-            __DIR__ . '/../../../src/Common/reflectionFunctions.php',
-        ]);
-    }
-
-    /**
      * @inheritdoc
      *
      * @throws \Exception
      */
     public function process(ContainerBuilder $container): void
     {
-        $excludedFiles = canonicalizeFilesPath($this->excludedFiles);
+        $enabled = true === $container->hasParameter('service_bus.auto_import.handlers_enabled')
+            ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
+            : false;
 
-        foreach(searchFiles($this->directories, '/\.php/i') as $file)
+        if(false === $enabled)
+        {
+            return;
+        }
+
+        $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
+
+        foreach(searchFiles(self::getDirectories($container), '/\.php/i') as $file)
         {
             /** @var \SplFileInfo $file */
 
@@ -94,5 +75,39 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 
         return false !== \strpos($fileContent, '@CommandHandler') ||
             false !== \strpos($fileContent, '@EventListener');
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return array<int, string>
+     */
+    private static function getDirectories(ContainerBuilder $container): array
+    {
+        return true === $container->hasParameter('service_bus.auto_import.handlers_directories')
+            ? $container->getParameter('service_bus.auto_import.handlers_directories')
+            : [];
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return array<int, string>
+     */
+    private static function getExcludedFiles(ContainerBuilder $container): array
+    {
+        $excludedFiles = true === $container->hasParameter('service_bus.auto_import.handlers_excluded')
+            ? $container->getParameter('service_bus.auto_import.handlers_excluded')
+            : [];
+
+        return \array_merge($excludedFiles, [
+            __FILE__,
+            __DIR__ . '/../../../src/Storage/functions.php',
+            __DIR__ . '/../../../src/DependencyInjection/Compiler/functions.php',
+            __DIR__ . '/../../../src/Storage/SQL/queryBuilderFunctions.php',
+            __DIR__ . '/../../../src/Common/commonFunctions.php',
+            __DIR__ . '/../../../src/Common/datetimeFunctions.php',
+            __DIR__ . '/../../../src/Common/reflectionFunctions.php',
+        ]);
     }
 }

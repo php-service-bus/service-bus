@@ -33,7 +33,11 @@ final class ImportSagasCompilerPassTest extends TestCase
     {
         $containerBuilder = new ContainerBuilder();
 
-        $compiler = new ImportSagasCompilerPass([__DIR__ . '/../../Stubs'], []);
+        $containerBuilder->setParameter('service_bus.auto_import.sagas_enabled', true);
+        $containerBuilder->setParameter('service_bus.auto_import.sagas_directories', [__DIR__ . '/../../Stubs']);
+        $containerBuilder->setParameter('service_bus.auto_import.sagas_excluded', []);
+
+        $compiler = new ImportSagasCompilerPass();
         $compiler->process($containerBuilder);
 
         /** @var array<int, string> $registeredSagas */

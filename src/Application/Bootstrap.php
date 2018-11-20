@@ -80,7 +80,13 @@ final class Bootstrap
      */
     public function enableAutoImportSagas(array $directories, array $excludedFiles = []): self
     {
-        $this->containerBuilder->addCompilerPasses(new ImportSagasCompilerPass($directories, $excludedFiles));
+        $this->importParameters([
+            'service_bus.auto_import.sagas_enabled'     => true,
+            'service_bus.auto_import.sagas_directories' => $directories,
+            'service_bus.auto_import.sagas_excluded'    => $excludedFiles
+        ]);
+
+        $this->containerBuilder->addCompilerPasses(new ImportSagasCompilerPass());
 
         return $this;
     }
@@ -112,7 +118,13 @@ final class Bootstrap
      */
     public function enableAutoImportMessageHandlers(array $directories, array $excludedFiles = []): self
     {
-        $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass($directories, $excludedFiles));
+        $this->importParameters([
+            'service_bus.auto_import.handlers_enabled'     => true,
+            'service_bus.auto_import.handlers_directories' => $directories,
+            'service_bus.auto_import.handlers_excluded'    => $excludedFiles
+        ]);
+
+        $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass());
 
         return $this;
     }

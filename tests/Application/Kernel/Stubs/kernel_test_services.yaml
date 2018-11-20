@@ -7,7 +7,7 @@ services:
     arguments:
       $level: debug
 
-  Psr\Log\LoggerInterface:
+  service_bus.logger:
     class: Monolog\Logger
     arguments:
       $name: 'kernel_test'
