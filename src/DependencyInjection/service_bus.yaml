@@ -12,7 +12,6 @@ services:
   # @see TaggedMessageHandlersCompilerPass
   service_bus.services_locator:
     public: true
-    synthetic: true
 
   # Application environment
   Desperado\ServiceBus\Environment:
