@@ -216,8 +216,6 @@ final class AmqpConnectionConfiguration
      *
      * @param string $query
      *
-     * @psalm-suppress MixedTypeCoercion
-     *
      * @return array<string, string|int|float>
      */
     private static function parseQuery(string $query): array
@@ -225,6 +223,8 @@ final class AmqpConnectionConfiguration
         $output = [];
 
         \parse_str($query, $output);
+
+        /** @var array<string, string|int|float> $output */
 
         return $output;
     }

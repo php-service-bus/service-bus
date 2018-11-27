@@ -38,6 +38,8 @@ interface SchedulerStore
     /**
      * Remove operation
      *
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
      * @param ScheduledOperationId $id
      * @param callable             $postRemove function(?NextScheduledOperation){}
      *

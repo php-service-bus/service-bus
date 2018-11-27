@@ -107,7 +107,7 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise It does not return any result
      */
@@ -130,14 +130,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedArgument
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedArgument Cannot specify data type
      *
      * @return Promise It does not return any result
      */
     public function disconnect($replyCode = 0, $replyText = ''): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(int $replyCode, string $replyText): \Generator
             {
@@ -178,8 +181,8 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyChannelOverride>
      */
@@ -249,9 +252,8 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the generator
      *
      * @return Promise<\Bunny\Protocol\MethodBasicConsumeOkFrame>
      */
@@ -260,7 +262,10 @@ final class BunnyClientOverride extends Client
         $exclusive = false, $nowait = false, $arguments = []
     ): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(
                 int $channel, string $queue, string $consumerTag, bool $noLocal, bool $noAck,
@@ -282,7 +287,7 @@ final class BunnyClientOverride extends Client
                 $frame              = new AmqpProtocol\MethodFrame(60, 20);
                 $frame->channel     = $channel;
                 $frame->payloadSize = $buffer->getLength();
-                /** @psalm-suppress InvalidPropertyAssignmentValue */
+                /** @psalm-suppress InvalidPropertyAssignmentValue Incorrect bunny contract */
                 $frame->payload = $buffer;
 
                 $this->getWriter()->appendFrame($frame, $this->getWriteBuffer());
@@ -300,15 +305,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<bool|\Bunny\Protocol\MethodBasicCancelOkFrame>
      */
     public function cancel($channel, $consumerTag, $nowait = false): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(int $channel, string $consumerTag, bool $nowait): \Generator
             {
@@ -341,15 +348,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\MethodBasicGetOkFrame>
      */
     public function get($channel, $queue = '', $noAck = false): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(int $channel, string $queue, bool $noAck): \Generator
             {
@@ -378,15 +387,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\MethodBasicQosOkFrame>
      */
     public function qos($channel, $prefetchSize = 0, $prefetchCount = 0, $global = false): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(int $channel, int $prefetchSize, int $prefetchCount, bool $global): \Generator
             {
@@ -415,15 +426,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\MethodConnectionOpenOkFrame>
      */
     public function connectionOpen($virtualHost = '/', $capabilities = '', $insist = false): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(string $virtualHost, string $capabilities, bool $insist): \Generator
             {
@@ -453,15 +466,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\MethodConnectionCloseOkFrame>
      */
     public function connectionClose($replyCode, $replyText, $closeClassId, $closeMethodId): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(int $replyCode, string $replyText, int $closeClassId, int $closeMethodId): \Generator
             {
@@ -491,15 +506,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\MethodChannelOpenOkFrame>
      */
     public function channelOpen($channel, $outOfBand = ''): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(int $channel, string $outOfBand): \Generator
             {
@@ -526,15 +543,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\MethodChannelFlowOkFrame>
      */
     public function channelFlow($channel, $active): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(int $channel, bool $active): \Generator
             {
@@ -560,15 +579,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\MethodAccessRequestOkFrame>
      */
     public function accessRequest($channel, $realm = '/data', $exclusive = false, $passive = true, $active = true, $write = true, $read = true): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(int $channel, string $realm, bool $exclusive, bool $passive, bool $active, bool $write, bool $read): \Generator
             {
@@ -593,13 +614,11 @@ final class BunnyClientOverride extends Client
         );
     }
 
-
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\MethodExchangeDeclareOkFrame>
      */
@@ -615,7 +634,10 @@ final class BunnyClientOverride extends Client
         $arguments = []
     ): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(
                 int $channel, string $exchange, string $exchangeType, bool $passive, bool $durable,
@@ -636,7 +658,7 @@ final class BunnyClientOverride extends Client
                 $frame              = new AmqpProtocol\MethodFrame(40, 10);
                 $frame->channel     = $channel;
                 $frame->payloadSize = $buffer->getLength();
-                /** @psalm-suppress InvalidPropertyAssignmentValue */
+                /** @psalm-suppress InvalidPropertyAssignmentValue Incorrect bunny contract */
                 $frame->payload = $buffer;
 
                 $this->getWriter()->appendFrame($frame, $this->getWriteBuffer());
@@ -654,15 +676,17 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\MethodExchangeDeleteOkFrame>
      */
     public function exchangeDelete($channel, $exchange, $ifUnused = false, $nowait = false): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(int $channel, string $exchange, bool $ifUnused, bool $nowait): \Generator
             {
@@ -691,9 +715,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<bool>
      */
@@ -732,17 +756,16 @@ final class BunnyClientOverride extends Client
             }
         );
 
-        /** @psalm-suppress InvalidPropertyAssignmentValue */
+        /** @psalm-suppress InvalidPropertyAssignmentValue Change contract data type */
         return $this->flushWriteBufferPromise = $deferred->promise();
     }
 
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -787,10 +810,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -835,10 +857,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -883,8 +904,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -920,8 +942,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -958,8 +981,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -996,8 +1020,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1025,8 +1050,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1063,10 +1089,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1119,10 +1144,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1168,10 +1192,9 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedArgument
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1291,9 +1314,9 @@ final class BunnyClientOverride extends Client
     }
 
     /**
-     * @param bool|Promise|ReactPromise|\Generator $awaitResult
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
-     * @psalm-suppress MixedTypeCoercion
+     * @param bool|Promise|ReactPromise|\Generator $awaitResult
      *
      * @return Promise<bool>
      */
@@ -1301,7 +1324,7 @@ final class BunnyClientOverride extends Client
     {
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-        /** @psalm-suppress MissingClosureParamType */
+        /** @psalm-suppress MissingClosureParamType Mixed data type */
             static function($awaitResult): \Generator
             {
                 if(true === \is_bool($awaitResult))
@@ -1328,8 +1351,8 @@ final class BunnyClientOverride extends Client
     /**
      * Execute connect
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
      * @return \Generator<null>
      */

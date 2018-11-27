@@ -45,7 +45,7 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
     {
         $transaction = $this->transaction;
 
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function(string $queryString, array $parameters = []) use ($transaction): \Generator
             {
@@ -80,7 +80,7 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
     {
         $transaction = $this->transaction;
 
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function() use ($transaction): \Generator
             {
@@ -107,7 +107,7 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
     {
         $transaction = $this->transaction;
 
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function() use ($transaction): \Generator
             {

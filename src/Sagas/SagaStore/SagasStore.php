@@ -23,10 +23,9 @@ interface SagasStore
     /**
      * Save the new saga
      *
-     * @param StoredSaga $savedSaga
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @param StoredSaga $savedSaga
      *
      * @return \Generator It does not return any result
      *
@@ -39,10 +38,9 @@ interface SagasStore
     /**
      * Update the status of an existing saga
      *
-     * @param StoredSaga $savedSaga
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @param StoredSaga $savedSaga
      *
      * @return \Generator It does not return any result
      *
@@ -54,10 +52,9 @@ interface SagasStore
     /**
      * Load saga
      *
-     * @param SagaId $id
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @param SagaId $id
      *
      * @return \Generator<\Desperado\ServiceBus\Sagas\SagaStore\StoredSaga|null>
      *
@@ -70,10 +67,9 @@ interface SagasStore
     /**
      * Remove saga
      *
-     * @param SagaId $id
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @param SagaId $id
      *
      * @return \Generator It does not return any result
      *

@@ -317,7 +317,7 @@ final class BunnyRabbitMqTransport implements Transport
                 $channel = $this->channel;
 
                 yield new Coroutine(self::doCreateExchange($channel, $exchange));
-                /** @psalm-suppress MixedTypeCoercion */
+                /** @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise */
                 yield new Coroutine(self::doBindExchange($channel, $exchange, $binds));
 
                 unset($channel);
@@ -343,7 +343,7 @@ final class BunnyRabbitMqTransport implements Transport
                 $channel = $this->channel;
 
                 yield new Coroutine(self::doCreateQueue($channel, $queue));
-                /** @psalm-suppress MixedTypeCoercion */
+                /** @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise */
                 yield new Coroutine(self::doBindQueue($channel, $queue, $binds));
 
                 unset($channel);

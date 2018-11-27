@@ -84,6 +84,7 @@ final class SqlSchedulerStore implements SchedulerStore
             /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
             $nextOperation = yield new Coroutine(self::fetchNextOperation($transaction));
 
+            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)  */
             asyncCall($postAdd, $operation, $nextOperation);
 
             yield $transaction->commit();
@@ -132,6 +133,7 @@ final class SqlSchedulerStore implements SchedulerStore
             /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
             $nextOperation = yield new Coroutine(self::fetchNextOperation($transaction));
 
+            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)  */
             asyncCall($postRemove, $nextOperation);
 
             yield $transaction->commit();
@@ -191,6 +193,7 @@ final class SqlSchedulerStore implements SchedulerStore
             /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
             $nextOperation = yield new Coroutine(self::fetchNextOperation($transaction));
 
+            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)  */
             asyncCall($postExtract, $operation, $nextOperation);
 
             yield $transaction->commit();
@@ -211,11 +214,11 @@ final class SqlSchedulerStore implements SchedulerStore
     }
 
     /**
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
      * @param TransactionAdapter $transaction
      *
-     * @psalm-suppress MixedTypeCoercion
-     *
-     * @return Promise<\Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null>
+     * @return \Generator<\Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null>
      */
     private static function fetchNextOperation(TransactionAdapter $transaction): \Generator
     {
@@ -231,7 +234,7 @@ final class SqlSchedulerStore implements SchedulerStore
         /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
         $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
-        /** @var array|null $result */
+        /** @var array<string, string>|null $result */
         $result = yield fetchOne($resultSet);
 
         unset($selectQuery, $compiledQuery, $resultSet);
@@ -262,12 +265,12 @@ final class SqlSchedulerStore implements SchedulerStore
     }
 
     /**
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
      * @param StorageAdapter       $adapter
      * @param ScheduledOperationId $id
      *
-     * @psalm-suppress MixedTypeCoercion
-     *
-     * @return Promise<\Desperado\ServiceBus\Scheduler\Data\ScheduledOperation|null>
+     * @return \Generator<\Desperado\ServiceBus\Scheduler\Data\ScheduledOperation|null>
      */
     private static function doLoadOperation(StorageAdapter $adapter, ScheduledOperationId $id): \Generator
     {

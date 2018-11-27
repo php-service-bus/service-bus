@@ -119,7 +119,7 @@ final class ContainerBuilder
     }
 
     /**
-     * @param array<string, mixed> $parameters
+     * @param array<string, bool|string|int|float|array<mixed, mixed>|null> $parameters
      *
      * @return void
      */
@@ -158,23 +158,23 @@ final class ContainerBuilder
     /**
      * Receive cached container
      *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
-     *
      * @return ContainerInterface
      */
     public function cachedContainer(): ContainerInterface
     {
         /**
-         * @noinspection   PhpIncludeInspection
-         * @psalm-suppress UnresolvableInclude
+         * @noinspection   PhpIncludeInspection Include generated file
+         * @psalm-suppress UnresolvableInclude Include generated file
          */
         include_once $this->getContainerClassPath();
 
         /** @var string $containerClassName */
         $containerClassName = $this->getContainerClassName();
 
-        return new $containerClassName();
+        /** @var ContainerInterface $container */
+        $container = new $containerClassName();
+
+        return $container;
     }
 
     /**

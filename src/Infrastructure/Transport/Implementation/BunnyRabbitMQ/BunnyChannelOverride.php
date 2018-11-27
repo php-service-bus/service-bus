@@ -34,10 +34,9 @@ use Bunny\Protocol as AmqpProtocol;
 final class BunnyChannelOverride extends Channel
 {
     /**
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
-     * @psalm-suppress MixedArgument
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @param callable $callback
      * @param string   $queue
@@ -61,7 +60,10 @@ final class BunnyChannelOverride extends Channel
         $arguments = []
     ): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(
                 callable $callback, string $queue, string $consumerTag, bool $noLocal, bool $noAck,
@@ -84,9 +86,9 @@ final class BunnyChannelOverride extends Channel
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
-     * @psalm-suppress MixedArgument
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<bool>
      */
@@ -99,7 +101,10 @@ final class BunnyChannelOverride extends Channel
         $immediate = false
     ): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(string $body, array $headers, string $exchange, string $routingKey, bool $mandatory, bool $immediate): \Generator
             {
@@ -112,9 +117,9 @@ final class BunnyChannelOverride extends Channel
     }
 
     /**
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
-     * @psalm-suppress MixedArgument
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @inheritdoc
      *
@@ -122,7 +127,10 @@ final class BunnyChannelOverride extends Channel
      */
     public function confirmSelect(callable $callback = null, $nowait = false): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
         return call(
             function(?callable $callback, bool $nowait): \Generator
             {
@@ -153,9 +161,9 @@ final class BunnyChannelOverride extends Channel
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress MixedTypeCoercion
-     * @psalm-suppress MixedArgument
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Message|bool>
      */
@@ -185,11 +193,11 @@ final class BunnyChannelOverride extends Channel
     }
 
     /**
-     * @param AmqpProtocol\MethodBasicGetOkFrame $frame
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch
-     * @psalm-suppress InvalidReturnType
-     * @psalm-suppress MixedTypeCoercion
+     * @param AmqpProtocol\MethodBasicGetOkFrame $frame
      *
      * @return Promise<\Bunny\Message|bool>
      */
@@ -237,7 +245,7 @@ final class BunnyChannelOverride extends Channel
                 unset($bodyFrame);
 
                 $this->state = ChannelStateEnum::READY;
-                /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
+                /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
                 $this->headerFrame = null;
 
                 return new Message(
@@ -261,7 +269,7 @@ final class BunnyChannelOverride extends Channel
      */
     protected function onBodyComplete(): void
     {
-        /** @psalm-suppress  RedundantConditionGivenDocblockType */
+        /** @psalm-suppress  RedundantConditionGivenDocblockType Incorrect bunny contract */
         if(null !== $this->returnFrame)
         {
             $this->processReturnFrame();
@@ -269,7 +277,7 @@ final class BunnyChannelOverride extends Channel
             return;
         }
 
-        /** @psalm-suppress  RedundantConditionGivenDocblockType */
+        /** @psalm-suppress  RedundantConditionGivenDocblockType Incorrect bunny contract */
         if(null !== $this->deliverFrame)
         {
             $this->processDeliverFrame();
@@ -277,7 +285,7 @@ final class BunnyChannelOverride extends Channel
             return;
         }
 
-        /** @psalm-suppress  RedundantConditionGivenDocblockType */
+        /** @psalm-suppress  RedundantConditionGivenDocblockType Incorrect bunny contract */
         if(null !== $this->getOkFrame)
         {
             $this->processGetOkFrame();
@@ -310,15 +318,15 @@ final class BunnyChannelOverride extends Channel
 
         foreach($this->returnCallbacks as $callback)
         {
-            /** @psalm-suppress InvalidArgument */
+            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
             asyncCall($callback, $message, $returnFrame);
         }
 
         unset($returnFrame);
 
-        /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
+        /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
         $this->returnFrame = null;
-        /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
+        /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
         $this->headerFrame = null;
     }
 
@@ -343,13 +351,13 @@ final class BunnyChannelOverride extends Channel
 
             $callback = $this->deliverCallbacks[$this->deliverFrame->consumerTag];
 
-            /** @psalm-suppress InvalidArgument */
+            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
             asyncCall($callback, $message, $this, $this->client);
         }
 
-        /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
+        /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
         $this->deliverFrame = null;
-        /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
+        /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
         $this->headerFrame = null;
     }
 
@@ -362,7 +370,7 @@ final class BunnyChannelOverride extends Channel
 
         /** Deferred has to be first nullified and then resolved, otherwise results in race condition */
         $deferred = $this->getDeferred;
-        /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
+        /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
         $this->getDeferred = null;
 
         $deferred->resolve(new Message(
@@ -375,9 +383,9 @@ final class BunnyChannelOverride extends Channel
             $content
         ));
 
-        /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
+        /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
         $this->getOkFrame = null;
-        /** @psalm-suppress PossiblyNullPropertyAssignmentValue */
+        /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
         $this->headerFrame = null;
     }
 }

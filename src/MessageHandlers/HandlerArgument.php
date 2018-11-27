@@ -92,7 +92,7 @@ final class HandlerArgument
         if(true === $this->hasType())
         {
             /** @noinspection NullPointerExceptionInspection */
-            /** @psalm-suppress PossiblyNullReference */
+            /** @psalm-suppress PossiblyNullReference Type cannot be null */
             return true === \class_exists($this->reflectionParameter->getType()->getName())
                 ? 'object'
                 : $this->reflectionParameter->getType()->getName();

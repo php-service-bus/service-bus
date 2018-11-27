@@ -37,7 +37,7 @@ final class DefaultAnnotationsReader implements AnnotationsReader
         try
         {
             /** @noinspection PhpDeprecationInspection */
-            /** @psalm-suppress DeprecatedMethod */
+            /** @psalm-suppress DeprecatedMethod This method is deprecated and will be removed in doctrine/annotations 2.0 */
             DoctrineAnnotations\AnnotationRegistry::registerLoader('class_exists');
 
             $this->reader = $reader ?? new DoctrineAnnotations\AnnotationReader();

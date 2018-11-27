@@ -167,7 +167,7 @@ final class SchedulerListener
                 /**
                  * @see SchedulerProvider::emitNextOperation()
                  *
-                 * @var \Generator $promise
+                 * @var \Generator $generator
                  */
                 $generator = invokeReflectionMethod(
                     $schedulerProvider,

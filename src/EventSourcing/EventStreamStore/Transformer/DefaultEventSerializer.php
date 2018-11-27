@@ -52,14 +52,13 @@ final class DefaultEventSerializer implements AggregateEventSerializer
     }
 
     /**
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
-     *
      * @inheritdoc
      */
     public function unserialize(string $eventClass, string $payload): Event
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->decoder->decode($payload);
+        /** @var Event $event */
+        $event = $this->decoder->decode($payload);
+
+        return $event;
     }
 }

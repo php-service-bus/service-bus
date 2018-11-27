@@ -40,9 +40,11 @@ final class IndexProvider
     }
 
     /**
-     * @param IndexKey $indexKey
+     * Receive index value
      *
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
+     * @param IndexKey $indexKey
      *
      * @return Promise<\Desperado\ServiceBus\Index\IndexValue|null>
      *
@@ -77,9 +79,9 @@ final class IndexProvider
     /**
      * Is there a value in the index
      *
-     * @param IndexKey $indexKey
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
-     * @psalm-suppress MixedTypeCoercion
+     * @param IndexKey $indexKey
      *
      * @return Promise<bool>
      *
@@ -111,10 +113,10 @@ final class IndexProvider
     /**
      * Add a value to the index. If false, then the value already exists
      *
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
      * @param IndexKey   $indexKey
      * @param IndexValue $value
-     *
-     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<bool>
      *

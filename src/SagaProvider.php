@@ -72,13 +72,13 @@ final class SagaProvider
     /**
      * Start new saga
      *
+     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
+     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
      * @param SagaId                 $id
      * @param Command                $command
      * @param MessageDeliveryContext $context
-     *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
-     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<\Desperado\ServiceBus\Sagas\Saga>
      *
@@ -126,12 +126,12 @@ final class SagaProvider
     /**
      * Load saga
      *
-     * @param SagaId                 $id
-     * @param MessageDeliveryContext $context
-     *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
+     * @param SagaId                 $id
+     * @param MessageDeliveryContext $context
      *
      * @return Promise<\Desperado\ServiceBus\Sagas\Saga|null>
      *
@@ -187,11 +187,11 @@ final class SagaProvider
     /**
      * Save saga
      *
-     * @param Saga                   $saga
-     * @param MessageDeliveryContext $context
-     *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
      * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     *
+     * @param Saga                   $saga
+     * @param MessageDeliveryContext $context
      *
      * @return Promise It does not return any result
      *
@@ -236,7 +236,7 @@ final class SagaProvider
     }
 
     /**
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
      * @param SagasStore $store
      * @param SagaId     $id
@@ -262,13 +262,13 @@ final class SagaProvider
     /**
      * Execute add/update saga entry
      *
+     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
+     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     *
      * @param SagasStore             $store
      * @param Saga                   $saga
      * @param MessageDeliveryContext $context
      * @param bool                   $isNew
-     *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
      * @return \Generator It does not return any result
      *

@@ -24,10 +24,9 @@ interface AggregateStore
     /**
      * Save new event stream
      *
-     * @param StoredAggregateEventStream $aggregateEventStream
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @param StoredAggregateEventStream $aggregateEventStream
      *
      * @return \Generator It does not return any result
      *
@@ -39,10 +38,9 @@ interface AggregateStore
     /**
      * Append events to exists stream
      *
-     * @param StoredAggregateEventStream $aggregateEventStream
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @param StoredAggregateEventStream $aggregateEventStream
      *
      * @return \Generator It does not return any result
      *
@@ -53,8 +51,7 @@ interface AggregateStore
     /**
      * Load event stream
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
      * @param AggregateId $id
      * @param int         $fromVersion
@@ -73,10 +70,9 @@ interface AggregateStore
     /**
      * Marks stream closed
      *
-     * @param AggregateId $id
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     * @param AggregateId $id
      *
      * @return \Generator It does not return any result
      *

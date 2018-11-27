@@ -82,13 +82,12 @@ final class EventSourcingProvider
     /**
      * Load aggregate
      *
+     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
      * @param AggregateId $id
      *
      * @return Promise<\Desperado\ServiceBus\EventSourcing\Aggregate|null>
-     *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
-     * @psalm-suppress MixedTypeCoercion
      *
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\LoadStreamFailed
      */
@@ -141,12 +140,11 @@ final class EventSourcingProvider
     /**
      * Save new aggregate
      *
+     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
      * @param Aggregate              $aggregate
      * @param MessageDeliveryContext $context
-     *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
-     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise It does not return any result
      *

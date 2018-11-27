@@ -75,6 +75,7 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
     {
         $connection = $this->connection;
 
+        /** InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function() use ($connection): void
             {
@@ -99,7 +100,7 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
     {
         $connection = $this->connection;
 
-        /** @psalm-suppress InvalidArgument */
+        /** InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function() use ($connection): void
             {

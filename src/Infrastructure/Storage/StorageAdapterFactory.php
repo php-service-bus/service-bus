@@ -39,9 +39,6 @@ final class StorageAdapterFactory
     }
 
     /**
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
-     *
      * @param string $adapter @see StorageAdapterFactory::SUPPORTED
      * @param string $connectionDSN DSN examples:
      *                              - inMemory: sqlite:///:memory:
@@ -59,7 +56,10 @@ final class StorageAdapterFactory
             true === \is_a($adapter, StorageAdapter::class, true)
         )
         {
-            return new $adapter(StorageConfiguration::fromDSN($connectionDSN));
+            /** @var StorageAdapter $adapter */
+            $adapter = new $adapter(StorageConfiguration::fromDSN($connectionDSN));
+
+            return $adapter;
         }
 
         throw new \LogicException(

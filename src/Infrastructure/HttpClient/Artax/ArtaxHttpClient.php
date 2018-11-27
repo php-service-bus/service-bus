@@ -86,7 +86,7 @@ final class ArtaxHttpClient implements HttpClient
     {
         $client = $this->handler;
 
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function(string $filePath, string $destinationDirectory, string $fileName) use ($client): \Generator
             {
@@ -159,7 +159,7 @@ final class ArtaxHttpClient implements HttpClient
     }
 
     /**
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @param Client          $client
      * @param Request         $request
@@ -169,7 +169,7 @@ final class ArtaxHttpClient implements HttpClient
      */
     private static function doRequest(Client $client, Request $request, LoggerInterface $logger): Promise
     {
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function(Request $request) use ($client, $logger): \Generator
             {
@@ -200,7 +200,7 @@ final class ArtaxHttpClient implements HttpClient
     }
 
     /**
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @param Response $response
      *
@@ -208,12 +208,12 @@ final class ArtaxHttpClient implements HttpClient
      */
     private static function adaptResponse(Response $response): Promise
     {
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            /** @psalm-suppress InvalidReturnType */
+            /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
             static function(Response $response): \Generator
             {
-                /** @psalm-suppress InvalidCast */
+                /** @psalm-suppress InvalidCast Invalid read stream handle */
                 $responseBody = (string) yield $response->getBody();
 
                 return new Psr7Response(

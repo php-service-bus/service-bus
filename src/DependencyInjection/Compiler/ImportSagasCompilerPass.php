@@ -92,9 +92,12 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
      */
     private static function getDirectories(ContainerBuilder $container): array
     {
-        return true === $container->hasParameter('service_bus.auto_import.sagas_directories')
+        /** @var array<int, string> $directories */
+        $directories = true === $container->hasParameter('service_bus.auto_import.sagas_directories')
             ? $container->getParameter('service_bus.auto_import.sagas_directories')
             : [];
+
+        return $directories;
     }
 
     /**
@@ -104,11 +107,13 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
      */
     private static function getExcludedFiles(ContainerBuilder $container): array
     {
+        /** @var array<int, string> $excludedFiles */
         $excludedFiles = true === $container->hasParameter('service_bus.auto_import.sagas_excluded')
             ? $container->getParameter('service_bus.auto_import.sagas_excluded')
             : [];
 
-        return \array_merge($excludedFiles, [
+        /** @var array<int, string> $directories */
+        $directories = \array_merge($excludedFiles, [
             __FILE__,
             __DIR__ . '/../../../src/Storage/functions.php',
             __DIR__ . '/../../../src/DependencyInjection/Compiler/functions.php',
@@ -117,5 +122,7 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
             __DIR__ . '/../../../src/Common/datetimeFunctions.php',
             __DIR__ . '/../../../src/Common/reflectionFunctions.php',
         ]);
+
+        return $directories;
     }
 }

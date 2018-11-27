@@ -52,7 +52,7 @@ function writeReflectionPropertyValue(object $object, string $propertyName, $val
 /**
  * Read property value
  *
- * @psalm-suppress MixedAssignment
+ * @psalm-suppress MixedAssignment Mixed return data type
  *
  * @param object $object
  * @param string $propertyName

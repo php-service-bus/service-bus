@@ -138,7 +138,7 @@ final class SQLSagaStore implements SagasStore
     }
 
     /**
-     * @psalm-suppress MixedInferredReturnType
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
      * @inheritdoc
      */

@@ -159,8 +159,6 @@ final class Handler
      * @param object|null $object If an object is not specified, it is assumed that the closure for the operation was
      *                            added earlier (@see Handler::$executionClosure)
      *
-     * @psalm-suppress InvalidNullableReturnType
-     *
      * @return \Closure
      *
      * @throws \LogicException
@@ -179,8 +177,10 @@ final class Handler
             );
         }
 
-        /** @psalm-suppress NullableReturnStatement */
-        return $this->reflectionMethod->getClosure($object);
+        /** @var \Closure $closure*/
+        $closure = $this->reflectionMethod->getClosure($object);
+
+        return $closure;
     }
 
     /**

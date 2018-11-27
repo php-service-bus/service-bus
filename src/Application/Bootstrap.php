@@ -73,10 +73,10 @@ final class Bootstrap
      * Note: All files containing user-defined functions must be excluded
      * Note: Increases start time because of the need to scan files
      *
-     * @param array<mixed, string> $directories
-     * @param array<mixed, string> $excludedFiles
+     * @param array<int, string> $directories
+     * @param array<int, string> $excludedFiles
      *
-     * @return $this
+     * @return self
      */
     public function enableAutoImportSagas(array $directories, array $excludedFiles = []): self
     {
@@ -96,7 +96,7 @@ final class Bootstrap
      *
      * @see https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md
      *
-     * @return Bootstrap
+     * @return self
      */
     public function enableScheduler(): self
     {
@@ -111,10 +111,10 @@ final class Bootstrap
      * Note: All files containing user-defined functions must be excluded
      * Note: Increases start time because of the need to scan files
      *
-     * @param array<mixed, string> $directories
-     * @param array<mixed, string> $excludedFiles
+     * @param array<int, string> $directories
+     * @param array<int, string> $excludedFiles
      *
-     * @return $this
+     * @return self
      */
     public function enableAutoImportMessageHandlers(array $directories, array $excludedFiles = []): self
     {
@@ -146,7 +146,7 @@ final class Bootstrap
      * @param string      $endpointExchange
      * @param string|null $endpointRoutingKey
      *
-     * @return $this
+     * @return self
      */
     public function useRabbitMqTransport(
         string $connectionDSN,
@@ -174,7 +174,7 @@ final class Bootstrap
      * @param string $adapter
      * @param string $connectionDSN
      *
-     * @return $this
+     * @return self
      */
     public function useSqlStorage(string $adapter, string $connectionDSN): self
     {
@@ -192,7 +192,7 @@ final class Bootstrap
      *
      * @param string $cacheDirectoryPath
      *
-     * @return $this
+     * @return self
      */
     public function useCustomCacheDirectory(string $cacheDirectoryPath): self
     {
@@ -204,9 +204,9 @@ final class Bootstrap
     /**
      * Import parameters to container
      *
-     * @param array<string, mixed> $parameters
+     * @param array<string, bool|string|int|float|array<mixed, mixed>|null> $parameters
      *
-     * @return $this
+     * @return self
      */
     public function importParameters(array $parameters): self
     {
@@ -218,7 +218,7 @@ final class Bootstrap
     /**
      * @param Extension[] $extensions
      *
-     * @return $this
+     * @return self
      */
     public function addExtensions(Extension ...$extensions): self
     {
@@ -232,7 +232,7 @@ final class Bootstrap
      *
      * @param CompilerPassInterface ...$compilerPassInterfaces
      *
-     * @return $this
+     * @return self
      */
     public function addCompilerPasses(CompilerPassInterface ...$compilerPassInterfaces): self
     {
