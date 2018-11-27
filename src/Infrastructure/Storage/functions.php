@@ -21,9 +21,9 @@ use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OneResultExpected;
  * Collect iterator data
  * Not recommended for use on large amounts of data
  *
- * @param ResultSet $iterator
+ * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
  *
- * @psalm-suppress MixedTypeCoercion
+ * @param ResultSet $iterator
  *
  * @return Promise<array<int, mixed>|null>
  *
@@ -32,9 +32,9 @@ use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OneResultExpected;
  */
 function fetchAll(ResultSet $iterator): Promise
 {
-    /** @psalm-suppress InvalidArgument */
+    /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
     return call(
-    /** @psalm-suppress InvalidReturnType */
+        /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
         static function(ResultSet $iterator): \Generator
         {
             $array = [];
@@ -53,19 +53,18 @@ function fetchAll(ResultSet $iterator): Promise
 /**
  * Extract 1 result
  *
- * @param ResultSet $iterator
+ * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
  *
- * @psalm-suppress MixedTypeCoercion
+ * @param ResultSet $iterator
  *
  * @return Promise<array<string, mixed>|null>
  *
- * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ResultSetIterationFailed Error getting operation
- *                                                                                          result
+ * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ResultSetIterationFailed Error getting operation  result
  * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\OneResultExpected The result must contain only 1 row
  */
 function fetchOne(ResultSet $iterator): Promise
 {
-    /** @psalm-suppress InvalidArgument */
+    /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
     return call(
         static function(ResultSet $iterator): \Generator
         {

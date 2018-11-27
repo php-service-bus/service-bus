@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\EventSourcingSnapshots;
 
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
@@ -69,11 +70,9 @@ final class Snapshotter
     /**
      * Load snapshot for aggregate
      *
-     * @param AggregateId $id
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
-     * @psalm-suppress MixedTypeCoercion
+     * @param AggregateId $id
      *
      * @return Promise<\Desperado\ServiceBus\EventSourcing\AggregateSnapshot|null>
      */
@@ -91,7 +90,7 @@ final class Snapshotter
                 try
                 {
                     /** @var StoredAggregateSnapshot|null $storedSnapshot */
-                    $storedSnapshot = yield $storage->load($id);
+                    $storedSnapshot = yield new Coroutine($storage->load($id));
 
                     if(null !== $storedSnapshot)
                     {
@@ -117,10 +116,9 @@ final class Snapshotter
     /**
      * Store new snapshot
      *
-     * @param AggregateSnapshot $snapshot
-     *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
+     *
+     * @param AggregateSnapshot $snapshot
      *
      * @return Promise It does not return any result
      */
@@ -135,15 +133,17 @@ final class Snapshotter
             {
                 try
                 {
-                    yield $storage->remove($snapshot->aggregate()->id());
-                    yield $storage->save(
-                        new StoredAggregateSnapshot(
-                            (string) $snapshot->aggregate()->id(),
-                            \get_class($snapshot->aggregate()->id()),
-                            \get_class($snapshot->aggregate()),
-                            $snapshot->version(),
-                            \serialize($snapshot->aggregate()),
-                            \date('Y-m-d H:i:s')
+                    yield new Coroutine($storage->remove($snapshot->aggregate()->id()));
+                    yield new Coroutine(
+                        $storage->save(
+                            new StoredAggregateSnapshot(
+                                (string) $snapshot->aggregate()->id(),
+                                \get_class($snapshot->aggregate()->id()),
+                                \get_class($snapshot->aggregate()),
+                                $snapshot->version(),
+                                \serialize($snapshot->aggregate()),
+                                \date('Y-m-d H:i:s')
+                            )
                         )
                     );
                 }

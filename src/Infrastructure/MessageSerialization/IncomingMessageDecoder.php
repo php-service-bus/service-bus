@@ -42,9 +42,9 @@ final class IncomingMessageDecoder
     }
 
     /**
-     * @param IncomingPackage $package
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
-     * @psalm-suppress MixedTypeCoercion
+     * @param IncomingPackage $package
      *
      * @return Promise<\Desperado\ServiceBus\Common\Contract\Messages\Message>
      *
@@ -56,7 +56,7 @@ final class IncomingMessageDecoder
         $decodersContainer = $this->decodersContainer;
         $deferred          = new Deferred();
 
-        /** @psalm-suppress InvalidReturnType */
+        /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
         Loop::defer(
             static function() use ($package, $decodersContainer, $deferred): \Generator
             {

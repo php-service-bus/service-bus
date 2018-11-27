@@ -50,7 +50,7 @@ final class FileChangesWatcher
      * Compare hashes
      * If returned false, the files have not been changed. Otherwise, return true
      *
-     * @psalm-suppress MixedTypeCoercion
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<bool>
      */
@@ -87,7 +87,7 @@ final class FileChangesWatcher
     /**
      * Execute calculate hashes
      *
-     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
      * @param string $directory
      *

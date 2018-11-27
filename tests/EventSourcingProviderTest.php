@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests;
 
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use function Amp\Promise\wait;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
@@ -244,7 +245,7 @@ final class EventSourcingProviderTest extends TestCase
 
         wait($provider->save($aggregate, $context));
 
-        wait($this->snapshotterStorage->remove($id));
+        wait(new Coroutine($this->snapshotterStorage->remove($id)));
 
         /** @var \Desperado\ServiceBus\EventSourcing\Aggregate|null $aggregate */
         $aggregate = wait($provider->load($id));

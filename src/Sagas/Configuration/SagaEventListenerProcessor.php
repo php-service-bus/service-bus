@@ -58,10 +58,10 @@ final class SagaEventListenerProcessor
     /**
      * Apply received event
      *
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
      * @param Event                  $event
      * @param MessageDeliveryContext $context
-     *
-     * @psalm-suppress MixedTypeCoercion
      *
      * @return Promise<bool>
      */

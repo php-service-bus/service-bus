@@ -172,7 +172,7 @@ function getObjectVars(object $object): array
             /**
              * @var object $this
              *
-             * @psalm-suppress InvalidScope
+             * @psalm-suppress InvalidScope Closure:bind not supports
              */
             return \get_object_vars($this);
         },
@@ -241,7 +241,7 @@ function castObjectToString(object $object): string
 {
     if(true === \method_exists($object, '__toString'))
     {
-        /** @psalm-suppress InvalidCast */
+        /** @psalm-suppress InvalidCast Object have __toString method */
         return (string) $object;
     }
 

@@ -62,7 +62,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     {
         /**
          * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument
+         * @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args)
          */
         return call(
             $this->closure,
@@ -87,6 +87,7 @@ final class DefaultMessageExecutor implements MessageExecutor
         KernelContext $context
     ): array
     {
+        /** @var array<int, mixed> $preparedArguments */
         $preparedArguments = [];
 
         /** @var \Desperado\ServiceBus\MessageHandlers\HandlerArgument $argument */
@@ -97,7 +98,7 @@ final class DefaultMessageExecutor implements MessageExecutor
             {
                 if(true === $argumentResolver->supports($argument))
                 {
-                    /** @psalm-suppress MixedAssignment */
+                    /** @psalm-suppress MixedAssignment Unknown data type */
                     $preparedArguments[] = $argumentResolver->resolve($message, $context, $argument);
                 }
             }

@@ -28,21 +28,29 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $enabled = true === $container->hasParameter('service_bus.auto_import.handlers_enabled')
-            ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
-            : false;
-
-        if(false === $enabled)
+        if(true === self::enabled($container))
         {
-            return;
+            $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
+
+            $files = searchFiles(self::getDirectories($container), '/\.php/i');
+
+            $this->registerClasses($container, $files, $excludedFiles);
         }
+    }
 
-        $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
-
-        foreach(searchFiles(self::getDirectories($container), '/\.php/i') as $file)
+    /**
+     * @param \Generator<\SplFileInfo> $generator
+     * @param array<int, string>       $excludedFiles
+     *
+     * @return void
+     */
+    private function registerClasses(ContainerBuilder $container, \Generator $generator, array $excludedFiles): void
+    {
+        /**
+         * @var \SplFileInfo $file
+         */
+        foreach($generator as $file)
         {
-            /** @var \SplFileInfo $file */
-
             $filePath = $file->getRealPath();
 
             if(true === \in_array($filePath, $excludedFiles, true))
@@ -58,10 +66,21 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
                 false === $container->hasDefinition($class)
             )
             {
-
                 $container->register($class, $class)->addTag('service_bus.service');
             }
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return bool
+     */
+    private static function enabled(ContainerBuilder $container): bool
+    {
+        return true === $container->hasParameter('service_bus.auto_import.handlers_enabled')
+            ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
+            : false;
     }
 
     /**
@@ -84,9 +103,12 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      */
     private static function getDirectories(ContainerBuilder $container): array
     {
-        return true === $container->hasParameter('service_bus.auto_import.handlers_directories')
+        /** @var array<int, string> $directories */
+        $directories = true === $container->hasParameter('service_bus.auto_import.handlers_directories')
             ? $container->getParameter('service_bus.auto_import.handlers_directories')
             : [];
+
+        return $directories;
     }
 
     /**
@@ -96,11 +118,13 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      */
     private static function getExcludedFiles(ContainerBuilder $container): array
     {
+        /** @var array<int, string> $excludedFiles */
         $excludedFiles = true === $container->hasParameter('service_bus.auto_import.handlers_excluded')
             ? $container->getParameter('service_bus.auto_import.handlers_excluded')
             : [];
 
-        return \array_merge($excludedFiles, [
+        /** @var array<int, string> $directories */
+        $directories = \array_merge($excludedFiles, [
             __FILE__,
             __DIR__ . '/../../../src/Storage/functions.php',
             __DIR__ . '/../../../src/DependencyInjection/Compiler/functions.php',
@@ -109,5 +133,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
             __DIR__ . '/../../../src/Common/datetimeFunctions.php',
             __DIR__ . '/../../../src/Common/reflectionFunctions.php',
         ]);
+
+        return $directories;
     }
 }

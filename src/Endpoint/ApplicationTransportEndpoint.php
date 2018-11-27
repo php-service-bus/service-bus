@@ -122,9 +122,9 @@ final class ApplicationTransportEndpoint implements Endpoint
         $operationId = $options->traceId();
 
         $package->setExpiredAfter($options->expiredAfter());
-        $package->setIsImmediate($options->isImmediate());
-        $package->setIsMandatory($options->isMandatory());
-        $package->setIsPersistent($options->isPersistent());
+        $package->setImmediateFlag($options->isImmediate());
+        $package->setMandatoryFlag($options->isMandatory());
+        $package->setPersistentFlag($options->isPersistent());
         $package->withTraceId($operationId);
 
         return $package;

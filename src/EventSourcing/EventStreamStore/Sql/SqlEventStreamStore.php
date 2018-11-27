@@ -128,6 +128,7 @@ final class SqlEventStreamStore implements AggregateStore
 
         if(null !== $streamData)
         {
+            /** @var array<int, array>|null $streamEventsData */
             $streamEventsData = yield new Coroutine(
                 self::doLoadStreamEvents(
                     $this->adapter,
@@ -166,11 +167,10 @@ final class SqlEventStreamStore implements AggregateStore
     /**
      * Store the parent event stream
      *
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
      * @param TransactionAdapter         $transaction
      * @param StoredAggregateEventStream $eventsStream
-     *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
      * @return \Generator It does not return any result
      *
@@ -198,13 +198,12 @@ final class SqlEventStreamStore implements AggregateStore
     /**
      * Saving events in stream
      *
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
      * @param TransactionAdapter         $transaction
      * @param StoredAggregateEventStream $eventsStream
      *
      * @return \Generator It does not return any result
-     *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
@@ -301,12 +300,10 @@ final class SqlEventStreamStore implements AggregateStore
     /**
      * Execute load event stream
      *
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
      * @param StorageAdapter $adapter
      * @param AggregateId    $id
-     *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
-     * @psalm-suppress MixedTypeCoercion
      *
      * @return \Generator<array<string, string>|null>
      *
@@ -339,14 +336,12 @@ final class SqlEventStreamStore implements AggregateStore
     /**
      * Load events for specified stream
      *
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
      * @param StorageAdapter $adapter
      * @param string         $streamId
      * @param int            $fromVersion
      * @param int|null       $toVersion
-     *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
-     * @psalm-suppress MixedTypeCoercion
      *
      * @return \Generator<array<int, array>>
      *

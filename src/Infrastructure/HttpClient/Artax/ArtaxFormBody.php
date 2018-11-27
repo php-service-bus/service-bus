@@ -92,7 +92,7 @@ final class ArtaxFormBody implements FormBody
         /** @var string|float|int|InputFilePath $value */
         foreach($fields as $key => $value)
         {
-            /** @psalm-suppress MixedArgument */
+            /** @psalm-suppress MixedArgument Incorrect processing of ternary operators */
             $value instanceof InputFilePath
                 ? $this->addFile($key, $value)
                 : $this->addField($key, $value);

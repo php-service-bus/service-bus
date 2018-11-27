@@ -38,7 +38,12 @@ final class ServiceBusExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator());
         $loader->load(__DIR__ . '/../service_bus.yaml');
 
-        /** @psalm-suppress MixedAssignment */
+        /**
+         * @var string $key
+         * @var mixed $value
+         *
+         * @psalm-suppress MixedAssignment Cannot assign $value to a mixed type
+         */
         foreach($configs as $key => $value)
         {
             $container->setParameter($key, $value);

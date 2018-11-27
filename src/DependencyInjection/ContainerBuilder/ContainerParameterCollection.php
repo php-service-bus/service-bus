@@ -21,18 +21,21 @@ final class ContainerParameterCollection implements \IteratorAggregate
     /**
      * Key=>value parameters
      *
-     * @var array<string, mixed>
+     * @var array<string, bool|string|int|float|array<mixed, mixed>|null>
      */
     private $collection = [];
 
     /**
-     * @param array<string, mixed> $parameters
+     * @param array<string, bool|string|int|float|array<mixed, mixed>|null> $parameters
      *
      * @return void
      */
     public function push(array $parameters): void
     {
-        /** @psalm-suppress MixedAssignment */
+        /**
+         * @var string $key
+         * @var bool|string|int|float|array<mixed, mixed>|null $value
+         */
         foreach($parameters as $key => $value)
         {
             $this->add($key, $value);
@@ -41,13 +44,12 @@ final class ContainerParameterCollection implements \IteratorAggregate
 
     /**
      * @param string $key
-     * @param mixed  $value
+     * @param bool|string|int|float|array<mixed, mixed>|null  $value
      *
      * @return void
      */
     public function add(string $key, $value): void
     {
-        /** @psalm-suppress MixedAssignment */
         $this->collection[$key] = $value;
     }
 
