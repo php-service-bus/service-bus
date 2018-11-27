@@ -1,9 +1,10 @@
-php_version: 7.2
+php_version: 7
 
 global_exclude_dirs:
   - vendor
   - bin
   - tests
+  - doc
 
 commit_failure_conditions:
   - "project.severity.critical > 0"
@@ -16,9 +17,10 @@ rules:
     enabled: false
   task_todo_comment:
     enabled: false
+  php.interface_has_no_interface_suffix:
+    enabled: false
   php.silenced_error:
     enabled: true
     function_whitelist: [unlink, fopen, fwrite, fclose, rename, chmod, mkdir, rmdir, file_put_contents, move_uploaded_file, chgrp, lchgrp, chown, lchown, touch, symlink, highlight_file, ftp_get, ftp_close, ftp_size, ftp_chdir, ftp_delete, ftp_rmdir, ftp_put, ftp_mkdir, ftp_chmod, ftp_nlist, copy, delete, fileatime, filectime, filemtime, is_readable, is_writable, is_writeable, is_executable, is_link, is_file, is_directory, fputs, fsockopen, get_resource_type, getenv, getimagesize, iconv, imagecreatefromstring, ldap_add, ldap_bind, ldap_delete, ldap_get_option, ldap_modify, ldap_search, ldap_set_option, link, posix_isatty, readfile, readlink, stream_socket_client]
   php.too_permissive_file_permissions:
     enabled: true
-allowed_dirs: [bin]
