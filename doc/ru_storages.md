@@ -44,7 +44,7 @@
   * Для PostgreSQL необходимо воспользоваться конструкцией [RETURNING](https://www.postgresql.org/docs/9.1/static/sql-insert.html), вернув поле ```id``` (именование важно)
 * [affectedRows](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/ResultSet.php#L60): Возвращает кол-во строк, которое было затронуто операциями INSERT/UPDATE/DELETE
 
-Для упрощения работы с результатом есть вспомогательные функции, которые позволяют получить результат в виде массива:  [fetchOne()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/functions.php#L60), и [fetchAll()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/functions.php#L30)
+Для упрощения работы с результатом есть вспомогательные функции, которые позволяют получить результат в виде массива:  [fetchOne()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Storage/functions.php#L65), и [fetchAll()](https://github.com/mmasiukevich/service-bus/blob/master/src/Storage/functions.php#L33)
 
 #### QueryBuilder
 Для упрощения работы с SQL используется библиотека [shadowhand/latitude](https://github.com/shadowhand/latitude). 

@@ -70,4 +70,4 @@
 В данном примере команда ```SomeDelayedCommand``` будет выполнена через 2 минуты.
 
 #### Отмена команды
-Если по каким-либо причинам вам необходимо отменить выполнение запланированной команды, то нужно вызвать метод [cancel()](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php#L138) класса [SchedulerProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php), передав в него идентификатор, с которым задание было создано (в примере выше это ```$delayedOperationId```)
+Если по каким-либо причинам вам необходимо отменить выполнение запланированной команды, то нужно вызвать метод [cancel()](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php#L141) класса [SchedulerProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/SchedulerProvider.php), передав в него идентификатор, с которым задание было создано (в примере выше это ```$delayedOperationId```)
