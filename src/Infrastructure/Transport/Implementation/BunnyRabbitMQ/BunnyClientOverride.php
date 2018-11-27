@@ -534,7 +534,7 @@ final class BunnyClientOverride extends Client
 
                 unset($buffer);
 
-                return $this->awaitChannelOpenOk($channel);
+                return yield $this->awaitChannelOpenOk($channel);
             },
             $channel, $outOfBand
         );
