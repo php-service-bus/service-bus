@@ -47,21 +47,21 @@ final class OutboundPackage
      *
      * @var bool
      */
-    private $isPersistent = false;
+    private $persistentFlag = false;
 
     /**
      * The message must be sent to the existing recipient
      *
      * @var bool
      */
-    private $isMandatory = false;
+    private $mandatoryFlag = false;
 
     /**
      * The message will be sent with the highest priority
      *
      * @var bool
      */
-    private $isImmediate = false;
+    private $immediateFlag = false;
 
     /**
      * The message will be marked expired after N milliseconds
@@ -94,7 +94,7 @@ final class OutboundPackage
      */
     public function isPersistent(): bool
     {
-        return $this->isPersistent;
+        return $this->persistentFlag;
     }
 
     /**
@@ -102,7 +102,7 @@ final class OutboundPackage
      */
     public function isMandatory(): bool
     {
-        return $this->isMandatory;
+        return $this->mandatoryFlag;
     }
 
     /**
@@ -110,7 +110,7 @@ final class OutboundPackage
      */
     public function isImmediate(): bool
     {
-        return $this->isImmediate;
+        return $this->immediateFlag;
     }
 
     /**
@@ -180,9 +180,9 @@ final class OutboundPackage
      *
      * @return void
      */
-    public function setIsPersistent(bool $isPersistent): void
+    public function setPersistentFlag(bool $isPersistent): void
     {
-        $this->isPersistent = $isPersistent;
+        $this->persistentFlag = $isPersistent;
     }
 
     /**
@@ -192,9 +192,9 @@ final class OutboundPackage
      *
      * @return void
      */
-    public function setIsMandatory(bool $isMandatory): void
+    public function setMandatoryFlag(bool $isMandatory): void
     {
-        $this->isMandatory = $isMandatory;
+        $this->mandatoryFlag = $isMandatory;
     }
 
     /**
@@ -204,9 +204,9 @@ final class OutboundPackage
      *
      * @return void
      */
-    public function setIsImmediate(bool $isImmediate): void
+    public function setImmediateFlag(bool $isImmediate): void
     {
-        $this->isImmediate = $isImmediate;
+        $this->immediateFlag = $isImmediate;
     }
 
     /**
