@@ -79,19 +79,19 @@ final class Customer extends Aggregate
 ```
 #### Available methods
 While using the aggregate the following secure methods are available:
-* [close()](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L137): A soft delete analogue. We do not delete the event stream, we just tag it as closed. A closed stream cannot be received, and hence modified
-* [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L107): Appliance of an event to an aggregate. Naming of event listeners follows an ```on{ClassName}``` pattern, where *on* is a prefix, *{ClassName}* – a basic name of event class.
+* [close()](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L138): A soft delete analogue. We do not delete the event stream, we just tag it as closed. A closed stream cannot be received, and hence modified
+* [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L108): Appliance of an event to an aggregate. Naming of event listeners follows an ```on{ClassName}``` pattern, where *on* is a prefix, *{ClassName}* – a basic name of event class.
 
 #### Life cycle
 While creating a new aggregate event [AggregateCreated](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateCreated.php) will be sent into transport;  when the aggregate is closed - [AggregateClosed](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateClosed.php)
 
 #### Working with indexes
 To work with indexes, use [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), which has the following methods  (the [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php) object is returned in each of them):
-* [get()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L51): Receive a saved value
-* [has()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L85): Was a value saved
-* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L122): Add a value to index. Working principle is similar to the ```\Memcached:add```: method, if values with such a keyword didn’t exist it will return «true», otherwise - «false» (best choice)
-* [remove()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L160): Delete saved value
-* [update()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L177): Update saved value
+* [get()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L54): Receive a saved value
+* [has()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L91): Was a value saved
+* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L126): Add a value to index. Working principle is similar to the ```\Memcached:add```: method, if values with such a keyword didn’t exist it will return «true», otherwise - «false» (best choice)
+* [remove()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L165): Delete saved value
+* [update()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L181): Update saved value
 
 #### Working with snapshots
 By default only one strategy of snapshots generation is implemented - [SnapshotVersionTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcingSnapshots/Trigger/SnapshotVersionTrigger.php), which is based on versions (generates a snapshot every *N* version changes). Snapshots are created automatically, with an exclusion of strategy selection (you can implement your own snapshots with the help of  [SnapshotTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcingSnapshots/Trigger/SnapshotTrigger.php) interface) no setting is required

@@ -27,29 +27,29 @@ An object of [Bootstrap](https://github.com/mmasiukevich/service-bus/blob/master
 
 
 Available methods:
-- [enableAutoImportSagas()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L80): Scans the project files and automatically registers all found sagas
-- [enableAutoImportMessageHandlers()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L112): Scans the project files and automatically registers all found message processors
-- [useRabbitMqTransport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L139): Configuration for the RabbitMQ transport
-- [useSqlStorage()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L167): Configuration for the SQL database
-- [useCustomCacheDirectory()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L185): If not designated, the default directory will be used ([sys_get_temp_dir()](http://php.net/manual/en/function.sys-get-temp-dir.php))
-- [importParameters()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L199): Imports the parameters into DI-containers
-- [addExtensions()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L211): Registers user [Extension](https://symfony.com/doc/current/bundles/extension.html) in DI-container
-- [addCompilerPasses()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L225): Registers user [CompilerPass](https://symfony.com/doc/current/service_container/compiler_passes.html) in DI-container
-- [boot()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L123): Compiles DI-container
-- [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L95): Enable scheduler support. [Read more](https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md)
+- [enableAutoImportSagas()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L81): Scans the project files and automatically registers all found sagas
+- [enableAutoImportMessageHandlers()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L119): Scans the project files and automatically registers all found message processors
+- [useRabbitMqTransport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L151): Configuration for the RabbitMQ transport
+- [useSqlStorage()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L179): Configuration for the SQL database
+- [useCustomCacheDirectory()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L197): If not designated, the default directory will be used ([sys_get_temp_dir()](http://php.net/manual/en/function.sys-get-temp-dir.php))
+- [importParameters()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L211): Imports the parameters into DI-containers
+- [addExtensions()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L223): Registers user [Extension](https://symfony.com/doc/current/bundles/extension.html) in DI-container
+- [addCompilerPasses()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L237): Registers user [CompilerPass](https://symfony.com/doc/current/service_container/compiler_passes.html) in DI-container
+- [boot()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L135): Compiles DI-container
+- [enableScheduler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/Bootstrap.php#L101): Enable scheduler support. [Read more](https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md)
 
 #### Transport Configuration
-For the configuration of the transport layer is responsible [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), in which is available [transport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L229)
-- [createQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L52): Creates a new queue (if it does not exist)
-- [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L37): Creates an exchange (if it does not exist)
+For the configuration of the transport layer is responsible [ServiceBusKernel](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php), in which is available [transport()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L230)
+- [createQueue()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L54): Creates a new queue (if it does not exist)
+- [createTopic()](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php#L39): Creates an exchange (if it does not exist)
 
 #### Kernel configuration
 - [monitorLoopBlock()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L80): Enable detection of blocking event loop
 - [enableGarbageCleaning()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L95): Periodically force a garbage collector
 - [useDefaultStopSignalHandler()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L116): Use default handler for SIGINT/SIGTERM signals
 - [stopAfter()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L150): Shut down the daemon after N seconds
-- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L218): Apply specific route to deliver a message
-- [stopWhenFilesChange()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L178):
+- [registerMessageCustomEndpoint()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L219): Apply specific route to deliver a message
+- [stopWhenFilesChange()](https://github.com/mmasiukevich/service-bus/blob/master/src/Application/ServiceBusKernel.php#L179):
 
 #### Creation of database schema
 **Important**: at the application initiation, a database scheme is not created. This is for the users to do.

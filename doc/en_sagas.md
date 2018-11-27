@@ -51,9 +51,9 @@ On saga status change next events will be raised:
 
 #### Creation
 There is a specific provider created for more convenient operations with sagas - [SagaProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php). Each of its methods returns [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php) object.
-- [start()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L78): Creates and starts new saga firing a command;
-- [obtain()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L126): Retrieves a saga instance from database;
-- [save()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L161): Saves all changes in saga state and sends all saga events to transport.
+- [start()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L88): Creates and starts new saga firing a command;
+- [obtain()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L141): Retrieves a saga instance from database;
+- [save()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L200): Saves all changes in saga state and sends all saga events to transport.
 
 #### Example
 
