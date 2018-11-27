@@ -29,38 +29,44 @@ final class ImportSagasCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $enabled = true === $container->hasParameter('service_bus.auto_import.sagas_enabled')
+        if(true === self::enabled($container))
+        {
+            $foundSagas    = [];
+            $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
+
+            foreach(searchFiles(self::getDirectories($container), '/\.php/i') as $file)
+            {
+                /** @var \SplFileInfo $file */
+
+                $filePath = $file->getRealPath();
+
+                if(true === \in_array($filePath, $excludedFiles, true))
+                {
+                    continue;
+                }
+
+                $class = extractNamespaceFromFile((string) $file);
+
+                if(null !== $class && true === \is_a($class, Saga::class, true))
+                {
+                    $foundSagas[] = $class;
+                }
+            }
+
+            self::updateParameters($container, $foundSagas);
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return bool
+     */
+    private static function enabled(ContainerBuilder $container): bool
+    {
+        return true === $container->hasParameter('service_bus.auto_import.sagas_enabled')
             ? (bool) $container->getParameter('service_bus.auto_import.sagas_enabled')
             : false;
-
-        if(false === $enabled)
-        {
-            return;
-        }
-
-        $foundSagas    = [];
-        $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
-
-        foreach(searchFiles(self::getDirectories($container), '/\.php/i') as $file)
-        {
-            /** @var \SplFileInfo $file */
-
-            $filePath = $file->getRealPath();
-
-            if(true === \in_array($filePath, $excludedFiles, true))
-            {
-                continue;
-            }
-
-            $class = extractNamespaceFromFile((string) $file);
-
-            if(null !== $class && true === \is_a($class, Saga::class, true))
-            {
-                $foundSagas[] = $class;
-            }
-        }
-
-        self::updateParameters($container, $foundSagas);
     }
 
     /**

@@ -28,21 +28,29 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $enabled = true === $container->hasParameter('service_bus.auto_import.handlers_enabled')
-            ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
-            : false;
-
-        if(false === $enabled)
+        if(true === self::enabled($container))
         {
-            return;
+            $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
+
+            $files = searchFiles(self::getDirectories($container), '/\.php/i');
+
+            $this->registerClasses($container, $files, $excludedFiles);
         }
+    }
 
-        $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
-
-        foreach(searchFiles(self::getDirectories($container), '/\.php/i') as $file)
+    /**
+     * @param \Generator<\SplFileInfo> $generator
+     * @param array<int, string>       $excludedFiles
+     *
+     * @return void
+     */
+    private function registerClasses(ContainerBuilder $container, \Generator $generator, array $excludedFiles): void
+    {
+        /**
+         * @var \SplFileInfo $file
+         */
+        foreach($generator as $file)
         {
-            /** @var \SplFileInfo $file */
-
             $filePath = $file->getRealPath();
 
             if(true === \in_array($filePath, $excludedFiles, true))
@@ -58,10 +66,21 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
                 false === $container->hasDefinition($class)
             )
             {
-
                 $container->register($class, $class)->addTag('service_bus.service');
             }
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return bool
+     */
+    private static function enabled(ContainerBuilder $container): bool
+    {
+        return true === $container->hasParameter('service_bus.auto_import.handlers_enabled')
+            ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
+            : false;
     }
 
     /**
