@@ -350,6 +350,287 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise
+     */
+    public function reject($channel, $deliveryTag, $requeue = true): Promise
+    {
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
+        return call(
+            function(int $channel, int $deliveryTag, bool $requeue): \Generator
+            {
+                $buffer = $this->getWriteBuffer();
+
+                $buffer->appendUint8(1);
+                $buffer->appendUint16($channel);
+                $buffer->appendUint32(13);
+                $buffer->appendUint16(60);
+                $buffer->appendUint16(90);
+                $buffer->appendInt64($deliveryTag);
+                $this->getWriter()->appendBits([$requeue], $buffer);
+                $buffer->appendUint8(206);
+
+                return yield $this->flushWriteBuffer();
+            },
+            $channel, $deliveryTag, $requeue
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise
+     */
+    public function recoverAsync($channel, $requeue = false): Promise
+    {
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
+        return call(
+            function(int $channel, bool $requeue): \Generator
+            {
+                $buffer = $this->getWriteBuffer();
+
+                $buffer->appendUint8(1);
+                $buffer->appendUint16($channel);
+                $buffer->appendUint32(5);
+                $buffer->appendUint16(60);
+                $buffer->appendUint16(100);
+                $this->getWriter()->appendBits([$requeue], $buffer);
+                $buffer->appendUint8(206);
+
+                return yield $this->flushWriteBuffer();
+            },
+            $channel, $requeue
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\MethodBasicRecoverOkFrame>
+     */
+    public function recover($channel, $requeue = false): Promise
+    {
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
+        return call(
+            function(int $channel, bool $requeue): \Generator
+            {
+                $buffer = $this->getWriteBuffer();
+
+                $buffer->appendUint8(1);
+                $buffer->appendUint16($channel);
+                $buffer->appendUint32(5);
+                $buffer->appendUint16(60);
+                $buffer->appendUint16(110);
+                $this->getWriter()->appendBits([$requeue], $buffer);
+                $buffer->appendUint8(206);
+
+                yield $this->flushWriteBuffer();
+
+                return yield $this->awaitRecoverOk($channel);
+            },
+            $channel, $requeue
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise
+     */
+    public function nack($channel, $deliveryTag = 0, $multiple = false, $requeue = true): Promise
+    {
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
+        return call(
+            function(int $channel, int $deliveryTag, bool $multiple, bool $requeue): \Generator
+            {
+                $buffer = $this->getWriteBuffer();
+
+                $buffer->appendUint8(1);
+                $buffer->appendUint16($channel);
+                $buffer->appendUint32(13);
+                $buffer->appendUint16(60);
+                $buffer->appendUint16(120);
+                $buffer->appendInt64($deliveryTag);
+                $this->getWriter()->appendBits([$multiple, $requeue], $buffer);
+                $buffer->appendUint8(206);
+
+                return yield $this->flushWriteBuffer();
+            },
+            $channel, $deliveryTag, $multiple, $requeue
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\MethodTxSelectOkFrame>
+     */
+    public function txSelect($channel): Promise
+    {
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
+        return call(
+            function(int $channel): \Generator
+            {
+                $buffer = $this->getWriteBuffer();
+
+                $buffer->appendUint8(1);
+                $buffer->appendUint16($channel);
+                $buffer->appendUint32(4);
+                $buffer->appendUint16(90);
+                $buffer->appendUint16(10);
+                $buffer->appendUint8(206);
+
+                yield $this->flushWriteBuffer();
+
+                return yield $this->awaitTxSelectOk($channel);
+            },
+            $channel
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\MethodTxCommitOkFrame>
+     */
+    public function txCommit($channel): Promise
+    {
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
+        return call(
+            function(int $channel): \Generator
+            {
+                $buffer = $this->getWriteBuffer();
+
+                $buffer->appendUint8(1);
+                $buffer->appendUint16($channel);
+                $buffer->appendUint32(4);
+                $buffer->appendUint16(90);
+                $buffer->appendUint16(20);
+                $buffer->appendUint8(206);
+
+                yield $this->flushWriteBuffer();
+
+                return yield $this->awaitTxCommitOk($channel);
+            },
+            $channel
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\MethodTxRollbackOkFrame>
+     */
+    public function txRollback($channel): Promise
+    {
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
+        return call(
+            function(int $channel): \Generator
+            {
+                $buffer = $this->getWriteBuffer();
+                $buffer->appendUint8(1);
+                $buffer->appendUint16($channel);
+                $buffer->appendUint32(4);
+                $buffer->appendUint16(90);
+                $buffer->appendUint16(30);
+                $buffer->appendUint8(206);
+
+                yield $this->flushWriteBuffer();
+
+                return yield $this->awaitTxRollbackOk($channel);
+            },
+            $channel
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise
+     */
+    public function confirmSelect($channel, $nowait = false): Promise
+    {
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Clarification of the type of data
+         */
+        return call(
+            function(int $channel, bool $nowait): \Generator
+            {
+                $buffer = $this->getWriteBuffer();
+
+                $buffer->appendUint8(1);
+                $buffer->appendUint16($channel);
+                $buffer->appendUint32(5);
+                $buffer->appendUint16(85);
+                $buffer->appendUint16(10);
+                $this->getWriter()->appendBits([$nowait], $buffer);
+                $buffer->appendUint8(206);
+
+                yield $this->flushWriteBuffer();
+
+                if(false === $nowait)
+                {
+                    return yield $this->awaitConfirmSelectOk($channel);
+                }
+            },
+            $channel, $nowait
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\MethodBasicGetOkFrame>
      */
@@ -906,7 +1187,6 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -944,7 +1224,6 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -981,9 +1260,926 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitQueueDeclareOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodQueueDeclareOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitQueueBindOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodQueueBindOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitQueuePurgeOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodQueuePurgeOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitQueueDeleteOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodQueueDeleteOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitQueueUnbindOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodQueueUnbindOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitConsumeOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodBasicConsumeOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitCancelOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodBasicCancelOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitNack($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodBasicNackFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitReturn($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodBasicReturnFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitRecoverOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodBasicRecoverOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitDeliver($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodBasicDeliverFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitGetOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodBasicGetOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodBasicGetEmptyFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitAck($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodBasicAckFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitTxSelectOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodTxSelectOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitTxCommitOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodTxCommitOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitTxRollbackOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodTxRollbackOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitConfirmSelectOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodConfirmSelectOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitExchangeBindOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodExchangeBindOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+                else if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+                else if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitExchangeUnbindOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodExchangeUnbindOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1022,7 +2218,6 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1052,7 +2247,6 @@ final class BunnyClientOverride extends Client
      *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1066,6 +2260,322 @@ final class BunnyClientOverride extends Client
                 if($frame instanceof AmqpProtocol\MethodConnectionCloseOkFrame)
                 {
                     $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitConnectionBlocked(): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodConnectionBlockedFrame)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitConnectionUnblocked(): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodConnectionUnblockedFrame)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitChannelFlow($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodChannelFlowFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitChannelFlowOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodChannelFlowOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitChannelClose($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitChannelCloseOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodChannelCloseOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+                {
+                    yield $this->connectionCloseOk();
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
+
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     */
+    public function awaitAccessRequestOk($channel): Promise
+    {
+        $deferred = new Deferred();
+
+        $this->addAwaitCallback(
+            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
+            {
+                if($frame instanceof AmqpProtocol\MethodAccessRequestOkFrame && $frame->channel === $channel)
+                {
+                    $deferred->resolve($frame);
+
+                    return true;
+                }
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+                {
+                    yield $this->channelCloseOk($channel);
+
+                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
 
                     return true;
                 }
@@ -1104,14 +2614,14 @@ final class BunnyClientOverride extends Client
             {
                 if($frame instanceof AmqpProtocol\MethodChannelOpenOkFrame && $frame->channel === $channel)
                 {
-                    $deferred->resolve($frame);
-
                     yield $this->qos(
                         $frame->channel,
                         $this->qosConfig->qosSize(),
                         $this->qosConfig->qosCount(),
                         $this->qosConfig->isGlobal()
                     );
+
+                    $deferred->resolve($frame);
 
                     return true;
                 }
