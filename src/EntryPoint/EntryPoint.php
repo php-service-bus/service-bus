@@ -85,7 +85,7 @@ final class EntryPoint
     {
         $this->logger = $logger ?? new NullLogger();
 
-        $this->transport = $transport;
+        $this->transport      = $transport;
         $this->messageDecoder = $messageDecoder;
         $this->endpointRouter = $endpointRouter;
         $this->messagesRouter = $messagesRouter ?? new Router();
@@ -102,10 +102,10 @@ final class EntryPoint
     {
         $this->listenQueue = $queue;
 
-        $transport = $this->transport;
-        $logger = $this->logger;
-        $decoder = $this->messageDecoder;
-        $router = $this->messagesRouter;
+        $transport      = $this->transport;
+        $logger         = $this->logger;
+        $decoder        = $this->messageDecoder;
+        $router         = $this->messagesRouter;
         $endpointRouter = $this->endpointRouter;
 
         /** Hack for phpunit tests */
@@ -125,8 +125,7 @@ final class EntryPoint
 
                     try
                     {
-                        /** @var \Desperado\ServiceBus\Common\Contract\Messages\Message $message */
-                        $message = yield $decoder->decode($package);
+                        $message = $decoder->decode($package);
 
                         $logger->debug('Dispatch "{messageClass}" message', [
                             'packageId'    => $package->id(),
@@ -188,7 +187,7 @@ final class EntryPoint
             {
                 try
                 {
-                    $executors = $router->match($message);
+                    $executors    = $router->match($message);
                     $messageClass = \get_class($message);
 
                     if(0 === \count($executors))

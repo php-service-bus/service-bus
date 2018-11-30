@@ -13,9 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\MessageSerialization;
 
-use Amp\Deferred;
-use Amp\Loop;
-use Amp\Promise;
+use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -46,55 +44,29 @@ final class IncomingMessageDecoder
      *
      * @param IncomingPackage $package
      *
-     * @return Promise<\Desperado\ServiceBus\Common\Contract\Messages\Message>
+     * @return Message
      *
      * @throws \LogicException Could not find encoder in the service container
      * @throws \Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed
      */
-    public function decode(IncomingPackage $package): Promise
+    public function decode(IncomingPackage $package): Message
     {
-        $decodersContainer = $this->decodersContainer;
-        $deferred          = new Deferred();
+        $encoderKey = self::extractEncoderKey($package->headers());
 
-        /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
-        Loop::defer(
-            static function() use ($package, $decodersContainer, $deferred): void
-            {
-                try
-                {
-                    $encoderKey = self::extractEncoderKey($package->headers());
+        if(false === $this->decodersContainer->has($encoderKey))
+        {
+            throw new \LogicException(
+                \sprintf('Could not find encoder "%s" in the service container', $encoderKey)
+            );
+        }
 
-                    if(false === $decodersContainer->has($encoderKey))
-                    {
-                        $deferred->fail(
-                            new \LogicException(
-                                \sprintf('Could not find encoder "%s" in the service container', $encoderKey)
-                            )
-                        );
+        /** @var MessageDecoder $encoder */
+        $encoder = $this->decodersContainer->get($encoderKey);
 
-                        return;
-                    }
+        /** @var Message $message */
+        $message = $encoder->decode($package->payload());
 
-                    /** @var MessageDecoder $encoder */
-                    $encoder = $decodersContainer->get($encoderKey);
-
-                    /** @var string $payload */
-                    $payload = $package->payload();
-
-                    $deferred->resolve(
-                        $encoder->decode($payload)
-                    );
-
-                    unset($encoder, $payload);
-                }
-                catch(\Throwable $throwable)
-                {
-                    $deferred->fail($throwable);
-                }
-            }
-        );
-
-        return $deferred->promise();
+        return $message;
     }
 
     /**
