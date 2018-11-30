@@ -14,19 +14,13 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\EntryPoint;
 
 use function Amp\call;
-use Amp\Deferred;
+use Amp\Coroutine;
 use Amp\Loop;
 use Amp\Promise;
-use Desperado\ServiceBus\Application\KernelContext;
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\Endpoint\EndpointRouter;
-use Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\Queue;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
-use Desperado\ServiceBus\MessageRouter\Router;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 
 /**
@@ -40,28 +34,14 @@ final class EntryPoint
     private $transport;
 
     /**
-     * @var Router
-     */
-    private $messagesRouter;
-
-    /**
      * @var Queue|null
      */
     private $listenQueue;
 
     /**
-     * Decoding of incoming messages
-     *
-     * @var IncomingMessageDecoder
+     * @var EntryPointProcessor
      */
-    private $messageDecoder;
-
-    /**
-     * Outbound message routing
-     *
-     * @var EndpointRouter
-     */
-    private $endpointRouter;
+    private $processor;
 
     /**
      * @var LoggerInterface
@@ -69,26 +49,15 @@ final class EntryPoint
     private $logger;
 
     /**
-     * @param Transport              $transport
-     * @param IncomingMessageDecoder $messageDecoder
-     * @param EndpointRouter         $endpointRouter
-     * @param Router|null            $messagesRouter
-     * @param LoggerInterface|null   $logger
+     * @param Transport            $transport
+     * @param  EntryPointProcessor $processor
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(
-        Transport $transport,
-        IncomingMessageDecoder $messageDecoder,
-        EndpointRouter $endpointRouter,
-        ?Router $messagesRouter = null,
-        ?LoggerInterface $logger = null
-    )
+    public function __construct(Transport $transport, EntryPointProcessor $processor, ?LoggerInterface $logger = null)
     {
+        $this->transport = $transport;
+        $this->processor = $processor;
         $this->logger = $logger ?? new NullLogger();
-
-        $this->transport      = $transport;
-        $this->messageDecoder = $messageDecoder;
-        $this->endpointRouter = $endpointRouter;
-        $this->messagesRouter = $messagesRouter ?? new Router();
     }
 
     /**
@@ -102,18 +71,16 @@ final class EntryPoint
     {
         $this->listenQueue = $queue;
 
-        $transport      = $this->transport;
-        $logger         = $this->logger;
-        $decoder        = $this->messageDecoder;
-        $router         = $this->messagesRouter;
-        $endpointRouter = $this->endpointRouter;
+        $transport = $this->transport;
+        $logger = $this->logger;
+        $processor = $this->processor;
 
         /** Hack for phpunit tests */
         $isTestCall = 'phpunitTests' === (string) \getenv('SERVICE_BUS_TESTING');
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Queue $queue) use ($transport, $decoder, $router, $logger, $endpointRouter, $isTestCall): \Generator
+            static function(Queue $queue) use ($transport, $processor, $logger, $isTestCall): \Generator
             {
                 /** @var \Amp\Iterator $iterator */
                 $iterator = yield $transport->consume($queue);
@@ -125,27 +92,7 @@ final class EntryPoint
 
                     try
                     {
-                        $message = $decoder->decode($package);
-
-                        $logger->debug('Dispatch "{messageClass}" message', [
-                            'packageId'    => $package->id(),
-                            'traceId'      => $package->traceId(),
-                            'messageClass' => \get_class($message)
-                        ]);
-
-                        $context = new KernelContext($package, $endpointRouter, $logger);
-
-                        $logger->debug('Handle message "{messageClass}"', [
-                                'messageClass' => \get_class($message),
-                                'packageId'    => $package->id(),
-                                'traceId'      => $package->traceId(),
-                            ]
-                        );
-
-                        yield $package->ack();
-                        yield self::process($router, $message, $context);
-
-                        unset($message, $context);
+                        yield (new Coroutine($processor->handle($package)));
                     }
                     catch(\Throwable $throwable)
                     {
@@ -156,9 +103,7 @@ final class EntryPoint
                         ]);
                     }
 
-                    unset($package);
-
-                    /** Hack for phpunit tests */
+                    /** Hack for phpUnit */
                     if(true === $isTestCall)
                     {
                         break;
@@ -167,65 +112,6 @@ final class EntryPoint
             },
             $queue
         );
-    }
-
-    /**
-     * Process message execution
-     *
-     * @param Router        $router
-     * @param Message       $message
-     * @param KernelContext $context
-     *
-     * @return Promise It does not return any result
-     */
-    private static function process(Router $router, Message $message, KernelContext $context): Promise
-    {
-        $deferred = new Deferred();
-
-        Loop::defer(
-            static function() use ($router, $deferred, $message, $context): \Generator
-            {
-                try
-                {
-                    $executors    = $router->match($message);
-                    $messageClass = \get_class($message);
-
-                    if(0 === \count($executors))
-                    {
-                        $context->logContextMessage(
-                            'There are no handlers configured for the message "{messageClass}"',
-                            ['messageClass' => $messageClass], LogLevel::DEBUG
-                        );
-
-                        $deferred->resolve();
-
-                        return;
-                    }
-
-                    foreach($executors as $executor)
-                    {
-                        /**
-                         * @see \Desperado\ServiceBus\MessageExecutor\MessageExecutor::__invoke
-                         *
-                         * @var callable $executor
-                         */
-
-                        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-                        yield call($executor, $message, $context);
-                    }
-
-                    unset($executors, $messageClass);
-
-                    $deferred->resolve();
-                }
-                catch(\Throwable $throwable)
-                {
-                    $deferred->fail($throwable);
-                }
-            }
-        );
-
-        return $deferred->promise();
     }
 
     /**

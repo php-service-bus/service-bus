@@ -190,13 +190,20 @@ services:
   Desperado\ServiceBus\MessageRouter\Router:
     configurator: ['@service_bus.message_routes_configurator', configure]
 
+  # Package handler
+  Desperado\ServiceBus\EntryPoint\EntryPointProcessor:
+    class: Desperado\ServiceBus\EntryPoint\DefaultEntryPointProcessor
+    arguments:
+      $messageDecoder: '@Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder'
+      $endpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
+      $messagesRouter: '@Desperado\ServiceBus\MessageRouter\Router'
+      $logger: '@service_bus.logger'
+
   # Application entry point
   Desperado\ServiceBus\EntryPoint\EntryPoint:
     arguments:
       $transport: '@Desperado\ServiceBus\Infrastructure\Transport\Transport'
-      $messageDecoder: '@Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder'
-      $endpointRouter: '@Desperado\ServiceBus\Endpoint\EndpointRouter'
-      $messagesRouter: '@Desperado\ServiceBus\MessageRouter\Router'
+      $processor: '@Desperado\ServiceBus\EntryPoint\EntryPointProcessor'
       $logger: '@service_bus.logger'
 
   # Passing message to arguments
