@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\Transport\Package;
 
-use Amp\ByteStream\InputStream;
 use Amp\Promise;
 use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
 
@@ -46,9 +45,9 @@ interface IncomingPackage
     /**
      * Receive message body
      *
-     * @return InputStream
+     * @return string
      */
-    public function payload(): InputStream;
+    public function payload(): string ;
 
     /**
      * Receive message headers bag

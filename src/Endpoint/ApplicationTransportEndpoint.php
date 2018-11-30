@@ -112,11 +112,7 @@ final class ApplicationTransportEndpoint implements Endpoint
         AmqpTransportLevelDestination $destination
     ): OutboundPackage
     {
-        $package = new OutboundPackage(
-            new InMemoryStream($payload),
-            $options->headers(),
-            $destination
-        );
+        $package = new OutboundPackage($payload, $options->headers(), $destination);
 
         /** @var string $operationId */
         $operationId = $options->traceId();

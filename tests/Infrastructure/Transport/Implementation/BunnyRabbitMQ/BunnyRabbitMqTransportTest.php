@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Infrastructure\Transport\Implementation\BunnyRabbitMQ;
 
-use Amp\ByteStream\InMemoryStream;
 use function Amp\Promise\wait;
 use Bunny\Channel;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
@@ -175,7 +174,7 @@ final class BunnyRabbitMqTransportTest extends TestCase
         wait(
             $this->transport->send(
                 new OutboundPackage(
-                    new InMemoryStream('somePayload'),
+                    'somePayload',
                     ['key' => 'value'],
                     new AmqpTransportLevelDestination('consume', 'consume')
                 )
@@ -189,7 +188,7 @@ final class BunnyRabbitMqTransportTest extends TestCase
             $package = $iterator->getCurrent();
 
             static::assertInstanceOf(BunnyIncomingPackage::class, $package);
-            static::assertEquals('somePayload', wait($package->payload()->read()));
+            static::assertEquals('somePayload', $package->payload());
             static::assertCount(2, $package->headers());
             static::assertTrue(Uuid::isValid($package->traceId()));
 
@@ -211,7 +210,7 @@ final class BunnyRabbitMqTransportTest extends TestCase
         wait(
             $this->transport->send(
                 new OutboundPackage(
-                    new InMemoryStream('somePayload'),
+                   'somePayload',
                     ['key' => 'value'],
                     new AmqpTransportLevelDestination('consume', 'consume')
                 )

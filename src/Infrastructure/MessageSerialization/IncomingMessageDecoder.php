@@ -58,7 +58,7 @@ final class IncomingMessageDecoder
 
         /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
         Loop::defer(
-            static function() use ($package, $decodersContainer, $deferred): \Generator
+            static function() use ($package, $decodersContainer, $deferred): void
             {
                 try
                 {
@@ -79,7 +79,7 @@ final class IncomingMessageDecoder
                     $encoder = $decodersContainer->get($encoderKey);
 
                     /** @var string $payload */
-                    $payload = yield $package->payload()->read();
+                    $payload = $package->payload();
 
                     $deferred->resolve(
                         $encoder->decode($payload)

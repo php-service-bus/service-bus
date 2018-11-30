@@ -39,6 +39,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
+     * @param ContainerBuilder         $container
      * @param \Generator<\SplFileInfo> $generator
      * @param array<int, string>       $excludedFiles
      *

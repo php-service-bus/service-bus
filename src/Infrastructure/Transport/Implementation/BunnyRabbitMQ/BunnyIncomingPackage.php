@@ -13,8 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ;
 
-use Amp\ByteStream\InMemoryStream;
-use Amp\ByteStream\InputStream;
 use function Amp\call;
 use Amp\Promise;
 use Bunny\Message as BunnyEnvelope;
@@ -102,9 +100,9 @@ final class BunnyIncomingPackage implements IncomingPackage
     /**
      * @inheritDoc
      */
-    public function payload(): InputStream
+    public function payload(): string
     {
-        return new InMemoryStream($this->originMessage->content);
+        return $this->originMessage->content;
     }
 
     /**

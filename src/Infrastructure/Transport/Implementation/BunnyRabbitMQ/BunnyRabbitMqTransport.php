@@ -237,7 +237,7 @@ final class BunnyRabbitMqTransport implements Transport
                         'expiration'    => $outboundPackage->expiredAfter()
                     ]));
 
-                    $content = yield $outboundPackage->payload()->read();
+                    $content = $outboundPackage->payload();
 
                     $logger->debug('Publish message to "{rabbitMqExchange}" with routing key "{rabbitMqRoutingKey}"', [
                         'traceId'            => $outboundPackage->traceId(),

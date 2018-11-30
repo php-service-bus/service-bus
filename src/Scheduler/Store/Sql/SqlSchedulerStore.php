@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Scheduler\Store\Sql;
 
 use function Amp\asyncCall;
 use Amp\Coroutine;
-use Amp\Promise;
 use function Desperado\ServiceBus\Common\datetimeToString;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
