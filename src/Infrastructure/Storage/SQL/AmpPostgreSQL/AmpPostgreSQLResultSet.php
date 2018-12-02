@@ -18,7 +18,6 @@ use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ResultSetIterationFailed;
 use Desperado\ServiceBus\Infrastructure\Storage\ResultSet;
-use Amp\Postgres\PgSqlResultSet;
 use Amp\Sql\ResultSet as AmpResultSet;
 use Amp\Postgres\PooledResultSet;
 
@@ -41,11 +40,6 @@ class AmpPostgreSQLResultSet implements ResultSet
     public function __construct(object $originalResultSet)
     {
         $this->originalResultSet = $originalResultSet;
-    }
-
-    public function __destruct()
-    {
-        unset($this->originalResultSet);
     }
 
     /**
@@ -94,7 +88,7 @@ class AmpPostgreSQLResultSet implements ResultSet
     {
         try
         {
-            if($this->originalResultSet instanceof PgSqlResultSet)
+            if($this->originalResultSet instanceof PooledResultSet)
             {
                 $result = $this->originalResultSet->getCurrent();
 

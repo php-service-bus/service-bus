@@ -60,6 +60,15 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
         );
     }
 
+    public function __destruct()
+    {
+        /** @psalm-suppress RedundantConditionGivenDocblockType Null in case of error */
+        if(null !== $this->pool)
+        {
+            $this->pool->close();
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -73,21 +82,9 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
             {
                 try
                 {
-                    /** @var \Amp\Sql\Link $connection */
-                    $connection = yield $connectionsPool->extractConnection();
-
-                    /** @var \Amp\Sql\Statement $statement */
-                    $statement = yield $connection->prepare($queryString);
-
-                    $resultSet = new AmpPostgreSQLResultSet(
-                        yield $statement->execute($parameters)
+                    return new AmpPostgreSQLResultSet(
+                        yield $connectionsPool->execute($queryString, $parameters)
                     );
-
-                    $connection->close();
-
-                    unset($connection, $statement);
-
-                    return $resultSet;
                 }
                 catch(\Throwable $throwable)
                 {

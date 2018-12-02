@@ -51,15 +51,9 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
             {
                 try
                 {
-                    /** @var \Amp\Sql\Statement $statement */
-                    $statement = yield $transaction->prepare($queryString);
-
-                    /** @var \Amp\Postgres\PooledResultSet $result */
-                    $result = yield $statement->execute($parameters);
-
-                    unset($statement);
-
-                    return new AmpPostgreSQLResultSet($result);
+                    return new AmpPostgreSQLResultSet(
+                        yield $transaction->execute($queryString, $parameters)
+                    );
                 }
                     // @codeCoverageIgnoreStart
                 catch(\Throwable $throwable)

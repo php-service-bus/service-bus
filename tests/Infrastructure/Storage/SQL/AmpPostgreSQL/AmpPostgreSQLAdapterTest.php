@@ -26,6 +26,11 @@ use Desperado\ServiceBus\Tests\Infrastructure\Storage\SQL\BaseStorageAdapterTest
 final class AmpPostgreSQLAdapterTest extends BaseStorageAdapterTest
 {
     /**
+     * @var AmpPostgreSQLAdapter
+     */
+    private static $adapter;
+
+    /**
      * @return void
      *
      * @throws \Throwable
@@ -52,6 +57,8 @@ final class AmpPostgreSQLAdapterTest extends BaseStorageAdapterTest
 
         wait($adapter->execute('DROP TABLE storage_test_table'));
         wait($adapter->execute('DROP TABLE test_ai'));
+
+        self::$adapter = null;
     }
 
     /**
@@ -59,10 +66,15 @@ final class AmpPostgreSQLAdapterTest extends BaseStorageAdapterTest
      */
     protected static function getAdapter(): StorageAdapter
     {
-        return StorageAdapterFactory::create(
-            AmpPostgreSQLAdapter::class,
-            (string) \getenv('TEST_POSTGRES_DSN')
-        );
+        if(null === self::$adapter)
+        {
+            self::$adapter = StorageAdapterFactory::create(
+                AmpPostgreSQLAdapter::class,
+                (string) \getenv('TEST_POSTGRES_DSN')
+            );
+        }
+
+        return self::$adapter;
     }
 
     /**
