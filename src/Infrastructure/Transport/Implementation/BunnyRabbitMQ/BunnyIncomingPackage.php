@@ -145,7 +145,7 @@ final class BunnyIncomingPackage implements IncomingPackage
             {
                 try
                 {
-                    yield $this->channel->nack($this->originMessage, false, $requeue);
+                    yield $this->channel->nack($this->originMessage->deliveryTag, false, $requeue);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -167,7 +167,7 @@ final class BunnyIncomingPackage implements IncomingPackage
             {
                 try
                 {
-                    yield $this->channel->reject($this->originMessage, $requeue);
+                    yield $this->channel->reject($this->originMessage->deliveryTag, $requeue);
                 }
                 catch(\Throwable $throwable)
                 {
