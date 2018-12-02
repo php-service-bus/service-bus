@@ -357,27 +357,22 @@ final class BunnyClientOverride extends Client
     public function reject($channel, $deliveryTag, $requeue = true): Promise
     {
         /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
+         * @var int $channel
+         * @var int $deliveryTag
          */
-        return call(
-            function(int $channel, int $deliveryTag, bool $requeue): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
 
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(13);
-                $buffer->appendUint16(60);
-                $buffer->appendUint16(90);
-                $buffer->appendInt64($deliveryTag);
-                $this->getWriter()->appendBits([$requeue], $buffer);
-                $buffer->appendUint8(206);
+        $buffer = $this->getWriteBuffer();
 
-                return yield $this->flushWriteBuffer();
-            },
-            $channel, $deliveryTag, $requeue
-        );
+        $buffer->appendUint8(1);
+        $buffer->appendUint16($channel);
+        $buffer->appendUint32(13);
+        $buffer->appendUint16(60);
+        $buffer->appendUint16(90);
+        $buffer->appendInt64($deliveryTag);
+        $this->getWriter()->appendBits([$requeue], $buffer);
+        $buffer->appendUint8(206);
+
+        return $this->flushWriteBuffer();
     }
 
     /**
@@ -390,27 +385,19 @@ final class BunnyClientOverride extends Client
      */
     public function recoverAsync($channel, $requeue = false): Promise
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, bool $requeue): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
+        /** @var int $channel */
 
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(5);
-                $buffer->appendUint16(60);
-                $buffer->appendUint16(100);
-                $this->getWriter()->appendBits([$requeue], $buffer);
-                $buffer->appendUint8(206);
+        $buffer = $this->getWriteBuffer();
 
-                return yield $this->flushWriteBuffer();
-            },
-            $channel, $requeue
-        );
+        $buffer->appendUint8(1);
+        $buffer->appendUint16($channel);
+        $buffer->appendUint32(5);
+        $buffer->appendUint16(60);
+        $buffer->appendUint16(100);
+        $this->getWriter()->appendBits([$requeue], $buffer);
+        $buffer->appendUint8(206);
+
+        return $this->flushWriteBuffer();
     }
 
     /**
@@ -460,27 +447,22 @@ final class BunnyClientOverride extends Client
     public function nack($channel, $deliveryTag = 0, $multiple = false, $requeue = true): Promise
     {
         /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
+         * @var int $channel
+         * @var int $deliveryTag
          */
-        return call(
-            function(int $channel, int $deliveryTag, bool $multiple, bool $requeue): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
 
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(13);
-                $buffer->appendUint16(60);
-                $buffer->appendUint16(120);
-                $buffer->appendInt64($deliveryTag);
-                $this->getWriter()->appendBits([$multiple, $requeue], $buffer);
-                $buffer->appendUint8(206);
+        $buffer = $this->getWriteBuffer();
 
-                return yield $this->flushWriteBuffer();
-            },
-            $channel, $deliveryTag, $multiple, $requeue
-        );
+        $buffer->appendUint8(1);
+        $buffer->appendUint16($channel);
+        $buffer->appendUint32(13);
+        $buffer->appendUint16(60);
+        $buffer->appendUint16(120);
+        $buffer->appendInt64($deliveryTag);
+        $this->getWriter()->appendBits([$multiple, $requeue], $buffer);
+        $buffer->appendUint8(206);
+
+        return $this->flushWriteBuffer();
     }
 
     /**
@@ -1012,7 +994,8 @@ final class BunnyClientOverride extends Client
             return $flushWriteBufferPromise;
         }
 
-        $deferred           = new Deferred();
+        $deferred = new Deferred();
+
         $this->writeWatcher = Loop::onWritable(
             $this->getStream(),
             function() use ($deferred): void

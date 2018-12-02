@@ -56,11 +56,11 @@ final class BunnyConsumer
     private $tag;
 
     /**
-     * Current in progress messages
+     * Current in progress messages count
      *
-     * @var array<string, bool>
+     * @var int
      */
-    private static $messagesInProcess = [];
+    private static $messagesInProcessCount = 0;
 
     /**
      * @param AmqpQueue            $queue
@@ -133,13 +133,9 @@ final class BunnyConsumer
     {
         return static function(BunnyEnvelope $envelope, BunnyChannelOverride $channel) use ($logger, $onMessageReceived): void
         {
-            $id = uuid();
-
-            $inProgressCount = \count(self::$messagesInProcess);
-
-            if(self::MAX_PROCESSED_MESSAGES_COUNT >= $inProgressCount)
+            if(self::MAX_PROCESSED_MESSAGES_COUNT >= self::$messagesInProcessCount)
             {
-                self::$messagesInProcess[$id] = true;
+                self::$messagesInProcessCount++;
 
                 /** Trace ID */
                 if(false === isset($envelope->headers[Transport::SERVICE_BUS_TRACE_HEADER]))
@@ -174,7 +170,7 @@ final class BunnyConsumer
                 }
                 finally
                 {
-                    unset(self::$messagesInProcess[$id]);
+                    self::$messagesInProcessCount--;
                 }
             }
         };
