@@ -38,4 +38,44 @@ final class PropertyNormalizerWrapper extends PropertyNormalizer
     {
         return $reflectionClass->newInstanceWithoutConstructor();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
+    {
+        $extractClosure = \Closure::bind(
+            function() use ($attribute)
+            {
+                return true === isset($this->{$attribute}) ? $this->{$attribute} : null;
+            },
+            $object, $object
+        );
+
+        return $extractClosure($object);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []): void
+    {
+        $extractClosure = \Closure::bind(
+            function() use ($attribute, $value)
+            {
+                $this->{$attribute} = $value;
+            },
+            $object, $object
+        );
+
+        $extractClosure($object);
+    }
 }

@@ -21,6 +21,13 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class PropertyNameConverter implements NameConverterInterface
 {
     /**
+     * Local cache
+     *
+     * @var array<string, string>
+     */
+    private $localStorage;
+
+    /**
      * @inheritdoc
      */
     public function normalize($propertyName): string
@@ -33,16 +40,20 @@ final class PropertyNameConverter implements NameConverterInterface
      */
     public function denormalize($propertyName): string
     {
-        /** @var string $result */
-        $result = \preg_replace_callback(
-            '/_(.?)/',
-            static function(array $matches): string
-            {
-                return \ucfirst((string) $matches[1]);
-            },
-            $propertyName
-        );
+        if(false === isset($this->cache[$propertyName]))
+        {
+            $this->localStorage[$propertyName] = \lcfirst(
+                \preg_replace_callback(
+                    '/_(.?)/',
+                    static function(array $matches): string
+                    {
+                        return \ucfirst((string) $matches[1]);
+                    },
+                    $propertyName
+                )
+            );
+        }
 
-        return \lcfirst($result);
+        return $this->localStorage[$propertyName];
     }
 }
