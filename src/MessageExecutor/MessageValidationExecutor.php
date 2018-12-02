@@ -43,7 +43,7 @@ final class MessageValidationExecutor implements MessageExecutor
     private $validationGroups;
 
     /**
-     * @param MessageExecutor    $processor
+     * @param MessageExecutor    $executor
      * @param array<int, string> $validationGroups
      */
     public function __construct(MessageExecutor $executor, array $validationGroups)

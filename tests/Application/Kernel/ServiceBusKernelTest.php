@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Application\Kernel;
 
-use Amp\ByteStream\InMemoryStream;
 use function Amp\Promise\wait;
 use Bunny\Channel;
 use Desperado\ServiceBus\Application\Bootstrap;
@@ -147,7 +146,7 @@ final class ServiceBusKernelTest extends TestCase
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
-        static::assertCount(7, $records);
+        static::assertCount(6, $records);
 
         $latest = \end($records);
 
@@ -175,7 +174,7 @@ final class ServiceBusKernelTest extends TestCase
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
-        static::assertCount(7, $records);
+        static::assertCount(6, $records);
 
         $latest = \end($records);
         \reset($records);
@@ -279,7 +278,7 @@ final class ServiceBusKernelTest extends TestCase
 
         $promise = $this->kernel->transport()->send(
             new OutboundPackage(
-                new InMemoryStream($encoder->encode($message)),
+                $encoder->encode($message),
                 $headers,
                 new AmqpTransportLevelDestination('test_topic', 'tests')
             )

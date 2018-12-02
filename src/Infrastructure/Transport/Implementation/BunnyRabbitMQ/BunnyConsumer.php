@@ -28,10 +28,7 @@ use Bunny\Message as BunnyEnvelope;
  */
 final class BunnyConsumer
 {
-    /** Maximum number of messages to be executed simultaneously */
-    private const MAX_PROCESSED_MESSAGES_COUNT = 50;
-
-    /**
+     /**
      * @var BunnyChannelOverride
      */
     private $channel;
@@ -54,13 +51,6 @@ final class BunnyConsumer
      * @var string|null
      */
     private $tag;
-
-    /**
-     * Current in progress messages
-     *
-     * @var array<string, bool>
-     */
-    private static $messagesInProcess = [];
 
     /**
      * @param AmqpQueue            $queue
@@ -133,49 +123,36 @@ final class BunnyConsumer
     {
         return static function(BunnyEnvelope $envelope, BunnyChannelOverride $channel) use ($logger, $onMessageReceived): void
         {
-            $id = uuid();
-
-            $inProgressCount = \count(self::$messagesInProcess);
-
-            if(self::MAX_PROCESSED_MESSAGES_COUNT >= $inProgressCount)
+            /** Trace ID */
+            if(false === isset($envelope->headers[Transport::SERVICE_BUS_TRACE_HEADER]))
             {
-                self::$messagesInProcess[$id] = true;
+                $envelope->headers[Transport::SERVICE_BUS_TRACE_HEADER] = uuid();
+            }
 
-                /** Trace ID */
-                if(false === isset($envelope->headers[Transport::SERVICE_BUS_TRACE_HEADER]))
-                {
-                    $envelope->headers[Transport::SERVICE_BUS_TRACE_HEADER] = uuid();
-                }
+            try
+            {
+                $package = BunnyIncomingPackage::received($channel, $envelope);
 
-                try
-                {
-                    $package = BunnyIncomingPackage::received($channel, $envelope);
+                $logger->debug('New message received', [
+                    'packageId'         => $package->id(),
+                    'traceId'           => $package->traceId(),
+                    'rawMessagePayload' => $envelope->content,
+                    'rawMessageHeaders' => $envelope->headers
+                ]);
 
-                    $logger->debug('New message received', [
-                        'packageId'         => $package->id(),
-                        'traceId'           => $package->traceId(),
-                        'rawMessagePayload' => $envelope->content,
-                        'rawMessageHeaders' => $envelope->headers
-                    ]);
+                /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+                asyncCall($onMessageReceived, $package);
 
-                    /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-                    asyncCall($onMessageReceived, $package);
-
-                    unset($package);
-                }
-                catch(\Throwable $throwable)
-                {
-                    $logger->error('Error occurred: {throwableMessage}', [
-                            'throwableMessage'  => $throwable->getMessage(),
-                            'throwablePoint'    => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
-                            'rawMessagePayload' => $envelope->content
-                        ]
-                    );
-                }
-                finally
-                {
-                    unset(self::$messagesInProcess[$id]);
-                }
+                unset($package);
+            }
+            catch(\Throwable $throwable)
+            {
+                $logger->error('Error occurred: {throwableMessage}', [
+                        'throwableMessage'  => $throwable->getMessage(),
+                        'throwablePoint'    => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
+                        'rawMessagePayload' => $envelope->content
+                    ]
+                );
             }
         };
     }

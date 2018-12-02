@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\Transport\Package;
 
-use Amp\ByteStream\InputStream;
 use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
 
 /**
@@ -24,7 +23,7 @@ final class OutboundPackage
     /**
      * Message body
      *
-     * @var InputStream
+     * @var string
      */
     private $payload;
 
@@ -78,11 +77,11 @@ final class OutboundPackage
     private $traceId;
 
     /**
-     * @param InputStream                     $payload
+     * @param string                          $payload
      * @param array<string, string|int|float> $headers
      * @param TransportLevelDestination       $destination
      */
-    public function __construct(InputStream $payload, array $headers, TransportLevelDestination $destination)
+    public function __construct(string $payload, array $headers, TransportLevelDestination $destination)
     {
         $this->payload     = $payload;
         $this->headers     = $headers;
@@ -134,9 +133,9 @@ final class OutboundPackage
     /**
      * Receive message body
      *
-     * @return InputStream
+     * @return string
      */
-    public function payload(): InputStream
+    public function payload(): string
     {
         return $this->payload;
     }

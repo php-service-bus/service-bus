@@ -62,6 +62,19 @@ final class DeliveryOptions
 
     /**
      * @param array<string, string|int|float> $headers
+     *
+     * @return self
+     */
+    public function nonPersistent(array $headers = []): self
+    {
+        $self = new self($headers);
+        $self->isPersistent = false;
+
+        return $self;
+    }
+
+    /**
+     * @param array<string, string|int|float> $headers
      */
     public function __construct(array $headers = [])
     {

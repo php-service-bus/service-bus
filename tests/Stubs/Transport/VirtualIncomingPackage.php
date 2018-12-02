@@ -13,8 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Stubs\Transport;
 
-use Amp\ByteStream\InMemoryStream;
-use Amp\ByteStream\InputStream;
 use Amp\Promise;
 use Amp\Success;
 use function Desperado\ServiceBus\Common\uuid;
@@ -63,9 +61,9 @@ final class VirtualIncomingPackage implements IncomingPackage
     /**
      * @inheritDoc
      */
-    public function payload(): InputStream
+    public function payload(): string
     {
-        return new InMemoryStream($this->payload);
+        return new $this->payload;
     }
 
     /**

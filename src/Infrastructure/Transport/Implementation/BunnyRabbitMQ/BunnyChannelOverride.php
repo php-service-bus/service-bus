@@ -101,19 +101,70 @@ final class BunnyChannelOverride extends Channel
         $immediate = false
     ): Promise
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(string $body, array $headers, string $exchange, string $routingKey, bool $mandatory, bool $immediate): \Generator
-            {
-                return yield $this->getClient()->publish(
-                    $this->getChannelId(), $body, $headers, $exchange, $routingKey, $mandatory, $immediate
-                );
-            },
-            $body, $headers, $exchange, $routingKey, $mandatory, $immediate
+        /** @var Promise $promise */
+        $promise = $this->getClient()->publish(
+            $this->getChannelId(), $body, $headers, $exchange, $routingKey, $mandatory, $immediate
         );
+
+        return $promise;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MoreSpecificImplementedParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param Message $message
+     * @param bool    $multiple
+     *
+     * @return Promise
+     */
+    public function ack(Message $message, $multiple = false): Promise
+    {
+        /** @var Promise $promise */
+        $promise = $this->getClient()->ack($this->getChannelId(), $message->deliveryTag, $multiple);
+
+        return $promise;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MoreSpecificImplementedParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int  $deliveryTag
+     * @param bool $requeue
+     *
+     * @return Promise
+     */
+    public function reject($deliveryTag, $requeue = true): Promise
+    {
+        /** @var Promise $promise */
+        $promise = $this->getClient()->reject($this->getChannelId(), $deliveryTag, $requeue);
+
+        return $promise;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress MoreSpecificImplementedParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int  $deliveryTag
+     * @param bool $multiple
+     * @param bool $requeue
+     *
+     * @return Promise
+     */
+    public function nack($deliveryTag = 0, $multiple = false, $requeue = true): Promise
+    {
+        /** @var Promise $promise */
+        $promise = $this->getClient()->nack($this->getChannelId(), $deliveryTag, $multiple, $requeue);
+
+        return $promise;
     }
 
     /**

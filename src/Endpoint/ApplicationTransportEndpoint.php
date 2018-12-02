@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Endpoint;
 
-use Amp\ByteStream\InMemoryStream;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
@@ -112,11 +111,7 @@ final class ApplicationTransportEndpoint implements Endpoint
         AmqpTransportLevelDestination $destination
     ): OutboundPackage
     {
-        $package = new OutboundPackage(
-            new InMemoryStream($payload),
-            $options->headers(),
-            $destination
-        );
+        $package = new OutboundPackage($payload, $options->headers(), $destination);
 
         /** @var string $operationId */
         $operationId = $options->traceId();
