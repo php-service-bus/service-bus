@@ -48,11 +48,16 @@ final class PropertyNormalizerWrapper extends PropertyNormalizer
     }
 
     /**
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedArgument Cannot specify data type
+     * @psalm-suppress MissingReturnType Mixed return type
+     *
      * {@inheritdoc}
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
         $extractClosure = \Closure::bind(
+        /** @psalm-suppress MissingClosureReturnType Mixed return type */
             function() use ($attribute)
             {
                 return true === isset($this->{$attribute}) ? $this->{$attribute} : null;
@@ -64,12 +69,15 @@ final class PropertyNormalizerWrapper extends PropertyNormalizer
     }
 
     /**
+     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress MixedArgument Cannot specify data type
+     *
      * {@inheritdoc}
      */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []): void
     {
         $extractClosure = \Closure::bind(
-            function() use ($attribute, $value)
+            function() use ($attribute, $value): void
             {
                 $this->{$attribute} = $value;
             },

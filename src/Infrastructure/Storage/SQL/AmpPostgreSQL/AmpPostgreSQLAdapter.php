@@ -78,6 +78,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
+        /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
             static function(string $queryString, array $parameters = []) use ($connectionsPool): \Generator
             {
                 try

@@ -47,6 +47,7 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
+        /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
             static function(string $queryString, array $parameters = []) use ($transaction): \Generator
             {
                 try
