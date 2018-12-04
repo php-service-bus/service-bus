@@ -43,7 +43,7 @@ function invokeReflectionMethod(object $object, string $methodName, ...$paramete
  */
 function writeReflectionPropertyValue(object $object, string $propertyName, $value): void
 {
-    $attribute = extractReflectionProprty($object, $propertyName);
+    $attribute = extractReflectionProperty($object, $propertyName);
 
     $attribute->setAccessible(true);
     $attribute->setValue($object, $value);
@@ -63,7 +63,7 @@ function writeReflectionPropertyValue(object $object, string $propertyName, $val
  */
 function readReflectionPropertyValue(object $object, string $propertyName)
 {
-    $attribute = extractReflectionProprty($object, $propertyName);
+    $attribute = extractReflectionProperty($object, $propertyName);
 
     $attribute->setAccessible(true);
     $value = $attribute->getValue($object);
@@ -74,11 +74,14 @@ function readReflectionPropertyValue(object $object, string $propertyName)
 /**
  * Extract property
  *
+ * @param object $object
+ * @param string $propertyName
+ *
  * @return \ReflectionProperty
  *
  * @throws \Throwable
  */
-function extractReflectionProprty(object $object, string $propertyName): \ReflectionProperty
+function extractReflectionProperty(object $object, string $propertyName): \ReflectionProperty
 {
     $property = null;
 
