@@ -81,8 +81,8 @@
   "minimum-stability": "dev",
   "scripts": {
     "psalm": "./vendor/bin/psalm --config=psalm.xml",
-    "phpunit": "phpunit --configuration phpunit.xml --verbose",
-    "coverage": "phpunit --configuration phpunit.xml --coverage-html ./coverage --verbose",
+    "phpunit": "/vendor/bin/phpunit --configuration phpunit.xml --verbose",
+    "coverage": "/vendor/bin/phpunit --configuration phpunit.xml --coverage-html ./coverage --verbose",
     "test": [
       "@phpunit"
     ]
