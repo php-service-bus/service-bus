@@ -78,7 +78,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-        /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
+        /** @psalm-return AmpPostgreSQLResultSet */
             static function(string $queryString, array $parameters = []) use ($connectionsPool): \Generator
             {
                 try
@@ -114,7 +114,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-        /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
+        /** @psalm-return AmpPostgreSQLTransactionAdapter */
             static function() use ($connectionsPool): \Generator
             {
                 try

@@ -37,13 +37,13 @@ final class BunnyChannelOverride extends Channel
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @param callable(BunnyEnvelope, BunnyChannelOverride):void $callback
-     * @param string   $queue
-     * @param string   $consumerTag
-     * @param bool     $noLocal
-     * @param bool     $noAck
-     * @param bool     $exclusive
-     * @param bool     $nowait
-     * @param array    $arguments
+     * @param string $queue
+     * @param string $consumerTag
+     * @param bool   $noLocal
+     * @param bool   $noAck
+     * @param bool   $exclusive
+     * @param bool   $nowait
+     * @param array  $arguments
      *
      * @return Promise<\Bunny\Protocol\MethodBasicConsumeOkFrame>
      */
@@ -58,10 +58,7 @@ final class BunnyChannelOverride extends Channel
         $arguments = []
     ): Promise
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             function(
                 callable $callback, string $queue, string $consumerTag, bool $noLocal, bool $noAck,
@@ -369,6 +366,7 @@ final class BunnyChannelOverride extends Channel
     /**
      * @inheritdoc
      *
+     * @codeCoverageIgnore
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @throws \LogicException Not implemented
@@ -381,6 +379,7 @@ final class BunnyChannelOverride extends Channel
     /**
      * @inheritdoc
      *
+     * @codeCoverageIgnore
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @throws \LogicException Not implemented
@@ -393,6 +392,7 @@ final class BunnyChannelOverride extends Channel
     /**
      * @inheritdoc
      *
+     * @codeCoverageIgnore
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @throws \LogicException Not implemented
@@ -405,6 +405,7 @@ final class BunnyChannelOverride extends Channel
     /**
      * @inheritdoc
      *
+     * @codeCoverageIgnore
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @throws \LogicException Not implemented
@@ -417,6 +418,7 @@ final class BunnyChannelOverride extends Channel
     /**
      * @inheritdoc
      *
+     * @codeCoverageIgnore
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @throws \LogicException Not implemented
@@ -429,6 +431,7 @@ final class BunnyChannelOverride extends Channel
     /**
      * @inheritdoc
      *
+     * @codeCoverageIgnore
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
      * @throws \LogicException Not implemented

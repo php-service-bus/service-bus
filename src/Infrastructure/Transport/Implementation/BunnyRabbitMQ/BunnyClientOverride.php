@@ -130,16 +130,12 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     * @psalm-suppress MixedArgument Cannot specify data type
      *
      * @return Promise It does not return any result
      */
     public function disconnect($replyCode = 0, $replyText = ''): Promise
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)  */
         return call(
             function(int $replyCode, string $replyText): \Generator
             {
@@ -1909,9 +1905,8 @@ final class BunnyClientOverride extends Client
      * Execute connect
      *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @return \Generator<null>
+     * @return \Generator
      */
     private function doConnect(): \Generator
     {

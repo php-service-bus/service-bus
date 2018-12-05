@@ -20,7 +20,6 @@ use Amp\Artax\Request;
 use Amp\Artax\Response;
 use function Amp\ByteStream\pipe;
 use function Amp\call;
-use Amp\Failure;
 use function Amp\File\open;
 use Amp\File\StatCache;
 use Amp\Promise;
@@ -75,8 +74,8 @@ final class ArtaxHttpClient implements HttpClient
     public function execute(HttpRequest $requestData): Promise
     {
         return 'GET' === $requestData->httpMethod()
-            ? $this->executeGet($requestData)
-            : $this->executePost($requestData);
+            ? Promise\adapt($this->executeGet($requestData))
+            : Promise\adapt($this->executePost($requestData));
     }
 
     /**
@@ -121,14 +120,16 @@ final class ArtaxHttpClient implements HttpClient
      *
      * @param HttpRequest $requestData
      *
-     * @return Promise<\GuzzleHttp\Psr7\Response>
+     * @return \Generator<\GuzzleHttp\Psr7\Response>
+     *
+     * @throws \Throwable
      */
-    private function executeGet(HttpRequest $requestData): Promise
+    private function executeGet(HttpRequest $requestData): \Generator
     {
         $request = (new Request($requestData->url(), $requestData->httpMethod()))
             ->withHeaders($requestData->headers());
 
-        return self::doRequest(
+        return yield from self::doRequest(
             $this->handler,
             $request,
             $this->logger
@@ -140,9 +141,11 @@ final class ArtaxHttpClient implements HttpClient
      *
      * @param HttpRequest $requestData
      *
-     * @return Promise<\GuzzleHttp\Psr7\Response>
+     * @return \Generator<\GuzzleHttp\Psr7\Response>
+     *
+     * @throws \Throwable
      */
-    private function executePost(HttpRequest $requestData): Promise
+    private function executePost(HttpRequest $requestData): \Generator
     {
         /** @var ArtaxFormBody|string|null $body */
         $body = $requestData->body();
@@ -155,76 +158,66 @@ final class ArtaxHttpClient implements HttpClient
             )
             ->withHeaders($requestData->headers());
 
-        return self::doRequest($this->handler, $request, $this->logger);
+        return yield from self::doRequest($this->handler, $request, $this->logger);
     }
 
     /**
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
      * @param Client          $client
      * @param Request         $request
      * @param LoggerInterface $logger
      *
-     * @return Promise<\GuzzleHttp\Psr7\Response>
+     * @return \Generator<\GuzzleHttp\Psr7\Response>
+     *
+     * @throws \Throwable
      */
-    private static function doRequest(Client $client, Request $request, LoggerInterface $logger): Promise
+    private static function doRequest(Client $client, Request $request, LoggerInterface $logger): \Generator
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function(Request $request) use ($client, $logger): \Generator
-            {
-                $requestId = uuid();
+        $requestId = uuid();
 
-                try
-                {
-                    self::logRequest($logger, $request, $requestId);
+        try
+        {
+            self::logRequest($logger, $request, $requestId);
 
-                    /** @var Psr7Response $response */
-                    $response = yield self::adaptResponse(
-                        yield $client->request($request)
-                    );
+            /** @var Response $artaxResponse */
+            $artaxResponse = yield $client->request($request);
 
-                    self::logResponse($logger, $response, $requestId);
+            /** @var Psr7Response $response */
+            $response = yield from self::adaptResponse($artaxResponse);
 
-                    return $response;
-                }
-                catch(\Throwable $throwable)
-                {
-                    self::logThrowable($logger, $throwable, $requestId);
+            unset($artaxResponse);
 
-                    return yield new Failure($throwable);
-                }
-            },
-            $request
-        );
+            self::logResponse($logger, $response, $requestId);
+
+            return $response;
+        }
+        catch(\Throwable $throwable)
+        {
+            self::logThrowable($logger, $throwable, $requestId);
+
+            throw $throwable;
+        }
     }
 
     /**
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
      * @param Response $response
      *
-     * @return Promise<\GuzzleHttp\Psr7\Response>
+     * @return \Generator<\GuzzleHttp\Psr7\Response>
      */
-    private static function adaptResponse(Response $response): Promise
+    private static function adaptResponse(Response $response): \Generator
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            /** @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator */
-            static function(Response $response): \Generator
-            {
-                /** @psalm-suppress InvalidCast Invalid read stream handle */
-                $responseBody = (string) yield $response->getBody();
+        /** @psalm-suppress InvalidCast Invalid read stream handle */
+        $responseBody = (string) yield $response->getBody();
 
-                return new Psr7Response(
-                    $response->getStatus(),
-                    $response->getHeaders(),
-                    $responseBody,
-                    $response->getProtocolVersion(),
-                    $response->getReason()
-                );
-            },
-            $response
+        return new Psr7Response(
+            $response->getStatus(),
+            $response->getHeaders(),
+            $responseBody,
+            $response->getProtocolVersion(),
+            $response->getReason()
         );
     }
 

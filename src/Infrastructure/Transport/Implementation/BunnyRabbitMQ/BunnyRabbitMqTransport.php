@@ -310,14 +310,14 @@ final class BunnyRabbitMqTransport implements Transport
         return call(
             function(AmqpExchange $exchange, array $binds): \Generator
             {
+                /** @var array<mixed, \Desperado\ServiceBus\Infrastructure\Transport\TopicBind> $binds */
+
                 yield $this->connect();
 
                 /** @var BunnyChannelOverride $channel */
                 $channel = $this->channel;
 
                 yield from self::doCreateExchange($channel, $exchange);
-
-                /** @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise */
                 yield from self::doBindExchange($channel, $exchange, $binds);
 
                 unset($channel);
@@ -337,13 +337,14 @@ final class BunnyRabbitMqTransport implements Transport
         return call(
             function(AmqpQueue $queue, array $binds): \Generator
             {
+                /** @var array<mixed, \Desperado\ServiceBus\Infrastructure\Transport\QueueBind> $binds */
+
                 yield $this->connect();
 
                 /** @var BunnyChannelOverride $channel */
                 $channel = $this->channel;
 
                 yield from self::doCreateQueue($channel, $queue);
-                /** @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise */
                 yield from self::doBindQueue($channel, $queue, $binds);
 
                 unset($channel);
