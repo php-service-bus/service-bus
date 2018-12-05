@@ -65,7 +65,7 @@ final class DeliveryOptions
      *
      * @return self
      */
-    public function nonPersistent(array $headers = []): self
+    public static function nonPersistent(array $headers = []): self
     {
         $self = new self($headers);
         $self->isPersistent = false;
