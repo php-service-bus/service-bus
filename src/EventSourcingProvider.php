@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use function Desperado\ServiceBus\Common\createWithoutConstructor;
@@ -116,7 +115,7 @@ final class EventSourcingProvider
                     }
 
                     /** @var StoredAggregateEventStream|null $storedEventStream */
-                    $storedEventStream = yield new Coroutine($storage->loadStream($id, $fromStreamVersion));
+                    $storedEventStream = yield from $storage->loadStream($id, $fromStreamVersion);
 
                     $aggregate = self::restoreStream($aggregate, $storedEventStream, $transformer);
 
@@ -170,8 +169,8 @@ final class EventSourcingProvider
                     $storedEventStream = $transformer->streamToStoredRepresentation($eventStream);
 
                     true === self::isNewEventStream($receivedEvents)
-                        ? yield new Coroutine($storage->saveStream($storedEventStream))
-                        : yield new Coroutine($storage->appendStream($storedEventStream));
+                        ? yield from $storage->saveStream($storedEventStream)
+                        : yield from $storage->appendStream($storedEventStream);
 
                     /** @var AggregateSnapshot|null $loadedSnapshot */
                     $loadedSnapshot = yield $snapshotter->load($aggregate->id());
@@ -181,7 +180,7 @@ final class EventSourcingProvider
                         yield $snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
                     }
 
-                    yield new Coroutine(self::publishEvents($receivedEvents, $context));
+                    yield from self::publishEvents($receivedEvents, $context);
 
                     unset($eventStream, $receivedEvents, $loadedSnapshot);
                 }

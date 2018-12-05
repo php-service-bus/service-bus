@@ -15,14 +15,10 @@ namespace Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabb
 
 use function Amp\asyncCall;
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use Bunny\Channel;
-use Bunny\ChannelModeEnum;
-use Bunny\ChannelStateEnum;
-use Bunny\Constants;
-use Bunny\Exception\ChannelException;
 use Bunny\Message;
-use Bunny\Protocol as AmqpProtocol;
 
 /**
  * The library (jakubkulhan/bunny) architecture does not allow to expand its functionality correctly
@@ -34,8 +30,10 @@ use Bunny\Protocol as AmqpProtocol;
 final class BunnyChannelOverride extends Channel
 {
     /**
-     * @psalm-suppress MissingParamType Cannot specify data type
+     * @inheritdoc
+     *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the promise
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @param callable $callback
@@ -71,7 +69,7 @@ final class BunnyChannelOverride extends Channel
             ): \Generator
             {
                 /** @var \Bunny\Protocol\MethodBasicConsumeOkFrame $response */
-                $response = yield $this->getClient()->consume(
+                $response = yield from $this->getClient()->consume(
                     $this->getChannelId(), $queue, $consumerTag, $noLocal, $noAck, $exclusive, $nowait, $arguments
                 );
 
@@ -86,9 +84,33 @@ final class BunnyChannelOverride extends Channel
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param string $consumerTag
+     * @param bool   $nowait
+     *
+     * @return Promise
+     */
+    public function cancel($consumerTag, $nowait = false): Promise
+    {
+        /** @var \Generator $generator */
+        $generator = $this->getClient()->cancel($consumerTag, $nowait);
+
+        return new Coroutine($generator);
+    }
+
+    /**
+     * @inheritdoc
+     *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
+     * @param string      $body
+     * @param array       $headers
+     * @param string      $exchange
+     * @param string|null $routingKey
+     * @param bool        $mandatory
+     * @param bool        $immediate
      *
      * @return Promise<bool>
      */
@@ -168,149 +190,53 @@ final class BunnyChannelOverride extends Channel
     }
 
     /**
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
      * @inheritdoc
      *
-     * @return Promise<\Bunny\Protocol\MethodConfirmSelectOkFrame>
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @return Promise
      */
-    public function confirmSelect(callable $callback = null, $nowait = false): Promise
+    public function exchangeDelete($exchange, $ifUnused = false, $nowait = false): Promise
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(?callable $callback, bool $nowait): \Generator
-            {
-                if($this->mode !== ChannelModeEnum::REGULAR)
-                {
-                    throw new ChannelException(
-                        'Channel not in regular mode, cannot change to transactional model'
-                    );
-                }
+        /** @var \Generator $generator */
+        $generator = $this->getClient()->exchangeDelete($this->getChannelId(), $exchange, $ifUnused, $nowait);
 
-                /** @var AmqpProtocol\MethodConfirmSelectOkFrame $response */
-                $response = yield $this->getClient()->confirmSelect($this->getChannelId(), $nowait);
-
-                $this->mode        = ChannelModeEnum::CONFIRM;
-                $this->deliveryTag = 0;
-
-                if(null !== $callback)
-                {
-                    $this->addAckListener($callback);
-                }
-
-                return $response;
-            },
-            $callback, $nowait
-        );
+        return new Coroutine($generator);
     }
 
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
-     * @return Promise<\Bunny\Message|bool>
+     * @param string $exchange
+     * @param string $exchangeType
+     * @param bool   $passive
+     * @param bool   $durable
+     * @param bool   $autoDelete
+     * @param bool   $internal
+     * @param bool   $nowait
+     * @param array  $arguments
+     *
+     * @return Promise
      */
-    public function get($queue = '', $noAck = false): Promise
+    public function exchangeDeclare(
+        $exchange,
+        $exchangeType = 'direct',
+        $passive = false,
+        $durable = false,
+        $autoDelete = false,
+        $internal = false,
+        $nowait = false,
+        $arguments = []
+    ): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            function(string $queue, bool $noAck): \Generator
-            {
-                /** @var AmqpProtocol\AbstractFrame $response */
-                $response = yield $this->getClient()->get($this->getChannelId(), $queue, $noAck);
-
-                if($response instanceof AmqpProtocol\MethodBasicGetEmptyFrame)
-                {
-                    return null;
-                }
-
-                if($response instanceof AmqpProtocol\MethodBasicGetOkFrame)
-                {
-                    return yield $this->getMessage($response);
-                }
-
-                throw new \LogicException('This statement should never be reached.');
-            },
-            $queue, $noAck
+        /** @var \Generator $generator */
+        $generator = $this->getClient()->exchangeDeclare(
+            $this->getChannelId(), $exchange, $exchangeType, $passive, $durable, $autoDelete, $internal, $nowait, $arguments
         );
-    }
 
-    /**
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @param AmqpProtocol\MethodBasicGetOkFrame $frame
-     *
-     * @return Promise<\Bunny\Message|bool>
-     */
-    private function getMessage(AmqpProtocol\MethodBasicGetOkFrame $frame): Promise
-    {
-        $amqpClient = $this->getClient();
-
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            function(AmqpProtocol\MethodBasicGetOkFrame $frame) use ($amqpClient): \Generator
-            {
-                $this->state = ChannelStateEnum::AWAITING_HEADER;
-
-                /** @var AmqpProtocol\ContentHeaderFrame $headerFrame */
-                $headerFrame = yield $this->getClient()->awaitContentHeader($this->getChannelId());
-
-                $this->headerFrame       = $headerFrame;
-                $this->bodySizeRemaining = $headerFrame->bodySize;
-                $this->state             = ChannelStateEnum::AWAITING_BODY;
-
-                while($this->bodySizeRemaining > 0)
-                {
-                    /** @var AmqpProtocol\ContentBodyFrame $bodyFrame */
-                    $bodyFrame = yield $amqpClient->awaitContentBody($this->getChannelId());
-
-                    $this->bodyBuffer->append($bodyFrame->payload);
-                    $this->bodySizeRemaining -= $bodyFrame->payloadSize;
-
-                    if(0 > $this->bodySizeRemaining)
-                    {
-                        $this->state = ChannelStateEnum::ERROR;
-
-                        $errorMessage = \sprintf('Body overflow, received %s more bytes.', -$this->bodySizeRemaining);
-
-                        yield $this->client->disconnect(
-                            Constants::STATUS_SYNTAX_ERROR,
-                            $errorMessage
-
-                        );
-
-                        throw new ChannelException($errorMessage);
-                    }
-                }
-
-                unset($bodyFrame);
-
-                $this->state = ChannelStateEnum::READY;
-                /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
-                $this->headerFrame = null;
-
-                return new Message(
-                    '',
-                    (string) $frame->deliveryTag,
-                    $frame->redelivered,
-                    $frame->exchange,
-                    $frame->routingKey,
-                    $headerFrame->toArray(),
-                    $this->bodyBuffer->consume($this->bodyBuffer->getLength())
-                );
-            },
-            $frame
-        );
+        return new Coroutine($generator);
     }
 
     /**
@@ -438,5 +364,77 @@ final class BunnyChannelOverride extends Channel
         $this->getOkFrame = null;
         /** @psalm-suppress PossiblyNullPropertyAssignmentValue Incorrect bunny contract */
         $this->headerFrame = null;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @throws \LogicException Not implemented
+     */
+    public function get($queue = '', $noAck = false): void
+    {
+        throw new \LogicException('Not implemented');
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @throws \LogicException Not implemented
+     */
+    public function run(callable $callback, $queue = '', $consumerTag = '', $noLocal = false, $noAck = false, $exclusive = false, $nowait = false, $arguments = []): void
+    {
+        throw new \LogicException('Not implemented');
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @throws \LogicException Not implemented
+     */
+    public function confirmSelect(callable $callback = null, $nowait = false): void
+    {
+        throw new \LogicException('Not implemented');
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @throws \LogicException Not implemented
+     */
+    public function txSelect(): void
+    {
+        throw new \LogicException('Not implemented');
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @throws \LogicException Not implemented
+     */
+    public function txCommit(): void
+    {
+        throw new \LogicException('Not implemented');
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @throws \LogicException Not implemented
+     */
+    public function txRollback(): void
+    {
+        throw new \LogicException('Not implemented');
     }
 }

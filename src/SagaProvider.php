@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
@@ -104,7 +103,7 @@ final class SagaProvider
                     $saga = new $sagaClass($id, $expireDate);
                     $saga->start($command);
 
-                    yield new Coroutine(self::doStore($this->store, $saga, $context, true));
+                    yield from self::doStore($this->store, $saga, $context, true);
 
                     unset($sagaClass, $sagaMetaData, $expireDate);
 
@@ -150,7 +149,7 @@ final class SagaProvider
                     $currentDatetime = datetimeInstantiator('NOW');
 
                     /** @var Saga|null $saga */
-                    $saga = yield new Coroutine(self::doLoad($this->store, $id));
+                    $saga = yield from self::doLoad($this->store, $id);
 
                     if(null === $saga)
                     {
@@ -165,7 +164,7 @@ final class SagaProvider
                         return $saga;
                     }
 
-                    yield new Coroutine($this->doCloseExpired($saga, $context));
+                    yield from $this->doCloseExpired($saga, $context);
 
                     unset($saga);
 
@@ -206,11 +205,11 @@ final class SagaProvider
                 try
                 {
                     /** @var Saga|null $existsSaga */
-                    $existsSaga = yield new Coroutine(self::doLoad($this->store, $saga->id()));
+                    $existsSaga = yield from self::doLoad($this->store, $saga->id());
 
                     if(null !== $existsSaga)
                     {
-                        yield new Coroutine(self::doStore($this->store, $saga, $context, false));
+                        yield from self::doStore($this->store, $saga, $context, false);
 
                         unset($existsSaga);
 
@@ -248,7 +247,7 @@ final class SagaProvider
         $saga = null;
 
         /** @var StoredSaga|null $savedSaga */
-        $savedSaga = yield new Coroutine($store->load($id));
+        $savedSaga = yield from $store->load($id);
 
         if(null !== $savedSaga)
         {
@@ -305,7 +304,7 @@ final class SagaProvider
                     ? $store->save($savedSaga)
                     : $store->update($savedSaga);
 
-                yield new Coroutine($generator);
+                yield from $generator;
             },
             [ConnectionFailed::class, StorageInteractingFailed::class],
             new ConstantBackoff(self::SAVE_SAGA_RETRY_DELAY)

@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Scheduler\Store\Sql;
 
 use function Amp\asyncCall;
-use Amp\Coroutine;
 use function Desperado\ServiceBus\Common\datetimeToString;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
@@ -81,9 +80,9 @@ final class SqlSchedulerStore implements SchedulerStore
             /** Receive next operation and notification about the scheduled job  */
 
             /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
-            $nextOperation = yield new Coroutine(self::fetchNextOperation($transaction));
+            $nextOperation = yield from self::fetchNextOperation($transaction);
 
-            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)  */
+            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
             asyncCall($postAdd, $operation, $nextOperation);
 
             yield $transaction->commit();
@@ -130,9 +129,9 @@ final class SqlSchedulerStore implements SchedulerStore
             unset($deleteQuery, $compiledQuery, $resultSet);
 
             /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
-            $nextOperation = yield new Coroutine(self::fetchNextOperation($transaction));
+            $nextOperation = yield from self::fetchNextOperation($transaction);
 
-            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)  */
+            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
             asyncCall($postRemove, $nextOperation);
 
             yield $transaction->commit();
@@ -158,7 +157,7 @@ final class SqlSchedulerStore implements SchedulerStore
     public function extract(ScheduledOperationId $id, callable $postExtract): \Generator
     {
         /** @var \Desperado\ServiceBus\Scheduler\Data\ScheduledOperation|null $operation */
-        $operation = yield new Coroutine(self::doLoadOperation($this->adapter, $id));
+        $operation = yield from self::doLoadOperation($this->adapter, $id);
 
         /** Scheduled operation not found */
         if(null === $operation)
@@ -190,9 +189,9 @@ final class SqlSchedulerStore implements SchedulerStore
             unset($deleteQuery, $compiledQuery, $resultSet);
 
             /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
-            $nextOperation = yield new Coroutine(self::fetchNextOperation($transaction));
+            $nextOperation = yield from self::fetchNextOperation($transaction);
 
-            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)  */
+            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
             asyncCall($postExtract, $operation, $nextOperation);
 
             yield $transaction->commit();

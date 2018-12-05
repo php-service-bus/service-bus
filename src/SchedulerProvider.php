@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Command;
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
@@ -96,7 +95,7 @@ final class SchedulerProvider
                         }
                     );
 
-                    yield new Coroutine($generator);
+                    yield from $generator;
 
                     if($context instanceof LoggingInContext)
                     {
@@ -158,7 +157,7 @@ final class SchedulerProvider
                         }
                     );
 
-                    yield new Coroutine($generator);
+                    yield from $generator;
                 }
                 catch(\Throwable $throwable)
                 {
@@ -205,7 +204,7 @@ final class SchedulerProvider
                 }
             );
 
-            yield new Coroutine($generator);
+            yield from $generator;
         }
         catch(ScheduledOperationNotFound $exception)
         {

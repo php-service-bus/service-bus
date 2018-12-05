@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ;
 
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Deferred;
 use Amp\Emitter;
 use Amp\Loop;
@@ -96,7 +95,7 @@ final class BunnyRabbitMqTransport implements Transport
     )
     {
         $this->connectionConfig = $connectionConfig;
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger           = $logger ?? new NullLogger();
 
         $this->client = new BunnyClientOverride(
             $this->connectionConfig,
@@ -126,7 +125,7 @@ final class BunnyRabbitMqTransport implements Transport
                     /** @var BunnyChannelOverride $channel */
                     $channel = yield $this->client->channel();
 
-                    $this->channel = $channel;
+                    $this->channel     = $channel;
                     $this->isConnected = true;
 
                     $this->logger->info('Connected to {transportHost}:{transportPort}', [
@@ -187,7 +186,7 @@ final class BunnyRabbitMqTransport implements Transport
                 /** @var BunnyChannelOverride $channel */
                 $channel = $this->channel;
 
-                $emitter = new Emitter();
+                $emitter  = new Emitter();
                 $consumer = new BunnyConsumer($queue, $channel, $this->logger);
 
                 $consumer->listen(
@@ -214,8 +213,8 @@ final class BunnyRabbitMqTransport implements Transport
     public function send(OutboundPackage $outboundPackage): Promise
     {
         /** @var BunnyChannelOverride|null $channel */
-        $channel = $this->channel;
-        $logger = $this->logger;
+        $channel  = $this->channel;
+        $logger   = $this->logger;
         $deferred = new Deferred();
 
         Loop::defer(
@@ -232,7 +231,7 @@ final class BunnyRabbitMqTransport implements Transport
 
                     /** @var \Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination $destination */
                     $destination = $outboundPackage->destination();
-                    $headers = \array_filter(\array_merge($outboundPackage->headers(), [
+                    $headers     = \array_filter(\array_merge($outboundPackage->headers(), [
                         'delivery-mode' => true === $outboundPackage->isPersistent() ? self::AMQP_DURABLE : null,
                         'expiration'    => $outboundPackage->expiredAfter()
                     ]));
@@ -316,9 +315,10 @@ final class BunnyRabbitMqTransport implements Transport
                 /** @var BunnyChannelOverride $channel */
                 $channel = $this->channel;
 
-                yield new Coroutine(self::doCreateExchange($channel, $exchange));
+                yield from self::doCreateExchange($channel, $exchange);
+
                 /** @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise */
-                yield new Coroutine(self::doBindExchange($channel, $exchange, $binds));
+                yield from self::doBindExchange($channel, $exchange, $binds);
 
                 unset($channel);
             },
@@ -342,9 +342,9 @@ final class BunnyRabbitMqTransport implements Transport
                 /** @var BunnyChannelOverride $channel */
                 $channel = $this->channel;
 
-                yield new Coroutine(self::doCreateQueue($channel, $queue));
+                yield from self::doCreateQueue($channel, $queue);
                 /** @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise */
-                yield new Coroutine(self::doBindQueue($channel, $queue, $binds));
+                yield from self::doBindQueue($channel, $queue, $binds);
 
                 unset($channel);
             },
@@ -397,7 +397,7 @@ final class BunnyRabbitMqTransport implements Transport
                 /** @var AmqpExchange $sourceExchange */
                 $sourceExchange = $bind->topic();
 
-                yield new Coroutine(self::doCreateExchange($channel, $sourceExchange));
+                yield from self::doCreateExchange($channel, $sourceExchange);
                 yield $channel->exchangeBind((string) $sourceExchange, (string) $exchange, (string) $bind->routingKey());
             }
         }
@@ -450,7 +450,7 @@ final class BunnyRabbitMqTransport implements Transport
                 /** @var AmqpExchange $destinationExchange */
                 $destinationExchange = $bind->topic();
 
-                yield new Coroutine(self::doCreateExchange($channel, $destinationExchange));
+                yield from self::doCreateExchange($channel, $destinationExchange);
 
                 yield $channel->queueBind((string) $queue, (string) $destinationExchange, (string) $bind->routingKey());
             }
