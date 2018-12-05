@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\EventSourcingSnapshots;
 
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
@@ -90,7 +89,7 @@ final class Snapshotter
                 try
                 {
                     /** @var StoredAggregateSnapshot|null $storedSnapshot */
-                    $storedSnapshot = yield new Coroutine($storage->load($id));
+                    $storedSnapshot = yield from $storage->load($id);
 
                     if(null !== $storedSnapshot)
                     {
@@ -133,17 +132,15 @@ final class Snapshotter
             {
                 try
                 {
-                    yield new Coroutine($storage->remove($snapshot->aggregate()->id()));
-                    yield new Coroutine(
-                        $storage->save(
-                            new StoredAggregateSnapshot(
-                                (string) $snapshot->aggregate()->id(),
-                                \get_class($snapshot->aggregate()->id()),
-                                \get_class($snapshot->aggregate()),
-                                $snapshot->version(),
-                                \serialize($snapshot->aggregate()),
-                                \date('Y-m-d H:i:s')
-                            )
+                    yield from $storage->remove($snapshot->aggregate()->id());
+                    yield from $storage->save(
+                        new StoredAggregateSnapshot(
+                            (string) $snapshot->aggregate()->id(),
+                            \get_class($snapshot->aggregate()->id()),
+                            \get_class($snapshot->aggregate()),
+                            $snapshot->version(),
+                            \serialize($snapshot->aggregate()),
+                            \date('Y-m-d H:i:s')
                         )
                     );
                 }

@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\EntryPoint;
 
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Loop;
 use Amp\Promise;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
@@ -92,7 +91,7 @@ final class EntryPoint
 
                     try
                     {
-                        yield (new Coroutine($processor->handle($package)));
+                        yield from $processor->handle($package);
                     }
                     catch(\Throwable $throwable)
                     {

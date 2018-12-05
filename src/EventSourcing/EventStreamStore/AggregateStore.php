@@ -24,8 +24,6 @@ interface AggregateStore
     /**
      * Save new event stream
      *
-     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
-     *
      * @param StoredAggregateEventStream $aggregateEventStream
      *
      * @return \Generator It does not return any result
@@ -38,8 +36,6 @@ interface AggregateStore
     /**
      * Append events to exists stream
      *
-     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
-     *
      * @param StoredAggregateEventStream $aggregateEventStream
      *
      * @return \Generator It does not return any result
@@ -51,7 +47,7 @@ interface AggregateStore
     /**
      * Load event stream
      *
-     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     * @psalm-return \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStream|null
      *
      * @param AggregateId $id
      * @param int         $fromVersion
@@ -69,8 +65,6 @@ interface AggregateStore
 
     /**
      * Marks stream closed
-     *
-     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
      * @param AggregateId $id
      *

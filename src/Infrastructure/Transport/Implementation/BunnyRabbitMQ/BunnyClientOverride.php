@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ;
 
-use React\Promise\PromiseInterface as ReactPromise;
 use function Amp\call;
 use Amp\Coroutine;
 use Amp\Deferred;
@@ -131,16 +130,12 @@ final class BunnyClientOverride extends Client
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     * @psalm-suppress MixedArgument Cannot specify data type
      *
      * @return Promise It does not return any result
      */
     public function disconnect($replyCode = 0, $replyText = ''): Promise
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)  */
         return call(
             function(int $replyCode, string $replyText): \Generator
             {
@@ -166,7 +161,7 @@ final class BunnyClientOverride extends Client
                     }
                 }
 
-                yield $this->connectionClose($replyCode, $replyText, 0, 0);
+                yield from $this->connectionClose($replyCode, $replyText, 0, 0);
 
                 $this->cancelReadWatcher();
                 $this->cancelWriteWatcher();
@@ -198,7 +193,7 @@ final class BunnyClientOverride extends Client
 
                     $this->channels[$channelId] = new BunnyChannelOverride($this, $channelId);
 
-                    yield $this->channelOpen($channelId);
+                    yield from $this->channelOpen($channelId);
 
                     return $this->channels[$channelId];
                 }
@@ -212,6 +207,8 @@ final class BunnyClientOverride extends Client
 
     /**
      * @inheritdoc
+     *
+     * @internal
      *
      * @return Promise It does not return any result
      */
@@ -251,639 +248,240 @@ final class BunnyClientOverride extends Client
 
     /**
      * @inheritdoc
+     * @internal
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the generator
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @return Promise<\Bunny\Protocol\MethodBasicConsumeOkFrame>
+     * @param int    $channel
+     * @param string $queue
+     * @param string $consumerTag
+     * @param bool   $noLocal
+     * @param bool   $noAck
+     * @param bool   $exclusive
+     * @param bool   $nowait
+     * @param array  $arguments
+     *
+     * @return \Generator<\Bunny\Protocol\MethodBasicConsumeOkFrame>
      */
     public function consume(
         $channel, $queue = '', $consumerTag = '', $noLocal = false, $noAck = false,
         $exclusive = false, $nowait = false, $arguments = []
-    ): Promise
+    ): \Generator
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(
-                int $channel, string $queue, string $consumerTag, bool $noLocal, bool $noAck,
-                bool $exclusive, bool $nowait, array $arguments
-            ): \Generator
-            {
-                $buffer = new AmqpProtocol\Buffer();
-                $buffer->appendUint16(60);
-                $buffer->appendUint16(20);
-                $buffer->appendInt16(0);
-                $buffer->appendUint8(\strlen($queue));
-                $buffer->append($queue);
-                $buffer->appendUint8(\strlen($consumerTag));
-                $buffer->append($consumerTag);
+        $buffer = new AmqpProtocol\Buffer();
+        $buffer->appendUint16(60);
+        $buffer->appendUint16(20);
+        $buffer->appendInt16(0);
+        $buffer->appendUint8(\strlen($queue));
+        $buffer->append($queue);
+        $buffer->appendUint8(\strlen($consumerTag));
+        $buffer->append($consumerTag);
 
-                $this->getWriter()->appendBits([$noLocal, $noAck, $exclusive, $nowait], $buffer);
-                $this->getWriter()->appendTable($arguments, $buffer);
+        $this->getWriter()->appendBits([$noLocal, $noAck, $exclusive, $nowait], $buffer);
+        $this->getWriter()->appendTable($arguments, $buffer);
 
-                $frame              = new AmqpProtocol\MethodFrame(60, 20);
-                $frame->channel     = $channel;
-                $frame->payloadSize = $buffer->getLength();
-                /** @psalm-suppress InvalidPropertyAssignmentValue Incorrect bunny contract */
-                $frame->payload = $buffer;
+        $frame              = new AmqpProtocol\MethodFrame(60, 20);
+        $frame->channel     = $channel;
+        $frame->payloadSize = $buffer->getLength();
+        /** @psalm-suppress InvalidPropertyAssignmentValue Incorrect bunny contract */
+        $frame->payload = $buffer;
 
-                $this->getWriter()->appendFrame($frame, $this->getWriteBuffer());
+        $this->getWriter()->appendFrame($frame, $this->getWriteBuffer());
 
-                yield $this->flushWriteBuffer();
+        yield $this->flushWriteBuffer();
 
-                unset($buffer, $frame);
+        unset($buffer, $frame);
 
-                return yield $this->awaitConsumeOk($channel);
-            },
-            $channel, $queue, $consumerTag, $noLocal, $noAck, $exclusive, $nowait, $arguments
-        );
+        return yield $this->awaitConsumeOk($channel);
     }
 
     /**
      * @inheritdoc
+     * @internal
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @return Promise<bool|\Bunny\Protocol\MethodBasicCancelOkFrame>
+     * @param int    $channel
+     * @param string $consumerTag
+     * @param bool   $nowait
+     *
+     * @return \Generator<\Bunny\Protocol\MethodBasicCancelOkFrame>
      */
-    public function cancel($channel, $consumerTag, $nowait = false): Promise
+    public function cancel($channel, $consumerTag, $nowait = false): \Generator
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, string $consumerTag, bool $nowait): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(6 + \strlen($consumerTag));
-                $buffer->appendUint16(60);
-                $buffer->appendUint16(30);
-                $buffer->appendUint8(\strlen($consumerTag));
-                $buffer->append($consumerTag);
-                $this->getWriter()->appendBits([$nowait], $buffer);
-                $buffer->appendUint8(206);
+        $buffer = $this->getWriteBuffer();
+        $buffer->appendUint8(1);
+        $buffer->appendUint16($channel);
+        $buffer->appendUint32(6 + \strlen($consumerTag));
+        $buffer->appendUint16(60);
+        $buffer->appendUint16(30);
+        $buffer->appendUint8(\strlen($consumerTag));
+        $buffer->append($consumerTag);
+        $this->getWriter()->appendBits([$nowait], $buffer);
+        $buffer->appendUint8(206);
 
-                if(true === $nowait)
-                {
-                    return yield $this->flushWriteBuffer();
-                }
+        if(true === $nowait)
+        {
+            return yield $this->flushWriteBuffer();
+        }
 
-                yield $this->flushWriteBuffer();
+        yield $this->flushWriteBuffer();
 
-                unset($buffer);
+        unset($buffer);
 
-                return yield $this->awaitCancelOk($channel);
-            },
-            $channel, $consumerTag, $nowait
-        );
+        return yield $this->awaitCancelOk($channel);
     }
 
     /**
      * @inheritdoc
+     * @internal
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @return Promise
+     * @param int  $channel
+     * @param int  $prefetchSize
+     * @param int  $prefetchCount
+     * @param bool $global
+     *
+     * @return \Generator<\Bunny\Protocol\MethodBasicQosOkFrame>
      */
-    public function reject($channel, $deliveryTag, $requeue = true): Promise
+    public function qos($channel, $prefetchSize = 0, $prefetchCount = 0, $global = false): \Generator
     {
-        /**
-         * @var int $channel
-         * @var int $deliveryTag
-         */
-
         $buffer = $this->getWriteBuffer();
 
         $buffer->appendUint8(1);
         $buffer->appendUint16($channel);
-        $buffer->appendUint32(13);
+        $buffer->appendUint32(11);
         $buffer->appendUint16(60);
-        $buffer->appendUint16(90);
-        $buffer->appendInt64($deliveryTag);
-        $this->getWriter()->appendBits([$requeue], $buffer);
+        $buffer->appendUint16(10);
+        $buffer->appendInt32($prefetchSize);
+        $buffer->appendInt16($prefetchCount);
+        $this->getWriter()->appendBits([$global], $buffer);
         $buffer->appendUint8(206);
 
-        return $this->flushWriteBuffer();
+        yield $this->flushWriteBuffer();
+
+        unset($buffer);
+
+        return yield $this->awaitQosOk($channel);
     }
 
     /**
      * @inheritdoc
+     * @internal
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @return Promise
+     * @param string $virtualHost
+     * @param string $capabilities
+     * @param bool   $insist
+     *
+     * @return \Generator<\Bunny\Protocol\MethodConnectionOpenOkFrame>
      */
-    public function recoverAsync($channel, $requeue = false): Promise
+    public function connectionOpen($virtualHost = '/', $capabilities = '', $insist = false): \Generator
     {
-        /** @var int $channel */
-
         $buffer = $this->getWriteBuffer();
+        $buffer->appendUint8(1);
+        $buffer->appendUint16(0);
+        $buffer->appendUint32(7 + \strlen($virtualHost) + \strlen($capabilities));
+        $buffer->appendUint16(10);
+        $buffer->appendUint16(40);
+        $buffer->appendUint8(\strlen($virtualHost));
+        $buffer->append($virtualHost);
+        $buffer->appendUint8(\strlen($capabilities));
+        $buffer->append($capabilities);
+        $this->getWriter()->appendBits([$insist], $buffer);
+        $buffer->appendUint8(206);
 
+        yield $this->flushWriteBuffer();
+
+        unset($buffer);
+
+        return yield $this->awaitConnectionOpenOk();
+    }
+
+    /**
+     * @inheritdoc
+     * @internal
+     *
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
+     * @param int    $replyCode
+     * @param string $replyText
+     * @param int    $closeClassId
+     * @param int    $closeMethodId
+     *
+     * @return \Generator<\Bunny\Protocol\MethodConnectionCloseOkFrame>
+     */
+    public function connectionClose($replyCode, $replyText, $closeClassId, $closeMethodId): \Generator
+    {
+        $buffer = $this->getWriteBuffer();
+        $buffer->appendUint8(1);
+        $buffer->appendUint16(0);
+        $buffer->appendUint32(11 + \strlen($replyText));
+        $buffer->appendUint16(10);
+        $buffer->appendUint16(50);
+        $buffer->appendInt16($replyCode);
+        $buffer->appendUint8(\strlen($replyText));
+        $buffer->append($replyText);
+        $buffer->appendInt16($closeClassId);
+        $buffer->appendInt16($closeMethodId);
+        $buffer->appendUint8(206);
+
+        yield $this->flushWriteBuffer();
+
+        unset($buffer);
+
+        return yield $this->awaitConnectionCloseOk();
+    }
+
+    /**
+     * @inheritdoc
+     * @internal
+     *
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
+     * @param int    $channel
+     * @param string $outOfBand
+     *
+     * @return \Generator<\Bunny\Protocol\MethodChannelOpenOkFrame>
+     */
+    public function channelOpen($channel, $outOfBand = ''): \Generator
+    {
+        $buffer = $this->getWriteBuffer();
         $buffer->appendUint8(1);
         $buffer->appendUint16($channel);
-        $buffer->appendUint32(5);
-        $buffer->appendUint16(60);
-        $buffer->appendUint16(100);
-        $this->getWriter()->appendBits([$requeue], $buffer);
+        $buffer->appendUint32(5 + \strlen($outOfBand));
+        $buffer->appendUint16(20);
+        $buffer->appendUint16(10);
+        $buffer->appendUint8(\strlen($outOfBand));
+        $buffer->append($outOfBand);
         $buffer->appendUint8(206);
 
-        return $this->flushWriteBuffer();
+        yield $this->flushWriteBuffer();
+
+        unset($buffer);
+
+        return yield $this->awaitChannelOpenOk($channel);
     }
 
     /**
      * @inheritdoc
+     * @internal
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @return Promise<\Bunny\Protocol\MethodBasicRecoverOkFrame>
-     */
-    public function recover($channel, $requeue = false): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, bool $requeue): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(5);
-                $buffer->appendUint16(60);
-                $buffer->appendUint16(110);
-                $this->getWriter()->appendBits([$requeue], $buffer);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                return yield $this->awaitRecoverOk($channel);
-            },
-            $channel, $requeue
-        );
-    }
-
-    /**
-     * @inheritdoc
+     * @param int    $channel
+     * @param string $exchange
+     * @param string $exchangeType
+     * @param bool   $passive
+     * @param bool   $durable
+     * @param bool   $autoDelete
+     * @param bool   $internal
+     * @param bool   $nowait
+     * @param array  $arguments
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise
-     */
-    public function nack($channel, $deliveryTag = 0, $multiple = false, $requeue = true): Promise
-    {
-        /**
-         * @var int $channel
-         * @var int $deliveryTag
-         */
-
-        $buffer = $this->getWriteBuffer();
-
-        $buffer->appendUint8(1);
-        $buffer->appendUint16($channel);
-        $buffer->appendUint32(13);
-        $buffer->appendUint16(60);
-        $buffer->appendUint16(120);
-        $buffer->appendInt64($deliveryTag);
-        $this->getWriter()->appendBits([$multiple, $requeue], $buffer);
-        $buffer->appendUint8(206);
-
-        return $this->flushWriteBuffer();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise<\Bunny\Protocol\MethodTxSelectOkFrame>
-     */
-    public function txSelect($channel): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(4);
-                $buffer->appendUint16(90);
-                $buffer->appendUint16(10);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                return yield $this->awaitTxSelectOk($channel);
-            },
-            $channel
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise<\Bunny\Protocol\MethodTxCommitOkFrame>
-     */
-    public function txCommit($channel): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(4);
-                $buffer->appendUint16(90);
-                $buffer->appendUint16(20);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                return yield $this->awaitTxCommitOk($channel);
-            },
-            $channel
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise<\Bunny\Protocol\MethodTxRollbackOkFrame>
-     */
-    public function txRollback($channel): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(4);
-                $buffer->appendUint16(90);
-                $buffer->appendUint16(30);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                return yield $this->awaitTxRollbackOk($channel);
-            },
-            $channel
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise
-     */
-    public function confirmSelect($channel, $nowait = false): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, bool $nowait): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(5);
-                $buffer->appendUint16(85);
-                $buffer->appendUint16(10);
-                $this->getWriter()->appendBits([$nowait], $buffer);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                if(false === $nowait)
-                {
-                    return yield $this->awaitConfirmSelectOk($channel);
-                }
-            },
-            $channel, $nowait
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise<\Bunny\Protocol\MethodBasicGetOkFrame>
-     */
-    public function get($channel, $queue = '', $noAck = false): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, string $queue, bool $noAck): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(8 + \strlen($queue));
-                $buffer->appendUint16(60);
-                $buffer->appendUint16(70);
-                $buffer->appendInt16(0);
-                $buffer->appendUint8(\strlen($queue));
-                $buffer->append($queue);
-                $this->getWriter()->appendBits([$noAck], $buffer);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                unset($buffer);
-
-                return yield $this->awaitGetOk($channel);
-            },
-            $channel, $queue, $noAck
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @return Promise<\Bunny\Protocol\MethodBasicQosOkFrame>
-     */
-    public function qos($channel, $prefetchSize = 0, $prefetchCount = 0, $global = false): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, int $prefetchSize, int $prefetchCount, bool $global): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(11);
-                $buffer->appendUint16(60);
-                $buffer->appendUint16(10);
-                $buffer->appendInt32($prefetchSize);
-                $buffer->appendInt16($prefetchCount);
-                $this->getWriter()->appendBits([$global], $buffer);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                unset($buffer);
-
-                return yield $this->awaitQosOk($channel);
-            },
-            $channel, $prefetchSize, $prefetchCount, $global
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @return Promise<\Bunny\Protocol\MethodConnectionOpenOkFrame>
-     */
-    public function connectionOpen($virtualHost = '/', $capabilities = '', $insist = false): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(string $virtualHost, string $capabilities, bool $insist): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16(0);
-                $buffer->appendUint32(7 + \strlen($virtualHost) + \strlen($capabilities));
-                $buffer->appendUint16(10);
-                $buffer->appendUint16(40);
-                $buffer->appendUint8(\strlen($virtualHost));
-                $buffer->append($virtualHost);
-                $buffer->appendUint8(\strlen($capabilities));
-                $buffer->append($capabilities);
-                $this->getWriter()->appendBits([$insist], $buffer);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                unset($buffer);
-
-                return yield $this->awaitConnectionOpenOk();
-            },
-            $virtualHost, $capabilities, $insist
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @return Promise<\Bunny\Protocol\MethodConnectionCloseOkFrame>
-     */
-    public function connectionClose($replyCode, $replyText, $closeClassId, $closeMethodId): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $replyCode, string $replyText, int $closeClassId, int $closeMethodId): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16(0);
-                $buffer->appendUint32(11 + \strlen($replyText));
-                $buffer->appendUint16(10);
-                $buffer->appendUint16(50);
-                $buffer->appendInt16($replyCode);
-                $buffer->appendUint8(\strlen($replyText));
-                $buffer->append($replyText);
-                $buffer->appendInt16($closeClassId);
-                $buffer->appendInt16($closeMethodId);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                unset($buffer);
-
-                return yield $this->awaitConnectionCloseOk();
-            },
-            $replyCode, $replyText, $closeClassId, $closeMethodId
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @return Promise<\Bunny\Protocol\MethodChannelOpenOkFrame>
-     */
-    public function channelOpen($channel, $outOfBand = ''): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, string $outOfBand): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(5 + \strlen($outOfBand));
-                $buffer->appendUint16(20);
-                $buffer->appendUint16(10);
-                $buffer->appendUint8(\strlen($outOfBand));
-                $buffer->append($outOfBand);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                unset($buffer);
-
-                return yield $this->awaitChannelOpenOk($channel);
-            },
-            $channel, $outOfBand
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @return Promise<\Bunny\Protocol\MethodChannelFlowOkFrame>
-     */
-    public function channelFlow($channel, $active): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, bool $active): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(5);
-                $buffer->appendUint16(20);
-                $buffer->appendUint16(20);
-                $this->getWriter()->appendBits([$active], $buffer);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                unset($buffer);
-
-                return yield $this->awaitChannelFlowOk($channel);
-            },
-            $channel, $active
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @return Promise<\Bunny\Protocol\MethodAccessRequestOkFrame>
-     */
-    public function accessRequest($channel, $realm = '/data', $exclusive = false, $passive = true, $active = true, $write = true, $read = true): Promise
-    {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, string $realm, bool $exclusive, bool $passive, bool $active, bool $write, bool $read): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(6 + \strlen($realm));
-                $buffer->appendUint16(30);
-                $buffer->appendUint16(10);
-                $buffer->appendUint8(\strlen($realm));
-                $buffer->append($realm);
-                $this->getWriter()->appendBits([$exclusive, $passive, $active, $write, $read], $buffer);
-                $buffer->appendUint8(206);
-
-                yield $this->flushWriteBuffer();
-
-                unset($buffer);
-
-                return yield $this->awaitAccessRequestOk($channel);
-            },
-            $channel, $realm, $exclusive, $passive, $active, $write, $read
-        );
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @return Promise<\Bunny\Protocol\MethodExchangeDeclareOkFrame>
+     * @return \Generator<\Bunny\Protocol\MethodExchangeDeclareOkFrame>
      */
     public function exchangeDeclare(
         $channel,
@@ -895,90 +493,72 @@ final class BunnyClientOverride extends Client
         $internal = false,
         $nowait = false,
         $arguments = []
-    ): Promise
+    ): \Generator
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(
-                int $channel, string $exchange, string $exchangeType, bool $passive, bool $durable,
-                bool $autoDelete, bool $internal, bool $nowait, array $arguments
-            ): \Generator
-            {
-                $buffer = new AmqpProtocol\Buffer();
-                $buffer->appendUint16(40);
-                $buffer->appendUint16(10);
-                $buffer->appendInt16(0);
-                $buffer->appendUint8(\strlen($exchange));
-                $buffer->append($exchange);
-                $buffer->appendUint8(\strlen($exchangeType));
-                $buffer->append($exchangeType);
-                $this->getWriter()->appendBits([$passive, $durable, $autoDelete, $internal, $nowait], $buffer);
-                $this->getWriter()->appendTable($arguments, $buffer);
+        $buffer = new AmqpProtocol\Buffer();
+        $buffer->appendUint16(40);
+        $buffer->appendUint16(10);
+        $buffer->appendInt16(0);
+        $buffer->appendUint8(\strlen($exchange));
+        $buffer->append($exchange);
+        $buffer->appendUint8(\strlen($exchangeType));
+        $buffer->append($exchangeType);
+        $this->getWriter()->appendBits([$passive, $durable, $autoDelete, $internal, $nowait], $buffer);
+        $this->getWriter()->appendTable($arguments, $buffer);
 
-                $frame              = new AmqpProtocol\MethodFrame(40, 10);
-                $frame->channel     = $channel;
-                $frame->payloadSize = $buffer->getLength();
-                /** @psalm-suppress InvalidPropertyAssignmentValue Incorrect bunny contract */
-                $frame->payload = $buffer;
+        $frame              = new AmqpProtocol\MethodFrame(40, 10);
+        $frame->channel     = $channel;
+        $frame->payloadSize = $buffer->getLength();
+        /** @psalm-suppress InvalidPropertyAssignmentValue Incorrect bunny contract */
+        $frame->payload = $buffer;
 
-                $this->getWriter()->appendFrame($frame, $this->getWriteBuffer());
+        $this->getWriter()->appendFrame($frame, $this->getWriteBuffer());
 
-                yield $this->flushWriteBuffer();
+        yield $this->flushWriteBuffer();
 
-                unset($buffer, $frame);
+        unset($buffer, $frame);
 
-                return yield $this->awaitExchangeDeclareOk($channel);
-            },
-            $channel, $exchange, $exchangeType, $passive, $durable, $autoDelete, $internal, $nowait, $arguments
-        );
+        return yield $this->awaitExchangeDeclareOk($channel);
     }
 
     /**
      * @inheritdoc
+     * @internal
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @return Promise<\Bunny\Protocol\MethodExchangeDeleteOkFrame>
+     * @param int    $channel
+     * @param string $exchange
+     * @param bool   $ifUnused
+     * @param bool   $nowait
+     *
+     * @return \Generator<\Bunny\Protocol\MethodExchangeDeleteOkFrame>
      */
-    public function exchangeDelete($channel, $exchange, $ifUnused = false, $nowait = false): Promise
+    public function exchangeDelete($channel, $exchange, $ifUnused = false, $nowait = false): \Generator
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Clarification of the type of data
-         */
-        return call(
-            function(int $channel, string $exchange, bool $ifUnused, bool $nowait): \Generator
-            {
-                $buffer = $this->getWriteBuffer();
-                $buffer->appendUint8(1);
-                $buffer->appendUint16($channel);
-                $buffer->appendUint32(8 + \strlen($exchange));
-                $buffer->appendUint16(40);
-                $buffer->appendUint16(20);
-                $buffer->appendInt16(0);
-                $buffer->appendUint8(\strlen($exchange));
-                $buffer->append($exchange);
-                $this->getWriter()->appendBits([$ifUnused, $nowait], $buffer);
-                $buffer->appendUint8(206);
+        $buffer = $this->getWriteBuffer();
+        $buffer->appendUint8(1);
+        $buffer->appendUint16($channel);
+        $buffer->appendUint32(8 + \strlen($exchange));
+        $buffer->appendUint16(40);
+        $buffer->appendUint16(20);
+        $buffer->appendInt16(0);
+        $buffer->appendUint8(\strlen($exchange));
+        $buffer->append($exchange);
+        $this->getWriter()->appendBits([$ifUnused, $nowait], $buffer);
+        $buffer->appendUint8(206);
 
-                yield $this->flushWriteBuffer();
+        yield $this->flushWriteBuffer();
 
-                unset($buffer);
+        unset($buffer);
 
-                return yield $this->awaitExchangeDeleteOk($channel);
-            },
-            $channel, $exchange, $ifUnused, $nowait
-        );
+        return yield $this->awaitExchangeDeleteOk($channel);
     }
 
     /**
      * @inheritdoc
+     * @internal
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
@@ -1027,9 +607,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1073,12 +654,14 @@ final class BunnyClientOverride extends Client
 
     /**
      * @inheritdoc
+     * @internal
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
+     * @param int $channel
+     *
+     * @return Promise
      */
     public function awaitContentHeader($channel): Promise
     {
@@ -1121,9 +704,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1243,7 +827,6 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
@@ -1291,9 +874,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1339,57 +923,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitQueuePurgeOk($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodQueuePurgeOkFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1435,9 +972,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1483,9 +1021,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1531,9 +1070,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1579,9 +1119,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1627,105 +1168,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitReturn($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodBasicReturnFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitRecoverOk($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodBasicRecoverOkFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1771,64 +1217,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitGetOk($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodBasicGetOkFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodBasicGetEmptyFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -1875,201 +1267,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitTxSelectOk($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodTxSelectOkFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitTxCommitOk($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodTxCommitOkFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitTxRollbackOk($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodTxRollbackOkFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitConfirmSelectOk($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodConfirmSelectOkFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -2086,7 +1287,8 @@ final class BunnyClientOverride extends Client
 
                     return true;
                 }
-                else if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
+
+                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
                 {
                     yield $this->channelCloseOk($channel);
 
@@ -2094,7 +1296,8 @@ final class BunnyClientOverride extends Client
 
                     return true;
                 }
-                else if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
+
+                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
                 {
                     yield $this->connectionCloseOk();
 
@@ -2113,9 +1316,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -2342,105 +1546,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitChannelFlow($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodChannelFlowFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitChannelFlowOk($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodChannelFlowOkFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -2486,9 +1595,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -2534,57 +1644,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
      *
-     * @return Promise<\Bunny\Protocol\AbstractFrame>
-     */
-    public function awaitAccessRequestOk($channel): Promise
-    {
-        $deferred = new Deferred();
-
-        $this->addAwaitCallback(
-            function(AmqpProtocol\AbstractFrame $frame) use ($deferred, $channel): \Generator
-            {
-                if($frame instanceof AmqpProtocol\MethodAccessRequestOkFrame && $frame->channel === $channel)
-                {
-                    $deferred->resolve($frame);
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodChannelCloseFrame && $frame->channel === $channel)
-                {
-                    yield $this->channelCloseOk($channel);
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                if($frame instanceof AmqpProtocol\MethodConnectionCloseFrame)
-                {
-                    yield $this->connectionCloseOk();
-
-                    $deferred->fail(new ClientException($frame->replyText, $frame->replyCode));
-
-                    return true;
-                }
-
-                return false;
-            }
-        );
-
-        return $deferred->promise();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @psalm-suppress MissingParamType Cannot specify data type
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -2597,7 +1660,7 @@ final class BunnyClientOverride extends Client
             {
                 if($frame instanceof AmqpProtocol\MethodChannelOpenOkFrame && $frame->channel === $channel)
                 {
-                    yield $this->qos(
+                    yield from $this->qos(
                         $frame->channel,
                         $this->qosConfig->qosSize(),
                         $this->qosConfig->qosCount(),
@@ -2637,9 +1700,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -2685,9 +1749,10 @@ final class BunnyClientOverride extends Client
     /**
      * @inheritdoc
      *
-     * @psalm-suppress MissingParamType Cannot specify data type
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     *
+     * @param int $channel
      *
      * @return Promise<\Bunny\Protocol\AbstractFrame>
      */
@@ -2747,11 +1812,11 @@ final class BunnyClientOverride extends Client
                 {
                     foreach($this->awaitCallbacks as $k => $callback)
                     {
-                        /** @var bool|Promise|ReactPromise|\Generator $executionResult */
-                        $executionResult = $callback($frame);
+                        /** @var bool|Promise|\Generator $listenerResult */
+                        $listenerResult = $callback($frame);
 
                         /** @var bool $awaitResult */
-                        $awaitResult = yield self::adaptAwaitResult($executionResult);
+                        $awaitResult = yield from self::adaptAwaitResult($listenerResult);
 
                         if(true === $awaitResult)
                         {
@@ -2762,7 +1827,7 @@ final class BunnyClientOverride extends Client
                             continue 2;
                         }
 
-                        unset($awaitResult, $executionResult);
+                        unset($awaitResult, $listenerResult);
                     }
 
                     if(0 === $frame->channel)
@@ -2791,6 +1856,36 @@ final class BunnyClientOverride extends Client
     }
 
     /**
+     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
+     *
+     * @param bool|Promise|\Generator $awaitResult
+     *
+     * @return \Generator<bool>
+     */
+    private static function adaptAwaitResult($awaitResult): \Generator
+    {
+        if(true === \is_bool($awaitResult))
+        {
+            return $awaitResult;
+        }
+
+        if($awaitResult instanceof Promise)
+        {
+            return yield $awaitResult;
+        }
+
+        /** @psalm-suppress RedundantConditionGivenDocblockType */
+        if($awaitResult instanceof \Generator)
+        {
+            return yield from $awaitResult;
+        }
+
+        throw new \LogicException(
+            \sprintf('Invalid await result type: %s', \gettype($awaitResult))
+        );
+    }
+
+    /**
      * Execute a callback when a stream resource becomes readable or is closed for reading
      *
      * @return void
@@ -2807,47 +1902,11 @@ final class BunnyClientOverride extends Client
     }
 
     /**
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @param bool|Promise|ReactPromise|\Generator $awaitResult
-     *
-     * @return Promise<bool>
-     */
-    private static function adaptAwaitResult($awaitResult): Promise
-    {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-        /** @psalm-suppress MissingClosureParamType Mixed data type */
-            static function($awaitResult): \Generator
-            {
-                if(true === \is_bool($awaitResult))
-                {
-                    return $awaitResult;
-                }
-
-                if($awaitResult instanceof \Generator)
-                {
-                    return yield new Coroutine($awaitResult);
-                }
-
-                if($awaitResult instanceof ReactPromise)
-                {
-                    return yield $awaitResult;
-                }
-
-                return $awaitResult;
-            },
-            $awaitResult
-        );
-    }
-
-    /**
      * Execute connect
      *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
-     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @return \Generator<null>
+     * @return \Generator
      */
     private function doConnect(): \Generator
     {
@@ -2869,7 +1928,8 @@ final class BunnyClientOverride extends Client
         }
 
         $this->connectionTuneOk($tune->channelMax, $tune->frameMax, $this->options['heartbeat']);
-        yield $this->connectionOpen($this->options['vhost']);
+
+        yield from $this->connectionOpen((string) ($this->options['vhost'] ?? '/'));
 
         $this->onConnected();
     }

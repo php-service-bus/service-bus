@@ -60,8 +60,8 @@ final class SqlEventStreamStore implements AggregateStore
 
         try
         {
-            yield new Coroutine(self::doSaveStream($transaction, $aggregateEventStream));
-            yield new Coroutine(self::doSaveEvents($transaction, $aggregateEventStream));
+            yield from self::doSaveStream($transaction, $aggregateEventStream);
+            yield from self::doSaveEvents($transaction, $aggregateEventStream);
 
             yield $transaction->commit();
         }
@@ -124,18 +124,16 @@ final class SqlEventStreamStore implements AggregateStore
         $aggregateEventStream = null;
 
         /** @var array<string, string>|null $streamData */
-        $streamData = yield new Coroutine(self::doLoadStream($this->adapter, $id));
+        $streamData = yield from self::doLoadStream($this->adapter, $id);
 
         if(null !== $streamData)
         {
             /** @var array<int, array>|null $streamEventsData */
-            $streamEventsData = yield new Coroutine(
-                self::doLoadStreamEvents(
-                    $this->adapter,
-                    (string) $streamData['id'],
-                    $fromVersion,
-                    $toVersion
-                )
+            $streamEventsData = yield from self::doLoadStreamEvents(
+                $this->adapter,
+                (string) $streamData['id'],
+                $fromVersion,
+                $toVersion
             );
 
             $aggregateEventStream = self::restoreEventStream($this->adapter, $streamData, $streamEventsData);

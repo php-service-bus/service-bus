@@ -60,12 +60,7 @@ final class IndexProvider
             static function(IndexKey $indexKey) use ($storage): \Generator
             {
                 /** @var string|int|float|boolean|null $value */
-                $value = yield new Coroutine(
-                    $storage->find(
-                        $indexKey->indexName(),
-                        $indexKey->valueKey()
-                    )
-                );
+                $value = yield from $storage->find($indexKey->indexName(), $indexKey->valueKey());
 
                 if(true === \is_scalar($value))
                 {
@@ -97,12 +92,7 @@ final class IndexProvider
             static function(IndexKey $indexKey) use ($storage): \Generator
             {
                 /** @var string|int|float|boolean|null $value */
-                $value = yield new Coroutine(
-                    $storage->find(
-                        $indexKey->indexName(),
-                        $indexKey->valueKey()
-                    )
-                );
+                $value = yield from $storage->find($indexKey->indexName(), $indexKey->valueKey());
 
                 return true === \is_scalar($value);
             },
@@ -133,13 +123,7 @@ final class IndexProvider
             {
                 try
                 {
-                    yield new Coroutine(
-                        $storage->add(
-                            $indexKey->indexName(),
-                            $indexKey->valueKey(),
-                            $value->value()
-                        )
-                    );
+                    yield from $storage->add($indexKey->indexName(), $indexKey->valueKey(), $value->value());
 
                     return true;
                 }

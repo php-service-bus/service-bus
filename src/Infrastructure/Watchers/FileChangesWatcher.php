@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Infrastructure\Watchers;
 
 use function Amp\ByteStream\buffer;
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Process\Process;
 use Amp\Promise;
 
@@ -61,7 +60,7 @@ final class FileChangesWatcher
             function(): \Generator
             {
                 /** @var string $bufferContent */
-                $bufferContent = yield new Coroutine(self::execute($this->directory));
+                $bufferContent = yield from self::execute($this->directory);
 
                 $hash = self::extractHash($bufferContent);
 

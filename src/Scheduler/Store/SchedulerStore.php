@@ -25,7 +25,7 @@ interface SchedulerStore
      * Extract operation (load and delete)
      *
      * @param ScheduledOperationId $id
-     * @param callable             $postExtract function(ScheduledOperation $operation) {}
+     * @param callable(ScheduledOperation|null, ?NextScheduledOperation|null):\Generator $postExtract
      *
      * @return \Generator It does not return any result
      *
@@ -41,7 +41,7 @@ interface SchedulerStore
      * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
      * @param ScheduledOperationId $id
-     * @param callable             $postRemove function(?NextScheduledOperation){}
+     * @param callable(NextScheduledOperation|null):Generator $postRemove
      *
      * @return \Generator<bool>
      *
@@ -54,7 +54,7 @@ interface SchedulerStore
      * Save new operation
      *
      * @param ScheduledOperation $operation
-     * @param callable           $postAdd function(ScheduledOperation $operation, ?NextScheduledOperation) {}
+     * @param callable(ScheduledOperation, NextScheduledOperation|null):Generator $postAdd
      *
      * @return \Generator It does not return any result
      *

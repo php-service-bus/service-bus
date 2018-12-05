@@ -60,10 +60,7 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     public function __invoke(Message $message, KernelContext $context): Promise
     {
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args)
-         */
+        /** @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             $this->closure,
             ...self::collectArguments($this->arguments, $this->argumentResolvers, $message, $context)

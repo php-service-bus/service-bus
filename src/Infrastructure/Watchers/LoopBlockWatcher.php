@@ -86,13 +86,13 @@ final class LoopBlockWatcher
     /**
      * @param LoggerInterface $logger
      *
-     * @return callable function(int $interval)
+     * @return callable(int):void
      */
     private static function createOnBlockHandler(LoggerInterface $logger): callable
     {
         return static function(int $blockInterval) use ($logger): void
         {
-            $trace = \debug_backtrace();
+            $trace     = \debug_backtrace();
             $traceData = ['info' => []];
 
             /** skip first since it's always the current method */

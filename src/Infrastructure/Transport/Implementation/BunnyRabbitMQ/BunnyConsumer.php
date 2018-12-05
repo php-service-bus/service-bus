@@ -28,7 +28,7 @@ use Bunny\Message as BunnyEnvelope;
  */
 final class BunnyConsumer
 {
-     /**
+    /**
      * @var BunnyChannelOverride
      */
     private $channel;
@@ -69,7 +69,7 @@ final class BunnyConsumer
     /**
      * Listen queue messages
      *
-     * @param callable $onMessageReceived function(BunnyIncomingPackage $package) {...}
+     * @param callable(BunnyIncomingPackage):\Generator $onMessageReceived
      *
      * @return Promise<\Bunny\Protocol\MethodBasicConsumeOkFrame>
      */
@@ -115,9 +115,9 @@ final class BunnyConsumer
      * Create listener callback
      *
      * @param LoggerInterface $logger
-     * @param callable        $onMessageReceived function(BunnyIncomingPackage $package) {...}
+     * @param callable(BunnyIncomingPackage):\Generator $onMessageReceived
      *
-     * @return callable function(BunnyEnvelope $envelope, BunnyChannelOverride $channel) {...}
+     * @return callable(BunnyEnvelope, BunnyChannelOverride):void
      */
     private static function createMessageHandler(LoggerInterface $logger, $onMessageReceived): callable
     {
