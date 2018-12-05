@@ -36,7 +36,7 @@ final class BunnyChannelOverride extends Channel
      * @psalm-suppress InvalidReturnType Incorrect resolving the value of the promise
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
-     * @param callable $callback
+     * @param callable(BunnyEnvelope, BunnyChannelOverride):void $callback
      * @param string   $queue
      * @param string   $consumerTag
      * @param bool     $noLocal

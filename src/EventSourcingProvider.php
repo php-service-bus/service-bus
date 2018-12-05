@@ -139,9 +139,6 @@ final class EventSourcingProvider
     /**
      * Save new aggregate
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
      * @param Aggregate              $aggregate
      * @param MessageDeliveryContext $context
      *

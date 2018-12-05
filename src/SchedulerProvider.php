@@ -189,20 +189,20 @@ final class SchedulerProvider
     {
         try
         {
-            $generator = $this->store->extract(
-                $id,
-                static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
+            /** @var callable(ScheduledOperation|null, ?NextScheduledOperation|null):\Generator $closure */
+            $closure = static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \ Generator
+            {
+                if(null !== $operation)
                 {
-                    if(null !== $operation)
-                    {
-                        yield self::processSendCommand($operation, $context);
+                    yield self::processSendCommand($operation, $context);
 
-                        yield $context->delivery(
-                            SchedulerOperationEmitted::create($operation->id(), $nextOperation)
-                        );
-                    }
+                    yield $context->delivery(
+                        SchedulerOperationEmitted::create($operation->id(), $nextOperation)
+                    );
                 }
-            );
+            };
+
+            $generator = $this->store->extract($id, $closure);
 
             yield from $generator;
         }

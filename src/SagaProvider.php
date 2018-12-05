@@ -261,9 +261,6 @@ final class SagaProvider
     /**
      * Execute add/update saga entry
      *
-     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
-     * @psalm-suppress LessSpecificReturnStatement Incorrect resolving the value of the promise
-     *
      * @param SagasStore             $store
      * @param Saga                   $saga
      * @param MessageDeliveryContext $context

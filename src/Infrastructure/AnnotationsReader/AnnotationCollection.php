@@ -63,7 +63,7 @@ final class AnnotationCollection implements \Countable, \IteratorAggregate
     /**
      * Filter collection data
      *
-     * @param callable $callable function(Annotation $annotation): ?Annotation {}
+     * @param callable(Annotation):?Annotation $callable
      *
      * @return AnnotationCollection
      */
