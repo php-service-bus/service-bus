@@ -1,33 +1,29 @@
 language: php
 
 php:
-- 7.2
+  - 7.2
+  - 7.3
 
-install:
-
-- travis_retry composer install --no-interaction --no-suggest
-- wget -c -nc --retry-connrefused --tries=0 https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar -O coveralls.phar
-- chmod +x coveralls.phar
-- php coveralls.phar --version
-
-before_script:
-- mkdir -p build/logs
-- ls -al
-- psql -c 'CREATE DATABASE test;' -U postgres
-
-script:
-- ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover build/logs/clover.xml
-
-after_success:
-- travis_retry php coveralls.phar -v
-- bash <(curl -s https://codecov.io/bash)
+services:
+  - postgresql
+  - rabbitmq
 
 cache:
   directories:
-  - vendor
-  - $HOME/.cache/composer
+    - $HOME/.cache/composer
 
-services:
-- postgresql
-- rabbitmq
+before_script:
+  - mkdir -p build/logs
+  - psql -c 'CREATE DATABASE test;' -U postgres
 
+install:
+  - travis_retry composer install --no-interaction --no-suggest
+  - travis_retry wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar
+  - chmod +x ocular.phar
+
+script:
+  - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.clover
+
+after_script:
+  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi

@@ -44,7 +44,7 @@ function removeDirectory(string $path): void
             continue;
         }
 
-        \is_dir($file) ? removeDirectory($file) : unlink($file);
+        \is_dir($file) ? removeDirectory($file) : \unlink($file);
     }
 
     \rmdir($path);
