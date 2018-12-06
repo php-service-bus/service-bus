@@ -51,6 +51,7 @@ tools:
         camel_case_parameter_name: true
         camel_case_variable_name: true
   external_code_coverage: true
+    timeout: 600
 checks:
   php:
     code_rating: true
