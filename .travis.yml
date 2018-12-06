@@ -25,4 +25,4 @@ script:
   - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.clover
 
 after_success:
-  - travis_retry code-coverage:upload --format=php-clover coverage.clover
+  - travis_retry php ocular.phar code-coverage:upload --format=php-clover coverage.clover
