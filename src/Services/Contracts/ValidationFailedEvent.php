@@ -30,8 +30,8 @@ interface ValidationFailedEvent extends Event
      *    ]
      * ]
      *
-     * @param string $correlationId
-     * @param array  $violations
+     * @param string                            $correlationId
+     * @param array<string, array<int, string>> $violations
      *
      * @return self
      */
