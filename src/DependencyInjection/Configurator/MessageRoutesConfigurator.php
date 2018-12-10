@@ -18,11 +18,13 @@ use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use Desperado\ServiceBus\MessageExecutor\DefaultMessageExecutor;
 use Desperado\ServiceBus\MessageExecutor\MessageValidationExecutor;
 use Desperado\ServiceBus\MessageHandlers\Handler;
+use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
 use Desperado\ServiceBus\MessageRouter\Router;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader;
 use Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\Validator\ValidatorBuilder;
 
 /**
  *
@@ -122,7 +124,12 @@ final class MessageRoutesConfigurator
             {
                 $router->registerListener(
                     (string) $handler->messageClass(),
-                    new DefaultMessageExecutor($handler->toClosure(), $handler->arguments(), $this->argumentResolvers)
+                    new DefaultMessageExecutor(
+                        $handler->toClosure(),
+                        $handler->arguments(),
+                        new HandlerOptions(),
+                        $this->argumentResolvers
+                    )
                 );
             }
 
@@ -144,6 +151,10 @@ final class MessageRoutesConfigurator
      */
     private function registerServices(Router $router): void
     {
+        $validator = (new ValidatorBuilder())
+            ->enableAnnotationMapping()
+            ->getValidator();
+
         /** @var ServiceHandlersLoader $serviceConfigurationExtractor */
         $serviceConfigurationExtractor = $this->routingServiceLocator->get(ServiceHandlersLoader::class);
 
@@ -160,14 +171,13 @@ final class MessageRoutesConfigurator
                 $messageExecutor = new DefaultMessageExecutor(
                     $handler->toClosure($serviceObject),
                     $handler->arguments(),
+                    $handler->options(),
                     $this->argumentResolvers
                 );
 
                 if(true === $handler->options()->validationEnabled())
                 {
-                    $messageExecutor = new MessageValidationExecutor(
-                        $messageExecutor, $handler->options()->validationGroups()
-                    );
+                    $messageExecutor = new MessageValidationExecutor($messageExecutor, $handler->options(), $validator);
                 }
 
                 $registerMethod = true === $handler->isCommandHandler()

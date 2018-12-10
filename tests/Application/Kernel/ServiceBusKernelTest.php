@@ -32,9 +32,13 @@ use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\KernelTestExtension;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\KernelTestService;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerResponseEventCommand;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommand;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommandWithResponseEvent;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\WithValidationCommand;
+use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\WithValidationRulesCommand;
 use Desperado\ServiceBus\Tests\Stubs\Messages\CommandWithPayload;
+use Desperado\ServiceBus\Tests\Stubs\Messages\ExecutionFailed;
 use Desperado\ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
+use Desperado\ServiceBus\Tests\Stubs\Messages\ValidationFailed;
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -262,6 +266,56 @@ final class ServiceBusKernelTest extends TestCase
         $this->kernel->useDefaultStopSignalHandler();
         $this->kernel->stopAfter(60);
         $this->kernel->stopWhenFilesChange(__DIR__);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function processMessageWithValidationFailure(): void
+    {
+        $this->sendMessage(new WithValidationRulesCommand(''));
+
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
+
+        $records = $this->logHandler->getRecords();
+
+        $messageEntry = $records[count($records) - 3];
+
+        static::assertEquals(
+            'Error validation, sending an error event and stopping message processing',
+            $messageEntry['message']
+        );
+
+        static::assertEquals(ValidationFailed::class, $messageEntry['context']['eventClass']);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function processMessageWithSpecifiedThrowableEvent(): void
+    {
+        $this->sendMessage(new TriggerThrowableCommandWithResponseEvent());
+
+        wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
+
+        $records = $this->logHandler->getRecords();
+
+        $messageEntry = $records[count($records) - 3];
+
+        static::assertEquals(
+            'Error processing, sending an error event and stopping message processing',
+            $messageEntry['message']
+        );
+
+        static::assertEquals(ExecutionFailed::class, $messageEntry['context']['eventClass']);
     }
 
     /**

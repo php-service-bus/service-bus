@@ -16,9 +16,10 @@ namespace Desperado\ServiceBus\MessageExecutor;
 use Amp\Failure;
 use Amp\Promise;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
+use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
+use Psr\Log\LogLevel;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ValidatorBuilder;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 
@@ -38,22 +39,22 @@ final class MessageValidationExecutor implements MessageExecutor
     private $validator;
 
     /**
-     * @var array<int, string>
+     * Execution options
+     *
+     * @var HandlerOptions
      */
-    private $validationGroups;
+    private $options;
 
     /**
      * @param MessageExecutor    $executor
-     * @param array<int, string> $validationGroups
+     * @param HandlerOptions     $options
+     * @param ValidatorInterface $validator
      */
-    public function __construct(MessageExecutor $executor, array $validationGroups)
+    public function __construct(MessageExecutor $executor, HandlerOptions $options, ValidatorInterface $validator)
     {
-        $this->executor         = $executor;
-        $this->validationGroups = $validationGroups;
-
-        $this->validator = (new ValidatorBuilder())
-            ->enableAnnotationMapping()
-            ->getValidator();
+        $this->executor  = $executor;
+        $this->options   = $options;
+        $this->validator = $validator;
     }
 
     /**
@@ -64,7 +65,7 @@ final class MessageValidationExecutor implements MessageExecutor
         try
         {
             /** @var ConstraintViolationList $violations */
-            $violations = $this->validator->validate($message, null, $this->validationGroups);
+            $violations = $this->validator->validate($message, null, $this->options->validationGroups());
         }
         catch(\Throwable $throwable)
         {
@@ -74,9 +75,37 @@ final class MessageValidationExecutor implements MessageExecutor
         if(0 !== \count($violations))
         {
             self::bindViolations($violations, $context);
+
+            /** If a validation error event class is specified, then we abort the execution */
+            if(true === $this->options->hasDefaultValidationFailedEvent())
+            {
+                $context->logContextMessage(
+                    'Error validation, sending an error event and stopping message processing',
+                    ['eventClass' => $this->options->defaultValidationFailedEvent()],
+                    LogLevel::DEBUG
+                );
+
+                return self::publishViolations((string) $this->options->defaultValidationFailedEvent(), $context);
+            }
         }
 
         return ($this->executor)($message, $context);
+    }
+
+    /**
+     * Publish failed event
+     *
+     * @param string        $eventClass
+     * @param KernelContext $context
+     *
+     * @return Promise
+     */
+    private static function publishViolations(string $eventClass, KernelContext $context): Promise
+    {
+        /** @var \Desperado\ServiceBus\Services\Contracts\ValidationFailedEvent $event */
+        $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $context->violations()]);
+
+        return $context->delivery($event);
     }
 
     /**

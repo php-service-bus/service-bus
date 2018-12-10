@@ -94,4 +94,35 @@ final class KernelTestService
             'violations' => $context->violations()
         ]);
     }
+
+    /**
+     * @CommandHandler(
+     *     validate=true,
+     *     defaultValidationFailedEvent="Desperado\ServiceBus\Tests\Stubs\Messages\ValidationFailed"
+     * )
+     *
+     * @param WithValidationRulesCommand $command
+     * @param KernelContext              $context
+     *
+     * @return void
+     */
+    public function validateWithErrorAndSpecifiedEvent(WithValidationRulesCommand $command, KernelContext $context): void
+    {
+
+    }
+
+    /**
+     * @CommandHandler(
+     *     defaultThrowableEvent="Desperado\ServiceBus\Tests\Stubs\Messages\ExecutionFailed"
+     * )
+     *
+     * @param TriggerThrowableCommandWithResponseEvent $command
+     * @param KernelContext                            $context
+     *
+     * @return void
+     */
+    public function handleWithSpecifiedThrowableEvent(TriggerThrowableCommandWithResponseEvent $command, KernelContext $context): void
+    {
+        throw new \RuntimeException('abube');
+    }
 }
