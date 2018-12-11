@@ -96,9 +96,16 @@ function extractReflectionProperty(object $object, string $propertyName): \Refle
         /** @noinspection LoopWhichDoesNotLoopInspection */
         while($reflector = $reflector->getParentClass())
         {
-            $property = $reflector->getProperty($propertyName);
+            try
+            {
+                $property = $reflector->getProperty($propertyName);
 
-            break;
+                break;
+            }
+            catch(\Throwable $throwable)
+            {
+                /** Not interested */
+            }
         }
     }
 
