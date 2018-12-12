@@ -229,12 +229,15 @@ final class BunnyRabbitMqTransport implements Transport
                         );
                     }
 
+                    $internalHeaders = [
+                        'delivery-mode'                => true === $outboundPackage->persistentFlag ? self::AMQP_DURABLE : null,
+                        'expiration'                   => $outboundPackage->expiredAfter,
+                        self::SERVICE_BUS_TRACE_HEADER => $outboundPackage->traceId
+                    ];
+
                     /** @var \Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination $destination */
                     $destination = $outboundPackage->destination;
-                    $headers     = \array_filter(\array_merge($outboundPackage->headers, [
-                        'delivery-mode' => true === $outboundPackage->persistentFlag ? self::AMQP_DURABLE : null,
-                        'expiration'    => $outboundPackage->expiredAfter
-                    ]));
+                    $headers     = \array_filter(\array_merge($internalHeaders, $outboundPackage->headers));
 
                     $content = $outboundPackage->payload;
 
