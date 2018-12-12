@@ -46,12 +46,12 @@ final class SqlSnapshotStore implements SnapshotStore
     {
         /** @var \Latitude\QueryBuilder\Query\InsertQuery $query */
         $insertQuery = insertQuery('event_store_snapshots', [
-            'id'                 => $aggregateSnapshot->aggregateId(),
-            'aggregate_id_class' => $aggregateSnapshot->aggregateIdClass(),
-            'aggregate_class'    => $aggregateSnapshot->aggregateClass(),
-            'version'            => $aggregateSnapshot->version(),
-            'payload'            => \base64_encode($aggregateSnapshot->payload()),
-            'created_at'         => $aggregateSnapshot->createdAt()
+            'id'                 => $aggregateSnapshot->aggregateId,
+            'aggregate_id_class' => $aggregateSnapshot->aggregateIdClass,
+            'aggregate_class'    => $aggregateSnapshot->aggregateClass,
+            'version'            => $aggregateSnapshot->version,
+            'payload'            => \base64_encode($aggregateSnapshot->payload),
+            'created_at'         => $aggregateSnapshot->createdAt
         ]);
 
         /** @var \Latitude\QueryBuilder\Query $compiledQuery */

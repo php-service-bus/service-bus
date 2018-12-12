@@ -26,42 +26,42 @@ final class AggregateEventStream
      *
      * @var AggregateId
      */
-    private $id;
+    public $id;
 
     /**
      * Aggregate class
      *
      * @var string
      */
-    private $aggregateClass;
+    public $aggregateClass;
 
     /**
      * Event collection
      *
      * @var array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent>
      */
-    private $events;
+    public $events;
 
     /**
      * Origin event collection
      *
      * @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event>
      */
-    private $originEvents;
+    public $originEvents;
 
     /**
      * Created at datetime
      *
      * @var \DateTimeImmutable
      */
-    private $createdAt;
+    public $createdAt;
 
     /**
      * Closed at datetime
      *
      * @var \DateTimeImmutable|null
      */
-    private $closedAt;
+    public $closedAt;
 
     /**
      * @param AggregateId             $id
@@ -87,66 +87,6 @@ final class AggregateEventStream
     }
 
     /**
-     * Receive aggregate (stream) identifier
-     *
-     * @return AggregateId
-     */
-    public function id(): AggregateId
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive aggregate class
-     *
-     * @return string
-     */
-    public function aggregateClass(): string
-    {
-        return $this->aggregateClass;
-    }
-
-    /**
-     * Receive aggregate events collection
-     *
-     * @return array
-     */
-    public function events(): array
-    {
-        return $this->events;
-    }
-
-    /**
-     * Receive original events collection
-     *
-     * @return array<int, \Desperado\ServiceBus\Common\Contract\Messages\Event>
-     */
-    public function originEvents(): array
-    {
-        return $this->originEvents;
-    }
-
-    /**
-     * Receive created at datetime
-     *
-     * @return \DateTimeImmutable
-     */
-    public function createdAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Receive closed at datetime
-     *
-     * @return \DateTimeImmutable|null
-     */
-    public function closedAt(): ?\DateTimeImmutable
-    {
-        return $this->closedAt;
-    }
-
-    /**
      * @param array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent> $events
      *
      * @return array<int, \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent>
@@ -159,7 +99,7 @@ final class AggregateEventStream
         {
             /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent $aggregateEvent */
 
-            $result[$aggregateEvent->playhead()] = $aggregateEvent;
+            $result[$aggregateEvent->playhead] = $aggregateEvent;
         }
 
         \ksort($result);
@@ -177,7 +117,7 @@ final class AggregateEventStream
         return \array_map(
             static function(AggregateEvent $event): Event
             {
-                return $event->event();
+                return $event->event;
             },
             $events
         );

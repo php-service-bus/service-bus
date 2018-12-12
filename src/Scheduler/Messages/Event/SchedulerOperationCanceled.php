@@ -27,21 +27,21 @@ final class SchedulerOperationCanceled implements Event
      *
      * @var ScheduledOperationId
      */
-    private $id;
+    public $id;
 
     /**
      * Reason
      *
      * @var string|null
      */
-    private $reason;
+    public $reason;
 
     /**
      * Next operation data
      *
      * @var NextScheduledOperation|null
      */
-    private $nextOperation;
+    public $nextOperation;
 
     /**
      * @param ScheduledOperationId        $id
@@ -63,35 +63,5 @@ final class SchedulerOperationCanceled implements Event
         $self->nextOperation = $nextScheduledOperation;
 
         return $self;
-    }
-
-    /**
-     * Receive identifier
-     *
-     * @return ScheduledOperationId
-     */
-    public function id(): ScheduledOperationId
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive next operation data
-     *
-     * @return NextScheduledOperation|null
-     */
-    public function nextOperation(): ?NextScheduledOperation
-    {
-        return $this->nextOperation;
-    }
-
-    /**
-     * Receive cancellation reason
-     *
-     * @return null|string
-     */
-    public function reason(): ?string
-    {
-        return $this->reason;
     }
 }

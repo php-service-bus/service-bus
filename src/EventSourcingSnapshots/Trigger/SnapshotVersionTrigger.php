@@ -48,6 +48,6 @@ class SnapshotVersionTrigger implements SnapshotTrigger
             return true;
         }
 
-        return $this->stepInterval <= ($aggregate->version() - $previousSnapshot->version());
+        return $this->stepInterval <= ($aggregate->version() - $previousSnapshot->version);
     }
 }

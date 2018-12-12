@@ -23,42 +23,42 @@ final class StoredAggregateEvent
      *
      * @var string
      */
-    private $eventId;
+    public $eventId;
 
     /**
      * Playhead position
      *
      * @var int
      */
-    private $playheadPosition;
+    public $playheadPosition;
 
     /**
      * Serialized event data
      *
      * @var string
      */
-    private $eventData;
+    public $eventData;
 
     /**
      * Event class
      *
      * @var string
      */
-    private $eventClass;
+    public $eventClass;
 
     /**
      * Occured at datetime
      *
      * @var string
      */
-    private $occuredAt;
+    public $occuredAt;
 
     /**
      * Recorded at datetime
      *
      * @var string|null
      */
-    private $recordedAt;
+    public $recordedAt;
 
     /**
      * @param string      $eventId
@@ -83,65 +83,5 @@ final class StoredAggregateEvent
         $this->eventClass       = $eventClass;
         $this->occuredAt        = $occuredAt;
         $this->recordedAt       = $recordedAt;
-    }
-
-    /**
-     * Receive event id
-     *
-     * @return string
-     */
-    public function eventId(): string
-    {
-        return $this->eventId;
-    }
-
-    /**
-     * Receive playhead position
-     *
-     * @return int
-     */
-    public function playheadPosition(): int
-    {
-        return $this->playheadPosition;
-    }
-
-    /**
-     * Receive serialized event data
-     *
-     * @return string
-     */
-    public function eventData(): string
-    {
-        return $this->eventData;
-    }
-
-    /**
-     * Receive event class
-     *
-     * @return string
-     */
-    public function eventClass(): string
-    {
-        return $this->eventClass;
-    }
-
-    /**
-     * Receive occured at datetime
-     *
-     * @return string
-     */
-    public function occuredAt(): string
-    {
-        return $this->occuredAt;
-    }
-
-    /**
-     * Receive recorded at datetime
-     *
-     * @return string|null
-     */
-    public function recordedAt(): ?string
-    {
-        return $this->recordedAt;
     }
 }

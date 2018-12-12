@@ -25,35 +25,35 @@ final class AggregateEvent
      *
      * @var string
      */
-    private $id;
+    public $id;
 
     /**
      * Playhead position
      *
      * @var int
      */
-    private $playhead;
+    public $playhead;
 
     /**
      * Received event
      *
      * @var Event
      */
-    private $event;
+    public $event;
 
     /**
      * Occurred datetime
      *
      * @var \DateTimeImmutable
      */
-    private $occuredAt;
+    public $occuredAt;
 
     /**
      * Recorded datetime
      *
      * @var \DateTimeImmutable|null
      */
-    private $recordedAt;
+    public $recordedAt;
 
     /**
      * @param string                  $id
@@ -75,55 +75,5 @@ final class AggregateEvent
         $this->playhead   = $playhead;
         $this->occuredAt  = $occuredAt;
         $this->recordedAt = $recordedAt;
-    }
-
-    /**
-     * Receive
-     *
-     * @return string
-     */
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive
-     *
-     * @return int
-     */
-    public function playhead(): int
-    {
-        return $this->playhead;
-    }
-
-    /**
-     * Receive
-     *
-     * @return Event
-     */
-    public function event(): Event
-    {
-        return $this->event;
-    }
-
-    /**
-     * Receive
-     *
-     * @return \DateTimeImmutable
-     */
-    public function occuredAt(): \DateTimeImmutable
-    {
-        return $this->occuredAt;
-    }
-
-    /**
-     * Receive
-     *
-     * @return \DateTimeImmutable|null
-     */
-    public function recordedAt(): ?\DateTimeImmutable
-    {
-        return $this->recordedAt;
     }
 }

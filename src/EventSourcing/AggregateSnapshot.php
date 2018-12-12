@@ -23,14 +23,14 @@ final class AggregateSnapshot
      *
      * @var Aggregate
      */
-    private $aggregate;
+    public $aggregate;
 
     /**
      * Aggregate version
      *
      * @var int
      */
-    private $version;
+    public $version;
 
     /**
      * @param Aggregate $aggregate
@@ -40,25 +40,5 @@ final class AggregateSnapshot
     {
         $this->aggregate = $aggregate;
         $this->version   = $version;
-    }
-
-    /**
-     * Receive aggregate
-     *
-     * @return Aggregate
-     */
-    public function aggregate(): Aggregate
-    {
-        return $this->aggregate;
-    }
-
-    /**
-     * Receive snapshot (aggregate) version
-     *
-     * @return int
-     */
-    public function version(): int
-    {
-        return $this->version;
     }
 }

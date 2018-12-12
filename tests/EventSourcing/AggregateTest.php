@@ -43,22 +43,22 @@ final class AggregateTest extends TestCase
         /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEventStream $eventStream */
         $eventStream = invokeReflectionMethod($aggregate, 'makeStream');
 
-        $events = $eventStream->events();
+        $events = $eventStream->events;
 
-        /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent $aggregateClosedEvent */
+        /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent $aggregateEvent */
         $aggregateEvent = \end($events);
 
         /** @noinspection UnnecessaryAssertionInspection */
-        static::assertInstanceOf(AggregateClosed::class, $aggregateEvent->event());
+        static::assertInstanceOf(AggregateClosed::class, $aggregateEvent->event);
 
         /** @var AggregateClosed $aggregateClosedEvent */
-        $aggregateClosedEvent = $aggregateEvent->event();
+        $aggregateClosedEvent = $aggregateEvent->event;
 
-        static::assertTrue(Uuid::isValid($aggregateClosedEvent->id()));
+        static::assertTrue(Uuid::isValid($aggregateClosedEvent->id));
         /** @noinspection UnnecessaryAssertionInspection */
-        static::assertInstanceOf(\DateTimeImmutable::class, $aggregateClosedEvent->datetime());
-        static::assertEquals(TestAggregate::class, $aggregateClosedEvent->aggregateClass());
-        static::assertEquals(TestAggregateId::class, $aggregateClosedEvent->idClass());
+        static::assertInstanceOf(\DateTimeImmutable::class, $aggregateClosedEvent->datetime);
+        static::assertEquals(TestAggregate::class, $aggregateClosedEvent->aggregateClass);
+        static::assertEquals(TestAggregateId::class, $aggregateClosedEvent->idClass);
 
         $aggregate->firstAction('root');
     }
@@ -77,21 +77,21 @@ final class AggregateTest extends TestCase
         /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEventStream $eventStream */
         $eventStream = invokeReflectionMethod($aggregate, 'makeStream');
 
-        $events = $eventStream->events();
+        $events = $eventStream->events;
 
-        /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent $aggregateClosedEvent */
+        /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEvent $aggregateEvent */
         $aggregateEvent = \end($events);
 
         /** @noinspection UnnecessaryAssertionInspection */
-        static::assertInstanceOf(AggregateCreated::class, $aggregateEvent->event());
+        static::assertInstanceOf(AggregateCreated::class, $aggregateEvent->event);
 
         /** @var AggregateCreated $aggregateCreatedEvent */
-        $aggregateCreatedEvent = $aggregateEvent->event();
+        $aggregateCreatedEvent = $aggregateEvent->event;
 
-        static::assertTrue(Uuid::isValid($aggregateCreatedEvent->id()));
+        static::assertTrue(Uuid::isValid($aggregateCreatedEvent->id));
         /** @noinspection UnnecessaryAssertionInspection */
-        static::assertInstanceOf(\DateTimeImmutable::class, $aggregateCreatedEvent->datetime());
-        static::assertEquals(TestAggregate::class, $aggregateCreatedEvent->aggregateClass());
-        static::assertEquals(TestAggregateId::class, $aggregateCreatedEvent->idClass());
+        static::assertInstanceOf(\DateTimeImmutable::class, $aggregateCreatedEvent->datetime);
+        static::assertEquals(TestAggregate::class, $aggregateCreatedEvent->aggregateClass);
+        static::assertEquals(TestAggregateId::class, $aggregateCreatedEvent->idClass);
     }
 }

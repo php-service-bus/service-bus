@@ -153,7 +153,7 @@ abstract class Aggregate
      */
     private function onAggregateClosed(AggregateClosed $event): void
     {
-        $this->closedAt = $event->datetime();
+        $this->closedAt = $event->datetime;
     }
 
     /**
@@ -167,7 +167,7 @@ abstract class Aggregate
      */
     private function onAggregateCreated(AggregateCreated $event): void
     {
-        $this->createdAt = $event->datetime();
+        $this->createdAt = $event->datetime;
     }
 
     /**
@@ -210,12 +210,12 @@ abstract class Aggregate
     {
         $this->clearEvents();
 
-        $this->id = $aggregateEventsStream->id();
+        $this->id = $aggregateEventsStream->id;
 
         /** @var AggregateEvent $aggregateEvent */
-        foreach($aggregateEventsStream->events() as $aggregateEvent)
+        foreach($aggregateEventsStream->events as $aggregateEvent)
         {
-            $this->applyEvent($aggregateEvent->event());
+            $this->applyEvent($aggregateEvent->event);
 
             /** @noinspection DisconnectedForeachInstructionInspection */
             $this->increaseVersion(self::INCREASE_VERSION_STEP);

@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Endpoint;
 
-use Amp\Coroutine;
 use function Amp\Promise\wait;
 use Desperado\ServiceBus\Endpoint\ApplicationTransportEndpoint;
 use Desperado\ServiceBus\Endpoint\DeliveryOptions;
@@ -48,9 +47,9 @@ final class ApplicationTransportEndpointTest extends TestCase
             );
 
             $options = new DeliveryOptions();
-            $options->withCustomTraceId('ssss');
+            $options->traceId = 'ssss';
 
-            wait(new Coroutine($endpoint->delivery(new SecondEmptyCommand(), $options)));
+            wait($endpoint->delivery(new SecondEmptyCommand(), $options));
         }
         catch(\Throwable $throwable)
         {

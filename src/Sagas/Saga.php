@@ -348,7 +348,7 @@ abstract class Saga
     {
         $event = SagaClosed::create($this->id, $withReason);
 
-        $this->closedAt = $event->datetime();
+        $this->closedAt = $event->datetime;
 
         $this->attachEvent($event);
     }

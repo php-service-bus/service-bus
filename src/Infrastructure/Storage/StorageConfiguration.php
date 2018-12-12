@@ -23,63 +23,63 @@ final class StorageConfiguration
      *
      * @var string
      */
-    private $originalDSN;
+    public $originalDSN;
 
     /**
      * Scheme
      *
      * @var string|null
      */
-    private $scheme;
+    public $scheme;
 
     /**
      * Database host
      *
      * @var string|null
      */
-    private $host;
+    public $host;
 
     /**
      * Database port
      *
      * @var int|null
      */
-    private $port;
+    public $port;
 
     /**
      * Database user
      *
      * @var string|null
      */
-    private $username;
+    public $username;
 
     /**
      * Database user password
      *
      * @var string|null
      */
-    private $password;
+    public $password;
 
     /**
      * Database name
      *
      * @var string|null
      */
-    private $databaseName;
+    public $databaseName;
 
     /**
      * Connection encoding
      *
      * @var string
      */
-    private $encoding;
+    public $encoding;
 
     /**
      * All query parameters
      *
      * @var array
      */
-    private $queryParameters = [];
+    public $queryParameters = [];
 
     /**
      * @param string $connectionDSN DSN examples:
@@ -114,96 +114,6 @@ final class StorageConfiguration
         $self->encoding     = $self->queryParameters['charset'] ?? 'UTF-8';
 
         return $self;
-    }
-
-    /**
-     * Get original specified DSN
-     *
-     * @return string
-     */
-    public function originalDSN(): string
-    {
-        return $this->originalDSN;
-    }
-
-    /**
-     * Get scheme
-     *
-     * @return string|null
-     */
-    public function scheme(): ?string
-    {
-        return $this->scheme;
-    }
-
-    /**
-     * Get query parameters
-     *
-     * @return array
-     */
-    public function queryParameters(): array
-    {
-        return $this->queryParameters;
-    }
-
-    /**
-     * Get database host
-     *
-     * @return string
-     */
-    public function host(): string
-    {
-        return (string) $this->host;
-    }
-
-    /**
-     * Get database port
-     *
-     * @return int|null
-     */
-    public function port(): ?int
-    {
-        return $this->port;
-    }
-
-    /**
-     * Get database username
-     *
-     * @return string|null
-     */
-    public function username(): ?string
-    {
-        return $this->username;
-    }
-
-    /**
-     * Get database user password
-     *
-     * @return string|null
-     */
-    public function password(): ?string
-    {
-        return $this->password;
-    }
-
-    /**
-     * Get database name
-     *
-     * @return string|null
-     */
-    public function databaseName(): ?string
-    {
-        return $this->databaseName;
-    }
-
-    /**
-     * Get encoding
-     *
-     * @return string
-     */
-    public function encoding(): string
-    {
-        return $this->encoding;
     }
 
     /**

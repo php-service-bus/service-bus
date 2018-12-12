@@ -49,11 +49,11 @@ final class SQLSagaStore implements SagasStore
     {
         /** @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery */
         $insertQuery = insertQuery('sagas_store', [
-            'id'               => $storedSaga->id(),
-            'identifier_class' => $storedSaga->idClass(),
-            'saga_class'       => $storedSaga->sagaClass(),
-            'payload'          => $storedSaga->payload(),
-            'state_id'         => $storedSaga->status(),
+            'id'               => $storedSaga->id,
+            'identifier_class' => $storedSaga->idClass,
+            'saga_class'       => $storedSaga->sagaClass,
+            'payload'          => $storedSaga->payload,
+            'state_id'         => $storedSaga->status,
             'created_at'       => $storedSaga->formatCreatedAt(),
             'expiration_date'  => $storedSaga->formatExpirationDate(),
             'closed_at'        => $storedSaga->formatClosedAt()
@@ -76,12 +76,12 @@ final class SQLSagaStore implements SagasStore
          * @psalm-suppress ImplicitToStringCast
          */
         $updateQuery = updateQuery('sagas_store', [
-            'payload'   => $storedSaga->payload(),
-            'state_id'  => $storedSaga->status(),
+            'payload'   => $storedSaga->payload,
+            'state_id'  => $storedSaga->status,
             'closed_at' => $storedSaga->formatClosedAt()
         ])
-            ->where(equalsCriteria('id', $storedSaga->id()))
-            ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass()));
+            ->where(equalsCriteria('id', $storedSaga->id))
+            ->andWhere(equalsCriteria('identifier_class', $storedSaga->idClass));
 
         /** @var \Latitude\QueryBuilder\Query $compiledQuery */
         $compiledQuery = $updateQuery->compile();

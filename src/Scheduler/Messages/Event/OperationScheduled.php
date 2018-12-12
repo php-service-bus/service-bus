@@ -28,28 +28,28 @@ final class OperationScheduled implements Event
      *
      * @var ScheduledOperationId
      */
-    private $id;
+    public $id;
 
     /**
      * Command namespace
      *
      * @var string
      */
-    private $commandNamespace;
+    public $commandNamespace;
 
     /**
      * Execution date
      *
      * @var \DateTimeImmutable
      */
-    private $executionDate;
+    public $executionDate;
 
     /**
      * Next operation data
      *
      * @var NextScheduledOperation|null
      */
-    private $nextOperation;
+    public $nextOperation;
 
     /**
      * @param ScheduledOperationId        $id
@@ -74,46 +74,6 @@ final class OperationScheduled implements Event
         $self->nextOperation    = $nextOperation;
 
         return $self;
-    }
-
-    /**
-     * Receive identifier
-     *
-     * @return ScheduledOperationId
-     */
-    public function id(): ScheduledOperationId
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive command namespace
-     *
-     * @return string
-     */
-    public function commandNamespace(): string
-    {
-        return $this->commandNamespace;
-    }
-
-    /**
-     * Receive execution date
-     *
-     * @return \DateTimeImmutable
-     */
-    public function executionDate(): \DateTimeImmutable
-    {
-        return $this->executionDate;
-    }
-
-    /**
-     * Receive next operation data
-     *
-     * @return NextScheduledOperation|null
-     */
-    public function nextOperation(): ?NextScheduledOperation
-    {
-        return $this->nextOperation;
     }
 
     /**

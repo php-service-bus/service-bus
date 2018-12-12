@@ -86,9 +86,9 @@ final class SchedulerProvider
                         {
                             yield $context->delivery(
                                 OperationScheduled::create(
-                                    $operation->id(),
-                                    $operation->command(),
-                                    $operation->date(),
+                                    $operation->id,
+                                    $operation->command,
+                                    $operation->date,
                                     $nextOperation
                                 )
                             );
@@ -100,7 +100,7 @@ final class SchedulerProvider
                     if($context instanceof LoggingInContext)
                     {
                         $context->logContextMessage('Operation "{messageClass}" scheduled', [
-                                'messageClass' => \get_class($operation->command())
+                                'messageClass' => \get_class($operation->command)
                             ]
                         );
                     }
@@ -108,7 +108,7 @@ final class SchedulerProvider
                 catch(UniqueConstraintViolationCheckFailed $exception)
                 {
                     throw new DuplicateScheduledJob(
-                        \sprintf('Job with ID "%s" already exists', $operation->id()),
+                        \sprintf('Job with ID "%s" already exists', $operation->id),
                         $exception->getCode(),
                         $exception
                     );
@@ -197,7 +197,7 @@ final class SchedulerProvider
                     yield self::processSendCommand($operation, $context);
 
                     yield $context->delivery(
-                        SchedulerOperationEmitted::create($operation->id(), $nextOperation)
+                        SchedulerOperationEmitted::create($operation->id, $nextOperation)
                     );
                 }
             };
@@ -246,7 +246,7 @@ final class SchedulerProvider
         {
             if(null !== $nextOperation)
             {
-                $id    = $nextOperation->id();
+                $id    = $nextOperation->id;
                 $delay = self::calculateExecutionDelay($nextOperation);
 
                 /** Message will return after a specified time interval */
@@ -296,7 +296,7 @@ final class SchedulerProvider
         $currentDate = datetimeInstantiator('NOW');
 
         /** @noinspection UnnecessaryCastingInspection */
-        $executionDelay = $nextScheduledOperation->time()->getTimestamp() - $currentDate->getTimestamp();
+        $executionDelay = $nextScheduledOperation->time->getTimestamp() - $currentDate->getTimestamp();
 
         return $executionDelay * 1000;
     }
@@ -313,14 +313,14 @@ final class SchedulerProvider
         return call(
             static function(ScheduledOperation $operation, MessageDeliveryContext $context): \Generator
             {
-                yield $context->delivery($operation->command());
+                yield $context->delivery($operation->command);
 
                 if($context instanceof LoggingInContext)
                 {
                     $context->logContextMessage(
                         'The delayed "{messageClass}" command has been sent to the transport', [
-                            'messageClass'         => \get_class($operation->command()),
-                            'scheduledOperationId' => (string) $operation->id()
+                            'messageClass'         => \get_class($operation->command),
+                            'scheduledOperationId' => (string) $operation->id
                         ]
                     );
                 }

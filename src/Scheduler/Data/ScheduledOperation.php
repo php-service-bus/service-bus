@@ -28,28 +28,28 @@ final class ScheduledOperation
      *
      * @var ScheduledOperationId
      */
-    private $id;
+    public $id;
 
     /**
      * Scheduled message
      *
      * @var Command
      */
-    private $command;
+    public $command;
 
     /**
      * Execution date
      *
      * @var \DateTimeImmutable
      */
-    private $date;
+    public $date;
 
     /**
      * The message was sent to the transport
      *
      * @var bool
      */
-    private $isSent;
+    public $isSent;
 
     /**
      * @param ScheduledOperationId $id
@@ -84,46 +84,6 @@ final class ScheduledOperation
             $dateTime,
             (bool) $data['is_sent']
         );
-    }
-
-    /**
-     * Receive identifier
-     *
-     * @return ScheduledOperationId
-     */
-    public function id(): ScheduledOperationId
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive command
-     *
-     * @return Command
-     */
-    public function command(): Command
-    {
-        return $this->command;
-    }
-
-    /**
-     * Receive execution date
-     *
-     * @return \DateTimeImmutable
-     */
-    public function date(): \DateTimeImmutable
-    {
-        return $this->date;
-    }
-
-    /**
-     * Receive the message sending flag
-     *
-     * @return bool
-     */
-    public function isSent(): bool
-    {
-        return $this->isSent;
     }
 
     /**

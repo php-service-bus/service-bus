@@ -21,6 +21,7 @@ use Desperado\ServiceBus\IndexProvider;
 use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
+use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -95,7 +96,7 @@ final class IndexProviderTest extends TestCase
         /** @var bool $result */
         $result = wait($this->indexer->add($index, $value));
 
-        static::assertInternalType('bool', $result);
+        static::assertThat($result, new IsType('bool'));
         static::assertTrue($result);
 
         /** @var IndexValue|null $storedValue */
@@ -120,14 +121,14 @@ final class IndexProviderTest extends TestCase
         /** @var bool $result */
         $result = wait($this->indexer->add($index, $value));
 
-        static::assertInternalType('bool', $result);
+        static::assertThat($result, new IsType('bool'));
         static::assertTrue($result);
 
 
         /** @var bool $result */
         $result = wait($this->indexer->add($index, $value));
 
-        static::assertInternalType('bool', $result);
+        static::assertThat($result, new IsType('bool'));
         static::assertFalse($result);
     }
 

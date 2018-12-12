@@ -23,12 +23,12 @@ final class AmqpTransportLevelDestination implements TransportLevelDestination
     /**
      * @var string
      */
-    private $exchange;
+    public $exchange;
 
     /**
      * @var string|null
      */
-    private $routingKey;
+    public $routingKey;
 
     /**
      * @param string      $exchange
@@ -38,21 +38,5 @@ final class AmqpTransportLevelDestination implements TransportLevelDestination
     {
         $this->exchange   = $exchange;
         $this->routingKey = $routingKey;
-    }
-
-    /**
-     * @return string
-     */
-    public function exchange(): string
-    {
-        return $this->exchange;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function routingKey(): ?string
-    {
-        return $this->routingKey;
     }
 }

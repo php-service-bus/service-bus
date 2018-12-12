@@ -18,48 +18,47 @@ namespace Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore;
  */
 final class StoredAggregateSnapshot
 {
-
     /**
      * Aggregate id
      *
      * @var string
      */
-    private $aggregateId;
+    public $aggregateId;
 
     /**
      * Aggregate id class
      *
      * @var string
      */
-    private $aggregateIdClass;
+    public $aggregateIdClass;
 
     /**
      * Aggregate class
      *
      * @var string
      */
-    private $aggregateClass;
+    public $aggregateClass;
 
     /**
      * Aggregate version
      *
      * @var int
      */
-    private $version;
+    public $version;
 
     /**
      * Serialized aggregate data
      *
      * @var string
      */
-    private $payload;
+    public $payload;
 
     /**
      * Snapshot creation date
      *
      * @var string
      */
-    private $createdAt;
+    public $createdAt;
 
     /**
      * @param string $aggregateId
@@ -84,65 +83,5 @@ final class StoredAggregateSnapshot
         $this->version          = $version;
         $this->payload          = $payload;
         $this->createdAt        = $createdAt;
-    }
-
-    /**
-     * Receive aggregate id
-     *
-     * @return string
-     */
-    public function aggregateId(): string
-    {
-        return $this->aggregateId;
-    }
-
-    /**
-     * Receive aggregate id class
-     *
-     * @return string
-     */
-    public function aggregateIdClass(): string
-    {
-        return $this->aggregateIdClass;
-    }
-
-    /**
-     * Receive aggregate class
-     *
-     * @return string
-     */
-    public function aggregateClass(): string
-    {
-        return $this->aggregateClass;
-    }
-
-    /**
-     * Receive aggregate version
-     *
-     * @return int
-     */
-    public function version(): int
-    {
-        return $this->version;
-    }
-
-    /**
-     * Receive serialized aggregate data
-     *
-     * @return string
-     */
-    public function payload(): string
-    {
-        return $this->payload;
-    }
-
-    /**
-     * Receive creation date
-     *
-     * @return string
-     */
-    public function createdAt(): string
-    {
-        return $this->createdAt;
     }
 }

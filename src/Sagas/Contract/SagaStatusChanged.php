@@ -27,49 +27,49 @@ final class SagaStatusChanged implements Event
      *
      * @var string
      */
-    private $id;
+    public $id;
 
     /**
      * Saga identifier class
      *
      * @var string
      */
-    private $idClass;
+    public $idClass;
 
     /**
      * Saga class
      *
      * @var string
      */
-    private $sagaClass;
+    public $sagaClass;
 
     /**
      * Previous saga status
      *
      * @var string
      */
-    private $previousStatus;
+    public $previousStatus;
 
     /**
      * Previous saga status
      *
      * @var string
      */
-    private $newStatus;
+    public $newStatus;
 
     /**
      * Reason for changing the status of the saga
      *
      * @var string|null
      */
-    private $withReason;
+    public $withReason;
 
     /**
      * Operation datetime
      *
      * @var \DateTimeImmutable
      */
-    private $datetime;
+    public $datetime;
 
     /**
      * @noinspection PhpDocMissingThrowsInspection
@@ -100,75 +100,5 @@ final class SagaStatusChanged implements Event
         $self->datetime = new \DateTimeImmutable('NOW');
 
         return $self;
-    }
-
-    /**
-     * Receive saga identifier
-     *
-     * @return string
-     */
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive saga identifier class
-     *
-     * @return string
-     */
-    public function idClass(): string
-    {
-        return $this->idClass;
-    }
-
-    /**
-     * Receive saga class
-     *
-     * @return string
-     */
-    public function sagaClass(): string
-    {
-        return $this->sagaClass;
-    }
-
-    /**
-     * Receive old saga status id
-     *
-     * @return string
-     */
-    public function previousStatus(): string
-    {
-        return $this->previousStatus;
-    }
-
-    /**
-     * Receive new saga status id
-     *
-     * @return string
-     */
-    public function newStatus(): string
-    {
-        return $this->newStatus;
-    }
-
-    /**
-     * Receive the reason for changing the status of the saga
-     *
-     * @return string|null
-     */
-    public function withReason(): ?string
-    {
-        return $this->withReason;
-    }
-
-    /**
-     * Receive operation datetime
-     *
-     * @return \DateTimeImmutable
-     */
-    public function datetime(): \DateTimeImmutable
-    {
-        return $this->datetime;
     }
 }

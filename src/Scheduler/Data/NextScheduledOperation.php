@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Scheduler\Data;
 
 use function Desperado\ServiceBus\Common\datetimeInstantiator;
-use function Desperado\ServiceBus\Common\datetimeToString;
 use Desperado\ServiceBus\Scheduler\ScheduledOperationId;
 
 /**
@@ -27,14 +26,14 @@ final class NextScheduledOperation
      *
      * @var ScheduledOperationId
      */
-    private $id;
+    public $id;
 
     /**
-     * Time in milliseconds
+     * Next operation date
      *
-     * @var string
+     * @var \DateTimeImmutable
      */
-    private $time;
+    public $time;
 
     /**
      * @param array<string, string> $row
@@ -59,26 +58,6 @@ final class NextScheduledOperation
     public function __construct(ScheduledOperationId $id, \DateTimeImmutable $time)
     {
         $this->id   = $id;
-        $this->time = (string) datetimeToString($time);
-    }
-
-    /**
-     * @return ScheduledOperationId
-     */
-    public function id(): ScheduledOperationId
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function time(): \DateTimeImmutable
-    {
-        /** @noinspection OneTimeUseVariablesInspection */
-        /** @var \DateTimeImmutable $datetime */
-        $datetime = datetimeInstantiator($this->time);
-
-        return $datetime;
+        $this->time = $time;
     }
 }

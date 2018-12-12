@@ -29,56 +29,56 @@ final class StoredSaga
      *
      * @var string
      */
-    private $id;
+    public $id;
 
     /**
      * Saga identifier class
      *
      * @var string
      */
-    private $idClass;
+    public $idClass;
 
     /**
      * Saga class
      *
      * @var string
      */
-    private $sagaClass;
+    public $sagaClass;
 
     /**
      * Serialized representation of the saga
      *
      * @var string
      */
-    private $payload;
+    public $payload;
 
     /**
      * Current status of the saga
      *
      * @var string
      */
-    private $status;
+    public $status;
 
     /**
      * Date of creation
      *
      * @var \DateTimeImmutable
      */
-    private $createdAt;
+    public $createdAt;
 
     /**
      * Date of expiration
      *
      * @var \DateTimeImmutable
      */
-    private $expirationDate;
+    public $expirationDate;
 
     /**
      * Closing date of the saga
      *
      * @var \DateTimeImmutable|null
      */
-    private $closedAt;
+    public $closedAt;
 
     /**
      * @param SagaId                  $id
@@ -144,7 +144,7 @@ final class StoredSaga
             $closedAtDateTime = datetimeInstantiator($closedAt);
 
             /** @var SagaId $sagaId */
-            $sagaId = self::identifierInstantiator($idClass, $id, $sagaClass);
+            $sagaId = new $idClass($id, $sagaClass);
 
             return self::create(
                 $sagaId,
@@ -187,86 +187,6 @@ final class StoredSaga
     }
 
     /**
-     * Receive saga id
-     *
-     * @return string
-     */
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive saga id class
-     *
-     * @return string
-     */
-    public function idClass(): string
-    {
-        return $this->idClass;
-    }
-
-    /**
-     * Receive saga class
-     *
-     * @return string
-     */
-    public function sagaClass(): string
-    {
-        return $this->sagaClass;
-    }
-
-    /**
-     * Receive serialized saga payload
-     *
-     * @return string
-     */
-    public function payload(): string
-    {
-        return $this->payload;
-    }
-
-    /**
-     * Receive current status
-     *
-     * @return string
-     */
-    public function status(): string
-    {
-        return $this->status;
-    }
-
-    /**
-     * Receive created_at date
-     *
-     * @return \DateTimeImmutable
-     */
-    public function createdAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Receive closed_at date
-     *
-     * @return \DateTimeImmutable|null
-     */
-    public function closedAt(): ?\DateTimeImmutable
-    {
-        return $this->closedAt;
-    }
-
-    /**
-     * Receive expiration date
-     *
-     * @return \DateTimeImmutable
-     */
-    public function expirationDate(): \DateTimeImmutable
-    {
-        return $this->expirationDate;
-    }
-
-    /**
      * Receive created_at as string
      *
      * @param string $format
@@ -300,23 +220,6 @@ final class StoredSaga
     public function formatClosedAt(string $format = 'Y-m-d H:i:s'): ?string
     {
         return datetimeToString($this->closedAt, $format);
-    }
-
-    /**
-     * Create identifier instance
-     *
-     * @template        SagaId
-     * @template-typeof SagaId $idClass
-     *
-     * @param string $idClass
-     * @param string $idValue
-     * @param string $sagaClass
-     *
-     * @return SagaId
-     */
-    private static function identifierInstantiator(string $idClass, string $idValue, string $sagaClass): SagaId
-    {
-        return new $idClass($idValue, $sagaClass);
     }
 
     /**

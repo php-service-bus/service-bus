@@ -18,6 +18,7 @@ use function Desperado\ServiceBus\Infrastructure\Storage\fetchAll;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchOne;
 use Desperado\ServiceBus\Infrastructure\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
+use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -141,7 +142,7 @@ final class DoctrineDBALResultSetTest extends TestCase
             )
         );
 
-        static::assertInternalType('array', $result);
+        static::assertThat($result, new IsType('array'));
         static::assertEmpty($result);
     }
 

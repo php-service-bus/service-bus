@@ -29,14 +29,14 @@ final class SchedulerOperationEmitted implements Event
      *
      * @var ScheduledOperationId
      */
-    private $id;
+    public $id;
 
     /**
      * Next operation data
      *
      * @var NextScheduledOperation|null
      */
-    private $nextOperation;
+    public $nextOperation;
 
     /**
      * @param ScheduledOperationId        $id
@@ -52,25 +52,5 @@ final class SchedulerOperationEmitted implements Event
         $self->nextOperation = $nextScheduledOperation;
 
         return $self;
-    }
-
-    /**
-     * Receive scheduled operation identifier
-     *
-     * @return ScheduledOperationId
-     */
-    public function id(): ScheduledOperationId
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive next operation data
-     *
-     * @return NextScheduledOperation|null
-     */
-    public function nextOperation(): ?NextScheduledOperation
-    {
-        return $this->nextOperation;
     }
 }

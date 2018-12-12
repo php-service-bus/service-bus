@@ -21,23 +21,25 @@ final class SagaMetadata
     public const DEFAULT_EXPIRE_INTERVAL = '+1 hour';
 
     /**
+     * Class namespace
+     *
      * @var string
      */
-    private $sagaClass;
+    public $sagaClass;
 
     /**
      * Identifier class
      *
      * @var string
      */
-    private $identifierClass;
+    public $identifierClass;
 
     /**
      * The field that contains the saga identifier
      *
      * @var string
      */
-    private $containingIdentifierProperty;
+    public $containingIdentifierProperty;
 
     /**
      * Saga expire date modifier
@@ -46,7 +48,7 @@ final class SagaMetadata
      *
      * @var string
      */
-    private $expireDateModifier;
+    public $expireDateModifier;
 
     /**
      * @param string $sagaClass
@@ -65,45 +67,5 @@ final class SagaMetadata
         $this->identifierClass              = $identifierClass;
         $this->containingIdentifierProperty = $containingIdentifierProperty;
         $this->expireDateModifier           = $expireDateModifier;
-    }
-
-    /**
-     * Receive saga class
-     *
-     * @return string
-     */
-    public function sagaClass(): string
-    {
-        return $this->sagaClass;
-    }
-
-    /**
-     * Receive saga expire date modifier
-     *
-     * @return string
-     */
-    public function expireDateModifier(): string
-    {
-        return $this->expireDateModifier;
-    }
-
-    /**
-     * Receive identifier class
-     *
-     * @return string
-     */
-    public function identifierClass(): string
-    {
-        return $this->identifierClass;
-    }
-
-    /**
-     * Receive the name of the event property that contains the saga ID
-     *
-     * @return string
-     */
-    public function containingIdentifierProperty(): string
-    {
-        return $this->containingIdentifierProperty;
     }
 }

@@ -49,7 +49,7 @@ final class DoctrineDBALAdapter implements StorageAdapter
         try
         {
             $this->connection = DriverManager::getConnection(
-                ['url' => $configuration->originalDSN()],
+                ['url' => $configuration->originalDSN],
                 new Configuration()
             );
         }

@@ -33,6 +33,7 @@ use Desperado\ServiceBus\Tests\Stubs\Sagas\IncorrectSagaId;
 use Desperado\ServiceBus\Tests\Stubs\Sagas\SagasStoreStub;
 use Desperado\ServiceBus\Tests\Stubs\Sagas\TestSagaId;
 use Monolog\Handler\TestHandler;
+use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 use Desperado\ServiceBus\Sagas\Configuration\SagaEventListenerProcessor;
 
@@ -263,7 +264,7 @@ final class SagaEventListenerProcessorTest extends TestCase
         /** @var array $messages */
         $messages = readReflectionPropertyValue($context, 'messages');
 
-        static::assertInternalType('array', $messages);
+        static::assertThat($messages, new IsType('array'));
         static::assertNotEmpty($messages);
 
         /** @var SecondEventWithKey $responseEvent */
