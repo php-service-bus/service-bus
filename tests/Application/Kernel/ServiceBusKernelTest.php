@@ -206,7 +206,11 @@ final class ServiceBusKernelTest extends TestCase
         static::assertEquals('Publish message to "{rabbitMqExchange}" with routing key "{rabbitMqRoutingKey}"', $latest['message']);
         static::assertEquals('test_topic', $latest['context']['rabbitMqExchange']);
         static::assertEquals('tests', $latest['context']['rabbitMqRoutingKey']);
-        static::assertEquals(['delivery-mode' => 2], $latest['context']['headers']);
+
+        static::assertArrayHasKey('delivery-mode', $latest['context']['headers']);
+        static::assertArrayHasKey('service-bus-trace-id', $latest['context']['headers']);
+
+        static::assertEquals(2, $latest['context']['headers']['delivery-mode']);
     }
 
     /**
