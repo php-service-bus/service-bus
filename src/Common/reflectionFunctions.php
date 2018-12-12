@@ -87,7 +87,7 @@ function extractReflectionProperty(object $object, string $propertyName): \Refle
 
     try
     {
-        $property = new \ReflectionProperty($object, $propertyName);
+        return new \ReflectionProperty($object, $propertyName);
     }
     catch(\ReflectionException $e)
     {
@@ -98,20 +98,18 @@ function extractReflectionProperty(object $object, string $propertyName): \Refle
         {
             try
             {
-                $property = $reflector->getProperty($propertyName);
-
-                break;
+                return $reflector->getProperty($propertyName);
             }
             catch(\Throwable $throwable)
             {
                 /** Not interested */
             }
         }
+
+        throw new \ReflectionException(
+            \sprintf('Property "%s" not exists in "%s"', $propertyName, \get_class($object))
+        );
     }
-
-    /** @var \ReflectionProperty $property */
-
-    return $property;
 }
 
 /**
