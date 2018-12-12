@@ -28,14 +28,34 @@ final class CommandHandler implements ServicesAnnotationsMarker
      *
      * @var bool
      */
-    private $validate = false;
+    public $validate = false;
+
+    /**
+     * In case of validation errors, automatically send the event and stop further execution
+     * The event must implement @see ValidationFailedEvent interface
+     *
+     * If no class is specified, control is passed to user code
+     *
+     * @var string|null
+     */
+    public $defaultValidationFailedEvent;
+
+    /**
+     * In case of a runtime error, automatically send the specified event with the message received from the exception
+     * The event must implement @see ExecutionFailedEvent interface
+     *
+     * If no class is specified, control is passed to user code
+     *
+     * @var string|null
+     */
+    public $defaultThrowableEvent;
 
     /**
      * Validation groups
      *
      * @var array<int, string>
      */
-    private $groups = [];
+    public $groups = [];
 
     /**
      * @param array $data
@@ -59,25 +79,5 @@ final class CommandHandler implements ServicesAnnotationsMarker
 
             $this->{$property} = $value;
         }
-    }
-
-    /**
-     * Command validation enabled?
-     *
-     * @return bool
-     */
-    public function validationEnabled(): bool
-    {
-        return $this->validate;
-    }
-
-    /**
-     * Receive validation groups
-     *
-     * @return array<int, string>
-     */
-    public function validationGroups(): array
-    {
-        return $this->groups;
     }
 }

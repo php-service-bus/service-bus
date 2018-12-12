@@ -18,6 +18,8 @@ use Amp\Promise;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\MessageHandlers\HandlerArgumentCollection;
+use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
+use Psr\Log\LogLevel;
 
 /**
  *
@@ -44,14 +46,28 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $argumentResolvers;
 
     /**
+     * Execution options
+     *
+     * @var HandlerOptions
+     */
+    private $options;
+
+    /**
      * @param \Closure                                                                $closure
      * @param HandlerArgumentCollection                                               $arguments
+     * @param HandlerOptions                                                          $options
      * @param array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
      */
-    public function __construct(\Closure $closure, HandlerArgumentCollection $arguments, array $argumentResolvers)
+    public function __construct(
+        \Closure $closure,
+        HandlerArgumentCollection $arguments,
+        HandlerOptions $options,
+        array $argumentResolvers
+    )
     {
         $this->closure           = $closure;
         $this->arguments         = $arguments;
+        $this->options           = $options;
         $this->argumentResolvers = $argumentResolvers;
     }
 
@@ -60,11 +76,66 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     public function __invoke(Message $message, KernelContext $context): Promise
     {
-        /** @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args) */
+        $argumentResolvers = $this->argumentResolvers;
+
+        /**
+         * @psalm-suppress  MixedArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         */
         return call(
-            $this->closure,
-            ...self::collectArguments($this->arguments, $this->argumentResolvers, $message, $context)
+            static function(
+                \Closure $closure, HandlerArgumentCollection $arguments, HandlerOptions $options, Message $message,
+                KernelContext $context
+            ) use ($argumentResolvers): \Generator
+            {
+                try
+                {
+                    $resolvedArgs = self::collectArguments($arguments, $argumentResolvers, $message, $context);
+
+                    /** @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args) */
+                    yield call($closure, ...$resolvedArgs);
+
+                    unset($resolvedArgs);
+                }
+                catch(\Throwable $throwable)
+                {
+                    if(false === $options->hasDefaultThrowableEvent())
+                    {
+                        throw $throwable;
+                    }
+
+                    $context->logContextMessage(
+                        'Error processing, sending an error event and stopping message processing',
+                        ['eventClass' => $options->defaultThrowableEvent()],
+                        LogLevel::DEBUG
+                    );
+
+                    yield from self::publishThrowable(
+                        (string) $options->defaultThrowableEvent(),
+                        $throwable->getMessage(),
+                        $context
+                    );
+                }
+            },
+            $this->closure, $this->arguments, $this->options, $message, $context
         );
+    }
+
+    /**
+     * Publish failed response event
+     *
+     * @param string        $eventClass
+     * @param string        $errorMessage
+     * @param KernelContext $context
+     *
+     * @return \Generator
+     */
+    private static function publishThrowable(string $eventClass, string $errorMessage, KernelContext $context): \Generator
+    {
+        /** @var \Desperado\ServiceBus\Services\Contracts\ExecutionFailedEvent $event */
+        $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $errorMessage]);
+
+        yield $context->delivery($event);
     }
 
     /**

@@ -83,11 +83,9 @@ function readReflectionPropertyValue(object $object, string $propertyName)
  */
 function extractReflectionProperty(object $object, string $propertyName): \ReflectionProperty
 {
-    $property = null;
-
     try
     {
-        $property = new \ReflectionProperty($object, $propertyName);
+        return new \ReflectionProperty($object, $propertyName);
     }
     catch(\ReflectionException $e)
     {
@@ -96,15 +94,20 @@ function extractReflectionProperty(object $object, string $propertyName): \Refle
         /** @noinspection LoopWhichDoesNotLoopInspection */
         while($reflector = $reflector->getParentClass())
         {
-            $property = $reflector->getProperty($propertyName);
-
-            break;
+            try
+            {
+                return $reflector->getProperty($propertyName);
+            }
+            catch(\Throwable $throwable)
+            {
+                /** Not interested */
+            }
         }
+
+        throw new \ReflectionException(
+            \sprintf('Property "%s" not exists in "%s"', $propertyName, \get_class($object))
+        );
     }
-
-    /** @var \ReflectionProperty $property */
-
-    return $property;
 }
 
 /**

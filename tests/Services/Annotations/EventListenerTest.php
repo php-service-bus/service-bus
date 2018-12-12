@@ -41,8 +41,8 @@ final class EventListenerTest extends TestCase
     {
         $annotation = new EventListener([]);
 
-        static::assertFalse($annotation->validationEnabled());
-        static::assertEmpty($annotation->validationGroups());
+        static::assertFalse($annotation->validate);
+        static::assertEmpty($annotation->groups);
     }
 
     /**
@@ -60,7 +60,24 @@ final class EventListenerTest extends TestCase
             ]
         ]);
 
-        static::assertTrue($annotation->validationEnabled());
-        static::assertEquals(['qwerty', 'root'], $annotation->validationGroups());
+        static::assertTrue($annotation->validate);
+        static::assertEquals(['qwerty', 'root'], $annotation->groups);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     */
+    public function withCustomEvents(): void
+    {
+        $handler = new EventListener([
+                'defaultValidationFailedEvent' => EventListener::class,
+                'defaultThrowableEvent'        => \Throwable::class
+            ]
+        );
+
+        self::assertEquals(EventListener::class, $handler->defaultValidationFailedEvent);
+        self::assertEquals(\Throwable::class, $handler->defaultThrowableEvent);
     }
 }

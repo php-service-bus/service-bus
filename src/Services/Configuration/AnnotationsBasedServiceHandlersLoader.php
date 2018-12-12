@@ -88,9 +88,19 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
 
         $options = new HandlerOptions();
 
-        if(true === $annotation->validationEnabled())
+        if(true === $annotation->validate)
         {
-            $options->enableValidation($annotation->validationGroups());
+            $options->enableValidation($annotation->groups);
+        }
+
+        if('' !== (string) $annotation->defaultValidationFailedEvent)
+        {
+            $options->useDefaultValidationFailedEvent((string) $annotation->defaultValidationFailedEvent);
+        }
+
+        if('' !== (string) $annotation->defaultThrowableEvent)
+        {
+            $options->useDefaultThrowableEvent((string) $annotation->defaultThrowableEvent);
         }
 
         return $options;
