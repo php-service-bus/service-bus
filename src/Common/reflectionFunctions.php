@@ -83,8 +83,6 @@ function readReflectionPropertyValue(object $object, string $propertyName)
  */
 function extractReflectionProperty(object $object, string $propertyName): \ReflectionProperty
 {
-    $property = null;
-
     try
     {
         return new \ReflectionProperty($object, $propertyName);
