@@ -110,7 +110,7 @@ final class EventSourcingProvider
 
                     if(null !== $loadedSnapshot)
                     {
-                        $aggregate         = $loadedSnapshot->aggregate();
+                        $aggregate         = $loadedSnapshot->aggregate;
                         $fromStreamVersion = $aggregate->version() + 1;
                     }
 
@@ -161,7 +161,7 @@ final class EventSourcingProvider
                 {
                     /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEventStream $eventStream */
                     $eventStream    = invokeReflectionMethod($aggregate, 'makeStream');
-                    $receivedEvents = $eventStream->originEvents();
+                    $receivedEvents = $eventStream->originEvents;
 
                     $storedEventStream = $transformer->streamToStoredRepresentation($eventStream);
 
@@ -241,7 +241,7 @@ final class EventSourcingProvider
             {
                 /** @noinspection CallableParameterUseCaseInTypeContextInspection */
                 /** @var Aggregate $aggregate */
-                $aggregate = createWithoutConstructor($storedEventStream->aggregateClass());
+                $aggregate = createWithoutConstructor($storedEventStream->aggregateClass);
             }
 
             invokeReflectionMethod($aggregate, 'appendStream', $eventStream);

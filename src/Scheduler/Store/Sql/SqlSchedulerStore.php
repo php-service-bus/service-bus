@@ -63,10 +63,10 @@ final class SqlSchedulerStore implements SchedulerStore
              * @psalm-suppress ImplicitToStringCast
              */
             $insertQuery = insertQuery('scheduler_registry', [
-                'id'              => (string) $operation->id(),
-                'processing_date' => datetimeToString($operation->date()),
-                'command'         => \base64_encode(\serialize($operation->command())),
-                'is_sent'         => (int) $operation->isSent()
+                'id'              => (string) $operation->id,
+                'processing_date' => datetimeToString($operation->date),
+                'command'         => \base64_encode(\serialize($operation->command)),
+                'is_sent'         => (int) $operation->isSent
             ]);
 
             /** @var \Latitude\QueryBuilder\Query $compiledQuery */

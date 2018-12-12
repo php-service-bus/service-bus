@@ -320,7 +320,7 @@ final class SagaProviderTest extends TestCase
         /** @var \Desperado\ServiceBus\Sagas\Contract\SagaClosed $latest */
         $latest = \end($context->messages);
 
-        static::assertTrue(\is_object($latest));
+        static::assertEquals(true, \is_object($latest));
         static::assertInstanceOf(SagaClosed::class, $latest);
     }
 }

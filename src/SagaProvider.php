@@ -21,6 +21,7 @@ use function Desperado\ServiceBus\Common\datetimeInstantiator;
 use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
+use Desperado\ServiceBus\Infrastructure\Retry\OperationRetryWrapper;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed;
 use Desperado\ServiceBus\Sagas\Configuration\SagaMetadata;
@@ -35,17 +36,12 @@ use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
 use Desperado\ServiceBus\Sagas\SagaStore\StoredSaga;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
-use Kelunik\Retry\ConstantBackoff;
-use function Kelunik\Retry\retry;
 
 /**
  * Saga provider
  */
 final class SagaProvider
 {
-    private const SAVE_SAGA_RETRY_COUNT = 5;
-    private const SAVE_SAGA_RETRY_DELAY = 2000;
-
     /**
      * Sagas store
      *
@@ -61,11 +57,20 @@ final class SagaProvider
     private $sagaMetaDataCollection = [];
 
     /**
-     * @param SagasStore $store
+     * A wrapper on an operation that performs repetitions in case of an error
+     *
+     * @var OperationRetryWrapper
      */
-    public function __construct(SagasStore $store)
+    private $saveSagaRetryHandler;
+
+    /**
+     * @param SagasStore                 $store
+     * @param OperationRetryWrapper|null $saveSagaRetryHandler
+     */
+    public function __construct(SagasStore $store, OperationRetryWrapper $saveSagaRetryHandler = null)
     {
-        $this->store = $store;
+        $this->store                = $store;
+        $this->saveSagaRetryHandler = $saveSagaRetryHandler ?? new OperationRetryWrapper();
     }
 
     /**
@@ -97,13 +102,13 @@ final class SagaProvider
                     $sagaMetaData = $this->extractSagaMetaData($sagaClass);
 
                     /** @var \DateTimeImmutable $expireDate */
-                    $expireDate = datetimeInstantiator($sagaMetaData->expireDateModifier());
+                    $expireDate = datetimeInstantiator($sagaMetaData->expireDateModifier);
 
                     /** @var Saga $saga */
                     $saga = new $sagaClass($id, $expireDate);
                     $saga->start($command);
 
-                    yield from self::doStore($this->store, $saga, $context, true);
+                    yield from $this->doStore($saga, $context, true);
 
                     unset($sagaClass, $sagaMetaData, $expireDate);
 
@@ -149,7 +154,7 @@ final class SagaProvider
                     $currentDatetime = datetimeInstantiator('NOW');
 
                     /** @var Saga|null $saga */
-                    $saga = yield from self::doLoad($this->store, $id);
+                    $saga = yield from $this->doLoad($id);
 
                     if(null === $saga)
                     {
@@ -205,11 +210,11 @@ final class SagaProvider
                 try
                 {
                     /** @var Saga|null $existsSaga */
-                    $existsSaga = yield from self::doLoad($this->store, $saga->id());
+                    $existsSaga = yield from $this->doLoad($saga->id());
 
                     if(null !== $existsSaga)
                     {
-                        yield from self::doStore($this->store, $saga, $context, false);
+                        yield from $this->doStore($saga, $context, false);
 
                         unset($existsSaga);
 
@@ -237,22 +242,21 @@ final class SagaProvider
     /**
      * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @param SagasStore $store
-     * @param SagaId     $id
+     * @param SagaId $id
      *
      * @return \Generator<\Desperado\ServiceBus\Sagas\Saga|null>
      */
-    private static function doLoad(SagasStore $store, SagaId $id): \Generator
+    private function doLoad(SagaId $id): \Generator
     {
         $saga = null;
 
         /** @var StoredSaga|null $savedSaga */
-        $savedSaga = yield from $store->load($id);
+        $savedSaga = yield from $this->store->load($id);
 
         if(null !== $savedSaga)
         {
             /** @var Saga $saga */
-            $saga = \unserialize(\base64_decode($savedSaga->payload()), ['allowed_classes' => true]);
+            $saga = \unserialize((string) \base64_decode($savedSaga->payload), ['allowed_classes' => true]);
         }
 
         return $saga;
@@ -261,7 +265,6 @@ final class SagaProvider
     /**
      * Execute add/update saga entry
      *
-     * @param SagasStore             $store
      * @param Saga                   $saga
      * @param MessageDeliveryContext $context
      * @param bool                   $isNew
@@ -273,7 +276,7 @@ final class SagaProvider
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      * @throws \Throwable Reflection errors
      */
-    private static function doStore(SagasStore $store, Saga $saga, MessageDeliveryContext $context, bool $isNew): \Generator
+    private function doStore(Saga $saga, MessageDeliveryContext $context, bool $isNew): \Generator
     {
         /** @var array<int, \Desperado\ServiceBus\Common\Contract\Messages\Command> $commands */
         $commands = invokeReflectionMethod($saga, 'firedCommands');
@@ -292,9 +295,12 @@ final class SagaProvider
             $saga->expireDate(), $closedAt
         );
 
-        yield retry(
-            self::SAVE_SAGA_RETRY_COUNT,
-            static function() use ($store, $savedSaga, $isNew): \Generator
+        $store = $this->store;
+
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        yield call(
+            $this->saveSagaRetryHandler,
+            static function() use ($savedSaga, $isNew, $store): \Generator
             {
                 /** @var \Generator $generator */
                 $generator = true === $isNew
@@ -303,8 +309,7 @@ final class SagaProvider
 
                 yield from $generator;
             },
-            [ConnectionFailed::class, StorageInteractingFailed::class],
-            new ConstantBackoff(self::SAVE_SAGA_RETRY_DELAY)
+            ConnectionFailed::class, StorageInteractingFailed::class
         );
 
         /** @var array<mixed, \Desperado\ServiceBus\Common\Contract\Messages\Message> $messages */

@@ -28,7 +28,7 @@ final class EmitSchedulerOperation implements Command
      *
      * @var ScheduledOperationId
      */
-    private $id;
+    public $id;
 
     /**
      * @param ScheduledOperationId $id
@@ -42,13 +42,5 @@ final class EmitSchedulerOperation implements Command
         $self->id = $id;
 
         return $self;
-    }
-
-    /**
-     * @return ScheduledOperationId
-     */
-    public function id(): ScheduledOperationId
-    {
-        return $this->id;
     }
 }

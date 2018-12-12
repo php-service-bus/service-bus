@@ -56,16 +56,16 @@ final class AggregateEventStreamDataTransformer
             {
                 return $this->eventToStoredRepresentation($aggregateEvent);
             },
-            $aggregateEvent->events()
+            $aggregateEvent->events
         );
 
         return new StoredAggregateEventStream(
-            (string) $aggregateEvent->id(),
-            \get_class($aggregateEvent->id()),
-            $aggregateEvent->aggregateClass(),
+            (string) $aggregateEvent->id,
+            \get_class($aggregateEvent->id),
+            $aggregateEvent->aggregateClass,
             $preparedEvents,
-            (string) datetimeToString($aggregateEvent->createdAt()),
-            datetimeToString($aggregateEvent->closedAt())
+            (string) datetimeToString($aggregateEvent->createdAt),
+            datetimeToString($aggregateEvent->closedAt)
         );
     }
 
@@ -80,24 +80,24 @@ final class AggregateEventStreamDataTransformer
     {
         $events = [];
 
-        foreach($storedAggregateEventsStream->aggregateEvents() as $storedAggregateEvent)
+        foreach($storedAggregateEventsStream->storedAggregateEvents as $storedAggregateEvent)
         {
             $events[] = $this->eventToDomainRepresentation($storedAggregateEvent);
         }
 
         /** @var \DateTimeImmutable $createdAt */
-        $createdAt = datetimeInstantiator($storedAggregateEventsStream->createdAt());
+        $createdAt = datetimeInstantiator($storedAggregateEventsStream->createdAt);
         /** @var \DateTimeImmutable|null $closedAt */
-        $closedAt = datetimeInstantiator($storedAggregateEventsStream->closedAt());
+        $closedAt = datetimeInstantiator($storedAggregateEventsStream->closedAt);
 
         /** @var AggregateId $id */
         $id = self::identifierInstantiator(
-            $storedAggregateEventsStream->getAggregateIdClass(),
-            $storedAggregateEventsStream->aggregateId()
+            $storedAggregateEventsStream->aggregateIdClass,
+            $storedAggregateEventsStream->aggregateId
         );
 
         return new AggregateEventStream(
-            $id, $storedAggregateEventsStream->aggregateClass(), $events, $createdAt, $closedAt
+            $id, $storedAggregateEventsStream->aggregateClass, $events, $createdAt, $closedAt
         );
     }
 
@@ -111,12 +111,12 @@ final class AggregateEventStreamDataTransformer
     public function eventToStoredRepresentation(AggregateEvent $aggregateEvent): StoredAggregateEvent
     {
         return new StoredAggregateEvent(
-            $aggregateEvent->id(),
-            $aggregateEvent->playhead(),
-            $this->serializer->serialize($aggregateEvent->event()),
-            \get_class($aggregateEvent->event()),
-            (string) datetimeToString($aggregateEvent->occuredAt()),
-            datetimeToString($aggregateEvent->recordedAt())
+            $aggregateEvent->id,
+            $aggregateEvent->playhead,
+            $this->serializer->serialize($aggregateEvent->event),
+            \get_class($aggregateEvent->event),
+            (string) datetimeToString($aggregateEvent->occuredAt),
+            datetimeToString($aggregateEvent->recordedAt)
         );
     }
 
@@ -130,18 +130,18 @@ final class AggregateEventStreamDataTransformer
     public function eventToDomainRepresentation(StoredAggregateEvent $storedAggregateEvent): AggregateEvent
     {
         /** @var \DateTimeImmutable $occuredAt */
-        $occuredAt = datetimeInstantiator($storedAggregateEvent->occuredAt());
+        $occuredAt = datetimeInstantiator($storedAggregateEvent->occuredAt);
 
         /** @var \DateTimeImmutable|null $recordedAt */
-        $recordedAt = datetimeInstantiator($storedAggregateEvent->recordedAt());
+        $recordedAt = datetimeInstantiator($storedAggregateEvent->recordedAt);
 
         return new AggregateEvent(
-            $storedAggregateEvent->eventId(),
+            $storedAggregateEvent->eventId,
             $this->serializer->unserialize(
-                $storedAggregateEvent->eventClass(),
-                $storedAggregateEvent->eventData()
+                $storedAggregateEvent->eventClass,
+                $storedAggregateEvent->eventData
             ),
-            $storedAggregateEvent->playheadPosition(),
+            $storedAggregateEvent->playheadPosition,
             $occuredAt,
             $recordedAt
         );

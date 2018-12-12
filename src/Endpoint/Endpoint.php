@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Endpoint;
 
+use Amp\Promise;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 
 /**
@@ -33,9 +34,9 @@ interface Endpoint
      * @param Message         $message
      * @param DeliveryOptions $options
      *
-     * @return \Generator It does not return any result
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\SendMessageFailed Failed to send message
      */
-    public function delivery(Message $message, DeliveryOptions $options): \Generator;
+    public function delivery(Message $message, DeliveryOptions $options): Promise;
 }

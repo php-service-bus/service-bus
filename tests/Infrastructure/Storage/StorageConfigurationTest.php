@@ -30,11 +30,11 @@ final class StorageConfigurationTest extends TestCase
     {
         $configuration = StorageConfiguration::fromDSN('sqlite:///:memory:');
 
-        static::assertEquals('sqlite:///:memory:', $configuration->originalDSN());
-        static::assertEquals('sqlite', $configuration->scheme());
-        static::assertEquals('localhost', $configuration->host());
-        static::assertEquals(':memory:', $configuration->databaseName());
-        static::assertEquals('UTF-8', $configuration->encoding());
+        static::assertEquals('sqlite:///:memory:', $configuration->originalDSN);
+        static::assertEquals('sqlite', $configuration->scheme);
+        static::assertEquals('localhost', $configuration->host);
+        static::assertEquals(':memory:', $configuration->databaseName);
+        static::assertEquals('UTF-8', $configuration->encoding);
         static::assertFalse($configuration->hasCredentials());
     }
 
@@ -48,13 +48,13 @@ final class StorageConfigurationTest extends TestCase
         $configuration = StorageConfiguration::fromDSN(
             'pgsql://someUser:someUserPassword@host:54332/databaseName?charset=UTF-16'
         );
-        static::assertEquals('pgsql', $configuration->scheme());
-        static::assertEquals('host', $configuration->host());
-        static::assertEquals(54332, $configuration->port());
-        static::assertEquals('databaseName', $configuration->databaseName());
-        static::assertEquals('UTF-16', $configuration->encoding());
+        static::assertEquals('pgsql', $configuration->scheme);
+        static::assertEquals('host', $configuration->host);
+        static::assertEquals(54332, $configuration->port);
+        static::assertEquals('databaseName', $configuration->databaseName);
+        static::assertEquals('UTF-16', $configuration->encoding);
         static::assertTrue($configuration->hasCredentials());
-        static::assertEquals('someUser', $configuration->username());
-        static::assertEquals('someUserPassword', $configuration->password());
+        static::assertEquals('someUser', $configuration->username);
+        static::assertEquals('someUserPassword', $configuration->password);
     }
 }

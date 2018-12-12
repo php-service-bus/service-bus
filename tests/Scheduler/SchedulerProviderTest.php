@@ -145,9 +145,9 @@ final class SchedulerProviderTest extends TestCase
 
         $operation = ScheduledOperation::restoreFromRow($rowData);
 
-        static::assertEquals($id, $operation->id());
-        static::assertEquals($executionDate->format('c'), $operation->date()->format('c'));
-        static::assertTrue($operation->isSent());
+        static::assertEquals($id, $operation->id);
+        static::assertEquals($executionDate->format('c'), $operation->date->format('c'));
+        static::assertTrue($operation->isSent);
 
         $messages = $context->messages;
 
@@ -157,18 +157,18 @@ final class SchedulerProviderTest extends TestCase
         $message = \end($messages);
 
         static::assertInstanceOf(OperationScheduled::class, $message);
-        static::assertEquals(FirstEmptyCommand::class, $message->commandNamespace());
+        static::assertEquals(FirstEmptyCommand::class, $message->commandNamespace);
         static::assertTrue($message->hasNextOperation());
-        static::assertEquals($executionDate->format('c'), $message->executionDate()->format('c'));
+        static::assertEquals($executionDate->format('c'), $message->executionDate->format('c'));
 
-        static::assertNotNull($message->nextOperation());
+        static::assertNotNull($message->nextOperation);
 
         /** @var NextScheduledOperation $nextOperation */
-        $nextOperation = $message->nextOperation();
+        $nextOperation = $message->nextOperation;
 
         static::assertInstanceOf(NextScheduledOperation::class, $nextOperation);
-        static::assertEquals($id, $nextOperation->id());
-        static::assertEquals($executionDate->format('c'), $nextOperation->time()->format('c'));
+        static::assertEquals($id, $nextOperation->id);
+        static::assertEquals($executionDate->format('c'), $nextOperation->time->format('c'));
     }
 
     /**

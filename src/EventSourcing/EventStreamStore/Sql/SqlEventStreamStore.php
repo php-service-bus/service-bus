@@ -70,8 +70,8 @@ final class SqlEventStreamStore implements AggregateStore
             yield $transaction->rollback();
 
             throw new NonUniqueStreamId(
-                $aggregateEventStream->aggregateId(),
-                $aggregateEventStream->getAggregateIdClass()
+                $aggregateEventStream->aggregateId,
+                $aggregateEventStream->aggregateIdClass
             );
         }
         catch(\Throwable $throwable)
@@ -180,11 +180,11 @@ final class SqlEventStreamStore implements AggregateStore
     {
         /** @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery */
         $insertQuery = insertQuery('event_store_stream', [
-            'id'               => $eventsStream->aggregateId(),
-            'identifier_class' => $eventsStream->getAggregateIdClass(),
-            'aggregate_class'  => $eventsStream->aggregateClass(),
-            'created_at'       => $eventsStream->createdAt(),
-            'closed_at'        => $eventsStream->closedAt()
+            'id'               => $eventsStream->aggregateId,
+            'identifier_class' => $eventsStream->aggregateIdClass,
+            'aggregate_class'  => $eventsStream->aggregateClass,
+            'created_at'       => $eventsStream->createdAt,
+            'closed_at'        => $eventsStream->closedAt
         ]);
 
         /** @var \Latitude\QueryBuilder\Query $compiledQuery */
@@ -209,7 +209,7 @@ final class SqlEventStreamStore implements AggregateStore
      */
     private static function doSaveEvents(TransactionAdapter $transaction, StoredAggregateEventStream $eventsStream): \Generator
     {
-        $eventsCount = \count($eventsStream->aggregateEvents());
+        $eventsCount = \count($eventsStream->storedAggregateEvents);
 
         if(0 !== $eventsCount)
         {
@@ -275,17 +275,17 @@ final class SqlEventStreamStore implements AggregateStore
     {
         $eventsRows = [];
 
-        foreach($eventsStream->aggregateEvents() as $storedAggregateEvent)
+        foreach($eventsStream->storedAggregateEvents as $storedAggregateEvent)
         {
             /** @var StoredAggregateEvent $storedAggregateEvent */
 
             $row = [
-                $storedAggregateEvent->eventId(),
-                $eventsStream->aggregateId(),
-                $storedAggregateEvent->playheadPosition(),
-                $storedAggregateEvent->eventClass(),
-                \base64_encode($storedAggregateEvent->eventData()),
-                $storedAggregateEvent->occuredAt(),
+                $storedAggregateEvent->eventId,
+                $eventsStream->aggregateId,
+                $storedAggregateEvent->playheadPosition,
+                $storedAggregateEvent->eventClass,
+                \base64_encode($storedAggregateEvent->eventData),
+                $storedAggregateEvent->occuredAt,
                 \date('Y-m-d H:i:s')
             ];
 

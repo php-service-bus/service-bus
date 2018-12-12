@@ -57,7 +57,7 @@ final class SchedulerListener
              *
              * @var \Generator $generator
              */
-            $generator = invokeReflectionMethod($schedulerProvider, 'emit', $command->id(), $context);
+            $generator = invokeReflectionMethod($schedulerProvider, 'emit', $command->id, $context);
 
             return new Coroutine($generator);
         }
@@ -66,7 +66,7 @@ final class SchedulerListener
         {
             $context->logContextMessage(
                 'Emit scheduled operation "{scheduledOperationId}" failed with message "{throwableMessage}"', [
-                    'scheduledOperationId' => (string) $command->id(),
+                    'scheduledOperationId' => (string) $command->id,
                     'throwableMessage'     => $throwable->getMessage(),
                     'throwablePoint'       => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
                 ]
@@ -172,7 +172,7 @@ final class SchedulerListener
                 $generator = invokeReflectionMethod(
                     $schedulerProvider,
                     'emitNextOperation',
-                    $event->nextOperation(),
+                    $event->nextOperation,
                     $context
                 );
 

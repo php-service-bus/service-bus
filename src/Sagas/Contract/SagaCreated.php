@@ -26,35 +26,35 @@ final class SagaCreated implements Event
      *
      * @var string
      */
-    private $id;
+    public $id;
 
     /**
      * Saga identifier class
      *
      * @var string
      */
-    private $idClass;
+    public $idClass;
 
     /**
      * Saga class
      *
      * @var string
      */
-    private $sagaClass;
+    public $sagaClass;
 
     /**
      * Date of creation
      *
      * @var \DateTimeImmutable
      */
-    private $datetime;
+    public $datetime;
 
     /**
      * Date of expiration
      *
      * @var \DateTimeImmutable
      */
-    private $expirationDate;
+    public $expirationDate;
 
     /**
      * @noinspection PhpDocMissingThrowsInspection
@@ -76,55 +76,5 @@ final class SagaCreated implements Event
         $self->expirationDate = $expirationDate;
 
         return $self;
-    }
-
-    /**
-     * Receive saga identifier
-     *
-     * @return string
-     */
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive saga identifier class
-     *
-     * @return string
-     */
-    public function idClass(): string
-    {
-        return $this->idClass;
-    }
-
-    /**
-     * Receive saga class
-     *
-     * @return string
-     */
-    public function sagaClass(): string
-    {
-        return $this->sagaClass;
-    }
-
-    /**
-     * Receive date of creation
-     *
-     * @return \DateTimeImmutable
-     */
-    public function datetime(): \DateTimeImmutable
-    {
-        return $this->datetime;
-    }
-
-    /**
-     * Receive date of expiration
-     *
-     * @return \DateTimeImmutable
-     */
-    public function expirationDate(): \DateTimeImmutable
-    {
-        return $this->expirationDate;
     }
 }

@@ -124,9 +124,9 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
 
         $options = $deliveryOptions ?? new DeliveryOptions();
 
-        if(null === $options->traceId())
+        if(null === $options->traceId)
         {
-            $options->withCustomTraceId($traceId);
+            $options->traceId = $traceId;
         }
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
@@ -146,7 +146,7 @@ final class KernelContext implements MessageDeliveryContext, LoggingInContext
                         ]
                     );
 
-                    yield from $endpoint->delivery($message, $options);
+                    yield $endpoint->delivery($message, $options);
                 }
             },
             $message, $options

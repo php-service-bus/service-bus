@@ -23,42 +23,42 @@ final class StoredAggregateEventStream
      *
      * @var string
      */
-    private $aggregateId;
+    public $aggregateId;
 
     /**
      * Aggregate id class
      *
      * @var string
      */
-    private $aggregateIdClass;
+    public $aggregateIdClass;
 
     /**
      * Aggregate class
      *
      * @var string
      */
-    private $aggregateClass;
+    public $aggregateClass;
 
     /**
      * Stored events data
      *
      * @var array<int, \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent>
      */
-    private $storedAggregateEvents;
+    public $storedAggregateEvents;
 
     /**
      * Stream created at datetime
      *
      * @var string
      */
-    private $createdAt;
+    public $createdAt;
 
     /**
      * Stream closed at datetime
      *
      * @var string|null
      */
-    private $closedAt;
+    public $closedAt;
 
     /**
      * @param string                                                                                $aggregateId
@@ -83,65 +83,5 @@ final class StoredAggregateEventStream
         $this->storedAggregateEvents = $storedAggregateEvents;
         $this->createdAt             = $createdAt;
         $this->closedAt              = $closedAt;
-    }
-
-    /**
-     * Receive aggregate id
-     *
-     * @return string
-     */
-    public function aggregateId(): string
-    {
-        return $this->aggregateId;
-    }
-
-    /**
-     * Receive aggregate id class
-     *
-     * @return string
-     */
-    public function getAggregateIdClass(): string
-    {
-        return $this->aggregateIdClass;
-    }
-
-    /**
-     * Receive aggregate class
-     *
-     * @return string
-     */
-    public function aggregateClass(): string
-    {
-        return $this->aggregateClass;
-    }
-
-    /**
-     * Receive stored events
-     *
-     * @return array<int, \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEvent>
-     */
-    public function aggregateEvents(): array
-    {
-        return $this->storedAggregateEvents;
-    }
-
-    /**
-     * Receive created at datetime
-     *
-     * @return string
-     */
-    public function createdAt(): string
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Receive closed at datetime
-     *
-     * @return string|null
-     */
-    public function closedAt(): ?string
-    {
-        return $this->closedAt;
     }
 }

@@ -65,7 +65,7 @@ final class SagaListenerOptions
      */
     public function sagaClass(): string
     {
-        return $this->sagaMetadata->sagaClass();
+        return $this->sagaMetadata->sagaClass;
     }
 
     /**
@@ -75,7 +75,7 @@ final class SagaListenerOptions
      */
     public function identifierClass(): string
     {
-        return $this->sagaMetadata->identifierClass();
+        return $this->sagaMetadata->identifierClass;
     }
 
     /**
@@ -90,7 +90,7 @@ final class SagaListenerOptions
             return $this->containingIdentifierProperty;
         }
 
-        return $this->sagaMetadata->containingIdentifierProperty();
+        return $this->sagaMetadata->containingIdentifierProperty;
     }
 
     /**

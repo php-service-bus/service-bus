@@ -25,28 +25,28 @@ final class AggregateClosed implements Event
      *
      * @var string
      */
-    private $id;
+    public $id;
 
     /**
      * Aggregate identifier class
      *
      * @var string
      */
-    private $idClass;
+    public $idClass;
 
     /**
      * Aggregate class
      *
      * @var string
      */
-    private $aggregateClass;
+    public $aggregateClass;
 
     /**
      * Operation datetime
      *
      * @var \DateTimeImmutable
      */
-    private $datetime;
+    public $datetime;
 
     /**
      * @noinspection PhpDocMissingThrowsInspection
@@ -68,45 +68,5 @@ final class AggregateClosed implements Event
         $self->datetime = new \DateTimeImmutable('NOW');
 
         return $self;
-    }
-
-    /**
-     * Receive aggregate identifier
-     *
-     * @return string
-     */
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * Receive aggregate identifier class
-     *
-     * @return string
-     */
-    public function idClass(): string
-    {
-        return $this->idClass;
-    }
-
-    /**
-     * Receive aggregate class
-     *
-     * @return string
-     */
-    public function aggregateClass(): string
-    {
-        return $this->aggregateClass;
-    }
-
-    /**
-     * Receive operation datetime
-     *
-     * @return \DateTimeImmutable
-     */
-    public function datetime(): \DateTimeImmutable
-    {
-        return $this->datetime;
     }
 }

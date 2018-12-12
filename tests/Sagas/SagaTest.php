@@ -146,24 +146,24 @@ class SagaTest extends TestCase
 
         static::assertInstanceOf(SagaStatusChanged::class, $changedStatusEvent);
         /** @noinspection UnnecessaryAssertionInspection */
-        static::assertInstanceOf(\DateTimeImmutable::class, $changedStatusEvent->datetime());
-        static::assertEquals((string) $id, $changedStatusEvent->id());
-        static::assertEquals(\get_class($id), $changedStatusEvent->idClass());
-        static::assertEquals(CorrectSaga::class, $changedStatusEvent->sagaClass());
-        static::assertTrue(SagaStatus::created()->equals(SagaStatus::create($changedStatusEvent->previousStatus())));
-        static::assertTrue(SagaStatus::completed()->equals(SagaStatus::create($changedStatusEvent->newStatus())));
-        static::assertNull($changedStatusEvent->withReason());
+        static::assertInstanceOf(\DateTimeImmutable::class, $changedStatusEvent->datetime);
+        static::assertEquals((string) $id, $changedStatusEvent->id);
+        static::assertEquals(\get_class($id), $changedStatusEvent->idClass);
+        static::assertEquals(CorrectSaga::class, $changedStatusEvent->sagaClass);
+        static::assertTrue(SagaStatus::created()->equals(SagaStatus::create($changedStatusEvent->previousStatus)));
+        static::assertTrue(SagaStatus::completed()->equals(SagaStatus::create($changedStatusEvent->newStatus)));
+        static::assertNull($changedStatusEvent->withReason);
 
         /** @var \Desperado\ServiceBus\Sagas\Contract\SagaClosed $sagaClosedEvent */
         $sagaClosedEvent = $events[2];
 
         static::assertInstanceOf(SagaClosed::class, $sagaClosedEvent);
         /** @noinspection UnnecessaryAssertionInspection */
-        static::assertInstanceOf(\DateTimeImmutable::class, $sagaClosedEvent->datetime());
-        static::assertEquals((string) $id, $sagaClosedEvent->id());
-        static::assertEquals(\get_class($id), $sagaClosedEvent->idClass());
-        static::assertEquals(CorrectSaga::class, $sagaClosedEvent->sagaClass());
-        static::assertNull($sagaClosedEvent->withReason());
+        static::assertInstanceOf(\DateTimeImmutable::class, $sagaClosedEvent->datetime);
+        static::assertEquals((string) $id, $sagaClosedEvent->id);
+        static::assertEquals(\get_class($id), $sagaClosedEvent->idClass);
+        static::assertEquals(CorrectSaga::class, $sagaClosedEvent->sagaClass);
+        static::assertNull($sagaClosedEvent->withReason);
     }
 
     /**
@@ -190,11 +190,11 @@ class SagaTest extends TestCase
 
         static::assertInstanceOf(SagaCreated::class, $sagaCreatedEvent);
         /** @noinspection UnnecessaryAssertionInspection */
-        static::assertInstanceOf(\DateTimeImmutable::class, $sagaCreatedEvent->datetime());
+        static::assertInstanceOf(\DateTimeImmutable::class, $sagaCreatedEvent->datetime);
         /** @noinspection UnnecessaryAssertionInspection */
-        static::assertInstanceOf(\DateTimeImmutable::class, $sagaCreatedEvent->expirationDate());
-        static::assertEquals((string) $id, $sagaCreatedEvent->id());
-        static::assertEquals(\get_class($id), $sagaCreatedEvent->idClass());
-        static::assertEquals(CorrectSaga::class, $sagaCreatedEvent->sagaClass());
+        static::assertInstanceOf(\DateTimeImmutable::class, $sagaCreatedEvent->expirationDate);
+        static::assertEquals((string) $id, $sagaCreatedEvent->id);
+        static::assertEquals(\get_class($id), $sagaCreatedEvent->idClass);
+        static::assertEquals(CorrectSaga::class, $sagaCreatedEvent->sagaClass);
     }
 }

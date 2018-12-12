@@ -230,32 +230,32 @@ final class BunnyRabbitMqTransport implements Transport
                     }
 
                     /** @var \Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination $destination */
-                    $destination = $outboundPackage->destination();
-                    $headers     = \array_filter(\array_merge($outboundPackage->headers(), [
-                        'delivery-mode' => true === $outboundPackage->isPersistent() ? self::AMQP_DURABLE : null,
-                        'expiration'    => $outboundPackage->expiredAfter()
+                    $destination = $outboundPackage->destination;
+                    $headers     = \array_filter(\array_merge($outboundPackage->headers, [
+                        'delivery-mode' => true === $outboundPackage->persistentFlag ? self::AMQP_DURABLE : null,
+                        'expiration'    => $outboundPackage->expiredAfter
                     ]));
 
-                    $content = $outboundPackage->payload();
+                    $content = $outboundPackage->payload;
 
                     $logger->debug('Publish message to "{rabbitMqExchange}" with routing key "{rabbitMqRoutingKey}"', [
-                        'traceId'            => $outboundPackage->traceId(),
-                        'rabbitMqExchange'   => $destination->exchange(),
-                        'rabbitMqRoutingKey' => $destination->routingKey(),
+                        'traceId'            => $outboundPackage->traceId,
+                        'rabbitMqExchange'   => $destination->exchange,
+                        'rabbitMqRoutingKey' => $destination->routingKey,
                         'content'            => $content,
                         'headers'            => $headers,
-                        'isMandatory'        => $outboundPackage->isMandatory(),
-                        'isImmediate'        => $outboundPackage->isImmediate(),
-                        'expiredAt'          => $outboundPackage->expiredAfter()
+                        'isMandatory'        => $outboundPackage->mandatoryFlag,
+                        'isImmediate'        => $outboundPackage->immediateFlag,
+                        'expiredAt'          => $outboundPackage->expiredAfter
                     ]);
 
                     yield $channel->publish(
                         $content,
                         \array_filter($headers),
-                        $destination->exchange(),
-                        $destination->routingKey(),
-                        $outboundPackage->isMandatory(),
-                        $outboundPackage->isImmediate()
+                        $destination->exchange,
+                        $destination->routingKey,
+                        $outboundPackage->mandatoryFlag,
+                        $outboundPackage->immediateFlag
                     );
 
                     unset($destination, $headers);

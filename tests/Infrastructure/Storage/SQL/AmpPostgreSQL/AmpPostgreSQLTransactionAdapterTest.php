@@ -22,6 +22,7 @@ use function Desperado\ServiceBus\Infrastructure\Storage\SQL\insertQuery;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\selectQuery;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageConfiguration;
+use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -155,7 +156,7 @@ final class AmpPostgreSQLTransactionAdapterTest extends TestCase
         /** @var array $collection */
         $collection = wait(fetchAll(wait($this->adapter->execute($query->sql(), $query->params()))));
 
-        static::assertInternalType('array', $collection);
+        static::assertThat($collection, new IsType('array'));
         static::assertCount(0, $collection);
     }
 }

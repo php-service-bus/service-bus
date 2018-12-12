@@ -144,7 +144,7 @@ final class EventSourcingProviderTest extends TestCase
         /** @var AggregateEventStream $stream */
         $stream = invokeReflectionMethod($loadedAggregate, 'makeStream');
 
-        static::assertCount(0, $stream->events());
+        static::assertCount(0, $stream->events);
 
         wait($this->provider->save($loadedAggregate, $context));
     }

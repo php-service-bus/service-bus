@@ -97,15 +97,15 @@ abstract class SQLSagaStoreTestCase extends TestCase
         /** @var StoredSaga $loadedSaga */
         $loadedSaga = wait(new Coroutine($this->store->load(new TestSagaId($uuid, CorrectSaga::class))));
 
-        static::assertEquals($savedSaga->id(), $loadedSaga->id());
-        static::assertEquals($savedSaga->idClass(), $loadedSaga->idClass());
-        static::assertEquals($savedSaga->sagaClass(), $loadedSaga->sagaClass());
-        static::assertEquals($savedSaga->payload(), $loadedSaga->payload());
-        static::assertEquals($savedSaga->status(), $loadedSaga->status());
-        static::assertEquals($savedSaga->payload(), $loadedSaga->payload());
-        static::assertEquals($savedSaga->createdAt(), $loadedSaga->createdAt());
-        static::assertEquals($savedSaga->expirationDate(), $loadedSaga->expirationDate());
-        static::assertEquals($savedSaga->closedAt(), $loadedSaga->closedAt());
+        static::assertEquals($savedSaga->id, $loadedSaga->id);
+        static::assertEquals($savedSaga->idClass, $loadedSaga->idClass);
+        static::assertEquals($savedSaga->sagaClass, $loadedSaga->sagaClass);
+        static::assertEquals($savedSaga->payload, $loadedSaga->payload);
+        static::assertEquals($savedSaga->status, $loadedSaga->status);
+        static::assertEquals($savedSaga->payload, $loadedSaga->payload);
+        static::assertEquals($savedSaga->createdAt, $loadedSaga->createdAt);
+        static::assertEquals($savedSaga->expirationDate, $loadedSaga->expirationDate);
+        static::assertEquals($savedSaga->closedAt, $loadedSaga->closedAt);
 
         $toUpdate = StoredSaga::fromRow([
             'id'               => $uuid,
@@ -123,7 +123,7 @@ abstract class SQLSagaStoreTestCase extends TestCase
         /** @var StoredSaga $loadedSaga */
         $loadedSaga = wait(new Coroutine($this->store->load(new TestSagaId($uuid, CorrectSaga::class))));
 
-        static::assertEquals('qwertyRoot333', $loadedSaga->payload());
+        static::assertEquals('qwertyRoot333', $loadedSaga->payload);
 
         wait(new Coroutine($this->store->remove(new TestSagaId($uuid, CorrectSaga::class))));
 

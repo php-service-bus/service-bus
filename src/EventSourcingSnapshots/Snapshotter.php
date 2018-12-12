@@ -94,9 +94,9 @@ final class Snapshotter
                     if(null !== $storedSnapshot)
                     {
                         /** @var Aggregate $aggregate */
-                        $aggregate = \unserialize($storedSnapshot->payload(), ['allowed_classes' => true]);
+                        $aggregate = \unserialize($storedSnapshot->payload, ['allowed_classes' => true]);
 
-                        $snapshot = new AggregateSnapshot($aggregate, $storedSnapshot->version());
+                        $snapshot = new AggregateSnapshot($aggregate, $storedSnapshot->version);
 
                         unset($storedSnapshot, $aggregate);
                     }
@@ -132,14 +132,14 @@ final class Snapshotter
             {
                 try
                 {
-                    yield from $storage->remove($snapshot->aggregate()->id());
+                    yield from $storage->remove($snapshot->aggregate->id());
                     yield from $storage->save(
                         new StoredAggregateSnapshot(
-                            (string) $snapshot->aggregate()->id(),
-                            \get_class($snapshot->aggregate()->id()),
-                            \get_class($snapshot->aggregate()),
-                            $snapshot->version(),
-                            \serialize($snapshot->aggregate()),
+                            (string) $snapshot->aggregate->id(),
+                            \get_class($snapshot->aggregate->id()),
+                            \get_class($snapshot->aggregate),
+                            $snapshot->version,
+                            \serialize($snapshot->aggregate),
                             \date('Y-m-d H:i:s')
                         )
                     );

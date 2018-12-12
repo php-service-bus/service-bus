@@ -123,6 +123,8 @@ final class KernelTestService
      */
     public function handleWithSpecifiedThrowableEvent(TriggerThrowableCommandWithResponseEvent $command, KernelContext $context): void
     {
+        [$command, $context];
+
         throw new \RuntimeException('abube');
     }
 }

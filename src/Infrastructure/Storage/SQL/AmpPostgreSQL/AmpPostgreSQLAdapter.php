@@ -41,18 +41,18 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
      */
     public function __construct(StorageConfiguration $configuration)
     {
-        $queryData = $configuration->queryParameters();
+        $queryData = $configuration->queryParameters;
 
         $maxConnectionsCount = (int) ($queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS);
         $idleTimeout         = (int) ($queryData['idle_timeout'] ?? Pool::DEFAULT_IDLE_TIMEOUT);
 
         $this->pool = pool(
             new ConnectionConfig(
-                $configuration->host(),
-                $configuration->port() ?? ConnectionConfig::DEFAULT_PORT,
-                $configuration->username(),
-                $configuration->password(),
-                $configuration->databaseName()
+                (string) $configuration->host,
+                $configuration->port ?? ConnectionConfig::DEFAULT_PORT,
+                (string) $configuration->username,
+                (string) $configuration->password,
+                (string) $configuration->databaseName
             ),
             $maxConnectionsCount,
             $idleTimeout
