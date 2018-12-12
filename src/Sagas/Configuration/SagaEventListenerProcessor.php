@@ -128,7 +128,7 @@ final class SagaEventListenerProcessor
 
             try
             {
-                $propertyValue = (string) readReflectionPropertyValue($event, $propertyName);
+                $propertyValue = self::readEventProperty($event, $propertyName);
             }
             catch(\Throwable $throwable)
             {
@@ -151,6 +151,26 @@ final class SagaEventListenerProcessor
         }
 
         throw new IdentifierClassNotFound($identifierClass, $sagaListenerOptions->sagaClass());
+    }
+
+    /**
+     * Read event property value
+     *
+     * @param Event  $event
+     * @param string $propertyName
+     *
+     * @return string
+     *
+     * @throws \Throwable Reflection property not found
+     */
+    private static function readEventProperty(Event $event, string $propertyName): string
+    {
+        if(true === isset($event->{$propertyName}))
+        {
+            return (string) $event->{$propertyName};
+        }
+
+        return (string) readReflectionPropertyValue($event, $propertyName);;
     }
 
     /**
