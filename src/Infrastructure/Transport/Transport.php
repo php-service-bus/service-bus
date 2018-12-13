@@ -21,8 +21,8 @@ use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
  */
 interface Transport
 {
-    public const SERVICE_BUS_TRACE_HEADER = 'service-bus-trace-id';
-    public const SERVICE_BUS_SERIALIZER_HEADER = 'message.encoder';
+    public const SERVICE_BUS_TRACE_HEADER = 'X-SERVICE-BUS-TRACE-ID';
+    public const SERVICE_BUS_SERIALIZER_HEADER = 'X-SERVICE-BUS-ENCODER';
 
     /**
      * Create topic and bind them
