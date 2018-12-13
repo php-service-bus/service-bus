@@ -91,6 +91,9 @@ final class ApplicationTransportEndpoint implements Endpoint
         $transport = $this->transport;
 
         $encoded = $this->encoder->encode($message);
+
+        $options->headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] = $this->encoder->name();
+
         $package = self::createPackage($encoded, $options, $this->destination);
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */

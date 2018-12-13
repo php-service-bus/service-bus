@@ -73,6 +73,14 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
     /**
      * @inheritDoc
      */
+    public function name(): string
+    {
+        return 'service_bus.default_encoder';
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function decode(string $serializedMessage): Message
     {
         try

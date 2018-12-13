@@ -21,6 +21,13 @@ use Desperado\ServiceBus\Common\Contract\Messages\Message;
 interface MessageDecoder
 {
     /**
+     * Receive decoder name
+     *
+     * @return string
+     */
+    public function name(): string;
+
+    /**
      * Restore message from string
      *
      * @param string $serializedMessage

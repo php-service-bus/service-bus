@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Infrastructure\MessageSerialization;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
+use Desperado\ServiceBus\Infrastructure\Transport\Transport;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
@@ -22,9 +23,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 final class IncomingMessageDecoder
 {
-    public const HEADERS_ENCODER_KEY = 'message.encoder';
-
-    public const DEFAULT_ENCODER = 'service_bus.default_encoder';
+    public const DEFAULT_DECODER = 'service_bus.default_encoder';
 
     /**
      * @var ServiceLocator
@@ -77,7 +76,7 @@ final class IncomingMessageDecoder
     private static function extractEncoderKey(array $headers): string
     {
         /** @var string $encoderKey */
-        $encoderKey = $headers[self::HEADERS_ENCODER_KEY] ?? self::DEFAULT_ENCODER;
+        $encoderKey = $headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] ?? self::DEFAULT_DECODER;
 
         return $encoderKey;
     }
