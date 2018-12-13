@@ -13,6 +13,13 @@ A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets yo
 #### Scope of use
 Basically, it is suitable for development of distributed applications. By using the Message Bus and Saga pattern it lets you decrease the coupling of contexts.
 
+### Get started
+```
+composer create-project mmasiukevich/service-bus-skeleton my-project
+```
+Demo application (WIP): [service-bus-demo](https://github.com/mmasiukevich/service-bus-demo)
+
+
 #### Main Features
  - Asynchronous messaging
  - Distribution (messages can be handled by different processes).
