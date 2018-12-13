@@ -170,7 +170,7 @@ final class SagaEventListenerProcessor
             return (string) $event->{$propertyName};
         }
 
-        return (string) readReflectionPropertyValue($event, $propertyName);;
+        return (string) readReflectionPropertyValue($event, $propertyName);
     }
 
     /**
