@@ -21,6 +21,13 @@ use Desperado\ServiceBus\Common\Contract\Messages\Message;
 interface MessageEncoder
 {
     /**
+     * Receive encoder name
+     *
+     * @return string
+     */
+    public function name(): string;
+
+    /**
      * Encode message to string
      *
      * @param Message $message
