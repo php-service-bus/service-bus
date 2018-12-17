@@ -73,9 +73,18 @@ final class ArtaxHttpClient implements HttpClient
      */
     public function execute(HttpRequest $requestData): Promise
     {
-        return 'GET' === $requestData->httpMethod()
-            ? Promise\adapt($this->executeGet($requestData))
-            : Promise\adapt($this->executePost($requestData));
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            function(HttpRequest $requestData): \Generator
+            {
+                $generator = 'GET' === $requestData->httpMethod()
+                    ? $this->executeGet($requestData)
+                    : $this->executePost($requestData);
+
+                return yield from $generator;
+            },
+            $requestData
+        );
     }
 
     /**
@@ -129,7 +138,7 @@ final class ArtaxHttpClient implements HttpClient
         $request = (new Request($requestData->url(), $requestData->httpMethod()))
             ->withHeaders($requestData->headers());
 
-        return yield from self::doRequest(
+        return self::doRequest(
             $this->handler,
             $request,
             $this->logger
@@ -158,7 +167,7 @@ final class ArtaxHttpClient implements HttpClient
             )
             ->withHeaders($requestData->headers());
 
-        return yield from self::doRequest($this->handler, $request, $this->logger);
+        return self::doRequest($this->handler, $request, $this->logger);
     }
 
     /**
