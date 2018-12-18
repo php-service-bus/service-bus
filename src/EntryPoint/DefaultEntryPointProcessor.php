@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\EntryPoint;
 
+use function Amp\call;
+use Amp\Promise;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Endpoint\EndpointRouter;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder;
@@ -72,43 +74,55 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     /**
      * @inheritdoc
      */
-    public function handle(IncomingPackage $package): \Generator
+    public function handle(IncomingPackage $package): Promise
     {
-        yield $package->ack();
+        $messageDecoder = $this->messageDecoder;
+        $messagesRouter = $this->messagesRouter;
+        $logger         = $this->logger;
+        $endpointRouter = $this->endpointRouter;
 
-        $message = $this->messageDecoder->decode($package);
-
-        $this->logger->debug('Dispatch "{messageClass}" message', [
-            'packageId'    => $package->id(),
-            'traceId'      => $package->traceId(),
-            'messageClass' => \get_class($message)
-        ]);
-
-        $executors = $this->messagesRouter->match($message);
-
-        if(0 === \count($executors))
-        {
-            $this->logger->debug(
-                'There are no handlers configured for the message "{messageClass}"',
-                ['messageClass' => \get_class($message)]
-            );
-
-            return;
-        }
-
-        /** @var \Desperado\ServiceBus\MessageExecutor\MessageExecutor $executor */
-        foreach($executors as $executor)
-        {
-            $context = new KernelContext($package, $this->endpointRouter, $this->logger);
-
-            try
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(IncomingPackage $package) use ($messageDecoder, $messagesRouter, $endpointRouter, $logger): \Generator
             {
-                yield $executor($message, $context);
-            }
-            catch(\Throwable $throwable)
-            {
-                $context->logContextThrowable($throwable);
-            }
-        }
+                yield $package->ack();
+
+                $message = $messageDecoder->decode($package);
+
+                $logger->debug('Dispatch "{messageClass}" message', [
+                    'packageId'    => $package->id(),
+                    'traceId'      => $package->traceId(),
+                    'messageClass' => \get_class($message)
+                ]);
+
+                $executors = $messagesRouter->match($message);
+
+                if(0 === \count($executors))
+                {
+                    $logger->debug(
+                        'There are no handlers configured for the message "{messageClass}"',
+                        ['messageClass' => \get_class($message)]
+                    );
+
+                    return;
+                }
+
+                /** @var \Desperado\ServiceBus\MessageExecutor\MessageExecutor $executor */
+                foreach($executors as $executor)
+                {
+                    $context = new KernelContext($package, $endpointRouter, $logger);
+
+                    try
+                    {
+                        yield $executor($message, $context);
+                    }
+                    catch(\Throwable $throwable)
+                    {
+                        $context->logContextThrowable($throwable);
+                    }
+                }
+            },
+            $package
+        );
     }
 }

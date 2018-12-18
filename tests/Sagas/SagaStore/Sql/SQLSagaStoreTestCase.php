@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Sagas\SagaStore\Sql;
 
-use Amp\Coroutine;
 use function Amp\Promise\wait;
 use Desperado\ServiceBus\Sagas\SagaStatus;
 use Desperado\ServiceBus\Sagas\SagaStore\Sql\SQLSagaStore;
@@ -92,10 +91,10 @@ abstract class SQLSagaStoreTestCase extends TestCase
             'closed_at'        => '2019-01-01 00:00:00'
         ]);
 
-        wait(new Coroutine($this->store->save($savedSaga)));
+        wait($this->store->save($savedSaga));
 
         /** @var StoredSaga $loadedSaga */
-        $loadedSaga = wait(new Coroutine($this->store->load(new TestSagaId($uuid, CorrectSaga::class))));
+        $loadedSaga = wait($this->store->load(new TestSagaId($uuid, CorrectSaga::class)));
 
         static::assertEquals($savedSaga->id, $loadedSaga->id);
         static::assertEquals($savedSaga->idClass, $loadedSaga->idClass);
@@ -118,17 +117,17 @@ abstract class SQLSagaStoreTestCase extends TestCase
             'closed_at'        => '2019-01-01 00:00:00'
         ]);
 
-        wait(new Coroutine($this->store->update($toUpdate)));
+        wait($this->store->update($toUpdate));
 
         /** @var StoredSaga $loadedSaga */
-        $loadedSaga = wait(new Coroutine($this->store->load(new TestSagaId($uuid, CorrectSaga::class))));
+        $loadedSaga = wait($this->store->load(new TestSagaId($uuid, CorrectSaga::class)));
 
         static::assertEquals('qwertyRoot333', $loadedSaga->payload);
 
-        wait(new Coroutine($this->store->remove(new TestSagaId($uuid, CorrectSaga::class))));
+        wait($this->store->remove(new TestSagaId($uuid, CorrectSaga::class)));
 
         static::assertNull(
-            wait(new Coroutine($this->store->load(new TestSagaId($uuid, CorrectSaga::class))))
+            wait($this->store->load(new TestSagaId($uuid, CorrectSaga::class)))
         );
     }
 }

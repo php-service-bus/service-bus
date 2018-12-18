@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\EntryPoint;
 
+use Amp\Promise;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
 
 /**
@@ -25,7 +26,7 @@ interface EntryPointProcessor
      *
      * @param IncomingPackage $package
      *
-     * @return \Generator
+     * @return Promise
      */
-    public function handle(IncomingPackage $package): \Generator;
+    public function handle(IncomingPackage $package): Promise;
 }

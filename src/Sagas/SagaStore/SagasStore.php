@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\SagaStore;
 
+use Amp\Promise;
 use Desperado\ServiceBus\Sagas\SagaId;
 
 /**
@@ -27,13 +28,13 @@ interface SagasStore
      *
      * @param StoredSaga $savedSaga
      *
-     * @return \Generator It does not return any result
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function save(StoredSaga $savedSaga): \Generator;
+    public function save(StoredSaga $savedSaga): Promise;
 
     /**
      * Update the status of an existing saga
@@ -42,12 +43,12 @@ interface SagasStore
      *
      * @param StoredSaga $savedSaga
      *
-     * @return \Generator It does not return any result
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function update(StoredSaga $savedSaga): \Generator;
+    public function update(StoredSaga $savedSaga): Promise;
 
     /**
      * Load saga
@@ -56,13 +57,13 @@ interface SagasStore
      *
      * @param SagaId $id
      *
-     * @return \Generator<\Desperado\ServiceBus\Sagas\SagaStore\StoredSaga|null>
+     * @return Promise<\Desperado\ServiceBus\Sagas\SagaStore\StoredSaga|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      * @throws \Desperado\ServiceBus\Sagas\SagaStore\Exceptions\RestoreSagaFailed
      */
-    public function load(SagaId $id): \Generator;
+    public function load(SagaId $id): Promise;
 
     /**
      * Remove saga
@@ -71,10 +72,10 @@ interface SagasStore
      *
      * @param SagaId $id
      *
-     * @return \Generator It does not return any result
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function remove(SagaId $id): \Generator;
+    public function remove(SagaId $id): Promise;
 }

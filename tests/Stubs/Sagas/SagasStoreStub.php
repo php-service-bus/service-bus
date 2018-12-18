@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Stubs\Sagas;
 
+use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Sagas\SagaId;
 use Desperado\ServiceBus\Sagas\SagaStore\SagasStore;
@@ -26,32 +27,32 @@ class SagasStoreStub implements SagasStore
     /**
      * @inheritdoc
      */
-    public function save(StoredSaga $savedSaga): \Generator
+    public function save(StoredSaga $savedSaga): Promise
     {
-        return yield new Success();
+        return new Success();
     }
 
     /**
      * @inheritdoc
      */
-    public function update(StoredSaga $savedSaga): \Generator
+    public function update(StoredSaga $savedSaga): Promise
     {
-        return yield new Success();
+        return new Success();
     }
 
     /**
      * @inheritdoc
      */
-    public function load(SagaId $id): \Generator
+    public function load(SagaId $id): Promise
     {
-        return yield new Success();
+        return new Success();
     }
 
     /**
      * @inheritdoc
      */
-    public function remove(SagaId $id): \Generator
+    public function remove(SagaId $id): Promise
     {
-        return yield new Success();
+        return new Success();
     }
 }

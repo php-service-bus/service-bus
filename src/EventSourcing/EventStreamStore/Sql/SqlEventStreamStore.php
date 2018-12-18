@@ -13,9 +13,11 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql;
 
-use Amp\Coroutine;
+use function Amp\call;
+use Amp\Promise;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed;
+use Desperado\ServiceBus\Infrastructure\Storage\QueryExecutor;
 use function Latitude\QueryBuilder\field;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
@@ -29,7 +31,6 @@ use function Desperado\ServiceBus\Infrastructure\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\selectQuery;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\updateQuery;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
-use Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed;
 
 /**
@@ -53,63 +54,81 @@ final class SqlEventStreamStore implements AggregateStore
     /**
      * @inheritdoc
      */
-    public function saveStream(StoredAggregateEventStream $aggregateEventStream): \Generator
+    public function saveStream(StoredAggregateEventStream $aggregateEventStream): Promise
     {
-        /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
-        $transaction = yield $this->adapter->transaction();
+        $adapter = $this->adapter;
 
-        try
-        {
-            yield from self::doSaveStream($transaction, $aggregateEventStream);
-            yield from self::doSaveEvents($transaction, $aggregateEventStream);
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(StoredAggregateEventStream $aggregateEventStream) use ($adapter): \Generator
+            {
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
+                $transaction = yield $adapter->transaction();
 
-            yield $transaction->commit();
-        }
-        catch(UniqueConstraintViolationCheckFailed $exception)
-        {
-            yield $transaction->rollback();
+                try
+                {
+                    yield from self::doSaveStream($transaction, $aggregateEventStream);
+                    yield from self::doSaveEvents($transaction, $aggregateEventStream);
 
-            throw new NonUniqueStreamId(
-                $aggregateEventStream->aggregateId,
-                $aggregateEventStream->aggregateIdClass
-            );
-        }
-        catch(\Throwable $throwable)
-        {
-            yield $transaction->rollback();
+                    yield $transaction->commit();
+                }
+                catch(UniqueConstraintViolationCheckFailed $exception)
+                {
+                    yield $transaction->rollback();
 
-            throw new SaveStreamFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
-        }
-        finally
-        {
-            unset($transaction);
-        }
+                    throw new NonUniqueStreamId(
+                        $aggregateEventStream->aggregateId,
+                        $aggregateEventStream->aggregateIdClass
+                    );
+                }
+                catch(\Throwable $throwable)
+                {
+                    yield $transaction->rollback();
+
+                    throw new SaveStreamFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                }
+                finally
+                {
+                    unset($transaction);
+                }
+            },
+            $aggregateEventStream
+        );
     }
 
     /**
      * @inheritdoc
      */
-    public function appendStream(StoredAggregateEventStream $aggregateEventStream): \Generator
+    public function appendStream(StoredAggregateEventStream $aggregateEventStream): Promise
     {
-        /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
-        $transaction = yield $this->adapter->transaction();
+        $adapter = $this->adapter;
 
-        try
-        {
-            yield new Coroutine(self::doSaveEvents($transaction, $aggregateEventStream));
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(StoredAggregateEventStream $aggregateEventStream) use ($adapter): \Generator
+            {
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
+                $transaction = yield $adapter->transaction();
 
-            yield $transaction->commit();
-        }
-        catch(\Throwable $throwable)
-        {
-            yield $transaction->rollback();
+                try
+                {
+                    yield from self::doSaveEvents($transaction, $aggregateEventStream);
 
-            throw new SaveStreamFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
-        }
-        finally
-        {
-            unset($transaction);
-        }
+                    yield $transaction->commit();
+                }
+                catch(\Throwable $throwable)
+                {
+                    yield $transaction->rollback();
+
+                    throw new SaveStreamFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                }
+                finally
+                {
+                    unset($transaction);
+                }
+            },
+            $aggregateEventStream
+        );
     }
 
     /**
@@ -119,47 +138,65 @@ final class SqlEventStreamStore implements AggregateStore
         AggregateId $id,
         int $fromVersion = Aggregate::START_PLAYHEAD_INDEX,
         ?int $toVersion = null
-    ): \Generator
+    ): Promise
     {
-        $aggregateEventStream = null;
+        $adapter = $this->adapter;
 
-        /** @var array<string, string>|null $streamData */
-        $streamData = yield from self::doLoadStream($this->adapter, $id);
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(AggregateId $id, int $fromVersion, ?int $toVersion) use ($adapter): \Generator
+            {
+                $aggregateEventStream = null;
 
-        if(null !== $streamData)
-        {
-            /** @var array<int, array>|null $streamEventsData */
-            $streamEventsData = yield from self::doLoadStreamEvents(
-                $this->adapter,
-                (string) $streamData['id'],
-                $fromVersion,
-                $toVersion
-            );
+                /** @var array<string, string>|null $streamData */
+                $streamData = yield from self::doLoadStream($adapter, $id);
 
-            $aggregateEventStream = self::restoreEventStream($this->adapter, $streamData, $streamEventsData);
-        }
+                if(null !== $streamData)
+                {
+                    /** @var array<int, array>|null $streamEventsData */
+                    $streamEventsData = yield from self::doLoadStreamEvents(
+                        $adapter,
+                        (string) $streamData['id'],
+                        $fromVersion,
+                        $toVersion
+                    );
 
-        return $aggregateEventStream;
+                    $aggregateEventStream = self::restoreEventStream($adapter, $streamData, $streamEventsData);
+                }
+
+                return $aggregateEventStream;
+            },
+            $id, $fromVersion, $toVersion
+        );
     }
 
     /**
      * @inheritdoc
      */
-    public function closeStream(AggregateId $id): \Generator
+    public function closeStream(AggregateId $id): Promise
     {
-        /**
-         * @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery
-         *
-         * @psalm-suppress ImplicitToStringCast
-         */
-        $updateQuery = updateQuery('event_store_stream', ['closed_at' => \date('Y-m-d H:i:s')])
-            ->where(equalsCriteria('id', $id))
-            ->andWhere(equalsCriteria('identifier_class', \get_class($id)));
+        $adapter = $this->adapter;
 
-        /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-        $compiledQuery = $updateQuery->compile();
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(AggregateId $id) use ($adapter): \Generator
+            {
+                /**
+                 * @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery
+                 *
+                 * @psalm-suppress ImplicitToStringCast
+                 */
+                $updateQuery = updateQuery('event_store_stream', ['closed_at' => \date('Y-m-d H:i:s')])
+                    ->where(equalsCriteria('id', $id))
+                    ->andWhere(equalsCriteria('identifier_class', \get_class($id)));
 
-        yield $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $updateQuery->compile();
+
+                yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+            },
+            $id
+        );
     }
 
     /**
@@ -167,7 +204,7 @@ final class SqlEventStreamStore implements AggregateStore
      *
      * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @param TransactionAdapter         $transaction
+     * @param QueryExecutor              $queryExecutor
      * @param StoredAggregateEventStream $eventsStream
      *
      * @return \Generator It does not return any result
@@ -176,7 +213,7 @@ final class SqlEventStreamStore implements AggregateStore
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    private static function doSaveStream(TransactionAdapter $transaction, StoredAggregateEventStream $eventsStream): \Generator
+    private static function doSaveStream(QueryExecutor $queryExecutor, StoredAggregateEventStream $eventsStream): \Generator
     {
         /** @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery */
         $insertQuery = insertQuery('event_store_stream', [
@@ -190,7 +227,7 @@ final class SqlEventStreamStore implements AggregateStore
         /** @var \Latitude\QueryBuilder\Query $compiledQuery */
         $compiledQuery = $insertQuery->compile();
 
-        yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+        yield $queryExecutor->execute($compiledQuery->sql(), $compiledQuery->params());
     }
 
     /**
@@ -198,7 +235,7 @@ final class SqlEventStreamStore implements AggregateStore
      *
      * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
-     * @param TransactionAdapter         $transaction
+     * @param QueryExecutor              $queryExecutor
      * @param StoredAggregateEventStream $eventsStream
      *
      * @return \Generator It does not return any result
@@ -207,13 +244,13 @@ final class SqlEventStreamStore implements AggregateStore
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    private static function doSaveEvents(TransactionAdapter $transaction, StoredAggregateEventStream $eventsStream): \Generator
+    private static function doSaveEvents(QueryExecutor $queryExecutor, StoredAggregateEventStream $eventsStream): \Generator
     {
         $eventsCount = \count($eventsStream->storedAggregateEvents);
 
         if(0 !== $eventsCount)
         {
-            yield $transaction->execute(
+            yield $queryExecutor->execute(
                 self::createSaveEventQueryString($eventsCount),
                 self::collectSaveEventQueryParameters($eventsStream)
             );
