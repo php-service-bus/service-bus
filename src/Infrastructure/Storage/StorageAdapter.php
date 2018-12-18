@@ -18,21 +18,8 @@ use Amp\Promise;
 /**
  * Interface adapter for working with the database
  */
-interface StorageAdapter
+interface StorageAdapter extends QueryExecutor
 {
-    /**
-     * Execute query
-     *
-     * @param string $queryString
-     * @param array  $parameters
-     *
-     * @return Promise<\Desperado\ServiceBus\Infrastructure\Storage\ResultSet>
-     *
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed Could not connect to database
-     */
-    public function execute(string $queryString, array $parameters = []): Promise;
-
     /**
      * Does the transaction adapter
      *
