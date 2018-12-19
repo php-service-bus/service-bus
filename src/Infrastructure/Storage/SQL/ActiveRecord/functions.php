@@ -34,13 +34,7 @@ use Latitude\QueryBuilder\Query as LatitudeQuery;
  * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
  * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed Could not connect to database
  */
-function find(
-    QueryExecutor $queryExecutor,
-    string $tableName,
-    array $criteria = [],
-    ?int $limit = null,
-    array $orderBy = []
-): \Generator
+function find(QueryExecutor $queryExecutor, string $tableName, array $criteria = [], ?int $limit = null, array $orderBy = []): \Generator
 {
     [$query, $parameters] = buildQuery(selectQuery($tableName), $criteria, $orderBy, $limit);
 
