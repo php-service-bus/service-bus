@@ -149,7 +149,7 @@ abstract class Table
                 /** @var array<string, string|int|float|null>|null $data */
                 $data = yield fetchOne($resultSet);
 
-                unset($self, $query, $parameters, $resultSet);
+                unset($query, $parameters, $resultSet);
 
                 if(true === \is_array($data))
                 {
@@ -198,7 +198,7 @@ abstract class Table
                 /** @var array<string, string|int|float|null>|null $rows */
                 $rows = yield fetchAll($resultSet);
 
-                unset($self, $query, $parameters, $resultSet);
+                unset($query, $parameters, $resultSet);
 
                 $result = [];
 
