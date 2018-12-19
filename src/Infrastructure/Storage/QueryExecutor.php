@@ -28,9 +28,9 @@ interface QueryExecutor
      *
      * @return Promise<\Desperado\ServiceBus\Infrastructure\Storage\ResultSet>
      *
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of
-     *                                                                                          interaction errors
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed Could not connect to database
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed Duplicate entry
      */
     public function execute(string $queryString, array $parameters = []): Promise;
 }

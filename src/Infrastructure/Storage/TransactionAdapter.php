@@ -18,7 +18,7 @@ use Amp\Promise;
 /**
  * Storage adapters Interface
  */
-interface TransactionAdapter extends QueryExecutor
+interface TransactionAdapter extends QueryExecutor, BinaryDataDecoder
 {
     /**
      * Commit transaction

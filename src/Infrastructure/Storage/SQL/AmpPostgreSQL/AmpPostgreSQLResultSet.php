@@ -32,7 +32,7 @@ class AmpPostgreSQLResultSet implements ResultSet
     private $originalResultSet;
 
     /**
-     * @noinspection PhpDocSignatureInspection
+     * @noinspection   PhpDocSignatureInspection
      * @psalm-suppress TypeCoercion Assume a different data type
      *
      * @param AmpResultSet|PooledResultSet $originalResultSet
@@ -90,11 +90,15 @@ class AmpPostgreSQLResultSet implements ResultSet
         {
             if($this->originalResultSet instanceof PooledResultSet)
             {
+                /** @var array<string, mixed> $result */
                 $result = $this->originalResultSet->getCurrent();
 
-                if(true === isset($result['id']))
+                if(0 !== \count($result))
                 {
-                    return (string) $result['id'];
+                    /** @var bool|int|string $value */
+                    $value = \reset($result);
+
+                    return false !== $value ? (string) $value : null;
                 }
             }
 

@@ -18,7 +18,7 @@ use Amp\Promise;
 /**
  * Interface adapter for working with the database
  */
-interface StorageAdapter extends QueryExecutor
+interface StorageAdapter extends QueryExecutor, BinaryDataDecoder
 {
     /**
      * Does the transaction adapter
@@ -37,13 +37,4 @@ interface StorageAdapter extends QueryExecutor
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\TransactionNotSupported The adapter does not support transactions
      */
     public function transaction(): Promise;
-
-    /**
-     * Unescape binary string
-     *
-     * @param string|resource $payload
-     *
-     * @return string
-     */
-    public function unescapeBinary($payload): string;
 }
