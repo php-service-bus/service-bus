@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Infrastructure\Storage\SQL\ActiveRecord;
 
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Promise;
 use Amp\Success;
 use function Desperado\ServiceBus\Common\uuid;
@@ -36,6 +35,13 @@ use Latitude\QueryBuilder\Query as LatitudeQuery;
  */
 abstract class Table
 {
+    /**
+     * Stored entry identifier
+     *
+     * @var string|int
+     */
+    private $insertId;
+
     /**
      * @var QueryExecutor
      */
@@ -92,6 +98,8 @@ abstract class Table
     }
 
     /**
+     * Create and persist entry
+     *
      * @param QueryExecutor $queryExecutor
      * @param array         $data
      *
@@ -103,7 +111,18 @@ abstract class Table
      */
     final public static function new(QueryExecutor $queryExecutor, array $data): Promise
     {
-        return new Coroutine(self::create($queryExecutor, $data, true));
+        return call(
+            function(array $data) use ($queryExecutor): \Generator
+            {
+                /** @var self $self */
+                $self = yield from static::create($queryExecutor, $data, true);
+
+                $self->insertId = (string) yield $self->save();
+
+                return $self;
+            },
+            $data
+        );
     }
 
     /**
@@ -262,7 +281,6 @@ abstract class Table
      *
      * @return Promise
      *
-     * @throws \LogicException Unable to update unsaved entity
      * @throws \RuntimeException Unable to find an entry (possibly RC occured)
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed Could not connect to database
@@ -273,11 +291,6 @@ abstract class Table
         return call(
             function(): \Generator
             {
-                if(true === $this->isNew)
-                {
-                    throw new \LogicException('Unable to update unsaved entity');
-                }
-
                 [$query, $parameters] = self::buildQuery(
                     selectQuery(static::tableName()),
                     [equalsCriteria(static::primaryKey(), $this->searchPrimaryKeyValue())]
@@ -335,6 +348,16 @@ abstract class Table
                 return $affectedRows;
             }
         );
+    }
+
+    /**
+     * Receive the ID of the last entry added
+     *
+     * @return string|null
+     */
+    final public function lastInsertId(): ?string
+    {
+        return $this->insertId;
     }
 
     /**

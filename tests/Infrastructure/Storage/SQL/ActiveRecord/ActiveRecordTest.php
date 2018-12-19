@@ -120,7 +120,7 @@ EOT
             )
         );
 
-        $id = wait($testTable->save());
+        $id = $testTable->lastInsertId();
 
         static::assertEquals($expectedId, $id);
 
@@ -132,21 +132,6 @@ EOT
         static::assertEquals('second', $testTable->second_value);
     }
 
-    /**
-     * @test
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unable to update unsaved entity
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function refreshUnStored(): void
-    {
-        /** @var TestTable $testTable */
-        $testTable = wait(TestTable::new($this->adapter, ['id' => uuid(), 'first_value' => 'first', 'second_value' => 'second']));
-        wait($testTable->refresh());
-    }
 
     /**
      * @test
@@ -203,7 +188,9 @@ EOT
         /** @var TestTable $testTable */
         $testTable = wait(TestTable::new($this->adapter, ['id' => $id, 'first_value' => 'first', 'second_value' => 'second']));
 
-        static::assertEquals($id, wait($testTable->save()));
+        wait($testTable->save());
+
+        static::assertEquals($id, $testTable->lastInsertId());
         static::assertEquals(0, wait($testTable->save()));
     }
 
@@ -278,7 +265,7 @@ EOT
     /**
      * @test
      * @expectedException \LogicException
-     * @expectedExceptionMessage Column "qwerty" does not exist in table "test_table"
+     * @expectedExceptionMessage Column "qqqq" does not exist in table "test_table"
      *
      * @return void
      *
@@ -286,8 +273,7 @@ EOT
      */
     public function unExistsProperty(): void
     {
-        $testTable         = wait(TestTable::new($this->adapter, []));
-        $testTable->qwerty = 'qqqq';
+      wait(TestTable::new($this->adapter, ['qqqq' =>'111']));
     }
 
     /**
@@ -301,7 +287,6 @@ EOT
     {
         /** @var SecondTestTable $table */
         $table = wait(SecondTestTable::new($this->adapter, ['title' => 'root']));
-        wait($table->save());
 
         unset($table);
 
@@ -327,7 +312,6 @@ EOT
     {
         /** @var SecondTestTable $table */
         $table = wait(SecondTestTable::new($this->adapter, ['title' => 'root']));
-        wait($table->save());
 
         static::assertTrue(isset($table->pk));
 
@@ -347,20 +331,9 @@ EOT
      */
     public function selectWithOrder(): void
     {
-        $collection = [
-            TestTable::new($this->adapter, ['id' => uuid(), 'first_value' => '1', 'second_value' => '3']),
-            TestTable::new($this->adapter, ['id' => uuid(), 'first_value' => '2', 'second_value' => '2']),
-            TestTable::new($this->adapter, ['id' => uuid(), 'first_value' => '3', 'second_value' => '1']),
-        ];
-
-        /** @var Promise $promise */
-        foreach($collection as $promise)
-        {
-            /** @var TestTable $entity */
-            $entity = wait($promise);
-
-            wait($entity->save());
-        }
+        wait(TestTable::new($this->adapter, ['id' => uuid(), 'first_value' => '1', 'second_value' => '3']));
+        wait(TestTable::new($this->adapter, ['id' => uuid(), 'first_value' => '2', 'second_value' => '2']));
+        wait(TestTable::new($this->adapter, ['id' => uuid(), 'first_value' => '3', 'second_value' => '1']));
 
         /** @var TestTable[] $collection */
         $collection = wait(TestTable::findBy($this->adapter, [], 50, ['first_value' => 'desc']));
@@ -382,7 +355,6 @@ EOT
         /** @var TestTable $table */
         $table = wait(TestTable::new($this->adapter, ['id' => uuid(), 'first_value' => '1', 'second_value' => '3']));
 
-        wait($table->save());
         wait($table->remove());
         wait($table->refresh());
     }
@@ -400,8 +372,6 @@ EOT
     {
         /** @var TestTable $table */
         $table = wait(TestTable::new($this->adapter, ['id' => uuid(), 'first_value' => '1', 'second_value' => '3']));
-
-        wait($table->save());
 
         $table->id = null;
 
