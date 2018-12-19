@@ -15,7 +15,6 @@ namespace Desperado\ServiceBus\Infrastructure\Storage\SQL\ActiveRecord;
 
 use function Amp\call;
 use Amp\Promise;
-use Amp\Success;
 use Desperado\ServiceBus\Infrastructure\Cache\CacheAdapter;
 use Desperado\ServiceBus\Infrastructure\Cache\InMemoryCacheAdapter;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchAll;

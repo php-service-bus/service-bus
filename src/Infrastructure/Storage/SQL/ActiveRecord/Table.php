@@ -14,23 +14,20 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Infrastructure\Storage\SQL\ActiveRecord;
 
 use function Amp\call;
+use Amp\Coroutine;
 use Amp\Promise;
 use Amp\Success;
 use function Desperado\ServiceBus\Common\uuid;
-use Desperado\ServiceBus\Infrastructure\Storage\BinaryDataDecoder;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchAll;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchOne;
 use Desperado\ServiceBus\Infrastructure\Storage\QueryExecutor;
 use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
-use function Desperado\ServiceBus\Infrastructure\Storage\SQL\deleteQuery;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\equalsCriteria;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\insertQuery;
-use function Desperado\ServiceBus\Infrastructure\Storage\SQL\selectQuery;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\updateQuery;
-use Latitude\QueryBuilder\CriteriaInterface;
-use Latitude\QueryBuilder\Query as LatitudeQuery;
 
 /**
+ * @api
  * @todo: pk generation strategy
  */
 abstract class Table
@@ -111,6 +108,7 @@ abstract class Table
      */
     final public static function new(QueryExecutor $queryExecutor, array $data): Promise
     {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             function(array $data) use ($queryExecutor): \Generator
             {
@@ -160,15 +158,13 @@ abstract class Table
         return call(
             static function(QueryExecutor $queryExecutor, array $criteria): \Generator
             {
-                [$query, $parameters] = self::buildQuery(selectQuery(static::tableName()), $criteria);
-
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $queryExecutor->execute($query, $parameters);
+                $resultSet = yield from find($queryExecutor, static::tableName(), $criteria);
 
                 /** @var array<string, string|int|float|null>|null $data */
                 $data = yield fetchOne($resultSet);
 
-                unset($query, $parameters, $resultSet);
+                unset($resultSet);
 
                 if(true === \is_array($data))
                 {
@@ -184,8 +180,8 @@ abstract class Table
      *
      * @param QueryExecutor                                        $queryExecutor
      * @param array<int, \Latitude\QueryBuilder\CriteriaInterface> $criteria
-     * @param int                                                  $limit
-     * @param array|null                                           $orderBy
+     * @param int|null                                             $limit
+     * @param array                                                $orderBy
      *
      * @return Promise<array<int, static>>
      *
@@ -196,28 +192,21 @@ abstract class Table
     final public static function findBy(
         QueryExecutor $queryExecutor,
         array $criteria = [],
-        int $limit = 50,
-        ?array $orderBy = null
+        ?int $limit = null,
+        array $orderBy = []
     ): Promise
     {
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(QueryExecutor $queryExecutor, array $criteria, int $limit, ?array $orderBy): \Generator
+            static function(QueryExecutor $queryExecutor, array $criteria, ?int $limit, array $orderBy): \Generator
             {
-                [$query, $parameters] = self::buildQuery(
-                    selectQuery(static::tableName()),
-                    $criteria,
-                    $orderBy ?? [],
-                    $limit
-                );
-
                 /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $queryExecutor->execute($query, $parameters);
+                $resultSet = yield from find($queryExecutor, static::tableName(), $criteria, $limit, $orderBy);
 
                 /** @var array<string, string|int|float|null>|null $rows */
                 $rows = yield fetchAll($resultSet);
 
-                unset($query, $parameters, $resultSet);
+                unset($resultSet);
 
                 $result = [];
 
@@ -291,21 +280,22 @@ abstract class Table
         return call(
             function(): \Generator
             {
-                [$query, $parameters] = self::buildQuery(
-                    selectQuery(static::tableName()),
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+                $resultSet = yield from find(
+                    $this->queryExecutor,
+                    static::tableName(),
                     [equalsCriteria(static::primaryKey(), $this->searchPrimaryKeyValue())]
                 );
-
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $this->queryExecutor->execute($query, $parameters);
 
                 /** @var array<string, string|int|float|null>|null $row */
                 $row = yield fetchOne($resultSet);
 
+                unset($resultSet);
+
                 if(true === \is_array($row))
                 {
                     $this->changes = [];
-                    $this->data    = self::unescapeBinary($this->queryExecutor, $row);
+                    $this->data    = unescapeBinary($this->queryExecutor, $row);
 
                     return;
                 }
@@ -325,28 +315,17 @@ abstract class Table
      */
     final public function remove(): Promise
     {
-        $queryExecutor = $this->queryExecutor;
-
         if(true === $this->isNew)
         {
             return new Success();
         }
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call(
-            static function() use ($queryExecutor): \Generator
-            {
-                [$query, $parameters] = self::buildQuery(deleteQuery(static::tableName()));
-
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-                $resultSet = yield $queryExecutor->execute($query, $parameters);
-
-                $affectedRows = $resultSet->affectedRows();
-
-                unset($resultSet, $query, $parameters);
-
-                return $affectedRows;
-            }
+        return new Coroutine(
+            remove(
+                $this->queryExecutor,
+                static::tableName(),
+                [equalsCriteria(static::primaryKey(), $this->searchPrimaryKeyValue())]
+            )
         );
     }
 
@@ -482,7 +461,7 @@ abstract class Table
      */
     private function updateExistsEntry(array $changeSet): \Generator
     {
-        [$query, $parameters] = self::buildQuery(
+        [$query, $parameters] = buildQuery(
             updateQuery(static::tableName(), $changeSet),
             [equalsCriteria(static::primaryKey(), $this->searchPrimaryKeyValue())]
         );
@@ -521,51 +500,6 @@ abstract class Table
     }
 
     /**
-     * @param LatitudeQuery\AbstractQuery $queryBuilder
-     * @param array                       $criteriaCollection
-     * @param array                       $orderBy
-     * @param int|null                    $limit
-     *
-     * @return array 0 - SQL query; 1 - query parameters
-     */
-    private static function buildQuery(
-        LatitudeQuery\AbstractQuery $queryBuilder,
-        array $criteriaCollection = [],
-        array $orderBy = [],
-        ?int $limit = null
-    ): array
-    {
-        /** @var LatitudeQuery\SelectQuery|LatitudeQuery\UpdateQuery|LatitudeQuery\DeleteQuery $queryBuilder */
-
-        $isFirstCondition = true;
-
-        /** @var CriteriaInterface $criteriaItem */
-        foreach($criteriaCollection as $criteriaItem)
-        {
-            $methodName = true === $isFirstCondition ? 'where' : 'andWhere';
-            $queryBuilder->{$methodName}($criteriaItem);
-            $isFirstCondition = false;
-        }
-
-        if(null !== $limit)
-        {
-            $queryBuilder->limit($limit);
-        }
-
-        foreach($orderBy as $column => $direction)
-        {
-            $queryBuilder->orderBy($column, $direction);
-        }
-
-        $compiledQuery = $queryBuilder->compile();
-
-        return [
-            $compiledQuery->sql(),
-            $compiledQuery->params()
-        ];
-    }
-
-    /**
      * Create entry
      *
      * @param QueryExecutor                        $queryExecutor
@@ -590,7 +524,7 @@ abstract class Table
 
         if(false === $isNew)
         {
-            $data = self::unescapeBinary($queryExecutor, $data);
+            $data = unescapeBinary($queryExecutor, $data);
         }
 
         foreach($data as $key => $value)
@@ -601,30 +535,6 @@ abstract class Table
         $self->isNew = $isNew;
 
         return $self;
-    }
-
-    /**
-     * Unescape binary data
-     *
-     * @param QueryExecutor $queryExecutor
-     * @param array         $set
-     *
-     * @return array<string, string|int|null|float>
-     */
-    private static function unescapeBinary(QueryExecutor $queryExecutor, array $set): array
-    {
-        if($queryExecutor instanceof BinaryDataDecoder)
-        {
-            foreach($set as $key => $value)
-            {
-                if(false === empty($value) && true === \is_string($value))
-                {
-                    $set[$key] = $queryExecutor->unescapeBinary($value);
-                }
-            }
-        }
-
-        return $set;
     }
 
     /**
