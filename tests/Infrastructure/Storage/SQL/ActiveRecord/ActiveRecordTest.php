@@ -94,7 +94,7 @@ EOT
      *
      * @throws \Throwable
      */
-    public function findUnExists(): void
+    public function findNonExistent(): void
     {
         $testTable = wait(TestTable::find($this->adapter, uuid()));
 
