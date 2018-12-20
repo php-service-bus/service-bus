@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Index\Storage\Sql;
 
+use function Amp\call;
+use Amp\Promise;
 use Desperado\ServiceBus\Index\Storage\IndexesStorage;
 use function Desperado\ServiceBus\Infrastructure\Storage\fetchOne;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\insertQuery;
@@ -43,75 +45,119 @@ final class SqlIndexesStorage implements IndexesStorage
     /**
      * @inheritDoc
      */
-    public function find(string $indexKey, string $valueKey): \Generator
+    public function find(string $indexKey, string $valueKey): Promise
     {
-        /** @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery */
-        $selectQuery = selectQuery('event_sourcing_indexes')
-            ->where(equalsCriteria('index_tag', $indexKey))
-            ->andWhere(equalsCriteria('value_key', $valueKey));
+        $adapter = $this->adapter;
 
-        /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-        $compiledQuery = $selectQuery->compile();
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(string $indexKey, string $valueKey) use ($adapter): \Generator
+            {
+                /** @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery */
+                $selectQuery = selectQuery('event_sourcing_indexes')
+                    ->where(equalsCriteria('index_tag', $indexKey))
+                    ->andWhere(equalsCriteria('value_key', $valueKey));
 
-        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-        $resultSet = yield $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $selectQuery->compile();
 
-        /** @var array<string, mixed>|null $result */
-        $result = yield fetchOne($resultSet);
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+                $resultSet = yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
 
-        if(null !== $result && true === \is_array($result))
-        {
-            return $result['value_data'];
-        }
+                /** @var array<string, mixed>|null $result */
+                $result = yield fetchOne($resultSet);
+
+                if(null !== $result && true === \is_array($result))
+                {
+                    return $result['value_data'];
+                }
+            },
+            $indexKey, $valueKey
+        );
     }
 
     /**
      * @inheritDoc
      */
-    public function add(string $indexKey, string $valueKey, $value): \Generator
+    public function add(string $indexKey, string $valueKey, $value): Promise
     {
-        /** @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery */
-        $insertQuery = insertQuery('event_sourcing_indexes', [
-            'index_tag'  => $indexKey,
-            'value_key'  => $valueKey,
-            'value_data' => $value
-        ]);
+        $adapter = $this->adapter;
 
-        /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-        $compiledQuery = $insertQuery->compile();
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Mixed value type
+         */
+        return call(
+        /** @psalm-suppress MissingClosureParamType Mixed value type */
+            static function(string $indexKey, string $valueKey, $value) use ($adapter): \Generator
+            {
+                /** @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery */
+                $insertQuery = insertQuery('event_sourcing_indexes', [
+                    'index_tag'  => $indexKey,
+                    'value_key'  => $valueKey,
+                    'value_data' => $value
+                ]);
 
-        yield $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $insertQuery->compile();
+
+                yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+            },
+            $indexKey, $valueKey, $value
+        );
     }
 
     /**
      * @inheritDoc
      */
-    public function delete(string $indexKey, string $valueKey): \Generator
+    public function delete(string $indexKey, string $valueKey): Promise
     {
-        /** @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery */
-        $deleteQuery = deleteQuery('event_sourcing_indexes')
-            ->where(equalsCriteria('index_tag', $indexKey))
-            ->andWhere(equalsCriteria('value_key', $valueKey));
+        $adapter = $this->adapter;
 
-        /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-        $compiledQuery = $deleteQuery->compile();
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(string $indexKey, string $valueKey) use ($adapter): \Generator
+            {
+                /** @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery */
+                $deleteQuery = deleteQuery('event_sourcing_indexes')
+                    ->where(equalsCriteria('index_tag', $indexKey))
+                    ->andWhere(equalsCriteria('value_key', $valueKey));
 
-        yield $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $deleteQuery->compile();
+
+                yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+            },
+            $indexKey, $valueKey
+        );
     }
 
     /**
      * @inheritDoc
      */
-    public function update(string $indexKey, string $valueKey, $value): \Generator
+    public function update(string $indexKey, string $valueKey, $value): Promise
     {
-        /** @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery */
-        $updateQuery = updateQuery('event_sourcing_indexes', ['value_data' => $value])
-            ->where(equalsCriteria('index_tag', $indexKey))
-            ->andWhere(equalsCriteria('value_key', $valueKey));
+        $adapter = $this->adapter;
 
-        /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-        $compiledQuery = $updateQuery->compile();
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument Mixed value type
+         */
+        return call(
+            /** @psalm-suppress MissingClosureParamType Mixed value type */
+            static function(string $indexKey, string $valueKey, $value) use ($adapter): \Generator
+            {
+                /** @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery */
+                $updateQuery = updateQuery('event_sourcing_indexes', ['value_data' => $value])
+                    ->where(equalsCriteria('index_tag', $indexKey))
+                    ->andWhere(equalsCriteria('value_key', $valueKey));
 
-        yield $this->adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+                /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                $compiledQuery = $updateQuery->compile();
+
+                yield $adapter->execute($compiledQuery->sql(), $compiledQuery->params());
+            },
+            $indexKey, $valueKey, $value
+        );
     }
 }

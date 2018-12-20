@@ -95,7 +95,7 @@ final class SchedulerProvider
                         }
                     );
 
-                    yield from $generator;
+                    yield $generator;
 
                     if($context instanceof LoggingInContext)
                     {
@@ -157,7 +157,7 @@ final class SchedulerProvider
                         }
                     );
 
-                    yield from $generator;
+                    yield $generator;
                 }
                 catch(\Throwable $throwable)
                 {
@@ -204,7 +204,7 @@ final class SchedulerProvider
 
             $generator = $this->store->extract($id, $closure);
 
-            yield from $generator;
+            yield $generator;
         }
         catch(ScheduledOperationNotFound $exception)
         {

@@ -28,36 +28,25 @@ use Desperado\ServiceBus\Infrastructure\Storage\StorageConfiguration;
 final class AmpPostgreSQLAdapter implements StorageAdapter
 {
     /**
+     * Connection parameters
+     *
+     * @var StorageConfiguration
+     */
+    private $configuration;
+
+    /**
      * Connections pool
      *
-     * @var Pool
+     * @var Pool|null
      */
     private $pool;
 
     /**
      * @param StorageConfiguration $configuration
-     *
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
     public function __construct(StorageConfiguration $configuration)
     {
-        $queryData = $configuration->queryParameters;
-
-        $maxConnectionsCount = (int) ($queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS);
-        $idleTimeout         = (int) ($queryData['idle_timeout'] ?? Pool::DEFAULT_IDLE_TIMEOUT);
-
-        $this->pool = pool(
-            new ConnectionConfig(
-                (string) $configuration->host,
-                $configuration->port ?? ConnectionConfig::DEFAULT_PORT,
-                (string) $configuration->username,
-                (string) $configuration->password,
-                (string) $configuration->databaseName
-            ),
-            $maxConnectionsCount,
-            $idleTimeout
-
-        );
+        $this->configuration = $configuration;
     }
 
     public function __destruct()
@@ -74,7 +63,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
      */
     public function execute(string $queryString, array $parameters = []): Promise
     {
-        $connectionsPool = $this->pool;
+        $connectionsPool = $this->pool();
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
@@ -110,7 +99,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
      */
     public function transaction(): Promise
     {
-        $connectionsPool = $this->pool;
+        $connectionsPool = $this->pool();
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
@@ -147,5 +136,36 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
 
         /** @noinspection PhpComposerExtensionStubsInspection */
         return \pg_unescape_bytea($payload);
+    }
+
+    /**
+     * Receive connection pool
+     *
+     * @return Pool
+     */
+    private function pool(): Pool
+    {
+        if(null === $this->pool)
+        {
+            $queryData = $this->configuration->queryParameters;
+
+            $maxConnectionsCount = (int) ($queryData['max_connections'] ?? Pool::DEFAULT_MAX_CONNECTIONS);
+            $idleTimeout         = (int) ($queryData['idle_timeout'] ?? Pool::DEFAULT_IDLE_TIMEOUT);
+
+            $this->pool = pool(
+                new ConnectionConfig(
+                    (string) $this->configuration->host,
+                    $this->configuration->port ?? ConnectionConfig::DEFAULT_PORT,
+                    (string) $this->configuration->username,
+                    (string) $this->configuration->password,
+                    (string) $this->configuration->databaseName
+                ),
+                $maxConnectionsCount,
+                $idleTimeout
+
+            );
+        }
+
+        return $this->pool;
     }
 }

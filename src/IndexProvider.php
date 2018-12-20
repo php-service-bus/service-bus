@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus;
 
 use function Amp\call;
-use Amp\Coroutine;
 use Amp\Promise;
 use Desperado\ServiceBus\Index\IndexKey;
 use Desperado\ServiceBus\Index\Storage\IndexesStorage;
@@ -60,7 +59,7 @@ final class IndexProvider
             static function(IndexKey $indexKey) use ($storage): \Generator
             {
                 /** @var string|int|float|boolean|null $value */
-                $value = yield from $storage->find($indexKey->indexName(), $indexKey->valueKey());
+                $value = yield $storage->find($indexKey->indexName(), $indexKey->valueKey());
 
                 if(true === \is_scalar($value))
                 {
@@ -92,7 +91,7 @@ final class IndexProvider
             static function(IndexKey $indexKey) use ($storage): \Generator
             {
                 /** @var string|int|float|boolean|null $value */
-                $value = yield from $storage->find($indexKey->indexName(), $indexKey->valueKey());
+                $value = yield $storage->find($indexKey->indexName(), $indexKey->valueKey());
 
                 return true === \is_scalar($value);
             },
@@ -123,7 +122,7 @@ final class IndexProvider
             {
                 try
                 {
-                    yield from $storage->add($indexKey->indexName(), $indexKey->valueKey(), $value->value());
+                    yield $storage->add($indexKey->indexName(), $indexKey->valueKey(), $value->value());
 
                     return true;
                 }
@@ -148,7 +147,7 @@ final class IndexProvider
      */
     public function remove(IndexKey $indexKey): Promise
     {
-        return new Coroutine($this->storage->delete($indexKey->indexName(), $indexKey->valueKey()));
+        return $this->storage->delete($indexKey->indexName(), $indexKey->valueKey());
     }
 
     /**
@@ -164,6 +163,6 @@ final class IndexProvider
      */
     public function update(IndexKey $indexKey, IndexValue $value): Promise
     {
-        return new Coroutine($this->storage->update($indexKey->indexName(), $indexKey->valueKey(), $value->value()));
+        return $this->storage->update($indexKey->indexName(), $indexKey->valueKey(), $value->value());
     }
 }

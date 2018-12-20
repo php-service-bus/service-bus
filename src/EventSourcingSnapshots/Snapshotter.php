@@ -89,7 +89,7 @@ final class Snapshotter
                 try
                 {
                     /** @var StoredAggregateSnapshot|null $storedSnapshot */
-                    $storedSnapshot = yield from $storage->load($id);
+                    $storedSnapshot = yield $storage->load($id);
 
                     if(null !== $storedSnapshot)
                     {
@@ -132,8 +132,8 @@ final class Snapshotter
             {
                 try
                 {
-                    yield from $storage->remove($snapshot->aggregate->id());
-                    yield from $storage->save(
+                    yield $storage->remove($snapshot->aggregate->id());
+                    yield $storage->save(
                         new StoredAggregateSnapshot(
                             (string) $snapshot->aggregate->id(),
                             \get_class($snapshot->aggregate->id()),

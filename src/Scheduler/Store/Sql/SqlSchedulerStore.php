@@ -14,6 +14,8 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Scheduler\Store\Sql;
 
 use function Amp\asyncCall;
+use function Amp\call;
+use Amp\Promise;
 use function Desperado\ServiceBus\Common\datetimeToString;
 use Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation;
 use Desperado\ServiceBus\Scheduler\Data\ScheduledOperation;
@@ -50,165 +52,193 @@ final class SqlSchedulerStore implements SchedulerStore
     /**
      * @inheritDoc
      */
-    public function add(ScheduledOperation $operation, callable $postAdd): \Generator
+    public function add(ScheduledOperation $operation, callable $postAdd): Promise
     {
-        /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
-        $transaction = yield $this->adapter->transaction();
+        $adapter = $this->adapter;
 
-        try
-        {
-            /**
-             * @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery
-             *
-             * @psalm-suppress ImplicitToStringCast
-             */
-            $insertQuery = insertQuery('scheduler_registry', [
-                'id'              => (string) $operation->id,
-                'processing_date' => datetimeToString($operation->date),
-                'command'         => \base64_encode(\serialize($operation->command)),
-                'is_sent'         => (int) $operation->isSent
-            ]);
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(ScheduledOperation $operation, callable $postAdd) use ($adapter): \Generator
+            {
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
+                $transaction = yield $adapter->transaction();
 
-            /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-            $compiledQuery = $insertQuery->compile();
+                try
+                {
+                    /**
+                     * @var \Latitude\QueryBuilder\Query\InsertQuery $insertQuery
+                     *
+                     * @psalm-suppress ImplicitToStringCast
+                     */
+                    $insertQuery = insertQuery('scheduler_registry', [
+                        'id'              => (string) $operation->id,
+                        'processing_date' => datetimeToString($operation->date),
+                        'command'         => \base64_encode(\serialize($operation->command)),
+                        'is_sent'         => (int) $operation->isSent
+                    ]);
 
-            /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-            $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+                    /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                    $compiledQuery = $insertQuery->compile();
 
-            unset($insertQuery, $compiledQuery, $resultSet);
+                    /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+                    $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
-            /** Receive next operation and notification about the scheduled job  */
+                    unset($insertQuery, $compiledQuery, $resultSet);
 
-            /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
-            $nextOperation = yield from self::fetchNextOperation($transaction);
+                    /** Receive next operation and notification about the scheduled job  */
 
-            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-            asyncCall($postAdd, $operation, $nextOperation);
+                    /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
+                    $nextOperation = yield from self::fetchNextOperation($transaction);
 
-            yield $transaction->commit();
+                    /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+                    asyncCall($postAdd, $operation, $nextOperation);
 
-            unset($nextOperation);
-        }
-        catch(\Throwable $throwable)
-        {
-            yield $transaction->rollback();
+                    yield $transaction->commit();
 
-            /** @noinspection PhpUnhandledExceptionInspection */
-            throw $throwable;
-        }
-        finally
-        {
-            unset($transaction);
-        }
+                    unset($nextOperation);
+                }
+                catch(\Throwable $throwable)
+                {
+                    yield $transaction->rollback();
+
+                    /** @noinspection PhpUnhandledExceptionInspection */
+                    throw $throwable;
+                }
+                finally
+                {
+                    unset($transaction);
+                }
+            },
+            $operation, $postAdd
+        );
     }
 
     /**
      * @inheritDoc
      */
-    public function remove(ScheduledOperationId $id, callable $postRemove): \Generator
+    public function remove(ScheduledOperationId $id, callable $postRemove): Promise
     {
-        /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
-        $transaction = yield $this->adapter->transaction();
+        $adapter = $this->adapter;
 
-        try
-        {
-            /**
-             * @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery
-             *
-             * @psalm-suppress ImplicitToStringCast
-             */
-            $deleteQuery = deleteQuery('scheduler_registry')
-                ->where(equalsCriteria('id', $id));
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(ScheduledOperationId $id, callable $postRemove) use ($adapter): \Generator
+            {
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
+                $transaction = yield $adapter->transaction();
 
-            /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-            $compiledQuery = $deleteQuery->compile();
+                try
+                {
+                    /**
+                     * @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery
+                     *
+                     * @psalm-suppress ImplicitToStringCast
+                     */
+                    $deleteQuery = deleteQuery('scheduler_registry')
+                        ->where(equalsCriteria('id', $id));
 
-            /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-            $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+                    /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                    $compiledQuery = $deleteQuery->compile();
 
-            unset($deleteQuery, $compiledQuery, $resultSet);
+                    /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+                    $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
-            /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
-            $nextOperation = yield from self::fetchNextOperation($transaction);
+                    unset($deleteQuery, $compiledQuery, $resultSet);
 
-            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-            asyncCall($postRemove, $nextOperation);
+                    /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
+                    $nextOperation = yield from self::fetchNextOperation($transaction);
 
-            yield $transaction->commit();
+                    /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+                    asyncCall($postRemove, $nextOperation);
 
-            unset($nextOperation);
-        }
-        catch(\Throwable $throwable)
-        {
-            yield $transaction->rollback();
+                    yield $transaction->commit();
 
-            /** @noinspection PhpUnhandledExceptionInspection */
-            throw $throwable;
-        }
-        finally
-        {
-            unset($transaction);
-        }
+                    unset($nextOperation);
+                }
+                catch(\Throwable $throwable)
+                {
+                    yield $transaction->rollback();
+
+                    /** @noinspection PhpUnhandledExceptionInspection */
+                    throw $throwable;
+                }
+                finally
+                {
+                    unset($transaction);
+                }
+            },
+            $id, $postRemove
+        );
     }
 
     /**
      * @inheritDoc
      */
-    public function extract(ScheduledOperationId $id, callable $postExtract): \Generator
+    public function extract(ScheduledOperationId $id, callable $postExtract): Promise
     {
-        /** @var \Desperado\ServiceBus\Scheduler\Data\ScheduledOperation|null $operation */
-        $operation = yield from self::doLoadOperation($this->adapter, $id);
+        $adapter = $this->adapter;
 
-        /** Scheduled operation not found */
-        if(null === $operation)
-        {
-            throw new ScheduledOperationNotFound(
-                \sprintf('Operation with ID "%s" not found', $id)
-            );
-        }
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(ScheduledOperationId $id, callable $postExtract) use ($adapter): \Generator
+            {
 
-        /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
-        $transaction = yield $this->adapter->transaction();
+                /** @var \Desperado\ServiceBus\Scheduler\Data\ScheduledOperation|null $operation */
+                $operation = yield from self::doLoadOperation($adapter, $id);
 
-        try
-        {
-            /**
-             * @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery
-             *
-             * @psalm-suppress ImplicitToStringCast
-             */
-            $deleteQuery = deleteQuery('scheduler_registry')
-                ->where(equalsCriteria('id', $id));
+                /** Scheduled operation not found */
+                if(null === $operation)
+                {
+                    throw new ScheduledOperationNotFound(
+                        \sprintf('Operation with ID "%s" not found', $id)
+                    );
+                }
 
-            /** @var \Latitude\QueryBuilder\Query $compiledQuery */
-            $compiledQuery = $deleteQuery->compile();
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
+                $transaction = yield $adapter->transaction();
 
-            /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
-            $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
+                try
+                {
+                    /**
+                     * @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery
+                     *
+                     * @psalm-suppress ImplicitToStringCast
+                     */
+                    $deleteQuery = deleteQuery('scheduler_registry')
+                        ->where(equalsCriteria('id', $id));
 
-            unset($deleteQuery, $compiledQuery, $resultSet);
+                    /** @var \Latitude\QueryBuilder\Query $compiledQuery */
+                    $compiledQuery = $deleteQuery->compile();
 
-            /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
-            $nextOperation = yield from self::fetchNextOperation($transaction);
+                    /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+                    $resultSet = yield $transaction->execute($compiledQuery->sql(), $compiledQuery->params());
 
-            /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-            asyncCall($postExtract, $operation, $nextOperation);
+                    unset($deleteQuery, $compiledQuery, $resultSet);
 
-            yield $transaction->commit();
+                    /** @var \Desperado\ServiceBus\Scheduler\Data\NextScheduledOperation|null $nextOperation */
+                    $nextOperation = yield from self::fetchNextOperation($transaction);
 
-            unset($nextOperation);
-        }
-        catch(\Throwable $throwable)
-        {
-            yield $transaction->rollback();
+                    /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+                    asyncCall($postExtract, $operation, $nextOperation);
 
-            /** @noinspection PhpUnhandledExceptionInspection */
-            throw $throwable;
-        }
-        finally
-        {
-            unset($transaction);
-        }
+                    yield $transaction->commit();
+
+                    unset($nextOperation);
+                }
+                catch(\Throwable $throwable)
+                {
+                    yield $transaction->rollback();
+
+                    /** @noinspection PhpUnhandledExceptionInspection */
+                    throw $throwable;
+                }
+                finally
+                {
+                    unset($transaction);
+                }
+            },
+            $id, $postExtract
+        );
     }
 
     /**

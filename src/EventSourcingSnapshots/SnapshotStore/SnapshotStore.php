@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore;
 
+use Amp\Promise;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
 
 /**
@@ -27,13 +28,13 @@ interface SnapshotStore
      *
      * @param StoredAggregateSnapshot $aggregateSnapshot
      *
-     * @return \Generator It does not return any result
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed
      */
-    public function save(StoredAggregateSnapshot $aggregateSnapshot): \Generator;
+    public function save(StoredAggregateSnapshot $aggregateSnapshot): Promise;
 
     /**
      * Load snapshot
@@ -42,12 +43,12 @@ interface SnapshotStore
      *
      * @param AggregateId $id
      *
-     * @return \Generator<\Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\StoredAggregateSnapshot|null>
+     * @return Promise<\Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\StoredAggregateSnapshot|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function load(AggregateId $id): \Generator;
+    public function load(AggregateId $id): Promise;
 
     /**
      * Remove snapshot from database
@@ -56,10 +57,10 @@ interface SnapshotStore
      *
      * @param AggregateId $id
      *
-     * @return \Generator It does not return any result
+     * @return Promise It does not return any result
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function remove(AggregateId $id): \Generator;
+    public function remove(AggregateId $id): Promise;
 }

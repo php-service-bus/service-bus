@@ -121,4 +121,20 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
             }
         );
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function unescapeBinary($payload): string
+    {
+        if(true === \is_resource($payload))
+        {
+            $payload = \stream_get_contents($payload, -1, 0);
+        }
+
+        /** @var string $payload */
+
+        /** @noinspection PhpComposerExtensionStubsInspection */
+        return \pg_unescape_bytea($payload);
+    }
 }

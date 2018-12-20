@@ -16,25 +16,21 @@ namespace Desperado\ServiceBus\Infrastructure\Storage;
 use Amp\Promise;
 
 /**
- * Interface adapter for working with the database
+ * Query execution interface
  */
-interface StorageAdapter extends QueryExecutor, BinaryDataDecoder
+interface QueryExecutor
 {
     /**
-     * Does the transaction adapter
+     * Execute query
      *
-     * @return bool
-     */
-    public function supportsTransaction(): bool;
-
-    /**
-     * Start transaction
+     * @param string $queryString
+     * @param array  $parameters
      *
-     * @return Promise<\Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter>
+     * @return Promise<\Desperado\ServiceBus\Infrastructure\Storage\ResultSet>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed Could not connect to database
-     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\TransactionNotSupported The adapter does not support transactions
+     * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\UniqueConstraintViolationCheckFailed Duplicate entry
      */
-    public function transaction(): Promise;
+    public function execute(string $queryString, array $parameters = []): Promise;
 }

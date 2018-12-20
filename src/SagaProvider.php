@@ -251,7 +251,7 @@ final class SagaProvider
         $saga = null;
 
         /** @var StoredSaga|null $savedSaga */
-        $savedSaga = yield from $this->store->load($id);
+        $savedSaga = yield $this->store->load($id);
 
         if(null !== $savedSaga)
         {
@@ -307,7 +307,7 @@ final class SagaProvider
                     ? $store->save($savedSaga)
                     : $store->update($savedSaga);
 
-                yield from $generator;
+                yield $generator;
             },
             ConnectionFailed::class, StorageInteractingFailed::class
         );

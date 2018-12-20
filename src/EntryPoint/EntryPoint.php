@@ -56,7 +56,7 @@ final class EntryPoint
     {
         $this->transport = $transport;
         $this->processor = $processor;
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger    = $logger ?? new NullLogger();
     }
 
     /**
@@ -71,7 +71,7 @@ final class EntryPoint
         $this->listenQueue = $queue;
 
         $transport = $this->transport;
-        $logger = $this->logger;
+        $logger    = $this->logger;
         $processor = $this->processor;
 
         /** Hack for phpunit tests */
@@ -91,7 +91,7 @@ final class EntryPoint
 
                     try
                     {
-                        yield from $processor->handle($package);
+                        yield $processor->handle($package);
                     }
                     catch(\Throwable $throwable)
                     {

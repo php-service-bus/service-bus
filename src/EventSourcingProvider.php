@@ -115,7 +115,7 @@ final class EventSourcingProvider
                     }
 
                     /** @var StoredAggregateEventStream|null $storedEventStream */
-                    $storedEventStream = yield from $storage->loadStream($id, $fromStreamVersion);
+                    $storedEventStream = yield $storage->loadStream($id, $fromStreamVersion);
 
                     $aggregate = self::restoreStream($aggregate, $storedEventStream, $transformer);
 
@@ -166,8 +166,8 @@ final class EventSourcingProvider
                     $storedEventStream = $transformer->streamToStoredRepresentation($eventStream);
 
                     true === self::isNewEventStream($receivedEvents)
-                        ? yield from $storage->saveStream($storedEventStream)
-                        : yield from $storage->appendStream($storedEventStream);
+                        ? yield $storage->saveStream($storedEventStream)
+                        : yield $storage->appendStream($storedEventStream);
 
                     /** @var AggregateSnapshot|null $loadedSnapshot */
                     $loadedSnapshot = yield $snapshotter->load($aggregate->id());
