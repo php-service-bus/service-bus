@@ -54,6 +54,8 @@ final class TableMetadataLoader
      *    ...
      * ]
      *
+     * @psalm-return \Amp\Promise
+     *
      * @param string $table
      *
      * @return Promise<array<string, string>>
@@ -77,7 +79,7 @@ final class TableMetadataLoader
                     return $columns;
                 }
 
-                /** @var array<string, string> $columns */
+                /** @var array<string, string>|null $columns */
                 $columns = yield from $this->loadColumns($table);
 
                 yield $this->cacheAdapter->save($cacheKey, $columns);
@@ -89,6 +91,8 @@ final class TableMetadataLoader
     }
 
     /**
+     * @psalm-return \Generator
+     *
      * @param string $table
      *
      * @return \Generator<array<string, string>>
@@ -98,6 +102,7 @@ final class TableMetadataLoader
      */
     private function loadColumns(string $table): \Generator
     {
+        /** @var array<string, string> $result */
         $result = [];
 
         $queryBuilder = selectQuery('information_schema.columns', 'column_name', 'data_type')
@@ -108,10 +113,11 @@ final class TableMetadataLoader
         /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
         $resultSet = yield $this->queryExecutor->execute($compiledQuery->sql(), $compiledQuery->params());
 
-        /** @var array|null $columns */
+        /** @var array<int, array<string, string>> $columns */
         $columns = yield fetchAll($resultSet);
 
-        foreach($columns ?? [] as $columnData)
+        /** @var array{column_name:string, data_type:string} $columnData */
+        foreach($columns as $columnData)
         {
             $result[$columnData['column_name']] = $columnData['data_type'];
         }

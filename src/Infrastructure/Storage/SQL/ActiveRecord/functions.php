@@ -17,17 +17,18 @@ use Desperado\ServiceBus\Infrastructure\Storage\BinaryDataDecoder;
 use Desperado\ServiceBus\Infrastructure\Storage\QueryExecutor;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\deleteQuery;
 use function Desperado\ServiceBus\Infrastructure\Storage\SQL\selectQuery;
-use Latitude\QueryBuilder\CriteriaInterface;
 use Latitude\QueryBuilder\Query as LatitudeQuery;
 
 /**
  * @internal
  *
- * @param QueryExecutor $queryExecutor
- * @param string        $tableName
- * @param array         $criteria
- * @param int|null      $limit
- * @param array         $orderBy
+ * @psalm-return \Generator
+ *
+ * @param QueryExecutor                                          $queryExecutor
+ * @param string                                                 $tableName
+ * @param array<mixed, \Latitude\QueryBuilder\CriteriaInterface> $criteria
+ * @param int|null                                               $limit
+ * @param array<string, string>                                  $orderBy
  *
  * @return \Generator<\Desperado\ServiceBus\Infrastructure\Storage\ResultSet>
  *
@@ -36,6 +37,10 @@ use Latitude\QueryBuilder\Query as LatitudeQuery;
  */
 function find(QueryExecutor $queryExecutor, string $tableName, array $criteria = [], ?int $limit = null, array $orderBy = []): \Generator
 {
+    /**
+     * @var string                               $query
+     * @var array<string, string|int|float|null> $parameters
+     */
     [$query, $parameters] = buildQuery(selectQuery($tableName), $criteria, $orderBy, $limit);
 
     return yield $queryExecutor->execute($query, $parameters);
@@ -44,9 +49,11 @@ function find(QueryExecutor $queryExecutor, string $tableName, array $criteria =
 /**
  * @internal
  *
- * @param QueryExecutor $queryExecutor
- * @param string        $tableName
- * @param array         $criteria
+ * @psalm-return \Generator
+ *
+ * @param QueryExecutor                                          $queryExecutor
+ * @param string                                                 $tableName
+ * @param array<mixed, \Latitude\QueryBuilder\CriteriaInterface> $criteria
  *
  * @return \Generator<int>
  *
@@ -55,6 +62,10 @@ function find(QueryExecutor $queryExecutor, string $tableName, array $criteria =
  */
 function remove(QueryExecutor $queryExecutor, string $tableName, array $criteria = []): \Generator
 {
+    /**
+     * @var string                               $query
+     * @var array<string, string|int|float|null> $parameters
+     */
     [$query, $parameters] = buildQuery(deleteQuery($tableName), $criteria);
 
     /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
@@ -70,16 +81,16 @@ function remove(QueryExecutor $queryExecutor, string $tableName, array $criteria
 /**
  * @internal
  *
- * @param LatitudeQuery\AbstractQuery $queryBuilder
- * @param array                       $criteriaCollection
- * @param array                       $orderBy
- * @param int|null                    $limit
+ * @param LatitudeQuery\AbstractQuery                            $queryBuilder
+ * @param array<mixed, \Latitude\QueryBuilder\CriteriaInterface> $criteria
+ * @param array<string, string>                                  $orderBy
+ * @param int|null                                               $limit
  *
  * @return array 0 - SQL query; 1 - query parameters
  */
 function buildQuery(
     LatitudeQuery\AbstractQuery $queryBuilder,
-    array $criteriaCollection = [],
+    array $criteria = [],
     array $orderBy = [],
     ?int $limit = null
 ): array
@@ -88,22 +99,25 @@ function buildQuery(
 
     $isFirstCondition = true;
 
-    /** @var CriteriaInterface $criteriaItem */
-    foreach($criteriaCollection as $criteriaItem)
+    /** @var \Latitude\QueryBuilder\CriteriaInterface $criteriaItem */
+    foreach($criteria as $criteriaItem)
     {
         $methodName = true === $isFirstCondition ? 'where' : 'andWhere';
         $queryBuilder->{$methodName}($criteriaItem);
         $isFirstCondition = false;
     }
 
-    if(null !== $limit)
+    if($queryBuilder instanceof LatitudeQuery\SelectQuery)
     {
-        $queryBuilder->limit($limit);
-    }
+        foreach($orderBy as $column => $direction)
+        {
+            $queryBuilder->orderBy($column, $direction);
+        }
 
-    foreach($orderBy as $column => $direction)
-    {
-        $queryBuilder->orderBy($column, $direction);
+        if(null !== $limit)
+        {
+            $queryBuilder->limit($limit);
+        }
     }
 
     $compiledQuery = $queryBuilder->compile();
@@ -119,8 +133,8 @@ function buildQuery(
  *
  * Unescape binary data
  *
- * @param QueryExecutor $queryExecutor
- * @param array         $set
+ * @param QueryExecutor                        $queryExecutor
+ * @param array<string, string|int|null|float> $set
  *
  * @return array<string, string|int|null|float>
  */

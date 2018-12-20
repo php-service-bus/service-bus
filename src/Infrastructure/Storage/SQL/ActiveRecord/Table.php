@@ -35,7 +35,7 @@ abstract class Table
     /**
      * Stored entry identifier
      *
-     * @var string|int
+     * @var string|null
      */
     private $insertId;
 
@@ -97,10 +97,12 @@ abstract class Table
     /**
      * Create and persist entry
      *
-     * @param QueryExecutor $queryExecutor
-     * @param array         $data
+     * @psalm-return \Amp\Promise
      *
-     * @return Promise<static>
+     * @param QueryExecutor                        $queryExecutor
+     * @param array<string, string|int|float|null> $data
+     *
+     * @return Promise<\Desperado\ServiceBus\Infrastructure\Storage\SQL\ActiveRecord\Table>
      *
      * @throws \LogicException Unknown attribute
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
@@ -112,10 +114,17 @@ abstract class Table
         return call(
             function(array $data) use ($queryExecutor): \Generator
             {
-                /** @var self $self */
+                /**
+                 * @var array<string, string|int|float|null> $data
+                 * @var static                               $self
+                 */
+
                 $self = yield from static::create($queryExecutor, $data, true);
 
-                $self->insertId = (string) yield $self->save();
+                /** @var string|int $result */
+                $result = yield $self->save();
+
+                $self->insertId = (string) $result;
 
                 return $self;
             },
@@ -125,6 +134,8 @@ abstract class Table
 
     /**
      * Find entry by primary key
+     *
+     * @psalm-return \Amp\Promise
      *
      * @param QueryExecutor $queryExecutor
      * @param int|string    $id
@@ -142,8 +153,10 @@ abstract class Table
     /**
      * Find one entry by specified criteria
      *
-     * @param QueryExecutor                                        $queryExecutor
-     * @param array<int, \Latitude\QueryBuilder\CriteriaInterface> $criteria
+     * @psalm-return \Amp\Promise
+     *
+     * @param QueryExecutor                                          $queryExecutor
+     * @param array<mixed, \Latitude\QueryBuilder\CriteriaInterface> $criteria
      *
      * @return Promise<static|null>
      *
@@ -158,7 +171,10 @@ abstract class Table
         return call(
             static function(QueryExecutor $queryExecutor, array $criteria): \Generator
             {
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+                /**
+                 * @var array<mixed, \Latitude\QueryBuilder\CriteriaInterface> $criteria
+                 * @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet
+                 */
                 $resultSet = yield from find($queryExecutor, static::tableName(), $criteria);
 
                 /** @var array<string, string|int|float|null>|null $data */
@@ -178,10 +194,12 @@ abstract class Table
     /**
      * Find entries by specified criteria
      *
-     * @param QueryExecutor                                        $queryExecutor
-     * @param array<int, \Latitude\QueryBuilder\CriteriaInterface> $criteria
-     * @param int|null                                             $limit
-     * @param array                                                $orderBy
+     * @psalm-return \Amp\Promise
+     *
+     * @param QueryExecutor                                          $queryExecutor
+     * @param array<mixed, \Latitude\QueryBuilder\CriteriaInterface> $criteria
+     * @param int|null                                               $limit
+     * @param array<string, string>                                  $orderBy
      *
      * @return Promise<array<int, static>>
      *
@@ -200,7 +218,11 @@ abstract class Table
         return call(
             static function(QueryExecutor $queryExecutor, array $criteria, ?int $limit, array $orderBy): \Generator
             {
-                /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+                /**
+                 * @var array<mixed, \Latitude\QueryBuilder\CriteriaInterface> $criteria
+                 * @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet
+                 * @var array<string, string>                                  $orderBy
+                 */
                 $resultSet = yield from find($queryExecutor, static::tableName(), $criteria, $limit, $orderBy);
 
                 /** @var array<string, string|int|float|null>|null $rows */
@@ -208,11 +230,20 @@ abstract class Table
 
                 unset($resultSet);
 
+                /** @var array<int, static> $result */
                 $result = [];
 
-                foreach($rows as $row)
+                if(null !== $rows)
                 {
-                    $result[] = yield from self::create($queryExecutor, $row, false);
+                    /** @var array<string, string|int|float|null> $row */
+                    foreach($rows as $row)
+                    {
+                        /** @var static $entry */
+                        $entry    = yield from self::create($queryExecutor, $row, false);
+                        $result[] = $entry;
+
+                        unset($entry);
+                    }
                 }
 
                 return $result;
@@ -223,6 +254,8 @@ abstract class Table
 
     /**
      * Save entry changes
+     *
+     * @psalm-return \Amp\Promise
      *
      * @return Promise<string|int> Returns the ID of the saved entry, or the number of affected rows (in the case of an update)
      *
@@ -267,6 +300,8 @@ abstract class Table
 
     /**
      * Refresh entry data
+     *
+     * @psalm-return \Amp\Promise
      *
      * @return Promise
      *
@@ -413,6 +448,8 @@ abstract class Table
     /**
      * Store new entry
      *
+     * @psalm-return \Generator
+     *
      * @param array<string, string|int|float|null> $changeSet
      *
      * @return \Generator<string|int>
@@ -431,7 +468,10 @@ abstract class Table
         /** @todo: fix me */
         if($this->queryExecutor instanceof AmpPostgreSQLAdapter)
         {
-            /** @var \Latitude\QueryBuilder\Query\Postgres\InsertQuery $queryBuilder */
+            /**
+             * @psalm-suppress UndefinedMethod Cannot find method in traits
+             * @var \Latitude\QueryBuilder\Query\Postgres\InsertQuery $queryBuilder
+             */
             $queryBuilder->returning($primaryKey);
         }
 
@@ -455,12 +495,18 @@ abstract class Table
     /**
      * Update exists entry
      *
+     * @psalm-return \Generator
+     *
      * @param array $changeSet
      *
      * @return \Generator<int>
      */
     private function updateExistsEntry(array $changeSet): \Generator
     {
+        /**
+         * @var string                               $query
+         * @var array<string, string|int|float|null> $parameters
+         */
         [$query, $parameters] = buildQuery(
             updateQuery(static::tableName(), $changeSet),
             [equalsCriteria(static::primaryKey(), $this->searchPrimaryKeyValue())]
@@ -478,17 +524,17 @@ abstract class Table
     }
 
     /**
-     * @return string|int
+     * @return string
      *
      * @throws \LogicException Unable to find primary key value
      */
-    private function searchPrimaryKeyValue()
+    private function searchPrimaryKeyValue(): string
     {
         $primaryKey = static::primaryKey();
 
         if(true === isset($this->data[$primaryKey]) && '' !== (string ) $this->data[$primaryKey])
         {
-            return $this->data[$primaryKey];
+            return (string) $this->data[$primaryKey];
         }
 
         throw new \LogicException(
@@ -502,11 +548,13 @@ abstract class Table
     /**
      * Create entry
      *
+     * @psalm-return \Generator
+     *
      * @param QueryExecutor                        $queryExecutor
      * @param array<string, string|int|float|null> $data
      * @param bool                                 $isNew
      *
-     * @return \Generator
+     * @return \Generator<static>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed Basic type of interaction errors
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed Could not connect to database

@@ -19,12 +19,12 @@ namespace Desperado\ServiceBus\Infrastructure\Cache;
 final class InMemoryStorage
 {
     /**
-     * @var self
+     * @var self|null
      */
     private static $instance;
 
     /**
-     * @var array<string, mixed>
+     * @var array<string, int|string|float|null|array>
      */
     private $storage = [];
 
@@ -84,7 +84,7 @@ final class InMemoryStorage
      *
      * @param string $key
      *
-     * @return mixed
+     * @return int|string|float|null|array
      */
     public function get(string $key)
     {
@@ -120,9 +120,9 @@ final class InMemoryStorage
     /**
      * Store specified value
      *
-     * @param string $key
-     * @param mixed  $value
-     * @param int    $ttl
+     * @param string                      $key
+     * @param int|string|float|null|array $value
+     * @param int                         $ttl
      *
      * @return void
      */

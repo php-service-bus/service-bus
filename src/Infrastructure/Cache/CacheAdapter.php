@@ -25,7 +25,7 @@ interface CacheAdapter
      *
      * @param string $key
      *
-     * @return Promise<mixed>
+     * @return Promise<int|string|float|null|array>
      */
     public function get(string $key): Promise;
 
@@ -50,9 +50,9 @@ interface CacheAdapter
     /**
      * Save new cache entry
      *
-     * @param string $key
-     * @param mixed  $value
-     * @param int    $ttl
+     * @param string                      $key
+     * @param int|string|float|null|array $value
+     * @param int                         $ttl
      *
      * @return Promise<bool>
      */

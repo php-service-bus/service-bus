@@ -57,6 +57,7 @@ final class InMemoryCacheAdapter implements CacheAdapter
      */
     public function save(string $key, $value, int $ttl = 0): Promise
     {
+        /** @psalm-suppress MixedArgument */
         $this->storage->push($key, $value, $ttl);
 
         return new Success(true);
