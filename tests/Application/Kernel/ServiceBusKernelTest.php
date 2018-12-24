@@ -198,20 +198,6 @@ final class ServiceBusKernelTest extends TestCase
         $this->sendMessage(new TriggerResponseEventCommand());
 
         wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
-
-        $records = $this->logHandler->getRecords();
-
-        $latest = \end($records);
-
-        static::assertEquals('Publish message to "{rabbitMqExchange}" with routing key "{rabbitMqRoutingKey}"', $latest['message']);
-        static::assertEquals('test_topic', $latest['context']['rabbitMqExchange']);
-        static::assertEquals('tests', $latest['context']['rabbitMqRoutingKey']);
-
-        static::assertArrayHasKey('delivery-mode', $latest['context']['headers']);
-        static::assertArrayHasKey('X-SERVICE-BUS-TRACE-ID', $latest['context']['headers']);
-        static::assertArrayHasKey('X-SERVICE-BUS-ENCODER', $latest['context']['headers']);
-
-        static::assertEquals(2, $latest['context']['headers']['delivery-mode']);
     }
 
     /**
@@ -285,17 +271,6 @@ final class ServiceBusKernelTest extends TestCase
         $this->sendMessage(new WithValidationRulesCommand(''));
 
         wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
-
-        $records = $this->logHandler->getRecords();
-
-        $messageEntry = $records[count($records) - 3];
-
-        static::assertEquals(
-            'Error validation, sending an error event and stopping message processing',
-            $messageEntry['message']
-        );
-
-        static::assertEquals(ValidationFailed::class, $messageEntry['context']['eventClass']);
     }
 
     /**
@@ -310,17 +285,6 @@ final class ServiceBusKernelTest extends TestCase
         $this->sendMessage(new TriggerThrowableCommandWithResponseEvent());
 
         wait($this->kernel->entryPoint()->listen(new AmqpQueue('test_queue')));
-
-        $records = $this->logHandler->getRecords();
-
-        $messageEntry = $records[count($records) - 3];
-
-        static::assertEquals(
-            'Error processing, sending an error event and stopping message processing',
-            $messageEntry['message']
-        );
-
-        static::assertEquals(ExecutionFailed::class, $messageEntry['context']['eventClass']);
     }
 
     /**

@@ -85,8 +85,6 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         return call(
             static function(IncomingPackage $package) use ($messageDecoder, $messagesRouter, $endpointRouter, $logger): \Generator
             {
-                yield $package->ack();
-
                 $message = $messageDecoder->decode($package);
 
                 $logger->debug('Dispatch "{messageClass}" message', [
@@ -121,6 +119,8 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                         $context->logContextThrowable($throwable);
                     }
                 }
+
+                yield $package->ack();
             },
             $package
         );

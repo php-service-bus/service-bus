@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\EntryPoint;
 
 use function Amp\call;
+use Amp\Delayed;
 use Amp\Loop;
 use Amp\Promise;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
@@ -27,6 +28,8 @@ use Psr\Log\NullLogger;
  */
 final class EntryPoint
 {
+    private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 90;
+
     /**
      * @var Transport
      */
@@ -48,15 +51,36 @@ final class EntryPoint
     private $logger;
 
     /**
+     * The max number of concurrent tasks
+     *
+     * @var int
+     */
+    private $maxConcurrentTaskCount;
+
+    /**
+     * The current number of tasks performed
+     *
+     * @var int
+     */
+    private $currentTasksInProgressCount = 0;
+
+    /**
      * @param Transport            $transport
      * @param  EntryPointProcessor $processor
      * @param LoggerInterface|null $logger
+     * @param int|null             $maxConcurrentTaskCount
      */
-    public function __construct(Transport $transport, EntryPointProcessor $processor, ?LoggerInterface $logger = null)
+    public function __construct(
+        Transport $transport,
+        EntryPointProcessor $processor,
+        ?LoggerInterface $logger = null,
+        ?int $maxConcurrentTaskCount = null
+    )
     {
-        $this->transport = $transport;
-        $this->processor = $processor;
-        $this->logger    = $logger ?? new NullLogger();
+        $this->transport              = $transport;
+        $this->processor              = $processor;
+        $this->logger                 = $logger ?? new NullLogger();
+        $this->maxConcurrentTaskCount = ($maxConcurrentTaskCount ?? self::DEFAULT_MAX_CONCURRENT_TASK_COUNT);
     }
 
     /**
@@ -70,43 +94,53 @@ final class EntryPoint
     {
         $this->listenQueue = $queue;
 
-        $transport = $this->transport;
-        $logger    = $this->logger;
-        $processor = $this->processor;
-
         /** Hack for phpunit tests */
         $isTestCall = 'phpunitTests' === (string) \getenv('SERVICE_BUS_TESTING');
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Queue $queue) use ($transport, $processor, $logger, $isTestCall): \Generator
+            function(Queue $queue) use ($isTestCall): \Generator
             {
                 /** @var \Amp\Iterator $iterator */
-                $iterator = yield $transport->consume($queue);
+                $iterator = yield $this->transport->consume($queue);
 
                 while(yield $iterator->advance())
                 {
                     /** @var IncomingPackage $package */
                     $package = $iterator->getCurrent();
 
-                    try
+                    while($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
                     {
-                        yield $processor->handle($package);
+                        yield new Delayed(100);
                     }
-                    catch(\Throwable $throwable)
-                    {
-                        $logger->critical($throwable->getMessage(), [
-                            'packageId'      => $package->id(),
-                            'traceId'        => $package->traceId(),
-                            'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-                        ]);
-                    }
+
+                    $this->currentTasksInProgressCount++;
 
                     /** Hack for phpUnit */
                     if(true === $isTestCall)
                     {
+                        yield $this->processor->handle($package);
+
                         break;
                     }
+
+                    $this->processor->handle($package)->onResolve(
+                        function(?\Throwable $throwable) use ($package): void
+                        {
+                            $this->currentTasksInProgressCount--;
+
+                            if(null === $throwable)
+                            {
+                                return;
+                            }
+
+                            $this->logger->critical($throwable->getMessage(), [
+                                'packageId'      => $package->id(),
+                                'traceId'        => $package->traceId(),
+                                'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                            ]);
+                        }
+                    );
                 }
             },
             $queue
