@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\EntryPoint;
 
 use function Amp\call;
+use Amp\Delayed;
 use Amp\Loop;
 use Amp\Promise;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
@@ -27,6 +28,8 @@ use Psr\Log\NullLogger;
  */
 final class EntryPoint
 {
+    private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 80;
+
     /**
      * @var Transport
      */
@@ -48,15 +51,36 @@ final class EntryPoint
     private $logger;
 
     /**
+     * The max number of concurrent tasks
+     *
+     * @var int
+     */
+    private $maxConcurrentTaskCount;
+
+    /**
+     * The current number of tasks performed
+     *
+     * @var int
+     */
+    private $currentTasksInProgressCount = 0;
+
+    /**
      * @param Transport            $transport
      * @param  EntryPointProcessor $processor
      * @param LoggerInterface|null $logger
+     * @param int|null             $maxConcurrentTaskCount
      */
-    public function __construct(Transport $transport, EntryPointProcessor $processor, ?LoggerInterface $logger = null)
+    public function __construct(
+        Transport $transport,
+        EntryPointProcessor $processor,
+        ?LoggerInterface $logger = null,
+        ?int $maxConcurrentTaskCount = null
+    )
     {
-        $this->transport = $transport;
-        $this->processor = $processor;
-        $this->logger    = $logger ?? new NullLogger();
+        $this->transport              = $transport;
+        $this->processor              = $processor;
+        $this->logger                 = $logger ?? new NullLogger();
+        $this->maxConcurrentTaskCount = ($maxConcurrentTaskCount ?? self::DEFAULT_MAX_CONCURRENT_TASK_COUNT);
     }
 
     /**
@@ -70,57 +94,42 @@ final class EntryPoint
     {
         $this->listenQueue = $queue;
 
-        $transport = $this->transport;
-        $logger    = $this->logger;
-        $processor = $this->processor;
-
         /** Hack for phpunit tests */
         $isTestCall = 'phpunitTests' === (string) \getenv('SERVICE_BUS_TESTING');
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Queue $queue) use ($transport, $processor, $logger, $isTestCall): \Generator
+            function(Queue $queue) use ($isTestCall): \Generator
             {
                 /** @var \Amp\Iterator $iterator */
-                $iterator = yield $transport->consume($queue);
+                $iterator = yield $this->transport->consume($queue);
 
                 while(yield $iterator->advance())
                 {
                     /** @var IncomingPackage $package */
                     $package = $iterator->getCurrent();
 
-                    $promise = $processor->handle($package);
+                    received:
+
+                    if($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
+                    {
+                        yield new Delayed(300);
+                        goto received;
+                    }
+
+                    $this->currentTasksInProgressCount++;
+
+                    $promise = $this->processor->handle($package);
 
                     /** Hack for phpUnit */
                     if(true === $isTestCall)
                     {
-                        try
-                        {
-                            yield $promise;
-                        }
-                        catch(\Throwable $throwable)
-                        {
-                            /** Not interest */
-                        }
+                        yield from $this->testTaskResolve($promise);
 
                         break;
                     }
 
-                    $promise->onResolve(
-                        static function(?\Throwable $throwable) use ($logger, $package): void
-                        {
-                            if(null === $throwable)
-                            {
-                                return;
-                            }
-
-                            $logger->critical($throwable->getMessage(), [
-                                'packageId'      => $package->id(),
-                                'traceId'        => $package->traceId(),
-                                'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-                            ]);
-                        }
-                    );
+                    $this->normalResolve($promise, $package);
                 }
             },
             $queue
@@ -161,5 +170,55 @@ final class EntryPoint
                 );
             }
         );
+    }
+
+    /**
+     * Resolve of promise during normal usage
+     *
+     * @param Promise         $promise
+     * @param IncomingPackage $package
+     *
+     * @return void
+     */
+    private function normalResolve(Promise $promise, IncomingPackage $package): void
+    {
+        $promise->onResolve(
+            function(?\Throwable $throwable) use ($package): void
+            {
+                $this->currentTasksInProgressCount--;
+
+                if(null === $throwable)
+                {
+                    return;
+                }
+
+                $this->logger->critical($throwable->getMessage(), [
+                    'packageId'      => $package->id(),
+                    'traceId'        => $package->traceId(),
+                    'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                ]);
+            }
+        );
+    }
+
+    /**
+     * Resolve of promise during test call
+     *
+     * @param Promise $promise
+     *
+     * @return \Generator
+     */
+    private function testTaskResolve(Promise $promise): \Generator
+    {
+        try
+        {
+            yield $promise;
+
+            $this->currentTasksInProgressCount--;
+        }
+        catch(\Throwable $throwable)
+        {
+            /** Not interest */
+        }
     }
 }
