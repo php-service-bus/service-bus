@@ -28,7 +28,7 @@ use Psr\Log\NullLogger;
  */
 final class EntryPoint
 {
-    private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 80;
+    private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 90;
 
     /**
      * @var Transport
@@ -109,27 +109,38 @@ final class EntryPoint
                     /** @var IncomingPackage $package */
                     $package = $iterator->getCurrent();
 
-                    received:
-
-                    if($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
+                    while($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
                     {
-                        yield new Delayed(300);
-                        goto received;
+                        yield new Delayed(100);
                     }
 
                     $this->currentTasksInProgressCount++;
 
-                    $promise = $this->processor->handle($package);
-
                     /** Hack for phpUnit */
                     if(true === $isTestCall)
                     {
-                        yield from $this->testTaskResolve($promise);
+                        yield $this->processor->handle($package);
 
                         break;
                     }
 
-                    $this->normalResolve($promise, $package);
+                    $this->processor->handle($package)->onResolve(
+                        function(?\Throwable $throwable) use ($package): void
+                        {
+                            $this->currentTasksInProgressCount--;
+
+                            if(null === $throwable)
+                            {
+                                return;
+                            }
+
+                            $this->logger->critical($throwable->getMessage(), [
+                                'packageId'      => $package->id(),
+                                'traceId'        => $package->traceId(),
+                                'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                            ]);
+                        }
+                    );
                 }
             },
             $queue
@@ -170,55 +181,5 @@ final class EntryPoint
                 );
             }
         );
-    }
-
-    /**
-     * Resolve of promise during normal usage
-     *
-     * @param Promise         $promise
-     * @param IncomingPackage $package
-     *
-     * @return void
-     */
-    private function normalResolve(Promise $promise, IncomingPackage $package): void
-    {
-        $promise->onResolve(
-            function(?\Throwable $throwable) use ($package): void
-            {
-                $this->currentTasksInProgressCount--;
-
-                if(null === $throwable)
-                {
-                    return;
-                }
-
-                $this->logger->critical($throwable->getMessage(), [
-                    'packageId'      => $package->id(),
-                    'traceId'        => $package->traceId(),
-                    'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-                ]);
-            }
-        );
-    }
-
-    /**
-     * Resolve of promise during test call
-     *
-     * @param Promise $promise
-     *
-     * @return \Generator
-     */
-    private function testTaskResolve(Promise $promise): \Generator
-    {
-        try
-        {
-            yield $promise;
-
-            $this->currentTasksInProgressCount--;
-        }
-        catch(\Throwable $throwable)
-        {
-            /** Not interest */
-        }
     }
 }

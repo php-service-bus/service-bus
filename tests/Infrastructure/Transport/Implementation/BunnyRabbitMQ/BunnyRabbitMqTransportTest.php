@@ -68,6 +68,9 @@ final class BunnyRabbitMqTransportTest extends TestCase
             wait($channel->exchangeDelete('createExchange2'));
             wait($channel->queueDelete('createQueue2'));
 
+            wait($channel->exchangeDelete('consume'));
+            wait($channel->queueDelete('consume.messages'));
+
             wait($this->transport->disconnect());
         }
     }

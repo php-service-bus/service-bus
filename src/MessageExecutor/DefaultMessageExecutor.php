@@ -80,7 +80,7 @@ final class DefaultMessageExecutor implements MessageExecutor
 
         /**
          * @psalm-suppress  MixedArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress  InvalidArgument Incorrect psalm unpack parameters (...$args)
          */
         return call(
             static function(
@@ -105,8 +105,11 @@ final class DefaultMessageExecutor implements MessageExecutor
                     }
 
                     $context->logContextMessage(
-                        'Error processing, sending an error event and stopping message processing',
-                        ['eventClass' => $options->defaultThrowableEvent()],
+                        'Error processing, sending an error event and stopping message processing', [
+                        'eventClass'       => $options->defaultThrowableEvent(),
+                        'throwableMessage' => $throwable->getMessage(),
+                        'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                    ],
                         LogLevel::DEBUG
                     );
 
