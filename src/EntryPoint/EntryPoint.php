@@ -28,7 +28,7 @@ use Psr\Log\NullLogger;
  */
 final class EntryPoint
 {
-    private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 90;
+    private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 50;
 
     /**
      * @var Transport
@@ -111,7 +111,7 @@ final class EntryPoint
 
                     while($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
                     {
-                        yield new Delayed(100);
+                        yield new Delayed(50);
                     }
 
                     $this->currentTasksInProgressCount++;
