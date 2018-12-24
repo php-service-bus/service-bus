@@ -89,24 +89,38 @@ final class EntryPoint
                     /** @var IncomingPackage $package */
                     $package = $iterator->getCurrent();
 
-                    try
-                    {
-                        yield $processor->handle($package);
-                    }
-                    catch(\Throwable $throwable)
-                    {
-                        $logger->critical($throwable->getMessage(), [
-                            'packageId'      => $package->id(),
-                            'traceId'        => $package->traceId(),
-                            'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-                        ]);
-                    }
+                    $promise = $processor->handle($package);
 
                     /** Hack for phpUnit */
                     if(true === $isTestCall)
                     {
+                        try
+                        {
+                            yield $promise;
+                        }
+                        catch(\Throwable $throwable)
+                        {
+                            /** Not interest */
+                        }
+
                         break;
                     }
+
+                    $promise->onResolve(
+                        static function(?\Throwable $throwable) use ($logger, $package): void
+                        {
+                            if(null === $throwable)
+                            {
+                                return;
+                            }
+
+                            $logger->critical($throwable->getMessage(), [
+                                'packageId'      => $package->id(),
+                                'traceId'        => $package->traceId(),
+                                'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                            ]);
+                        }
+                    );
                 }
             },
             $queue
