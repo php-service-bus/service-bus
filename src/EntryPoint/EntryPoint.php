@@ -29,6 +29,7 @@ use Psr\Log\NullLogger;
 final class EntryPoint
 {
     private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 50;
+    private const DEFAULT_AWAIT_DELAY               = 50;
 
     /**
      * @var Transport
@@ -65,22 +66,32 @@ final class EntryPoint
     private $currentTasksInProgressCount = 0;
 
     /**
+     * Barrier wait delay (in milliseconds)
+     *
+     * @var int
+     */
+    private $awaitDelay;
+
+    /**
      * @param Transport            $transport
      * @param  EntryPointProcessor $processor
      * @param LoggerInterface|null $logger
      * @param int|null             $maxConcurrentTaskCount
+     * @param int|null             $awaitDelay Barrier wait delay (in milliseconds)
      */
     public function __construct(
         Transport $transport,
         EntryPointProcessor $processor,
         ?LoggerInterface $logger = null,
-        ?int $maxConcurrentTaskCount = null
+        ?int $maxConcurrentTaskCount = null,
+        ?int $awaitDelay = null
     )
     {
         $this->transport              = $transport;
         $this->processor              = $processor;
         $this->logger                 = $logger ?? new NullLogger();
-        $this->maxConcurrentTaskCount = ($maxConcurrentTaskCount ?? self::DEFAULT_MAX_CONCURRENT_TASK_COUNT);
+        $this->maxConcurrentTaskCount = $maxConcurrentTaskCount ?? self::DEFAULT_MAX_CONCURRENT_TASK_COUNT;
+        $this->awaitDelay             = $awaitDelay ?? self::DEFAULT_AWAIT_DELAY;
     }
 
     /**
@@ -111,7 +122,7 @@ final class EntryPoint
 
                     while($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
                     {
-                        yield new Delayed(50);
+                        yield new Delayed($this->awaitDelay);
                     }
 
                     $this->currentTasksInProgressCount++;
