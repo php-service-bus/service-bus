@@ -102,6 +102,8 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                         ['messageClass' => \get_class($message)]
                     );
 
+                    yield $package->ack();
+
                     return;
                 }
 
