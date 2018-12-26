@@ -117,10 +117,6 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                         'There are no handlers configured for the message "{messageClass}"',
                         ['messageClass' => \get_class($message)]
                     );
-
-                    yield $package->ack();
-
-                    return;
                 }
 
                 /** @var \Desperado\ServiceBus\MessageExecutor\MessageExecutor $executor */
