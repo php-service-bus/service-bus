@@ -17,6 +17,7 @@ use Amp\Postgres\Transaction as AmpTransaction;
 use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter;
+use Psr\Log\LoggerInterface;
 
 /**
  *  Async PostgreSQL transaction adapter
@@ -31,11 +32,18 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
     private $transaction;
 
     /**
-     * @param AmpTransaction $transaction
+     * @var LoggerInterface
      */
-    public function __construct(AmpTransaction $transaction)
+    private $logger;
+
+    /**
+     * @param AmpTransaction  $transaction
+     * @param LoggerInterface $logger
+     */
+    public function __construct(AmpTransaction $transaction, LoggerInterface $logger)
     {
         $this->transaction = $transaction;
+        $this->logger      = $logger;
     }
 
     /**
@@ -44,14 +52,17 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
     public function execute(string $queryString, array $parameters = []): Promise
     {
         $transaction = $this->transaction;
+        $logger      = $this->logger;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
         /** @psalm-return AmpPostgreSQLResultSet */
-            static function(string $queryString, array $parameters = []) use ($transaction): \Generator
+            static function(string $queryString, array $parameters = []) use ($transaction, $logger): \Generator
             {
                 try
                 {
+                    $logger->debug($queryString, $parameters);
+
                     return new AmpPostgreSQLResultSet(
                         yield $transaction->execute($queryString, $parameters)
                     );
@@ -74,13 +85,16 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
     public function commit(): Promise
     {
         $transaction = $this->transaction;
+        $logger      = $this->logger;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function() use ($transaction): \Generator
+            static function() use ($transaction, $logger): \Generator
             {
                 try
                 {
+                    $logger->debug('COMMIT');
+
                     yield $transaction->commit();
 
                     $transaction->close();
@@ -101,13 +115,16 @@ final class AmpPostgreSQLTransactionAdapter implements TransactionAdapter
     public function rollback(): Promise
     {
         $transaction = $this->transaction;
+        $logger      = $this->logger;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function() use ($transaction): \Generator
+            static function() use ($transaction, $logger): \Generator
             {
                 try
                 {
+                    $logger->debug('ROLLBACK');
+
                     yield $transaction->rollback();
 
                     unset($transaction);

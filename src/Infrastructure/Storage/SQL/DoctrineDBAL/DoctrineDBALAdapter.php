@@ -21,6 +21,8 @@ use Desperado\ServiceBus\Infrastructure\Storage\StorageConfiguration;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * DoctrineDBAL adapter
@@ -37,14 +39,20 @@ final class DoctrineDBALAdapter implements StorageAdapter
     private $connection;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @noinspection PhpDocMissingThrowsInspection
      *
      * @param StorageConfiguration $configuration
+     * @param LoggerInterface|null $logger
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed
      */
-    public function __construct(StorageConfiguration $configuration)
+    public function __construct(StorageConfiguration $configuration, ?LoggerInterface $logger = null)
     {
         try
         {
@@ -52,6 +60,8 @@ final class DoctrineDBALAdapter implements StorageAdapter
                 ['url' => $configuration->originalDSN],
                 new Configuration()
             );
+
+            $this->logger = $logger ?? new NullLogger();
         }
         catch(\Throwable $throwable)
         {
@@ -65,6 +75,8 @@ final class DoctrineDBALAdapter implements StorageAdapter
      */
     public function execute(string $queryString, array $parameters = []): Promise
     {
+        $this->logger->debug($queryString, $parameters);
+
         try
         {
 
@@ -104,9 +116,11 @@ final class DoctrineDBALAdapter implements StorageAdapter
     {
         try
         {
+            $this->logger->debug('START TRANSACTION');
+
             $this->connection->beginTransaction();
 
-            return new Success(new DoctrineDBALTransactionAdapter($this->connection));
+            return new Success(new DoctrineDBALTransactionAdapter($this->connection, $this->logger));
         }
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)

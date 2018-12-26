@@ -63,6 +63,7 @@ services:
     arguments:
       $adapter: '%service_bus.storage.adapter%'
       $connectionDSN: '%service_bus.storage.dsn%'
+      $logger: '@service_bus.logger'
 
   # Indexes storage
   Desperado\ServiceBus\Index\Storage\IndexesStorage:

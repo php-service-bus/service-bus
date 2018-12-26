@@ -15,6 +15,7 @@ namespace Desperado\ServiceBus\Infrastructure\Storage;
 
 use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -39,16 +40,17 @@ final class StorageAdapterFactory
     }
 
     /**
-     * @param string $adapter @see StorageAdapterFactory::SUPPORTED
-     * @param string $connectionDSN DSN examples:
-     *                              - inMemory: sqlite:///:memory:
-     *                              - AsyncPostgreSQL: pgsql://user:password@host:port/database
+     * @param string          $adapter       @see StorageAdapterFactory::SUPPORTED
+     * @param string          $connectionDSN DSN examples:
+     *                                       - inMemory: sqlite:///:memory:
+     *                                       - AsyncPostgreSQL: pgsql://user:password@host:port/database
+     * @param LoggerInterface $logger
      *
      * @return StorageAdapter
      *
      * @throws \LogicException Unsupported adapter specified
      */
-    public static function create(string $adapter, string $connectionDSN): StorageAdapter
+    public static function create(string $adapter, string $connectionDSN, LoggerInterface $logger): StorageAdapter
     {
         if(
             true === \in_array($adapter, self::SUPPORTED, true) &&
@@ -57,7 +59,7 @@ final class StorageAdapterFactory
         )
         {
             /** @var StorageAdapter $adapter */
-            $adapter = new $adapter(StorageConfiguration::fromDSN($connectionDSN));
+            $adapter = new $adapter(StorageConfiguration::fromDSN($connectionDSN), $logger);
 
             return $adapter;
         }

@@ -19,6 +19,7 @@ use Amp\Failure;
 use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter;
+use Psr\Log\LoggerInterface;
 
 /**
  * Doctrine DBAL transaction adapter
@@ -33,11 +34,17 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
     private $connection;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param Connection $connection
      */
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, LoggerInterface $logger)
     {
         $this->connection = $connection;
+        $this->logger = $logger;
     }
 
     /**
@@ -45,6 +52,8 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
      */
     public function execute(string $queryString, array $parameters = []): Promise
     {
+        $this->logger->debug($queryString, $parameters);
+
         try
         {
             $statement = $this->connection->prepare($queryString);
@@ -74,13 +83,16 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
     public function commit(): Promise
     {
         $connection = $this->connection;
+        $logger = $this->logger;
 
         /** InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function() use ($connection): void
+            static function() use ($connection, $logger): void
             {
                 try
                 {
+                    $logger->debug('COMMIT');
+
                     $connection->commit();
                 }
                     // @codeCoverageIgnoreStart
@@ -99,13 +111,16 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
     public function rollback(): Promise
     {
         $connection = $this->connection;
+        $logger = $this->logger;
 
         /** InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function() use ($connection): void
+            static function() use ($connection, $logger): void
             {
                 try
                 {
+                    $logger->debug('ROLLBACK');
+
                     $connection->rollBack();
                 }
                     // @codeCoverageIgnoreStart
