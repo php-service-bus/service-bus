@@ -17,6 +17,7 @@ use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Endpoint\EndpointRouter;
+use Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
 use Desperado\ServiceBus\MessageRouter\Router;
@@ -85,7 +86,22 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         return call(
             static function(IncomingPackage $package) use ($messageDecoder, $messagesRouter, $endpointRouter, $logger): \Generator
             {
-                $message = $messageDecoder->decode($package);
+                try
+                {
+                    $message = $messageDecoder->decode($package);
+                }
+                catch(DecodeMessageFailed $exception)
+                {
+                    $logger->error('Failed to denormalize the message', [
+                        'packageId' => $package->id(),
+                        'traceId'   => $package->traceId(),
+                        'payload'   => $package->payload()
+                    ]);
+
+                    yield $package->ack();
+
+                    return;
+                }
 
                 $logger->debug('Dispatch "{messageClass}" message', [
                     'packageId'    => $package->id(),
