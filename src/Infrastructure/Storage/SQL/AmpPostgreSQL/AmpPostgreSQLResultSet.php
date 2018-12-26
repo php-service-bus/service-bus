@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL;
 
 use Amp\Postgres\PgSqlCommandResult;
+use Amp\Postgres\PqCommandResult;
 use Amp\Promise;
 use Amp\Success;
 use Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ResultSetIterationFailed;
@@ -27,7 +28,7 @@ use Amp\Postgres\PooledResultSet;
 class AmpPostgreSQLResultSet implements ResultSet
 {
     /**
-     * @var AmpResultSet|PooledResultSet
+     * @var AmpResultSet|PooledResultSet|PgSqlCommandResult|PqCommandResult
      */
     private $originalResultSet;
 
@@ -119,7 +120,10 @@ class AmpPostgreSQLResultSet implements ResultSet
     {
         try
         {
-            if($this->originalResultSet instanceof PgSqlCommandResult)
+            if(
+                $this->originalResultSet instanceof PgSqlCommandResult ||
+                $this->originalResultSet instanceof PqCommandResult
+            )
             {
                 return $this->originalResultSet->getAffectedRowCount();
             }
