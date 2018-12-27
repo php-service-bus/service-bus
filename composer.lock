@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6e59a595f95d9c3b9e7d1115ff984850",
-    "content-hash": "277aedb6fd690d32bd554dc0d6e0b33f",
+    "hash": "9a918ce9b647ecc76635458a70322a63",
+    "content-hash": "da6875de3a0d11defdc190dce2a24232",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1564,52 +1564,6 @@
             ],
             "description": "A SQL query builder with zero dependencies",
             "time": "2018-05-09 14:39:02"
-        },
-        {
-            "name": "mlehner/gelf-php",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mlehner/gelf-php.git",
-                "reference": "ccaba9d296de6a7b8d115f62db58249362fe43fd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mlehner/gelf-php/zipball/ccaba9d296de6a7b8d115f62db58249362fe43fd",
-                "reference": "ccaba9d296de6a7b8d115f62db58249362fe43fd",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~3.7"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Gelf": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Matt Lehner",
-                    "email": "matt.lehner@tellecore.com"
-                },
-                {
-                    "name": "Lennart Koopmann",
-                    "email": "lennart@socketfeed.com",
-                    "homepage": "http://www.lennartkoopmann.net/"
-                },
-                {
-                    "name": "Julius Beckmann",
-                    "email": "github@h4cc.de"
-                }
-            ],
-            "description": "Fork of gelf-php with PHP namespace support",
-            "abandoned": "graylog2/gelf-php",
-            "time": "2014-02-20 17:57:06"
         },
         {
             "name": "monolog/monolog",
@@ -3387,20 +3341,21 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.3.0",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozart/assert.git",
-                "reference": "0df1908962e7a3071564e857d86874dad1ef204a"
+                "reference": "83e253c8e0be5b0257b881e1827274667c5c17a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/0df1908962e7a3071564e857d86874dad1ef204a",
-                "reference": "0df1908962e7a3071564e857d86874dad1ef204a",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/83e253c8e0be5b0257b881e1827274667c5c17a9",
+                "reference": "83e253c8e0be5b0257b881e1827274667c5c17a9",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3.3 || ^7.0"
+                "php": "^5.3.3 || ^7.0",
+                "symfony/polyfill-ctype": "^1.8"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.6",
@@ -3433,7 +3388,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2018-01-29 19:49:41"
+            "time": "2018-12-25 11:19:39"
         }
     ],
     "packages-dev": [
@@ -3780,6 +3735,45 @@
             "time": "2018-09-25 11:42:25"
         },
         {
+            "name": "graylog2/gelf-php",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bzikarsky/gelf-php.git",
+                "reference": "97650200d0eef03598a149e3c2074de9a05f88b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bzikarsky/gelf-php/zipball/97650200d0eef03598a149e3c2074de9a05f88b6",
+                "reference": "97650200d0eef03598a149e3c2074de9a05f88b6",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    ""
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lennart Koopmann",
+                    "email": "lennart@socketfeed.com",
+                    "homepage": "http://www.lennartkoopmann.net/"
+                }
+            ],
+            "description": "PHP classes to send GELF (Graylog extended log format) messages",
+            "homepage": "http://github.com/Graylog2/gelf-php",
+            "keywords": [
+                "log",
+                "logging"
+            ],
+            "time": "2013-12-19 11:49:39"
+        },
+        {
             "name": "muglug/package-versions-56",
             "version": "1.2.4",
             "source": {
@@ -3927,16 +3921,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.1.0",
+            "version": "v4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "d0230c5c77a7e3cfa69446febf340978540958c0"
+                "reference": "8aae5b59b83bb4d0dbf07b0a835f2680a658f610"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/d0230c5c77a7e3cfa69446febf340978540958c0",
-                "reference": "d0230c5c77a7e3cfa69446febf340978540958c0",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/8aae5b59b83bb4d0dbf07b0a835f2680a658f610",
+                "reference": "8aae5b59b83bb4d0dbf07b0a835f2680a658f610",
                 "shasum": ""
             },
             "require": {
@@ -3974,7 +3968,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2018-10-10 09:24:14"
+            "time": "2018-12-26 11:32:39"
         },
         {
             "name": "openlss/lib-array2xml",
