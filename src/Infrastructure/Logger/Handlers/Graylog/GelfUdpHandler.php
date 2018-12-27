@@ -11,14 +11,17 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Infrastructure\Logger\Gelf;
+namespace Desperado\ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 
 use Amp\ByteStream\ResourceOutputStream;
+use Monolog\Formatter\NormalizerFormatter;
+use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
 
 /**
- * Asynchronous sending messages to Graylog
+ *
  */
-final class StreamPublisher
+final class GelfUdpHandler extends AbstractProcessingHandler
 {
     /**
      * @var ResourceOutputStream
@@ -28,48 +31,50 @@ final class StreamPublisher
     /**
      * @var bool
      */
-    private $gzipContent;
+    private $gzipMessage;
 
     /**
      * @param string $host
      * @param int    $port
-     * @param bool   $gzipContent
+     * @param bool   $gzipMessage
+     * @param int    $level
+     * @param bool   $bubble
+     *
+     * @throws \RuntimeException Could not connect
      */
-    public function __construct(string $host, int $port, bool $gzipContent = false)
+    public function __construct(string $host, int $port, bool $gzipMessage = false, $level = Logger::DEBUG, $bubble = true)
     {
-        $this->outputStream = new ResourceOutputStream($this->createStream($host, $port));
-        $this->gzipContent  = $gzipContent;
+        parent::__construct($level, $bubble);
+
+        $this->outputStream = new ResourceOutputStream(self::createStream($host, $port));
+        $this->gzipMessage  = $gzipMessage;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      *
      * @return void
      *
      * @throws \Amp\ByteStream\ClosedException
      */
-    public function publish(\GELFMessage $message): void
+    protected function write(array $record): void
     {
-        $messageBody = $this->compressMessage($message);
+        $body = \json_encode($record, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
 
-        $this->outputStream->write($messageBody);
+        if(true === $this->gzipMessage)
+        {
+            $body = \gzcompress($body);
+        }
+
+        $this->outputStream->write($body);
     }
 
     /**
-     * @param \GELFMessage $message
-     *
-     * @return string
+     * @inheritdoc
      */
-    private function compressMessage(\GELFMessage $message): string
+    public function getFormatter(): NormalizerFormatter
     {
-        $content = \json_encode($message->toArray());
-
-        if(true === $this->gzipContent)
-        {
-            $content = \gzcompress($content);
-        }
-
-        return $content;
+        return new GelfFormatter();
     }
 
     /**
@@ -80,7 +85,7 @@ final class StreamPublisher
      *
      * @throws \RuntimeException Could not connect
      */
-    private function createStream(string $host, int $port)
+    private static function createStream(string $host, int $port)
     {
         $uri = \sprintf('udp://%s:%d', $host, $port);
 
@@ -93,7 +98,6 @@ final class StreamPublisher
 
         \stream_set_blocking($stream, false);
         \stream_set_write_buffer($stream, 0);
-
 
         return $stream;
     }

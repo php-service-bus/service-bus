@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Infrastructure\Logger\Gelf;
+namespace Desperado\ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Logger;
