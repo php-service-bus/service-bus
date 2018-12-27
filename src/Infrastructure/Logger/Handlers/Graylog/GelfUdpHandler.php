@@ -96,9 +96,6 @@ final class GelfUdpHandler extends AbstractProcessingHandler
             throw new \RuntimeException(\sprintf('Could not connect to %s:%d', $host, $port));
         }
 
-        \stream_set_blocking($stream, false);
-        \stream_set_write_buffer($stream, 0);
-
         return $stream;
     }
 }
