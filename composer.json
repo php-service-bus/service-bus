@@ -71,11 +71,7 @@
   "require-dev": {
     "doctrine/dbal": "^v2.6",
     "phpunit/phpunit": "^7",
-    "vimeo/psalm": "^2",
-    "graylog2/gelf-php": "^0.1"
-  },
-  "suggest": {
-    "graylog2/gelf-php": "Graylog support"
+    "vimeo/psalm": "^2"
   },
   "prefer-stable": true,
   "minimum-stability": "dev",

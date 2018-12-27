@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9a918ce9b647ecc76635458a70322a63",
-    "content-hash": "da6875de3a0d11defdc190dce2a24232",
+    "hash": "5e8486df1d1faa4454fcaca0f8b3a3b4",
+    "content-hash": "faa1c8089ec3b11df94e91ac470e0f84",
     "packages": [
         {
             "name": "amphp/amp",
@@ -3733,45 +3733,6 @@
                 "server"
             ],
             "time": "2018-09-25 11:42:25"
-        },
-        {
-            "name": "graylog2/gelf-php",
-            "version": "0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/bzikarsky/gelf-php.git",
-                "reference": "97650200d0eef03598a149e3c2074de9a05f88b6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/bzikarsky/gelf-php/zipball/97650200d0eef03598a149e3c2074de9a05f88b6",
-                "reference": "97650200d0eef03598a149e3c2074de9a05f88b6",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    ""
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Lennart Koopmann",
-                    "email": "lennart@socketfeed.com",
-                    "homepage": "http://www.lennartkoopmann.net/"
-                }
-            ],
-            "description": "PHP classes to send GELF (Graylog extended log format) messages",
-            "homepage": "http://github.com/Graylog2/gelf-php",
-            "keywords": [
-                "log",
-                "logging"
-            ],
-            "time": "2013-12-19 11:49:39"
         },
         {
             "name": "muglug/package-versions-56",
