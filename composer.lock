@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5e8486df1d1faa4454fcaca0f8b3a3b4",
-    "content-hash": "faa1c8089ec3b11df94e91ac470e0f84",
+    "hash": "6e59a595f95d9c3b9e7d1115ff984850",
+    "content-hash": "277aedb6fd690d32bd554dc0d6e0b33f",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1564,6 +1564,52 @@
             ],
             "description": "A SQL query builder with zero dependencies",
             "time": "2018-05-09 14:39:02"
+        },
+        {
+            "name": "mlehner/gelf-php",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mlehner/gelf-php.git",
+                "reference": "ccaba9d296de6a7b8d115f62db58249362fe43fd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mlehner/gelf-php/zipball/ccaba9d296de6a7b8d115f62db58249362fe43fd",
+                "reference": "ccaba9d296de6a7b8d115f62db58249362fe43fd",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Gelf": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Matt Lehner",
+                    "email": "matt.lehner@tellecore.com"
+                },
+                {
+                    "name": "Lennart Koopmann",
+                    "email": "lennart@socketfeed.com",
+                    "homepage": "http://www.lennartkoopmann.net/"
+                },
+                {
+                    "name": "Julius Beckmann",
+                    "email": "github@h4cc.de"
+                }
+            ],
+            "description": "Fork of gelf-php with PHP namespace support",
+            "abandoned": "graylog2/gelf-php",
+            "time": "2014-02-20 17:57:06"
         },
         {
             "name": "monolog/monolog",
