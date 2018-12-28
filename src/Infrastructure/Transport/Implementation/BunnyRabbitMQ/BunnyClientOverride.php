@@ -1999,7 +1999,7 @@ final class BunnyClientOverride extends Client
      */
     private function onConnecting(): void
     {
-        $this->state = ClientStateEnum::DISCONNECTING;
+        $this->state = ClientStateEnum::CONNECTING;
     }
 
     /**
