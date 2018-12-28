@@ -21,6 +21,7 @@ use Monolog\Logger;
  */
 final class GelfFormatter extends NormalizerFormatter
 {
+    private const GRAYLOG_VERSION    = 1.0;
     private const DEFAULT_MAX_LENGTH = 32766;
 
     /**
@@ -45,13 +46,6 @@ final class GelfFormatter extends NormalizerFormatter
     private $systemName;
 
     /**
-     * A prefix for 'context' fields from the Monolog record (optional)
-     *
-     * @var string|null
-     */
-    private $contextPrefix;
-
-    /**
      * Max length per field
      *
      * @var int
@@ -62,13 +56,12 @@ final class GelfFormatter extends NormalizerFormatter
      * @param string $contextPrefix
      * @param int    $maxLength
      */
-    public function __construct(string $contextPrefix = 'ctxt_', int $maxLength = self::DEFAULT_MAX_LENGTH)
+    public function __construct(int $maxLength = self::DEFAULT_MAX_LENGTH)
     {
         parent::__construct('U.u');
 
-        $this->systemName    = \gethostname();
-        $this->contextPrefix = $contextPrefix;
-        $this->maxLength     = $maxLength;
+        $this->systemName = \gethostname();
+        $this->maxLength  = $maxLength;
     }
 
     /**
@@ -76,73 +69,128 @@ final class GelfFormatter extends NormalizerFormatter
      */
     public function format(array $record): array
     {
+        /** @var array{datetime:int, message:string, level:int, channel:string, extra:array|null, context:array|null} $normalizedRecord */
         $normalizedRecord = parent::format($record);
 
+        /** @var array{
+         *    version:float|int,
+         *    host:string,
+         *    timestamp:int,
+         *    short_message:string,
+         *    level:int,
+         *    facility:string,
+         *    file:string|null,
+         *    line:int|null
+         * } $formatted
+         */
         $formatted = [
-            'version'       => 1.0,
+            'version'       => self::GRAYLOG_VERSION,
+            'host'          => $this->systemName,
             'timestamp'     => $normalizedRecord['datetime'],
             'short_message' => (string) $normalizedRecord['message'],
-            'host'          => $this->systemName,
-            'level'         => self::LEVEL_RELATIONS[(int) $normalizedRecord['level']]
+            'level'         => self::LEVEL_RELATIONS[(int) $normalizedRecord['level']],
+            'facility'      => $normalizedRecord['channel'] ?? null,
+            'file'          => $normalizedRecord['extra']['file'] ?? null,
+            'line'          => $normalizedRecord['extra']['line'] ?? null
         ];
 
-        $len = 200 + \strlen((string) $normalizedRecord['message']) + \strlen($this->systemName);
+        unset($normalizedRecord['extra']['file'], $normalizedRecord['extra']['line']);
+
+        /** @var array<string, string|int|float|array|null> $extraData */
+        $extraData = $normalizedRecord['extra'] ?? [];
+
+        /** @var array<string, string|int|float|array|null> $contextData */
+        $contextData = $normalizedRecord['context'] ?? [];
+
+        $formatted = $this->formatMessage((string) $normalizedRecord['message'], $formatted);
+        $formatted = $this->formatAdditionalData($extraData, $formatted);
+        $formatted = $this->formatAdditionalData($contextData, $formatted);
+
+        return \array_filter($formatted);
+    }
+
+    /**
+     * Format message data
+     *
+     * @param string $message
+     * @param array  $formatted
+     *
+     * @return array
+     */
+    private function formatMessage(string $message, array $formatted): array
+    {
+        $len = 200 + \strlen($message) + \strlen($this->systemName);
 
         if($len > $this->maxLength)
         {
-            $formatted['short_message'] = \substr($normalizedRecord['message'], 0, $this->maxLength);
-            $formatted['full_message']  = $normalizedRecord['message'];
+            $formatted['short_message'] = \substr($message, 0, $this->maxLength);
+            $formatted['full_message']  = $message;
         }
-
-        if(true === isset($normalizedRecord['channel']))
-        {
-            $formatted['facility'] = $normalizedRecord['channel'];
-        }
-
-        if(true === isset($normalizedRecord['extra']['line']))
-        {
-            $formatted['line'] = $normalizedRecord['extra']['line'];
-
-            unset($normalizedRecord['extra']['line']);
-        }
-
-        if(true === isset($normalizedRecord['extra']['file']))
-        {
-            $formatted['file'] = $normalizedRecord['extra']['file'];
-            unset($normalizedRecord['extra']['file']);
-        }
-
-        foreach($normalizedRecord['extra'] as $key => $val)
-        {
-            $val = \is_scalar($val) || null === $val ? $val : $this->toJson($val);
-            $len = \strlen($key . $val);
-
-            if($len > $this->maxLength)
-            {
-                $formatted[$key] = \substr($val, 0, $this->maxLength);
-
-                break;
-            }
-
-            $formatted[$key] = $val;
-        }
-
-        foreach($normalizedRecord['context'] as $key => $val)
-        {
-            $val = \is_scalar($val) || null === $val ? $val : $this->toJson($val);
-            $len = \strlen($this->contextPrefix . $key . $val);
-
-            if($len > $this->maxLength)
-            {
-                $formatted[$key] = \substr($val, 0, $this->maxLength);
-                break;
-            }
-
-            $formatted[$key] = $val;
-        }
-
-        //die(var_dump($formatted));
 
         return $formatted;
+    }
+
+    /**
+     * Format extra\context data
+     *
+     * @param array<string, string|int|float|array|null> $collection
+     * @param array                                      $formatted
+     *
+     * @return array
+     */
+    private function formatAdditionalData(array $collection, array $formatted): array
+    {
+        /**
+         * @var string                             $key
+         * @var string|int|float|array|object|null $value
+         */
+        foreach($collection as $key => $value)
+        {
+            $value = $this->formatValue($key, $value);
+
+            if(null === $value)
+            {
+                continue;
+            }
+
+            $len = \strlen($key . $value);
+
+            if(true === \is_string($value) && $len > $this->maxLength)
+            {
+                $formatted[$key] = \substr($value, 0, $this->maxLength);
+
+                continue;
+            }
+
+            $formatted[$key] = $value;
+        }
+
+        return $formatted;
+    }
+
+    /**
+     * @param string                             $key
+     * @param string|int|float|array|object|null $value
+     *
+     * @return string|int|float|null
+     *
+     * @throws \LogicException Invalid type
+     */
+    private function formatValue(string $key, $value)
+    {
+        if(null === $value || true === \is_scalar($value))
+        {
+            return $value;
+        }
+
+        /** @psalm-suppress RedundantConditionGivenDocblockType */
+        if(true === \is_array($value) || true === \is_object($value))
+        {
+            return $this->toJson($value);
+        }
+
+        throw new \LogicException(
+            \sprintf('Invalid "%s" field value type: "%s"', $key, \gettype($value))
+        );
     }
 }

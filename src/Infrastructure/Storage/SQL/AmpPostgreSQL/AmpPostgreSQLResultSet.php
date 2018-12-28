@@ -28,7 +28,7 @@ use Amp\Postgres\PooledResultSet;
 class AmpPostgreSQLResultSet implements ResultSet
 {
     /**
-     * @var AmpResultSet|PooledResultSet|PgSqlCommandResult|PqCommandResult
+     * @var AmpResultSet|PooledResultSet
      */
     private $originalResultSet;
 

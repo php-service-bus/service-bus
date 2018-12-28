@@ -67,6 +67,7 @@ final class GelfUdpHandler extends AbstractProcessingHandler
      * @return void
      *
      * @throws \Amp\ByteStream\ClosedException
+     * @throws \RuntimeException Could not connect
      */
     protected function write(array $record): void
     {
@@ -90,6 +91,8 @@ final class GelfUdpHandler extends AbstractProcessingHandler
 
     /**
      * @return ResourceOutputStream
+     *
+     * @throws \RuntimeException Could not connect
      */
     private function outputStream(): ResourceOutputStream
     {
