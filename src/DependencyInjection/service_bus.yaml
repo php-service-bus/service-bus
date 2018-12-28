@@ -19,16 +19,9 @@ services:
     arguments:
       $environment: '%service_bus.environment%'
 
-  # Create default logger instance factory
-  Desperado\ServiceBus\Infrastructure\Logger\DefaultLoggerFactory:
-
   # Default logger instance
   service_bus.logger:
-    class: Psr\Log\LoggerInterface
-    factory: 'Desperado\ServiceBus\Infrastructure\Logger\DefaultLoggerFactory:build'
-    arguments:
-      $entryPointName: '%service_bus.entry_point%'
-      $environment: '@Desperado\ServiceBus\Environment'
+    class: Psr\Log\NullLogger
 
   # Detect blocking ticks in an event loop
   Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher:
@@ -63,6 +56,7 @@ services:
     arguments:
       $adapter: '%service_bus.storage.adapter%'
       $connectionDSN: '%service_bus.storage.dsn%'
+      $logger: '@service_bus.logger'
 
   # Indexes storage
   Desperado\ServiceBus\Index\Storage\IndexesStorage:

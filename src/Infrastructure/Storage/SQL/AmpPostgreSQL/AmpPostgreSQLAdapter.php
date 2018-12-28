@@ -21,6 +21,8 @@ use Amp\Promise;
 use Amp\Sql\Transaction;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageConfiguration;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  *
@@ -42,11 +44,18 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
     private $pool;
 
     /**
-     * @param StorageConfiguration $configuration
+     * @var LoggerInterface
      */
-    public function __construct(StorageConfiguration $configuration)
+    private $logger;
+
+    /**
+     * @param StorageConfiguration $configuration
+     * @param LoggerInterface|null $logger
+     */
+    public function __construct(StorageConfiguration $configuration, ?LoggerInterface $logger = null)
     {
         $this->configuration = $configuration;
+        $this->logger        = $logger ?? new NullLogger();
     }
 
     public function __destruct()
@@ -64,14 +73,17 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
     public function execute(string $queryString, array $parameters = []): Promise
     {
         $connectionsPool = $this->pool();
+        $logger          = $this->logger;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
         /** @psalm-return AmpPostgreSQLResultSet */
-            static function(string $queryString, array $parameters = []) use ($connectionsPool): \Generator
+            static function(string $queryString, array $parameters = []) use ($connectionsPool, $logger): \Generator
             {
                 try
                 {
+                    $logger->debug($queryString, $parameters);
+
                     return new AmpPostgreSQLResultSet(
                         yield $connectionsPool->execute($queryString, $parameters)
                     );
@@ -100,16 +112,20 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
     public function transaction(): Promise
     {
         $connectionsPool = $this->pool();
+        $logger          = $this->logger;
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
         /** @psalm-return AmpPostgreSQLTransactionAdapter */
-            static function() use ($connectionsPool): \Generator
+            static function() use ($connectionsPool, $logger): \Generator
             {
                 try
                 {
+                    $logger->debug('BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED');
+
                     return new AmpPostgreSQLTransactionAdapter(
-                        yield $connectionsPool->beginTransaction(Transaction::ISOLATION_COMMITTED)
+                        yield $connectionsPool->beginTransaction(Transaction::ISOLATION_COMMITTED),
+                        $logger
                     );
                 }
                     // @codeCoverageIgnoreStart
