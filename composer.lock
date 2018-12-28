@@ -145,16 +145,16 @@
         },
         {
             "name": "amphp/byte-stream",
-            "version": "v1.5.0",
+            "version": "v1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/byte-stream.git",
-                "reference": "37b9ab16bb8f69c825c3c4e553fe00da73dd6926"
+                "reference": "6bbfcb6f47e92577e739586ba0c87e867be70a23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/byte-stream/zipball/37b9ab16bb8f69c825c3c4e553fe00da73dd6926",
-                "reference": "37b9ab16bb8f69c825c3c4e553fe00da73dd6926",
+                "url": "https://api.github.com/repos/amphp/byte-stream/zipball/6bbfcb6f47e92577e739586ba0c87e867be70a23",
+                "reference": "6bbfcb6f47e92577e739586ba0c87e867be70a23",
                 "shasum": ""
             },
             "require": {
@@ -200,7 +200,7 @@
                 "non-blocking",
                 "stream"
             ],
-            "time": "2018-10-22 19:37:37"
+            "time": "2018-12-27 18:08:06"
         },
         {
             "name": "amphp/cache",

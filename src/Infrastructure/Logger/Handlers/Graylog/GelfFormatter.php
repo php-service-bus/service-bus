@@ -91,6 +91,7 @@ final class GelfFormatter extends NormalizerFormatter
         if($len > $this->maxLength)
         {
             $formatted['short_message'] = \substr($normalizedRecord['message'], 0, $this->maxLength);
+            $formatted['full_message']  = $normalizedRecord['message'];
         }
 
         if(true === isset($normalizedRecord['channel']))
@@ -118,12 +119,12 @@ final class GelfFormatter extends NormalizerFormatter
 
             if($len > $this->maxLength)
             {
-                $formatted[\sprintf('_%s', $key)] = \substr($val, 0, $this->maxLength);
+                $formatted[$key] = \substr($val, 0, $this->maxLength);
 
                 break;
             }
 
-            $formatted[\sprintf('_%s', $key)] = $val;
+            $formatted[$key] = $val;
         }
 
         foreach($normalizedRecord['context'] as $key => $val)
@@ -133,12 +134,14 @@ final class GelfFormatter extends NormalizerFormatter
 
             if($len > $this->maxLength)
             {
-                $formatted[\sprintf('_%s', $key)] = \substr($val, 0, $this->maxLength);
+                $formatted[$key] = \substr($val, 0, $this->maxLength);
                 break;
             }
 
-            $formatted[\sprintf('_%s', $key)] = $val;
+            $formatted[$key] = $val;
         }
+
+        //die(var_dump($formatted));
 
         return $formatted;
     }

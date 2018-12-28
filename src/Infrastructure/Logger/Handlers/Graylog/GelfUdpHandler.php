@@ -24,7 +24,17 @@ use Monolog\Logger;
 final class GelfUdpHandler extends AbstractProcessingHandler
 {
     /**
-     * @var ResourceOutputStream
+     * @var string
+     */
+    private $host;
+
+    /**
+     * @var int
+     */
+    private $port;
+
+    /**
+     * @var ResourceOutputStream|null
      */
     private $outputStream;
 
@@ -46,8 +56,9 @@ final class GelfUdpHandler extends AbstractProcessingHandler
     {
         parent::__construct($level, $bubble);
 
-        $this->outputStream = new ResourceOutputStream(self::createStream($host, $port));
-        $this->gzipMessage  = $gzipMessage;
+        $this->host        = $host;
+        $this->port        = $port;
+        $this->gzipMessage = $gzipMessage;
     }
 
     /**
@@ -59,14 +70,14 @@ final class GelfUdpHandler extends AbstractProcessingHandler
      */
     protected function write(array $record): void
     {
-        $body = \json_encode($record, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
+        $body = \json_encode($record);
 
         if(true === $this->gzipMessage)
         {
             $body = \gzcompress($body);
         }
 
-        $this->outputStream->write($body);
+        $this->outputStream()->write($body);
     }
 
     /**
@@ -75,6 +86,19 @@ final class GelfUdpHandler extends AbstractProcessingHandler
     public function getFormatter(): NormalizerFormatter
     {
         return new GelfFormatter();
+    }
+
+    /**
+     * @return ResourceOutputStream
+     */
+    private function outputStream(): ResourceOutputStream
+    {
+        if(null === $this->outputStream)
+        {
+            $this->outputStream = new ResourceOutputStream(self::createStream($this->host, $this->port), 65000);
+        }
+
+        return $this->outputStream;
     }
 
     /**
@@ -93,7 +117,7 @@ final class GelfUdpHandler extends AbstractProcessingHandler
 
         if(false === $stream)
         {
-            throw new \RuntimeException(\sprintf('Could not connect to %s:%d', $host, $port));
+            throw new \RuntimeException(\sprintf('Could not connect to %s', $uri));
         }
 
         return $stream;
