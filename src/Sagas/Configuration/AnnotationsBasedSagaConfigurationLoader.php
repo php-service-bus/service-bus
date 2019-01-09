@@ -85,7 +85,7 @@ final class AnnotationsBasedSagaConfigurationLoader implements SagaConfiguration
         }
         catch(\Throwable $throwable)
         {
-            throw new InvalidSagaConfiguration($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new InvalidSagaConfiguration($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 

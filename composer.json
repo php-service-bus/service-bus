@@ -71,7 +71,7 @@
   "require-dev": {
     "doctrine/dbal": "^v2.6",
     "phpunit/phpunit": "^7",
-    "vimeo/psalm": "^2"
+    "vimeo/psalm": "^3"
   },
   "prefer-stable": true,
   "minimum-stability": "dev",

@@ -109,17 +109,13 @@ final class SchedulerProvider
                 {
                     throw new DuplicateScheduledJob(
                         \sprintf('Job with ID "%s" already exists', $operation->id),
-                        $exception->getCode(),
+                        (int) $exception->getCode(),
                         $exception
                     );
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new SchedulerFailure(
-                        $throwable->getMessage(),
-                        $throwable->getCode(),
-                        $throwable
-                    );
+                    throw new SchedulerFailure($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             },
             ScheduledOperation::new($id, $command, $executionDate)
@@ -161,11 +157,7 @@ final class SchedulerProvider
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new SchedulerFailure(
-                        $throwable->getMessage(),
-                        $throwable->getCode(),
-                        $throwable
-                    );
+                    throw new SchedulerFailure($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             },
             $id, $reason
@@ -219,11 +211,7 @@ final class SchedulerProvider
         }
         catch(\Throwable $throwable)
         {
-            throw new SchedulerFailure(
-                $throwable->getMessage(),
-                $throwable->getCode(),
-                $throwable
-            );
+            throw new SchedulerFailure($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 
@@ -275,11 +263,7 @@ final class SchedulerProvider
         }
         catch(\Throwable $throwable)
         {
-            throw new SchedulerFailure(
-                $throwable->getMessage(),
-                $throwable->getCode(),
-                $throwable
-            );
+            throw new SchedulerFailure($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 

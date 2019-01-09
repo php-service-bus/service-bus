@@ -27,6 +27,7 @@ final class EmptyDataDenormalizer implements DenormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = []): object
     {
+        /** @psalm-suppress MixedMethodCall Unknown class */
         return new $class();
     }
 

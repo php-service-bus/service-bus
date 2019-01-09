@@ -96,7 +96,7 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
         }
         catch(\Throwable $throwable)
         {
-            throw new DecodeMessageFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new DecodeMessageFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 
@@ -111,7 +111,7 @@ final class SymfonyMessageSerializer implements MessageEncoder, MessageDecoder
         }
         catch(\Throwable $throwable)
         {
-            throw new EncodeMessageFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new EncodeMessageFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 

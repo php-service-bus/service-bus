@@ -125,11 +125,7 @@ final class EventSourcingProvider
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new LoadStreamFailed(
-                        $throwable->getMessage(),
-                        $throwable->getCode(),
-                        $throwable
-                    );
+                    throw new LoadStreamFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             },
             $id
@@ -187,11 +183,7 @@ final class EventSourcingProvider
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new SaveStreamFailed(
-                        $throwable->getMessage(),
-                        $throwable->getCode(),
-                        $throwable
-                    );
+                    throw new SaveStreamFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             },
             $aggregate,

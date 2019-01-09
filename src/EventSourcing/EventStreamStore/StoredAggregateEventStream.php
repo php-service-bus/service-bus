@@ -28,6 +28,7 @@ final class StoredAggregateEventStream
     /**
      * Aggregate id class
      *
+     * @psalm-var class-string<\Desperado\ServiceBus\EventSourcing\AggregateId>
      * @var string
      */
     public $aggregateIdClass;
@@ -77,6 +78,8 @@ final class StoredAggregateEventStream
         ?string $closedAt = null
     )
     {
+        /** @psalm-var class-string<\Desperado\ServiceBus\EventSourcing\AggregateId> $aggregateIdClass */
+
         $this->aggregateId           = $aggregateId;
         $this->aggregateIdClass      = $aggregateIdClass;
         $this->aggregateClass        = $aggregateClass;

@@ -31,6 +31,8 @@ abstract class SagaId
     /**
      * Saga class
      *
+     * @psalm-var class-string<\Desperado\ServiceBus\Sagas\Saga>
+     *
      * @var string
      */
     private $sagaClass;
@@ -38,10 +40,12 @@ abstract class SagaId
     /**
      * @param string $sagaClass
      *
-     * @return self
+     * @return static
      */
     public static function new(string $sagaClass): self
     {
+        /** @psalm-var class-string<\Desperado\ServiceBus\Sagas\Saga> $sagaClass */
+
         return new static(uuid(), $sagaClass);
     }
 
@@ -65,6 +69,8 @@ abstract class SagaId
                 \sprintf('Invalid saga class specified ("%s")', $sagaClass)
             );
         }
+
+        /** @psalm-var class-string<\Desperado\ServiceBus\Sagas\Saga> $sagaClass */
 
         $this->id        = $id;
         $this->sagaClass = $sagaClass;
@@ -90,6 +96,8 @@ abstract class SagaId
 
     /**
      * Get saga class
+     *
+     * @psalm-return class-string<\Desperado\ServiceBus\Sagas\Saga>
      *
      * @return string
      */

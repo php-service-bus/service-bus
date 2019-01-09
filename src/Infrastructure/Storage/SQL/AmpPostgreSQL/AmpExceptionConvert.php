@@ -38,7 +38,7 @@ final class AmpExceptionConvert
         {
             return new InternalExceptions\UniqueConstraintViolationCheckFailed(
                 $throwable->getMessage(),
-                $throwable->getCode(),
+                (int) $throwable->getCode(),
                 $throwable
             );
         }
@@ -47,14 +47,14 @@ final class AmpExceptionConvert
         {
             return new InternalExceptions\ConnectionFailed(
                 $throwable->getMessage(),
-                $throwable->getCode(),
+                (int) $throwable->getCode(),
                 $throwable
             );
         }
 
         return new InternalExceptions\StorageInteractingFailed(
             $throwable->getMessage(),
-            $throwable->getCode(),
+            (int) $throwable->getCode(),
             $throwable
         );
     }
