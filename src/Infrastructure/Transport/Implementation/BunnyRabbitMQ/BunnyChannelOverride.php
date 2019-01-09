@@ -82,16 +82,17 @@ final class BunnyChannelOverride extends Channel
      * @inheritdoc
      *
      * @psalm-suppress ImplementedReturnTypeMismatch The data type has been changed
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
      * @param string $consumerTag
      * @param bool   $nowait
      *
-     * @return Promise
+     * @return Promise<\Bunny\Protocol\MethodBasicCancelOkFrame>
      */
     public function cancel($consumerTag, $nowait = false): Promise
     {
         /** @var \Generator $generator */
-        $generator = $this->getClient()->cancel($consumerTag, $nowait);
+        $generator = $this->getClient()->cancel($this->getChannelId(), $consumerTag, $nowait);
 
         return new Coroutine($generator);
     }

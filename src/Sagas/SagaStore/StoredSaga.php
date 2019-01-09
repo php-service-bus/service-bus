@@ -143,7 +143,10 @@ final class StoredSaga
             /** @var \DateTimeImmutable|null $closedAtDateTime */
             $closedAtDateTime = datetimeInstantiator($closedAt);
 
-            /** @var SagaId $sagaId */
+            /**
+             * @psalm-var class-string<\Desperado\ServiceBus\Sagas\SagaId> $idClass
+             * @var SagaId $sagaId
+             */
             $sagaId = new $idClass($id, $sagaClass);
 
             return self::create(
@@ -157,7 +160,7 @@ final class StoredSaga
         }
         catch(\Throwable $throwable)
         {
-            throw new RestoreSagaFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new RestoreSagaFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 

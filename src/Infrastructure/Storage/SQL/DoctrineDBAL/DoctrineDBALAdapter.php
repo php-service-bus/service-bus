@@ -56,6 +56,7 @@ final class DoctrineDBALAdapter implements StorageAdapter
     {
         try
         {
+            /** @psalm-suppress InternalClass */
             $this->connection = DriverManager::getConnection(
                 ['url' => $configuration->originalDSN],
                 new Configuration()

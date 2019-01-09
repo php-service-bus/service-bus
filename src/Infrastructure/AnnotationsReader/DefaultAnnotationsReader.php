@@ -47,7 +47,7 @@ final class DefaultAnnotationsReader implements AnnotationsReader
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
-            throw new ReadAnnotationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new ReadAnnotationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
         // @codeCoverageIgnoreEnd
     }
@@ -74,7 +74,7 @@ final class DefaultAnnotationsReader implements AnnotationsReader
         }
         catch(\Throwable $throwable)
         {
-            throw new ReadAnnotationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new ReadAnnotationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 

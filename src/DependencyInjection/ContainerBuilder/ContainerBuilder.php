@@ -168,7 +168,7 @@ final class ContainerBuilder
          */
         include_once $this->getContainerClassPath();
 
-        /** @var string $containerClassName */
+        /** @psalm-var class-string<\Symfony\Component\DependencyInjection\Container> $containerClassName */
         $containerClassName = $this->getContainerClassName();
 
         /** @var ContainerInterface $container */

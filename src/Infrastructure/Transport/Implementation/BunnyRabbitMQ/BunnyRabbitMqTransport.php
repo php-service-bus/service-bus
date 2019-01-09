@@ -138,7 +138,7 @@ final class BunnyRabbitMqTransport implements Transport
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new ConnectionFail($throwable->getMessage(), $throwable->getCode(), $throwable);
+                    throw new ConnectionFail($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             }
         );
@@ -268,7 +268,7 @@ final class BunnyRabbitMqTransport implements Transport
                 catch(\Throwable $throwable)
                 {
                     $deferred->fail(
-                        new SendMessageFailed($throwable->getMessage(), $throwable->getCode(), $throwable)
+                        new SendMessageFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable)
                     );
                 }
             }
@@ -377,7 +377,7 @@ final class BunnyRabbitMqTransport implements Transport
         }
         catch(\Throwable $throwable)
         {
-            throw new CreateTopicFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new CreateTopicFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 
@@ -407,7 +407,7 @@ final class BunnyRabbitMqTransport implements Transport
         }
         catch(\Throwable $throwable)
         {
-            throw new BindFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new BindFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 
@@ -430,7 +430,7 @@ final class BunnyRabbitMqTransport implements Transport
         }
         catch(\Throwable $throwable)
         {
-            throw new CreateQueueFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new CreateQueueFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 
@@ -461,7 +461,7 @@ final class BunnyRabbitMqTransport implements Transport
         }
         catch(\Throwable $throwable)
         {
-            throw new BindFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new BindFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
 }

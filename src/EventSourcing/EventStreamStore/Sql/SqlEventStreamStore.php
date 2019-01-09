@@ -85,7 +85,7 @@ final class SqlEventStreamStore implements AggregateStore
                 {
                     yield $transaction->rollback();
 
-                    throw new SaveStreamFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                    throw new SaveStreamFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
                 finally
                 {
@@ -120,7 +120,7 @@ final class SqlEventStreamStore implements AggregateStore
                 {
                     yield $transaction->rollback();
 
-                    throw new SaveStreamFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                    throw new SaveStreamFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
                 finally
                 {

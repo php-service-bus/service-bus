@@ -151,9 +151,6 @@ final class AggregateEventStreamDataTransformer
     /**
      * Create identifier instance
      *
-     * @template        AggregateId
-     * @template-typeof AggregateId $idClass
-     *
      * @param string $idClass
      * @param string $idValue
      *
@@ -161,6 +158,12 @@ final class AggregateEventStreamDataTransformer
      */
     private static function identifierInstantiator(string $idClass, string $idValue): AggregateId
     {
-        return new $idClass($idValue);
+        /**
+         * @psalm-var class-string<\Desperado\ServiceBus\EventSourcing\AggregateId> $idClass
+         * @var AggregateId $id
+         */
+        $id = new $idClass($idValue);
+
+        return $id;
     }
 }

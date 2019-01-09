@@ -64,7 +64,7 @@ final class BunnyIncomingPackage implements IncomingPackage
     {
         $self = new self();
 
-        $self->channel = $channel;
+        $self->channel       = $channel;
         $self->originMessage = $message;
 
         return $self;
@@ -128,7 +128,7 @@ final class BunnyIncomingPackage implements IncomingPackage
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new AcknowledgeFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                    throw new AcknowledgeFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             }
         );
@@ -149,7 +149,7 @@ final class BunnyIncomingPackage implements IncomingPackage
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new NotAcknowledgeFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                    throw new NotAcknowledgeFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             },
             $requeue
@@ -171,7 +171,7 @@ final class BunnyIncomingPackage implements IncomingPackage
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new RejectFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                    throw new RejectFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             },
             $requeue
@@ -195,7 +195,7 @@ final class BunnyIncomingPackage implements IncomingPackage
 
     private function __construct()
     {
-        $this->id = uuid();
+        $this->id   = uuid();
         $this->time = (float) \microtime(true);
     }
 }

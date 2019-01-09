@@ -120,7 +120,7 @@ final class SagaProvider
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new StartSagaFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                    throw new StartSagaFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             },
             $id, $command, $context
@@ -181,7 +181,7 @@ final class SagaProvider
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new LoadSagaFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                    throw new LoadSagaFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             },
             $id
@@ -231,7 +231,7 @@ final class SagaProvider
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new SaveSagaFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+                    throw new SaveSagaFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
                 }
             },
             $saga,

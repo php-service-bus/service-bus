@@ -60,7 +60,7 @@ class AmpPostgreSQLResultSet implements ResultSet
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
-            throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new ResultSetIterationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
         // @codeCoverageIgnoreEnd
     }
@@ -77,7 +77,7 @@ class AmpPostgreSQLResultSet implements ResultSet
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
-            throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new ResultSetIterationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
         // @codeCoverageIgnoreEnd
     }
@@ -108,7 +108,7 @@ class AmpPostgreSQLResultSet implements ResultSet
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
-            throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new ResultSetIterationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
         // @codeCoverageIgnoreEnd
     }
@@ -133,7 +133,7 @@ class AmpPostgreSQLResultSet implements ResultSet
             // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
-            throw new ResultSetIterationFailed($throwable->getMessage(), $throwable->getCode(), $throwable);
+            throw new ResultSetIterationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
         // @codeCoverageIgnoreEnd
     }

@@ -135,7 +135,7 @@ final class BunnyClientOverride extends Client
      */
     public function disconnect($replyCode = 0, $replyText = ''): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)  */
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             function(int $replyCode, string $replyText): \Generator
             {
@@ -199,7 +199,11 @@ final class BunnyClientOverride extends Client
                 }
                 catch(\Throwable $throwable)
                 {
-                    throw new ClientException('channel.open unexpected response', $throwable->getCode(), $throwable);
+                    throw new ClientException(
+                        'channel.open unexpected response',
+                        (int) $throwable->getCode(),
+                        $throwable
+                    );
                 }
             }
         );
@@ -1999,7 +2003,7 @@ final class BunnyClientOverride extends Client
      */
     private function onConnecting(): void
     {
-        $this->state = ClientStateEnum::DISCONNECTING;
+        $this->state = ClientStateEnum::CONNECTING;
     }
 
     /**

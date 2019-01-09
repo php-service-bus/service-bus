@@ -34,15 +34,15 @@ final class DoctrineDBALExceptionConvert
 
         if($throwable instanceof DoctrineDBALExceptions\ConnectionException)
         {
-            return new InternalExceptions\ConnectionFailed($message, $throwable->getCode(), $throwable);
+            return new InternalExceptions\ConnectionFailed($message, (int) $throwable->getCode(), $throwable);
         }
 
         if($throwable instanceof DoctrineDBALExceptions\UniqueConstraintViolationException)
         {
-            return new InternalExceptions\UniqueConstraintViolationCheckFailed($message, $throwable->getCode(), $throwable);
+            return new InternalExceptions\UniqueConstraintViolationCheckFailed($message, (int) $throwable->getCode(), $throwable);
         }
 
-        return new InternalExceptions\StorageInteractingFailed($message, $throwable->getCode(), $throwable);
+        return new InternalExceptions\StorageInteractingFailed($message, (int) $throwable->getCode(), $throwable);
     }
 
     /**

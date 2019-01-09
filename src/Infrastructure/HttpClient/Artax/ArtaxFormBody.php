@@ -89,7 +89,10 @@ final class ArtaxFormBody implements FormBody
      */
     public function addMultiple(array $fields): void
     {
-        /** @var string|float|int|InputFilePath $value */
+        /**
+         * @var string                         $key
+         * @var string|float|int|InputFilePath $value
+         */
         foreach($fields as $key => $value)
         {
             /** @psalm-suppress MixedArgument Incorrect processing of ternary operators */
