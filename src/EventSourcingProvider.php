@@ -38,6 +38,9 @@ use Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter;
  */
 final class EventSourcingProvider
 {
+    public const REVERT_MODE_SOFT_DELETE = 1;
+    public const REVERT_MODE_DELETE      = 2;
+
     /**
      * Event streams store
      *
@@ -188,6 +191,52 @@ final class EventSourcingProvider
             },
             $aggregate,
             $context
+        );
+    }
+
+    /**
+     * Revert aggregate to specified version
+     *
+     * Mode options:
+     *   - 1 (self::REVERT_MODE_SOFT_DELETE): Mark tail events as deleted (soft deletion). There may be version conflicts in some situations
+     *   - 2 (self::REVERT_MODE_DELETE): Removes tail events from the database (the best option)
+     *
+     * @param Aggregate $aggregate
+     * @param int       $toVersion
+     * @param int       $mode
+     *
+     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
+     * @return Promise<\Desperado\ServiceBus\EventSourcing\Aggregate> Returns a new aggregate object
+     *
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamDoesNotExist
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamIntegrityCheckFailed
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\StreamRevertFailed
+     */
+    public function revert(Aggregate $aggregate, int $toVersion, int $mode = self::REVERT_MODE_SOFT_DELETE): Promise
+    {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            function(Aggregate $aggregate, int $toVersion, int $mode): \Generator
+            {
+                yield $this->storage->revertStream(
+                    $aggregate->id(),
+                    $toVersion,
+                    self::REVERT_MODE_DELETE === $mode
+                );
+
+                /** @var StoredAggregateEventStream|null $storedEventStream */
+                $storedEventStream = yield $this->storage->loadStream($aggregate->id(), Aggregate::START_PLAYHEAD_INDEX);
+
+                /** @var Aggregate $aggregate */
+                $aggregate = self::restoreStream(null, $storedEventStream, $this->streamDataTransformer);
+
+                yield $this->snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
+
+                return $aggregate;
+            },
+            $aggregate, $toVersion, $mode
         );
     }
 

@@ -74,4 +74,21 @@ interface AggregateStore
      * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\CloseStreamFailed
      */
     public function closeStream(AggregateId $id): Promise;
+
+    /**
+     * Roll back all changes to specified version
+     *
+     * @psalm-return \Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStream|null
+     *
+     * @param AggregateId $id
+     * @param int         $toVersion
+     * @param bool        $force Delete all events after the specified version
+     *
+     * @return Promise It does not return any result
+     *
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamDoesNotExist
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamIntegrityCheckFailed
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\StreamRevertFailed
+     */
+    public function revertStream(AggregateId $id, int $toVersion, bool $force): Promise;
 }
