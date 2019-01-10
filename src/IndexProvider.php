@@ -52,14 +52,12 @@ final class IndexProvider
      */
     public function get(IndexKey $indexKey): Promise
     {
-        $storage = $this->storage;
-
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+       /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(IndexKey $indexKey) use ($storage): \Generator
+            function(IndexKey $indexKey): \Generator
             {
                 /** @var string|int|float|boolean|null $value */
-                $value = yield $storage->find($indexKey->indexName(), $indexKey->valueKey());
+                $value = yield $this->storage->find($indexKey->indexName(), $indexKey->valueKey());
 
                 if(true === \is_scalar($value))
                 {
@@ -84,14 +82,12 @@ final class IndexProvider
      */
     public function has(IndexKey $indexKey): Promise
     {
-        $storage = $this->storage;
-
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(IndexKey $indexKey) use ($storage): \Generator
+            function(IndexKey $indexKey): \Generator
             {
                 /** @var string|int|float|boolean|null $value */
-                $value = yield $storage->find($indexKey->indexName(), $indexKey->valueKey());
+                $value = yield $this->storage->find($indexKey->indexName(), $indexKey->valueKey());
 
                 return true === \is_scalar($value);
             },
@@ -114,15 +110,13 @@ final class IndexProvider
      */
     public function add(IndexKey $indexKey, IndexValue $value): Promise
     {
-        $storage = $this->storage;
-
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(IndexKey $indexKey, IndexValue $value) use ($storage): \Generator
+            function(IndexKey $indexKey, IndexValue $value): \Generator
             {
                 try
                 {
-                    yield $storage->add($indexKey->indexName(), $indexKey->valueKey(), $value->value());
+                    yield $this->storage->add($indexKey->indexName(), $indexKey->valueKey(), $value->value());
 
                     return true;
                 }
