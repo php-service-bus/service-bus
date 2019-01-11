@@ -25,8 +25,6 @@ final class PostgreSqlProjector implements Projector
      */
     public static function name(): string
     {
-        \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2018-12-15 09:00:00');
-
-        return self::NAME;
+          return self::NAME;
     }
 }
