@@ -93,7 +93,8 @@ final class AggregateEventStreamDataTransformer
         /** @var AggregateId $id */
         $id = self::identifierInstantiator(
             $storedAggregateEventsStream->aggregateIdClass,
-            $storedAggregateEventsStream->aggregateId
+            $storedAggregateEventsStream->aggregateId,
+            $storedAggregateEventsStream->aggregateClass
         );
 
         return new AggregateEventStream(
@@ -153,16 +154,18 @@ final class AggregateEventStreamDataTransformer
      *
      * @param string $idClass
      * @param string $idValue
+     * @param string $aggregateClass
      *
      * @return AggregateId
      */
-    private static function identifierInstantiator(string $idClass, string $idValue): AggregateId
+    private static function identifierInstantiator(string $idClass, string $idValue, string $aggregateClass): AggregateId
     {
         /**
          * @psalm-var class-string<\Desperado\ServiceBus\EventSourcing\AggregateId> $idClass
+         * @psalm-var class-string<\Desperado\ServiceBus\EventSourcing\Aggregate> $aggregateClass
          * @var AggregateId $id
          */
-        $id = new $idClass($idValue);
+        $id = new $idClass($idValue, $aggregateClass);
 
         return $id;
     }

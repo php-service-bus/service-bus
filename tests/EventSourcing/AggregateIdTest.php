@@ -23,13 +23,13 @@ final class AggregateIdTest extends TestCase
 {
     /**
      * @test
-     * @expectedException \Desperado\ServiceBus\EventSourcing\Exceptions\EmptyAggregateIdentifierNotAllowed
+     * @expectedException \Desperado\ServiceBus\EventSourcing\Exceptions\InvalidAggregateIdentifier
      * @expectedExceptionMessage The aggregate identifier can't be empty
      *
      * @return void
      */
     public function createWithEmptyId(): void
     {
-        new TestAggregateId('');
+        new TestAggregateId('', TestAggregate::class);
     }
 }

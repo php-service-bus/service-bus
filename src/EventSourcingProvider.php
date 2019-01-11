@@ -82,6 +82,39 @@ final class EventSourcingProvider
     }
 
     /**
+     * Create a new aggregate
+     *
+     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
+     * @param AggregateId            $id
+     * @param MessageDeliveryContext $context
+     *
+     * @return Promise<\Desperado\ServiceBus\EventSourcing\Aggregate>
+     *
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed
+     */
+    public function create(AggregateId $id, MessageDeliveryContext $context): Promise
+    {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            function(AggregateId $id, MessageDeliveryContext $context): \Generator
+            {
+                $aggregateClass = $id->aggregateClass();
+
+                /** @var Aggregate $aggregate */
+                $aggregate = new $aggregateClass($id);
+
+                yield $this->save($aggregate, $context);
+
+                return $aggregate;
+            },
+            $id, $context
+        );
+    }
+
+    /**
      * Load aggregate
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise

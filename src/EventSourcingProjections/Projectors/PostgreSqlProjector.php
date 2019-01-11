@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * PHP Service Bus (publish-subscribe pattern implementation)
+ * Supports Saga pattern and Event Sourcing
+ *
+ * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @license MIT
+ * @license https://opensource.org/licenses/MIT
+ */
+
+declare(strict_types = 1);
+
+namespace Desperado\ServiceBus\EventSourcingProjections\Projectors;
+
+/**
+ *
+ */
+final class PostgreSqlProjector implements Projector
+{
+    public const NAME = 'postgres';
+
+    /**
+     * @inheritdoc
+     */
+    public static function name(): string
+    {
+        \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2018-12-15 09:00:00');
+
+        return self::NAME;
+    }
+}

@@ -119,7 +119,7 @@ final class EventSourcingProviderTest extends TestCase
 
         $context = new TestContext();
 
-        $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
 
         wait($this->provider->save($aggregate, $context));
 
@@ -162,7 +162,7 @@ final class EventSourcingProviderTest extends TestCase
 
         $context = new TestContext();
 
-        $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
 
         wait($this->provider->save($aggregate, $context));
 
@@ -210,7 +210,7 @@ final class EventSourcingProviderTest extends TestCase
 
         $context = new TestContext();
 
-        $id = TestAggregateId::new();
+        $id = TestAggregateId::new(TestAggregate::class);
 
         $this->expectException(NonUniqueStreamId::class);
 
@@ -239,7 +239,7 @@ final class EventSourcingProviderTest extends TestCase
 
         $context = new TestContext();
 
-        $id = TestAggregateId::new();
+        $id = TestAggregateId::new(TestAggregate::class);
 
         $aggregate = new TestAggregate($id);
 
@@ -265,7 +265,7 @@ final class EventSourcingProviderTest extends TestCase
         wait(self::createSchema($this->adapter));
 
         $context   = new TestContext();
-        $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
 
         wait($this->provider->save($aggregate, $context));
 
@@ -311,7 +311,7 @@ final class EventSourcingProviderTest extends TestCase
         wait(self::createSchema($this->adapter));
 
         $context   = new TestContext();
-        $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
 
         wait($this->provider->save($aggregate, $context));
 
@@ -354,7 +354,7 @@ final class EventSourcingProviderTest extends TestCase
     public function revertUnknownStream(): void
     {
         wait(self::createSchema($this->adapter));
-        wait($this->store->revertStream(TestAggregateId::new(), 20, true));
+        wait($this->store->revertStream(TestAggregateId::new(TestAggregate::class), 20, true));
     }
 
     /**
@@ -370,7 +370,7 @@ final class EventSourcingProviderTest extends TestCase
         wait(self::createSchema($this->adapter));
 
         $context   = new TestContext();
-        $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
 
         $aggregate->firstAction('qwerty');
         $aggregate->firstAction('root');
@@ -385,6 +385,23 @@ final class EventSourcingProviderTest extends TestCase
 
         wait($this->provider->save($aggregate, $context));
         wait($this->provider->revert($aggregate, 3, EventSourcingProvider::REVERT_MODE_SOFT_DELETE));
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function createAggregate(): void
+    {
+        wait(self::createSchema($this->adapter));
+
+        /** @var Aggregate $aggregate */
+        $aggregate = wait($this->provider->create(TestAggregateId::new(TestAggregate::class), new TestContext()));
+
+        static::assertEquals(1, $aggregate->version());
     }
 
     /**

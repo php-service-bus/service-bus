@@ -11,15 +11,17 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\EventSourcing\Exceptions;
+namespace Desperado\ServiceBus\EventSourcingProjections;
 
 /**
  *
  */
-final class EmptyAggregateIdentifierNotAllowed extends \RuntimeException
+interface ReadModel
 {
-    public function __construct()
-    {
-        parent::__construct('The aggregate identifier can\'t be empty');
-    }
+    /**
+     * Receive read model data
+     *
+     * @return array<string, string|int|float|null>
+     */
+    public function toArray(): array;
 }
