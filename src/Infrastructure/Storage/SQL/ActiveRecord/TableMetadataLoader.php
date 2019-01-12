@@ -38,7 +38,8 @@ final class TableMetadataLoader
     private $cacheAdapter;
 
     /**
-     * @param QueryExecutor $queryExecutor
+     * @param QueryExecutor     $queryExecutor
+     * @param CacheAdapter|null $cacheAdapter
      */
     public function __construct(QueryExecutor $queryExecutor, ?CacheAdapter $cacheAdapter = null)
     {

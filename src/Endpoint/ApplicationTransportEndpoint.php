@@ -61,6 +61,7 @@ final class ApplicationTransportEndpoint implements Endpoint
      * @param Transport                     $transport
      * @param AmqpTransportLevelDestination $destination
      * @param MessageEncoder|null           $encoder
+     * @param OperationRetryWrapper|null    $deliveryRetryHandler
      */
     public function __construct(
         Transport $transport,

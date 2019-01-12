@@ -177,7 +177,6 @@ final class SchedulerProvider
     {
         try
         {
-            /** @var callable(ScheduledOperation|null, ?NextScheduledOperation|null):\Generator $closure */
             $closure = static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \ Generator
             {
                 if(null !== $operation)
@@ -189,6 +188,8 @@ final class SchedulerProvider
                     );
                 }
             };
+
+            /** @var callable(ScheduledOperation|null, ?NextScheduledOperation|null):\Generator $closure */
 
             $generator = $this->store->extract($id, $closure);
 
