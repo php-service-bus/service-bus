@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\EntryPoint;
+namespace Desperado\ServiceBus\Application\EntryPoint;
 
 use function Amp\call;
 use Amp\Promise;
