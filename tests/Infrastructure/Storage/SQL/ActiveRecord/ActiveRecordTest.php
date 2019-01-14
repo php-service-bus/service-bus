@@ -243,7 +243,7 @@ EOT
         wait($testTable->remove());
 
         /** @var TestTable[] $result */
-        $result = wait(TestTable::findBy($this->adapter, []));
+        $result = wait(TestTable::findBy($this->adapter));
 
         static::assertCount(0, $result);
     }

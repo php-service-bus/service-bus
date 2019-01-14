@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\DependencyInjection\ContainerBuilder;
+namespace Desperado\ServiceBus\Application\DependencyInjection\ContainerBuilder;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 

@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\EventSourcing;
 
+use Desperado\ServiceBus\Tests\Stubs\EventSourcing\TestAggregate;
 use Desperado\ServiceBus\Tests\Stubs\EventSourcing\TestAggregateId;
 use PHPUnit\Framework\TestCase;
 

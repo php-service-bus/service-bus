@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\DependencyInjection\Extensions;
+namespace Desperado\ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -19,9 +19,9 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
- * Share extension
+ *
  */
-final class SchedulerExtension extends Extension
+final class TestExtension extends Extension
 {
     /**
      * @inheritdoc
@@ -31,6 +31,6 @@ final class SchedulerExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader($container, new FileLocator());
-        $loader->load(__DIR__ . '/../scheduler.yaml');
+        $loader->load(__DIR__ . '/services.yaml');
     }
 }

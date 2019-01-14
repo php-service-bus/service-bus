@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\DependencyInjection\Extensions;
+namespace Desperado\ServiceBus\Application\DependencyInjection\Extensions;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,32 +21,16 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 /**
  * Share extension
  */
-final class ServiceBusExtension extends Extension
+final class SchedulerExtension extends Extension
 {
     /**
      * @inheritdoc
-     *
-     * @psalm-suppress MoreSpecificImplementedParamType
-     *
-     * @param array<string, mixed> $configs
-     * @param ContainerBuilder     $container
      *
      * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader($container, new FileLocator());
-        $loader->load(__DIR__ . '/../service_bus.yaml');
-
-        /**
-         * @var string $key
-         * @var mixed $value
-         *
-         * @psalm-suppress MixedAssignment Cannot assign $value to a mixed type
-         */
-        foreach($configs as $key => $value)
-        {
-            $container->setParameter($key, $value);
-        }
+        $loader->load(__DIR__ . '/../scheduler.yaml');
     }
 }

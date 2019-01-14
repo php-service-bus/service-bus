@@ -18,7 +18,7 @@
     },
     "files": [
       "src/Infrastructure/Storage/functions.php",
-      "src/DependencyInjection/Compiler/functions.php",
+      "src/Application/DependencyInjection/Compiler/functions.php",
       "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
       "src/Infrastructure/Storage/SQL/ActiveRecord/functions.php",
       "src/Common/commonFunctions.php",
@@ -32,7 +32,7 @@
     },
     "files": [
       "src/Infrastructure/Storage/functions.php",
-      "src/DependencyInjection/Compiler/functions.php",
+      "src/Application/DependencyInjection/Compiler/functions.php",
       "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
       "src/Infrastructure/Storage/SQL/ActiveRecord/functions.php",
       "src/Common/commonFunctions.php",

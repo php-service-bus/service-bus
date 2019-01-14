@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs;
+namespace Desperado\ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs;
 
 use Amp\Promise;
 use Amp\Success;

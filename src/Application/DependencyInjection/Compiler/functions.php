@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\DependencyInjection\Compiler;
+namespace Desperado\ServiceBus\Application\DependencyInjection\Compiler;
 
 /**
  * Extract namespace from file

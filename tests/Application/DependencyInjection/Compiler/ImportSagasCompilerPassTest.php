@@ -11,9 +11,9 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\DependencyInjection\Compiler;
+namespace Desperado\ServiceBus\Tests\Application\DependencyInjection\Compiler;
 
-use Desperado\ServiceBus\DependencyInjection\Compiler\ImportSagasCompilerPass;
+use Desperado\ServiceBus\Application\DependencyInjection\Compiler\ImportSagasCompilerPass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -34,7 +34,7 @@ final class ImportSagasCompilerPassTest extends TestCase
         $containerBuilder = new ContainerBuilder();
 
         $containerBuilder->setParameter('service_bus.auto_import.sagas_enabled', true);
-        $containerBuilder->setParameter('service_bus.auto_import.sagas_directories', [__DIR__ . '/../../Stubs']);
+        $containerBuilder->setParameter('service_bus.auto_import.sagas_directories', [__DIR__ . '/../../../Stubs']);
         $containerBuilder->setParameter('service_bus.auto_import.sagas_excluded', []);
 
         $compiler = new ImportSagasCompilerPass();

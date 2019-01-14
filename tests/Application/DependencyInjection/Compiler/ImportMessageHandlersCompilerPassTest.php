@@ -11,10 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\DependencyInjection\Compiler;
+namespace Desperado\ServiceBus\Tests\Application\DependencyInjection\Compiler;
 
-use Desperado\ServiceBus\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
-use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
+use Desperado\ServiceBus\Application\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
+use Desperado\ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use Desperado\ServiceBus\Scheduler\SchedulerListener;
 use Desperado\ServiceBus\SchedulerProvider;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +39,7 @@ final class ImportMessageHandlersCompilerPassTest extends TestCase
         $containerBuilder->register(SchedulerProvider::class);
 
         $containerBuilder->setParameter('service_bus.auto_import.handlers_enabled', true);
-        $containerBuilder->setParameter('service_bus.auto_import.handlers_directories', [__DIR__ . '/../../../src']);
+        $containerBuilder->setParameter('service_bus.auto_import.handlers_directories', [__DIR__ . '/../../../../src']);
         $containerBuilder->setParameter('service_bus.auto_import.handlers_excluded', []);
 
         (new ImportMessageHandlersCompilerPass())->process($containerBuilder);

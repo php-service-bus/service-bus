@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\DependencyInjection\Compiler;
+namespace Desperado\ServiceBus\Application\DependencyInjection\Compiler;
 
 use Desperado\ServiceBus\Sagas\Saga;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

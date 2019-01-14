@@ -169,7 +169,7 @@ services:
 
   # Message routes configurator
   service_bus.message_routes_configurator:
-    class: Desperado\ServiceBus\DependencyInjection\Configurator\MessageRoutesConfigurator
+    class: Desperado\ServiceBus\Application\DependencyInjection\Configurator\MessageRoutesConfigurator
     arguments:
       $servicesList: '%service_bus.services_map%'
       $sagasList: '%service_bus.sagas_map%'

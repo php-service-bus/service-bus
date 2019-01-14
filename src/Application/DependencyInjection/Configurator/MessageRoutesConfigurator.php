@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\DependencyInjection\Configurator;
+namespace Desperado\ServiceBus\Application\DependencyInjection\Configurator;
 
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use function Desperado\ServiceBus\Common\invokeReflectionMethod;

@@ -19,13 +19,13 @@ namespace Desperado\ServiceBus\MessageHandlers;
 final class HandlerArgumentCollection implements \IteratorAggregate, \Countable
 {
     /**
-     * @var array<string, \Desperado\ServiceBus\MessageHandlers\HandlerArgument>
+     * @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument>
      */
     private $collection;
 
     public function __construct()
     {
-        $this->collection = [];
+        $this->collection = new \SplObjectStorage();
     }
 
     /**
@@ -35,7 +35,10 @@ final class HandlerArgumentCollection implements \IteratorAggregate, \Countable
      */
     public function push(HandlerArgument $argument): void
     {
-        $this->collection[\spl_object_hash($argument)] = $argument;
+        if(false === $this->collection->contains($argument))
+        {
+            $this->collection->attach($argument);
+        }
     }
 
     /**
@@ -51,6 +54,6 @@ final class HandlerArgumentCollection implements \IteratorAggregate, \Countable
      */
     public function count(): int
     {
-        return \count($this->collection);
+        return $this->collection->count();
     }
 }

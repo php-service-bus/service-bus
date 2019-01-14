@@ -11,19 +11,19 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder;
+namespace Desperado\ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder;
 
 use function Desperado\ServiceBus\Common\removeDirectory;
-use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
-use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
-use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
+use Desperado\ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
+use Desperado\ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
+use Desperado\ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
 use Desperado\ServiceBus\Infrastructure\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use Desperado\ServiceBus\SagaProvider;
-use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\MessageHandlerService;
-use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\SomeTestService;
-use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\TestCompilerPass;
-use Desperado\ServiceBus\Tests\DependencyInjection\ContainerBuilder\Stubs\TestExtension;
+use Desperado\ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\MessageHandlerService;
+use Desperado\ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\SomeTestService;
+use Desperado\ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\TestCompilerPass;
+use Desperado\ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\TestExtension;
 use PHPUnit\Framework\TestCase;
 
 /**
