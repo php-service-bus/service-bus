@@ -53,8 +53,7 @@ final class GelfFormatter extends NormalizerFormatter
     private $maxLength;
 
     /**
-     * @param string $contextPrefix
-     * @param int    $maxLength
+     * @param int $maxLength
      */
     public function __construct(int $maxLength = self::DEFAULT_MAX_LENGTH)
     {

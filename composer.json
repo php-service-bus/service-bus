@@ -2,6 +2,7 @@
   "name": "mmasiukevich/service-bus",
   "description": "PHP Service Bus (publish-subscribe pattern)",
   "type": "library",
+  "keywords": ["cqs", "event-sourcing", "messaging", "publish-subscribe", "async-php", "amphp"],
   "authors": [
     {
       "name": "Masiukevich Maksim",
@@ -17,7 +18,7 @@
     },
     "files": [
       "src/Infrastructure/Storage/functions.php",
-      "src/DependencyInjection/Compiler/functions.php",
+      "src/Application/DependencyInjection/Compiler/functions.php",
       "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
       "src/Infrastructure/Storage/SQL/ActiveRecord/functions.php",
       "src/Common/commonFunctions.php",
@@ -31,7 +32,7 @@
     },
     "files": [
       "src/Infrastructure/Storage/functions.php",
-      "src/DependencyInjection/Compiler/functions.php",
+      "src/Application/DependencyInjection/Compiler/functions.php",
       "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
       "src/Infrastructure/Storage/SQL/ActiveRecord/functions.php",
       "src/Common/commonFunctions.php",
@@ -41,6 +42,7 @@
   },
   "require": {
     "php": ">=7.2",
+
     "amphp/amp": "^2.0",
     "amphp/log": "^1",
     "amphp/file": "^0.3",
@@ -48,10 +50,8 @@
     "amphp/parallel": "^1",
     "amphp/postgres": "^1",
     "kelunik/retry": "^v1.0",
-    "kelunik/loop-block": "^1.0",
-    "symfony/serializer": "^v4.2",
-    "symfony/property-info": "^v4.2",
-    "symfony/property-access": "^v4.2",
+
+    "symfony/serializer-pack": "^v1",
     "symfony/cache": "^v4.2",
     "symfony/dependency-injection": "^v4.2",
     "symfony/config": "^v4.2",
@@ -59,16 +59,15 @@
     "symfony/yaml": "^v4.2",
     "symfony/validator": "^v4.2",
     "symfony/debug": "^v4.2",
-    "doctrine/annotations": "^v1.6",
+
     "doctrine/cache": "^v1.8",
     "latitude/latitude": "^3.1",
-    "phpdocumentor/reflection-docblock": "^4.0",
     "guzzlehttp/psr7": "^1.4",
-    "react/promise": "v2.7.0",
     "bunny/bunny": "0.4.1",
     "ramsey/uuid": "^3.7"
   },
   "require-dev": {
+    "kelunik/loop-block": "^1.0",
     "doctrine/dbal": "^v2.6",
     "phpunit/phpunit": "^7",
     "vimeo/psalm": "^3"
@@ -82,5 +81,8 @@
     "test": [
       "@phpunit"
     ]
+  },
+  "config": {
+    "optimize-autoloader": true
   }
 }

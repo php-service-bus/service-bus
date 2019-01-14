@@ -36,7 +36,7 @@ final class AggregateTest extends TestCase
      */
     public function changeClosedStreamState(): void
     {
-        $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
 
         invokeReflectionMethod($aggregate, 'close');
 
@@ -72,7 +72,7 @@ final class AggregateTest extends TestCase
      */
     public function aggregateCreate(): void
     {
-        $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
 
         /** @var \Desperado\ServiceBus\EventSourcing\EventStream\AggregateEventStream $eventStream */
         $eventStream = invokeReflectionMethod($aggregate, 'makeStream');

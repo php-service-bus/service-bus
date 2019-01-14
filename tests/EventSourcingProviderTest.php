@@ -24,10 +24,11 @@ use Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql\SqlEventStreamStore;
 use Desperado\ServiceBus\EventSourcingProvider;
-use Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore;
-use Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SqlSnapshotStore;
-use Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter;
-use Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotVersionTrigger;
+use Desperado\ServiceBus\EventSourcing\SnapshotStore\SnapshotStore;
+use Desperado\ServiceBus\EventSourcing\SnapshotStore\SqlSnapshotStore;
+use Desperado\ServiceBus\EventSourcing\Snapshotter;
+use Desperado\ServiceBus\EventSourcing\SnapshotTrigger\SnapshotVersionTrigger;
+use function Desperado\ServiceBus\Infrastructure\Storage\fetchOne;
 use Desperado\ServiceBus\Infrastructure\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter;
 use Desperado\ServiceBus\Infrastructure\Storage\StorageAdapterFactory;
@@ -118,7 +119,7 @@ final class EventSourcingProviderTest extends TestCase
 
         $context = new TestContext();
 
-        $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
 
         wait($this->provider->save($aggregate, $context));
 
@@ -161,7 +162,7 @@ final class EventSourcingProviderTest extends TestCase
 
         $context = new TestContext();
 
-        $aggregate = new TestAggregate(TestAggregateId::new());
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
 
         wait($this->provider->save($aggregate, $context));
 
@@ -209,7 +210,7 @@ final class EventSourcingProviderTest extends TestCase
 
         $context = new TestContext();
 
-        $id = TestAggregateId::new();
+        $id = TestAggregateId::new(TestAggregate::class);
 
         $this->expectException(NonUniqueStreamId::class);
 
@@ -238,7 +239,7 @@ final class EventSourcingProviderTest extends TestCase
 
         $context = new TestContext();
 
-        $id = TestAggregateId::new();
+        $id = TestAggregateId::new(TestAggregate::class);
 
         $aggregate = new TestAggregate($id);
 
@@ -250,6 +251,157 @@ final class EventSourcingProviderTest extends TestCase
         $aggregate = wait($provider->load($id));
 
         static::assertNotNull($aggregate);
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function successSoftDeleteRevert(): void
+    {
+        wait(self::createSchema($this->adapter));
+
+        $context   = new TestContext();
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
+
+        wait($this->provider->save($aggregate, $context));
+
+        foreach(\range(1, 6) as $item)
+        {
+            $aggregate->firstAction($item + 1 . ' event');
+        }
+
+        /** 7 aggregate version */
+        wait($this->provider->save($aggregate, $context));
+
+        /** 7 aggregate version */
+        static::assertEquals(7, $aggregate->version());
+        static::assertEquals('7 event', $aggregate->firstValue());
+
+        /** @var TestAggregate $aggregate */
+        $aggregate = wait($this->provider->revert($aggregate, 5, EventSourcingProvider::REVERT_MODE_SOFT_DELETE));
+
+        static::assertEquals(5, $aggregate->version());
+        static::assertEquals('5 event', $aggregate->firstValue());
+
+        foreach(\range(1, 6) as $item)
+        {
+            $aggregate->firstAction($item + 5 . ' new event');
+        }
+
+        /** 7 aggregate version */
+        wait($this->provider->save($aggregate, $context));
+
+        static::assertEquals(11, $aggregate->version());
+        static::assertEquals('11 new event', $aggregate->firstValue());
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function successHardDeleteRevert(): void
+    {
+        wait(self::createSchema($this->adapter));
+
+        $context   = new TestContext();
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
+
+        wait($this->provider->save($aggregate, $context));
+
+        foreach(\range(1, 6) as $item)
+        {
+            $aggregate->firstAction($item + 1 . ' event');
+        }
+
+        /** 7 aggregate version */
+        wait($this->provider->save($aggregate, $context));
+
+        /** 7 aggregate version */
+        static::assertEquals(7, $aggregate->version());
+        static::assertEquals('7 event', $aggregate->firstValue());
+
+        /** @var TestAggregate $aggregate */
+        $aggregate = wait($this->provider->revert($aggregate, 5, EventSourcingProvider::REVERT_MODE_DELETE));
+
+        /** 7 aggregate version */
+        static::assertEquals(5, $aggregate->version());
+        static::assertEquals('5 event', $aggregate->firstValue());
+
+        $eventsCount = wait(
+            fetchOne(
+                wait($this->adapter->execute('SELECT COUNT(id) as cnt FROM event_store_stream_events'))
+            )
+        );
+
+        static::assertEquals(5, $eventsCount['cnt']);
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamDoesNotExist
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function revertUnknownStream(): void
+    {
+        wait(self::createSchema($this->adapter));
+        wait($this->store->revertStream(TestAggregateId::new(TestAggregate::class), 20, true));
+    }
+
+    /**
+     * @test
+     * @expectedException \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamIntegrityCheckFailed
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function revertWithVersionConflict(): void
+    {
+        wait(self::createSchema($this->adapter));
+
+        $context   = new TestContext();
+        $aggregate = new TestAggregate(TestAggregateId::new(TestAggregate::class));
+
+        $aggregate->firstAction('qwerty');
+        $aggregate->firstAction('root');
+        $aggregate->firstAction('qwertyRoot');
+
+        wait($this->provider->save($aggregate, $context));
+
+        /** @var TestAggregate $aggregate */
+        $aggregate = wait($this->provider->revert($aggregate, 2, EventSourcingProvider::REVERT_MODE_SOFT_DELETE));
+
+        $aggregate->firstAction('abube');
+
+        wait($this->provider->save($aggregate, $context));
+        wait($this->provider->revert($aggregate, 3, EventSourcingProvider::REVERT_MODE_SOFT_DELETE));
+    }
+
+    /**
+     * @test
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function createAggregate(): void
+    {
+        wait(self::createSchema($this->adapter));
+
+        /** @var Aggregate $aggregate */
+        $aggregate = wait($this->provider->create(TestAggregateId::new(TestAggregate::class), new TestContext()));
+
+        static::assertEquals(1, $aggregate->version());
     }
 
     /**
@@ -268,6 +420,10 @@ final class EventSourcingProviderTest extends TestCase
 
                 yield $adapter->execute(
                     \file_get_contents(__DIR__ . '/../src/EventSourcing/EventStreamStore/Sql/schema/event_store_stream_events.sql')
+                );
+
+                yield $adapter->execute(
+                    'CREATE UNIQUE INDEX IF NOT EXISTS event_store_stream_events_playhead ON event_store_stream_events (stream_id, playhead) WHERE canceled_at IS NULL;'
                 );
 
                 yield $adapter->execute(

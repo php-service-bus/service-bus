@@ -15,9 +15,13 @@ namespace Desperado\ServiceBus\EventSourcing\EventStreamStore\Sql;
 
 use function Amp\call;
 use Amp\Promise;
+use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamDoesNotExist;
+use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamIntegrityCheckFailed;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed;
+use Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\StreamRevertFailed;
 use Desperado\ServiceBus\Infrastructure\Storage\QueryExecutor;
+use function Desperado\ServiceBus\Infrastructure\Storage\SQL\deleteQuery;
 use function Latitude\QueryBuilder\field;
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
@@ -197,6 +201,141 @@ final class SqlEventStreamStore implements AggregateStore
             },
             $id
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function revertStream(AggregateId $id, int $toVersion, bool $force): Promise
+    {
+        $adapter = $this->adapter;
+
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            static function(AggregateId $id, int $toVersion, bool $force) use ($adapter): \Generator
+            {
+                /** @var array<string, string>|null $streamData */
+                $streamData = yield from self::doLoadStream($adapter, $id);
+
+                if(null === $streamData)
+                {
+                    throw new EventStreamDoesNotExist(
+                        \sprintf('Event stream with identifier "%s" doesn\'t exist', $id)
+                    );
+                }
+
+                /** @var string $streamId */
+                $streamId = $streamData['id'];
+
+                /** @var \Desperado\ServiceBus\Infrastructure\Storage\TransactionAdapter $transaction */
+                $transaction = yield $adapter->transaction();
+
+                try
+                {
+                    true === $force
+                        ? yield from self::doDeleteTailEvents($transaction, $streamId, $toVersion)
+                        : yield from self::doSkipEvents($transaction, $streamId, $toVersion);
+
+                    /** restore soft deleted events */
+                    yield from self::doRestoreEvents($transaction, $streamId, $toVersion);
+
+                    yield $transaction->commit();
+                }
+                catch(UniqueConstraintViolationCheckFailed $exception)
+                {
+                    yield $transaction->rollback();
+
+                    throw new EventStreamIntegrityCheckFailed(
+                        \sprintf('Error verifying the integrity of the events stream with ID "%s"', $id),
+                        (int) $exception->getCode(),
+                        $exception
+                    );
+                }
+                catch(\Throwable $throwable)
+                {
+                    yield $transaction->rollback();
+
+                    throw new StreamRevertFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
+                }
+                finally
+                {
+                    unset($transaction);
+                }
+            },
+            $id, $toVersion, $force
+        );
+    }
+
+    /**
+     * Soft deletion of events following the specified version
+     *
+     * @param QueryExecutor $executor
+     * @param string        $streamId
+     * @param int           $toVersion
+     *
+     * @return \Generator
+     */
+    private static function doSkipEvents(QueryExecutor $executor, string $streamId, int $toVersion): \Generator
+    {
+        /** @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery */
+        $updateQuery = updateQuery('event_store_stream_events', ['canceled_at' => \date('Y-m-d H:i:s')])
+            ->where(equalsCriteria('stream_id', $streamId))
+            ->andWhere(field('playhead')->gt($toVersion));
+
+        $compiledQuery = $updateQuery->compile();
+
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+        $resultSet = yield $executor->execute($compiledQuery->sql(), $compiledQuery->params());
+
+        unset($resultSet);
+    }
+
+    /**
+     * Complete removal of the "tail" events from the database
+     *
+     * @param QueryExecutor $executor
+     * @param string        $streamId
+     * @param int           $toVersion
+     *
+     * @return \Generator
+     */
+    private static function doDeleteTailEvents(QueryExecutor $executor, string $streamId, int $toVersion): \Generator
+    {
+        /** @var \Latitude\QueryBuilder\Query\DeleteQuery $deleteQuery */
+        $deleteQuery = deleteQuery('event_store_stream_events')
+            ->where(equalsCriteria('stream_id', $streamId))
+            ->andWhere(field('playhead')->gt($toVersion));
+
+        $compiledQuery = $deleteQuery->compile();
+
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+        $resultSet = yield $executor->execute($compiledQuery->sql(), $compiledQuery->params());
+
+        unset($resultSet);
+    }
+
+    /**
+     * Restore all events to the specified version
+     *
+     * @param QueryExecutor $executor
+     * @param string        $streamId
+     * @param int           $toVersion
+     *
+     * @return \Generator
+     */
+    private static function doRestoreEvents(QueryExecutor $executor, string $streamId, int $toVersion): \Generator
+    {
+        /** @var \Latitude\QueryBuilder\Query\UpdateQuery $updateQuery */
+        $updateQuery = updateQuery('event_store_stream_events', ['canceled_at' => null])
+            ->where(equalsCriteria('stream_id', $streamId))
+            ->andWhere(field('playhead')->lte($toVersion));
+
+        $compiledQuery = $updateQuery->compile();
+
+        /** @var \Desperado\ServiceBus\Infrastructure\Storage\ResultSet $resultSet */
+        $resultSet = yield $executor->execute($compiledQuery->sql(), $compiledQuery->params());
+
+        unset($resultSet);
     }
 
     /**
@@ -393,7 +532,8 @@ final class SqlEventStreamStore implements AggregateStore
         /** @var \Latitude\QueryBuilder\Query\SelectQuery $selectQuery */
         $selectQuery = selectQuery('event_store_stream_events')
             ->where(field('stream_id')->eq($streamId))
-            ->andWhere(field('playhead')->gte($fromVersion));
+            ->andWhere(field('playhead')->gte($fromVersion))
+            ->andWhere(field('canceled_at')->isNull());
 
         if(null !== $toVersion && $fromVersion < $toVersion)
         {

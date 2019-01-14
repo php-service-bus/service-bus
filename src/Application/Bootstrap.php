@@ -13,12 +13,12 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Application;
 
-use Desperado\ServiceBus\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
-use Desperado\ServiceBus\DependencyInjection\Compiler\ImportSagasCompilerPass;
-use Desperado\ServiceBus\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
-use Desperado\ServiceBus\DependencyInjection\ContainerBuilder\ContainerBuilder;
-use Desperado\ServiceBus\DependencyInjection\Extensions\SchedulerExtension;
-use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
+use Desperado\ServiceBus\Application\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
+use Desperado\ServiceBus\Application\DependencyInjection\Compiler\ImportSagasCompilerPass;
+use Desperado\ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
+use Desperado\ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
+use Desperado\ServiceBus\Application\DependencyInjection\Extensions\SchedulerExtension;
+use Desperado\ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Environment;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

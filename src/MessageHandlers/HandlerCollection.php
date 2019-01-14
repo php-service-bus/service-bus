@@ -21,13 +21,13 @@ final class HandlerCollection implements \IteratorAggregate, \Countable
     /**
      * Message handlers
      *
-     * @var array<mixed, \Desperado\ServiceBus\MessageHandlers\Handler>
+     * @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\Handler>
      */
     private $collection;
 
     public function __construct()
     {
-        $this->collection = [];
+        $this->collection = new \SplObjectStorage();
     }
 
     /**
@@ -39,7 +39,10 @@ final class HandlerCollection implements \IteratorAggregate, \Countable
      */
     public function push(Handler $handler): void
     {
-        $this->collection[\spl_object_hash($handler)] = $handler;
+        if(false === $this->collection->contains($handler))
+        {
+            $this->collection->attach($handler);
+        }
     }
 
     /**
@@ -55,6 +58,6 @@ final class HandlerCollection implements \IteratorAggregate, \Countable
      */
     public function count(): int
     {
-        return \count($this->collection);
+        return $this->collection->count();
     }
 }

@@ -99,7 +99,7 @@ final class BunnyConsumer
         return call(
             function(): \Generator
             {
-                yield $this->channel->cancel($this->tag, false);
+                yield $this->channel->cancel($this->tag);
 
                 $this->logger->info('Subscription canceled', [
                         'queue'       => (string) $this->queue,

@@ -20,7 +20,7 @@ use Desperado\ServiceBus\Application\ServiceBusKernel;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use function Desperado\ServiceBus\Common\removeDirectory;
-use Desperado\ServiceBus\DependencyInjection\Extensions\ServiceBusExtension;
+use Desperado\ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
 use Desperado\ServiceBus\Infrastructure\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpExchange;
@@ -36,9 +36,7 @@ use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommandW
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\WithValidationCommand;
 use Desperado\ServiceBus\Tests\Application\Kernel\Stubs\WithValidationRulesCommand;
 use Desperado\ServiceBus\Tests\Stubs\Messages\CommandWithPayload;
-use Desperado\ServiceBus\Tests\Stubs\Messages\ExecutionFailed;
 use Desperado\ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
-use Desperado\ServiceBus\Tests\Stubs\Messages\ValidationFailed;
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;

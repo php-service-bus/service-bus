@@ -31,13 +31,16 @@ use Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStre
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\AggregateEventSerializer;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\AggregateEventStreamDataTransformer;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\DefaultEventSerializer;
-use Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter;
+use Desperado\ServiceBus\EventSourcing\Snapshotter;
 
 /**
  *
  */
 final class EventSourcingProvider
 {
+    public const REVERT_MODE_SOFT_DELETE = 1;
+    public const REVERT_MODE_DELETE      = 2;
+
     /**
      * Event streams store
      *
@@ -79,6 +82,39 @@ final class EventSourcingProvider
     }
 
     /**
+     * Create a new aggregate
+     *
+     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
+     * @param AggregateId            $id
+     * @param MessageDeliveryContext $context
+     *
+     * @return Promise<\Desperado\ServiceBus\EventSourcing\Aggregate>
+     *
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\NonUniqueStreamId
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\SaveStreamFailed
+     */
+    public function create(AggregateId $id, MessageDeliveryContext $context): Promise
+    {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            function(AggregateId $id, MessageDeliveryContext $context): \Generator
+            {
+                $aggregateClass = $id->aggregateClass();
+
+                /** @var Aggregate $aggregate */
+                $aggregate = new $aggregateClass($id);
+
+                yield $this->save($aggregate, $context);
+
+                return $aggregate;
+            },
+            $id, $context
+        );
+    }
+
+    /**
      * Load aggregate
      *
      * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
@@ -92,13 +128,9 @@ final class EventSourcingProvider
      */
     public function load(AggregateId $id): Promise
     {
-        $storage     = $this->storage;
-        $transformer = $this->streamDataTransformer;
-        $snapshotter = $this->snapshotter;
-
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(AggregateId $id) use ($storage, $transformer, $snapshotter): \Generator
+            function(AggregateId $id): \Generator
             {
                 try
                 {
@@ -106,7 +138,7 @@ final class EventSourcingProvider
                     $fromStreamVersion = Aggregate::START_PLAYHEAD_INDEX;
 
                     /** @var AggregateSnapshot|null $loadedSnapshot */
-                    $loadedSnapshot = yield $snapshotter->load($id);
+                    $loadedSnapshot = yield $this->snapshotter->load($id);
 
                     if(null !== $loadedSnapshot)
                     {
@@ -115,9 +147,9 @@ final class EventSourcingProvider
                     }
 
                     /** @var StoredAggregateEventStream|null $storedEventStream */
-                    $storedEventStream = yield $storage->loadStream($id, $fromStreamVersion);
+                    $storedEventStream = yield $this->storage->loadStream($id, $fromStreamVersion);
 
-                    $aggregate = self::restoreStream($aggregate, $storedEventStream, $transformer);
+                    $aggregate = $this->restoreStream($aggregate, $storedEventStream);
 
                     unset($storedEventStream, $loadedSnapshot, $fromStreamVersion);
 
@@ -145,13 +177,9 @@ final class EventSourcingProvider
      */
     public function save(Aggregate $aggregate, MessageDeliveryContext $context): Promise
     {
-        $storage     = $this->storage;
-        $transformer = $this->streamDataTransformer;
-        $snapshotter = $this->snapshotter;
-
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Aggregate $aggregate, MessageDeliveryContext $context) use ($storage, $transformer, $snapshotter): \Generator
+            function(Aggregate $aggregate, MessageDeliveryContext $context): \Generator
             {
                 try
                 {
@@ -159,18 +187,18 @@ final class EventSourcingProvider
                     $eventStream    = invokeReflectionMethod($aggregate, 'makeStream');
                     $receivedEvents = $eventStream->originEvents;
 
-                    $storedEventStream = $transformer->streamToStoredRepresentation($eventStream);
+                    $storedEventStream = $this->streamDataTransformer->streamToStoredRepresentation($eventStream);
 
                     true === self::isNewEventStream($receivedEvents)
-                        ? yield $storage->saveStream($storedEventStream)
-                        : yield $storage->appendStream($storedEventStream);
+                        ? yield $this->storage->saveStream($storedEventStream)
+                        : yield $this->storage->appendStream($storedEventStream);
 
                     /** @var AggregateSnapshot|null $loadedSnapshot */
-                    $loadedSnapshot = yield $snapshotter->load($aggregate->id());
+                    $loadedSnapshot = yield $this->snapshotter->load($aggregate->id());
 
-                    if(true === $snapshotter->snapshotMustBeCreated($aggregate, $loadedSnapshot))
+                    if(true === $this->snapshotter->snapshotMustBeCreated($aggregate, $loadedSnapshot))
                     {
-                        yield $snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
+                        yield $this->snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
                     }
 
                     yield from self::publishEvents($receivedEvents, $context);
@@ -188,6 +216,52 @@ final class EventSourcingProvider
             },
             $aggregate,
             $context
+        );
+    }
+
+    /**
+     * Revert aggregate to specified version
+     *
+     * Mode options:
+     *   - 1 (self::REVERT_MODE_SOFT_DELETE): Mark tail events as deleted (soft deletion). There may be version conflicts in some situations
+     *   - 2 (self::REVERT_MODE_DELETE): Removes tail events from the database (the best option)
+     *
+     * @param Aggregate $aggregate
+     * @param int       $toVersion
+     * @param int       $mode
+     *
+     * @psalm-suppress MoreSpecificReturnType Incorrect resolving the value of the promise
+     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
+     *
+     * @return Promise<\Desperado\ServiceBus\EventSourcing\Aggregate> Returns a new aggregate object
+     *
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamDoesNotExist
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\EventStreamIntegrityCheckFailed
+     * @throws \Desperado\ServiceBus\EventSourcing\EventStreamStore\Exceptions\StreamRevertFailed
+     */
+    public function revert(Aggregate $aggregate, int $toVersion, int $mode = self::REVERT_MODE_SOFT_DELETE): Promise
+    {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        return call(
+            function(Aggregate $aggregate, int $toVersion, int $mode): \Generator
+            {
+                yield $this->storage->revertStream(
+                    $aggregate->id(),
+                    $toVersion,
+                    self::REVERT_MODE_DELETE === $mode
+                );
+
+                /** @var StoredAggregateEventStream|null $storedEventStream */
+                $storedEventStream = yield $this->storage->loadStream($aggregate->id());
+
+                /** @var Aggregate $aggregate */
+                $aggregate = $this->restoreStream(null, $storedEventStream);
+
+                yield $this->snapshotter->store(new AggregateSnapshot($aggregate, $aggregate->version()));
+
+                return $aggregate;
+            },
+            $aggregate, $toVersion, $mode
         );
     }
 
@@ -211,23 +285,18 @@ final class EventSourcingProvider
     /**
      * Restore the aggregate from the event stream/Add missing events to the aggregate from the snapshot
      *
-     * @param Aggregate                           $aggregate
-     * @param StoredAggregateEventStream|null     $storedEventStream
-     * @param AggregateEventStreamDataTransformer $transformer
+     * @param Aggregate                       $aggregate
+     * @param StoredAggregateEventStream|null $storedEventStream
      *
      * @return Aggregate|null
      *
      * @throws \ReflectionException
      */
-    private static function restoreStream(
-        ?Aggregate $aggregate,
-        ?StoredAggregateEventStream $storedEventStream,
-        AggregateEventStreamDataTransformer $transformer
-    ): ?Aggregate
+    private function restoreStream(?Aggregate $aggregate, ?StoredAggregateEventStream $storedEventStream): ?Aggregate
     {
         if(null !== $storedEventStream)
         {
-            $eventStream = $transformer->streamToDomainRepresentation($storedEventStream);
+            $eventStream = $this->streamDataTransformer->streamToDomainRepresentation($storedEventStream);
 
             if(null === $aggregate)
             {

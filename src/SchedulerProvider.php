@@ -72,15 +72,13 @@ final class SchedulerProvider
         MessageDeliveryContext $context
     ): Promise
     {
-        $store = $this->store;
-
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(ScheduledOperation $operation) use ($store, $context): \Generator
+            function(ScheduledOperation $operation) use ($context): \Generator
             {
                 try
                 {
-                    $generator = $store->add(
+                    $generator = $this->store->add(
                         $operation,
                         static function(ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \Generator
                         {
@@ -135,15 +133,13 @@ final class SchedulerProvider
      */
     public function cancel(ScheduledOperationId $id, MessageDeliveryContext $context, ?string $reason = null): Promise
     {
-        $store = $this->store;
-
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(ScheduledOperationId $id, ?string $reason = null) use ($store, $context): \Generator
+            function(ScheduledOperationId $id, ?string $reason = null) use ($context): \Generator
             {
                 try
                 {
-                    $generator = $store->remove(
+                    $generator = $this->store->remove(
                         $id,
                         static function(?NextScheduledOperation $nextOperation) use ($id, $reason, $context): \Generator
                         {
@@ -181,7 +177,6 @@ final class SchedulerProvider
     {
         try
         {
-            /** @var callable(ScheduledOperation|null, ?NextScheduledOperation|null):\Generator $closure */
             $closure = static function(?ScheduledOperation $operation, ?NextScheduledOperation $nextOperation) use ($context): \ Generator
             {
                 if(null !== $operation)
@@ -193,6 +188,8 @@ final class SchedulerProvider
                     );
                 }
             };
+
+            /** @var callable(ScheduledOperation|null, ?NextScheduledOperation|null):\Generator $closure */
 
             $generator = $this->store->extract($id, $closure);
 
@@ -206,7 +203,7 @@ final class SchedulerProvider
             }
 
             yield $context->delivery(
-                SchedulerOperationEmitted::create($id, null)
+                SchedulerOperationEmitted::create($id)
             );
         }
         catch(\Throwable $throwable)

@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\EventSourcing;
 
+use Desperado\ServiceBus\Tests\Stubs\EventSourcing\TestAggregate;
 use Desperado\ServiceBus\Tests\Stubs\EventSourcing\TestAggregateId;
 use PHPUnit\Framework\TestCase;
 
@@ -23,13 +24,13 @@ final class AggregateIdTest extends TestCase
 {
     /**
      * @test
-     * @expectedException \Desperado\ServiceBus\EventSourcing\Exceptions\EmptyAggregateIdentifierNotAllowed
+     * @expectedException \Desperado\ServiceBus\EventSourcing\Exceptions\InvalidAggregateIdentifier
      * @expectedExceptionMessage The aggregate identifier can't be empty
      *
      * @return void
      */
     public function createWithEmptyId(): void
     {
-        new TestAggregateId('');
+        new TestAggregateId('', TestAggregate::class);
     }
 }

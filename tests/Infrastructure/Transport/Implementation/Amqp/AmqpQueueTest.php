@@ -29,7 +29,7 @@ final class AmqpQueueTest extends TestCase
      */
     public function defaultCreate(): void
     {
-        $queue = AmqpQueue::default(__METHOD__, false);
+        $queue = AmqpQueue::default(__METHOD__);
 
         static::assertEquals(__METHOD__, (string) $queue);
 

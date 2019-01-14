@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "38ff06965eccf1453b9a730b599e4788",
-    "content-hash": "f42088761620c9ee74745990d978c136",
+    "hash": "7b538fc72e94a2369c8d60c631635763",
+    "content-hash": "b7e77777872d35b421a548b3fd054960",
     "packages": [
         {
             "name": "amphp/amp",
@@ -455,16 +455,16 @@
         },
         {
             "name": "amphp/parallel",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/parallel.git",
-                "reference": "ccf285bdcc38f355a1a113175291e1bfe87205ad"
+                "reference": "687776dc6933af4c6009ac58f915faf45e8463ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/parallel/zipball/ccf285bdcc38f355a1a113175291e1bfe87205ad",
-                "reference": "ccf285bdcc38f355a1a113175291e1bfe87205ad",
+                "url": "https://api.github.com/repos/amphp/parallel/zipball/687776dc6933af4c6009ac58f915faf45e8463ce",
+                "reference": "687776dc6933af4c6009ac58f915faf45e8463ce",
                 "shasum": ""
             },
             "require": {
@@ -514,7 +514,7 @@
                 "multi-processing",
                 "multi-threading"
             ],
-            "time": "2018-12-30 19:32:25"
+            "time": "2019-01-09 21:31:46"
         },
         {
             "name": "amphp/parser",
@@ -1430,47 +1430,6 @@
             "time": "2017-07-04 19:37:30"
         },
         {
-            "name": "kelunik/loop-block",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kelunik/loop-block.git",
-                "reference": "f2729737fc20705a4675bb07624b481a8ddbc170"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kelunik/loop-block/zipball/f2729737fc20705a4675bb07624b481a8ddbc170",
-                "reference": "f2729737fc20705a4675bb07624b481a8ddbc170",
-                "shasum": ""
-            },
-            "require": {
-                "amphp/amp": "^2"
-            },
-            "require-dev": {
-                "amphp/phpunit-util": "^1",
-                "friendsofphp/php-cs-fixer": "^2.3",
-                "phpunit/phpunit": "^6"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Kelunik\\LoopBlock\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Niklas Keller",
-                    "email": "me@kelunik.com"
-                }
-            ],
-            "description": "Detect blocking ticks in the Amp event loop.",
-            "time": "2017-06-15 17:41:23"
-        },
-        {
             "name": "kelunik/retry",
             "version": "v1.0.0",
             "source": {
@@ -2245,16 +2204,16 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.7.0",
+            "version": "v2.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "f4edc2581617431aea50430749db55cc3fc031b3"
+                "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/f4edc2581617431aea50430749db55cc3fc031b3",
-                "reference": "f4edc2581617431aea50430749db55cc3fc031b3",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
+                "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
                 "shasum": ""
             },
             "require": {
@@ -2287,7 +2246,7 @@
                 "promise",
                 "promises"
             ],
-            "time": "2018-06-13 15:59:06"
+            "time": "2019-01-07 21:25:54"
         },
         {
             "name": "symfony/cache",
@@ -3132,6 +3091,36 @@
             "time": "2019-01-03 09:07:35"
         },
         {
+            "name": "symfony/serializer-pack",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/serializer-pack.git",
+                "reference": "c5f18ba4ff989a42d7d140b7f85406e77cd8c4b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/serializer-pack/zipball/c5f18ba4ff989a42d7d140b7f85406e77cd8c4b2",
+                "reference": "c5f18ba4ff989a42d7d140b7f85406e77cd8c4b2",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/annotations": "^1.0",
+                "php": "^7.0",
+                "phpdocumentor/reflection-docblock": "^3.0|^4.0",
+                "symfony/property-access": "*",
+                "symfony/property-info": "*",
+                "symfony/serializer": "*"
+            },
+            "type": "symfony-pack",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A pack for the Symfony serializer",
+            "time": "2018-12-10 12:14:14"
+        },
+        {
             "name": "symfony/validator",
             "version": "v4.2.2",
             "source": {
@@ -3735,6 +3724,47 @@
             "time": "2018-09-25 11:42:25"
         },
         {
+            "name": "kelunik/loop-block",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kelunik/loop-block.git",
+                "reference": "f2729737fc20705a4675bb07624b481a8ddbc170"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kelunik/loop-block/zipball/f2729737fc20705a4675bb07624b481a8ddbc170",
+                "reference": "f2729737fc20705a4675bb07624b481a8ddbc170",
+                "shasum": ""
+            },
+            "require": {
+                "amphp/amp": "^2"
+            },
+            "require-dev": {
+                "amphp/phpunit-util": "^1",
+                "friendsofphp/php-cs-fixer": "^2.3",
+                "phpunit/phpunit": "^6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kelunik\\LoopBlock\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Niklas Keller",
+                    "email": "me@kelunik.com"
+                }
+            ],
+            "description": "Detect blocking ticks in the Amp event loop.",
+            "time": "2017-06-15 17:41:23"
+        },
+        {
             "name": "muglug/package-versions-56",
             "version": "1.2.4",
             "source": {
@@ -3882,16 +3912,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.1.1",
+            "version": "v4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "8aae5b59b83bb4d0dbf07b0a835f2680a658f610"
+                "reference": "594bcae1fc0bccd3993d2f0d61a018e26ac2865a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/8aae5b59b83bb4d0dbf07b0a835f2680a658f610",
-                "reference": "8aae5b59b83bb4d0dbf07b0a835f2680a658f610",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/594bcae1fc0bccd3993d2f0d61a018e26ac2865a",
+                "reference": "594bcae1fc0bccd3993d2f0d61a018e26ac2865a",
                 "shasum": ""
             },
             "require": {
@@ -3907,7 +3937,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.1-dev"
+                    "dev-master": "4.2-dev"
                 }
             },
             "autoload": {
@@ -3929,7 +3959,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2018-12-26 11:32:39"
+            "time": "2019-01-12 16:31:37"
         },
         {
             "name": "openlss/lib-array2xml",
@@ -5317,16 +5347,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "3.0.9",
+            "version": "3.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "195cb289edf071fd14195ecf3951eabf634b577a"
+                "reference": "3ca5ec9281ab2ab3b3caf83bfdd7ed085d3c2ecb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/195cb289edf071fd14195ecf3951eabf634b577a",
-                "reference": "195cb289edf071fd14195ecf3951eabf634b577a",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/3ca5ec9281ab2ab3b3caf83bfdd7ed085d3c2ecb",
+                "reference": "3ca5ec9281ab2ab3b3caf83bfdd7ed085d3c2ecb",
                 "shasum": ""
             },
             "require": {
@@ -5391,7 +5421,7 @@
                 "inspection",
                 "php"
             ],
-            "time": "2019-01-07 13:38:56"
+            "time": "2019-01-13 19:40:21"
         },
         {
             "name": "webmozart/glob",

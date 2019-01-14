@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Tests\Infrastructure\Cache;
 
-use Amp\Loop;
 use function Amp\Promise\wait;
 use Desperado\ServiceBus\Infrastructure\Cache\InMemoryCacheAdapter;
 use Desperado\ServiceBus\Infrastructure\Cache\InMemoryStorage;

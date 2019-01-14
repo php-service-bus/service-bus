@@ -16,7 +16,7 @@ namespace Desperado\ServiceBus\Application;
 use Amp\Loop;
 use Desperado\ServiceBus\Endpoint\Endpoint;
 use Desperado\ServiceBus\Endpoint\EndpointRouter;
-use Desperado\ServiceBus\EntryPoint\EntryPoint;
+use Desperado\ServiceBus\Application\EntryPoint\EntryPoint;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
 use Desperado\ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 use Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;

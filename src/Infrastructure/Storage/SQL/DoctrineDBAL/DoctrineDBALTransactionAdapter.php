@@ -39,12 +39,13 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
     private $logger;
 
     /**
-     * @param Connection $connection
+     * @param Connection      $connection
+     * @param LoggerInterface $logger
      */
     public function __construct(Connection $connection, LoggerInterface $logger)
     {
         $this->connection = $connection;
-        $this->logger = $logger;
+        $this->logger     = $logger;
     }
 
     /**
@@ -83,7 +84,7 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
     public function commit(): Promise
     {
         $connection = $this->connection;
-        $logger = $this->logger;
+        $logger     = $this->logger;
 
         /** InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
@@ -111,7 +112,7 @@ final class DoctrineDBALTransactionAdapter implements TransactionAdapter
     public function rollback(): Promise
     {
         $connection = $this->connection;
-        $logger = $this->logger;
+        $logger     = $this->logger;
 
         /** InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(

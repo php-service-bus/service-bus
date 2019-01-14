@@ -4,6 +4,9 @@ php:
   - 7.2
   - 7.3
 
+addons:
+  postgresql: "9.5"
+
 services:
   - postgresql
   - rabbitmq
