@@ -48,7 +48,7 @@ final class Handler
     /**
      * Collection of arguments to the message handler
      *
-     * @var HandlerArgumentCollection
+     * @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument>
      */
     private $argumentCollection;
 
@@ -177,7 +177,7 @@ final class Handler
             );
         }
 
-        /** @var \Closure $closure*/
+        /** @var \Closure $closure */
         $closure = $this->reflectionMethod->getClosure($object);
 
         return $closure;
@@ -210,15 +210,15 @@ final class Handler
      */
     public function hasArguments(): bool
     {
-        return 0 !== \count($this->argumentCollection);
+        return 0 !== $this->argumentCollection->count();
     }
 
     /**
      * Receive method parameters
      *
-     * @return HandlerArgumentCollection
+     * @return \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument>
      */
-    public function arguments(): HandlerArgumentCollection
+    public function arguments(): \SplObjectStorage
     {
         return $this->argumentCollection;
     }
@@ -261,15 +261,16 @@ final class Handler
     /**
      * @param \ReflectionMethod $reflectionMethod
      *
-     * @return HandlerArgumentCollection
+     * @return \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument>
      */
-    private static function extractArguments(\ReflectionMethod $reflectionMethod): HandlerArgumentCollection
+    private static function extractArguments(\ReflectionMethod $reflectionMethod): \SplObjectStorage
     {
-        $argumentCollection = new HandlerArgumentCollection();
+        /** @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument> $argumentCollection */
+        $argumentCollection = new \SplObjectStorage();
 
         foreach($reflectionMethod->getParameters() as $parameter)
         {
-            $argumentCollection->push(new HandlerArgument($parameter));
+            $argumentCollection->attach(new HandlerArgument($parameter));
         }
 
         return $argumentCollection;

@@ -32,7 +32,9 @@ final class ContainerBuilder
     /**
      * Parameters
      *
-     * @var ContainerParameterCollection
+     * Key=>value parameters
+     *
+     * @var array<string, bool|string|int|float|array<mixed, mixed>|null>
      */
     private $parameters;
 
@@ -46,14 +48,14 @@ final class ContainerBuilder
     /**
      * Extensions
      *
-     * @var ContainerExtensionCollection
+     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension>
      */
     private $extensions;
 
     /**
      * CompilerPass collection
      *
-     * @var ContainerCompilerPassCollection
+     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface>
      */
     private $compilerPasses;
 
@@ -84,10 +86,16 @@ final class ContainerBuilder
     {
         $this->entryPointName = $entryPointName;
         $this->environment    = $environment;
+        $this->parameters     = [];
 
-        $this->parameters     = new ContainerParameterCollection();
-        $this->extensions     = new ContainerExtensionCollection();
-        $this->compilerPasses = new ContainerCompilerPassCollection();
+        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension> $extensionCollection */
+        $extensionCollection = new \SplObjectStorage();
+
+        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface> $compilerPassCollection */
+        $compilerPassCollection = new \SplObjectStorage();
+
+        $this->extensions     = $extensionCollection;
+        $this->compilerPasses = $compilerPassCollection;
     }
 
     /**
@@ -101,7 +109,10 @@ final class ContainerBuilder
      */
     public function addCompilerPasses(CompilerPassInterface ...$compilerPasses): void
     {
-        $this->compilerPasses->push(...$compilerPasses);
+        foreach($compilerPasses as $compilerPass)
+        {
+            $this->compilerPasses->attach($compilerPass);
+        }
     }
 
     /**
@@ -115,7 +126,10 @@ final class ContainerBuilder
      */
     public function addExtensions(Extension ...$extensions): void
     {
-        $this->extensions->push(...$extensions);
+        foreach($extensions as $extension)
+        {
+            $this->extensions->attach($extension);
+        }
     }
 
     /**
@@ -125,7 +139,10 @@ final class ContainerBuilder
      */
     public function addParameters(array $parameters): void
     {
-        $this->parameters->push($parameters);
+        foreach($parameters as $key => $value)
+        {
+            $this->parameters[$key] = $value;
+        }
     }
 
     /**
@@ -184,17 +201,15 @@ final class ContainerBuilder
      */
     public function build(): ContainerInterface
     {
-        $this->parameters->add('service_bus.environment', (string) $this->environment);
-        $this->parameters->add('service_bus.entry_point', $this->entryPointName);
+        $this->parameters['service_bus.environment'] = (string) $this->environment;
+        $this->parameters['service_bus.entry_point'] = $this->entryPointName;
 
-        $containerParameters = \iterator_to_array($this->parameters);
-
-        $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($containerParameters));
+        $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($this->parameters));
 
         /** @var Extension $extension */
         foreach($this->extensions as $extension)
         {
-            $extension->load($containerParameters, $containerBuilder);
+            $extension->load($this->parameters, $containerBuilder);
         }
 
         /** @var CompilerPassInterface $compilerPass */

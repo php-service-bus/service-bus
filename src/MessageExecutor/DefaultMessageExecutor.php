@@ -17,7 +17,6 @@ use function Amp\call;
 use Amp\Promise;
 use Desperado\ServiceBus\Application\KernelContext;
 use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\MessageHandlers\HandlerArgumentCollection;
 use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
 use Psr\Log\LogLevel;
 
@@ -34,7 +33,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $closure;
 
     /**
-     * @var HandlerArgumentCollection
+     * @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument>
      */
     private $arguments;
 
@@ -53,14 +52,14 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $options;
 
     /**
-     * @param \Closure                                                                $closure
-     * @param HandlerArgumentCollection                                               $arguments
-     * @param HandlerOptions                                                          $options
-     * @param array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
+     * @param \Closure                                                                 $closure
+     * @param \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument> $arguments
+     * @param HandlerOptions                                                           $options
+     * @param array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver>  $argumentResolvers
      */
     public function __construct(
         \Closure $closure,
-        HandlerArgumentCollection $arguments,
+        \SplObjectStorage $arguments,
         HandlerOptions $options,
         array $argumentResolvers
     )
@@ -84,7 +83,7 @@ final class DefaultMessageExecutor implements MessageExecutor
          */
         return call(
             static function(
-                \Closure $closure, HandlerArgumentCollection $arguments, HandlerOptions $options, Message $message,
+                \Closure $closure, \SplObjectStorage $arguments, HandlerOptions $options, Message $message,
                 KernelContext $context
             ) use ($argumentResolvers): \Generator
             {
@@ -144,15 +143,15 @@ final class DefaultMessageExecutor implements MessageExecutor
     /**
      * Collect arguments list
      *
-     * @param HandlerArgumentCollection $arguments
-     * @param array                     $resolvers
-     * @param Message                   $message
-     * @param KernelContext             $context
+     * @param \SplObjectStorage $arguments
+     * @param array             $resolvers
+     * @param Message           $message
+     * @param KernelContext     $context
      *
      * @return array<int, mixed>
      */
     private static function collectArguments(
-        HandlerArgumentCollection $arguments,
+        \SplObjectStorage $arguments,
         array $resolvers,
         Message $message,
         KernelContext $context

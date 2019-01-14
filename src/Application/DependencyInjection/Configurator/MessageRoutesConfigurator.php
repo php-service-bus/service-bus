@@ -119,8 +119,11 @@ final class MessageRoutesConfigurator
         {
             $sagaConfiguration = $sagasConfigurationExtractor->load($sagaClass);
 
+            /** @var \IteratorAggregate<\Desperado\ServiceBus\MessageHandlers\Handler> $iterator */
+            $iterator = $sagaConfiguration->handlerCollection();
+
             /** @var \Desperado\ServiceBus\MessageHandlers\Handler $handler */
-            foreach($sagaConfiguration->handlerCollection() as $handler)
+            foreach($iterator as $handler)
             {
                 $router->registerListener(
                     (string) $handler->messageClass(),

@@ -13,8 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Services\Configuration;
 
-use Desperado\ServiceBus\MessageHandlers\HandlerCollection;
-
 /**
  * Retrieving a list of message handlers for the specified object
  */
@@ -25,7 +23,7 @@ interface ServiceHandlersLoader
      *
      * @param object $service
      *
-     * @return HandlerCollection
+     * @return \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\Handler>
      */
-    public function load(object $service): HandlerCollection;
+    public function load(object $service): \SplObjectStorage;
 }

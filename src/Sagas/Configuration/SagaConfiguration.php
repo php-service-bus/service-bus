@@ -13,8 +13,6 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Sagas\Configuration;
 
-use Desperado\ServiceBus\MessageHandlers\HandlerCollection;
-
 /**
  *
  */
@@ -26,15 +24,15 @@ final class SagaConfiguration
     private $metaData;
 
     /**
-     * @var HandlerCollection
+     * @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\Handler>
      */
     private $handlerCollection;
 
     /**
-     * @param SagaMetadata      $metaData
-     * @param HandlerCollection $handlerCollection
+     * @param SagaMetadata                                                     $metaData
+     * @param \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\Handler> $handlerCollection
      */
-    public function __construct(SagaMetadata $metaData, HandlerCollection $handlerCollection)
+    public function __construct(SagaMetadata $metaData, \SplObjectStorage $handlerCollection)
     {
         $this->metaData          = $metaData;
         $this->handlerCollection = $handlerCollection;
@@ -49,9 +47,9 @@ final class SagaConfiguration
     }
 
     /**
-     * @return HandlerCollection
+     * @return \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\Handler>
      */
-    public function handlerCollection(): HandlerCollection
+    public function handlerCollection(): \SplObjectStorage
     {
         return $this->handlerCollection;
     }

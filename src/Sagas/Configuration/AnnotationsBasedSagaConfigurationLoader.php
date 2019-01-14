@@ -19,7 +19,6 @@ use Desperado\ServiceBus\Infrastructure\AnnotationsReader\AnnotationsReader;
 use Desperado\ServiceBus\Infrastructure\AnnotationsReader\DefaultAnnotationsReader;
 use Desperado\ServiceBus\Common\Contract\Messages\Event;
 use Desperado\ServiceBus\MessageHandlers\Handler;
-use Desperado\ServiceBus\MessageHandlers\HandlerCollection;
 use Desperado\ServiceBus\SagaProvider;
 use Desperado\ServiceBus\Sagas\Annotations\SagaAnnotationMarker;
 use Desperado\ServiceBus\Sagas\Annotations\SagaEventListener;
@@ -73,7 +72,8 @@ final class AnnotationsBasedSagaConfigurationLoader implements SagaConfiguration
                 self::searchSagaHeader($sagaClass, $annotations)
             );
 
-            $handlersCollection = new HandlerCollection();
+            /** @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\Handler> $handlersCollection */
+            $handlersCollection = new \SplObjectStorage();
 
             $this->collectSagaEventHandlers($handlersCollection, $annotations, $sagaMetadata);
 
@@ -92,9 +92,9 @@ final class AnnotationsBasedSagaConfigurationLoader implements SagaConfiguration
     /**
      * Collect a collection of saga event handlers
      *
-     * @param HandlerCollection    $handlerCollection
-     * @param AnnotationCollection $annotationCollection
-     * @param SagaMetadata         $sagaMetadata
+     * @param \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\Handler> $handlerCollection
+     * @param AnnotationCollection                                             $annotationCollection
+     * @param SagaMetadata                                                     $sagaMetadata
      *
      * @return void
      *
@@ -102,7 +102,7 @@ final class AnnotationsBasedSagaConfigurationLoader implements SagaConfiguration
      * @throws \ReflectionException
      */
     private function collectSagaEventHandlers(
-        HandlerCollection $handlerCollection,
+        \SplObjectStorage $handlerCollection,
         AnnotationCollection $annotationCollection,
         SagaMetadata $sagaMetadata
     ): void
@@ -117,7 +117,7 @@ final class AnnotationsBasedSagaConfigurationLoader implements SagaConfiguration
         /** @var Annotation $methodAnnotation */
         foreach($methodAnnotations as $methodAnnotation)
         {
-            $handlerCollection->push($this->createSagaEventHandler($methodAnnotation, $sagaMetadata));
+            $handlerCollection->attach($this->createSagaEventHandler($methodAnnotation, $sagaMetadata));
         }
     }
 
