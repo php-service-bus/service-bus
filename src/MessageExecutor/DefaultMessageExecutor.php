@@ -134,7 +134,10 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     private static function publishThrowable(string $eventClass, string $errorMessage, KernelContext $context): \Generator
     {
-        /** @var \Desperado\ServiceBus\Services\Contracts\ExecutionFailedEvent $event */
+        /**
+         * @noinspection VariableFunctionsUsageInspection
+         * @var \Desperado\ServiceBus\Services\Contracts\ExecutionFailedEvent $event
+         */
         $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $errorMessage]);
 
         yield $context->delivery($event);
