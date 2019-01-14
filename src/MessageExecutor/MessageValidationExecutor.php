@@ -102,7 +102,10 @@ final class MessageValidationExecutor implements MessageExecutor
      */
     private static function publishViolations(string $eventClass, KernelContext $context): Promise
     {
-        /** @var \Desperado\ServiceBus\Services\Contracts\ValidationFailedEvent $event */
+        /**
+         * @noinspection VariableFunctionsUsageInspection
+         * @var \Desperado\ServiceBus\Services\Contracts\ValidationFailedEvent $event
+         */
         $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $context->violations()]);
 
         return $context->delivery($event);

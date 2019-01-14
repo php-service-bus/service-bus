@@ -108,13 +108,13 @@ final class Customer extends Aggregate
 #### Работа с индексами
 Для работы с индексами используется [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), у которого есть следующие методы (все возвращают объект [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php)):
 * [get()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L54): Получить сохранённое значение
-* [has()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L91): Было ли значение сохранено
-* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L126): Добавить значение в индекс. По принципу работы схож с методом ```\Memcached:add```: если значения с таким ключём не существовало, вернёт ```true```, в противном случае - ```false```
-* [remove()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L165): Удаляет сохранённое значение
-* [update()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L181): Обновляет сохранённое значение
+* [has()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L83): Было ли значение сохранено
+* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#111): Добавить значение в индекс. По принципу работы схож с методом ```\Memcached:add```: если значения с таким ключём не существовало, вернёт ```true```, в противном случае - ```false```
+* [remove()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#142): Удаляет сохранённое значение
+* [update()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#158):: Обновляет сохранённое значение
 
 #### Работа со снимками
-По умолчанию реализована лишь 1 стратегия генерации снимков - [SnapshotVersionTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcingSnapshots/Trigger/SnapshotVersionTrigger.php), основанная на версиях (создавать снимок каждые N версий). Снимки создаются автоматически, за исключением выбора стратегии (реализовать свои можно с помощью интерфейса [SnapshotTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcingSnapshots/Trigger/SnapshotTrigger.php)) никаких настроект не требуется
+По умолчанию реализована лишь 1 стратегия генерации снимков - [SnapshotVersionTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/SnapshotTrigger/SnapshotVersionTrigger.php), основанная на версиях (создавать снимок каждые N версий). Снимки создаются автоматически, за исключением выбора стратегии (реализовать свои можно с помощью интерфейса [SnapshotTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/SnapshotTrigger/SnapshotTrigger.php)) никаких настроект не требуется
 
 #### Примеры кода
 ```php
@@ -135,7 +135,7 @@ $context = new KernelContext();
        new SqlIndexesStorage($databaseAdapter)
    );
 
-   $customerId = CustomerId::new();
+   $customerId = CustomerId::new(Customer::class);
 
    $indexKey   = IndexKey::create('customer', 'email');
    $indexValue = IndexValue::create($registerCustomerCommand->email);
