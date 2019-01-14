@@ -124,6 +124,7 @@ final class AmpPostgreSQLAdapter implements StorageAdapter
                     $logger->debug('BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED');
 
                     return new AmpPostgreSQLTransactionAdapter(
+                        /** @noinspection ArgumentEqualsDefaultValueInspection */
                         yield $connectionsPool->beginTransaction(Transaction::ISOLATION_COMMITTED),
                         $logger
                     );
