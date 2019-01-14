@@ -32,7 +32,9 @@ final class ContainerBuilder
     /**
      * Parameters
      *
-     * @var ContainerParameterCollection
+     * Key=>value parameters
+     *
+     * @var array<string, bool|string|int|float|array<mixed, mixed>|null>
      */
     private $parameters;
 
@@ -84,6 +86,7 @@ final class ContainerBuilder
     {
         $this->entryPointName = $entryPointName;
         $this->environment    = $environment;
+        $this->parameters     = [];
 
         /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension> $extensionCollection */
         $extensionCollection = new \SplObjectStorage();
@@ -91,7 +94,6 @@ final class ContainerBuilder
         /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface> $compilerPassCollection */
         $compilerPassCollection = new \SplObjectStorage();
 
-        $this->parameters     = new ContainerParameterCollection();
         $this->extensions     = $extensionCollection;
         $this->compilerPasses = $compilerPassCollection;
     }
@@ -137,7 +139,10 @@ final class ContainerBuilder
      */
     public function addParameters(array $parameters): void
     {
-        $this->parameters->push($parameters);
+        foreach($parameters as $key => $value)
+        {
+            $this->parameters[$key] = $value;
+        }
     }
 
     /**
@@ -196,17 +201,15 @@ final class ContainerBuilder
      */
     public function build(): ContainerInterface
     {
-        $this->parameters->add('service_bus.environment', (string) $this->environment);
-        $this->parameters->add('service_bus.entry_point', $this->entryPointName);
+        $this->parameters['service_bus.environment'] = (string) $this->environment;
+        $this->parameters['service_bus.entry_point'] = $this->entryPointName;
 
-        $containerParameters = \iterator_to_array($this->parameters);
-
-        $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($containerParameters));
+        $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($this->parameters));
 
         /** @var Extension $extension */
         foreach($this->extensions as $extension)
         {
-            $extension->load($containerParameters, $containerBuilder);
+            $extension->load($this->parameters, $containerBuilder);
         }
 
         /** @var CompilerPassInterface $compilerPass */
