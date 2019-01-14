@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore;
+namespace Desperado\ServiceBus\EventSourcing\SnapshotStore;
 
 /**
  * Aggregate snapshot stored representation

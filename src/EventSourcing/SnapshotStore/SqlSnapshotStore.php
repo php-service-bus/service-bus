@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore;
+namespace Desperado\ServiceBus\EventSourcing\SnapshotStore;
 
 use function Amp\call;
 use Amp\Promise;

@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\EventSourcingSnapshots\Trigger;
+namespace Desperado\ServiceBus\EventSourcing\SnapshotTrigger;
 
 use Desperado\ServiceBus\EventSourcing\Aggregate;
 use Desperado\ServiceBus\EventSourcing\AggregateSnapshot;

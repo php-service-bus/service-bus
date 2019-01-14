@@ -106,27 +106,27 @@ services:
       $adapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
   # Snapshots store
-  Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore:
-    class: Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SqlSnapshotStore
+  Desperado\ServiceBus\EventSourcing\SnapshotStore\SnapshotStore:
+    class: Desperado\ServiceBus\EventSourcing\SnapshotStore\SqlSnapshotStore
     arguments:
       $adapter: '@Desperado\ServiceBus\Infrastructure\Storage\StorageAdapter'
 
   # Snapshots trigger
-  Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotTrigger:
-    class: Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotVersionTrigger
+  Desperado\ServiceBus\EventSourcing\SnapshotTrigger\SnapshotTrigger:
+    class: Desperado\ServiceBus\EventSourcing\SnapshotTrigger\SnapshotVersionTrigger
 
   # Snapshotter
-  Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter:
+  Desperado\ServiceBus\EventSourcing\Snapshotter:
     arguments:
-      $storage: '@Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore'
-      $trigger: '@Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotTrigger'
+      $storage: '@Desperado\ServiceBus\EventSourcing\SnapshotStore\SnapshotStore'
+      $trigger: '@Desperado\ServiceBus\EventSourcing\SnapshotTrigger\SnapshotTrigger'
       $logger: '@service_bus.logger'
 
   # Event sourcing provider
   Desperado\ServiceBus\EventSourcingProvider:
     arguments:
       $storage: '@Desperado\ServiceBus\EventSourcing\EventStreamStore\AggregateStore'
-      $snapshotter: '@Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter'
+      $snapshotter: '@Desperado\ServiceBus\EventSourcing\Snapshotter'
 
   # Symfony serializer message decoder
   Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageDecoder:

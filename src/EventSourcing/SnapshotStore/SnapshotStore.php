@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore;
+namespace Desperado\ServiceBus\EventSourcing\SnapshotStore;
 
 use Amp\Promise;
 use Desperado\ServiceBus\EventSourcing\AggregateId;
@@ -43,7 +43,7 @@ interface SnapshotStore
      *
      * @param AggregateId $id
      *
-     * @return Promise<\Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\StoredAggregateSnapshot|null>
+     * @return Promise<\Desperado\ServiceBus\EventSourcing\SnapshotStore\StoredAggregateSnapshot|null>
      *
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\ConnectionFailed
      * @throws \Desperado\ServiceBus\Infrastructure\Storage\Exceptions\StorageInteractingFailed

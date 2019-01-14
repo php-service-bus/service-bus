@@ -11,16 +11,13 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\EventSourcingSnapshots;
+namespace Desperado\ServiceBus\EventSourcing;
 
 use function Amp\call;
 use Amp\Promise;
-use Desperado\ServiceBus\EventSourcing\Aggregate;
-use Desperado\ServiceBus\EventSourcing\AggregateId;
-use Desperado\ServiceBus\EventSourcing\AggregateSnapshot;
-use Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\SnapshotStore;
-use Desperado\ServiceBus\EventSourcingSnapshots\SnapshotStore\StoredAggregateSnapshot;
-use Desperado\ServiceBus\EventSourcingSnapshots\Trigger\SnapshotTrigger;
+use Desperado\ServiceBus\EventSourcing\SnapshotStore\SnapshotStore;
+use Desperado\ServiceBus\EventSourcing\SnapshotStore\StoredAggregateSnapshot;
+use Desperado\ServiceBus\EventSourcing\SnapshotTrigger\SnapshotTrigger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 

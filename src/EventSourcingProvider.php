@@ -31,7 +31,7 @@ use Desperado\ServiceBus\EventSourcing\EventStreamStore\StoredAggregateEventStre
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\AggregateEventSerializer;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\AggregateEventStreamDataTransformer;
 use Desperado\ServiceBus\EventSourcing\EventStreamStore\Transformer\DefaultEventSerializer;
-use Desperado\ServiceBus\EventSourcingSnapshots\Snapshotter;
+use Desperado\ServiceBus\EventSourcing\Snapshotter;
 
 /**
  *

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "355d995d15e24698c4cb250a41f2c958",
+    "hash": "7b538fc72e94a2369c8d60c631635763",
     "content-hash": "b7e77777872d35b421a548b3fd054960",
     "packages": [
         {
@@ -3912,16 +3912,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.1.1",
+            "version": "v4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "8aae5b59b83bb4d0dbf07b0a835f2680a658f610"
+                "reference": "594bcae1fc0bccd3993d2f0d61a018e26ac2865a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/8aae5b59b83bb4d0dbf07b0a835f2680a658f610",
-                "reference": "8aae5b59b83bb4d0dbf07b0a835f2680a658f610",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/594bcae1fc0bccd3993d2f0d61a018e26ac2865a",
+                "reference": "594bcae1fc0bccd3993d2f0d61a018e26ac2865a",
                 "shasum": ""
             },
             "require": {
@@ -3937,7 +3937,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.1-dev"
+                    "dev-master": "4.2-dev"
                 }
             },
             "autoload": {
@@ -3959,7 +3959,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2018-12-26 11:32:39"
+            "time": "2019-01-12 16:31:37"
         },
         {
             "name": "openlss/lib-array2xml",
@@ -5347,16 +5347,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "3.0.10",
+            "version": "3.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "d3324b42fa996bcf4b5a532086c0777153679e04"
+                "reference": "3ca5ec9281ab2ab3b3caf83bfdd7ed085d3c2ecb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/d3324b42fa996bcf4b5a532086c0777153679e04",
-                "reference": "d3324b42fa996bcf4b5a532086c0777153679e04",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/3ca5ec9281ab2ab3b3caf83bfdd7ed085d3c2ecb",
+                "reference": "3ca5ec9281ab2ab3b3caf83bfdd7ed085d3c2ecb",
                 "shasum": ""
             },
             "require": {
@@ -5421,7 +5421,7 @@
                 "inspection",
                 "php"
             ],
-            "time": "2019-01-09 13:49:02"
+            "time": "2019-01-13 19:40:21"
         },
         {
             "name": "webmozart/glob",
