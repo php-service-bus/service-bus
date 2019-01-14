@@ -18,7 +18,6 @@ use Desperado\ServiceBus\Infrastructure\AnnotationsReader\AnnotationCollection;
 use Desperado\ServiceBus\Infrastructure\AnnotationsReader\AnnotationsReader;
 use Desperado\ServiceBus\Infrastructure\AnnotationsReader\DefaultAnnotationsReader;
 use Desperado\ServiceBus\MessageHandlers\Handler;
-use Desperado\ServiceBus\MessageHandlers\HandlerCollection;
 use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
 use Desperado\ServiceBus\Services\Annotations\CommandHandler;
 use Desperado\ServiceBus\Services\Annotations\EventListener;
@@ -45,9 +44,9 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     /**
      * @inheritdoc
      */
-    public function load(object $service): HandlerCollection
+    public function load(object $service): \SplObjectStorage
     {
-        $collection = new HandlerCollection();
+        $collection = new \SplObjectStorage();
 
         /** @var \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation $annotation */
         foreach($this->loadMethodLevelAnnotations($service) as $annotation)
@@ -69,7 +68,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                 $handlerReflectionMethod
             );
 
-            $collection->push($handler);
+            $collection->attach($handler);
         }
 
         return $collection;

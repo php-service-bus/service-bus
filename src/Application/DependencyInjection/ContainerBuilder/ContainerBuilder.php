@@ -46,14 +46,14 @@ final class ContainerBuilder
     /**
      * Extensions
      *
-     * @var ContainerExtensionCollection
+     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension>
      */
     private $extensions;
 
     /**
      * CompilerPass collection
      *
-     * @var ContainerCompilerPassCollection
+     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface>
      */
     private $compilerPasses;
 
@@ -85,9 +85,15 @@ final class ContainerBuilder
         $this->entryPointName = $entryPointName;
         $this->environment    = $environment;
 
+        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension> $extensionCollection */
+        $extensionCollection = new \SplObjectStorage();
+
+        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface> $compilerPassCollection */
+        $compilerPassCollection = new \SplObjectStorage();
+
         $this->parameters     = new ContainerParameterCollection();
-        $this->extensions     = new ContainerExtensionCollection();
-        $this->compilerPasses = new ContainerCompilerPassCollection();
+        $this->extensions     = $extensionCollection;
+        $this->compilerPasses = $compilerPassCollection;
     }
 
     /**
@@ -101,7 +107,10 @@ final class ContainerBuilder
      */
     public function addCompilerPasses(CompilerPassInterface ...$compilerPasses): void
     {
-        $this->compilerPasses->push(...$compilerPasses);
+        foreach($compilerPasses as $compilerPass)
+        {
+            $this->compilerPasses->attach($compilerPass);
+        }
     }
 
     /**
@@ -115,7 +124,10 @@ final class ContainerBuilder
      */
     public function addExtensions(Extension ...$extensions): void
     {
-        $this->extensions->push(...$extensions);
+        foreach($extensions as $extension)
+        {
+            $this->extensions->attach($extension);
+        }
     }
 
     /**

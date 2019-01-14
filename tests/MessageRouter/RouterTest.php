@@ -14,7 +14,6 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\MessageRouter;
 
 use Desperado\ServiceBus\MessageExecutor\DefaultMessageExecutor;
-use Desperado\ServiceBus\MessageHandlers\HandlerArgumentCollection;
 use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
 use Desperado\ServiceBus\MessageRouter\Router;
 use Desperado\ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
@@ -44,7 +43,7 @@ final class RouterTest extends TestCase
 
                     }
                 ),
-                new HandlerArgumentCollection(),
+                new \SplObjectStorage(),
                 new HandlerOptions(),
                 []
             )
@@ -69,7 +68,7 @@ final class RouterTest extends TestCase
 
                     }
                 ),
-                new HandlerArgumentCollection(),
+                new \SplObjectStorage(),
                 new HandlerOptions(),
                 []
             )
@@ -94,7 +93,7 @@ final class RouterTest extends TestCase
 
                     }
                 ),
-                new HandlerArgumentCollection(),
+                new \SplObjectStorage(),
                 new HandlerOptions(),
                 []
             )
@@ -119,7 +118,7 @@ final class RouterTest extends TestCase
 
                     }
                 ),
-                new HandlerArgumentCollection(),
+                new \SplObjectStorage(),
                 new HandlerOptions(),
                 []
             )
@@ -145,7 +144,7 @@ final class RouterTest extends TestCase
 
                 }
             ),
-            new HandlerArgumentCollection(),
+            new \SplObjectStorage(),
             new HandlerOptions(),
             []
         );
@@ -168,7 +167,7 @@ final class RouterTest extends TestCase
 
                 }
             ),
-            new HandlerArgumentCollection(),
+            new \SplObjectStorage(),
             new HandlerOptions(),
             []
         );
