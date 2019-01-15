@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace Desperado\ServiceBus\Infrastructure\Transport\Package;
 
+use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
 
 /**
@@ -80,11 +81,13 @@ final class OutboundPackage
      * @param string                          $payload
      * @param array<string, string|int|float> $headers
      * @param TransportLevelDestination       $destination
+     * @param string|null                     $traceId
      */
-    public function __construct(string $payload, array $headers, TransportLevelDestination $destination)
+    public function __construct(string $payload, array $headers, TransportLevelDestination $destination, ?string $traceId = null)
     {
         $this->payload     = $payload;
         $this->headers     = $headers;
         $this->destination = $destination;
+        $this->traceId     = $traceId ?? uuid();
     }
 }
