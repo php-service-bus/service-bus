@@ -11,25 +11,25 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ;
+namespace Desperado\ServiceBus\Infrastructure\Transport\Implementation\PhpInnacle;
 
 use function Amp\asyncCall;
 use function Amp\call;
 use Amp\Promise;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpQueue;
-use Desperado\ServiceBus\Infrastructure\Transport\Transport;
+use PHPinnacle\Ridge\Channel;
+use PHPinnacle\Ridge\Message;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Bunny\Message as BunnyEnvelope;
 
 /**
- *
+ * @internal
  */
-final class BunnyConsumer
+final class PhpInnacleConsumer
 {
     /**
-     * @var BunnyChannelOverride
+     * @var Channel
      */
     private $channel;
 
@@ -54,10 +54,10 @@ final class BunnyConsumer
 
     /**
      * @param AmqpQueue            $queue
-     * @param BunnyChannelOverride $channel
+     * @param Channel              $channel
      * @param LoggerInterface|null $logger
      */
-    public function __construct(AmqpQueue $queue, BunnyChannelOverride $channel, ?LoggerInterface $logger = null)
+    public function __construct(AmqpQueue $queue, Channel $channel, ?LoggerInterface $logger = null)
     {
         $this->tag = uuid();
 
@@ -71,7 +71,7 @@ final class BunnyConsumer
      *
      * @param callable(BunnyIncomingPackage):\Generator $onMessageReceived
      *
-     * @return Promise<\Bunny\Protocol\MethodBasicConsumeOkFrame>
+     * @return Promise
      */
     public function listen(callable $onMessageReceived): Promise
     {
@@ -115,33 +115,27 @@ final class BunnyConsumer
      * Create listener callback
      *
      * @param LoggerInterface $logger
-     * @param callable(BunnyIncomingPackage):\Generator $onMessageReceived
+     * @param callable(PhpInnacleIncomingPackage):\Generator $onMessageReceived
      *
-     * @return callable(BunnyEnvelope, BunnyChannelOverride):void
+     * @return callable(Message, Channel):void
      */
     private static function createMessageHandler(LoggerInterface $logger, $onMessageReceived): callable
     {
-        return static function(BunnyEnvelope $envelope, BunnyChannelOverride $channel) use ($logger, $onMessageReceived): void
+        return static function(Message $message, Channel $channel) use ($logger, $onMessageReceived): void
         {
-            /** Trace ID */
-            if(false === isset($envelope->headers[Transport::SERVICE_BUS_TRACE_HEADER]))
-            {
-                $envelope->headers[Transport::SERVICE_BUS_TRACE_HEADER] = uuid();
-            }
-
             try
             {
-                $package = BunnyIncomingPackage::received($channel, $envelope);
+                $incomingPackage = PhpInnacleIncomingPackage::received($message, $channel);
 
                 $logger->debug('New message received', [
-                    'packageId'         => $package->id(),
-                    'traceId'           => $package->traceId(),
-                    'rawMessagePayload' => $envelope->content,
-                    'rawMessageHeaders' => $envelope->headers
+                    'packageId'         => $incomingPackage->id(),
+                    'traceId'           => $incomingPackage->traceId(),
+                    'rawMessagePayload' => $incomingPackage->payload(),
+                    'rawMessageHeaders' => $incomingPackage->headers()
                 ]);
 
                 /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-                asyncCall($onMessageReceived, $package);
+                asyncCall($onMessageReceived, $incomingPackage);
 
                 unset($package);
             }
@@ -150,7 +144,7 @@ final class BunnyConsumer
                 $logger->error('Error occurred: {throwableMessage}', [
                         'throwableMessage'  => $throwable->getMessage(),
                         'throwablePoint'    => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
-                        'rawMessagePayload' => $envelope->content
+                        'rawMessagePayload' => $message->content()
                     ]
                 );
             }

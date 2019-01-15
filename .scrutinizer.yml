@@ -1,6 +1,6 @@
 filter:
   paths: [src/*]
-  excluded_paths: [tests/*,src/Infrastructure/Transport/Implementation/BunnyRabbitMQ/BunnyClientOverride.php]
+  excluded_paths: [tests/*]
 tools:
   php_analyzer: true
   php_sim: true

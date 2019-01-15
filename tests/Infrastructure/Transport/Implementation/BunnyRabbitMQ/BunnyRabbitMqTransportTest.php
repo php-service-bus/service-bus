@@ -14,14 +14,13 @@ declare(strict_types = 1);
 namespace Desperado\ServiceBus\Tests\Infrastructure\Transport\Implementation\BunnyRabbitMQ;
 
 use function Amp\Promise\wait;
-use Bunny\Channel;
 use function Desperado\ServiceBus\Common\readReflectionPropertyValue;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpConnectionConfiguration;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpExchange;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpQueue;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination;
-use Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyIncomingPackage;
-use Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyRabbitMqTransport;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\PhpInnacle\PhpInnacleTransport;
+use Desperado\ServiceBus\Infrastructure\Transport\Implementation\PhpInnacle\PhpInnacleIncomingPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\QueueBind;
 use Desperado\ServiceBus\Infrastructure\Transport\TopicBind;
@@ -34,7 +33,7 @@ use Ramsey\Uuid\Uuid;
 final class BunnyRabbitMqTransportTest extends TestCase
 {
     /**
-     * @var BunnyRabbitMqTransport
+     * @var PhpInnacleTransport
      */
     private $transport;
 
@@ -45,7 +44,7 @@ final class BunnyRabbitMqTransportTest extends TestCase
     {
         parent::setUp();
 
-        $this->transport = new BunnyRabbitMqTransport(AmqpConnectionConfiguration::createLocalhost());
+        $this->transport = new PhpInnacleTransport(AmqpConnectionConfiguration::createLocalhost());
     }
 
     /**
@@ -57,7 +56,7 @@ final class BunnyRabbitMqTransportTest extends TestCase
     {
         parent::tearDown();
 
-        /** @var Channel|null $channel */
+        /** @var \PHPinnacle\Ridge\Channel|null $channel */
         $channel = readReflectionPropertyValue($this->transport, 'channel');
 
         if(null !== $channel)
@@ -187,37 +186,15 @@ final class BunnyRabbitMqTransportTest extends TestCase
         /** @noinspection LoopWhichDoesNotLoopInspection */
         while(wait($iterator->advance()))
         {
-            /** @var BunnyIncomingPackage $package */
+            /** @var PhpInnacleIncomingPackage $package */
             $package = $iterator->getCurrent();
 
-            static::assertInstanceOf(BunnyIncomingPackage::class, $package);
+            static::assertInstanceOf(PhpInnacleIncomingPackage::class, $package);
             static::assertEquals('somePayload', $package->payload());
             static::assertCount(2, $package->headers());
             static::assertTrue(Uuid::isValid($package->traceId()));
 
             break;
         }
-    }
-
-    /**
-     * @test
-     * @expectedException \Desperado\ServiceBus\Infrastructure\Transport\Exceptions\SendMessageFailed
-     * @expectedExceptionMessage There is no active connection to the message broker. You must call the connect method
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    public function sendMessageWithoutConnection(): void
-    {
-        wait(
-            $this->transport->send(
-                new OutboundPackage(
-                   'somePayload',
-                    ['key' => 'value'],
-                    new AmqpTransportLevelDestination('consume', 'consume')
-                )
-            )
-        );
     }
 }
