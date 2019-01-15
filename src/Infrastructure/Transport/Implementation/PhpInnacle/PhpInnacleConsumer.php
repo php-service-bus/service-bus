@@ -69,7 +69,7 @@ final class PhpInnacleConsumer
     /**
      * Listen queue messages
      *
-     * @param callable(BunnyIncomingPackage):\Generator $onMessageReceived
+     * @param callable(PhpInnacleIncomingPackage):\Generator $onMessageReceived
      *
      * @return Promise
      */
@@ -137,7 +137,7 @@ final class PhpInnacleConsumer
                 /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
                 asyncCall($onMessageReceived, $incomingPackage);
 
-                unset($package);
+                unset($incomingPackage);
             }
             catch(\Throwable $throwable)
             {

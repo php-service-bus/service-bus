@@ -211,6 +211,7 @@ final class PhpInnacleTransport implements Transport
      */
     public function send(OutboundPackage $outboundPackage): Promise
     {
+        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             function(OutboundPackage $outboundPackage): \Generator
             {
