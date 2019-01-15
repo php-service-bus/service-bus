@@ -63,8 +63,9 @@
     "doctrine/cache": "^v1.8",
     "latitude/latitude": "^3.1",
     "guzzlehttp/psr7": "^1.4",
-    "bunny/bunny": "0.4.1",
-    "ramsey/uuid": "^3.7"
+    "ramsey/uuid": "^3.7",
+
+    "phpinnacle/ridge": "^0.1"
   },
   "require-dev": {
     "kelunik/loop-block": "^1.0",

@@ -11,11 +11,10 @@
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ;
+namespace Desperado\ServiceBus\Infrastructure\Transport\Implementation\PhpInnacle;
 
 use function Amp\call;
 use Amp\Promise;
-use Bunny\Message as BunnyEnvelope;
 use function Desperado\ServiceBus\Common\uuid;
 use Desperado\ServiceBus\Endpoint\TransportLevelDestination;
 use Desperado\ServiceBus\Infrastructure\Transport\Exceptions\AcknowledgeFailed;
@@ -24,11 +23,13 @@ use Desperado\ServiceBus\Infrastructure\Transport\Exceptions\RejectFailed;
 use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination;
 use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
 use Desperado\ServiceBus\Infrastructure\Transport\Transport;
+use PHPinnacle\Ridge\Channel;
+use PHPinnacle\Ridge\Message;
 
 /**
  *
  */
-final class BunnyIncomingPackage implements IncomingPackage
+final class PhpInnacleIncomingPackage implements IncomingPackage
 {
     /**
      * Received package id
@@ -45,22 +46,22 @@ final class BunnyIncomingPackage implements IncomingPackage
     private $time;
 
     /**
-     * @var BunnyEnvelope
+     * @var Message
      */
     private $originMessage;
 
     /**
-     * @var BunnyChannelOverride
+     * @var Channel
      */
     private $channel;
 
     /**
-     * @param BunnyChannelOverride $channel
-     * @param BunnyEnvelope        $message
+     * @param Message $message
+     * @param Channel $channel
      *
      * @return self
      */
-    public static function received(BunnyChannelOverride $channel, BunnyEnvelope $message): self
+    public static function received(Message $message, Channel $channel): self
     {
         $self = new self();
 
@@ -92,8 +93,8 @@ final class BunnyIncomingPackage implements IncomingPackage
     public function origin(): TransportLevelDestination
     {
         return new AmqpTransportLevelDestination(
-            $this->originMessage->exchange,
-            $this->originMessage->routingKey
+            $this->originMessage->exchange(),
+            $this->originMessage->routingKey()
         );
     }
 
@@ -102,7 +103,7 @@ final class BunnyIncomingPackage implements IncomingPackage
      */
     public function payload(): string
     {
-        return $this->originMessage->content;
+        return $this->originMessage->content();
     }
 
     /**
@@ -110,7 +111,7 @@ final class BunnyIncomingPackage implements IncomingPackage
      */
     public function headers(): array
     {
-        return $this->originMessage->headers;
+        return $this->originMessage->headers();
     }
 
     /**
@@ -145,7 +146,7 @@ final class BunnyIncomingPackage implements IncomingPackage
             {
                 try
                 {
-                    yield $this->channel->nack($this->originMessage->deliveryTag, false, $requeue);
+                    yield $this->channel->nack($this->originMessage, false, $requeue);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -167,7 +168,7 @@ final class BunnyIncomingPackage implements IncomingPackage
             {
                 try
                 {
-                    yield $this->channel->reject($this->originMessage->deliveryTag, $requeue);
+                    yield $this->channel->reject($this->originMessage, $requeue);
                 }
                 catch(\Throwable $throwable)
                 {
@@ -179,20 +180,23 @@ final class BunnyIncomingPackage implements IncomingPackage
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function traceId(): string
     {
-        /**
-         * @see BunnyConsumer::createMessageHandler#144
-         *
-         * @var string $traceId
-         */
-        $traceId = (string) $this->originMessage->headers[Transport::SERVICE_BUS_TRACE_HEADER];
+        $traceId = (string) $this->originMessage->header(Transport::SERVICE_BUS_TRACE_HEADER);
+
+        if('' === $traceId)
+        {
+            $traceId = uuid();
+        }
 
         return $traceId;
     }
 
+    /**
+     *
+     */
     private function __construct()
     {
         $this->id   = uuid();

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "77ca3c56b4734548abcff230e224e63c",
-    "content-hash": "b7e77777872d35b421a548b3fd054960",
+    "hash": "5d024e0e736d2cfd888a50ebb49764a7",
+    "content-hash": "335714afadfacaf7f9e3759bba08de1b",
     "packages": [
         {
             "name": "amphp/amp",
@@ -980,62 +980,6 @@
             "time": "2018-10-24 03:34:54"
         },
         {
-            "name": "bunny/bunny",
-            "version": "v0.4.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jakubkulhan/bunny.git",
-                "reference": "8744243db0df7525a65299adef1aa50be407db53"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jakubkulhan/bunny/zipball/8744243db0df7525a65299adef1aa50be407db53",
-                "reference": "8744243db0df7525a65299adef1aa50be407db53",
-                "shasum": ""
-            },
-            "require": {
-                "php": "~7.0",
-                "psr/log": "~1.0",
-                "react/event-loop": "^1.0 || ^0.5 || ^0.4",
-                "react/promise": "~2.2"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~6.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Bunny\\": "src/Bunny/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jakub Kulhan",
-                    "email": "jakub.kulhan@gmail.com"
-                }
-            ],
-            "description": "Performant pure-PHP AMQP (RabbitMQ) sync/async (ReactPHP) library",
-            "keywords": [
-                "AMQP",
-                "bunny",
-                "exchange",
-                "message",
-                "messaging",
-                "queue",
-                "queueing",
-                "rabbit",
-                "rabbitmq",
-                "react",
-                "react-php",
-                "reactphp"
-            ],
-            "time": "2018-08-15 13:25:32"
-        },
-        {
             "name": "cash/lrucache",
             "version": "1.0.0",
             "source": {
@@ -1800,6 +1744,61 @@
             "time": "2017-07-14 14:27:02"
         },
         {
+            "name": "phpinnacle/ridge",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpinnacle/ridge.git",
+                "reference": "4f60fb855a0cc743815d7de64518d6dd4ed8dc44"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpinnacle/ridge/zipball/4f60fb855a0cc743815d7de64518d6dd4ed8dc44",
+                "reference": "4f60fb855a0cc743815d7de64518d6dd4ed8dc44",
+                "shasum": ""
+            },
+            "require": {
+                "amphp/amp": "^2.0",
+                "amphp/socket": "^0.10.11",
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "amphp/phpunit-util": "^1.0",
+                "phpunit/phpunit": "^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPinnacle\\Ridge\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHPinnacle",
+                    "email": "dev@phpinnacle.com",
+                    "homepage": "https://phpinnacle.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHPinnacle async AMQP client",
+            "homepage": "https://github.com/phpinnacle/ridge",
+            "keywords": [
+                "AMQP",
+                "async",
+                "phpinnacle"
+            ],
+            "time": "2019-01-15 07:20:59"
+        },
+        {
             "name": "psr/cache",
             "version": "1.0.1",
             "source": {
@@ -2160,93 +2159,6 @@
                 "uuid"
             ],
             "time": "2018-07-19 23:38:55"
-        },
-        {
-            "name": "react/event-loop",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/event-loop.git",
-                "reference": "0266aff7aa7b0613b1f38a723e14a0ebc55cfca3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/0266aff7aa7b0613b1f38a723e14a0ebc55cfca3",
-                "reference": "0266aff7aa7b0613b1f38a723e14a0ebc55cfca3",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.8.35 || ^5.7 || ^6.4"
-            },
-            "suggest": {
-                "ext-event": "~1.0 for ExtEventLoop",
-                "ext-pcntl": "For signal handling support when using the StreamSelectLoop"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "React\\EventLoop\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "ReactPHP's core reactor event loop that libraries can use for evented I/O.",
-            "keywords": [
-                "asynchronous",
-                "event-loop"
-            ],
-            "time": "2018-07-11 14:37:46"
-        },
-        {
-            "name": "react/promise",
-            "version": "v2.7.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/promise.git",
-                "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
-                "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.8"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "React\\Promise\\": "src/"
-                },
-                "files": [
-                    "src/functions_include.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jan Sorgalla",
-                    "email": "jsorgalla@gmail.com"
-                }
-            ],
-            "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-            "keywords": [
-                "promise",
-                "promises"
-            ],
-            "time": "2019-01-07 21:25:54"
         },
         {
             "name": "symfony/cache",

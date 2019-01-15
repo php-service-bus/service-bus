@@ -41,7 +41,7 @@ services:
 
   # Messages transport
   Desperado\ServiceBus\Infrastructure\Transport\Transport:
-    class: Desperado\ServiceBus\Infrastructure\Transport\Implementation\BunnyRabbitMQ\BunnyRabbitMqTransport
+    class: Desperado\ServiceBus\Infrastructure\Transport\Implementation\PhpInnacle\PhpInnacleTransport
     arguments:
       $connectionConfig: '@Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpConnectionConfiguration'
       $qosConfig: null
