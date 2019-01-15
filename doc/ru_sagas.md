@@ -50,9 +50,9 @@
 
 #### Создание
 Для операций с сагами есть специальный провайдер - [SagaProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php), имеющий несколько методов (каждый метод возвращает объект [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php))
-- [start()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L88): Создаёт и запускает новую сагу, передавая в неё команду
-- [obtain()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L141): Получает существующую сагу из базы данных
-- [save()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L200): Сохраняет все изменения в саге, а также триггерит отправку сообщений в транспорт
+- [start()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L92): Создаёт и запускает новую сагу, передавая в неё команду
+- [obtain()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L145): Получает существующую сагу из базы данных
+- [save()](https://github.com/mmasiukevich/service-bus/blob/master/src/SagaProvider.php#L204): Сохраняет все изменения в саге, а также триггерит отправку сообщений в транспорт
 
 #### Примеры кода
 

@@ -89,9 +89,9 @@ While creating a new aggregate event [AggregateCreated](https://github.com/mmasi
 To work with indexes, use [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), which has the following methods  (the [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php) object is returned in each of them):
 * [get()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L54): Receive a saved value
 * [has()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L83): Was a value saved
-* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#111): Add a value to index. Working principle is similar to the ```\Memcached:add```: method, if values with such a keyword didn’t exist it will return «true», otherwise - «false» (best choice)
-* [remove()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#142): Delete saved value
-* [update()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#158): Update saved value
+* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L111): Add a value to index. Working principle is similar to the ```\Memcached:add```: method, if values with such a keyword didn’t exist it will return «true», otherwise - «false» (best choice)
+* [remove()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L142): Delete saved value
+* [update()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L158): Update saved value
 
 #### Working with snapshots
 By default only one strategy of snapshots generation is implemented - [SnapshotVersionTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/SnapshotTrigger/SnapshotVersionTrigger.php), which is based on versions (generates a snapshot every *N* version changes). Snapshots are created automatically, with an exclusion of strategy selection (you can implement your own snapshots with the help of  [SnapshotTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/SnapshotTrigger/SnapshotTrigger.php) interface) no setting is required
