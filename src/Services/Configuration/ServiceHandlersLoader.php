@@ -2,16 +2,15 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Services\Configuration;
+namespace ServiceBus\Services\Configuration;
 
 /**
  * Retrieving a list of message handlers for the specified object
@@ -23,7 +22,10 @@ interface ServiceHandlersLoader
      *
      * @param object $service
      *
-     * @return \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\Handler>
+     * @return \SplObjectStorage<\ServiceBus\MessageHandlers\Handler>
+     *
+     * @throws \ServiceBus\Services\Exceptions\InvalidEventType
+     * @throws \ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed
      */
     public function load(object $service): \SplObjectStorage;
 }

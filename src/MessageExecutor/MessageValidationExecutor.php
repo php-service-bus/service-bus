@@ -2,26 +2,25 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\MessageExecutor;
+namespace ServiceBus\MessageExecutor;
 
 use Amp\Failure;
 use Amp\Promise;
-use function Desperado\ServiceBus\Common\invokeReflectionMethod;
-use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
 use Psr\Log\LogLevel;
+use ServiceBus\Context\KernelContext;
+use function ServiceBus\Common\invokeReflectionMethod;
+use ServiceBus\Common\Messages\Message;
+use ServiceBus\MessageHandlers\HandlerOptions;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Desperado\ServiceBus\Application\KernelContext;
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
 
 /**
  * Executing message validation
@@ -104,7 +103,7 @@ final class MessageValidationExecutor implements MessageExecutor
     {
         /**
          * @noinspection VariableFunctionsUsageInspection
-         * @var \Desperado\ServiceBus\Services\Contracts\ValidationFailedEvent $event
+         * @var \ServiceBus\Services\Contracts\ValidationFailedEvent $event
          */
         $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $context->violations()]);
 

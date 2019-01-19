@@ -2,16 +2,15 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Infrastructure\Logger\Handlers\Graylog;
+namespace ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Logger;
@@ -53,10 +52,13 @@ final class GelfFormatter extends NormalizerFormatter
     private $maxLength;
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection
+     *
      * @param int $maxLength
      */
     public function __construct(int $maxLength = self::DEFAULT_MAX_LENGTH)
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         parent::__construct('U.u');
 
         $this->systemName = \gethostname();
@@ -65,6 +67,9 @@ final class GelfFormatter extends NormalizerFormatter
 
     /**
      * @inheritdoc
+     *
+     * @throws \LogicException Invalid type
+     * @throws \RuntimeException if encoding fails and errors are not ignored
      */
     public function format(array $record): array
     {
@@ -136,6 +141,9 @@ final class GelfFormatter extends NormalizerFormatter
      * @param array                                      $formatted
      *
      * @return array
+     *
+     * @throws \LogicException Invalid type
+     * @throws \RuntimeException if encoding fails and errors are not ignored
      */
     private function formatAdditionalData(array $collection, array $formatted): array
     {
@@ -174,6 +182,7 @@ final class GelfFormatter extends NormalizerFormatter
      * @return string|int|float|null
      *
      * @throws \LogicException Invalid type
+     * @throws \RuntimeException if encoding fails and errors are not ignored
      */
     private function formatValue(string $key, $value)
     {

@@ -2,24 +2,23 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\MessageRouter;
+namespace ServiceBus\MessageRouter;
 
-use Desperado\ServiceBus\Common\Contract\Messages\Command;
-use Desperado\ServiceBus\Common\Contract\Messages\Event;
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\MessageExecutor\MessageExecutor;
-use Desperado\ServiceBus\MessageRouter\Exceptions\InvalidCommandClassSpecified;
-use Desperado\ServiceBus\MessageRouter\Exceptions\InvalidEventClassSpecified;
-use Desperado\ServiceBus\MessageRouter\Exceptions\MultipleCommandHandlersNotAllowed;
+use ServiceBus\Common\Messages\Command;
+use ServiceBus\Common\Messages\Event;
+use ServiceBus\Common\Messages\Message;
+use ServiceBus\MessageExecutor\MessageExecutor;
+use ServiceBus\MessageRouter\Exceptions\InvalidCommandClassSpecified;
+use ServiceBus\MessageRouter\Exceptions\InvalidEventClassSpecified;
+use ServiceBus\MessageRouter\Exceptions\MultipleCommandHandlersNotAllowed;
 
 /**
  *
@@ -29,14 +28,14 @@ final class Router implements \Countable
     /**
      * Event listeners
      *
-     * @var array<string, array<string|int, \Desperado\ServiceBus\MessageExecutor\MessageExecutor>>
+     * @var array<string, array<string|int, \ServiceBus\MessageExecutor\MessageExecutor>>
      */
     private $eventListenersMap = [];
 
     /**
      * Command handlers
      *
-     * @var array<string, \Desperado\ServiceBus\MessageExecutor\MessageExecutor>
+     * @var array<string, \ServiceBus\MessageExecutor\MessageExecutor>
      */
     private $commandHandlersMap = [];
 
@@ -56,7 +55,7 @@ final class Router implements \Countable
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\MessageRouter\Exceptions\InvalidEventClassSpecified
+     * @throws \ServiceBus\MessageRouter\Exceptions\InvalidEventClassSpecified
      */
     public function registerListener($event, MessageExecutor $handler): void
     {
@@ -84,8 +83,8 @@ final class Router implements \Countable
      *
      * @return void
      *
-     * @throws \Desperado\ServiceBus\MessageRouter\Exceptions\InvalidCommandClassSpecified
-     * @throws \Desperado\ServiceBus\MessageRouter\Exceptions\MultipleCommandHandlersNotAllowed
+     * @throws \ServiceBus\MessageRouter\Exceptions\InvalidCommandClassSpecified
+     * @throws \ServiceBus\MessageRouter\Exceptions\MultipleCommandHandlersNotAllowed
      */
     public function registerHandler($command, MessageExecutor $handler): void
     {
@@ -112,7 +111,7 @@ final class Router implements \Countable
     /**
      * @param Message $message
      *
-     * @return array<mixed, \Desperado\ServiceBus\MessageExecutor\MessageExecutor>
+     * @return array<mixed, \ServiceBus\MessageExecutor\MessageExecutor>
      */
     public function match(Message $message): array
     {

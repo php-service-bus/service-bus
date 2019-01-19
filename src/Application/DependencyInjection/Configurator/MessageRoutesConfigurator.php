@@ -2,27 +2,22 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Application\DependencyInjection\Configurator;
+namespace ServiceBus\Application\DependencyInjection\Configurator;
 
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use function Desperado\ServiceBus\Common\invokeReflectionMethod;
-use Desperado\ServiceBus\MessageExecutor\DefaultMessageExecutor;
-use Desperado\ServiceBus\MessageExecutor\MessageValidationExecutor;
-use Desperado\ServiceBus\MessageHandlers\Handler;
-use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
-use Desperado\ServiceBus\MessageRouter\Router;
-use Desperado\ServiceBus\SagaProvider;
-use Desperado\ServiceBus\Sagas\Configuration\SagaConfigurationLoader;
-use Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader;
+use http\Message;
+use ServiceBus\MessageExecutor\DefaultMessageExecutor;
+use ServiceBus\MessageExecutor\MessageValidationExecutor;
+use ServiceBus\MessageHandlers\Handler;
+use ServiceBus\MessageRouter\Router;
+use ServiceBus\Services\Configuration\ServiceHandlersLoader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Validator\ValidatorBuilder;
 
@@ -46,7 +41,7 @@ final class MessageRoutesConfigurator
     private $sagasList;
 
     /**
-     * @var array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver>
+     * @var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
      */
     private $argumentResolvers;
 
@@ -69,7 +64,7 @@ final class MessageRoutesConfigurator
      * @param array<mixed, string>                                                    $sagasList
      * @param ServiceLocator                                                          $routingServiceLocator
      * @param ServiceLocator                                                          $servicesServiceLocator
-     * @param array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
+     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
      */
     public function __construct(
         array $servicesList,
@@ -96,53 +91,6 @@ final class MessageRoutesConfigurator
     public function configure(Router $router): void
     {
         $this->registerServices($router);
-        $this->registerSagas($router);
-    }
-
-    /**
-     * @param Router $router
-     *
-     * @return void
-     *
-     * @throws \ReflectionException
-     * @throws \Desperado\ServiceBus\Sagas\Configuration\Exceptions\InvalidSagaConfiguration
-     */
-    private function registerSagas(Router $router): void
-    {
-        /** @var SagaConfigurationLoader $sagasConfigurationExtractor */
-        $sagasConfigurationExtractor = $this->routingServiceLocator->get(SagaConfigurationLoader::class);
-
-        /** @var SagaProvider $sagaProvider */
-        $sagaProvider = $this->routingServiceLocator->get(SagaProvider::class);
-
-        foreach($this->sagasList as $sagaClass)
-        {
-            $sagaConfiguration = $sagasConfigurationExtractor->load($sagaClass);
-
-            /** @var \IteratorAggregate<\Desperado\ServiceBus\MessageHandlers\Handler> $iterator */
-            $iterator = $sagaConfiguration->handlerCollection();
-
-            /** @var \Desperado\ServiceBus\MessageHandlers\Handler $handler */
-            foreach($iterator as $handler)
-            {
-                $router->registerListener(
-                    (string) $handler->messageClass(),
-                    new DefaultMessageExecutor(
-                        $handler->toClosure(),
-                        $handler->arguments(),
-                        new HandlerOptions(),
-                        $this->argumentResolvers
-                    )
-                );
-            }
-
-            invokeReflectionMethod(
-                $sagaProvider,
-                'appendMetaData',
-                $sagaClass,
-                $sagaConfiguration->metaData()
-            );
-        }
     }
 
     /**
@@ -166,7 +114,7 @@ final class MessageRoutesConfigurator
             /** @var object $serviceObject */
             $serviceObject = $this->servicesServiceLocator->get(\sprintf('%s_service', $serviceId));
 
-            /** @var \Desperado\ServiceBus\MessageHandlers\Handler $handler */
+            /** @var \ServiceBus\MessageHandlers\Handler $handler */
             foreach($serviceConfigurationExtractor->load($serviceObject) as $handler)
             {
                 self::assertMessageClassSpecifiedInArguments($serviceObject, $handler);

@@ -2,18 +2,17 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\MessageHandlers;
+namespace ServiceBus\MessageHandlers;
 
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
+use ServiceBus\Common\Messages\Message;
 
 /**
  * Message handler representation
@@ -48,7 +47,7 @@ final class Handler
     /**
      * Collection of arguments to the message handler
      *
-     * @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument>
+     * @var \SplObjectStorage<\ServiceBus\MessageHandlers\HandlerArgument>
      */
     private $argumentCollection;
 
@@ -216,7 +215,7 @@ final class Handler
     /**
      * Receive method parameters
      *
-     * @return \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument>
+     * @return \SplObjectStorage<\ServiceBus\MessageHandlers\HandlerArgument>
      */
     public function arguments(): \SplObjectStorage
     {
@@ -261,11 +260,11 @@ final class Handler
     /**
      * @param \ReflectionMethod $reflectionMethod
      *
-     * @return \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument>
+     * @return \SplObjectStorage<\ServiceBus\MessageHandlers\HandlerArgument>
      */
     private static function extractArguments(\ReflectionMethod $reflectionMethod): \SplObjectStorage
     {
-        /** @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument> $argumentCollection */
+        /** @var \SplObjectStorage<\ServiceBus\MessageHandlers\HandlerArgument> $argumentCollection */
         $argumentCollection = new \SplObjectStorage();
 
         foreach($reflectionMethod->getParameters() as $parameter)

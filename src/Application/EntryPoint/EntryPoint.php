@@ -2,26 +2,25 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Application\EntryPoint;
+namespace ServiceBus\Application\EntryPoint;
 
 use function Amp\call;
 use Amp\Delayed;
 use Amp\Loop;
 use Amp\Promise;
-use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
-use Desperado\ServiceBus\Infrastructure\Transport\Queue;
-use Desperado\ServiceBus\Infrastructure\Transport\Transport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ServiceBus\Transport\Common\Package\IncomingPackage;
+use ServiceBus\Transport\Common\Queue;
+use ServiceBus\Transport\Common\Transport;
 
 /**
  *

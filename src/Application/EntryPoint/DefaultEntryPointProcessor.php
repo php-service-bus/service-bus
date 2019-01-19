@@ -2,27 +2,25 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Application\EntryPoint;
+namespace ServiceBus\Application\EntryPoint;
 
 use function Amp\call;
 use Amp\Promise;
-use Desperado\ServiceBus\Application\KernelContext;
-use Desperado\ServiceBus\Endpoint\EndpointRouter;
-use Desperado\ServiceBus\Infrastructure\MessageSerialization\Exceptions\DecodeMessageFailed;
-use Desperado\ServiceBus\Infrastructure\MessageSerialization\IncomingMessageDecoder;
-use Desperado\ServiceBus\Infrastructure\Transport\Package\IncomingPackage;
-use Desperado\ServiceBus\MessageRouter\Router;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ServiceBus\Context\KernelContext;
+use ServiceBus\Endpoint\EndpointRouter;
+use ServiceBus\MessageRouter\Router;
+use ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed;
+use ServiceBus\Transport\Common\Package\IncomingPackage;
 
 /**
  *
@@ -119,7 +117,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     );
                 }
 
-                /** @var \Desperado\ServiceBus\MessageExecutor\MessageExecutor $executor */
+                /** @var \ServiceBus\MessageExecutor\MessageExecutor $executor */
                 foreach($executors as $executor)
                 {
                     $context = new KernelContext($package, $endpointRouter, $logger);

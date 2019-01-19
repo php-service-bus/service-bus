@@ -2,26 +2,25 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Application;
+namespace ServiceBus\Application;
 
 use Amp\Loop;
-use Desperado\ServiceBus\Endpoint\Endpoint;
-use Desperado\ServiceBus\Endpoint\EndpointRouter;
-use Desperado\ServiceBus\Application\EntryPoint\EntryPoint;
-use Desperado\ServiceBus\Infrastructure\Transport\Transport;
-use Desperado\ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
-use Desperado\ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
-use Desperado\ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
 use Psr\Log\LoggerInterface;
+use ServiceBus\Application\EntryPoint\EntryPoint;
+use ServiceBus\Endpoint\Endpoint;
+use ServiceBus\Endpoint\EndpointRouter;
+use ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
+use ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
+use ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
+use ServiceBus\Transport\Common\Transport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -243,13 +242,18 @@ final class ServiceBusKernel
     }
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection
+     *
      * @param string $service
      *
      * @return object
      */
     private function getKernelContainerService(string $service): object
     {
-        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         * @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator
+         */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
         /** @var object $object */

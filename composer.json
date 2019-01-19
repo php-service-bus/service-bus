@@ -1,58 +1,35 @@
 {
-  "name": "mmasiukevich/service-bus",
+  "name": "php-service-bus/php-service-bus",
   "description": "PHP Service Bus (publish-subscribe pattern)",
   "type": "library",
-  "keywords": ["cqs", "event-sourcing", "messaging", "publish-subscribe", "async-php", "amphp"],
+  "keywords": ["cqrs", "event-sourcing", "async-php", "command-bus", "messaging"],
   "authors": [
     {
       "name": "Masiukevich Maksim",
-      "email": "desperado@minsk-info.ru",
+      "email": "dev@async-php.com",
       "homepage": "https://github.com/mmasiukevich",
-      "role": "Developer"
+      "role": "Maintainer"
     }
   ],
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Desperado\\ServiceBus\\": "src/"
-    },
-    "files": [
-      "src/Infrastructure/Storage/functions.php",
-      "src/Application/DependencyInjection/Compiler/functions.php",
-      "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
-      "src/Infrastructure/Storage/SQL/ActiveRecord/functions.php",
-      "src/Common/commonFunctions.php",
-      "src/Common/datetimeFunctions.php",
-      "src/Common/reflectionFunctions.php"
-    ]
+      "ServiceBus\\": "src/"
+    }
   },
   "autoload-dev": {
     "psr-4": {
-      "Desperado\\ServiceBus\\Tests\\": "tests/"
-    },
-    "files": [
-      "src/Infrastructure/Storage/functions.php",
-      "src/Application/DependencyInjection/Compiler/functions.php",
-      "src/Infrastructure/Storage/SQL/queryBuilderFunctions.php",
-      "src/Infrastructure/Storage/SQL/ActiveRecord/functions.php",
-      "src/Common/commonFunctions.php",
-      "src/Common/datetimeFunctions.php",
-      "src/Common/reflectionFunctions.php"
-    ]
+      "ServiceBus\\Tests\\": "tests/"
+    }
   },
   "require": {
     "php": ">=7.2",
 
-    "amphp/amp": "^2.0",
-    "amphp/log": "^1",
-    "amphp/file": "^0.3",
-    "amphp/artax": "^3.0",
-    "amphp/parallel": "^1",
-    "amphp/postgres": "^1",
-    "kelunik/retry": "^v1.0",
+    "php-service-bus/common": "dev-master",
+    "php-service-bus/transport-amqp": "dev-master",
+    "php-service-bus/message-serializer": "dev-master",
+    "php-service-bus/annotations-reader": "dev-master",
 
-    "symfony/serializer-pack": "^v1",
-    "symfony/cache": "^v4.2",
     "symfony/dependency-injection": "^v4.2",
     "symfony/config": "^v4.2",
     "symfony/dotenv": "^v4.2",
@@ -60,16 +37,14 @@
     "symfony/validator": "^v4.2",
     "symfony/debug": "^v4.2",
 
-    "doctrine/cache": "^v1.8",
-    "latitude/latitude": "^3.1",
-    "guzzlehttp/psr7": "^1.4",
-    "ramsey/uuid": "^3.7",
-
-    "phpinnacle/ridge": "^0.1"
+    "amphp/log": "^1",
+    "amphp/file": "^0.3",
+    "amphp/artax": "^3.0",
+    "amphp/parallel": "^1",
+    "kelunik/retry": "^v1.0"
   },
   "require-dev": {
     "kelunik/loop-block": "^1.0",
-    "doctrine/dbal": "^v2.6",
     "phpunit/phpunit": "^7",
     "vimeo/psalm": "^3"
   },

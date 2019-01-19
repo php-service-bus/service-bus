@@ -2,16 +2,15 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Application\DependencyInjection\Compiler;
+namespace ServiceBus\Application\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -73,12 +72,15 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection
+     *
      * @param ContainerBuilder $container
      *
      * @return bool
      */
     private static function enabled(ContainerBuilder $container): bool
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return true === $container->hasParameter('service_bus.auto_import.handlers_enabled')
             ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
             : false;
@@ -98,13 +100,18 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection
+     *
      * @param ContainerBuilder $container
      *
      * @return array<int, string>
      */
     private static function getDirectories(ContainerBuilder $container): array
     {
-        /** @var array<int, string> $directories */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         * @var array<int, string> $directories
+         */
         $directories = true === $container->hasParameter('service_bus.auto_import.handlers_directories')
             ? $container->getParameter('service_bus.auto_import.handlers_directories')
             : [];
@@ -113,28 +120,22 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
+     * @noinspection PhpDocMissingThrowsInspection
+     *
      * @param ContainerBuilder $container
      *
      * @return array<int, string>
      */
     private static function getExcludedFiles(ContainerBuilder $container): array
     {
-        /** @var array<int, string> $excludedFiles */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         * @var array<int, string> $excludedFiles
+         */
         $excludedFiles = true === $container->hasParameter('service_bus.auto_import.handlers_excluded')
             ? $container->getParameter('service_bus.auto_import.handlers_excluded')
             : [];
 
-        /** @var array<int, string> $directories */
-        $directories = \array_merge($excludedFiles, [
-            __FILE__,
-            __DIR__ . '/../../../src/Storage/functions.php',
-            __DIR__ . '/../../../src/DependencyInjection/Compiler/functions.php',
-            __DIR__ . '/../../../src/Storage/SQL/queryBuilderFunctions.php',
-            __DIR__ . '/../../../src/Common/commonFunctions.php',
-            __DIR__ . '/../../../src/Common/datetimeFunctions.php',
-            __DIR__ . '/../../../src/Common/reflectionFunctions.php',
-        ]);
-
-        return $directories;
+        return $excludedFiles;
     }
 }

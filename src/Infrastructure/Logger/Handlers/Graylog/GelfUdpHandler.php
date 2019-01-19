@@ -2,16 +2,15 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Infrastructure\Logger\Handlers\Graylog;
+namespace ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 
 use Amp\ByteStream\ResourceOutputStream;
 use Monolog\Formatter\NormalizerFormatter;
@@ -49,8 +48,6 @@ final class GelfUdpHandler extends AbstractProcessingHandler
      * @param bool   $gzipMessage
      * @param int    $level
      * @param bool   $bubble
-     *
-     * @throws \RuntimeException Could not connect
      */
     public function __construct(string $host, int $port, bool $gzipMessage = false, $level = Logger::DEBUG, $bubble = true)
     {

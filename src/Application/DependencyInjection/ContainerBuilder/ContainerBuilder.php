@@ -2,18 +2,17 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Application\DependencyInjection\ContainerBuilder;
+namespace ServiceBus\Application\DependencyInjection\ContainerBuilder;
 
-use Desperado\ServiceBus\Environment;
+use ServiceBus\Environment;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -198,6 +197,11 @@ final class ContainerBuilder
      * Build container
      *
      * @return ContainerInterface
+     *
+     * @throws \InvalidArgumentException When provided tag is not defined in this extension
+     * @throws \LogicException Cannot dump an uncompiled container
+     * @throws \RuntimeException When cache file can't be written
+     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
      */
     public function build(): ContainerInterface
     {
@@ -231,6 +235,10 @@ final class ContainerBuilder
      * @param SymfonyContainerBuilder $builder
      *
      * @return void
+     *
+     * @throws \LogicException Cannot dump an uncompiled container
+     * @throws \RuntimeException When cache file can't be written
+     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
      */
     private function dumpContainer(SymfonyContainerBuilder $builder): void
     {

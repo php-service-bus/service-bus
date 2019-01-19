@@ -2,20 +2,19 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\ArgumentResolvers;
+namespace ServiceBus\ArgumentResolvers;
 
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\Common\ExecutionContext\MessageDeliveryContext;
-use Desperado\ServiceBus\MessageHandlers\HandlerArgument;
+use ServiceBus\Common\Messages\Message;
+use ServiceBus\Context\KernelContext;
+use ServiceBus\MessageHandlers\HandlerArgument;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
@@ -49,7 +48,7 @@ final class ContainerArgumentResolver implements ArgumentResolver
      *
      * @return object
      */
-    public function resolve(Message $message, MessageDeliveryContext $context, HandlerArgument $argument): object
+    public function resolve(Message $message, KernelContext $context, HandlerArgument $argument): object
     {
         /** @var object $object */
         $object = $this->serviceLocator->get((string) $argument->className());

@@ -2,23 +2,22 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\MessageExecutor;
+namespace ServiceBus\MessageExecutor;
 
 use function Amp\call;
 use Amp\Promise;
-use Desperado\ServiceBus\Application\KernelContext;
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
 use Psr\Log\LogLevel;
+use ServiceBus\Common\Messages\Message;
+use ServiceBus\Context\KernelContext;
+use ServiceBus\MessageHandlers\HandlerOptions;
 
 /**
  *
@@ -33,14 +32,14 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $closure;
 
     /**
-     * @var \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument>
+     * @var \SplObjectStorage<\ServiceBus\MessageHandlers\HandlerArgument>
      */
     private $arguments;
 
     /**
      * Argument resolvers collection
      *
-     * @var array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver>
+     * @var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
      */
     private $argumentResolvers;
 
@@ -53,9 +52,9 @@ final class DefaultMessageExecutor implements MessageExecutor
 
     /**
      * @param \Closure                                                                 $closure
-     * @param \SplObjectStorage<\Desperado\ServiceBus\MessageHandlers\HandlerArgument> $arguments
+     * @param \SplObjectStorage<\ServiceBus\MessageHandlers\HandlerArgument> $arguments
      * @param HandlerOptions                                                           $options
-     * @param array<string, \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver>  $argumentResolvers
+     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>  $argumentResolvers
      */
     public function __construct(
         \Closure $closure,
@@ -136,7 +135,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     {
         /**
          * @noinspection VariableFunctionsUsageInspection
-         * @var \Desperado\ServiceBus\Services\Contracts\ExecutionFailedEvent $event
+         * @var \ServiceBus\Services\Contracts\ExecutionFailedEvent $event
          */
         $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $errorMessage]);
 
@@ -163,10 +162,10 @@ final class DefaultMessageExecutor implements MessageExecutor
         /** @var array<int, mixed> $preparedArguments */
         $preparedArguments = [];
 
-        /** @var \Desperado\ServiceBus\MessageHandlers\HandlerArgument $argument */
+        /** @var \ServiceBus\MessageHandlers\HandlerArgument $argument */
         foreach($arguments as $argument)
         {
-            /** @var \Desperado\ServiceBus\ArgumentResolvers\ArgumentResolver $argumentResolver */
+            /** @var \ServiceBus\ArgumentResolvers\ArgumentResolver $argumentResolver */
             foreach($resolvers as $argumentResolver)
             {
                 if(true === $argumentResolver->supports($argument))

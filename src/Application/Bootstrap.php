@@ -2,24 +2,21 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Application;
+namespace ServiceBus\Application;
 
-use Desperado\ServiceBus\Application\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
-use Desperado\ServiceBus\Application\DependencyInjection\Compiler\ImportSagasCompilerPass;
-use Desperado\ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
-use Desperado\ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
-use Desperado\ServiceBus\Application\DependencyInjection\Extensions\SchedulerExtension;
-use Desperado\ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
-use Desperado\ServiceBus\Environment;
+use ServiceBus\Application\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
+use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
+use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
+use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
+use ServiceBus\Environment;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -68,44 +65,6 @@ final class Bootstrap
     }
 
     /**
-     * All sagas from the specified directories will be registered automatically
-     *
-     * Note: All files containing user-defined functions must be excluded
-     * Note: Increases start time because of the need to scan files
-     *
-     * @param array<int, string> $directories
-     * @param array<int, string> $excludedFiles
-     *
-     * @return self
-     */
-    public function enableAutoImportSagas(array $directories, array $excludedFiles = []): self
-    {
-        $this->importParameters([
-            'service_bus.auto_import.sagas_enabled'     => true,
-            'service_bus.auto_import.sagas_directories' => $directories,
-            'service_bus.auto_import.sagas_excluded'    => $excludedFiles
-        ]);
-
-        $this->containerBuilder->addCompilerPasses(new ImportSagasCompilerPass());
-
-        return $this;
-    }
-
-    /**
-     * Enable scheduler (amqp-base)
-     *
-     * @see https://github.com/mmasiukevich/service-bus/blob/master/doc/scheduler.md
-     *
-     * @return self
-     */
-    public function enableScheduler(): self
-    {
-        $this->containerBuilder->addExtensions(new SchedulerExtension());
-
-        return $this;
-    }
-
-    /**
      * All message handlers from the specified directories will be registered automatically
      *
      * Note: All files containing user-defined functions must be excluded
@@ -131,6 +90,11 @@ final class Bootstrap
 
     /**
      * @return ContainerInterface
+     *
+     * @throws \InvalidArgumentException When provided tag is not defined in this extension
+     * @throws \LogicException Cannot dump an uncompiled container
+     * @throws \RuntimeException When cache file can't be written
+     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
      */
     public function boot(): ContainerInterface
     {

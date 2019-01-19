@@ -2,19 +2,19 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\MessageHandlers;
+namespace ServiceBus\MessageHandlers;
 
-use Desperado\ServiceBus\Services\Contracts\ExecutionFailedEvent;
-use Desperado\ServiceBus\Services\Contracts\ValidationFailedEvent;
+use ServiceBus\Services\Contracts\ExecutionFailedEvent;
+use ServiceBus\Services\Contracts\ValidationFailedEvent;
+use ServiceBus\Services\Exceptions\InvalidEventType;
 
 /**
  * Execution options
@@ -60,16 +60,17 @@ final class HandlerOptions
      *
      * @return void
      *
-     * @throws \LogicException
-     *
-     * @throws \LogicException Event class must implement @see ExecutionFailedEvent
+     * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent
      */
     public function useDefaultValidationFailedEvent(string $eventClass): void
     {
         if(false === \is_a($eventClass, ValidationFailedEvent::class, true))
         {
-            throw new \LogicException(
-                \sprintf('Event class "%s" must implement "%s" interface', $eventClass, ValidationFailedEvent::class)
+            throw new InvalidEventType(
+                \sprintf(
+                    'Event class "%s" must implement "%s" interface', $eventClass,
+                    ValidationFailedEvent::class
+                )
             );
         }
 
@@ -81,14 +82,17 @@ final class HandlerOptions
      *
      * @return void
      *
-     * @throws \LogicException Event class must implement @see ExecutionFailedEvent
+     * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent
      */
     public function useDefaultThrowableEvent(string $eventClass): void
     {
         if(false === \is_a($eventClass, ExecutionFailedEvent::class, true))
         {
-            throw new \LogicException(
-                \sprintf('Event class "%s" must implement "%s" interface', $eventClass, ExecutionFailedEvent::class)
+            throw new InvalidEventType(
+                \sprintf(
+                    'Event class "%s" must implement "%s" interface', $eventClass,
+                    ExecutionFailedEvent::class
+                )
             );
         }
 

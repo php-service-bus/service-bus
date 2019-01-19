@@ -2,26 +2,25 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Services\Configuration;
+namespace ServiceBus\Services\Configuration;
 
-use Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation;
-use Desperado\ServiceBus\Infrastructure\AnnotationsReader\AnnotationCollection;
-use Desperado\ServiceBus\Infrastructure\AnnotationsReader\AnnotationsReader;
-use Desperado\ServiceBus\Infrastructure\AnnotationsReader\DefaultAnnotationsReader;
-use Desperado\ServiceBus\MessageHandlers\Handler;
-use Desperado\ServiceBus\MessageHandlers\HandlerOptions;
-use Desperado\ServiceBus\Services\Annotations\CommandHandler;
-use Desperado\ServiceBus\Services\Annotations\EventListener;
-use Desperado\ServiceBus\Services\Annotations\ServicesAnnotationsMarker;
+use ServiceBus\AnnotationsReader\Annotation;
+use ServiceBus\AnnotationsReader\AnnotationCollection;
+use ServiceBus\AnnotationsReader\AnnotationsReader;
+use ServiceBus\AnnotationsReader\DoctrineAnnotationsReader;
+use ServiceBus\MessageHandlers\Handler;
+use ServiceBus\MessageHandlers\HandlerOptions;
+use ServiceBus\Services\Annotations\CommandHandler;
+use ServiceBus\Services\Annotations\EventListener;
+use ServiceBus\Services\Annotations\ServicesAnnotationsMarker;
 
 /**
  * Getting a list of command and event handlers
@@ -35,10 +34,12 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
 
     /**
      * @param AnnotationsReader $annotationReader
+     *
+     * @throws \ServiceBus\AnnotationsReader\Exceptions\ParserConfigurationError
      */
     public function __construct(AnnotationsReader $annotationReader = null)
     {
-        $this->annotationReader = $annotationReader ?? new DefaultAnnotationsReader();
+        $this->annotationReader = $annotationReader ?? new DoctrineAnnotationsReader(null, ['psalm']);
     }
 
     /**
@@ -48,14 +49,14 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     {
         $collection = new \SplObjectStorage();
 
-        /** @var \Desperado\ServiceBus\Infrastructure\AnnotationsReader\Annotation $annotation */
+        /** @var \ServiceBus\AnnotationsReader\Annotation $annotation */
         foreach($this->loadMethodLevelAnnotations($service) as $annotation)
         {
             /** @var CommandHandler|EventListener $handlerAnnotation */
-            $handlerAnnotation = $annotation->annotationObject();
+            $handlerAnnotation = $annotation->annotationObject;
 
             /** @var \ReflectionMethod $handlerReflectionMethod */
-            $handlerReflectionMethod = $annotation->reflectionMethod();
+            $handlerReflectionMethod = $annotation->reflectionMethod;
 
             $factoryMethod = $handlerAnnotation instanceof CommandHandler ? 'commandHandler' : 'eventListener';
 
@@ -80,6 +81,8 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
      * @param ServicesAnnotationsMarker $annotation
      *
      * @return HandlerOptions
+     *
+     * @throws \ServiceBus\Services\Exceptions\InvalidEventType
      */
     private function createOptions(ServicesAnnotationsMarker $annotation): HandlerOptions
     {
@@ -111,6 +114,8 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
      * @param object $service
      *
      * @return AnnotationCollection
+     *
+     * @throws \ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed
      */
     private function loadMethodLevelAnnotations(object $service): AnnotationCollection
     {
@@ -119,7 +124,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             ->filter(
                 static function(Annotation $annotation): ?Annotation
                 {
-                    if($annotation->annotationObject() instanceof ServicesAnnotationsMarker)
+                    if($annotation->annotationObject instanceof ServicesAnnotationsMarker)
                     {
                         return $annotation;
                     }

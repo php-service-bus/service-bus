@@ -11,9 +11,7 @@
          beStrictAboutTestsThatDoNotTestAnything="false">
     <php>
         <ini name="error_reporting" value="-1"/>
-        <env name="TEST_POSTGRES_DSN" value="pgsql://postgres:123456789@localhost:5432/test"/>
         <env name="TRANSPORT_CONNECTION_DSN" value="amqp://guest:guest@localhost:5672"/>
-        <env name="DATABASE_CONNECTION_DSN" value="sqlite:///:memory:"/>
     </php>
 
     <testsuites>

@@ -2,27 +2,26 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
 declare(strict_types = 1);
 
-namespace Desperado\ServiceBus\Endpoint;
+namespace ServiceBus\Endpoint;
 
 use function Amp\call;
 use Amp\Promise;
-use Desperado\ServiceBus\Common\Contract\Messages\Message;
-use Desperado\ServiceBus\Infrastructure\MessageSerialization\MessageEncoder;
-use Desperado\ServiceBus\Infrastructure\MessageSerialization\Symfony\SymfonyMessageSerializer;
-use Desperado\ServiceBus\Infrastructure\Retry\OperationRetryWrapper;
-use Desperado\ServiceBus\Infrastructure\Transport\Exceptions\SendMessageFailed;
-use Desperado\ServiceBus\Infrastructure\Transport\Implementation\Amqp\AmqpTransportLevelDestination;
-use Desperado\ServiceBus\Infrastructure\Transport\Package\OutboundPackage;
-use Desperado\ServiceBus\Infrastructure\Transport\Transport;
+use ServiceBus\Common\Messages\Message;
+use ServiceBus\Infrastructure\Retry\OperationRetryWrapper;
+use ServiceBus\MessageSerializer\MessageEncoder;
+use ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer;
+use ServiceBus\Transport\Amqp\AmqpTransportLevelDestination;
+use ServiceBus\Transport\Common\Exceptions\SendMessageFailed;
+use ServiceBus\Transport\Common\Package\OutboundPackage;
+use ServiceBus\Transport\Common\Transport;
 
 /**
  * Application level transport endpoint
@@ -93,7 +92,7 @@ final class ApplicationTransportEndpoint implements Endpoint
 
         $encoded = $this->encoder->encode($message);
 
-        $options->headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] = $this->encoder->name();
+        $options->headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] = \get_class($this->encoder);
 
         $package = self::createPackage($encoded, $options, $this->destination);
 
@@ -122,14 +121,15 @@ final class ApplicationTransportEndpoint implements Endpoint
         AmqpTransportLevelDestination $destination
     ): OutboundPackage
     {
-        $package = new OutboundPackage($payload, $options->headers, $destination);
-
-        $package->expiredAfter   = $options->expiredAfter;
-        $package->immediateFlag  = $options->isImmediate;
-        $package->mandatoryFlag  = $options->isMandatory;
-        $package->persistentFlag = $options->isPersistent;
-        $package->traceId        = $options->traceId;
-
-        return $package;
+        return OutboundPackage::create(
+            $payload,
+            $options->headers,
+            $destination,
+            $options->traceId,
+            $options->isPersistent,
+            $options->isMandatory,
+            $options->isImmediate,
+            $options->expiredAfter
+        );
     }
 }
