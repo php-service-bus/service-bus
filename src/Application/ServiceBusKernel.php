@@ -13,6 +13,7 @@ declare(strict_types = 1);
 namespace ServiceBus\Application;
 
 use Amp\Loop;
+use Amp\Promise;
 use Psr\Log\LoggerInterface;
 use ServiceBus\Application\EntryPoint\EntryPoint;
 use ServiceBus\Endpoint\Endpoint;
@@ -20,6 +21,7 @@ use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 use ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
+use ServiceBus\Transport\Common\Queue;
 use ServiceBus\Transport\Common\Transport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -50,24 +52,33 @@ final class ServiceBusKernel
     private $transport;
 
     /**
+     * @param Transport          $transport
      * @param ContainerInterface $globalContainer
      *
      * @throws \Throwable
      */
-    public function __construct(ContainerInterface $globalContainer)
+    public function __construct(Transport $transport, ContainerInterface $globalContainer)
     {
-        $this->container = $globalContainer;
-
         /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
-
-        /** @var Transport $transport */
-        $transport = $serviceLocator->get(Transport::class);
         /** @var EntryPoint $entryPoint */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
+        $this->container  = $globalContainer;
         $this->transport  = $transport;
         $this->entryPoint = $entryPoint;
+    }
+
+    /**
+     * Run application
+     *
+     * @param Queue $queue
+     *
+     * @return Promise It does not return any result
+     */
+    public function run(Queue $queue): Promise
+    {
+        return $this->entryPoint->listen($this->transport, $queue);
     }
 
     /**
@@ -128,7 +139,7 @@ final class ServiceBusKernel
                 ]
             );
 
-            $this->entryPoint->stop($stopDelay);
+            $this->entryPoint->stop($this->transport, $stopDelay);
         };
 
         foreach($signals as $signal)
@@ -159,7 +170,7 @@ final class ServiceBusKernel
 
                 $logger->info('The demon\'s lifetime has expired ({lifetime} seconds)', ['lifetime' => $seconds]);
 
-                $this->entryPoint->stop();
+                $this->entryPoint->stop($this->transport);
             }
         );
 
@@ -197,7 +208,7 @@ final class ServiceBusKernel
                         ['delay' => $stopDelay]
                     );
 
-                    $this->entryPoint->stop($stopDelay);
+                    $this->entryPoint->stop($this->transport, $stopDelay);
                 }
             }
         );

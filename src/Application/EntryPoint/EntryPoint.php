@@ -31,11 +31,6 @@ final class EntryPoint
     private const DEFAULT_AWAIT_DELAY               = 50;
 
     /**
-     * @var Transport
-     */
-    private $transport;
-
-    /**
      * @var Queue|null
      */
     private $listenQueue;
@@ -72,21 +67,18 @@ final class EntryPoint
     private $awaitDelay;
 
     /**
-     * @param Transport            $transport
      * @param  EntryPointProcessor $processor
      * @param LoggerInterface|null $logger
      * @param int|null             $maxConcurrentTaskCount
      * @param int|null             $awaitDelay Barrier wait delay (in milliseconds)
      */
     public function __construct(
-        Transport $transport,
         EntryPointProcessor $processor,
         ?LoggerInterface $logger = null,
         ?int $maxConcurrentTaskCount = null,
         ?int $awaitDelay = null
     )
     {
-        $this->transport              = $transport;
         $this->processor              = $processor;
         $this->logger                 = $logger ?? new NullLogger();
         $this->maxConcurrentTaskCount = $maxConcurrentTaskCount ?? self::DEFAULT_MAX_CONCURRENT_TASK_COUNT;
@@ -96,11 +88,12 @@ final class EntryPoint
     /**
      * Start queue listen
      *
-     * @param Queue $queue
+     * @param Transport $transport
+     * @param Queue     $queue
      *
      * @return Promise It does not return any result
      */
-    public function listen(Queue $queue): Promise
+    public function listen(Transport $transport, Queue $queue): Promise
     {
         $this->listenQueue = $queue;
 
@@ -109,10 +102,10 @@ final class EntryPoint
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            function(Queue $queue) use ($isTestCall): \Generator
+            function(Transport $transport, Queue $queue) use ($isTestCall): \Generator
             {
                 /** @var \Amp\Iterator $iterator */
-                $iterator = yield $this->transport->consume($queue);
+                $iterator = yield $transport->consume($queue);
 
                 while(yield $iterator->advance())
                 {
@@ -153,21 +146,22 @@ final class EntryPoint
                     );
                 }
             },
-            $queue
+            $transport, $queue
         );
     }
 
     /**
-     * @param int $delay The delay before the completion (in seconds)
+     * @param Transport $transport
+     * @param int       $delay The delay before the completion (in seconds)
      *
      * @return void
      */
-    public function stop(int $delay = 10): void
+    public function stop(Transport $transport, int $delay = 10): void
     {
         $delay = 0 >= $delay ? 1 : $delay;
 
         Loop::defer(
-            function() use ($delay): \Generator
+            function() use ($transport, $delay): \Generator
             {
                 if(null === $this->listenQueue)
                 {
@@ -176,7 +170,7 @@ final class EntryPoint
                     return;
                 }
 
-                yield $this->transport->stop($this->listenQueue);
+                yield $transport->stop($this->listenQueue);
 
                 $this->logger->info('Handler will stop after {duration} seconds', ['duration' => $delay]);
 

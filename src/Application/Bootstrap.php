@@ -104,54 +104,6 @@ final class Bootstrap
     }
 
     /**
-     * Use RabbitMQ transport
-     *
-     * @param string      $connectionDSN
-     * @param string      $endpointExchange
-     * @param string|null $endpointRoutingKey
-     *
-     * @return self
-     */
-    public function useRabbitMqTransport(
-        string $connectionDSN,
-        string $endpointExchange,
-        ?string $endpointRoutingKey
-    ): self
-    {
-        $this->containerBuilder->addParameters([
-            'service_bus.transport.dsn'             => $connectionDSN,
-            'service_bus.default_destination_topic' => $endpointExchange,
-            'service_bus.default_destination_key'   => $endpointRoutingKey
-        ]);
-
-        return $this;
-    }
-
-    /**
-     * Use SQL storage
-     *
-     * Possible adapters:
-     *
-     * -- Desperado\ServiceBus\Storage\SQL\AmpPostgreSQL\AmpPostgreSQLAdapter
-     * -- Desperado\ServiceBus\Storage\SQL\DoctrineDBAL\DoctrineDBALAdapter
-     *
-     * @param string $adapter
-     * @param string $connectionDSN
-     *
-     * @return self
-     */
-    public function useSqlStorage(string $adapter, string $connectionDSN): self
-    {
-        $this->containerBuilder->addParameters([
-            'service_bus.storage.adapter' => $adapter,
-            'service_bus.storage.dsn'     => $connectionDSN
-
-        ]);
-
-        return $this;
-    }
-
-    /**
      * Use custom cache directory
      *
      * @param string $cacheDirectoryPath
