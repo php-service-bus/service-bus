@@ -1,5 +1,5 @@
 {
-  "name": "php-service-bus/php-service-bus",
+  "name": "mmasiukevich/service-bus",
   "description": "PHP Service Bus (publish-subscribe pattern)",
   "type": "library",
   "keywords": ["cqrs", "event-sourcing", "async-php", "command-bus", "messaging"],
