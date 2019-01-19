@@ -629,16 +629,16 @@
         },
         {
             "name": "amphp/process",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/process.git",
-                "reference": "90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c"
+                "reference": "e7e28219da753f865f9055e87d0b9b110ea607ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/process/zipball/90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c",
-                "reference": "90f3f31cbd0eee7fa5ae03ce588b1fc8f122997c",
+                "url": "https://api.github.com/repos/amphp/process/zipball/e7e28219da753f865f9055e87d0b9b110ea607ba",
+                "reference": "e7e28219da753f865f9055e87d0b9b110ea607ba",
                 "shasum": ""
             },
             "require": {
@@ -680,7 +680,7 @@
             ],
             "description": "Asynchronous process manager.",
             "homepage": "https://github.com/amphp/process",
-            "time": "2018-11-09 00:02:00"
+            "time": "2019-01-15 21:42:43"
         },
         {
             "name": "amphp/socket",
@@ -1744,23 +1744,79 @@
             "time": "2017-07-14 14:27:02"
         },
         {
-            "name": "phpinnacle/ridge",
-            "version": "0.1.0",
+            "name": "phpinnacle/buffer",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/phpinnacle/ridge.git",
-                "reference": "4f60fb855a0cc743815d7de64518d6dd4ed8dc44"
+                "url": "https://github.com/phpinnacle/buffer.git",
+                "reference": "a3b662cc90ac9ca81219626f8d2e7a15f096bc60"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpinnacle/ridge/zipball/4f60fb855a0cc743815d7de64518d6dd4ed8dc44",
-                "reference": "4f60fb855a0cc743815d7de64518d6dd4ed8dc44",
+                "url": "https://api.github.com/repos/phpinnacle/buffer/zipball/a3b662cc90ac9ca81219626f8d2e7a15f096bc60",
+                "reference": "a3b662cc90ac9ca81219626f8d2e7a15f096bc60",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPinnacle\\Buffer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHPinnacle",
+                    "email": "dev@phpinnacle.com",
+                    "homepage": "https://phpinnacle.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHPinnacle binary buffer implementation",
+            "homepage": "https://github.com/phpinnacle/buffer",
+            "keywords": [
+                "Buffer",
+                "binary",
+                "binary data",
+                "pack",
+                "phpinnacle",
+                "unpack"
+            ],
+            "time": "2019-01-16 13:38:21"
+        },
+        {
+            "name": "phpinnacle/ridge",
+            "version": "0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpinnacle/ridge.git",
+                "reference": "be77a866901077cf40d46ea97eade99f81695cff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpinnacle/ridge/zipball/be77a866901077cf40d46ea97eade99f81695cff",
+                "reference": "be77a866901077cf40d46ea97eade99f81695cff",
                 "shasum": ""
             },
             "require": {
                 "amphp/amp": "^2.0",
                 "amphp/socket": "^0.10.11",
-                "php": "^7.2"
+                "php": "^7.2",
+                "phpinnacle/buffer": "^0.1.1"
             },
             "require-dev": {
                 "amphp/phpunit-util": "^1.0",
@@ -1796,7 +1852,7 @@
                 "async",
                 "phpinnacle"
             ],
-            "time": "2019-01-15 07:20:59"
+            "time": "2019-01-18 13:36:33"
         },
         {
             "name": "psr/cache",
@@ -4392,16 +4448,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.5.1",
+            "version": "7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c23d78776ad415d5506e0679723cb461d71f488f"
+                "reference": "7c89093bd00f7d5ddf0ab81dee04f801416b4944"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c23d78776ad415d5506e0679723cb461d71f488f",
-                "reference": "c23d78776ad415d5506e0679723cb461d71f488f",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/7c89093bd00f7d5ddf0ab81dee04f801416b4944",
+                "reference": "7c89093bd00f7d5ddf0ab81dee04f801416b4944",
                 "shasum": ""
             },
             "require": {
@@ -4472,7 +4528,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-12-12 07:20:32"
+            "time": "2019-01-15 08:19:08"
         },
         {
             "name": "sabre/event",
