@@ -15,12 +15,18 @@
   "autoload": {
     "psr-4": {
       "ServiceBus\\": "src/"
-    }
+    },
+    "files": [
+      "src/Application/DependencyInjection/Compiler/functions.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
       "ServiceBus\\Tests\\": "tests/"
-    }
+    },
+    "files": [
+      "src/Application/DependencyInjection/Compiler/functions.php"
+    ]
   },
   "require": {
     "php": ">=7.2",
