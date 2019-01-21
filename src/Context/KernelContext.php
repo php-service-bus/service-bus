@@ -76,8 +76,8 @@ final class KernelContext
     )
     {
         $this->incomingPackage = $incomingPackage;
-        $this->endpointRouter = $endpointRouter;
-        $this->logger = $logger;
+        $this->endpointRouter  = $endpointRouter;
+        $this->logger          = $logger;
     }
 
     /**
@@ -114,8 +114,8 @@ final class KernelContext
     public function delivery(Message $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
         $messageClass = \get_class($message);
-        $endpoints = $this->endpointRouter->route($messageClass);
-        $logger = $this->logger;
+        $endpoints    = $this->endpointRouter->route($messageClass);
+        $logger       = $this->logger;
 
         $traceId = $this->incomingPackage->traceId();
 
@@ -136,10 +136,10 @@ final class KernelContext
 
                     /** @noinspection DisconnectedForeachInstructionInspection */
                     $logger->debug(
-                        'Send message "{messageClass}" to "{entryPoint}" entry point', [
+                        'Send message "{messageClass}" to "{endpoint}"', [
                             'traceId'      => $traceId,
                             'messageClass' => \get_class($message),
-                            'entryPoint'   => $endpoint->name()
+                            'endpoint'     => $endpoint->name()
                         ]
                     );
 
@@ -212,6 +212,6 @@ final class KernelContext
     private function validationFailed(array $violations): void
     {
         $this->isValidMessage = false;
-        $this->violations = $violations;
+        $this->violations     = $violations;
     }
 }

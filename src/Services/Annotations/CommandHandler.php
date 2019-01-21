@@ -15,7 +15,7 @@ namespace ServiceBus\Services\Annotations;
 /**
  * Annotation indicating to the command handler
  *
- * The command should implement the interface "\Desperado\Contracts\Common\Command"
+ * The command should implement the interface "\ServiceBus\Common\Messages\Command"
  *
  * @Annotation
  * @Target("METHOD")

@@ -3,11 +3,28 @@ parameters:
   service_bus.default_destination_topic: ''
   service_bus.default_destination_key: ''
 
+  # Decoder relation
+  service_bus.decoder_configuration:
+    # 'custom_encoder_key': 'custom_decoder_id'
+
 services:
   _defaults:
     autowire: false
     autoconfigure: false
     public: false
+
+  # Symfony serializer message decoder
+  service_bus.decoder.default_handler:
+    class: ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer
+    arguments:
+      $serializer: null
+      $normalizers: []
+
+  service_bus.decoder.service_locator:
+    class: Symfony\Component\DependencyInjection\ServiceLocator
+    tags: ['container.service_locator']
+    arguments:
+      - service_bus.decoder.default_handler: '@service_bus.decoder.default_handler'
 
   # @see TaggedMessageHandlersCompilerPass
   service_bus.services_locator:
@@ -38,20 +55,6 @@ services:
   ServiceBus\Services\Configuration\ServiceHandlersLoader:
     class: ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader
 
-  # Symfony serializer message decoder
-  ServiceBus\MessageSerializer\MessageDecoder:
-    class: ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer
-    arguments:
-      $serializer: null
-      $normalizers: []
-
-  # Incoming message decoder
-  service_bus.decoder_locator:
-    class: Symfony\Component\DependencyInjection\ServiceLocator
-    tags: ['container.service_locator']
-    arguments:
-      - 'service_bus.default_encoder': '@ServiceBus\MessageSerializer\MessageDecoder'
-
   # Internal kernel locator
   service_bus.public_services_locator:
     public: true
@@ -67,7 +70,8 @@ services:
   # Incoming message decoder
   ServiceBus\EntryPoint\IncomingMessageDecoder:
     arguments:
-      $decodersContainer: '@service_bus.decoder_locator'
+      $decodersConfiguration: '%service_bus.decoder_configuration%'
+      $decodersLocator: '@service_bus.decoder.service_locator'
 
   # Handling incoming package
   ServiceBus\EntryPoint\EntryPointProcessor:

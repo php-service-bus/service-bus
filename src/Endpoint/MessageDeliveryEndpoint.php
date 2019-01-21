@@ -16,8 +16,6 @@ use function Amp\call;
 use Amp\Promise;
 use ServiceBus\Common\Messages\Message;
 use ServiceBus\Infrastructure\Retry\OperationRetryWrapper;
-use ServiceBus\MessageSerializer\MessageEncoder;
-use ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer;
 use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Exceptions\SendMessageFailed;
 use ServiceBus\Transport\Common\Package\OutboundPackage;
@@ -43,7 +41,7 @@ final class MessageDeliveryEndpoint implements Endpoint
     /**
      * Convert message to string
      *
-     * @var MessageEncoder
+     * @var EndpointEncoder
      */
     private $encoder;
 
@@ -65,21 +63,21 @@ final class MessageDeliveryEndpoint implements Endpoint
      * @param string                     $name
      * @param Transport                  $transport
      * @param DeliveryDestination        $destination
-     * @param MessageEncoder|null        $encoder
+     * @param EndpointEncoder|null       $encoder
      * @param OperationRetryWrapper|null $deliveryRetryHandler
      */
     public function __construct(
         string $name,
         Transport $transport,
         DeliveryDestination $destination,
-        ?MessageEncoder $encoder = null,
+        ?EndpointEncoder $encoder = null,
         ?OperationRetryWrapper $deliveryRetryHandler = null
     )
     {
         $this->name                 = $name;
         $this->transport            = $transport;
         $this->destination          = $destination;
-        $this->encoder              = $encoder ?? new SymfonyMessageSerializer();
+        $this->encoder              = $encoder ?? EndpointEncoder::createDefault();
         $this->deliveryRetryHandler = $deliveryRetryHandler ?? new OperationRetryWrapper();
     }
 
@@ -96,10 +94,9 @@ final class MessageDeliveryEndpoint implements Endpoint
      */
     public function delivery(Message $message, DeliveryOptions $options): Promise
     {
-        $encoded = $this->encoder->encode($message);
+        $encoded = $this->encoder->handler->encode($message);
 
-        /** @noinspection GetClassUsageInspection Encoder cant't be null */
-        $options->headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] = \get_class($this->encoder);
+        $options->headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] = $this->encoder->tag;
 
         $package = self::createPackage($encoded, $options, $this->destination);
 

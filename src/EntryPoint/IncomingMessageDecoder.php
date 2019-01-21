@@ -2,9 +2,8 @@
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation)
- * Supports Saga pattern and Event Sourcing
  *
- * @author  Maksim Masiukevich <desperado@minsk-info.ru>
+ * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
@@ -24,19 +23,32 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 final class IncomingMessageDecoder
 {
-    public const DEFAULT_DECODER = 'service_bus.default_encoder';
+    public const DEFAULT_DECODER = 'service_bus.decoder.default_handler';
+
+    /**
+     * Decoders mapping
+     *
+     * [
+     *   'custom_encoder_key' => 'custom_decoder_id'
+     * ]
+     *
+     * @var array<string, string>
+     */
+    private $decodersConfiguration;
 
     /**
      * @var ServiceLocator
      */
-    private $decodersContainer;
+    private $decodersLocator;
 
     /**
-     * @param ServiceLocator $decodersContainer
+     * @param array<string, string> $decodersConfiguration
+     * @param ServiceLocator        $decodersLocator
      */
-    public function __construct(ServiceLocator $decodersContainer)
+    public function __construct(array $decodersConfiguration, ServiceLocator $decodersLocator)
     {
-        $this->decodersContainer = $decodersContainer;
+        $this->decodersConfiguration = $decodersConfiguration;
+        $this->decodersLocator       = $decodersLocator;
     }
 
     /**
@@ -46,27 +58,58 @@ final class IncomingMessageDecoder
      *
      * @return Message
      *
-     * @throws \LogicException Could not find encoder in the service container
+     * @throws \LogicException Could not find decoder in the service container
      * @throws \ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed
      */
     public function decode(IncomingPackage $package): Message
     {
-        $encoderKey = self::extractEncoderKey($package->headers());
+        $encoderKey = $this->extractEncoderKey($package->headers());
 
-        if(false === $this->decodersContainer->has($encoderKey))
-        {
-            throw new \LogicException(
-                \sprintf('Could not find encoder "%s" in the service container', $encoderKey)
-            );
-        }
-
-        /** @var MessageDecoder $encoder */
-        $encoder = $this->decodersContainer->get($encoderKey);
+        $decoder = $this->findDecoderByKey($encoderKey);
 
         /** @var Message $message */
-        $message = $encoder->decode($package->payload());
+        $message = $decoder->decode($package->payload());
 
         return $message;
+    }
+
+    /**
+     * @param string $encoderKey
+     *
+     * @return MessageDecoder
+     *
+     * @throws \LogicException Could not find decoder
+     */
+    private function findDecoderByKey(string $encoderKey): MessageDecoder
+    {
+        /** @var string $encoderContainerId */
+        $encoderContainerId = true === !empty($this->decodersConfiguration[$encoderKey])
+            ? $this->decodersConfiguration[$encoderKey]
+            : self::DEFAULT_DECODER;
+
+        return $this->obtainDecoder($encoderContainerId);
+    }
+
+    /**
+     * @param string $decoderId
+     *
+     * @return MessageDecoder
+     *
+     * @throws \LogicException Could not find decoder
+     */
+    private function obtainDecoder(string $decoderId): MessageDecoder
+    {
+        if(true === $this->decodersLocator->has($decoderId))
+        {
+            /** @var MessageDecoder $decoder */
+            $decoder = $this->decodersLocator->get($decoderId);
+
+            return $decoder;
+        }
+
+        throw new \LogicException(
+            \sprintf('Could not find decoder "%s" in the service container', $decoderId)
+        );
     }
 
     /**
@@ -74,7 +117,7 @@ final class IncomingMessageDecoder
      *
      * @return string
      */
-    private static function extractEncoderKey(array $headers): string
+    private function extractEncoderKey(array $headers): string
     {
         /** @var string $encoderKey */
         $encoderKey = $headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] ?? self::DEFAULT_DECODER;
