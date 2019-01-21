@@ -22,6 +22,10 @@ use ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 use ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
 use ServiceBus\Transport\Common\Queue;
+use ServiceBus\Transport\Common\QueueBind;
+use ServiceBus\Transport\Common\Topic;
+use ServiceBus\Transport\Common\TopicBind;
+use ServiceBus\Transport\Common\Transport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -35,12 +39,20 @@ final class ServiceBusKernel
      * @var ContainerInterface
      */
     private $container;
+
     /**
      * Application entry point
      *
      * @var EntryPoint
      */
     private $entryPoint;
+
+    /**
+     * Transport implementation
+     *
+     * @var Transport
+     */
+    private $transport;
 
     /**
      * @param ContainerInterface $globalContainer
@@ -57,7 +69,47 @@ final class ServiceBusKernel
         /** @var EntryPoint $entryPoint */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
+        /** @var Transport $transport */
+        $transport = $serviceLocator->get(Transport::class);
+
         $this->entryPoint = $entryPoint;
+        $this->transport  = $transport;
+    }
+
+    /**
+     * Create queue and bind to topic(s)
+     * If the topic to which we binds does not exist, it will be created
+     *
+     * @param Queue     $queue
+     * @param QueueBind ...$binds
+     *
+     * @return Promise
+     *
+     * @throws \ServiceBus\Transport\Common\Exceptions\BindFailed
+     * @throws \ServiceBus\Transport\Common\Exceptions\ConnectionFail
+     * @throws \ServiceBus\Transport\Common\Exceptions\CreateQueueFailed
+     */
+    public function createQueue(Queue $queue, QueueBind ...$binds): Promise
+    {
+        return $this->transport->createQueue($queue, ...$binds);
+    }
+
+    /**
+     * Create topic and bind them
+     * If the topic to which we binds does not exist, it will be created
+     *
+     * @param Topic     $topic
+     * @param TopicBind ...$binds
+     *
+     * @return Promise
+     *
+     * @throws \ServiceBus\Transport\Common\Exceptions\BindFailed
+     * @throws \ServiceBus\Transport\Common\Exceptions\ConnectionFail
+     * @throws \ServiceBus\Transport\Common\Exceptions\CreateTopicFailed
+     */
+    public function createTopic(Topic $topic, TopicBind ...$binds): Promise
+    {
+        return $this->transport->createTopic($topic, ...$binds);
     }
 
     /**
