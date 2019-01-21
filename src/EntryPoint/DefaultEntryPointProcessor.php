@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ServiceBus\Context\KernelContext;
 use ServiceBus\Endpoint\EndpointRouter;
+use ServiceBus\EntryPoint\Exceptions\EndpointRouterNotConfigured;
 use ServiceBus\MessageRouter\Router;
 use ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
@@ -37,7 +38,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     /**
      * Outbound message routing
      *
-     * @var EndpointRouter
+     * @var EndpointRouter|null
      */
     private $endpointRouter;
 
@@ -53,19 +54,16 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
 
     /**
      * @param IncomingMessageDecoder $messageDecoder
-     * @param EndpointRouter         $endpointRouter
      * @param Router                 $messagesRouter
      * @param LoggerInterface        $logger
      */
     public function __construct(
         IncomingMessageDecoder $messageDecoder,
-        EndpointRouter $endpointRouter,
         ?Router $messagesRouter = null,
         ?LoggerInterface $logger = null
     )
     {
         $this->messageDecoder = $messageDecoder;
-        $this->endpointRouter = $endpointRouter;
         $this->messagesRouter = $messagesRouter ?? new Router();
         $this->logger         = $logger ?? new NullLogger();
     }
@@ -73,8 +71,24 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     /**
      * @inheritdoc
      */
+    public function appendEndpointRouter(EndpointRouter $endpointRouter): void
+    {
+        $this->endpointRouter = $endpointRouter;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function handle(IncomingPackage $package): Promise
     {
+        if(null === $this->endpointRouter)
+        {
+            throw new EndpointRouterNotConfigured(
+                'Application configuration is not completed. You must call the "appendEndpointRouter()" method, '
+                . 'passing the outgoing messages router to it'
+            );
+        }
+
         $messageDecoder = $this->messageDecoder;
         $messagesRouter = $this->messagesRouter;
         $logger         = $this->logger;

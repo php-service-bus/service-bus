@@ -27,18 +27,38 @@ final class EndpointRouter
     private $routes = [];
 
     /**
-     * Default end point is the application itself (sending goes to the same transport from which messages are received)
+     * Destination points for global routes (marked with "*")
      *
-     * @var  Endpoint
+     * @var array<array-key, \ServiceBus\Endpoint\Endpoint>
      */
-    private $defaultEndpoint;
+    private $globalEndpoints = [];
 
     /**
-     * @param Endpoint $defaultEndpoint
+     * Adding global delivery route
+     *
+     * @param Endpoint $endpoint
+     *
+     * @return void
      */
-    public function __construct(Endpoint $defaultEndpoint)
+    public function addGlobalDestination(Endpoint $endpoint): void
     {
-        $this->defaultEndpoint = $defaultEndpoint;
+        $this->globalEndpoints[\spl_object_hash($endpoint)] = $endpoint;
+    }
+
+    /**
+     * Add custom endpoint for multiple messages
+     *
+     * @param array    $messages
+     * @param Endpoint $endpoint
+     *
+     * @return void
+     */
+    public function registerRoutes(array $messages, Endpoint $endpoint): void
+    {
+        foreach($messages as $message)
+        {
+            $this->registerRoute($message, $endpoint);
+        }
     }
 
     /**
@@ -60,10 +80,15 @@ final class EndpointRouter
      *
      * @param string $messageClass
      *
-     * @return array<mixed, \ServiceBus\Endpoint\Endpoint>
+     * @return array<array-key, \ServiceBus\Endpoint\Endpoint>
      */
     public function route(string $messageClass): array
     {
-        return $this->routes[$messageClass] ?? [$this->defaultEndpoint];
+        if(false === empty($this->routes[$messageClass]))
+        {
+            return $this->routes[$messageClass];
+        }
+
+        return $this->globalEndpoints;
     }
 }

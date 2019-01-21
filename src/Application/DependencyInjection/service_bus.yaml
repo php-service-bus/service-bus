@@ -59,6 +59,7 @@ services:
     tags: ['container.service_locator']
     arguments:
       - service_bus.logger: '@service_bus.logger'
+        ServiceBus\EntryPoint\EntryPointProcessor: '@ServiceBus\EntryPoint\EntryPointProcessor'
         ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
         ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
 
@@ -66,6 +67,22 @@ services:
   ServiceBus\EntryPoint\IncomingMessageDecoder:
     arguments:
       $decodersContainer: '@service_bus.decoder_locator'
+
+  # Handling incoming package
+  ServiceBus\EntryPoint\EntryPointProcessor:
+    class: ServiceBus\EntryPoint\DefaultEntryPointProcessor
+    arguments:
+      $messageDecoder: '@ServiceBus\EntryPoint\IncomingMessageDecoder'
+      $messagesRouter: '@ServiceBus\MessageRouter\Router'
+      $logger: '@service_bus.logger'
+
+  # Application entry point
+  ServiceBus\EntryPoint\EntryPoint:
+    arguments:
+      $processor: '@ServiceBus\EntryPoint\EntryPointProcessor'
+      $logger: '@service_bus.logger'
+      $maxConcurrentTaskCount: 60
+      $awaitDelay: 40
 
   # Isolated service locator for routing configuration
   service_bus.routing_configuration_locator:

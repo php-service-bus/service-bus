@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use ServiceBus\Endpoint\Endpoint;
 use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\EntryPoint\EntryPoint;
+use ServiceBus\EntryPoint\EntryPointProcessor;
 use ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 use ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
@@ -52,6 +53,13 @@ final class ServiceBusKernel
     private $transport;
 
     /**
+     * Outbound message routing
+     *
+     * @var EndpointRouter
+     */
+    private $endpointRouter;
+
+    /**
      * @param Transport          $transport
      * @param ContainerInterface $globalContainer
      *
@@ -61,12 +69,14 @@ final class ServiceBusKernel
     {
         /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
+
         /** @var EntryPoint $entryPoint */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
-        $this->container  = $globalContainer;
-        $this->transport  = $transport;
-        $this->entryPoint = $entryPoint;
+        $this->container      = $globalContainer;
+        $this->transport      = $transport;
+        $this->entryPoint     = $entryPoint;
+        $this->endpointRouter = new EndpointRouter();
     }
 
     /**
@@ -75,10 +85,52 @@ final class ServiceBusKernel
      * @param Queue $queue
      *
      * @return Promise It does not return any result
+     *
+     * @throws \Throwable
      */
     public function run(Queue $queue): Promise
     {
+        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        $serviceLocator = $this->container->get('service_bus.public_services_locator');
+
+        /** @var EntryPointProcessor $processor */
+        $processor = $serviceLocator->get(EntryPointProcessor::class);
+
+        $processor->appendEndpointRouter($this->endpointRouter);
+
         return $this->entryPoint->listen($this->transport, $queue);
+    }
+
+    /**
+     * Registration of message delivery routes
+     *
+     * @param string|array $messages You can specify the mask "*", specific message class,  or an array of message classes
+     * @param Endpoint     $endpoint
+     *
+     * @return ServiceBusKernel
+     */
+    public function addEndpoint($messages, Endpoint $endpoint): self
+    {
+        if(true === \is_string($messages))
+        {
+            if('*' === $messages)
+            {
+                $this->endpointRouter->addGlobalDestination($endpoint);
+
+                return $this;
+            }
+
+            $this->endpointRouter->registerRoute($messages, $endpoint);
+
+            return $this;
+        }
+
+        if(true === \is_array($messages))
+        {
+            $this->endpointRouter->registerRoutes($messages, $endpoint);
+        }
+
+        return $this;
     }
 
     /**

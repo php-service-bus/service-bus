@@ -23,7 +23,7 @@ use ServiceBus\Transport\Common\Queue;
 use ServiceBus\Transport\Common\Transport;
 
 /**
- *
+ * Application entry point
  */
 final class EntryPoint
 {
