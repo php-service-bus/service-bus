@@ -60,6 +60,13 @@ final class ServiceBusKernel
     private $endpointRouter;
 
     /**
+     * Handling incoming package processor
+     *
+     * @var EntryPointProcessor
+     */
+    private $entryPointProcessor;
+
+    /**
      * @param Transport          $transport
      * @param ContainerInterface $globalContainer
      *
@@ -73,14 +80,23 @@ final class ServiceBusKernel
         /** @var EntryPoint $entryPoint */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
-        $this->container      = $globalContainer;
-        $this->transport      = $transport;
-        $this->entryPoint     = $entryPoint;
-        $this->endpointRouter = new EndpointRouter();
+        /** @var EndpointRouter $endpointRouter */
+        $endpointRouter = $serviceLocator->get(EndpointRouter::class);
+
+        /** @var EntryPointProcessor $processor */
+        $entryPointProcessor = $serviceLocator->get(EntryPointProcessor::class);
+
+        $this->container           = $globalContainer;
+        $this->transport           = $transport;
+        $this->entryPoint          = $entryPoint;
+        $this->endpointRouter      = $endpointRouter;
+        $this->entryPointProcessor = $entryPointProcessor;
     }
 
     /**
      * Run application
+     *
+     * @todo: More flexible processor configuration
      *
      * @param Queue $queue
      *
@@ -90,13 +106,7 @@ final class ServiceBusKernel
      */
     public function run(Queue $queue): Promise
     {
-        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
-        $serviceLocator = $this->container->get('service_bus.public_services_locator');
-
-        /** @var EntryPointProcessor $processor */
-        $processor = $serviceLocator->get(EntryPointProcessor::class);
-
-        $processor->appendEndpointRouter($this->endpointRouter);
+        $this->entryPointProcessor->appendEndpointRouter($this->endpointRouter);
 
         return $this->entryPoint->listen($this->transport, $queue);
     }

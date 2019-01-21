@@ -59,6 +59,7 @@ services:
     tags: ['container.service_locator']
     arguments:
       - service_bus.logger: '@service_bus.logger'
+        ServiceBus\Endpoint\EndpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
         ServiceBus\EntryPoint\EntryPointProcessor: '@ServiceBus\EntryPoint\EntryPointProcessor'
         ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
         ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
@@ -102,6 +103,9 @@ services:
         - '@ServiceBus\ArgumentResolvers\MessageArgumentResolver'
         - '@ServiceBus\ArgumentResolvers\ContextArgumentResolver'
         - '@ServiceBus\ArgumentResolvers\ContainerArgumentResolver'
+
+  # Outbound message routing
+  ServiceBus\Endpoint\EndpointRouter:
 
   # Incoming messages router
   ServiceBus\MessageRouter\Router:

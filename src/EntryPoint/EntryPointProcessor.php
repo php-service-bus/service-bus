@@ -17,7 +17,7 @@ use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 
 /**
- * Handling incoming package
+ * Handling incoming package processor
  */
 interface EntryPointProcessor
 {
