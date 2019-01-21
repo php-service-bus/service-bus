@@ -11,7 +11,7 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Application\EntryPoint;
+namespace ServiceBus\EntryPoint;
 
 use ServiceBus\Common\Messages\Message;
 use ServiceBus\MessageSerializer\MessageDecoder;

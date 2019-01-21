@@ -26,10 +26,8 @@ use ServiceBus\Transport\Common\Transport;
 /**
  * Application level transport endpoint
  */
-final class ApplicationTransportEndpoint implements Endpoint
+final class MessageDeliveryEndpoint implements Endpoint
 {
-    public const  ENDPOINT_NAME = 'application';
-
     /**
      * @var Transport
      */
@@ -57,18 +55,28 @@ final class ApplicationTransportEndpoint implements Endpoint
     private $deliveryRetryHandler;
 
     /**
+     * Endpoint name
+     *
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @param string                        $name
      * @param Transport                     $transport
      * @param AmqpTransportLevelDestination $destination
      * @param MessageEncoder|null           $encoder
      * @param OperationRetryWrapper|null    $deliveryRetryHandler
      */
     public function __construct(
+        string $name,
         Transport $transport,
         AmqpTransportLevelDestination $destination,
         ?MessageEncoder $encoder = null,
         ?OperationRetryWrapper $deliveryRetryHandler = null
     )
     {
+        $this->name                 = $name;
         $this->transport            = $transport;
         $this->destination          = $destination;
         $this->encoder              = $encoder ?? new SymfonyMessageSerializer();
@@ -80,7 +88,7 @@ final class ApplicationTransportEndpoint implements Endpoint
      */
     public function name(): string
     {
-        return self::ENDPOINT_NAME;
+        return $this->name;
     }
 
     /**
@@ -88,19 +96,18 @@ final class ApplicationTransportEndpoint implements Endpoint
      */
     public function delivery(Message $message, DeliveryOptions $options): Promise
     {
-        $transport = $this->transport;
-
         $encoded = $this->encoder->encode($message);
 
+        /** @noinspection GetClassUsageInspection Encoder cant't be null */
         $options->headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] = \get_class($this->encoder);
 
         $package = self::createPackage($encoded, $options, $this->destination);
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call($this->deliveryRetryHandler,
-            static function() use ($transport, $package): \Generator
+            function() use ($package): \Generator
             {
-                yield $transport->send($package);
+                yield $this->transport->send($package);
             },
             SendMessageFailed::class
         );

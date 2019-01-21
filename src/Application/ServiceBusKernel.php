@@ -15,9 +15,9 @@ namespace ServiceBus\Application;
 use Amp\Loop;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
-use ServiceBus\Application\EntryPoint\EntryPoint;
 use ServiceBus\Endpoint\Endpoint;
 use ServiceBus\Endpoint\EndpointRouter;
+use ServiceBus\EntryPoint\EntryPoint;
 use ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 use ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
@@ -232,24 +232,6 @@ final class ServiceBusKernel
         $entryPointRouter = $this->getKernelContainerService(EndpointRouter::class);
 
         $entryPointRouter->registerRoute($messageClass, $endpoint);
-    }
-
-    /**
-     * @return Transport
-     */
-    public function transport(): Transport
-    {
-        return $this->transport;
-    }
-
-    /**
-     * @return EntryPoint
-     *
-     * @throws \Throwable
-     */
-    public function entryPoint(): EntryPoint
-    {
-        return $this->entryPoint;
     }
 
     /**

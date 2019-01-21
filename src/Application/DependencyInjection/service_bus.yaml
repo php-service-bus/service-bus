@@ -52,14 +52,6 @@ services:
     arguments:
       - 'service_bus.default_encoder': '@ServiceBus\MessageSerializer\MessageDecoder'
 
-  # Application entry point
-  ServiceBus\Application\EntryPoint\EntryPoint:
-    arguments:
-      $processor: '@ServiceBus\Application\EntryPoint\EntryPointProcessor'
-      $logger: '@service_bus.logger'
-      $maxConcurrentTaskCount: null
-      $awaitDelay: null
-
   # Internal kernel locator
   service_bus.public_services_locator:
     public: true
@@ -69,11 +61,9 @@ services:
       - service_bus.logger: '@service_bus.logger'
         ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
         ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
-        ServiceBus\Application\EntryPoint\EntryPoint: '@ServiceBus\Application\EntryPoint\EntryPoint'
-        ServiceBus\Endpoint\EndpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
 
   # Incoming message decoder
-  ServiceBus\Application\EntryPoint\IncomingMessageDecoder:
+  ServiceBus\EntryPoint\IncomingMessageDecoder:
     arguments:
       $decodersContainer: '@service_bus.decoder_locator'
 
@@ -89,7 +79,6 @@ services:
     class: ServiceBus\Application\DependencyInjection\Configurator\MessageRoutesConfigurator
     arguments:
       $servicesList: '%service_bus.services_map%'
-      $sagasList: '%service_bus.sagas_map%'
       $routingServiceLocator: '@service_bus.routing_configuration_locator'
       $servicesServiceLocator: '@service_bus.services_locator'
       $argumentResolvers:
@@ -100,15 +89,6 @@ services:
   # Incoming messages router
   ServiceBus\MessageRouter\Router:
     configurator: ['@service_bus.message_routes_configurator', configure]
-
-  # Package handler
-  ServiceBus\Application\EntryPoint\EntryPointProcessor:
-    class: ServiceBus\Application\EntryPoint\DefaultEntryPointProcessor
-    arguments:
-      $messageDecoder: '@ServiceBus\Application\EntryPoint\IncomingMessageDecoder'
-      $endpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
-      $messagesRouter: '@ServiceBus\MessageRouter\Router'
-      $logger: '@service_bus.logger'
 
   # Passing message to arguments
   ServiceBus\ArgumentResolvers\MessageArgumentResolver:
@@ -122,11 +102,6 @@ services:
       # see TaggedMessageHandlersCompilerPass::process
       $serviceLocator: '@service_bus.services_locator'
     tags: ['service_bus_argument_resolver']
-
-  # Outbound message routing
-  ServiceBus\Endpoint\EndpointRouter:
-    arguments:
-      $defaultEndpoint: '@ServiceBus\Endpoint\ApplicationTransportEndpoint'
 
 
 

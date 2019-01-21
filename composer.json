@@ -25,7 +25,8 @@
       "ServiceBus\\Tests\\": "tests/"
     },
     "files": [
-      "src/Application/DependencyInjection/Compiler/functions.php"
+      "src/Application/DependencyInjection/Compiler/functions.php",
+      "tests/functions.php"
     ]
   },
   "require": {

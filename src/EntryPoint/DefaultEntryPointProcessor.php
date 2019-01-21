@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Application\EntryPoint;
+namespace ServiceBus\EntryPoint;
 
 use function Amp\call;
 use Amp\Promise;

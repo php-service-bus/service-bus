@@ -34,13 +34,6 @@ final class MessageRoutesConfigurator
     private $servicesList;
 
     /**
-     * List of registered services
-     *
-     * @var array<mixed, string>
-     */
-    private $sagasList;
-
-    /**
      * @var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
      */
     private $argumentResolvers;
@@ -61,21 +54,18 @@ final class MessageRoutesConfigurator
 
     /**
      * @param array<mixed, string>                                                    $servicesList
-     * @param array<mixed, string>                                                    $sagasList
      * @param ServiceLocator                                                          $routingServiceLocator
      * @param ServiceLocator                                                          $servicesServiceLocator
      * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
      */
     public function __construct(
         array $servicesList,
-        array $sagasList,
         ServiceLocator $routingServiceLocator,
         ServiceLocator $servicesServiceLocator,
         array $argumentResolvers
     )
     {
         $this->servicesList           = $servicesList;
-        $this->sagasList              = $sagasList;
         $this->routingServiceLocator  = $routingServiceLocator;
         $this->servicesServiceLocator = $servicesServiceLocator;
         $this->argumentResolvers      = $argumentResolvers;
