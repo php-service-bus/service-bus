@@ -1497,12 +1497,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-common.git",
-                "reference": "5f56f4f1c712edc1bcde8516214231755acb834a"
+                "reference": "6f73ced30881d842bb81781f589363ee60e44db4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/5f56f4f1c712edc1bcde8516214231755acb834a",
-                "reference": "5f56f4f1c712edc1bcde8516214231755acb834a",
+                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/6f73ced30881d842bb81781f589363ee60e44db4",
+                "reference": "6f73ced30881d842bb81781f589363ee60e44db4",
                 "shasum": ""
             },
             "require": {
@@ -1539,7 +1539,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-19 14:09:50"
+            "time": "2019-01-21 11:01:04"
         },
         {
             "name": "phpdocumentor/reflection-common",

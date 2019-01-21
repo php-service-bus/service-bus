@@ -171,11 +171,10 @@ final class Bootstrap
         $this->containerBuilder = new ContainerBuilder($entryPoint, Environment::create($envValue));
 
         $this->containerBuilder->addParameters([
-            'service_bus.environment'     => $envValue,
-            'service_bus.entry_point'     => $entryPoint,
-            'service_bus.transport.dsn'   => '',
-            'service_bus.storage.adapter' => '',
-            'service_bus.storage.dsn'     => ''
+            'service_bus.environment'               => $envValue,
+            'service_bus.entry_point'               => $entryPoint,
+            'service_bus.default_destination_topic' => (string) \getenv('SENDER_DESTINATION_TOPIC'),
+            'service_bus.default_destination_key'   => (string) \getenv('SENDER_DESTINATION_TOPIC_ROUTING_KEY')
         ]);
 
         $this->containerBuilder->addExtensions(new ServiceBusExtension());

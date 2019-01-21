@@ -34,6 +34,14 @@ final class EndpointRouter
     private $globalEndpoints = [];
 
     /**
+     * @param Endpoint $defaultEndpoint
+     */
+    public function __construct(Endpoint $defaultEndpoint)
+    {
+        $this->addGlobalDestination($defaultEndpoint);
+    }
+
+    /**
      * Adding global delivery route
      *
      * @param Endpoint $endpoint

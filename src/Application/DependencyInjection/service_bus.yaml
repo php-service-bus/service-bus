@@ -59,8 +59,7 @@ services:
     tags: ['container.service_locator']
     arguments:
       - service_bus.logger: '@service_bus.logger'
-        ServiceBus\Endpoint\EndpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
-        ServiceBus\EntryPoint\EntryPointProcessor: '@ServiceBus\EntryPoint\EntryPointProcessor'
+        ServiceBus\EntryPoint\EntryPoint: '@ServiceBus\EntryPoint\EntryPoint'
         ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
         ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
 
@@ -74,12 +73,14 @@ services:
     class: ServiceBus\EntryPoint\DefaultEntryPointProcessor
     arguments:
       $messageDecoder: '@ServiceBus\EntryPoint\IncomingMessageDecoder'
+      $endpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
       $messagesRouter: '@ServiceBus\MessageRouter\Router'
       $logger: '@service_bus.logger'
 
   # Application entry point
   ServiceBus\EntryPoint\EntryPoint:
     arguments:
+      $transport: '@ServiceBus\Transport\Common\Transport'
       $processor: '@ServiceBus\EntryPoint\EntryPointProcessor'
       $logger: '@service_bus.logger'
       $maxConcurrentTaskCount: 60
@@ -104,8 +105,27 @@ services:
         - '@ServiceBus\ArgumentResolvers\ContextArgumentResolver'
         - '@ServiceBus\ArgumentResolvers\ContainerArgumentResolver'
 
+  # Default transport implementation
+  ServiceBus\Transport\Common\Transport:
+    class: ServiceBus\Transport\Common\InMemory\InMemoryTransport
+
+  # Default transport level destination
+  ServiceBus\Transport\Common\DeliveryDestination:
+    class: ServiceBus\Transport\Common\InMemory\InMemoryDeliveryDestination
+
+  # Application level transport endpoint
+  ServiceBus\Endpoint\Endpoint:
+    class: ServiceBus\Endpoint\MessageDeliveryEndpoint
+    arguments:
+      $name: 'application'
+      $transport: '@ServiceBus\Transport\Common\Transport'
+      $destination: '@ServiceBus\Transport\Common\DeliveryDestination'
+      $encoder: null
+
   # Outbound message routing
   ServiceBus\Endpoint\EndpointRouter:
+    arguments:
+      $defaultEndpoint: '@ServiceBus\Endpoint\Endpoint'
 
   # Incoming messages router
   ServiceBus\MessageRouter\Router:

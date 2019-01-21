@@ -18,12 +18,10 @@ use Psr\Log\LoggerInterface;
 use ServiceBus\Endpoint\Endpoint;
 use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\EntryPoint\EntryPoint;
-use ServiceBus\EntryPoint\EntryPointProcessor;
 use ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 use ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
 use ServiceBus\Transport\Common\Queue;
-use ServiceBus\Transport\Common\Transport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -37,7 +35,6 @@ final class ServiceBusKernel
      * @var ContainerInterface
      */
     private $container;
-
     /**
      * Application entry point
      *
@@ -46,101 +43,33 @@ final class ServiceBusKernel
     private $entryPoint;
 
     /**
-     * Messages transport interface
-     *
-     * @var Transport
-     */
-    private $transport;
-
-    /**
-     * Outbound message routing
-     *
-     * @var EndpointRouter
-     */
-    private $endpointRouter;
-
-    /**
-     * Handling incoming package processor
-     *
-     * @var EntryPointProcessor
-     */
-    private $entryPointProcessor;
-
-    /**
-     * @param Transport          $transport
      * @param ContainerInterface $globalContainer
      *
      * @throws \Throwable
      */
-    public function __construct(Transport $transport, ContainerInterface $globalContainer)
+    public function __construct(ContainerInterface $globalContainer)
     {
+        $this->container = $globalContainer;
+
         /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
         /** @var EntryPoint $entryPoint */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
-        /** @var EndpointRouter $endpointRouter */
-        $endpointRouter = $serviceLocator->get(EndpointRouter::class);
-
-        /** @var EntryPointProcessor $processor */
-        $entryPointProcessor = $serviceLocator->get(EntryPointProcessor::class);
-
-        $this->container           = $globalContainer;
-        $this->transport           = $transport;
-        $this->entryPoint          = $entryPoint;
-        $this->endpointRouter      = $endpointRouter;
-        $this->entryPointProcessor = $entryPointProcessor;
+        $this->entryPoint = $entryPoint;
     }
 
     /**
      * Run application
      *
-     * @todo: More flexible processor configuration
-     *
      * @param Queue $queue
      *
-     * @return Promise It does not return any result
-     *
-     * @throws \Throwable
+     * @return Promise
      */
     public function run(Queue $queue): Promise
     {
-        $this->entryPointProcessor->appendEndpointRouter($this->endpointRouter);
-
-        return $this->entryPoint->listen($this->transport, $queue);
-    }
-
-    /**
-     * Registration of message delivery routes
-     *
-     * @param string|array $messages You can specify the mask "*", specific message class,  or an array of message classes
-     * @param Endpoint     $endpoint
-     *
-     * @return ServiceBusKernel
-     */
-    public function addEndpoint($messages, Endpoint $endpoint): self
-    {
-        if(true === \is_string($messages))
-        {
-            if('*' === $messages)
-            {
-                $this->endpointRouter->addGlobalDestination($endpoint);
-
-                return $this;
-            }
-
-            $this->endpointRouter->registerRoute($messages, $endpoint);
-
-            return $this;
-        }
-
-        if(true === \is_array($messages))
-        {
-            $this->endpointRouter->registerRoutes($messages, $endpoint);
-        }
-
-        return $this;
+        return $this->entryPoint->listen($queue);
     }
 
     /**
@@ -148,6 +77,8 @@ final class ServiceBusKernel
      * DO NOT USE IN PRODUCTION environment
      *
      * @return $this
+     *
+     * @throws \Throwable
      */
     public function monitorLoopBlock(): self
     {
@@ -163,6 +94,8 @@ final class ServiceBusKernel
      * Enable periodic forced launch of the garbage collector
      *
      * @return $this
+     *
+     * @throws \Throwable
      */
     public function enableGarbageCleaning(): self
     {
@@ -184,6 +117,8 @@ final class ServiceBusKernel
      *
      * @throws Loop\UnsupportedFeatureException This might happen if ext-pcntl is missing and the loop driver doesn't
      *                                          support another way to dispatch signals
+     *
+     * @throws \Throwable
      */
     public function useDefaultStopSignalHandler(int $stopDelay = 10, array $signals = [\SIGINT, \SIGTERM]): self
     {
@@ -201,7 +136,7 @@ final class ServiceBusKernel
                 ]
             );
 
-            $this->entryPoint->stop($this->transport, $stopDelay);
+            $this->entryPoint->stop($stopDelay);
         };
 
         foreach($signals as $signal)
@@ -232,7 +167,7 @@ final class ServiceBusKernel
 
                 $logger->info('The demon\'s lifetime has expired ({lifetime} seconds)', ['lifetime' => $seconds]);
 
-                $this->entryPoint->stop($this->transport);
+                $this->entryPoint->stop();
             }
         );
 
@@ -270,7 +205,7 @@ final class ServiceBusKernel
                         ['delay' => $stopDelay]
                     );
 
-                    $this->entryPoint->stop($this->transport, $stopDelay);
+                    $this->entryPoint->stop($stopDelay);
                 }
             }
         );
@@ -287,6 +222,8 @@ final class ServiceBusKernel
      * @param Endpoint $endpoint
      *
      * @return void
+     *
+     * @throws \Throwable
      */
     public function registerMessageCustomEndpoint(string $messageClass, Endpoint $endpoint): void
     {
@@ -297,18 +234,15 @@ final class ServiceBusKernel
     }
 
     /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
      * @param string $service
      *
      * @return object
+     *
+     * @throws \Throwable
      */
     private function getKernelContainerService(string $service): object
     {
-        /**
-         * @noinspection PhpUnhandledExceptionInspection
-         * @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator
-         */
+        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
         /** @var object $object */

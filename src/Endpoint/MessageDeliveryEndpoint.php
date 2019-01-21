@@ -18,7 +18,7 @@ use ServiceBus\Common\Messages\Message;
 use ServiceBus\Infrastructure\Retry\OperationRetryWrapper;
 use ServiceBus\MessageSerializer\MessageEncoder;
 use ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer;
-use ServiceBus\Transport\Amqp\AmqpTransportLevelDestination;
+use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Exceptions\SendMessageFailed;
 use ServiceBus\Transport\Common\Package\OutboundPackage;
 use ServiceBus\Transport\Common\Transport;
@@ -36,7 +36,7 @@ final class MessageDeliveryEndpoint implements Endpoint
     /**
      * Which exchange (and with which key) the message will be sent to
      *
-     * @var AmqpTransportLevelDestination
+     * @var DeliveryDestination
      */
     private $destination;
 
@@ -62,16 +62,16 @@ final class MessageDeliveryEndpoint implements Endpoint
     private $name;
 
     /**
-     * @param string                        $name
-     * @param Transport                     $transport
-     * @param AmqpTransportLevelDestination $destination
-     * @param MessageEncoder|null           $encoder
-     * @param OperationRetryWrapper|null    $deliveryRetryHandler
+     * @param string                     $name
+     * @param Transport                  $transport
+     * @param DeliveryDestination        $destination
+     * @param MessageEncoder|null        $encoder
+     * @param OperationRetryWrapper|null $deliveryRetryHandler
      */
     public function __construct(
         string $name,
         Transport $transport,
-        AmqpTransportLevelDestination $destination,
+        DeliveryDestination $destination,
         ?MessageEncoder $encoder = null,
         ?OperationRetryWrapper $deliveryRetryHandler = null
     )
@@ -116,16 +116,16 @@ final class MessageDeliveryEndpoint implements Endpoint
     /**
      * Create outbound package with specified parameters
      *
-     * @param string                        $payload
-     * @param DeliveryOptions               $options
-     * @param AmqpTransportLevelDestination $destination
+     * @param string              $payload
+     * @param DeliveryOptions     $options
+     * @param DeliveryDestination $destination
      *
      * @return OutboundPackage
      */
     private static function createPackage(
         string $payload,
         DeliveryOptions $options,
-        AmqpTransportLevelDestination $destination
+        DeliveryDestination $destination
     ): OutboundPackage
     {
         return OutboundPackage::create(
