@@ -43,7 +43,7 @@ services:
     class: ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer
     arguments:
       $serializer: null
-      $normalizers: ~
+      $normalizers: []
 
   # Incoming message decoder
   service_bus.decoder_locator:
@@ -59,6 +59,7 @@ services:
     tags: ['container.service_locator']
     arguments:
       - service_bus.logger: '@service_bus.logger'
+        ServiceBus\Transport\Common\Transport: '@ServiceBus\Transport\Common\Transport'
         ServiceBus\EntryPoint\EntryPoint: '@ServiceBus\EntryPoint\EntryPoint'
         ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
         ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
@@ -91,7 +92,7 @@ services:
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: ['container.service_locator']
     arguments:
-      - Desperado\ServiceBus\Services\Configuration\ServiceHandlersLoader: '@ServiceBus\Services\Configuration\ServiceHandlersLoader'
+      - ServiceBus\Services\Configuration\ServiceHandlersLoader: '@ServiceBus\Services\Configuration\ServiceHandlersLoader'
 
   # Message routes configurator
   service_bus.message_routes_configurator:
@@ -143,6 +144,3 @@ services:
       # see TaggedMessageHandlersCompilerPass::process
       $serviceLocator: '@service_bus.services_locator'
     tags: ['service_bus_argument_resolver']
-
-
-

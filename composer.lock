@@ -1445,22 +1445,24 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-amqp.git",
-                "reference": "c2695184e039449e750de5c85e5da21fc7577efd"
+                "reference": "9b411147747297d99c5019d0dbad671dba1de498"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/c2695184e039449e750de5c85e5da21fc7577efd",
-                "reference": "c2695184e039449e750de5c85e5da21fc7577efd",
+                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/9b411147747297d99c5019d0dbad671dba1de498",
+                "reference": "9b411147747297d99c5019d0dbad671dba1de498",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
                 "php-service-bus/common": "dev-master",
                 "php-service-bus/transport-common": "dev-master",
-                "phpinnacle/ridge": "^0.1"
+                "phpinnacle/ridge": "^0.1",
+                "symfony/config": "^v4.2"
             },
             "require-dev": {
                 "phpunit/phpunit": "^7",
+                "symfony/dependency-injection": "^v4.2",
                 "vimeo/psalm": "^3"
             },
             "type": "library",
@@ -1489,7 +1491,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-19 13:14:40"
+            "time": "2019-01-21 13:30:19"
         },
         {
             "name": "php-service-bus/transport-common",
