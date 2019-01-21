@@ -4,8 +4,8 @@ parameters:
   service_bus.default_destination_key: ''
 
   # Decoder relation
-  service_bus.decoder_configuration:
-    # 'custom_encoder_key': 'custom_decoder_id'
+  service_bus.decoder_configuration: []
+    # -'custom_encoder_key': 'custom_decoder_id'
 
 services:
   _defaults:
