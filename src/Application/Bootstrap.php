@@ -110,6 +110,7 @@ final class Bootstrap
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
      * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
+     * @throws \Throwable Boot module failed
      */
     public function boot(): ContainerInterface
     {
