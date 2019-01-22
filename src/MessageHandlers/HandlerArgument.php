@@ -24,10 +24,12 @@ final class HandlerArgument
 
     /**
      * @param \ReflectionParameter $reflectionParameter
+     *
+     * @return self
      */
-    public function __construct(\ReflectionParameter $reflectionParameter)
+    public static function create(\ReflectionParameter $reflectionParameter): self
     {
-        $this->reflectionParameter = $reflectionParameter;
+        return new self($reflectionParameter);
     }
 
     /**
@@ -153,5 +155,13 @@ final class HandlerArgument
         }
 
         return false;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    private function __construct(\ReflectionParameter $reflectionParameter)
+    {
+        $this->reflectionParameter = $reflectionParameter;
     }
 }

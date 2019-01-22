@@ -18,6 +18,11 @@ use ServiceBus\Services\Exceptions\InvalidEventType;
 
 /**
  * Execution options
+ *
+ * @property-read bool               $validationEnabled
+ * @property-read array<int, string> $validationGroups
+ * @property-read string|null        $defaultValidationFailedEvent
+ * @property-read string|null        $defaultThrowableEvent
  */
 final class HandlerOptions
 {
@@ -26,14 +31,14 @@ final class HandlerOptions
      *
      * @var bool
      */
-    private $validationEnabled = false;
+    public $validationEnabled = false;
 
     /**
      * Validation groups
      *
      * @var array<int, string>
      */
-    private $validationGroups = [];
+    public $validationGroups = [];
 
     /**
      * In case of validation errors, automatically send the event and stop further execution
@@ -43,7 +48,7 @@ final class HandlerOptions
      *
      * @var string|null
      */
-    private $defaultValidationFailedEvent;
+    public $defaultValidationFailedEvent;
 
     /**
      * In case of a runtime error, automatically send the specified event with the message received from the exception
@@ -53,7 +58,15 @@ final class HandlerOptions
      *
      * @var string|null
      */
-    private $defaultThrowableEvent;
+    public $defaultThrowableEvent;
+
+    /**
+     * @return self
+     */
+    public static function create(): self
+    {
+        return new self();
+    }
 
     /**
      * @param string $eventClass
@@ -111,62 +124,10 @@ final class HandlerOptions
     }
 
     /**
-     * Is validation enabled
-     *
-     * @return bool
+     * @codeCoverageIgnore
      */
-    public function validationEnabled(): bool
+    private function __construct()
     {
-        return $this->validationEnabled;
-    }
 
-    /**
-     * Receive validation groups
-     *
-     * @return array<int, string>
-     */
-    public function validationGroups(): array
-    {
-        return $this->validationGroups;
-    }
-
-    /**
-     * Is the default validation failed event specified
-     *
-     * @return bool
-     */
-    public function hasDefaultValidationFailedEvent(): bool
-    {
-        return null !== $this->defaultValidationFailedEvent;
-    }
-
-    /**
-     * Receive validation error class
-     *
-     * @return string|null
-     */
-    public function defaultValidationFailedEvent(): ?string
-    {
-        return $this->defaultValidationFailedEvent;
-    }
-
-    /**
-     * Is the default error event specified
-     *
-     * @return bool
-     */
-    public function hasDefaultThrowableEvent(): bool
-    {
-        return null !== $this->defaultThrowableEvent;
-    }
-
-    /**
-     * Receive error event class
-     *
-     * @return string|null
-     */
-    public function defaultThrowableEvent(): ?string
-    {
-        return $this->defaultThrowableEvent;
     }
 }

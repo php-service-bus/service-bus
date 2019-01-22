@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+
+  queue:
+    build:
+      context: ./rabbitmq
+    container_name: bus-test-queue
+    restart: always
+    ports:
+    - 5672:5672
+    - 15672:15672
+    environment:
+      RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 512MiB
+      RABBITMQ_ERLANG_COOKIE: f6fAjy5yes
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  db:
+    image: postgres
+    container_name: bus-test-db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 123456789
+      POSTGRES_USER: postgres
+      POSTGRES_DB: test
+    ports:
+    - 5432:5432

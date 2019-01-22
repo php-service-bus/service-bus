@@ -109,7 +109,7 @@ final class Handler
         \Closure $executionClosure
     ): self
     {
-        $self = new self(self::TYPE_SAGA_LISTENER, new HandlerOptions, $reflectionMethod);
+        $self = new self(self::TYPE_SAGA_LISTENER, HandlerOptions::create(), $reflectionMethod);
 
         $self->preparedMessageClass = $messageClass;
         $self->executionClosure     = $executionClosure;
@@ -269,7 +269,7 @@ final class Handler
 
         foreach($reflectionMethod->getParameters() as $parameter)
         {
-            $argumentCollection->attach(new HandlerArgument($parameter));
+            $argumentCollection->attach(HandlerArgument::create($parameter));
         }
 
         return $argumentCollection;
