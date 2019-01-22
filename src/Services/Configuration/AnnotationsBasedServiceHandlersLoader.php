@@ -88,7 +88,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     {
         /** @var CommandHandler|EventListener $annotation */
 
-        $options = new HandlerOptions();
+        $options = HandlerOptions::create();
 
         if(true === $annotation->validate)
         {

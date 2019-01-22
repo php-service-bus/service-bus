@@ -35,7 +35,7 @@ final class ImportMessageHandlersCompilerPassTest extends TestCase
         $containerBuilder = new ContainerBuilder();
 
         $containerBuilder->setParameter('service_bus.auto_import.handlers_enabled', true);
-        $containerBuilder->setParameter('service_bus.auto_import.handlers_directories', [__DIR__ . '/../../../../tests']);
+        $containerBuilder->setParameter('service_bus.auto_import.handlers_directories', [__DIR__ . '/../../../Stubs']);
         $containerBuilder->setParameter('service_bus.auto_import.handlers_excluded', []);
 
         (new ImportMessageHandlersCompilerPass())->process($containerBuilder);

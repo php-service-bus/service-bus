@@ -116,6 +116,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 
         return (true === \class_exists($reflectionTypeName) || true === \interface_exists($reflectionTypeName)) &&
             false === \is_a($reflectionTypeName, Message::class, true) &&
-            false === \is_a($reflectionTypeName,  KernelContext::class, true);
+            false === \is_a($reflectionTypeName, KernelContext::class, true) &&
+            false === \is_a($reflectionTypeName, \Throwable::class, true);
     }
 }
