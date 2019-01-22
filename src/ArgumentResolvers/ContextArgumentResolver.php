@@ -12,8 +12,8 @@ declare(strict_types = 1);
 
 namespace ServiceBus\ArgumentResolvers;
 
+use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Messages\Message;
-use ServiceBus\Context\KernelContext;
 use ServiceBus\MessageHandlers\HandlerArgument;
 
 /**
@@ -26,15 +26,15 @@ final class ContextArgumentResolver implements ArgumentResolver
      */
     public function supports(HandlerArgument $argument): bool
     {
-        return $argument->isA(KernelContext::class);
+        return $argument->isA(ServiceBusContext::class);
     }
 
     /**
      * @inheritdoc
      *
-     * @return KernelContext
+     * @return ServiceBusContext
      */
-    public function resolve(Message $message, KernelContext $context, HandlerArgument $argument): KernelContext
+    public function resolve(Message $message, ServiceBusContext $context, HandlerArgument $argument): ServiceBusContext
     {
         return $context;
     }

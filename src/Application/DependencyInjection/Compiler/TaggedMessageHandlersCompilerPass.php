@@ -12,8 +12,8 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Application\DependencyInjection\Compiler;
 
+use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Messages\Message;
-use ServiceBus\Context\KernelContext;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -116,7 +116,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 
         return (true === \class_exists($reflectionTypeName) || true === \interface_exists($reflectionTypeName)) &&
             false === \is_a($reflectionTypeName, Message::class, true) &&
-            false === \is_a($reflectionTypeName, KernelContext::class, true) &&
+            false === \is_a($reflectionTypeName, ServiceBusContext::class, true) &&
             false === \is_a($reflectionTypeName, \Throwable::class, true);
     }
 }

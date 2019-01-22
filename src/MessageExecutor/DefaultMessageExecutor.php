@@ -97,14 +97,14 @@ final class DefaultMessageExecutor implements MessageExecutor
                 }
                 catch(\Throwable $throwable)
                 {
-                    if(false === $options->hasDefaultThrowableEvent())
+                    if(null === $options->defaultThrowableEvent)
                     {
                         throw $throwable;
                     }
 
                     $context->logContextMessage(
                         'Error processing, sending an error event and stopping message processing', [
-                        'eventClass'       => $options->defaultThrowableEvent(),
+                        'eventClass'       => $options->defaultThrowableEvent,
                         'throwableMessage' => $throwable->getMessage(),
                         'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
                     ],
@@ -112,7 +112,7 @@ final class DefaultMessageExecutor implements MessageExecutor
                     );
 
                     yield from self::publishThrowable(
-                        (string) $options->defaultThrowableEvent(),
+                        (string) $options->defaultThrowableEvent,
                         $throwable->getMessage(),
                         $context
                     );

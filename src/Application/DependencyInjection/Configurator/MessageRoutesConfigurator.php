@@ -116,7 +116,7 @@ final class MessageRoutesConfigurator
                     $this->argumentResolvers
                 );
 
-                if(true === $handler->options()->validationEnabled())
+                if(true === $handler->options()->validationEnabled)
                 {
                     $messageExecutor = new MessageValidationExecutor($messageExecutor, $handler->options(), $validator);
                 }

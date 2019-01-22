@@ -16,15 +16,17 @@ use function Amp\call;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use ServiceBus\Common\Context\ServiceBusContext;
+use ServiceBus\Common\Endpoint\DeliveryOptions;
 use ServiceBus\Common\Messages\Message;
-use ServiceBus\Endpoint\DeliveryOptions;
+use ServiceBus\Endpoint\DefaultDeliveryOptions;
 use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 
 /**
  *
  */
-final class KernelContext
+final class KernelContext implements ServiceBusContext
 {
     /**
      * @var IncomingPackage
@@ -81,10 +83,7 @@ final class KernelContext
     }
 
     /**
-     * Is the received message correct?
-     * If validation is not enabled in the handler parameters, it always returns true
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isValid(): bool
     {
@@ -92,16 +91,7 @@ final class KernelContext
     }
 
     /**
-     * If the message is incorrect, returns a list of violations
-     *
-     * [
-     *    'propertyPath' => [
-     *        0 => 'some message',
-     *        ....
-     *    ]
-     * ]
-     *
-     * @return array<string, array<int, string>>
+     * @inheritdoc
      */
     public function violations(): array
     {
@@ -119,16 +109,16 @@ final class KernelContext
 
         $traceId = $this->incomingPackage->traceId();
 
-        $options = $deliveryOptions ?? new DeliveryOptions();
+        $options = $deliveryOptions ?? DefaultDeliveryOptions::create();
 
         if(null === $options->traceId)
         {
-            $options->traceId = $traceId;
+            $options = $options->withTraceId($traceId);
         }
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Message $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): \Generator
+            static function(Message $message, DefaultDeliveryOptions $options) use ($endpoints, $logger, $traceId): \Generator
             {
                 foreach($endpoints as $endpoint)
                 {
@@ -178,9 +168,7 @@ final class KernelContext
     }
 
     /**
-     * Receive incoming operation id
-     *
-     * @return string
+     * @inheritdoc
      */
     public function operationId(): string
     {
@@ -188,9 +176,7 @@ final class KernelContext
     }
 
     /**
-     * Receive trace message id
-     *
-     * @return string
+     * @inheritdoc
      */
     public function traceId(): string
     {

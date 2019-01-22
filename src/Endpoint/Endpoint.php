@@ -30,13 +30,13 @@ interface Endpoint
     /**
      * Send message to endpoint
      *
-     * @param Message         $message
-     * @param DeliveryOptions $options
+     * @param Message                $message
+     * @param DefaultDeliveryOptions $options
      *
      * @return Promise It does not return any result
      *
      * @throws \ServiceBus\MessageSerializer\Exceptions\EncodeMessageFailed
      * @throws \ServiceBus\Transport\Common\Exceptions\SendMessageFailed Failed to send message
      */
-    public function delivery(Message $message, DeliveryOptions $options): Promise;
+    public function delivery(Message $message, DefaultDeliveryOptions $options): Promise;
 }

@@ -92,11 +92,11 @@ final class MessageDeliveryEndpoint implements Endpoint
     /**
      * @inheritDoc
      */
-    public function delivery(Message $message, DeliveryOptions $options): Promise
+    public function delivery(Message $message, DefaultDeliveryOptions $options): Promise
     {
         $encoded = $this->encoder->handler->encode($message);
 
-        $options->headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] = $this->encoder->tag;
+        $options= $options->withHeader(Transport::SERVICE_BUS_SERIALIZER_HEADER, $this->encoder->tag);
 
         $package = self::createPackage($encoded, $options, $this->destination);
 
@@ -113,15 +113,15 @@ final class MessageDeliveryEndpoint implements Endpoint
     /**
      * Create outbound package with specified parameters
      *
-     * @param string              $payload
-     * @param DeliveryOptions     $options
-     * @param DeliveryDestination $destination
+     * @param string                 $payload
+     * @param DefaultDeliveryOptions $options
+     * @param DeliveryDestination    $destination
      *
      * @return OutboundPackage
      */
     private static function createPackage(
         string $payload,
-        DeliveryOptions $options,
+        DefaultDeliveryOptions $options,
         DeliveryDestination $destination
     ): OutboundPackage
     {

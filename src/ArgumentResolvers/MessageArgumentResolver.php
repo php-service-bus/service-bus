@@ -12,8 +12,8 @@ declare(strict_types = 1);
 
 namespace ServiceBus\ArgumentResolvers;
 
+use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Messages\Message;
-use ServiceBus\Context\KernelContext;
 use ServiceBus\MessageHandlers\HandlerArgument;
 
 /**
@@ -34,7 +34,7 @@ final class MessageArgumentResolver implements ArgumentResolver
      *
      * @return Message
      */
-    public function resolve(Message $message, KernelContext $context, HandlerArgument $argument): Message
+    public function resolve(Message $message, ServiceBusContext $context, HandlerArgument $argument): Message
     {
         return $message;
     }

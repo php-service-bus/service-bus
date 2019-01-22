@@ -64,7 +64,7 @@ final class MessageValidationExecutor implements MessageExecutor
         try
         {
             /** @var ConstraintViolationList $violations */
-            $violations = $this->validator->validate($message, null, $this->options->validationGroups());
+            $violations = $this->validator->validate($message, null, $this->options->validationGroups);
         }
         catch(\Throwable $throwable)
         {
@@ -76,15 +76,15 @@ final class MessageValidationExecutor implements MessageExecutor
             self::bindViolations($violations, $context);
 
             /** If a validation error event class is specified, then we abort the execution */
-            if(true === $this->options->hasDefaultValidationFailedEvent())
+            if(null !== $this->options->defaultValidationFailedEvent)
             {
                 $context->logContextMessage(
                     'Error validation, sending an error event and stopping message processing',
-                    ['eventClass' => $this->options->defaultValidationFailedEvent()],
+                    ['eventClass' => $this->options->defaultValidationFailedEvent],
                     LogLevel::DEBUG
                 );
 
-                return self::publishViolations((string) $this->options->defaultValidationFailedEvent(), $context);
+                return self::publishViolations((string) $this->options->defaultValidationFailedEvent, $context);
             }
         }
 
