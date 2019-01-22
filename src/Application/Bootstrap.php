@@ -16,6 +16,7 @@ use ServiceBus\Application\DependencyInjection\Compiler\ImportMessageHandlersCom
 use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
+use ServiceBus\Common\Module\ServiceBusModule;
 use ServiceBus\Environment;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -62,6 +63,20 @@ final class Bootstrap
     public static function withEnvironmentValues(): self
     {
         return new self();
+    }
+
+    /**
+     * @param ServiceBusModule ...$serviceBusModules
+     *
+     * @return $this
+     *
+     * @throws \Throwable
+     */
+    public function applyModules(ServiceBusModule ...$serviceBusModules): self
+    {
+        $this->containerBuilder->addModules(...$serviceBusModules);
+
+        return $this;
     }
 
     /**

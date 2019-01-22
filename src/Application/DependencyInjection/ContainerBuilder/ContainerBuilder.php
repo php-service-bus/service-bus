@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Application\DependencyInjection\ContainerBuilder;
 
+use ServiceBus\Common\Module\ServiceBusModule;
 use ServiceBus\Environment;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -23,6 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Symfony DI container builder
+ *
+ * @internal
  */
 final class ContainerBuilder
 {
@@ -59,6 +62,13 @@ final class ContainerBuilder
     private $compilerPasses;
 
     /**
+     * Modules collection
+     *
+     * @var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule>
+     */
+    private $modules;
+
+    /**
      * @var Environment
      */
     private $environment;
@@ -93,8 +103,12 @@ final class ContainerBuilder
         /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface> $compilerPassCollection */
         $compilerPassCollection = new \SplObjectStorage();
 
+        /** @var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule> $modulesCollection */
+        $modulesCollection = new \SplObjectStorage();
+
         $this->extensions     = $extensionCollection;
         $this->compilerPasses = $compilerPassCollection;
+        $this->modules        = $modulesCollection;
     }
 
     /**
@@ -128,6 +142,21 @@ final class ContainerBuilder
         foreach($extensions as $extension)
         {
             $this->extensions->attach($extension);
+        }
+    }
+
+    /**
+     * Add customer modules
+     *
+     * @param ServiceBusModule ...$serviceBusModules
+     *
+     * @return void
+     */
+    public function addModules(ServiceBusModule ...$serviceBusModules): void
+    {
+        foreach($serviceBusModules as $serviceBusModule)
+        {
+            $this->modules->attach($serviceBusModule);
         }
     }
 
@@ -202,6 +231,7 @@ final class ContainerBuilder
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
      * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
+     * @throws \Throwable Boot module failed
      */
     public function build(): ContainerInterface
     {
@@ -220,6 +250,12 @@ final class ContainerBuilder
         foreach($this->compilerPasses as $compilerPass)
         {
             $containerBuilder->addCompilerPass($compilerPass);
+        }
+
+        /** @var ServiceBusModule $module */
+        foreach($this->modules as $module)
+        {
+            $module->boot($containerBuilder);
         }
 
         $containerBuilder->compile();

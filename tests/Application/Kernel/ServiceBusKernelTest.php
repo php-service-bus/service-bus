@@ -38,6 +38,7 @@ use ServiceBus\Transport\Amqp\AmqpExchange;
 use ServiceBus\Transport\Amqp\AmqpQueue;
 use ServiceBus\Transport\Amqp\AmqpTransportLevelDestination;
 use ServiceBus\Transport\Amqp\DependencyInjection\PhpInnacleTransportExtension;
+use ServiceBus\Transport\Amqp\PhpInnacle\PhpInnacleTransportModule;
 use ServiceBus\Transport\Common\Package\OutboundPackage;
 use ServiceBus\Transport\Common\QueueBind;
 use ServiceBus\Transport\Common\Transport;
@@ -88,19 +89,14 @@ final class ServiceBusKernelTest extends TestCase
             \mkdir($this->cacheDirectory);
         }
 
-        $bootstrap = Bootstrap::withDotEnv(__DIR__ . '/Stubs/.env');
-
-        $bootstrap->useCustomCacheDirectory($this->cacheDirectory);
-
-        $bootstrap->addExtensions(
-            new ServiceBusExtension(),
-            new KernelTestExtension(),
-            new PhpInnacleTransportExtension(
+        $bootstrap = Bootstrap::withDotEnv(__DIR__ . '/Stubs/.env')
+            ->useCustomCacheDirectory($this->cacheDirectory)
+            ->addExtensions(new ServiceBusExtension(), new KernelTestExtension())
+            ->applyModules(new PhpInnacleTransportModule(
                 (string) \getenv('TRANSPORT_CONNECTION_DSN'),
                 'test_topic',
                 'tests'
-            )
-        );
+            ));
 
         $this->container = $bootstrap->boot();
 

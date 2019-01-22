@@ -50,7 +50,7 @@
     "kelunik/retry": "^v1.0"
   },
   "require-dev": {
-    "php-service-bus/transport-amqp": "dev-master",
+    "php-service-bus/module-phpinnacle-transport": "dev-master",
     "kelunik/loop-block": "^1.0",
     "phpunit/phpunit": "^7",
     "vimeo/psalm": "^3"
