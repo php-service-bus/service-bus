@@ -33,6 +33,7 @@
     "php": ">=7.2",
 
     "php-service-bus/common": "dev-master",
+    "php-service-bus/transport-common": "dev-master",
     "php-service-bus/message-serializer": "dev-master",
     "php-service-bus/annotations-reader": "dev-master",
 

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1c08a0f05f2cb76204282d5a552c7fdf",
-    "content-hash": "0f5f87fecf301cee286a6955ece3316c",
+    "hash": "a6e70b8e0d99490404abdc6eb5304c4e",
+    "content-hash": "8231fd2ec5a3af6a2438c9bb01a7700e",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1340,12 +1340,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "92f10fcc8c3d18662bff25eb8ed5b826f0e53ca5"
+                "reference": "21bc9ce34e11d4b8065826268d7f357993917fcf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/92f10fcc8c3d18662bff25eb8ed5b826f0e53ca5",
-                "reference": "92f10fcc8c3d18662bff25eb8ed5b826f0e53ca5",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/21bc9ce34e11d4b8065826268d7f357993917fcf",
+                "reference": "21bc9ce34e11d4b8065826268d7f357993917fcf",
                 "shasum": ""
             },
             "require": {
@@ -1387,7 +1387,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-22 12:41:14"
+            "time": "2019-01-23 07:25:30"
         },
         {
             "name": "php-service-bus/message-serializer",
@@ -1440,6 +1440,56 @@
                 "messaging"
             ],
             "time": "2019-01-21 13:58:30"
+        },
+        {
+            "name": "php-service-bus/transport-common",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-service-bus/transport-common.git",
+                "reference": "68946e0edc1da0111e6e4fad9ac656382573accc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/68946e0edc1da0111e6e4fad9ac656382573accc",
+                "reference": "68946e0edc1da0111e6e4fad9ac656382573accc",
+                "shasum": ""
+            },
+            "require": {
+                "amphp/amp": "^2",
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7",
+                "vimeo/psalm": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ServiceBus\\Transport\\Common\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "dev@async-php.com",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP Service Bus transport common parts",
+            "keywords": [
+                "async-php",
+                "command-bus",
+                "cqrs",
+                "event-sourcing",
+                "messaging"
+            ],
+            "time": "2019-01-23 14:44:11"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -3399,30 +3449,28 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/module-phpinnacle-transport.git",
-                "reference": "9361285f191d78ebbe1840131c42af93d784553d"
+                "reference": "96c86cdbb17f0ad99b2e911d126851b809662ab1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/9361285f191d78ebbe1840131c42af93d784553d",
-                "reference": "9361285f191d78ebbe1840131c42af93d784553d",
+                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/96c86cdbb17f0ad99b2e911d126851b809662ab1",
+                "reference": "96c86cdbb17f0ad99b2e911d126851b809662ab1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "php-service-bus/common": "dev-master",
-                "php-service-bus/transport-amqp": "dev-master",
+                "php-service-bus/transport-phpinnacle": "dev-master",
                 "phpinnacle/ridge": "^0.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "^7",
-                "symfony/config": "^v4.2",
                 "symfony/dependency-injection": "^v4.2",
                 "vimeo/psalm": "^3"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "ServiceBus\\Transport\\Amqp\\PhpInnacle\\": "src/"
+                    "ServiceBus\\Transport\\Module\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3437,7 +3485,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "phpinnacle transport module for PHP Service Bus",
+            "description": "phpinnacle transport module",
             "keywords": [
                 "async-php",
                 "command-bus",
@@ -3445,7 +3493,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-22 12:56:53"
+            "time": "2019-01-23 15:37:59"
         },
         {
             "name": "php-service-bus/transport-amqp",
@@ -3453,12 +3501,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-amqp.git",
-                "reference": "a1d8d0e6a9f472f92a29b2af30a77f2be1911526"
+                "reference": "6db554cd211d29b086773acc9637bfbae2ee96eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/a1d8d0e6a9f472f92a29b2af30a77f2be1911526",
-                "reference": "a1d8d0e6a9f472f92a29b2af30a77f2be1911526",
+                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/6db554cd211d29b086773acc9637bfbae2ee96eb",
+                "reference": "6db554cd211d29b086773acc9637bfbae2ee96eb",
                 "shasum": ""
             },
             "require": {
@@ -3488,7 +3536,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "PHP Service Bus (publish-subscribe pattern) amqp transport common implementation",
+            "description": "PHP Service Bus amqp common implementation",
             "keywords": [
                 "async-php",
                 "command-bus",
@@ -3496,25 +3544,27 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-22 12:52:52"
+            "time": "2019-01-23 15:00:43"
         },
         {
-            "name": "php-service-bus/transport-common",
+            "name": "php-service-bus/transport-phpinnacle",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/php-service-bus/transport-common.git",
-                "reference": "6f73ced30881d842bb81781f589363ee60e44db4"
+                "url": "https://github.com/php-service-bus/transport-phpinnacle.git",
+                "reference": "b761d1a48a604f11457f6a15aa20366e701e6c6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/6f73ced30881d842bb81781f589363ee60e44db4",
-                "reference": "6f73ced30881d842bb81781f589363ee60e44db4",
+                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/b761d1a48a604f11457f6a15aa20366e701e6c6a",
+                "reference": "b761d1a48a604f11457f6a15aa20366e701e6c6a",
                 "shasum": ""
             },
             "require": {
-                "amphp/amp": "^2",
-                "php": ">=7.2"
+                "php": ">=7.2",
+                "php-service-bus/common": "dev-master",
+                "php-service-bus/transport-amqp": "dev-master",
+                "phpinnacle/ridge": "^0.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "^7",
@@ -3523,7 +3573,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "ServiceBus\\Transport\\Common\\": "src/"
+                    "ServiceBus\\Transport\\PhpInnacle\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3538,7 +3588,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "PHP Service Bus (publish-subscribe pattern) transport common parts",
+            "description": "phpinnacle transport bridge",
             "keywords": [
                 "async-php",
                 "command-bus",
@@ -3546,7 +3596,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-21 11:01:04"
+            "time": "2019-01-23 15:31:43"
         },
         {
             "name": "phpinnacle/buffer",
@@ -4965,6 +5015,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "php-service-bus/common": 20,
+        "php-service-bus/transport-common": 20,
         "php-service-bus/message-serializer": 20,
         "php-service-bus/annotations-reader": 20,
         "php-service-bus/module-phpinnacle-transport": 20

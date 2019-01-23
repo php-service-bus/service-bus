@@ -37,11 +37,10 @@ use ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
 use ServiceBus\Transport\Amqp\AmqpExchange;
 use ServiceBus\Transport\Amqp\AmqpQueue;
 use ServiceBus\Transport\Amqp\AmqpTransportLevelDestination;
-use ServiceBus\Transport\Amqp\DependencyInjection\PhpInnacleTransportExtension;
-use ServiceBus\Transport\Amqp\PhpInnacle\PhpInnacleTransportModule;
 use ServiceBus\Transport\Common\Package\OutboundPackage;
 use ServiceBus\Transport\Common\QueueBind;
 use ServiceBus\Transport\Common\Transport;
+use ServiceBus\Transport\Module\PhpInnacleTransportModule;
 
 /**
  *
