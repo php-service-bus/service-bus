@@ -12,10 +12,10 @@ declare(strict_types = 1);
 
 namespace ServiceBus\MessageRouter;
 
+use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Common\Messages\Command;
 use ServiceBus\Common\Messages\Event;
 use ServiceBus\Common\Messages\Message;
-use ServiceBus\MessageExecutor\MessageExecutor;
 use ServiceBus\MessageRouter\Exceptions\InvalidCommandClassSpecified;
 use ServiceBus\MessageRouter\Exceptions\InvalidEventClassSpecified;
 use ServiceBus\MessageRouter\Exceptions\MultipleCommandHandlersNotAllowed;
@@ -28,14 +28,14 @@ final class Router implements \Countable
     /**
      * Event listeners
      *
-     * @var array<string, array<string|int, \ServiceBus\MessageExecutor\MessageExecutor>>
+     * @var array<string, array<string|int, \ServiceBus\Common\MessageExecutor\MessageExecutor>>
      */
     private $eventListenersMap = [];
 
     /**
      * Command handlers
      *
-     * @var array<string, \ServiceBus\MessageExecutor\MessageExecutor>
+     * @var array<string, \ServiceBus\Common\MessageExecutor\MessageExecutor>
      */
     private $commandHandlersMap = [];
 
@@ -111,7 +111,7 @@ final class Router implements \Countable
     /**
      * @param Message $message
      *
-     * @return array<mixed, \ServiceBus\MessageExecutor\MessageExecutor>
+     * @return array<mixed, \ServiceBus\Common\MessageExecutor\MessageExecutor>
      */
     public function match(Message $message): array
     {

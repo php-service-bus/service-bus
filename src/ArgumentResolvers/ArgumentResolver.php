@@ -14,7 +14,7 @@ namespace ServiceBus\ArgumentResolvers;
 
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Messages\Message;
-use ServiceBus\MessageHandlers\HandlerArgument;
+use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 
 /**
  * Responsible for resolving the value of an argument
@@ -24,20 +24,20 @@ interface ArgumentResolver
     /**
      * Whether this resolver can resolve the value for the given Argument
      *
-     * @param HandlerArgument $argument
+     * @param MessageHandlerArgument $argument
      *
      * @return bool
      */
-    public function supports(HandlerArgument $argument): bool;
+    public function supports(MessageHandlerArgument $argument): bool;
 
     /**
      * Resolve argument value
      *
-     * @param Message           $message
-     * @param ServiceBusContext $context
-     * @param HandlerArgument   $argument
+     * @param Message                $message
+     * @param ServiceBusContext      $context
+     * @param MessageHandlerArgument $argument
      *
      * @return mixed
      */
-    public function resolve(Message $message, ServiceBusContext $context, HandlerArgument $argument);
+    public function resolve(Message $message, ServiceBusContext $context, MessageHandlerArgument $argument);
 }

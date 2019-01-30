@@ -117,7 +117,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     );
                 }
 
-                /** @var \ServiceBus\MessageExecutor\MessageExecutor $executor */
+                /** @var \ServiceBus\Common\MessageExecutor\MessageExecutor $executor */
                 foreach($executors as $executor)
                 {
                     $context = new KernelContext($package, $endpointRouter, $logger);

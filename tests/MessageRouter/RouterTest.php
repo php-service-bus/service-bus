@@ -14,7 +14,7 @@ namespace ServiceBus\Tests\MessageRouter;
 
 use PHPUnit\Framework\TestCase;
 use ServiceBus\MessageExecutor\DefaultMessageExecutor;
-use ServiceBus\MessageHandlers\HandlerOptions;
+use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use ServiceBus\MessageRouter\Router;
 use ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
 use ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
@@ -45,7 +45,7 @@ final class RouterTest extends TestCase
                     }
                 ),
                 new \SplObjectStorage(),
-                HandlerOptions::create(),
+                DefaultHandlerOptions::createForEventListener(),
                 []
             )
         );
@@ -72,7 +72,7 @@ final class RouterTest extends TestCase
                     }
                 ),
                 new \SplObjectStorage(),
-                HandlerOptions::create(),
+                DefaultHandlerOptions::createForEventListener(),
                 []
             )
         );
@@ -99,7 +99,7 @@ final class RouterTest extends TestCase
                     }
                 ),
                 new \SplObjectStorage(),
-                HandlerOptions::create(),
+                DefaultHandlerOptions::createForCommandHandler(),
                 []
             )
         );
@@ -126,7 +126,7 @@ final class RouterTest extends TestCase
                     }
                 ),
                 new \SplObjectStorage(),
-                HandlerOptions::create(),
+                DefaultHandlerOptions::createForCommandHandler(),
                 []
             )
         );
@@ -154,7 +154,7 @@ final class RouterTest extends TestCase
                 }
             ),
             new \SplObjectStorage(),
-            HandlerOptions::create(),
+            DefaultHandlerOptions::createForCommandHandler(),
             []
         );
 
@@ -179,7 +179,7 @@ final class RouterTest extends TestCase
                 }
             ),
             new \SplObjectStorage(),
-            HandlerOptions::create(),
+            DefaultHandlerOptions::createForCommandHandler(),
             []
         );
 

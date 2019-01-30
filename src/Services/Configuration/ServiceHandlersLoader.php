@@ -22,7 +22,7 @@ interface ServiceHandlersLoader
      *
      * @param object $service
      *
-     * @return \SplObjectStorage<\ServiceBus\MessageHandlers\Handler>
+     * @return \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandler>
      *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
      * @throws \ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed

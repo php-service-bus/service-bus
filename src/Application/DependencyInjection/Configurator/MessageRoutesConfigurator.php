@@ -12,14 +12,13 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Application\DependencyInjection\Configurator;
 
-use http\Message;
-use ServiceBus\MessageExecutor\DefaultMessageExecutor;
-use ServiceBus\MessageExecutor\MessageValidationExecutor;
-use ServiceBus\MessageHandlers\Handler;
+use ServiceBus\Common\MessageExecutor\MessageExecutorFactory;
+use ServiceBus\Common\MessageHandler\MessageHandler;
+use ServiceBus\Common\Messages\Command;
+use ServiceBus\Common\Messages\Message;
 use ServiceBus\MessageRouter\Router;
 use ServiceBus\Services\Configuration\ServiceHandlersLoader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\Validator\ValidatorBuilder;
 
 /**
  *
@@ -27,16 +26,18 @@ use Symfony\Component\Validator\ValidatorBuilder;
 final class MessageRoutesConfigurator
 {
     /**
+     * Message executor factory
+     *
+     * @var MessageExecutorFactory
+     */
+    private $executorFactory;
+
+    /**
      * List of registered sagas
      *
      * @var array<mixed, string>
      */
     private $servicesList;
-
-    /**
-     * @var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
-     */
-    private $argumentResolvers;
 
     /**
      * Isolated service locator for registered services
@@ -53,22 +54,21 @@ final class MessageRoutesConfigurator
     private $routingServiceLocator;
 
     /**
-     * @param array<mixed, string>                                                    $servicesList
-     * @param ServiceLocator                                                          $routingServiceLocator
-     * @param ServiceLocator                                                          $servicesServiceLocator
-     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
+     * @param array<mixed, string> $servicesList
+     * @param ServiceLocator       $routingServiceLocator
+     * @param ServiceLocator       $servicesServiceLocator
      */
     public function __construct(
+        MessageExecutorFactory $executorFactory,
         array $servicesList,
         ServiceLocator $routingServiceLocator,
-        ServiceLocator $servicesServiceLocator,
-        array $argumentResolvers
+        ServiceLocator $servicesServiceLocator
     )
     {
+        $this->executorFactory        = $executorFactory;
         $this->servicesList           = $servicesList;
         $this->routingServiceLocator  = $routingServiceLocator;
         $this->servicesServiceLocator = $servicesServiceLocator;
-        $this->argumentResolvers      = $argumentResolvers;
     }
 
     /**
@@ -92,10 +92,6 @@ final class MessageRoutesConfigurator
      */
     private function registerServices(Router $router): void
     {
-        $validator = (new ValidatorBuilder())
-            ->enableAnnotationMapping()
-            ->getValidator();
-
         /** @var ServiceHandlersLoader $serviceConfigurationExtractor */
         $serviceConfigurationExtractor = $this->routingServiceLocator->get(ServiceHandlersLoader::class);
 
@@ -104,49 +100,39 @@ final class MessageRoutesConfigurator
             /** @var object $serviceObject */
             $serviceObject = $this->servicesServiceLocator->get(\sprintf('%s_service', $serviceId));
 
-            /** @var \ServiceBus\MessageHandlers\Handler $handler */
+            /** @var \ServiceBus\Common\MessageHandler\MessageHandler $handler */
             foreach($serviceConfigurationExtractor->load($serviceObject) as $handler)
             {
                 self::assertMessageClassSpecifiedInArguments($serviceObject, $handler);
 
-                $messageExecutor = new DefaultMessageExecutor(
-                    $handler->toClosure($serviceObject),
-                    $handler->arguments(),
-                    $handler->options(),
-                    $this->argumentResolvers
-                );
+                $messageExecutor = $this->executorFactory->create($handler);
 
-                if(true === $handler->options()->validationEnabled)
-                {
-                    $messageExecutor = new MessageValidationExecutor($messageExecutor, $handler->options(), $validator);
-                }
-
-                $registerMethod = true === $handler->isCommandHandler()
+                $registerMethod = true === \is_a((string) $handler->messageClass, Command::class, true)
                     ? 'registerHandler'
                     : 'registerListener';
 
-                $router->{$registerMethod}((string) $handler->messageClass(), $messageExecutor);
+                $router->{$registerMethod}((string) $handler->messageClass, $messageExecutor);
             }
         }
     }
 
     /**
-     * @param object  $service
-     * @param Handler $handler
+     * @param object         $service
+     * @param MessageHandler $handler
      *
      * @return void
      *
      * @throws \LogicException
      */
-    private static function assertMessageClassSpecifiedInArguments(object $service, Handler $handler): void
+    private static function assertMessageClassSpecifiedInArguments(object $service, MessageHandler $handler): void
     {
-        if(null === $handler->messageClass() || '' === (string) $handler->messageClass())
+        if(null === $handler->messageClass || '' === (string) $handler->messageClass)
         {
             throw new \LogicException(
                 \sprintf(
                     'In the method of "%s:%s" is not found an argument of type "%s"',
                     \get_class($service),
-                    $handler->methodName(),
+                    $handler->methodName,
                     Message::class
                 )
             );

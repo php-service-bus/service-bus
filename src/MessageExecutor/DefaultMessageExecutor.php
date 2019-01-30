@@ -15,9 +15,11 @@ namespace ServiceBus\MessageExecutor;
 use function Amp\call;
 use Amp\Promise;
 use Psr\Log\LogLevel;
+use ServiceBus\Common\Context\ServiceBusContext;
+use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Common\Messages\Message;
 use ServiceBus\Context\KernelContext;
-use ServiceBus\MessageHandlers\HandlerOptions;
+use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 
 /**
  *
@@ -32,7 +34,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $closure;
 
     /**
-     * @var \SplObjectStorage<\ServiceBus\MessageHandlers\HandlerArgument>
+     * @var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument>
      */
     private $arguments;
 
@@ -46,20 +48,20 @@ final class DefaultMessageExecutor implements MessageExecutor
     /**
      * Execution options
      *
-     * @var HandlerOptions
+     * @var DefaultHandlerOptions
      */
     private $options;
 
     /**
-     * @param \Closure                                                                 $closure
-     * @param \SplObjectStorage<\ServiceBus\MessageHandlers\HandlerArgument> $arguments
-     * @param HandlerOptions                                                           $options
-     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>  $argumentResolvers
+     * @param \Closure                                                                    $closure
+     * @param \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument> $arguments
+     * @param DefaultHandlerOptions                                                       $options
+     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>               $argumentResolvers
      */
     public function __construct(
         \Closure $closure,
         \SplObjectStorage $arguments,
-        HandlerOptions $options,
+        DefaultHandlerOptions $options,
         array $argumentResolvers
     )
     {
@@ -72,7 +74,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     /**
      * @inheritDoc
      */
-    public function __invoke(Message $message, KernelContext $context): Promise
+    public function __invoke(Message $message, ServiceBusContext $context): Promise
     {
         $argumentResolvers = $this->argumentResolvers;
 
@@ -82,7 +84,7 @@ final class DefaultMessageExecutor implements MessageExecutor
          */
         return call(
             static function(
-                \Closure $closure, \SplObjectStorage $arguments, HandlerOptions $options, Message $message,
+                \Closure $closure, \SplObjectStorage $arguments, DefaultHandlerOptions $options, Message $message,
                 KernelContext $context
             ) use ($argumentResolvers): \Generator
             {
@@ -162,7 +164,7 @@ final class DefaultMessageExecutor implements MessageExecutor
         /** @var array<int, mixed> $preparedArguments */
         $preparedArguments = [];
 
-        /** @var \ServiceBus\MessageHandlers\HandlerArgument $argument */
+        /** @var \ServiceBus\Common\MessageHandler\MessageHandlerArgument $argument */
         foreach($arguments as $argument)
         {
             /** @var \ServiceBus\ArgumentResolvers\ArgumentResolver $argumentResolver */

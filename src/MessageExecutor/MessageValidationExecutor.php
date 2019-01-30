@@ -15,10 +15,12 @@ namespace ServiceBus\MessageExecutor;
 use Amp\Failure;
 use Amp\Promise;
 use Psr\Log\LogLevel;
+use ServiceBus\Common\Context\ServiceBusContext;
+use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Context\KernelContext;
 use function ServiceBus\Common\invokeReflectionMethod;
 use ServiceBus\Common\Messages\Message;
-use ServiceBus\MessageHandlers\HandlerOptions;
+use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -40,16 +42,16 @@ final class MessageValidationExecutor implements MessageExecutor
     /**
      * Execution options
      *
-     * @var HandlerOptions
+     * @var DefaultHandlerOptions
      */
     private $options;
 
     /**
-     * @param MessageExecutor    $executor
-     * @param HandlerOptions     $options
-     * @param ValidatorInterface $validator
+     * @param MessageExecutor       $executor
+     * @param DefaultHandlerOptions $options
+     * @param ValidatorInterface    $validator
      */
-    public function __construct(MessageExecutor $executor, HandlerOptions $options, ValidatorInterface $validator)
+    public function __construct(MessageExecutor $executor, DefaultHandlerOptions $options, ValidatorInterface $validator)
     {
         $this->executor  = $executor;
         $this->options   = $options;
@@ -59,7 +61,7 @@ final class MessageValidationExecutor implements MessageExecutor
     /**
      * @inheritdoc
      */
-    public function __invoke(Message $message, KernelContext $context): Promise
+    public function __invoke(Message $message, ServiceBusContext $context): Promise
     {
         try
         {
@@ -99,7 +101,7 @@ final class MessageValidationExecutor implements MessageExecutor
      *
      * @return Promise
      */
-    private static function publishViolations(string $eventClass, KernelContext $context): Promise
+    private static function publishViolations(string $eventClass, ServiceBusContext $context): Promise
     {
         /**
          * @noinspection VariableFunctionsUsageInspection
@@ -114,11 +116,11 @@ final class MessageValidationExecutor implements MessageExecutor
      * Bind violations to context
      *
      * @param ConstraintViolationList $violations
-     * @param KernelContext           $context
+     * @param ServiceBusContext       $context
      *
      * @return void
      */
-    private static function bindViolations(ConstraintViolationList $violations, KernelContext $context): void
+    private static function bindViolations(ConstraintViolationList $violations, ServiceBusContext $context): void
     {
         $errors = [];
 

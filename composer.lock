@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a6e70b8e0d99490404abdc6eb5304c4e",
+    "hash": "dc218230d05dedc790a52558056a9dae",
     "content-hash": "8231fd2ec5a3af6a2438c9bb01a7700e",
     "packages": [
         {
@@ -1289,12 +1289,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/annotations-reader.git",
-                "reference": "c73c015e44d45dfbb82e6b32565fadef4ce38705"
+                "reference": "211e3db5810ae290f49933d09fa99504fdfcfcb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/annotations-reader/zipball/c73c015e44d45dfbb82e6b32565fadef4ce38705",
-                "reference": "c73c015e44d45dfbb82e6b32565fadef4ce38705",
+                "url": "https://api.github.com/repos/php-service-bus/annotations-reader/zipball/211e3db5810ae290f49933d09fa99504fdfcfcb4",
+                "reference": "211e3db5810ae290f49933d09fa99504fdfcfcb4",
                 "shasum": ""
             },
             "require": {
@@ -1324,7 +1324,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "PHP Service Bus (publish-subscribe pattern) annotations reader component",
+            "description": "PHP Service Bus annotations reader component",
             "keywords": [
                 "async-php",
                 "command-bus",
@@ -1332,7 +1332,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-19 13:42:20"
+            "time": "2019-01-24 14:23:17"
         },
         {
             "name": "php-service-bus/common",
@@ -1340,12 +1340,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "21bc9ce34e11d4b8065826268d7f357993917fcf"
+                "reference": "95eb9fa50e31c73dc6908039aa1cbf12238ca6b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/21bc9ce34e11d4b8065826268d7f357993917fcf",
-                "reference": "21bc9ce34e11d4b8065826268d7f357993917fcf",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/95eb9fa50e31c73dc6908039aa1cbf12238ca6b0",
+                "reference": "95eb9fa50e31c73dc6908039aa1cbf12238ca6b0",
                 "shasum": ""
             },
             "require": {
@@ -1387,7 +1387,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-23 07:25:30"
+            "time": "2019-01-30 15:40:02"
         },
         {
             "name": "php-service-bus/message-serializer",
@@ -1395,12 +1395,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/message-serializer.git",
-                "reference": "425437b6b2066be7b9deb4cbb47c6700de733a5b"
+                "reference": "8ceab3f0c487d9fb5f66d4f4a77b75cbf340466c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/425437b6b2066be7b9deb4cbb47c6700de733a5b",
-                "reference": "425437b6b2066be7b9deb4cbb47c6700de733a5b",
+                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/8ceab3f0c487d9fb5f66d4f4a77b75cbf340466c",
+                "reference": "8ceab3f0c487d9fb5f66d4f4a77b75cbf340466c",
                 "shasum": ""
             },
             "require": {
@@ -1431,7 +1431,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "PHP Service Bus (publish-subscribe pattern) messages serializer component",
+            "description": "PHP Service Bus messages serializer component",
             "keywords": [
                 "async-php",
                 "command-bus",
@@ -1439,7 +1439,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-21 13:58:30"
+            "time": "2019-01-26 10:44:15"
         },
         {
             "name": "php-service-bus/transport-common",
@@ -2819,16 +2819,16 @@
     "packages-dev": [
         {
             "name": "composer/xdebug-handler",
-            "version": "1.3.1",
+            "version": "1.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/xdebug-handler.git",
-                "reference": "dc523135366eb68f22268d069ea7749486458562"
+                "reference": "d17708133b6c276d6e42ef887a877866b909d892"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/dc523135366eb68f22268d069ea7749486458562",
-                "reference": "dc523135366eb68f22268d069ea7749486458562",
+                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/d17708133b6c276d6e42ef887a877866b909d892",
+                "reference": "d17708133b6c276d6e42ef887a877866b909d892",
                 "shasum": ""
             },
             "require": {
@@ -2859,7 +2859,7 @@
                 "Xdebug",
                 "performance"
             ],
-            "time": "2018-11-29 10:59:02"
+            "time": "2019-01-28 20:25:53"
         },
         {
             "name": "doctrine/instantiator",
@@ -3449,12 +3449,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/module-phpinnacle-transport.git",
-                "reference": "96c86cdbb17f0ad99b2e911d126851b809662ab1"
+                "reference": "6440ab05af84b999a12a830bf8587898fbe27244"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/96c86cdbb17f0ad99b2e911d126851b809662ab1",
-                "reference": "96c86cdbb17f0ad99b2e911d126851b809662ab1",
+                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/6440ab05af84b999a12a830bf8587898fbe27244",
+                "reference": "6440ab05af84b999a12a830bf8587898fbe27244",
                 "shasum": ""
             },
             "require": {
@@ -3493,7 +3493,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-23 15:37:59"
+            "time": "2019-01-23 15:50:30"
         },
         {
             "name": "php-service-bus/transport-amqp",
@@ -3552,12 +3552,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-phpinnacle.git",
-                "reference": "b761d1a48a604f11457f6a15aa20366e701e6c6a"
+                "reference": "c891baf333ba8919aa4a5614924bd7f036a71ac7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/b761d1a48a604f11457f6a15aa20366e701e6c6a",
-                "reference": "b761d1a48a604f11457f6a15aa20366e701e6c6a",
+                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/c891baf333ba8919aa4a5614924bd7f036a71ac7",
+                "reference": "c891baf333ba8919aa4a5614924bd7f036a71ac7",
                 "shasum": ""
             },
             "require": {
@@ -3596,7 +3596,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-23 15:31:43"
+            "time": "2019-01-23 15:50:10"
         },
         {
             "name": "phpinnacle/buffer",
@@ -4335,16 +4335,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "4.0.1",
+            "version": "4.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "febd209a219cea7b56ad799b30ebbea34b71eb8f"
+                "reference": "4a43e9af57b4afa663077b9bc85255dbc6e8a2bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/febd209a219cea7b56ad799b30ebbea34b71eb8f",
-                "reference": "febd209a219cea7b56ad799b30ebbea34b71eb8f",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/4a43e9af57b4afa663077b9bc85255dbc6e8a2bd",
+                "reference": "4a43e9af57b4afa663077b9bc85255dbc6e8a2bd",
                 "shasum": ""
             },
             "require": {
@@ -4381,7 +4381,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2018-11-25 09:31:21"
+            "time": "2019-01-28 15:26:03"
         },
         {
             "name": "sebastian/exporter",
@@ -4842,16 +4842,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "3.0.12",
+            "version": "3.0.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "279912cb5566c4b5394af9ac4f8cbd8c9a2b9450"
+                "reference": "0bb5143efd2350bcbb01f06f5374a4c6cf5a7a4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/279912cb5566c4b5394af9ac4f8cbd8c9a2b9450",
-                "reference": "279912cb5566c4b5394af9ac4f8cbd8c9a2b9450",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/0bb5143efd2350bcbb01f06f5374a4c6cf5a7a4b",
+                "reference": "0bb5143efd2350bcbb01f06f5374a4c6cf5a7a4b",
                 "shasum": ""
             },
             "require": {
@@ -4915,7 +4915,7 @@
                 "inspection",
                 "php"
             ],
-            "time": "2019-01-20 17:50:47"
+            "time": "2019-01-29 15:34:31"
         },
         {
             "name": "webmozart/glob",

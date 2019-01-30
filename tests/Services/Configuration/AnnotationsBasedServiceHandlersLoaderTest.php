@@ -19,6 +19,7 @@ use ServiceBus\Context\KernelContext;
 use ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader;
 use ServiceBus\Services\Annotations\CommandHandler;
 use ServiceBus\Services\Annotations\EventListener;
+use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
 use ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
 
@@ -76,7 +77,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              * @EventListener()
              *
              * @param FirstEmptyEvent $event
-             * @param KernelContext     $context
+             * @param KernelContext   $context
              *
              * @return Promise
              */
@@ -89,7 +90,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              * @EventListener()
              *
              * @param FirstEmptyEvent $event
-             * @param KernelContext     $context
+             * @param KernelContext   $context
              *
              * @return \Generator
              */
@@ -102,7 +103,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              * @ServiceBus\Tests\Services\Configuration\SomeAnotherMethodLevelAnnotation
              *
              * @param FirstEmptyCommand $command
-             * @param KernelContext       $context
+             * @param KernelContext     $context
              *
              * @return void
              */
@@ -119,31 +120,34 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
 
         foreach($handlers as $handler)
         {
-            /** @var \ServiceBus\MessageHandlers\Handler $handler */
+            /**
+             * @var \ServiceBus\Common\MessageHandler\MessageHandler $handler
+             * @var DefaultHandlerOptions                            $options
+             */
 
-            $options = $handler->options();
+            $options = $handler->options;
 
-            static::assertTrue($handler->hasReturnDeclaration());
+            static::assertNotNull($handler->returnDeclaration);
 
-            static::assertTrue($handler->hasArguments());
-            static::assertCount(2, $handler->arguments());
+            static::assertTrue($handler->hasArguments);
+            static::assertCount(2, $handler->arguments);
 
-            if(true === $handler->isCommandHandler())
+            if(true === $handler->options->isCommandHandler)
             {
-                static::assertEquals(FirstEmptyCommand::class, $handler->messageClass());
+                static::assertEquals(FirstEmptyCommand::class, $handler->messageClass);
                 /** @noinspection UnnecessaryAssertionInspection */
-                static::assertInstanceOf(\Closure::class, $handler->toClosure($service));
+                static::assertInstanceOf(\Closure::class, $handler->closure);
 
                 static::assertTrue($options->validationEnabled);
                 static::assertEquals(['qwerty', 'root'], $options->validationGroups);
 
-                static::assertEquals('handle', $handler->methodName());
+                static::assertEquals('handle', $handler->methodName);
             }
             else
             {
-                static::assertEquals(FirstEmptyEvent::class, $handler->messageClass());
+                static::assertEquals(FirstEmptyEvent::class, $handler->messageClass);
                 /** @noinspection UnnecessaryAssertionInspection */
-                static::assertInstanceOf(\Closure::class, $handler->toClosure($service));
+                static::assertInstanceOf(\Closure::class, $handler->closure);
 
                 static::assertFalse($options->validationEnabled);
                 static::assertEmpty($options->validationGroups);

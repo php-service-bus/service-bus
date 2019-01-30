@@ -14,7 +14,7 @@ namespace ServiceBus\ArgumentResolvers;
 
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Messages\Message;
-use ServiceBus\MessageHandlers\HandlerArgument;
+use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
@@ -38,9 +38,9 @@ final class ContainerArgumentResolver implements ArgumentResolver
     /**
      * @inheritdoc
      */
-    public function supports(HandlerArgument $argument): bool
+    public function supports(MessageHandlerArgument $argument): bool
     {
-        return true === $argument->isObject() && true === $this->serviceLocator->has((string) $argument->className());
+        return true === $argument->isObject && true === $this->serviceLocator->has((string) $argument->typeClass);
     }
 
     /**
@@ -48,10 +48,10 @@ final class ContainerArgumentResolver implements ArgumentResolver
      *
      * @return object
      */
-    public function resolve(Message $message, ServiceBusContext $context, HandlerArgument $argument): object
+    public function resolve(Message $message, ServiceBusContext $context, MessageHandlerArgument $argument): object
     {
         /** @var object $object */
-        $object = $this->serviceLocator->get((string) $argument->className());
+        $object = $this->serviceLocator->get((string) $argument->typeClass);
 
         return $object;
     }

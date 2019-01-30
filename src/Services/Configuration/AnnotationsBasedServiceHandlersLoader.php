@@ -16,8 +16,7 @@ use ServiceBus\AnnotationsReader\Annotation;
 use ServiceBus\AnnotationsReader\AnnotationCollection;
 use ServiceBus\AnnotationsReader\AnnotationsReader;
 use ServiceBus\AnnotationsReader\DoctrineAnnotationsReader;
-use ServiceBus\MessageHandlers\Handler;
-use ServiceBus\MessageHandlers\HandlerOptions;
+use ServiceBus\Common\MessageHandler\MessageHandler;
 use ServiceBus\Services\Annotations\CommandHandler;
 use ServiceBus\Services\Annotations\EventListener;
 use ServiceBus\Services\Annotations\ServicesAnnotationsMarker;
@@ -58,15 +57,17 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             /** @var \ReflectionMethod $handlerReflectionMethod */
             $handlerReflectionMethod = $annotation->reflectionMethod;
 
-            $factoryMethod = $handlerAnnotation instanceof CommandHandler ? 'commandHandler' : 'eventListener';
-
             /**
-             * @var Handler                      $handler
+             * @var MessageHandler               $handler
              * @var CommandHandler|EventListener $handlerAnnotation
              */
-            $handler = Handler::{$factoryMethod}(
-                $this->createOptions($handlerAnnotation),
-                $handlerReflectionMethod
+            $handler = MessageHandler::create(
+                $handlerReflectionMethod->getClosure($service),
+                $handlerReflectionMethod,
+                $this->createOptions(
+                    $handlerAnnotation,
+                    $handlerAnnotation instanceof CommandHandler
+                )
             );
 
             $collection->attach($handler);
@@ -80,29 +81,32 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
      *
      * @param ServicesAnnotationsMarker $annotation
      *
-     * @return HandlerOptions
+     * @return DefaultHandlerOptions
      *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
      */
-    private function createOptions(ServicesAnnotationsMarker $annotation): HandlerOptions
+    private function createOptions(ServicesAnnotationsMarker $annotation, bool $isCommandHandler): DefaultHandlerOptions
     {
         /** @var CommandHandler|EventListener $annotation */
 
-        $options = HandlerOptions::create();
+        $factoryMethod = true === $isCommandHandler ? 'createForCommandHandler' : 'createForEventListener';
+
+        /** @var DefaultHandlerOptions $options */
+        $options = DefaultHandlerOptions::{$factoryMethod}();
 
         if(true === $annotation->validate)
         {
-            $options->enableValidation($annotation->groups);
+            $options = $options->enableValidation($annotation->groups);
         }
 
         if('' !== (string) $annotation->defaultValidationFailedEvent)
         {
-            $options->useDefaultValidationFailedEvent((string) $annotation->defaultValidationFailedEvent);
+            $options = $options->withDefaultValidationFailedEvent((string) $annotation->defaultValidationFailedEvent);
         }
 
         if('' !== (string) $annotation->defaultThrowableEvent)
         {
-            $options->useDefaultThrowableEvent((string) $annotation->defaultThrowableEvent);
+            $options = $options->withDefaultThrowableEvent((string) $annotation->defaultThrowableEvent);
         }
 
         return $options;

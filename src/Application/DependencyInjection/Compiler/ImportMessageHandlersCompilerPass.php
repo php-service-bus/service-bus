@@ -12,6 +12,9 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Application\DependencyInjection\Compiler;
 
+use function ServiceBus\Common\canonicalizeFilesPath;
+use function ServiceBus\Common\extractNamespaceFromFile;
+use function ServiceBus\Common\searchFiles;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
