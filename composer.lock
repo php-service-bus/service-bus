@@ -1340,12 +1340,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "95eb9fa50e31c73dc6908039aa1cbf12238ca6b0"
+                "reference": "09a30fd3ea001111a7dd231fcb05b9b1d828ebc6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/95eb9fa50e31c73dc6908039aa1cbf12238ca6b0",
-                "reference": "95eb9fa50e31c73dc6908039aa1cbf12238ca6b0",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/09a30fd3ea001111a7dd231fcb05b9b1d828ebc6",
+                "reference": "09a30fd3ea001111a7dd231fcb05b9b1d828ebc6",
                 "shasum": ""
             },
             "require": {
@@ -1387,7 +1387,7 @@
                 "event-sourcing",
                 "messaging"
             ],
-            "time": "2019-01-30 15:40:02"
+            "time": "2019-01-30 16:04:18"
         },
         {
             "name": "php-service-bus/message-serializer",
