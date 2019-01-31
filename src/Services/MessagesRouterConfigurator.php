@@ -10,20 +10,22 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Application\DependencyInjection\Configurator;
+namespace ServiceBus\Services;
 
 use ServiceBus\Common\MessageExecutor\MessageExecutorFactory;
 use ServiceBus\Common\MessageHandler\MessageHandler;
 use ServiceBus\Common\Messages\Command;
 use ServiceBus\Common\Messages\Message;
-use ServiceBus\MessageRouter\Router;
+use ServiceBus\MessagesRouter\Exceptions\MessageRouterConfigurationFailed;
+use ServiceBus\MessagesRouter\Router;
+use ServiceBus\MessagesRouter\RouterConfigurator;
 use ServiceBus\Services\Configuration\ServiceHandlersLoader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  *
  */
-final class MessageRoutesConfigurator
+final class MessagesRouterConfigurator implements RouterConfigurator
 {
     /**
      * Message executor factory
@@ -72,49 +74,41 @@ final class MessageRoutesConfigurator
     }
 
     /**
-     * @param Router $router
-     *
-     * @return void
-     *
-     * @throws \Throwable Invalid handler definition
+     * @inheritDoc
      */
     public function configure(Router $router): void
     {
-        $this->registerServices($router);
-    }
-
-    /**
-     * @param Router $router
-     *
-     * @return void
-     *
-     * @throws \Throwable Invalid handler definition
-     */
-    private function registerServices(Router $router): void
-    {
-        /** @var ServiceHandlersLoader $serviceConfigurationExtractor */
-        $serviceConfigurationExtractor = $this->routingServiceLocator->get(ServiceHandlersLoader::class);
-
-        foreach($this->servicesList as $serviceId)
+        try
         {
-            /** @var object $serviceObject */
-            $serviceObject = $this->servicesServiceLocator->get(\sprintf('%s_service', $serviceId));
+            /** @var ServiceHandlersLoader $serviceConfigurationExtractor */
+            $serviceConfigurationExtractor = $this->routingServiceLocator->get(ServiceHandlersLoader::class);
 
-            /** @var \ServiceBus\Common\MessageHandler\MessageHandler $handler */
-            foreach($serviceConfigurationExtractor->load($serviceObject) as $handler)
+            foreach($this->servicesList as $serviceId)
             {
-                self::assertMessageClassSpecifiedInArguments($serviceObject, $handler);
+                /** @var object $serviceObject */
+                $serviceObject = $this->servicesServiceLocator->get(\sprintf('%s_service', $serviceId));
 
-                $messageExecutor = $this->executorFactory->create($handler);
+                /** @var \ServiceBus\Common\MessageHandler\MessageHandler $handler */
+                foreach($serviceConfigurationExtractor->load($serviceObject) as $handler)
+                {
+                    self::assertMessageClassSpecifiedInArguments($serviceObject, $handler);
 
-                $registerMethod = true === \is_a((string) $handler->messageClass, Command::class, true)
-                    ? 'registerHandler'
-                    : 'registerListener';
+                    $messageExecutor = $this->executorFactory->create($handler);
 
-                $router->{$registerMethod}((string) $handler->messageClass, $messageExecutor);
+                    $registerMethod = true === \is_a((string) $handler->messageClass, Command::class, true)
+                        ? 'registerHandler'
+                        : 'registerListener';
+
+                    $router->{$registerMethod}((string) $handler->messageClass, $messageExecutor);
+                }
             }
         }
+        catch(\Throwable $throwable)
+        {
+            throw new MessageRouterConfigurationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
+        }
     }
+
 
     /**
      * @param object         $service

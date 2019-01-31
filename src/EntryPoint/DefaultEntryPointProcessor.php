@@ -18,8 +18,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ServiceBus\Context\KernelContext;
 use ServiceBus\Endpoint\EndpointRouter;
-use ServiceBus\MessageRouter\Router;
 use ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed;
+use ServiceBus\MessagesRouter\Router;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 
 /**

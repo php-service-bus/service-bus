@@ -79,7 +79,7 @@ services:
     arguments:
       $messageDecoder: '@ServiceBus\EntryPoint\IncomingMessageDecoder'
       $endpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
-      $messagesRouter: '@ServiceBus\MessageRouter\Router'
+      $messagesRouter: '@ServiceBus\MessagesRouter\Router'
       $logger: '@service_bus.logger'
 
   # Application entry point
@@ -98,7 +98,7 @@ services:
     arguments:
       - ServiceBus\Services\Configuration\ServiceHandlersLoader: '@ServiceBus\Services\Configuration\ServiceHandlersLoader'
 
-  #
+  # Default message executor factory
   ServiceBus\Common\MessageExecutor\MessageExecutorFactory:
     class: ServiceBus\MessageExecutor\DefaultMessageExecutorFactory
     arguments:
@@ -107,15 +107,6 @@ services:
         - '@ServiceBus\ArgumentResolvers\ContextArgumentResolver'
         - '@ServiceBus\ArgumentResolvers\ContainerArgumentResolver'
       $validator: ~
-
-  # Message routes configurator
-  service_bus.message_routes_configurator:
-    class: ServiceBus\Application\DependencyInjection\Configurator\MessageRoutesConfigurator
-    arguments:
-      $executorFactory: '@ServiceBus\Common\MessageExecutor\MessageExecutorFactory'
-      $servicesList: '%service_bus.services_map%'
-      $routingServiceLocator: '@service_bus.routing_configuration_locator'
-      $servicesServiceLocator: '@service_bus.services_locator'
 
   # Default transport implementation
   ServiceBus\Transport\Common\Transport:
@@ -139,9 +130,24 @@ services:
     arguments:
       $defaultEndpoint: '@ServiceBus\Endpoint\Endpoint'
 
+  # Service bus messages router configuration
+  ServiceBus\Services\MessagesRouterConfigurator:
+    arguments:
+      $executorFactory: '@ServiceBus\Common\MessageExecutor\MessageExecutorFactory'
+      $servicesList: '%service_bus.services_map%'
+      $routingServiceLocator: '@service_bus.routing_configuration_locator'
+      $servicesServiceLocator: '@service_bus.services_locator'
+
+  # Chain router configurator
+  ServiceBus\MessagesRouter\ChainRouterConfigurator:
+    calls:
+      - method: addConfigurator
+        arguments:
+          - '@ServiceBus\Services\MessagesRouterConfigurator'
+
   # Incoming messages router
-  ServiceBus\MessageRouter\Router:
-    configurator: ['@service_bus.message_routes_configurator', configure]
+  ServiceBus\MessagesRouter\Router:
+    configurator: ['@ServiceBus\MessagesRouter\ChainRouterConfigurator', configure]
 
   # Passing message to arguments
   ServiceBus\ArgumentResolvers\MessageArgumentResolver:

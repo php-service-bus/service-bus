@@ -32,6 +32,7 @@
     "php-service-bus/transport-common": "dev-master",
     "php-service-bus/message-serializer": "dev-master",
     "php-service-bus/annotations-reader": "dev-master",
+    "php-service-bus/messages-router": "dev-master",
 
     "symfony/dependency-injection": "^v4.2",
     "symfony/config": "^v4.2",

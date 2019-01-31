@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "dc218230d05dedc790a52558056a9dae",
-    "content-hash": "8231fd2ec5a3af6a2438c9bb01a7700e",
+    "hash": "bb03ad617dff7abfbec9831a156d7b9e",
+    "content-hash": "bd8dfb3c14492805b9ddde57f2322eea",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1440,6 +1440,55 @@
                 "messaging"
             ],
             "time": "2019-01-26 10:44:15"
+        },
+        {
+            "name": "php-service-bus/messages-router",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-service-bus/messages-router.git",
+                "reference": "56db0ca0cc361549aabdda205a3d6e025c00bb4f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-service-bus/messages-router/zipball/56db0ca0cc361549aabdda205a3d6e025c00bb4f",
+                "reference": "56db0ca0cc361549aabdda205a3d6e025c00bb4f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2",
+                "php-service-bus/common": "dev-master"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7",
+                "symfony/dependency-injection": "^v4.2",
+                "vimeo/psalm": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ServiceBus\\MessagesRouter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "dev@async-php.com",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Messages router component",
+            "keywords": [
+                "async-php",
+                "command-bus",
+                "messaging"
+            ],
+            "time": "2019-01-31 13:57:32"
         },
         {
             "name": "php-service-bus/transport-common",
@@ -5018,6 +5067,7 @@
         "php-service-bus/transport-common": 20,
         "php-service-bus/message-serializer": 20,
         "php-service-bus/annotations-reader": 20,
+        "php-service-bus/messages-router": 20,
         "php-service-bus/module-phpinnacle-transport": 20
     },
     "prefer-stable": true,
