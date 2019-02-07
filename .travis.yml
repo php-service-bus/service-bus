@@ -4,11 +4,7 @@ php:
   - 7.2
   - 7.3
 
-addons:
-  postgresql: "9.5"
-
 services:
-  - postgresql
   - rabbitmq
 
 cache:
@@ -17,7 +13,6 @@ cache:
 
 before_script:
   - mkdir -p build/logs
-  - psql -c 'CREATE DATABASE test;' -U postgres
 
 install:
   - travis_retry composer install --no-interaction --no-suggest
@@ -30,3 +25,4 @@ script:
 after_script:
   - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar; fi
   - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then ./vendor/bin/psalm --config=psalm.xml; fi
