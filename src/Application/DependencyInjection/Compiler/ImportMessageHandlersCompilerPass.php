@@ -26,7 +26,13 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     /**
      * @inheritdoc
      *
-     * @throws \Exception
+     * @param ContainerBuilder $container
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     * @throws \ServiceBus\Common\Exceptions\File\LoadContentFailed
+     * @throws \ServiceBus\Common\Exceptions\File\NonexistentFile
      */
     public function process(ContainerBuilder $container): void
     {
@@ -46,6 +52,10 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      * @param array<int, string>       $excludedFiles
      *
      * @return void
+     *
+     * @throws \LogicException
+     * @throws \ServiceBus\Common\Exceptions\File\LoadContentFailed
+     * @throws \ServiceBus\Common\Exceptions\File\NonexistentFile
      */
     private function registerClasses(ContainerBuilder $container, \Generator $generator, array $excludedFiles): void
     {
@@ -93,13 +103,22 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      * @param string $filePath
      *
      * @return bool
+     *
+     * @throws \LogicException Error loading file contents
      */
     private static function isMessageHandler(string $filePath): bool
     {
         $fileContent = \file_get_contents($filePath);
 
-        return false !== \strpos($fileContent, '@CommandHandler') ||
-            false !== \strpos($fileContent, '@EventListener');
+        if(false !== $fileContent)
+        {
+            return false !== \strpos($fileContent, '@CommandHandler') ||
+                false !== \strpos($fileContent, '@EventListener');
+        }
+
+        throw new \LogicException(
+            \sprintf('Error loading "%s" file contents', $filePath)
+        );
     }
 
     /**
