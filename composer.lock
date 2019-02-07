@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "be584ea4e5ed5cabf75203569c3e8ccc",
-    "content-hash": "52de8cc2aadcf7a1257d109c7966fc85",
+    "hash": "d8e773be780e316a474edb3155117682",
+    "content-hash": "5d06e610860156d96fa122a53d171017",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1484,6 +1484,54 @@
                 "messaging"
             ],
             "time": "2019-02-07 13:01:47"
+        },
+        {
+            "name": "php-service-bus/storage-common",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-service-bus/storage-common.git",
+                "reference": "276d1f37699b0cbf028b3077b0d8d4ba8b2d20a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/276d1f37699b0cbf028b3077b0d8d4ba8b2d20a6",
+                "reference": "276d1f37699b0cbf028b3077b0d8d4ba8b2d20a6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "amphp/amp": "^2",
+                "phpunit/phpunit": "^7",
+                "vimeo/psalm": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ServiceBus\\Storage\\Common\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "dev@async-php.com",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Common storage parts",
+            "keywords": [
+                "async-php",
+                "command-bus",
+                "messaging"
+            ],
+            "time": "2019-02-07 11:21:00"
         },
         {
             "name": "php-service-bus/transport-common",

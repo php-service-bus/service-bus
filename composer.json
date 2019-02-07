@@ -27,6 +27,7 @@
       "ServiceBus\\Transport\\Amqp\\Tests\\": "vendor/php-service-bus/transport-amqp/tests",
       "ServiceBus\\Transport\\PhpInnacle\\Tests\\": "vendor/php-service-bus/transport-phpinnacle/tests",
       "ServiceBus\\Transport\\Module\\Tests\\": "vendor/php-service-bus/module-phpinnacle-transport/tests",
+      "ServiceBus\\Storage\\Common\\Tests\\":  "vendor/php-service-bus/storage-common/tests",
       "ServiceBus\\Tests\\": "tests/"
     },
     "files": [
@@ -38,6 +39,7 @@
 
     "php-service-bus/common": "^v3.0",
     "php-service-bus/transport-common": "^v3.0",
+    "php-service-bus/storage-common": "^v3.0",
     "php-service-bus/message-serializer": "^v3.0",
     "php-service-bus/annotations-reader": "^v3.0",
     "php-service-bus/messages-router": "^v3.0",
