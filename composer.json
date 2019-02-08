@@ -1,8 +1,14 @@
 {
-  "name": "mmasiukevich/service-bus",
+  "name": "php-service-bus/service-bus",
   "description": "PHP Service Bus (publish-subscribe pattern)",
   "type": "library",
-  "keywords": ["cqrs", "event-sourcing", "async-php", "command-bus", "messaging"],
+  "keywords": [
+    "async-php",
+    "command-bus",
+    "messaging",
+    "saga",
+    "event-sourcing"
+  ],
   "authors": [
     {
       "name": "Masiukevich Maksim",
