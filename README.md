@@ -22,7 +22,7 @@ Basically, it is suitable for development of distributed applications. By using 
 ```
 composer create-project php-service-bus/service-bus-skeleton my-project
 ```
-Demo application (WIP): [service-bus-demo](https://github.com/mmasiukevich/service-bus-demo)
+Demo application (WIP): [service-bus-demo](https://github.com/php-service-bus/service-bus-demo)
 
 #### Main Features
  - Cooperative multitasking
@@ -34,9 +34,9 @@ Demo application (WIP): [service-bus-demo](https://github.com/mmasiukevich/servi
  - Event Sourcing implementation
 
 #### Requirements
-  - PHP 7.2
+  - PHP 7.2+
   - RabbitMQ
-  - PostgreSQL
+  - PostgreSQL 9.5+
 
 ## Security
 
