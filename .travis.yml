@@ -21,8 +21,8 @@ install:
 
 script:
   - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.clover
+  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then ./vendor/bin/psalm --config=psalm.xml; fi
 
 after_script:
   - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar; fi
   - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
-  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then ./vendor/bin/psalm --config=psalm.xml; fi
