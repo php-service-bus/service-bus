@@ -22,9 +22,10 @@ interface ServiceHandlersLoader
      *
      * @param object $service
      *
-     * @return \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandler>
+     * @return \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandler, string>
      *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
+     * @throws \ServiceBus\Services\Exceptions\UnableCreateClosure
      * @throws \ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed
      */
     public function load(object $service): \SplObjectStorage;

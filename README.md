@@ -10,6 +10,7 @@ A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets yo
 
 ### Documentation
 
+
 ### Scope of use
 
 Basically, it is suitable for development of distributed applications. By using the Message Bus and Saga pattern it lets you decrease the coupling of contexts.

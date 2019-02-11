@@ -53,7 +53,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * Validation groups
      *
-     * @var array<int, string>
+     * @var array<array-key, string>
      */
     public $validationGroups = [];
 
@@ -96,7 +96,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * Enable validation
      *
-     * @param array<int, string> $validationGroups
+     * @param array<array-key, string> $validationGroups
      *
      * @return self
      */
@@ -174,7 +174,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      * @param bool        $isEventListener
      * @param bool        $isCommandHandler
      * @param bool        $validationEnabled
-     * @param array       $validationGroups
+     * @param array<array-key, string> $validationGroups
      * @param string|null $defaultValidationFailedEvent
      * @param string|null $defaultThrowableEvent
      */

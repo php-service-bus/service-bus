@@ -56,7 +56,7 @@ final class EndpointRouter
     /**
      * Add custom endpoint for multiple messages
      *
-     * @param array    $messages
+     * @param array<array-key, string>    $messages
      * @param Endpoint $endpoint
      *
      * @return void

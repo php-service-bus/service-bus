@@ -102,9 +102,13 @@ final class FileChangesWatcher
                 )
             );
 
+            /** @psalm-suppress TooManyTemplateParams Wrong Promise template */
             yield $process->start();
 
-            /** @var string $bufferContent */
+            /**
+             * @psalm-suppress TooManyTemplateParams Wrong Promise template
+             * @var string $bufferContent
+             */
             $bufferContent = yield buffer($process->getStdout());
 
             return $bufferContent;

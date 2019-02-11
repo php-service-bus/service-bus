@@ -36,8 +36,8 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
     /**
      * @noinspection PhpDocMissingThrowsInspection
      *
-     * @param array                   $argumentResolvers
-     * @param ValidatorInterface|null $validator
+     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
+     * @param ValidatorInterface|null                                       $validator
      */
     public function __construct(array $argumentResolvers, ?ValidatorInterface $validator = null)
     {

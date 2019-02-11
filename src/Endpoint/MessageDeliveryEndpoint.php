@@ -90,13 +90,15 @@ final class MessageDeliveryEndpoint implements Endpoint
     }
 
     /**
+     * @psalm-suppress MixedInferredReturnType
+     *
      * @inheritDoc
      */
     public function delivery(Message $message, DefaultDeliveryOptions $options): Promise
     {
         $encoded = $this->encoder->handler->encode($message);
 
-        $options= $options->withHeader(Transport::SERVICE_BUS_SERIALIZER_HEADER, $this->encoder->tag);
+        $options->withHeader(Transport::SERVICE_BUS_SERIALIZER_HEADER, $this->encoder->tag);
 
         $package = self::createPackage($encoded, $options, $this->destination);
 

@@ -99,6 +99,8 @@ final class KernelContext implements ServiceBusContext
     }
 
     /**
+     * @psalm-suppress MixedInferredReturnType
+     *
      * @inheritdoc
      */
     public function delivery(Message $message, ?DeliveryOptions $deliveryOptions = null): Promise
@@ -111,9 +113,9 @@ final class KernelContext implements ServiceBusContext
 
         $options = $deliveryOptions ?? DefaultDeliveryOptions::create();
 
-        if(null === $options->traceId)
+        if(null === $options->traceId())
         {
-            $options = $options->withTraceId($traceId);
+            $options->withTraceId($traceId);
         }
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
@@ -180,7 +182,7 @@ final class KernelContext implements ServiceBusContext
      */
     public function traceId(): string
     {
-        return $this->incomingPackage->traceId();
+        return (string) $this->incomingPackage->traceId();
     }
 
     /**

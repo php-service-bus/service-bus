@@ -20,6 +20,7 @@ use ServiceBus\Common\MessageHandler\MessageHandler;
 use ServiceBus\Services\Annotations\CommandHandler;
 use ServiceBus\Services\Annotations\EventListener;
 use ServiceBus\Services\Annotations\ServicesAnnotationsMarker;
+use ServiceBus\Services\Exceptions\UnableCreateClosure;
 
 /**
  * Getting a list of command and event handlers
@@ -57,12 +58,26 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             /** @var \ReflectionMethod $handlerReflectionMethod */
             $handlerReflectionMethod = $annotation->reflectionMethod;
 
+            /** @psalm-var \Closure(\ServiceBus\Common\Messages\Message, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
+            $closure = $handlerReflectionMethod->getClosure($service);
+
+            if(null === $closure)
+            {
+                throw new UnableCreateClosure(
+                    \sprintf(
+                        'Unable to create a closure for the "%s" method',
+                        $annotation->reflectionMethod ? $annotation->reflectionMethod->getName() : 'n\a'
+                    )
+                );
+            }
+
             /**
+             * @var \ReflectionMethod            $handlerReflectionMethod
              * @var MessageHandler               $handler
              * @var CommandHandler|EventListener $handlerAnnotation
              */
             $handler = MessageHandler::create(
-                $handlerReflectionMethod->getClosure($service),
+                $closure,
                 $handlerReflectionMethod,
                 $this->createOptions(
                     $handlerAnnotation,
@@ -72,6 +87,8 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
 
             $collection->attach($handler);
         }
+
+        /** @psalm-var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandler, string> $collection */
 
         return $collection;
     }

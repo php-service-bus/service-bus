@@ -34,7 +34,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $closure;
 
     /**
-     * @var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument>
+     * @var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string>
      */
     private $arguments;
 
@@ -53,10 +53,10 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $options;
 
     /**
-     * @param \Closure                                                                    $closure
-     * @param \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument> $arguments
-     * @param DefaultHandlerOptions                                                       $options
-     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>               $argumentResolvers
+     * @param \Closure                                                                            $closure
+     * @param \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
+     * @param DefaultHandlerOptions                                                               $options
+     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>                       $argumentResolvers
      */
     public function __construct(
         \Closure $closure,

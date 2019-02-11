@@ -111,9 +111,13 @@ final class EntryPoint
         return call(
             function(Queue $queue) use ($isTestCall): \Generator
             {
-                /** @var \Amp\Iterator $iterator */
+                /**
+                 * @psalm-suppress TooManyTemplateParams Wrong Iterator template
+                 * @var \Amp\Iterator $iterator
+                 */
                 $iterator = yield $this->transport->consume($queue);
 
+                /** @psalm-suppress TooManyTemplateParams Wrong Promise template */
                 while(yield $iterator->advance())
                 {
                     /** @var IncomingPackage $package */

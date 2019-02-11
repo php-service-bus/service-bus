@@ -50,21 +50,21 @@ final class ContainerBuilder
     /**
      * Extensions
      *
-     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension>
+     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension, string>
      */
     private $extensions;
 
     /**
      * CompilerPass collection
      *
-     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface>
+     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface, string>
      */
     private $compilerPasses;
 
     /**
      * Modules collection
      *
-     * @var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule>
+     * @var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule, string>
      */
     private $modules;
 
@@ -97,13 +97,13 @@ final class ContainerBuilder
         $this->environment    = $environment;
         $this->parameters     = [];
 
-        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension> $extensionCollection */
+        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension, string> $extensionCollection */
         $extensionCollection = new \SplObjectStorage();
 
-        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface> $compilerPassCollection */
+        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface, string> $compilerPassCollection */
         $compilerPassCollection = new \SplObjectStorage();
 
-        /** @var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule> $modulesCollection */
+        /** @var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule, string> $modulesCollection */
         $modulesCollection = new \SplObjectStorage();
 
         $this->extensions     = $extensionCollection;

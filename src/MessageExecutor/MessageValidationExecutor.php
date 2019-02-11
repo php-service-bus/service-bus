@@ -96,8 +96,8 @@ final class MessageValidationExecutor implements MessageExecutor
     /**
      * Publish failed event
      *
-     * @param string        $eventClass
-     * @param KernelContext $context
+     * @param string            $eventClass
+     * @param ServiceBusContext $context
      *
      * @return Promise
      */

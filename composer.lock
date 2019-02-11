@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d8e773be780e316a474edb3155117682",
-    "content-hash": "5d06e610860156d96fa122a53d171017",
+    "hash": "3c83333ababd704600ccf13db27118ac",
+    "content-hash": "44077a10519757da8ad8cb5481761f9c",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1334,16 +1334,16 @@
         },
         {
             "name": "php-service-bus/common",
-            "version": "v3.0.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "4832b5b1cf702eac55edddfdb62325aa20d5ba11"
+                "reference": "e3bc91b8b470fd8bb9579212009cee795e451903"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/4832b5b1cf702eac55edddfdb62325aa20d5ba11",
-                "reference": "4832b5b1cf702eac55edddfdb62325aa20d5ba11",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/e3bc91b8b470fd8bb9579212009cee795e451903",
+                "reference": "e3bc91b8b470fd8bb9579212009cee795e451903",
                 "shasum": ""
             },
             "require": {
@@ -1383,7 +1383,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-07 11:11:38"
+            "time": "2019-02-11 07:50:38"
         },
         {
             "name": "php-service-bus/message-serializer",
@@ -1535,16 +1535,16 @@
         },
         {
             "name": "php-service-bus/transport-common",
-            "version": "v3.0.x-dev",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-common.git",
-                "reference": "9a32550cc81cd500ebe586070c70f0acf6959066"
+                "reference": "85bdc0ae5a125d5f168308780e5bb625af387447"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/9a32550cc81cd500ebe586070c70f0acf6959066",
-                "reference": "9a32550cc81cd500ebe586070c70f0acf6959066",
+                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/85bdc0ae5a125d5f168308780e5bb625af387447",
+                "reference": "85bdc0ae5a125d5f168308780e5bb625af387447",
                 "shasum": ""
             },
             "require": {
@@ -1579,7 +1579,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-07 14:27:22"
+            "time": "2019-02-11 07:42:26"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -2381,7 +2381,7 @@
                 },
                 {
                     "name": "Gert de Pagter",
-                    "email": "backendtea@gmail.com"
+                    "email": "BackEndTea@gmail.com"
                 }
             ],
             "description": "Symfony polyfill for ctype functions",

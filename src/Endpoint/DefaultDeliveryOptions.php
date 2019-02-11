@@ -69,9 +69,9 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     public $traceId;
 
     /**
-     * @return self
+     * @inheritdoc
      */
-    public static function create(): self
+    public static function create(): DeliveryOptions
     {
         return new self();
     }
@@ -87,51 +87,44 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @param int|string|null $traceId
-     *
-     * @return self
+     * @inheritdoc
      */
-    public function withTraceId($traceId): self
+    public function withTraceId($traceId): void
     {
-        return new self(
-            $this->headers,
-            $this->isPersistent,
-            $this->isMandatory,
-            $this->isImmediate,
-            $this->expiredAfter,
-            $traceId
-        );
+        $this->traceId = $traceId;
     }
 
     /**
-     * @param string           $key
-     * @param string|int|float $value
-     *
-     * @return DefaultDeliveryOptions
+     * @inheritdoc
      */
-    public function withHeader(string $key, $value): self
+    public function withHeader(string $key, $value): void
     {
-        /** @var array<string, string|int|float> $headers */
-        $headers       = $this->headers;
-        $headers[$key] = $value;
-
-        return new self(
-            $headers,
-            $this->isPersistent,
-            $this->isMandatory,
-            $this->isImmediate,
-            $this->expiredAfter,
-            $this->traceId
-        );
+        $this->headers[$key] = $value;
     }
 
     /**
-     * @param array           $headers
-     * @param bool            $isPersistent
-     * @param bool            $isMandatory
-     * @param bool            $isImmediate
-     * @param int|null        $expiredAfter
-     * @param int|string|null $traceId
+     * @inheritDoc
+     */
+    public function traceId()
+    {
+        return $this->traceId;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function headers(): array
+    {
+        return $this->headers;
+    }
+
+    /**
+     * @param array<string, string|int|float> $headers
+     * @param bool                            $isPersistent
+     * @param bool                            $isMandatory
+     * @param bool                            $isImmediate
+     * @param int|null                        $expiredAfter
+     * @param int|string|null                 $traceId
      */
     private function __construct(
         array $headers = [],
