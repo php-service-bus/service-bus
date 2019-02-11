@@ -5,34 +5,31 @@
 [![Latest Stable Version](https://poser.pugx.org/php-service-bus/service-bus/v/stable)](https://packagist.org/packages/php-service-bus/service-bus)
 [![License](https://poser.pugx.org/php-service-bus/service-bus/license)](https://packagist.org/packages/php-service-bus/service-bus)
 
-### What is it?
-A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets you implement an asynchronous messaging, a transparent workflow and control of long-lived business transactions by means of the Saga pattern. It implements the [message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) and it includes the following patterns: Saga, Publish\Subscribe, Message Bus.
-
-### Documentation
-
-
-### Scope of use
-
-Basically, it is suitable for development of distributed applications. By using the Message Bus and Saga pattern it lets you decrease the coupling of contexts.
-
-### Performance
-
-[Performance comparison with the "symfony/messenger"](https://github.com/php-service-bus/performance-comparison)
-
-### Get started
-```
-composer create-project php-service-bus/service-bus-skeleton my-project
-```
-Demo application (WIP): [service-bus-demo](https://github.com/php-service-bus/service-bus-demo)
+## What is it?
+A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets you implement an asynchronous messaging, a transparent workflow and control of long-lived business transactions by means of the Saga pattern. It implements the [message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) and it includes the following patterns: Saga, CQRS, Publish\Subscribe, Message Bus.
 
 #### Main Features
- - Cooperative multitasking
-   - Significantly increases the processing speed in case of a large number of I/O operations
- - Asynchronous messaging
- - Distribution (messages can be handled by different processes).
-   - Subscribers can be implemented on any programming language.
- - Orchestration of long-lived business transactions (for example, a checkout) with the help of Saga pattern
- - Event Sourcing implementation
+ - Concurrency
+ - Asynchronous messaging (Publish\Subscribe pattern implementation)
+ - Event-driven architecture
+ - Distribution (messages can be handled by different processes)
+   - Subscribers can be implemented on any programming language
+ - High performance (Due to [cooperative multitasking](https://nikic.github.io/2012/12/22/Cooperative-multitasking-using-coroutines-in-PHP.html))
+   - [Performance comparison with the "symfony/messenger"](https://github.com/php-service-bus/performance-comparison)
+ - Orchestration of long-lived business transactions (for example, a checkout) with the help of [Saga Pattern](https://github.com/php-service-bus/service-bus/blob/master/doc/sagas.md)
+ - Full history of aggregate changes ([EventSourcing](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md))
+
+#### Scope of use
+Basically, it is suitable for development of distributed applications. By using the Message Bus and Saga pattern it lets you decrease the coupling of contexts.
+
+#### Get started
+```
+composer create-project php-service-bus/skeleton my-project
+```
+Demo application (WIP): [service-bus-demo](https://github.com/php-service-bus/demo)
+
+#### Documentation
+
 
 #### Requirements
   - PHP 7.2+
