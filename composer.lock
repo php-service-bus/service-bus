@@ -1338,12 +1338,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "e3bc91b8b470fd8bb9579212009cee795e451903"
+                "reference": "a9e3170dcd5523da89a0db97b27eed313e723738"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/e3bc91b8b470fd8bb9579212009cee795e451903",
-                "reference": "e3bc91b8b470fd8bb9579212009cee795e451903",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/a9e3170dcd5523da89a0db97b27eed313e723738",
+                "reference": "a9e3170dcd5523da89a0db97b27eed313e723738",
                 "shasum": ""
             },
             "require": {
@@ -1383,7 +1383,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-11 07:50:38"
+            "time": "2019-02-11 07:59:39"
         },
         {
             "name": "php-service-bus/message-serializer",
@@ -1487,16 +1487,16 @@
         },
         {
             "name": "php-service-bus/storage-common",
-            "version": "v3.0.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/storage-common.git",
-                "reference": "276d1f37699b0cbf028b3077b0d8d4ba8b2d20a6"
+                "reference": "6ee58724072711bcb568d83831ce5bb95f677d2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/276d1f37699b0cbf028b3077b0d8d4ba8b2d20a6",
-                "reference": "276d1f37699b0cbf028b3077b0d8d4ba8b2d20a6",
+                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/6ee58724072711bcb568d83831ce5bb95f677d2d",
+                "reference": "6ee58724072711bcb568d83831ce5bb95f677d2d",
                 "shasum": ""
             },
             "require": {
@@ -1531,7 +1531,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-07 11:21:00"
+            "time": "2019-02-11 14:16:18"
         },
         {
             "name": "php-service-bus/transport-common",

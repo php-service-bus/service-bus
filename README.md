@@ -26,7 +26,12 @@ composer create-project php-service-bus/skeleton my-project
 Demo application (WIP): [service-bus-demo](https://github.com/php-service-bus/demo)
 
 #### Documentation
+Documentation can be found in the [documentation](https://github.com/php-service-bus/documentation) repository
 
+* [Installation](https://github.com/php-service-bus/documentation/blob/master/pages/installation.md)
+* [Basic information](https://github.com/php-service-bus/documentation/blob/master/pages/basic_information.md)
+* [Available modules](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md)
+* [Available packages](https://github.com/php-service-bus/documentation/blob/master/pages/available_packages.md)
 
 #### Requirements
   - PHP 7.2+
