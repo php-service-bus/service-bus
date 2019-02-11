@@ -9,23 +9,23 @@
  - Асинхронное выполнение сообщений
  - Распределённость (сообщения могут обрабатываться разными процессами)
    - Подписчики могут быть написаны на любом языке программирования
- - Аркестрация долгоживущих бизнесс процессов (например, выполнение процесса оформления заказа в интернет магазине) с помощью [Saga Pattern](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md)
- - Полная история изменения агрегата благодаря применению [EventSourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md)
+ - Аркестрация долгоживущих бизнесс процессов (например, выполнение процесса оформления заказа в интернет магазине) с помощью [Saga Pattern](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_sagas.md)
+ - Полная история изменения агрегата благодаря применению [EventSourcing](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_event_sourcing.md)
  - Уменьшение связанности между компонентами (контекстами) приложения
 
 #### Документация
-- [EventSourcing](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_event_sourcing.md)
-- [Sagas](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_sagas.md)
-- [Messages (Command/Event/Query)](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_messages.md)
-- [Processing of messages](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_message_handlers.md)
-- [Scheduler](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_scheduler.md)
-- [Database adapters](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_storages.md)
-- [Initialization](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_initialization.md)
+- [EventSourcing](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_event_sourcing.md)
+- [Sagas](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_sagas.md)
+- [Messages (Command/Event/Query)](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_messages.md)
+- [Processing of messages](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_message_handlers.md)
+- [Scheduler](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_scheduler.md)
+- [Database adapters](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_storages.md)
+- [Initialization](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_initialization.md)
 
 #### Требования
   - PHP 7.2
-  - RabbitMQ (можно использовать свой транспорт, реализовав  [Transport](https://github.com/mmasiukevich/service-bus/blob/master/src/Infrastructure/Transport/Transport.php))
-  - PostgreSQL [Подробнее про адаптеры](https://github.com/mmasiukevich/service-bus/blob/master/doc/ru_storages.md)
+  - RabbitMQ (можно использовать свой транспорт, реализовав  [Transport](https://github.com/php-service-bus/service-bus/blob/master/src/Infrastructure/Transport/Transport.php))
+  - PostgreSQL [Подробнее про адаптеры](https://github.com/php-service-bus/service-bus/blob/master/doc/ru_storages.md)
 
 
 ## Безопасность

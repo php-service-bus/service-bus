@@ -1,17 +1,17 @@
 Table of contents
-* [What is Event Sourcing?](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#what-is-event-sourcing)
-* [Field of appliance](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#field-of-appliance)
-* [Event stream](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#event-stream)
-* [Problems](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#problems)
-* [Snapshots](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#snapshots)
-* [Projections](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#projections)
-* [Indexes](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#indexes)
-* [Aggregate example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#aggregate-example)
-* [Available methods](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#available-methods)
-* [Life cycle](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#life-cycle)
-* [Working with indexes](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#working-with-indexes)
-* [Working with snapshots](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#working-with-snapshots)
-* [Code example](https://github.com/mmasiukevich/service-bus/blob/master/doc/en_event_sourcing.md#code-examples)
+* [What is Event Sourcing?](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#what-is-event-sourcing)
+* [Field of appliance](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#field-of-appliance)
+* [Event stream](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#event-stream)
+* [Problems](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#problems)
+* [Snapshots](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#snapshots)
+* [Projections](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#projections)
+* [Indexes](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#indexes)
+* [Aggregate example](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#aggregate-example)
+* [Available methods](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#available-methods)
+* [Life cycle](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#life-cycle)
+* [Working with indexes](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#working-with-indexes)
+* [Working with snapshots](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#working-with-snapshots)
+* [Code example](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md#code-examples)
 
 #### What is Event Sourcing?
 While the classic scheme implies the storage of the final aggregate state, Event Sourcing persists the state of business entity as a sequence of state-changing events. For example, we have ```User<string:name, string:email, string:password_hash>``` structure. All data is stored in database as a table of ```users``` with fields of the same name. This approach doesn’t let us see the history of user data changes: at what time, by whom and under which conditions they were initiated. Also it isn’t possible to cancel some operations. Event Sourcing ensures that all changes to user state are stored as a sequence of events. For example ```UserRegisteredEvent```, ```UserPasswordChangedEvent```, ```UserEmailChangedEvent```, ```UserPasswordChangedEvent```. To restore current aggregate state we need to apply all events one by one in the initial order. As a result we can have a full history of changes.
@@ -79,22 +79,22 @@ final class Customer extends Aggregate
 ```
 #### Available methods
 While using the aggregate the following secure methods are available:
-* [close()](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L138): A soft delete analogue. We do not delete the event stream, we just tag it as closed. A closed stream cannot be received, and hence modified
-* [raise()](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Aggregate.php#L108): Appliance of an event to an aggregate. Naming of event listeners follows an ```on{ClassName}``` pattern, where *on* is a prefix, *{ClassName}* – a basic name of event class.
+* [close()](https://github.com/php-service-bus/service-bus/blob/master/src/EventSourcing/Aggregate.php#L138): A soft delete analogue. We do not delete the event stream, we just tag it as closed. A closed stream cannot be received, and hence modified
+* [raise()](https://github.com/php-service-bus/service-bus/blob/master/src/EventSourcing/Aggregate.php#L108): Appliance of an event to an aggregate. Naming of event listeners follows an ```on{ClassName}``` pattern, where *on* is a prefix, *{ClassName}* – a basic name of event class.
 
 #### Life cycle
-While creating a new aggregate event [AggregateCreated](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateCreated.php) will be sent into transport;  when the aggregate is closed - [AggregateClosed](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/Contract/AggregateClosed.php)
+While creating a new aggregate event [AggregateCreated](https://github.com/php-service-bus/service-bus/blob/master/src/EventSourcing/Contract/AggregateCreated.php) will be sent into transport;  when the aggregate is closed - [AggregateClosed](https://github.com/php-service-bus/service-bus/blob/master/src/EventSourcing/Contract/AggregateClosed.php)
 
 #### Working with indexes
-To work with indexes, use [IndexProvider](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php), which has the following methods  (the [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php) object is returned in each of them):
-* [get()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L54): Receive a saved value
-* [has()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L83): Was a value saved
-* [add()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L111): Add a value to index. Working principle is similar to the ```\Memcached:add```: method, if values with such a keyword didn’t exist it will return «true», otherwise - «false» (best choice)
-* [remove()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L142): Delete saved value
-* [update()](https://github.com/mmasiukevich/service-bus/blob/master/src/IndexProvider.php#L158): Update saved value
+To work with indexes, use [IndexProvider](https://github.com/php-service-bus/service-bus/blob/master/src/IndexProvider.php), which has the following methods  (the [Promise](https://github.com/amphp/amp/blob/master/lib/Promise.php) object is returned in each of them):
+* [get()](https://github.com/php-service-bus/service-bus/blob/master/src/IndexProvider.php#L54): Receive a saved value
+* [has()](https://github.com/php-service-bus/service-bus/blob/master/src/IndexProvider.php#L83): Was a value saved
+* [add()](https://github.com/php-service-bus/service-bus/blob/master/src/IndexProvider.php#L111): Add a value to index. Working principle is similar to the ```\Memcached:add```: method, if values with such a keyword didn’t exist it will return «true», otherwise - «false» (best choice)
+* [remove()](https://github.com/php-service-bus/service-bus/blob/master/src/IndexProvider.php#L142): Delete saved value
+* [update()](https://github.com/php-service-bus/service-bus/blob/master/src/IndexProvider.php#L158): Update saved value
 
 #### Working with snapshots
-By default only one strategy of snapshots generation is implemented - [SnapshotVersionTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/SnapshotTrigger/SnapshotVersionTrigger.php), which is based on versions (generates a snapshot every *N* version changes). Snapshots are created automatically, with an exclusion of strategy selection (you can implement your own snapshots with the help of  [SnapshotTrigger](https://github.com/mmasiukevich/service-bus/blob/master/src/EventSourcing/SnapshotTrigger/SnapshotTrigger.php) interface) no setting is required
+By default only one strategy of snapshots generation is implemented - [SnapshotVersionTrigger](https://github.com/php-service-bus/service-bus/blob/master/src/EventSourcing/SnapshotTrigger/SnapshotVersionTrigger.php), which is based on versions (generates a snapshot every *N* version changes). Snapshots are created automatically, with an exclusion of strategy selection (you can implement your own snapshots with the help of  [SnapshotTrigger](https://github.com/php-service-bus/service-bus/blob/master/src/EventSourcing/SnapshotTrigger/SnapshotTrigger.php) interface) no setting is required
 
 #### Code examples
 ```php

@@ -1,12 +1,12 @@
 {
-  "name": "mmasiukevich/service-bus",
+  "name": "php-service-bus/service-bus",
   "description": "PHP Service Bus (publish-subscribe pattern)",
   "type": "library",
   "keywords": ["cqs", "event-sourcing", "messaging", "publish-subscribe", "async-php", "amphp"],
   "authors": [
     {
       "name": "Masiukevich Maksim",
-      "email": "desperado@minsk-info.ru",
+      "email": "dev@async-php.com",
       "homepage": "https://github.com/mmasiukevich",
       "role": "Developer"
     }
