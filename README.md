@@ -19,9 +19,6 @@ A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets yo
  - Orchestration of long-lived business transactions (for example, a checkout) with the help of [Saga Pattern](https://github.com/php-service-bus/service-bus/blob/master/doc/sagas.md)
  - Full history of aggregate changes ([EventSourcing](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md))
 
-#### Scope of use
-Basically, it is suitable for development of distributed applications. By using the Message Bus and Saga pattern it lets you decrease the coupling of contexts.
-
 #### Get started
 ```
 composer create-project php-service-bus/skeleton my-project
