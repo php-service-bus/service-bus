@@ -37,8 +37,8 @@ Documentation can be found in the [documentation](https://github.com/php-service
   * [Transport](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#transport)
   * [Database](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#database)
 * [Available packages](https://github.com/php-service-bus/documentation/blob/master/pages/available_packages.md)
-  * [http-client](https://github.com/php-service-bus/documentation/blob/master/pages/packages/http_client.md)
-  * [cache](https://github.com/php-service-bus/documentation/blob/master/pages/packages/cache.md)
+  * [Http-client](https://github.com/php-service-bus/documentation/blob/master/pages/packages/http_client.md)
+  * [Cache](https://github.com/php-service-bus/documentation/blob/master/pages/packages/cache.md)
 
 #### Requirements
   - PHP 7.2+
