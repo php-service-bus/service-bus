@@ -53,7 +53,7 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
      * @param int    $logLevel
      * @param bool   $gzipMessage
      */
-    public function __construct(string $host, int $port, int $logLevel = Logger::DEBUG, bool $gzipMessage = false)
+    public function __construct(string $host =  '0.0.0.0', int $port = 514, int $logLevel = Logger::DEBUG, bool $gzipMessage = false)
     {
         $this->host        = $host;
         $this->port        = $port;
