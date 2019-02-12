@@ -26,18 +26,22 @@ final class UdpHandler extends AbstractProcessingHandler
      * @var string
      */
     private $host;
+
     /**
      * @var int
      */
     private $port;
+
     /**
      * @var ResourceOutputStream|null
      */
     private $outputStream;
+
     /**
      * @var bool
      */
     private $gzipMessage;
+
     /**
      * @param string $host
      * @param int    $port
@@ -54,27 +58,42 @@ final class UdpHandler extends AbstractProcessingHandler
     )
     {
         parent::__construct($level, $bubble);
+
         $this->host        = $host;
         $this->port        = $port;
         $this->gzipMessage = $gzipMessage;
     }
+
     /**
      * @inheritdoc
      *
      * @return void
-     *
-     * @throws \Amp\ByteStream\ClosedException
-     * @throws \RuntimeException Could not connect
      */
     protected function write(array $record): void
     {
-        $body = \json_encode($record);
-        if(true === $this->gzipMessage)
+        try
         {
-            $body = \gzcompress($body);
+            $body = \json_encode($record);
+
+            if(false === \is_string($body))
+            {
+                return;
+            }
+
+            if(true === $this->gzipMessage)
+            {
+                /** @noinspection UnnecessaryCastingInspection */
+                $body = (string) \gzcompress($body);
+            }
+
+            $this->outputStream()->write($body);
         }
-        $this->outputStream()->write($body);
+        catch(\Throwable $throwable)
+        {
+            /** Not interest */
+        }
     }
+
     /**
      * @inheritdoc
      */
@@ -82,6 +101,7 @@ final class UdpHandler extends AbstractProcessingHandler
     {
         return new Formatter();
     }
+
     /**
      * @return ResourceOutputStream
      *
@@ -93,8 +113,10 @@ final class UdpHandler extends AbstractProcessingHandler
         {
             $this->outputStream = new ResourceOutputStream(self::createStream($this->host, $this->port), 65000);
         }
+
         return $this->outputStream;
     }
+
     /**
      * @param string $host
      * @param int    $port
@@ -105,12 +127,14 @@ final class UdpHandler extends AbstractProcessingHandler
      */
     private static function createStream(string $host, int $port)
     {
-        $uri = \sprintf('udp://%s:%d', $host, $port);
+        $uri    = \sprintf('udp://%s:%d', $host, $port);
         $stream = @\stream_socket_client($uri, $errno, $errstr, 0, \STREAM_CLIENT_CONNECT);
+
         if(false === $stream)
         {
             throw new \RuntimeException(\sprintf('Could not connect to %s', $uri));
         }
+
         return $stream;
     }
 }

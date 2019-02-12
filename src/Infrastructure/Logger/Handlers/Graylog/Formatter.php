@@ -22,6 +22,7 @@ final class Formatter extends NormalizerFormatter
 {
     private const GRAYLOG_VERSION    = 1.0;
     private const DEFAULT_MAX_LENGTH = 32766;
+
     /**
      * Translates Monolog log levels to Graylog2 log priorities.
      */
@@ -35,18 +36,21 @@ final class Formatter extends NormalizerFormatter
         Logger::ALERT     => 1,
         Logger::EMERGENCY => 0,
     ];
+
     /**
      * The name of the system for the Gelf log message
      *
      * @var string
      */
     private $systemName;
+
     /**
      * Max length per field
      *
      * @var int
      */
     private $maxLength;
+
     /**
      * @noinspection PhpDocMissingThrowsInspection
      *
@@ -56,9 +60,12 @@ final class Formatter extends NormalizerFormatter
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         parent::__construct('U.u');
-        $this->systemName = \gethostname();
+
+        /** @noinspection UnnecessaryCastingInspection */
+        $this->systemName = (string) \gethostname();
         $this->maxLength  = $maxLength;
     }
+
     /**
      * @inheritdoc
      *
@@ -69,6 +76,7 @@ final class Formatter extends NormalizerFormatter
     {
         /** @var array{datetime:int, message:string, level:int, channel:string, extra:array|null, context:array|null} $normalizedRecord */
         $normalizedRecord = parent::format($record);
+
         /** @var array{
          *    version:float|int,
          *    host:string,
@@ -90,16 +98,21 @@ final class Formatter extends NormalizerFormatter
             'file'          => $normalizedRecord['extra']['file'] ?? null,
             'line'          => $normalizedRecord['extra']['line'] ?? null
         ];
+
         unset($normalizedRecord['extra']['file'], $normalizedRecord['extra']['line']);
+
         /** @var array<string, string|int|float|array|null> $extraData */
         $extraData = $normalizedRecord['extra'] ?? [];
+
         /** @var array<string, string|int|float|array|null> $contextData */
         $contextData = $normalizedRecord['context'] ?? [];
-        $formatted = $this->formatMessage((string) $normalizedRecord['message'], $formatted);
-        $formatted = $this->formatAdditionalData($extraData, $formatted);
-        $formatted = $this->formatAdditionalData($contextData, $formatted);
+        $formatted   = $this->formatMessage((string) $normalizedRecord['message'], $formatted);
+        $formatted   = $this->formatAdditionalData($extraData, $formatted);
+        $formatted   = $this->formatAdditionalData($contextData, $formatted);
+
         return \array_filter($formatted);
     }
+
     /**
      * Format message data
      *
@@ -111,13 +124,16 @@ final class Formatter extends NormalizerFormatter
     private function formatMessage(string $message, array $formatted): array
     {
         $len = 200 + \strlen($message) + \strlen($this->systemName);
+
         if($len > $this->maxLength)
         {
             $formatted['short_message'] = \substr($message, 0, $this->maxLength);
             $formatted['full_message']  = $message;
         }
+
         return $formatted;
     }
+
     /**
      * Format extra\context data
      *
@@ -138,20 +154,27 @@ final class Formatter extends NormalizerFormatter
         foreach($collection as $key => $value)
         {
             $value = $this->formatValue($key, $value);
+
             if(null === $value)
             {
                 continue;
             }
+
             $len = \strlen($key . $value);
+
             if(true === \is_string($value) && $len > $this->maxLength)
             {
                 $formatted[$key] = \substr($value, 0, $this->maxLength);
+
                 continue;
             }
+
             $formatted[$key] = $value;
         }
+
         return $formatted;
     }
+
     /**
      * @param string                             $key
      * @param string|int|float|array|object|null $value
@@ -167,11 +190,13 @@ final class Formatter extends NormalizerFormatter
         {
             return $value;
         }
+
         /** @psalm-suppress RedundantConditionGivenDocblockType */
         if(true === \is_array($value) || true === \is_object($value))
         {
             return $this->toJson($value);
         }
+
         throw new \LogicException(
             \sprintf('Invalid "%s" field value type: "%s"', $key, \gettype($value))
         );
