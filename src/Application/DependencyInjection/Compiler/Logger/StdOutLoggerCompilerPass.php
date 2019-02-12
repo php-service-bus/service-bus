@@ -33,7 +33,7 @@ final class StdOutLoggerCompilerPass implements CompilerPassInterface
     /**
      * @param int $logLevel
      */
-    public function __construct(int $logLevel)
+    public function __construct(int $logLevel = Logger::DEBUG)
     {
         $this->logLevel = $logLevel;
     }
