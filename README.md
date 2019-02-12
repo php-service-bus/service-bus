@@ -32,15 +32,13 @@ Documentation can be found in the [documentation](https://github.com/php-service
 * [Basic information](https://github.com/php-service-bus/documentation/blob/master/pages/basic_information.md)
 * [Available modules](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md)
   * [Components](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#components)
-    * [Sagas](https://github.com/php-service-bus/documentation/blob/master/pages/modules/sagas.md)
-    * [Event Sourcing](https://github.com/php-service-bus/documentation/blob/master/pages/modules/event_sourcing.md)
-  * [Infrastructure](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#infrastructure)
-    * [Transport](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#transport)
-    * [Database](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#database)
-    * [Logger](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#logger)
+  * [Sagas](https://github.com/php-service-bus/documentation/blob/master/pages/modules/sagas.md)
+  * [Event Sourcing](https://github.com/php-service-bus/documentation/blob/master/pages/modules/event_sourcing.md)
+  * [Transport](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#transport)
+  * [Database](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#database)
 * [Available packages](https://github.com/php-service-bus/documentation/blob/master/pages/available_packages.md)
-  * [http-client](https://github.com/php-service-bus/documentation/blob/master/pages/available_packages.md#http-client)
-  * [cache](https://github.com/php-service-bus/documentation/blob/master/pages/available_packages.md#cache)
+  * [http-client](https://github.com/php-service-bus/documentation/blob/master/pages/packages/http_client.md)
+  * [cache](https://github.com/php-service-bus/documentation/blob/master/pages/packages/cache.md)
 
 #### Requirements
   - PHP 7.2+
