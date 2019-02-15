@@ -16,8 +16,8 @@ A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets yo
    - Subscribers can be implemented on any programming language
  - High performance (Due to [cooperative multitasking](https://nikic.github.io/2012/12/22/Cooperative-multitasking-using-coroutines-in-PHP.html))
    - [Performance comparison with the "symfony/messenger"](https://github.com/php-service-bus/performance-comparison)
- - Orchestration of long-lived business transactions (for example, a checkout) with the help of [Saga Pattern](https://github.com/php-service-bus/service-bus/blob/master/doc/sagas.md)
- - Full history of aggregate changes ([EventSourcing](https://github.com/php-service-bus/service-bus/blob/master/doc/en_event_sourcing.md))
+ - Orchestration of long-lived business transactions (for example, a checkout) with the help of Saga Pattern
+ - Full history of aggregate changes (EventSourcing)
 
 #### Get started
 ```
@@ -44,6 +44,10 @@ Documentation can be found in the [documentation](https://github.com/php-service
   - PHP 7.2+
   - RabbitMQ
   - PostgreSQL 9.5+
+
+## Contacts
+* [Telegram chat](https://t.me/php_service_bus)
+* [`dev@async-php.com`](mailto:dev@async-php.com)
 
 ## Security
 
