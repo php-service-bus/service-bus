@@ -190,7 +190,6 @@ final class ServiceBusKernelTest extends TestCase
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
-        static::assertCount(7, $records);
 
         $latest = \end($records);
         \reset($records);
