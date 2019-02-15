@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/php-service-bus/service-bus.svg?branch=v3.0)](https://travis-ci.org/php-service-bus/service-bus)
 [![Code Coverage](https://scrutinizer-ci.com/g/php-service-bus/service-bus/badges/coverage.png?b=v3.0)](https://scrutinizer-ci.com/g/php-service-bus/service-bus/?branch=v3.0)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/php-service-bus/service-bus/badges/quality-score.png?b=v3.0)](https://scrutinizer-ci.com/g/php-service-bus/service-bus/?branch=v3.0)
-[![SymfonyInsight](https://insight.symfony.com/projects/4c7edc8a-3dfc-432e-9749-35ecdfc927bb/mini.svg)](https://insight.symfony.com/projects/4c7edc8a-3dfc-432e-9749-35ecdfc927bb)
+[![SymfonyInsight](https://insight.symfony.com/projects/cc0f0f0b-56f1-4ff6-b37d-69ce5db06f32/mini.svg)](https://insight.symfony.com/projects/cc0f0f0b-56f1-4ff6-b37d-69ce5db06f32)
 [![Latest Stable Version](https://poser.pugx.org/php-service-bus/service-bus/v/stable)](https://packagist.org/packages/php-service-bus/service-bus)
 [![License](https://poser.pugx.org/php-service-bus/service-bus/license)](https://packagist.org/packages/php-service-bus/service-bus)
 
