@@ -22,14 +22,16 @@ final class EnvironmentTest extends TestCase
 {
     /**
      * @test
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Provided incorrect value of the environment: "qwerty". Allowable values: prod, dev,
-     *                           test
      *
      * @return void
+     *
+     * @throws \Throwable
      */
     public function wrongEnvironment(): void
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Provided incorrect value of the environment: "qwerty". Allowable values: prod, dev, test');
+
         Environment::create('qwerty');
     }
 

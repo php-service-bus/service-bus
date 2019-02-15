@@ -14,6 +14,7 @@ namespace ServiceBus\Endpoint;
 
 use function Amp\call;
 use Amp\Promise;
+use ServiceBus\Common\Endpoint\DeliveryOptions;
 use ServiceBus\Common\Messages\Message;
 use ServiceBus\Infrastructure\Retry\OperationRetryWrapper;
 use ServiceBus\Transport\Common\DeliveryDestination;
@@ -90,11 +91,25 @@ final class MessageDeliveryEndpoint implements Endpoint
     }
 
     /**
+     * @inheritDoc
+     */
+    public function withNewDeliveryDestination(DeliveryDestination $destination): Endpoint
+    {
+        return new self(
+            $this->name,
+            $this->transport,
+            $destination,
+            $this->encoder,
+            $this->deliveryRetryHandler
+        );
+    }
+
+    /**
      * @psalm-suppress MixedInferredReturnType
      *
      * @inheritDoc
      */
-    public function delivery(Message $message, DefaultDeliveryOptions $options): Promise
+    public function delivery(Message $message, DeliveryOptions $options): Promise
     {
         $encoded = $this->encoder->handler->encode($message);
 
@@ -115,27 +130,28 @@ final class MessageDeliveryEndpoint implements Endpoint
     /**
      * Create outbound package with specified parameters
      *
-     * @param string                 $payload
-     * @param DefaultDeliveryOptions $options
-     * @param DeliveryDestination    $destination
+     * @param string              $payload
+     * @param DeliveryOptions     $options
+     * @param DeliveryDestination $destination
      *
      * @return OutboundPackage
      */
     private static function createPackage(
         string $payload,
-        DefaultDeliveryOptions $options,
+        DeliveryOptions $options,
         DeliveryDestination $destination
     ): OutboundPackage
     {
         return OutboundPackage::create(
             $payload,
-            $options->headers,
+            $options->headers(),
             $destination,
-            $options->traceId,
-            $options->isPersistent,
-            $options->isMandatory,
-            $options->isImmediate,
-            $options->expiredAfter
+            $options->traceId(),
+            $options->isPersistent(),
+            true,
+            // @todo: fixme
+            false,
+            $options->expirationAfter()
         );
     }
 }

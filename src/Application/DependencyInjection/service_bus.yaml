@@ -5,7 +5,7 @@ parameters:
 
   # Decoder relation
   service_bus.decoder_configuration: []
-    # -'custom_encoder_key': 'custom_decoder_id'
+  # -'custom_encoder_key': 'custom_decoder_id'
 
 services:
   _defaults:
@@ -66,6 +66,8 @@ services:
         ServiceBus\EntryPoint\EntryPoint: '@ServiceBus\EntryPoint\EntryPoint'
         ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
         ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher: '@ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher'
+        ServiceBus\Endpoint\Endpoint: '@ServiceBus\Endpoint\Endpoint'
+        ServiceBus\Endpoint\EndpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
 
   # Incoming message decoder
   ServiceBus\EntryPoint\IncomingMessageDecoder:

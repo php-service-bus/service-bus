@@ -13,7 +13,6 @@ declare(strict_types = 1);
 namespace ServiceBus\Application\DependencyInjection\Compiler\Logger;
 
 use Monolog\Logger;
-use Psr\Log\NullLogger;
 use ServiceBus\Infrastructure\Logger\Handlers\Graylog\UdpHandler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

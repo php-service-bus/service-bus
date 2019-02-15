@@ -66,7 +66,7 @@
   "require-dev": {
     "php-service-bus/module-phpinnacle-transport": "^v3.0",
     "kelunik/loop-block": "^1.0",
-    "phpunit/phpunit": "^7",
+    "phpunit/phpunit": "^8",
     "vimeo/psalm": "^v3"
   },
   "prefer-stable": true,

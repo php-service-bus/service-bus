@@ -73,6 +73,8 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
      */
     private function collectServiceDependencies(string $serviceClass, ContainerBuilder $container, array &$servicesReference): void
     {
+        /** @psalm-var class-string $serviceClass */
+
         $reflectionClass = new \ReflectionClass($serviceClass);
 
         foreach($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod)

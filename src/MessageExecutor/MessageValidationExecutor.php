@@ -17,7 +17,6 @@ use Amp\Promise;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
-use ServiceBus\Context\KernelContext;
 use function ServiceBus\Common\invokeReflectionMethod;
 use ServiceBus\Common\Messages\Message;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;

@@ -45,7 +45,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
      *
      * @var bool
      */
-    public $isMandatory = false;
+    public $isMandatory = true;
 
     /**
      * The message will be sent with the highest priority
@@ -119,6 +119,30 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isPersistent(): bool
+    {
+        return $this->isPersistent;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isHighestPriority(): bool
+    {
+        return $this->isImmediate;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function expirationAfter(): ?int
+    {
+        return $this->expiredAfter;
+    }
+
+    /**
      * @param array<string, string|int|float> $headers
      * @param bool                            $isPersistent
      * @param bool                            $isMandatory
@@ -129,7 +153,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     private function __construct(
         array $headers = [],
         bool $isPersistent = true,
-        bool $isMandatory = false,
+        bool $isMandatory = true,
         bool $isImmediate = false,
         ?int $expiredAfter = null,
         $traceId = null

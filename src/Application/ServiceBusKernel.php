@@ -21,6 +21,7 @@ use ServiceBus\EntryPoint\EntryPoint;
 use ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 use ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
+use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Queue;
 use ServiceBus\Transport\Common\QueueBind;
 use ServiceBus\Transport\Common\Topic;
@@ -266,23 +267,50 @@ final class ServiceBusKernel
     }
 
     /**
-     * Apply specific route to deliver a message
+     * Apply specific route to deliver a messages
      * By default, messages will be sent to the application transport. If a different option is specified for the
      * message, it will be sent only to it
      *
-     * @param string   $messageClass
      * @param Endpoint $endpoint
+     * @param string   ...$messages
      *
-     * @return void
+     * @return ServiceBusKernel
      *
      * @throws \Throwable
      */
-    public function registerMessageCustomEndpoint(string $messageClass, Endpoint $endpoint): void
+    public function registerEndpointForMessages(Endpoint $endpoint, string ...$messages): self
     {
         /** @var EndpointRouter $entryPointRouter */
         $entryPointRouter = $this->getKernelContainerService(EndpointRouter::class);
 
-        $entryPointRouter->registerRoute($messageClass, $endpoint);
+        foreach($messages as $messageClass)
+        {
+            $entryPointRouter->registerRoute($messageClass, $endpoint);
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     *
+     * @param DeliveryDestination $deliveryDestination
+     * @param string              ...$messages
+     *
+     * @return ServiceBusKernel
+     *
+     * @throws \Throwable
+     *
+     * @throws \Throwable
+     */
+    public function registerDestinationForMessages(DeliveryDestination $deliveryDestination, string ...$messages): self
+    {
+        /** @var Endpoint $applicationEndpoint */
+        $applicationEndpoint = $this->getKernelContainerService(Endpoint::class);
+
+        $newEndpoint = $applicationEndpoint->withNewDeliveryDestination($deliveryDestination);
+
+        return $this->registerEndpointForMessages($newEndpoint, ...$messages);
     }
 
     /**

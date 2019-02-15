@@ -22,12 +22,15 @@ final class EventListenerTest extends TestCase
 {
     /**
      * @test
-     * @expectedException \InvalidArgumentException
      *
      * @return void
+     *
+     * @throws \Throwable
      */
     public function withWrongProperties(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         new EventListener(['qwerty' => 'root']);
     }
 

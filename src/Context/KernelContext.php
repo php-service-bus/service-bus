@@ -120,7 +120,7 @@ final class KernelContext implements ServiceBusContext
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Message $message, DefaultDeliveryOptions $options) use ($endpoints, $logger, $traceId): \Generator
+            static function(Message $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): \Generator
             {
                 foreach($endpoints as $endpoint)
                 {
