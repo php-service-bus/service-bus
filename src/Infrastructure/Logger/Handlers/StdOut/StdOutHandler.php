@@ -20,6 +20,8 @@ use Monolog\Logger;
 
 /**
  * Console output handler
+ *
+ * @codeCoverageIgnore
  */
 final class StdOutHandler extends AbstractProcessingHandler
 {
@@ -43,12 +45,19 @@ final class StdOutHandler extends AbstractProcessingHandler
      * @inheritdoc
      *
      * @return void
-     *
-     * @throws \Amp\ByteStream\ClosedException
      */
     protected function write(array $record): void
     {
-        $this->streamWriter->write((string) $record['formatted']);
+        try
+        {
+            $this->streamWriter->write((string) $record['formatted']);
+        }
+            // @codeCoverageIgnoreStart
+        catch(\Throwable $throwable)
+        {
+            /** Not interest */
+        }
+        // @codeCoverageIgnoreEnd
     }
 
     /**

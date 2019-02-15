@@ -19,6 +19,8 @@ use Monolog\Logger;
 
 /**
  * Graylog UDP handler
+ *
+ * @codeCoverageIgnore
  */
 final class UdpHandler extends AbstractProcessingHandler
 {
@@ -75,10 +77,12 @@ final class UdpHandler extends AbstractProcessingHandler
         {
             $body = \json_encode($record);
 
+            // @codeCoverageIgnoreStart
             if(false === \is_string($body))
             {
                 return;
             }
+            // @codeCoverageIgnoreEnd
 
             if(true === $this->gzipMessage)
             {
@@ -88,10 +92,12 @@ final class UdpHandler extends AbstractProcessingHandler
 
             $this->outputStream()->write($body);
         }
+            // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
             /** Not interest */
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**

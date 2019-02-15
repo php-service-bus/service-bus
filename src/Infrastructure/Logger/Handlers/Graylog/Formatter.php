@@ -56,20 +56,19 @@ final class Formatter extends NormalizerFormatter
      *
      * @param int $maxLength
      */
-    public function __construct(int $maxLength = self::DEFAULT_MAX_LENGTH)
+    public function __construct(?string $systemName = null, ?int $maxLength = null)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         parent::__construct('U.u');
 
         /** @noinspection UnnecessaryCastingInspection */
-        $this->systemName = (string) \gethostname();
-        $this->maxLength  = $maxLength;
+        $this->systemName = $systemName ?? (string) \gethostname();
+        $this->maxLength  = $maxLength ?? self::DEFAULT_MAX_LENGTH;
     }
 
     /**
      * @inheritdoc
      *
-     * @throws \LogicException Invalid type
      * @throws \RuntimeException if encoding fails and errors are not ignored
      */
     public function format(array $record): array
@@ -142,7 +141,6 @@ final class Formatter extends NormalizerFormatter
      *
      * @return array
      *
-     * @throws \LogicException Invalid type
      * @throws \RuntimeException if encoding fails and errors are not ignored
      */
     private function formatAdditionalData(array $collection, array $formatted): array
@@ -153,7 +151,7 @@ final class Formatter extends NormalizerFormatter
          */
         foreach($collection as $key => $value)
         {
-            $value = $this->formatValue($key, $value);
+            $value = $this->formatValue($value);
 
             if(null === $value)
             {
@@ -176,29 +174,19 @@ final class Formatter extends NormalizerFormatter
     }
 
     /**
-     * @param string                             $key
      * @param string|int|float|array|object|null $value
      *
      * @return string|int|float|null
      *
-     * @throws \LogicException Invalid type
      * @throws \RuntimeException if encoding fails and errors are not ignored
      */
-    private function formatValue(string $key, $value)
+    private function formatValue($value)
     {
         if(null === $value || true === \is_scalar($value))
         {
             return $value;
         }
 
-        /** @psalm-suppress RedundantConditionGivenDocblockType */
-        if(true === \is_array($value) || true === \is_object($value))
-        {
-            return $this->toJson($value);
-        }
-
-        throw new \LogicException(
-            \sprintf('Invalid "%s" field value type: "%s"', $key, \gettype($value))
-        );
+        return $this->toJson($value);
     }
 }

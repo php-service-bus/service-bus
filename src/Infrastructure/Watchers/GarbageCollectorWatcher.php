@@ -15,9 +15,12 @@ namespace ServiceBus\Infrastructure\Watchers;
 use Amp\Loop;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use function ServiceBus\formatBytes;
 
 /**
  * Periodic forced launch of the garbage collector
+ *
+ * @codeCoverageIgnore
  */
 final class GarbageCollectorWatcher
 {
@@ -73,33 +76,11 @@ final class GarbageCollectorWatcher
                 $logger->info('Forces collection of any existing garbage cycles', ['number' => \gc_collect_cycles()]);
                 $logger->info(
                     'Reclaims memory used by the Zend Engine memory manager',
-                    ['bytes' => self::formatBytes(\gc_mem_caches())]
+                    ['bytes' => formatBytes(\gc_mem_caches())]
                 );
             }
         );
 
         Loop::unreference($this->watcherId);
-    }
-
-    /**
-     * Formats bytes into a human readable string
-     *
-     * @param int $bytes
-     *
-     * @return string
-     */
-    private static function formatBytes(int $bytes): string
-    {
-        if(1024 * 1024 < $bytes)
-        {
-            return \round($bytes / 1024 / 1024, 2) . ' mb';
-        }
-
-        if(1024 < $bytes)
-        {
-            return \round($bytes / 1024, 2) . ' kb';
-        }
-
-        return $bytes . ' b';
     }
 }

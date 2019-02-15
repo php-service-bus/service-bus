@@ -64,10 +64,12 @@ final class FileChangesWatcher
                 $hash = self::extractHash($bufferContent);
 
                 /** A runtime error has occurred */
+                // @codeCoverageIgnoreStart
                 if(null === $hash)
                 {
                     return false;
                 }
+                // @codeCoverageIgnoreEnd
 
                 /** New hash is different from previously received */
                 if(null !== $this->previousHash && $this->previousHash !== $hash)
@@ -113,10 +115,12 @@ final class FileChangesWatcher
 
             return $bufferContent;
         }
+            // @codeCoverageIgnoreStart
         catch(\Throwable $throwable)
         {
             return '';
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**

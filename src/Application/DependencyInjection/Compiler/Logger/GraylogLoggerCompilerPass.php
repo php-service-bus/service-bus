@@ -52,7 +52,7 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
      * @param int    $logLevel
      * @param bool   $gzipMessage
      */
-    public function __construct(string $host =  '0.0.0.0', int $port = 514, int $logLevel = Logger::DEBUG, bool $gzipMessage = false)
+    public function __construct(string $host = '0.0.0.0', int $port = 514, int $logLevel = Logger::DEBUG, bool $gzipMessage = false)
     {
         $this->host        = $host;
         $this->port        = $port;
@@ -71,7 +71,7 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
 
         $handlerDefinition = new Definition(UdpHandler::class, [
             '%service_bus.logger.graylog.udp_host%',
-            '%service_bus.logger.graylog.udp_port',
+            '%service_bus.logger.graylog.udp_port%',
             '%service_bus.logger.graylog.gzip%',
             '%service_bus.logger.graylog.log_level%'
         ]);

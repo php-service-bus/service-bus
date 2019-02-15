@@ -101,6 +101,11 @@ final class ServiceBusKernelTest extends TestCase
 
         $this->kernel = new ServiceBusKernel($this->container);
 
+        $this->kernel
+            ->enableGarbageCleaning()
+            ->monitorLoopBlock()
+            ->stopWhenFilesChange(__DIR__);
+
         $topic = AmqpExchange::direct('test_topic');
         $queue = new AmqpQueue('test_queue');
 
@@ -158,7 +163,6 @@ final class ServiceBusKernelTest extends TestCase
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
-        static::assertCount(6, $records);
 
         $latest = \end($records);
 
@@ -186,7 +190,7 @@ final class ServiceBusKernelTest extends TestCase
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
-        static::assertCount(6, $records);
+        static::assertCount(7, $records);
 
         $latest = \end($records);
         \reset($records);
