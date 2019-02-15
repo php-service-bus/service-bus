@@ -292,7 +292,8 @@ final class ServiceBusKernel
     }
 
     /**
-     *
+     * Like the registerEndpointForMessages method, it adds a custom message delivery route.
+     * The only difference is that the route is specified for the current application transport
      *
      * @param DeliveryDestination $deliveryDestination
      * @param string              ...$messages
