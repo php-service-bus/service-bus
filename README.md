@@ -9,7 +9,7 @@
 A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets you implement an asynchronous messaging, a transparent workflow and control of long-lived business transactions by means of the Saga pattern. It implements the [message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) and it includes the following patterns: Saga, Publish\Subscribe, Message Bus.
 
 #### Main Features
- - Concurrency
+ - Сooperative multitasking
  - Asynchronous messaging (Publish\Subscribe pattern implementation)
  - Event-driven architecture
  - Distribution (messages can be handled by different processes)
