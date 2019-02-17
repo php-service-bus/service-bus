@@ -14,7 +14,7 @@ A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets yo
  - Event-driven architecture
  - Distribution (messages can be handled by different processes)
    - Subscribers can be implemented on any programming language
- - High performance (Due to [cooperative multitasking](https://nikic.github.io/2012/12/22/Cooperative-multitasking-using-coroutines-in-PHP.html))
+ - High performance 
    - [Performance comparison with the "symfony/messenger"](https://github.com/php-service-bus/performance-comparison)
  - Orchestration of long-lived business transactions (for example, a checkout) with the help of Saga Pattern
  - Full history of aggregate changes (EventSourcing)
