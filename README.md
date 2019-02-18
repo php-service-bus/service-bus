@@ -47,7 +47,7 @@ Documentation can be found in the [documentation](https://github.com/php-service
   - PostgreSQL 9.5+
 
 ## Contacts
-* [Telegram chat](https://t.me/php_service_bus)
+* [Telegram chat (RU)](https://t.me/php_service_bus)
 * [`dev@async-php.com`](mailto:dev@async-php.com)
 
 ## Security
