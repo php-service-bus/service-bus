@@ -135,21 +135,23 @@ final class EntryPoint
                         break;
                     }
 
-                    $this->processor->handle($package)->onResolve(
-                        function(?\Throwable $throwable) use ($package): void
+                    Loop::defer(
+                        function() use ($package): \Generator
                         {
-                            $this->currentTasksInProgressCount--;
-
-                            if(null === $throwable)
+                            try
                             {
-                                return;
-                            }
+                                yield $this->processor->handle($package);
 
-                            $this->logger->critical($throwable->getMessage(), [
-                                'packageId'      => $package->id(),
-                                'traceId'        => $package->traceId(),
-                                'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-                            ]);
+                                $this->currentTasksInProgressCount--;
+                            }
+                            catch(\Throwable $throwable)
+                            {
+                                $this->logger->critical($throwable->getMessage(), [
+                                    'packageId'      => $package->id(),
+                                    'traceId'        => $package->traceId(),
+                                    'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                                ]);
+                            }
                         }
                     );
 
