@@ -96,7 +96,7 @@ final class EntryPoint
     /**
      * Start queue listen
      *
-     * @param Queue     $queue
+     * @param Queue $queue
      *
      * @return Promise It does not return any result
      */
@@ -120,15 +120,10 @@ final class EntryPoint
                 /** @psalm-suppress TooManyTemplateParams Wrong Promise template */
                 while(yield $iterator->advance())
                 {
+                    $this->currentTasksInProgressCount++;
+
                     /** @var IncomingPackage $package */
                     $package = $iterator->getCurrent();
-
-                    while($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
-                    {
-                        yield new Delayed($this->awaitDelay);
-                    }
-
-                    $this->currentTasksInProgressCount++;
 
                     /** Hack for phpUnit */
                     if(true === $isTestCall)
@@ -155,6 +150,11 @@ final class EntryPoint
                             ]);
                         }
                     );
+
+                    while($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
+                    {
+                        yield new Delayed($this->awaitDelay);
+                    }
                 }
             },
             $queue
@@ -162,7 +162,7 @@ final class EntryPoint
     }
 
     /**
-     * @param int       $delay The delay before the completion (in seconds)
+     * @param int $delay The delay before the completion (in seconds)
      *
      * @return void
      */
