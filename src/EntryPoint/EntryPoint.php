@@ -128,6 +128,8 @@ final class EntryPoint
                     /** Hack for phpUnit */
                     if(true === $isTestCall)
                     {
+                        $this->currentTasksInProgressCount--;
+
                         yield $this->processor->handle($package);
 
                         break;
