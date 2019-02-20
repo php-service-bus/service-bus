@@ -9,12 +9,12 @@
 A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets you implement an asynchronous messaging, a transparent workflow and control of long-lived business transactions by means of the Saga pattern. It implements the [message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) and it includes the following patterns: Saga, Publish\Subscribe, Message Bus.
 
 #### Main Features
- - Concurrency
+ - Сooperative multitasking
  - Asynchronous messaging (Publish\Subscribe pattern implementation)
  - Event-driven architecture
  - Distribution (messages can be handled by different processes)
    - Subscribers can be implemented on any programming language
- - High performance (Due to [cooperative multitasking](https://nikic.github.io/2012/12/22/Cooperative-multitasking-using-coroutines-in-PHP.html))
+ - High performance 
    - [Performance comparison with the "symfony/messenger"](https://github.com/php-service-bus/performance-comparison)
  - Orchestration of long-lived business transactions (for example, a checkout) with the help of Saga Pattern
  - Full history of aggregate changes (EventSourcing)
@@ -34,6 +34,7 @@ Documentation can be found in the [documentation](https://github.com/php-service
   * [Components](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#components)
   * [Sagas](https://github.com/php-service-bus/documentation/blob/master/pages/modules/sagas.md)
   * [Event Sourcing](https://github.com/php-service-bus/documentation/blob/master/pages/modules/event_sourcing.md)
+  * [Scheduler](https://github.com/php-service-bus/documentation/blob/master/pages/modules/scheduler.md)
   * [Transport](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#transport)
   * [Database](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#database)
 * [Available packages](https://github.com/php-service-bus/documentation/blob/master/pages/available_packages.md)
@@ -46,7 +47,7 @@ Documentation can be found in the [documentation](https://github.com/php-service
   - PostgreSQL 9.5+
 
 ## Contacts
-* [Telegram chat](https://t.me/php_service_bus)
+* [Telegram chat (RU)](https://t.me/php_service_bus)
 * [`dev@async-php.com`](mailto:dev@async-php.com)
 
 ## Security
