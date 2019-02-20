@@ -27,8 +27,8 @@ use ServiceBus\Transport\Common\Transport;
  */
 final class EntryPoint
 {
-    private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 50;
-    private const DEFAULT_AWAIT_DELAY               = 50;
+    private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 60;
+    private const DEFAULT_AWAIT_DELAY               = 20;
 
     /**
      * @var Transport
