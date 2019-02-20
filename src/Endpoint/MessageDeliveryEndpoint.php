@@ -13,6 +13,8 @@ declare(strict_types = 1);
 namespace ServiceBus\Endpoint;
 
 use function Amp\call;
+use Amp\Deferred;
+use Amp\Loop;
 use Amp\Promise;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
 use ServiceBus\Common\Messages\Message;
@@ -115,15 +117,8 @@ final class MessageDeliveryEndpoint implements Endpoint
 
         $options->withHeader(Transport::SERVICE_BUS_SERIALIZER_HEADER, $this->encoder->tag);
 
-        $package = self::createPackage($encoded, $options, $this->destination);
-
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
-        return call($this->deliveryRetryHandler,
-            function() use ($package): \Generator
-            {
-                yield $this->transport->send($package);
-            },
-            SendMessageFailed::class
+        return $this->deferredDelivery(
+            self::createPackage($encoded, $options, $this->destination)
         );
     }
 
@@ -153,5 +148,40 @@ final class MessageDeliveryEndpoint implements Endpoint
             false,
             $options->expirationAfter()
         );
+    }
+
+    /**
+     * @param OutboundPackage $package
+     *
+     * @return Promise
+     */
+    private function deferredDelivery(OutboundPackage $package): Promise
+    {
+        $deferred = new Deferred();
+
+        Loop::defer(
+            function() use ($package, $deferred): \Generator
+            {
+                try
+                {
+                    yield call(
+                        $this->deliveryRetryHandler,
+                        function() use ($package): \Generator
+                        {
+                            yield $this->transport->send($package);
+                        },
+                        SendMessageFailed::class
+                    );
+
+                    $deferred->resolve();
+                }
+                catch(\Throwable $throwable)
+                {
+                    $deferred->fail($throwable);
+                }
+            }
+        );
+
+        return $deferred->promise();
     }
 }
