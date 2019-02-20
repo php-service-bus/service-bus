@@ -3533,16 +3533,16 @@
         },
         {
             "name": "php-service-bus/module-phpinnacle-transport",
-            "version": "v3.0.0",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/module-phpinnacle-transport.git",
-                "reference": "0235ac4e61605ca914249558cc4596d899ea715b"
+                "reference": "ec118154dd9677566af1e0ac8982f86fdf90d62f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/0235ac4e61605ca914249558cc4596d899ea715b",
-                "reference": "0235ac4e61605ca914249558cc4596d899ea715b",
+                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/ec118154dd9677566af1e0ac8982f86fdf90d62f",
+                "reference": "ec118154dd9677566af1e0ac8982f86fdf90d62f",
                 "shasum": ""
             },
             "require": {
@@ -3551,7 +3551,7 @@
                 "phpinnacle/ridge": "^0.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7",
+                "phpunit/phpunit": "^8",
                 "symfony/dependency-injection": "^v4.2",
                 "vimeo/psalm": "^v3"
             },
@@ -3581,7 +3581,7 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-02-07 14:47:25"
+            "time": "2019-02-20 18:02:08"
         },
         {
             "name": "php-service-bus/transport-amqp",
