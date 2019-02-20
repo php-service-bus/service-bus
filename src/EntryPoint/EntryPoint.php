@@ -135,26 +135,10 @@ final class EntryPoint
                         break;
                     }
 
-                    Loop::defer(
-                        function() use ($package): \Generator
-                        {
-                            try
-                            {
-                                yield $this->processor->handle($package);
+                    /** Handle incoming package */
+                    $this->deferExecution($package);
 
-                                $this->currentTasksInProgressCount--;
-                            }
-                            catch(\Throwable $throwable)
-                            {
-                                $this->logger->critical($throwable->getMessage(), [
-                                    'packageId'      => $package->id(),
-                                    'traceId'        => $package->traceId(),
-                                    'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-                                ]);
-                            }
-                        }
-                    );
-
+                    /** Limit the maximum number of concurrently running tasks */
                     while($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
                     {
                         yield new Delayed($this->awaitDelay);
@@ -197,6 +181,34 @@ final class EntryPoint
                         Loop::stop();
                     }
                 );
+            }
+        );
+    }
+
+    /**
+     * @param IncomingPackage $package
+     *
+     * @return void
+     */
+    private function deferExecution(IncomingPackage $package): void
+    {
+        Loop::defer(
+            function() use ($package): \Generator
+            {
+                try
+                {
+                    yield $this->processor->handle($package);
+
+                    $this->currentTasksInProgressCount--;
+                }
+                catch(\Throwable $throwable)
+                {
+                    $this->logger->critical($throwable->getMessage(), [
+                        'packageId'      => $package->id(),
+                        'traceId'        => $package->traceId(),
+                        'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                    ]);
+                }
             }
         );
     }

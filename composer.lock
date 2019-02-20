@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d49802e11c064c43bf971d5dd1ca0cf1",
+    "hash": "94363979fc7e352e8dc133139dedb5af",
     "content-hash": "8799a5d061d2dd733d9d6cb368239c82",
     "packages": [
         {
@@ -1385,16 +1385,16 @@
         },
         {
             "name": "php-service-bus/message-serializer",
-            "version": "v3.0.2",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/message-serializer.git",
-                "reference": "5380e619ce8481f3773069d3b54c0b7aa94fd6d7"
+                "reference": "7ad24d968f6fb6a3b86ae3350553220a469759c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/5380e619ce8481f3773069d3b54c0b7aa94fd6d7",
-                "reference": "5380e619ce8481f3773069d3b54c0b7aa94fd6d7",
+                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/7ad24d968f6fb6a3b86ae3350553220a469759c1",
+                "reference": "7ad24d968f6fb6a3b86ae3350553220a469759c1",
                 "shasum": ""
             },
             "require": {
@@ -1432,7 +1432,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-15 10:05:51"
+            "time": "2019-02-20 14:25:07"
         },
         {
             "name": "php-service-bus/messages-router",
@@ -3280,16 +3280,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.2.0",
+            "version": "v4.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "594bcae1fc0bccd3993d2f0d61a018e26ac2865a"
+                "reference": "5221f49a608808c1e4d436df32884cbc1b821ac0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/594bcae1fc0bccd3993d2f0d61a018e26ac2865a",
-                "reference": "594bcae1fc0bccd3993d2f0d61a018e26ac2865a",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/5221f49a608808c1e4d436df32884cbc1b821ac0",
+                "reference": "5221f49a608808c1e4d436df32884cbc1b821ac0",
                 "shasum": ""
             },
             "require": {
@@ -3327,7 +3327,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2019-01-12 16:31:37"
+            "time": "2019-02-16 20:54:15"
         },
         {
             "name": "openlss/lib-array2xml",
@@ -3635,16 +3635,16 @@
         },
         {
             "name": "php-service-bus/transport-phpinnacle",
-            "version": "v3.0.2",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-phpinnacle.git",
-                "reference": "538135aa163bac7236b5b1b4d47a300ee144d1d2"
+                "reference": "6d02a280229ad4448f134253f4ee0b3b9507e94a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/538135aa163bac7236b5b1b4d47a300ee144d1d2",
-                "reference": "538135aa163bac7236b5b1b4d47a300ee144d1d2",
+                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/6d02a280229ad4448f134253f4ee0b3b9507e94a",
+                "reference": "6d02a280229ad4448f134253f4ee0b3b9507e94a",
                 "shasum": ""
             },
             "require": {
@@ -3683,7 +3683,7 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-02-15 10:14:42"
+            "time": "2019-02-20 17:54:34"
         },
         {
             "name": "phpinnacle/buffer",
@@ -3861,16 +3861,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "7.0.1",
+            "version": "7.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "4832739a02c418397e404da6c3e4fe680b7a4de7"
+                "reference": "cfca9c5f7f2694ca0c7749ffb142927d9f05250f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/4832739a02c418397e404da6c3e4fe680b7a4de7",
-                "reference": "4832739a02c418397e404da6c3e4fe680b7a4de7",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/cfca9c5f7f2694ca0c7749ffb142927d9f05250f",
+                "reference": "cfca9c5f7f2694ca0c7749ffb142927d9f05250f",
                 "shasum": ""
             },
             "require": {
@@ -3920,7 +3920,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-02-01 07:29:14"
+            "time": "2019-02-15 13:40:27"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -4015,16 +4015,16 @@
         },
         {
             "name": "phpunit/php-timer",
-            "version": "2.0.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-timer.git",
-                "reference": "8b8454ea6958c3dee38453d3bd571e023108c91f"
+                "reference": "8b389aebe1b8b0578430bda0c7c95a829608e059"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-timer/zipball/8b8454ea6958c3dee38453d3bd571e023108c91f",
-                "reference": "8b8454ea6958c3dee38453d3bd571e023108c91f",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-timer/zipball/8b389aebe1b8b0578430bda0c7c95a829608e059",
+                "reference": "8b389aebe1b8b0578430bda0c7c95a829608e059",
                 "shasum": ""
             },
             "require": {
@@ -4036,7 +4036,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0-dev"
+                    "dev-master": "2.1-dev"
                 }
             },
             "autoload": {
@@ -4060,7 +4060,7 @@
             "keywords": [
                 "timer"
             ],
-            "time": "2018-02-01 13:07:23"
+            "time": "2019-02-20 10:12:59"
         },
         {
             "name": "phpunit/php-token-stream",
@@ -4113,16 +4113,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.0.2",
+            "version": "8.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "d64e502503bcfab5d46c0b74ffd41f4986831dc7"
+                "reference": "a7af0201285445c9c73c4bdf869c486e36b41604"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d64e502503bcfab5d46c0b74ffd41f4986831dc7",
-                "reference": "d64e502503bcfab5d46c0b74ffd41f4986831dc7",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a7af0201285445c9c73c4bdf869c486e36b41604",
+                "reference": "a7af0201285445c9c73c4bdf869c486e36b41604",
                 "shasum": ""
             },
             "require": {
@@ -4191,7 +4191,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-02-07 14:17:09"
+            "time": "2019-02-18 09:23:05"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -4876,16 +4876,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "3.0.15",
+            "version": "3.0.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "c310a2dd86660944b3f15fb8486ab73d45066618"
+                "reference": "f49be31aeb7c2e063ae732521020247e769bf83d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/c310a2dd86660944b3f15fb8486ab73d45066618",
-                "reference": "c310a2dd86660944b3f15fb8486ab73d45066618",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/f49be31aeb7c2e063ae732521020247e769bf83d",
+                "reference": "f49be31aeb7c2e063ae732521020247e769bf83d",
                 "shasum": ""
             },
             "require": {
@@ -4950,7 +4950,7 @@
                 "inspection",
                 "php"
             ],
-            "time": "2019-02-11 23:39:19"
+            "time": "2019-02-18 21:52:09"
         },
         {
             "name": "webmozart/glob",
