@@ -162,7 +162,6 @@ final class EntryPoint
     }
 
     /**
-     * @param Transport $transport
      * @param int       $delay The delay before the completion (in seconds)
      *
      * @return void
