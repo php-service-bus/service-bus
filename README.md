@@ -55,7 +55,7 @@ Documentation can be found in the [documentation](https://github.com/php-service
 
 ## Security
 
-If you discover any security related issues, please email [`dev@async-php.com`](mailto:dev@async-php.com) instead of using the issue tracker.you discover any security related issues, please email [`dev@async-php.com`](mailto:dev@async-php.com) instead of using the issue tracker.
+If you discover any security related issues, please email [`dev@async-php.com`](mailto:dev@async-php.com) instead of using the issue tracker.
 
 ## License
 
