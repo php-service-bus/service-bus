@@ -1332,16 +1332,16 @@
         },
         {
             "name": "php-service-bus/common",
-            "version": "v3.0.0",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "4832b5b1cf702eac55edddfdb62325aa20d5ba11"
+                "reference": "71e9167bdec0e245cc77bc7fbb37c250481693ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/4832b5b1cf702eac55edddfdb62325aa20d5ba11",
-                "reference": "4832b5b1cf702eac55edddfdb62325aa20d5ba11",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/71e9167bdec0e245cc77bc7fbb37c250481693ef",
+                "reference": "71e9167bdec0e245cc77bc7fbb37c250481693ef",
                 "shasum": ""
             },
             "require": {
@@ -1350,7 +1350,7 @@
                 "ramsey/uuid": "^3.7"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7",
+                "phpunit/phpunit": "^8",
                 "symfony/dependency-injection": "^v4.2",
                 "vimeo/psalm": "^3"
             },
@@ -1381,7 +1381,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-07 11:11:38"
+            "time": "2019-02-15 09:15:23"
         },
         {
             "name": "php-service-bus/message-serializer",
@@ -3639,17 +3639,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-phpinnacle.git",
-                "reference": "7e240fea19299bff2d1e7352ed802df86929bb5a"
+                "reference": "f97d3b0ae4ca08d53233279b353ee79303fe68ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/7e240fea19299bff2d1e7352ed802df86929bb5a",
-                "reference": "7e240fea19299bff2d1e7352ed802df86929bb5a",
+                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/f97d3b0ae4ca08d53233279b353ee79303fe68ea",
+                "reference": "f97d3b0ae4ca08d53233279b353ee79303fe68ea",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "php-service-bus/common": "v3.0",
+                "php-service-bus/common": "^v3.0",
                 "php-service-bus/transport-amqp": "v3.0.x-dev",
                 "phpinnacle/ridge": "^0.1"
             },
@@ -3683,7 +3683,7 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-02-22 10:53:32"
+            "time": "2019-02-22 11:52:37"
         },
         {
             "name": "phpinnacle/buffer",
