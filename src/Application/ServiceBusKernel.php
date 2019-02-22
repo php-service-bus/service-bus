@@ -116,13 +116,13 @@ final class ServiceBusKernel
     /**
      * Run application
      *
-     * @param Queue $queue
+     * @param Queue ...$queues
      *
      * @return Promise
      */
-    public function run(Queue $queue): Promise
+    public function run(Queue ...$queues): Promise
     {
-        return $this->entryPoint->listen($queue);
+        return $this->entryPoint->listen(...$queues);
     }
 
     /**

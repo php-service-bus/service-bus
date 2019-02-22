@@ -36,11 +36,6 @@ final class EntryPoint
     private $transport;
 
     /**
-     * @var Queue|null
-     */
-    private $listenQueue;
-
-    /**
      * @var EntryPointProcessor
      */
     private $processor;
@@ -96,26 +91,24 @@ final class EntryPoint
     /**
      * Start queue listen
      *
-     * @param Queue $queue
+     * @param Queue ...$queues
      *
      * @return Promise It does not return any result
      */
-    public function listen(Queue $queue): Promise
+    public function listen(Queue ...$queues): Promise
     {
-        $this->listenQueue = $queue;
-
         /** Hack for phpunit tests */
         $isTestCall = 'phpunitTests' === (string) \getenv('SERVICE_BUS_TESTING');
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            function(Queue $queue) use ($isTestCall): \Generator
+            function(array $queues) use ($isTestCall): \Generator
             {
                 /**
                  * @psalm-suppress TooManyTemplateParams Wrong Iterator template
                  * @var \Amp\Iterator $iterator
                  */
-                $iterator = yield $this->transport->consume($queue);
+                $iterator = yield $this->transport->consume(...$queues);
 
                 /** @psalm-suppress TooManyTemplateParams Wrong Promise template */
                 while(yield $iterator->advance())
@@ -145,7 +138,7 @@ final class EntryPoint
                     }
                 }
             },
-            $queue
+            $queues
         );
     }
 
@@ -161,14 +154,7 @@ final class EntryPoint
         Loop::defer(
             function() use ($delay): \Generator
             {
-                if(null === $this->listenQueue)
-                {
-                    Loop::stop();
-
-                    return;
-                }
-
-                yield $this->transport->stop($this->listenQueue);
+                yield $this->transport->stop();
 
                 $this->logger->info('Handler will stop after {duration} seconds', ['duration' => $delay]);
 
