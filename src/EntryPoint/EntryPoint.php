@@ -106,6 +106,7 @@ final class EntryPoint
             {
                 /**
                  * @psalm-suppress TooManyTemplateParams Wrong Iterator template
+                 * @var Queue[] $queues
                  * @var \Amp\Iterator $iterator
                  */
                 $iterator = yield $this->transport->consume(...$queues);
