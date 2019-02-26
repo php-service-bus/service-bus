@@ -36,7 +36,8 @@ final class ContainerBuilder
      *
      * Key=>value parameters
      *
-     * @var array<string, bool|string|int|float|array<mixed, mixed>|null>
+     * @psalm-var array<string, bool|string|int|float|array<mixed, mixed>|null>
+     * @var array
      */
     private $parameters;
 
@@ -50,21 +51,24 @@ final class ContainerBuilder
     /**
      * Extensions
      *
-     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension, string>
+     * @psalm-var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension, string>
+     * @var \SplObjectStorage
      */
     private $extensions;
 
     /**
      * CompilerPass collection
      *
-     * @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface, string>
+     * @psalm-var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface, string>
+     * @var \SplObjectStorage
      */
     private $compilerPasses;
 
     /**
      * Modules collection
      *
-     * @var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule, string>
+     * @psalm-var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule, string>
+     * @var \SplObjectStorage
      */
     private $modules;
 
@@ -97,18 +101,12 @@ final class ContainerBuilder
         $this->environment    = $environment;
         $this->parameters     = [];
 
-        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension, string> $extensionCollection */
-        $extensionCollection = new \SplObjectStorage();
-
-        /** @var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface, string> $compilerPassCollection */
-        $compilerPassCollection = new \SplObjectStorage();
-
-        /** @var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule, string> $modulesCollection */
-        $modulesCollection = new \SplObjectStorage();
-
-        $this->extensions     = $extensionCollection;
-        $this->compilerPasses = $compilerPassCollection;
-        $this->modules        = $modulesCollection;
+        /** @psalm-suppress MixedTypeCoercion */
+        $this->extensions = new \SplObjectStorage();
+        /** @psalm-suppress MixedTypeCoercion */
+        $this->compilerPasses = new \SplObjectStorage();
+        /** @psalm-suppress MixedTypeCoercion */
+        $this->modules = new \SplObjectStorage();
     }
 
     /**
@@ -161,7 +159,9 @@ final class ContainerBuilder
     }
 
     /**
-     * @param array<string, bool|string|int|float|array<mixed, mixed>|null> $parameters
+     * @psalm-param array<string, bool|string|int|float|array<mixed, mixed>|null> $parameters
+     *
+     * @param array $parameters
      *
      * @return void
      */
@@ -230,7 +230,8 @@ final class ContainerBuilder
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
-     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
+     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has
+     *                                                                                not been dumped
      * @throws \Throwable Boot module failed
      */
     public function build(): ContainerInterface
@@ -274,7 +275,8 @@ final class ContainerBuilder
      *
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
-     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
+     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has
+     *                                                                                not been dumped
      */
     private function dumpContainer(SymfonyContainerBuilder $builder): void
     {

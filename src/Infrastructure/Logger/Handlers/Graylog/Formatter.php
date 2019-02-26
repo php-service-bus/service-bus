@@ -76,7 +76,7 @@ final class Formatter extends NormalizerFormatter
         /** @var array{datetime:int, message:string, level:int, channel:string, extra:array|null, context:array|null} $normalizedRecord */
         $normalizedRecord = parent::format($record);
 
-        /** @var array{
+        /** @psalm-var array{
          *    version:float|int,
          *    host:string,
          *    timestamp:int,
@@ -100,10 +100,10 @@ final class Formatter extends NormalizerFormatter
 
         unset($normalizedRecord['extra']['file'], $normalizedRecord['extra']['line']);
 
-        /** @var array<string, string|int|float|array|null> $extraData */
+        /** @psalm-var array<string, string|int|float|array|null> $extraData */
         $extraData = $normalizedRecord['extra'] ?? [];
 
-        /** @var array<string, string|int|float|array|null> $contextData */
+        /** @psalm-var array<string, string|int|float|array|null> $contextData */
         $contextData = $normalizedRecord['context'] ?? [];
         $formatted   = $this->formatMessage((string) $normalizedRecord['message'], $formatted);
         $formatted   = $this->formatAdditionalData($extraData, $formatted);
@@ -136,8 +136,10 @@ final class Formatter extends NormalizerFormatter
     /**
      * Format extra\context data
      *
-     * @param array<string, string|int|float|array|null> $collection
-     * @param array                                      $formatted
+     * @psalm-param array<string, string|int|float|array|null> $collection
+     *
+     * @param array $collection
+     * @param array $formatted
      *
      * @return array
      *
@@ -146,8 +148,8 @@ final class Formatter extends NormalizerFormatter
     private function formatAdditionalData(array $collection, array $formatted): array
     {
         /**
-         * @var string                             $key
-         * @var string|int|float|array|object|null $value
+         * @psalm-var string                             $key
+         * @psalm-var string|int|float|array|object|null $value
          */
         foreach($collection as $key => $value)
         {

@@ -17,7 +17,6 @@ use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\Infrastructure\Retry\OperationRetryWrapper;
 use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Exceptions\SendMessageFailed;
@@ -111,7 +110,7 @@ final class MessageDeliveryEndpoint implements Endpoint
      *
      * @inheritDoc
      */
-    public function delivery(Message $message, DeliveryOptions $options): Promise
+    public function delivery(object $message, DeliveryOptions $options): Promise
     {
         $encoded = $this->encoder->handler->encode($message);
 
@@ -143,8 +142,8 @@ final class MessageDeliveryEndpoint implements Endpoint
             $destination,
             $options->traceId(),
             $options->isPersistent(),
-            true,
             // @todo: fixme
+            false,
             false,
             $options->expirationAfter()
         );

@@ -14,7 +14,6 @@ namespace ServiceBus\Endpoint;
 
 use Amp\Promise;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\Transport\Common\DeliveryDestination;
 
 /**
@@ -41,7 +40,7 @@ interface Endpoint
     /**
      * Send message to endpoint
      *
-     * @param Message                $message
+     * @param object          $message
      * @param DeliveryOptions $options
      *
      * @return Promise It does not return any result
@@ -49,5 +48,5 @@ interface Endpoint
      * @throws \ServiceBus\MessageSerializer\Exceptions\EncodeMessageFailed
      * @throws \ServiceBus\Transport\Common\Exceptions\SendMessageFailed Failed to send message
      */
-    public function delivery(Message $message, DeliveryOptions $options): Promise;
+    public function delivery(object $message, DeliveryOptions $options): Promise;
 }

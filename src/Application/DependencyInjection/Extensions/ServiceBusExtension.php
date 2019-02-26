@@ -26,9 +26,10 @@ final class ServiceBusExtension extends Extension
      * @inheritdoc
      *
      * @psalm-suppress MoreSpecificImplementedParamType
+     * @psalm-param    array<string, mixed> $configs
      *
-     * @param array<string, mixed> $configs
-     * @param ContainerBuilder     $container
+     * @param array            $configs
+     * @param ContainerBuilder $container
      *
      * @throws \Exception
      */
@@ -39,7 +40,7 @@ final class ServiceBusExtension extends Extension
 
         /**
          * @var string $key
-         * @var mixed $value
+         * @var mixed  $value
          *
          * @psalm-suppress MixedAssignment Cannot assign $value to a mixed type
          */

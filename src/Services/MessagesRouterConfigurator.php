@@ -14,8 +14,6 @@ namespace ServiceBus\Services;
 
 use ServiceBus\Common\MessageExecutor\MessageExecutorFactory;
 use ServiceBus\Common\MessageHandler\MessageHandler;
-use ServiceBus\Common\Messages\Command;
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\MessagesRouter\Exceptions\MessageRouterConfigurationFailed;
 use ServiceBus\MessagesRouter\Router;
 use ServiceBus\MessagesRouter\RouterConfigurator;
@@ -88,18 +86,18 @@ final class MessagesRouterConfigurator implements RouterConfigurator
                 /** @var object $serviceObject */
                 $serviceObject = $this->servicesServiceLocator->get(\sprintf('%s_service', $serviceId));
 
-                /** @var \ServiceBus\Common\MessageHandler\MessageHandler $handler */
+                /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
                 foreach($serviceConfigurationExtractor->load($serviceObject) as $handler)
                 {
-                    self::assertMessageClassSpecifiedInArguments($serviceObject, $handler);
+                    self::assertMessageClassSpecifiedInArguments($serviceObject, $handler->messageHandler);
 
-                    $messageExecutor = $this->executorFactory->create($handler);
+                    $messageExecutor = $this->executorFactory->create($handler->messageHandler);
 
-                    $registerMethod = true === \is_a((string) $handler->messageClass, Command::class, true)
+                    $registerMethod = true === $handler->isCommandHandler()
                         ? 'registerHandler'
                         : 'registerListener';
 
-                    $router->{$registerMethod}((string) $handler->messageClass, $messageExecutor);
+                    $router->{$registerMethod}((string) $handler->messageHandler->messageClass, $messageExecutor);
                 }
             }
         }
@@ -108,7 +106,6 @@ final class MessagesRouterConfigurator implements RouterConfigurator
             throw new MessageRouterConfigurationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }
-
 
     /**
      * @param object         $service
@@ -124,10 +121,9 @@ final class MessagesRouterConfigurator implements RouterConfigurator
         {
             throw new \LogicException(
                 \sprintf(
-                    'In the method of "%s:%s" is not found an argument of type "%s"',
+                    'The message argument was not found in the "%s:%s" method',
                     \get_class($service),
-                    $handler->methodName,
-                    Message::class
+                    $handler->methodName
                 )
             );
         }

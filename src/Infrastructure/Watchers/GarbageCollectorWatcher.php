@@ -15,7 +15,7 @@ namespace ServiceBus\Infrastructure\Watchers;
 use Amp\Loop;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use function ServiceBus\formatBytes;
+use function ServiceBus\Common\formatBytes;
 
 /**
  * Periodic forced launch of the garbage collector

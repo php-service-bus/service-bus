@@ -24,7 +24,8 @@ use Symfony\Component\Validator\ValidatorBuilder;
 final class DefaultMessageExecutorFactory implements MessageExecutorFactory
 {
     /**
-     * @var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
+     * @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
+     * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
     private $argumentResolvers;
 
@@ -36,8 +37,10 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
     /**
      * @noinspection PhpDocMissingThrowsInspection
      *
-     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
-     * @param ValidatorInterface|null                                       $validator
+     * @psalm-param  array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
+     *
+     * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[] $argumentResolvers
+     * @param ValidatorInterface|null                          $validator
      */
     public function __construct(array $argumentResolvers, ?ValidatorInterface $validator = null)
     {

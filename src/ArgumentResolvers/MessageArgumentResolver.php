@@ -13,7 +13,6 @@ declare(strict_types = 1);
 namespace ServiceBus\ArgumentResolvers;
 
 use ServiceBus\Common\Context\ServiceBusContext;
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 
 /**
@@ -26,15 +25,16 @@ final class MessageArgumentResolver implements ArgumentResolver
      */
     public function supports(MessageHandlerArgument $argument): bool
     {
-        return $argument->isA(Message::class);
+        /** The message object MUST be the first argument */
+        return 1 === $argument->position;
     }
 
     /**
      * @inheritdoc
      *
-     * @return Message
+     * @return object
      */
-    public function resolve(Message $message, ServiceBusContext $context, MessageHandlerArgument $argument): Message
+    public function resolve(object $message, ServiceBusContext $context, MessageHandlerArgument $argument): object
     {
         return $message;
     }

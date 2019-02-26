@@ -12,12 +12,10 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Stubs\Messages;
 
-use ServiceBus\Common\Messages\Event;
-
 /**
  *
  */
-final class SecondEventWithKey implements Event
+final class SecondEventWithKey
 {
     /**
      * @var string

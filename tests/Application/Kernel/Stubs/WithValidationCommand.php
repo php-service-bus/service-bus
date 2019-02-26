@@ -12,13 +12,12 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Application\Kernel\Stubs;
 
-use ServiceBus\Common\Messages\Command;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  *
  */
-final class WithValidationCommand implements Command
+final class WithValidationCommand
 {
     /**
      * @Assert\NotBlank()

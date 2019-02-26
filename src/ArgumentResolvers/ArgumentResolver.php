@@ -13,7 +13,6 @@ declare(strict_types = 1);
 namespace ServiceBus\ArgumentResolvers;
 
 use ServiceBus\Common\Context\ServiceBusContext;
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 
 /**
@@ -33,11 +32,11 @@ interface ArgumentResolver
     /**
      * Resolve argument value
      *
-     * @param Message                $message
+     * @param object                 $message
      * @param ServiceBusContext      $context
      * @param MessageHandlerArgument $argument
      *
      * @return mixed
      */
-    public function resolve(Message $message, ServiceBusContext $context, MessageHandlerArgument $argument);
+    public function resolve(object $message, ServiceBusContext $context, MessageHandlerArgument $argument);
 }

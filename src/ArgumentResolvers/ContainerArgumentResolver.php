@@ -13,7 +13,6 @@ declare(strict_types = 1);
 namespace ServiceBus\ArgumentResolvers;
 
 use ServiceBus\Common\Context\ServiceBusContext;
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -48,7 +47,7 @@ final class ContainerArgumentResolver implements ArgumentResolver
      *
      * @return object
      */
-    public function resolve(Message $message, ServiceBusContext $context, MessageHandlerArgument $argument): object
+    public function resolve(object $message, ServiceBusContext $context, MessageHandlerArgument $argument): object
     {
         /** @var object $object */
         $object = $this->serviceLocator->get((string) $argument->typeClass);

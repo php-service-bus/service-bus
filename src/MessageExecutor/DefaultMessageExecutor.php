@@ -17,7 +17,6 @@ use Amp\Promise;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\Context\KernelContext;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 
@@ -34,14 +33,16 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $closure;
 
     /**
-     * @var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string>
+     * @psalm-var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string>
+     * @var \SplObjectStorage
      */
     private $arguments;
 
     /**
      * Argument resolvers collection
      *
-     * @var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
+     * @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
+     * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
     private $argumentResolvers;
 
@@ -53,10 +54,14 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $options;
 
     /**
-     * @param \Closure                                                                            $closure
-     * @param \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
-     * @param DefaultHandlerOptions                                                               $options
-     * @param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>                       $argumentResolvers
+     * @psalm-param \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
+     * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
+     *              $argumentResolvers
+     *
+     * @param \Closure                                         $closure
+     * @param \SplObjectStorage                                $arguments
+     * @param DefaultHandlerOptions                            $options
+     * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[] $argumentResolvers
      */
     public function __construct(
         \Closure $closure,
@@ -74,7 +79,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     /**
      * @inheritDoc
      */
-    public function __invoke(Message $message, ServiceBusContext $context): Promise
+    public function __invoke(object $message, ServiceBusContext $context): Promise
     {
         $argumentResolvers = $this->argumentResolvers;
 
@@ -84,12 +89,17 @@ final class DefaultMessageExecutor implements MessageExecutor
          */
         return call(
             static function(
-                \Closure $closure, \SplObjectStorage $arguments, DefaultHandlerOptions $options, Message $message,
+                \Closure $closure, \SplObjectStorage $arguments, DefaultHandlerOptions $options, object $message,
                 KernelContext $context
             ) use ($argumentResolvers): \Generator
             {
                 try
                 {
+                    /**
+                     * @psalm-var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
+                     * @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
+                     */
+
                     $resolvedArgs = self::collectArguments($arguments, $argumentResolvers, $message, $context);
 
                     /** @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args) */
@@ -147,27 +157,29 @@ final class DefaultMessageExecutor implements MessageExecutor
     /**
      * Collect arguments list
      *
-     * @param \SplObjectStorage $arguments
-     * @param array             $resolvers
-     * @param Message           $message
-     * @param KernelContext     $context
+     * @psalm-param \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
+     * @psalm-param  array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $resolvers
+     * @psalm-return array<int, mixed>
      *
-     * @return array<int, mixed>
+     * @param \SplObjectStorage                                $arguments
+     * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[] $resolvers
+     * @param object                                           $message
+     * @param KernelContext                                    $context
+     *
+     * @return array
      */
     private static function collectArguments(
         \SplObjectStorage $arguments,
         array $resolvers,
-        Message $message,
+        object $message,
         KernelContext $context
     ): array
     {
-        /** @var array<int, mixed> $preparedArguments */
         $preparedArguments = [];
 
         /** @var \ServiceBus\Common\MessageHandler\MessageHandlerArgument $argument */
         foreach($arguments as $argument)
         {
-            /** @var \ServiceBus\ArgumentResolvers\ArgumentResolver $argumentResolver */
             foreach($resolvers as $argumentResolver)
             {
                 if(true === $argumentResolver->supports($argument))
@@ -177,6 +189,8 @@ final class DefaultMessageExecutor implements MessageExecutor
                 }
             }
         }
+
+        /** @var array<int, mixed> $preparedArguments */
 
         return $preparedArguments;
     }

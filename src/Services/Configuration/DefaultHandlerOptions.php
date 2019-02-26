@@ -20,12 +20,12 @@ use ServiceBus\Services\Exceptions\InvalidEventType;
 /**
  * Execution options
  *
- * @property-read bool               $isEventListener
- * @property-read bool               $isCommandHandler
- * @property-read bool               $validationEnabled
- * @property-read array<int, string> $validationGroups
- * @property-read string|null        $defaultValidationFailedEvent
- * @property-read string|null        $defaultThrowableEvent
+ * @property-read bool        $isEventListener
+ * @property-read bool        $isCommandHandler
+ * @property-read bool        $validationEnabled
+ * @property-read string[]    $validationGroups
+ * @property-read string|null $defaultValidationFailedEvent
+ * @property-read string|null $defaultThrowableEvent
  */
 final class DefaultHandlerOptions implements MessageHandlerOptions
 {
@@ -53,7 +53,8 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * Validation groups
      *
-     * @var array<array-key, string>
+     * @psalm-var array<array-key, string>
+     * @var string[]
      */
     public $validationGroups = [];
 
@@ -63,6 +64,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      *
      * If no class is specified, control is passed to user code
      *
+     * @psalm-var class-string|null
      * @var string|null
      */
     public $defaultValidationFailedEvent;
@@ -73,6 +75,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      *
      * If no class is specified, control is passed to user code
      *
+     * @psalm-var class-string|null
      * @var string|null
      */
     public $defaultThrowableEvent;
@@ -96,23 +99,35 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * Enable validation
      *
-     * @param array<array-key, string> $validationGroups
+     * @psalm-param array<array-key, string> $validationGroups
+     *
+     * @param string[] $validationGroups
      *
      * @return self
      */
     public function enableValidation(array $validationGroups = []): self
     {
+        $defaultValidationFailedEvent = $this->defaultValidationFailedEvent;
+        $defaultThrowableEvent        = $this->defaultThrowableEvent;
+
+        /**
+         * @psalm-var class-string|null $defaultValidationFailedEvent
+         * @psalm-var class-string|null $defaultThrowableEvent
+         */
+
         return new self(
             $this->isEventListener,
             $this->isCommandHandler,
             true,
             $validationGroups,
-            $this->defaultValidationFailedEvent,
-            $this->defaultThrowableEvent
+            $defaultValidationFailedEvent,
+            $defaultThrowableEvent
         );
     }
 
     /**
+     * @param class-string $eventClass
+     *
      * @param string $eventClass
      *
      * @return self
@@ -131,17 +146,26 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
             );
         }
 
+        $defaultThrowableEvent = $this->defaultThrowableEvent;
+
+        /**
+         * @psalm-var class-string $eventClass
+         * @psalm-var class-string|null $defaultThrowableEvent
+         */
+
         return new self(
             $this->isEventListener,
             $this->isCommandHandler,
             $this->validationEnabled,
             $this->validationGroups,
             $eventClass,
-            $this->defaultThrowableEvent
+            $defaultThrowableEvent
         );
     }
 
     /**
+     * @param class-string $eventClass
+     *
      * @param string $eventClass
      *
      * @return self
@@ -160,21 +184,32 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
             );
         }
 
+        $defaultValidationFailedEvent = $this->defaultValidationFailedEvent;
+
+        /**
+         * @psalm-var class-string $eventClass
+         * @psalm-var class-string|null $defaultValidationFailedEvent
+         */
+
         return new self(
             $this->isEventListener,
             $this->isCommandHandler,
             $this->validationEnabled,
             $this->validationGroups,
-            $this->defaultValidationFailedEvent,
+            $defaultValidationFailedEvent,
             $eventClass
         );
     }
 
     /**
+     * @psalm-param    array<array-key, string> $validationGroups
+     * @psalm-param    class-string|null $defaultValidationFailedEvent
+     * @psalm-param    class-string|null $defaultThrowableEvent
+     *
      * @param bool        $isEventListener
      * @param bool        $isCommandHandler
      * @param bool        $validationEnabled
-     * @param array<array-key, string> $validationGroups
+     * @param string[]    $validationGroups
      * @param string|null $defaultValidationFailedEvent
      * @param string|null $defaultThrowableEvent
      */

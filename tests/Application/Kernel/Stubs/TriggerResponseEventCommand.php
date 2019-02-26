@@ -12,12 +12,10 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Application\Kernel\Stubs;
 
-use ServiceBus\Common\Messages\Command;
-
 /**
  *
  */
-final class TriggerResponseEventCommand implements Command
+final class TriggerResponseEventCommand
 {
 
 }

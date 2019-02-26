@@ -13,7 +13,6 @@ declare(strict_types = 1);
 namespace ServiceBus\Application\DependencyInjection\Compiler;
 
 use ServiceBus\Common\Context\ServiceBusContext;
-use ServiceBus\Common\Messages\Message;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -35,11 +34,15 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
         $servicesReference = [];
         $serviceIds        = [];
 
-        /** @var array<string, array<mixed, string>> $taggedServices */
+        /**
+         * @psalm-var array<string, array<mixed, string>> $taggedServices
+         * @var array $taggedServices
+         */
         $taggedServices = $container->findTaggedServiceIds('service_bus.service');
 
         foreach($taggedServices as $id => $tags)
         {
+            /** @psalm-var class-string|null $serviceClass */
             $serviceClass = $container->getDefinition($id)->getClass();
 
             if(null !== $serviceClass)
@@ -63,18 +66,19 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
+     * @psalm-param class-string $serviceClass
+     *
      * @param string           $serviceClass
      * @param ContainerBuilder $container
      * @param array            $servicesReference (passed by reference)
      *
      * @return void
+     *
      * @throws \LogicException
      * @throws \ReflectionException
      */
     private function collectServiceDependencies(string $serviceClass, ContainerBuilder $container, array &$servicesReference): void
     {
-        /** @psalm-var class-string $serviceClass */
-
         $reflectionClass = new \ReflectionClass($serviceClass);
 
         foreach($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod)
@@ -90,15 +94,8 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
                 $reflectionType     = $parameter->getType();
                 $reflectionTypeName = $reflectionType->getName();
 
-                if(true === self::supportedType($parameter))
+                if(true === self::supportedType($parameter) && true === $container->has($reflectionTypeName))
                 {
-                    if(false === $container->has($reflectionTypeName))
-                    {
-                        throw new \LogicException(
-                            \sprintf('The "%s" service was not found in the dependency container', $reflectionTypeName)
-                        );
-                    }
-
                     $servicesReference[$reflectionTypeName] = new ServiceClosureArgument(new Reference($reflectionTypeName));
                 }
             }
@@ -117,7 +114,6 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
         $reflectionTypeName = $reflectionType->getName();
 
         return (true === \class_exists($reflectionTypeName) || true === \interface_exists($reflectionTypeName)) &&
-            false === \is_a($reflectionTypeName, Message::class, true) &&
             false === \is_a($reflectionTypeName, ServiceBusContext::class, true) &&
             false === \is_a($reflectionTypeName, \Throwable::class, true);
     }

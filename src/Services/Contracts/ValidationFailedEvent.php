@@ -12,12 +12,10 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Services\Contracts;
 
-use ServiceBus\Common\Messages\Event;
-
 /**
  *
  */
-interface ValidationFailedEvent extends Event
+interface ValidationFailedEvent
 {
     /**
      * List of validate violations:
@@ -29,8 +27,10 @@ interface ValidationFailedEvent extends Event
      *    ]
      * ]
      *
-     * @param string                            $correlationId
-     * @param array<string, array<int, string>> $violations
+     * @psalm-param array<string, array<int, string>> $violations
+     *
+     * @param string $correlationId
+     * @param array  $violations
      *
      * @return self
      */
@@ -46,7 +46,9 @@ interface ValidationFailedEvent extends Event
     /**
      * Receive list of validate violations
      *
-     * @return array<string, array<int, string>>
+     * @psalm-return array<string, array<int, string>>
+     *
+     * @return array
      */
     public function violations(): array;
 }

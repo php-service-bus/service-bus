@@ -12,7 +12,6 @@ declare(strict_types = 1);
 
 namespace ServiceBus\EntryPoint;
 
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\MessageSerializer\MessageDecoder;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 use ServiceBus\Transport\Common\Transport;
@@ -56,21 +55,18 @@ final class IncomingMessageDecoder
      *
      * @param IncomingPackage $package
      *
-     * @return Message
+     * @return object
      *
      * @throws \LogicException Could not find decoder in the service container
      * @throws \ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed
      */
-    public function decode(IncomingPackage $package): Message
+    public function decode(IncomingPackage $package): object
     {
         $encoderKey = $this->extractEncoderKey($package->headers());
 
-        $decoder = $this->findDecoderByKey($encoderKey);
-
-        /** @var Message $message */
-        $message = $decoder->decode($package->payload());
-
-        return $message;
+        return $this
+            ->findDecoderByKey($encoderKey)
+            ->decode($package->payload());
     }
 
     /**

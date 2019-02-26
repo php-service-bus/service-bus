@@ -12,12 +12,10 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Stubs\Messages;
 
-use ServiceBus\Common\Messages\Command;
-
 /**
  *
  */
-final class FirstEmptyCommand implements Command
+final class FirstEmptyCommand
 {
 
 }

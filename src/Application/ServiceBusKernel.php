@@ -163,8 +163,10 @@ final class ServiceBusKernel
     /**
      * Use default handler for signal "SIGINT" and "SIGTERM"
      *
-     * @param int               $stopDelay The delay before the completion (in seconds)
-     * @param array<mixed, int> $signals   Processed signals
+     * @psalm-param array<mixed, int> $signals
+     *
+     * @param int   $stopDelay The delay before the completion (in seconds)
+     * @param int[] $signals   Processed signals
      *
      * @return $this
      *
@@ -283,6 +285,7 @@ final class ServiceBusKernel
         /** @var EndpointRouter $entryPointRouter */
         $entryPointRouter = $this->getKernelContainerService(EndpointRouter::class);
 
+        /** @psalm-var class-string $messageClass */
         foreach($messages as $messageClass)
         {
             $entryPointRouter->registerRoute($messageClass, $endpoint);

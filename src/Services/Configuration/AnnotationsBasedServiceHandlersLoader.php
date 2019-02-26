@@ -58,7 +58,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             /** @var \ReflectionMethod $handlerReflectionMethod */
             $handlerReflectionMethod = $annotation->reflectionMethod;
 
-            /** @psalm-var \Closure(\ServiceBus\Common\Messages\Message, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
+            /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
             $closure = $handlerReflectionMethod->getClosure($service);
 
             if(null === $closure)
@@ -71,6 +71,8 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                 );
             }
 
+            $isCommandHandler = $handlerAnnotation instanceof CommandHandler;
+
             /**
              * @var \ReflectionMethod            $handlerReflectionMethod
              * @var MessageHandler               $handler
@@ -79,16 +81,18 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             $handler = MessageHandler::create(
                 $closure,
                 $handlerReflectionMethod,
-                $this->createOptions(
-                    $handlerAnnotation,
-                    $handlerAnnotation instanceof CommandHandler
-                )
+                $this->createOptions($handlerAnnotation, $isCommandHandler)
             );
 
-            $collection->attach($handler);
+            $factoryMethod = true === $isCommandHandler ? 'createCommandHandler' : 'createEventListener';
+
+            /** @var ServiceMessageHandler $serviceMessageHandler */
+            $serviceMessageHandler = ServiceMessageHandler::{$factoryMethod}($handler);
+
+            $collection->attach($serviceMessageHandler);
         }
 
-        /** @psalm-var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandler, string> $collection */
+        /** @psalm-var \SplObjectStorage<\ServiceBus\Services\Configuration\ServiceMessageHandler, string> $collection */
 
         return $collection;
     }
@@ -118,12 +122,14 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
 
         if('' !== (string) $annotation->defaultValidationFailedEvent)
         {
-            $options = $options->withDefaultValidationFailedEvent((string) $annotation->defaultValidationFailedEvent);
+            /** @psalm-suppress PossiblyNullArgument */
+            $options = $options->withDefaultValidationFailedEvent($annotation->defaultValidationFailedEvent);
         }
 
         if('' !== (string) $annotation->defaultThrowableEvent)
         {
-            $options = $options->withDefaultThrowableEvent((string) $annotation->defaultThrowableEvent);
+            /** @psalm-suppress PossiblyNullArgument */
+            $options = $options->withDefaultThrowableEvent($annotation->defaultThrowableEvent);
         }
 
         return $options;

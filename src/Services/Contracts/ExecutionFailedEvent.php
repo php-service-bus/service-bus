@@ -12,12 +12,10 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Services\Contracts;
 
-use ServiceBus\Common\Messages\Event;
-
 /**
  * Error processing message
  */
-interface ExecutionFailedEvent extends Event
+interface ExecutionFailedEvent
 {
     /**
      * @param string $correlationId

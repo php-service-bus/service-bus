@@ -12,12 +12,10 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Application\Kernel\Stubs;
 
-use ServiceBus\Common\Messages\Event;
-
 /**
  *
  */
-final class SuccessResponseEvent implements Event
+final class SuccessResponseEvent
 {
 
 }

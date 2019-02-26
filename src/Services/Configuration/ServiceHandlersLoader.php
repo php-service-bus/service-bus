@@ -20,9 +20,11 @@ interface ServiceHandlersLoader
     /**
      * Load specified saga listeners
      *
+     * @psalm-return \SplObjectStorage<\ServiceBus\Services\Configuration\ServiceMessageHandler, string>
+     *
      * @param object $service
      *
-     * @return \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandler, string>
+     * @return \SplObjectStorage
      *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
      * @throws \ServiceBus\Services\Exceptions\UnableCreateClosure

@@ -31,8 +31,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      * @return void
      *
      * @throws \LogicException
-     * @throws \ServiceBus\Common\Exceptions\File\LoadContentFailed
-     * @throws \ServiceBus\Common\Exceptions\File\NonexistentFile
+     * @throws \ServiceBus\Common\Exceptions\FileSystemException
      */
     public function process(ContainerBuilder $container): void
     {
@@ -47,21 +46,21 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param ContainerBuilder         $container
-     * @param \Generator<\SplFileInfo> $generator
-     * @param array<int, string>       $excludedFiles
+     * @psalm-param \Generator<\SplFileInfo> $generator
+     * @psalm-param array<int, string>       $excludedFiles
+     *
+     * @param ContainerBuilder $container
+     * @param \Generator       $generator
+     * @param string[]         $excludedFiles
      *
      * @return void
      *
      * @throws \LogicException
-     * @throws \ServiceBus\Common\Exceptions\File\LoadContentFailed
-     * @throws \ServiceBus\Common\Exceptions\File\NonexistentFile
+     * @throws \ServiceBus\Common\Exceptions\FileSystemException
      */
     private function registerClasses(ContainerBuilder $container, \Generator $generator, array $excludedFiles): void
     {
-        /**
-         * @var \SplFileInfo $file
-         */
+        /** @var \SplFileInfo $file */
         foreach($generator as $file)
         {
             $filePath = $file->getRealPath();
@@ -126,13 +125,14 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      *
-     * @return array<int, string>
+     * @return string[]
      */
     private static function getDirectories(ContainerBuilder $container): array
     {
         /**
          * @noinspection PhpUnhandledExceptionInspection
-         * @var array<int, string> $directories
+         * @psalm-var    array<int, string> $directories
+         * @var string[] $directories
          */
         $directories = true === $container->hasParameter('service_bus.auto_import.handlers_directories')
             ? $container->getParameter('service_bus.auto_import.handlers_directories')
@@ -144,15 +144,18 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     /**
      * @noinspection PhpDocMissingThrowsInspection
      *
+     * @psalm-return array<int, string>
+     *
      * @param ContainerBuilder $container
      *
-     * @return array<int, string>
+     * @return string[]
      */
     private static function getExcludedFiles(ContainerBuilder $container): array
     {
         /**
          * @noinspection PhpUnhandledExceptionInspection
-         * @var array<int, string> $excludedFiles
+         * @psalm-var    array<int, string> $excludedFiles
+         * @var string[] $excludedFiles
          */
         $excludedFiles = true === $container->hasParameter('service_bus.auto_import.handlers_excluded')
             ? $container->getParameter('service_bus.auto_import.handlers_excluded')

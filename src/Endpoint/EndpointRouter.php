@@ -22,14 +22,16 @@ final class EndpointRouter
      *
      * name => [destination handler]
      *
-     * @var array<string, array<mixed, \ServiceBus\Endpoint\Endpoint>>
+     * @psalm-var array<string, array<mixed, \ServiceBus\Endpoint\Endpoint>>
+     * @var \ServiceBus\Endpoint\Endpoint[][]
      */
     private $routes = [];
 
     /**
      * Destination points for global routes (marked with "*")
      *
-     * @var array<array-key, \ServiceBus\Endpoint\Endpoint>
+     * @psalm-var array<array-key, \ServiceBus\Endpoint\Endpoint>
+     * @var \ServiceBus\Endpoint\Endpoint[]
      */
     private $globalEndpoints = [];
 
@@ -56,7 +58,9 @@ final class EndpointRouter
     /**
      * Add custom endpoint for multiple messages
      *
-     * @param array<array-key, string>    $messages
+     * @psalm-param array<array-key, class-string>    $messages
+     *
+     * @param string[] $messages
      * @param Endpoint $endpoint
      *
      * @return void
@@ -72,6 +76,8 @@ final class EndpointRouter
     /**
      * Add custom endpoint to specified message
      *
+     * @psalm-param class-string $messageClass
+     *
      * @param string   $messageClass
      * @param Endpoint $endpoint
      *
@@ -86,9 +92,11 @@ final class EndpointRouter
      * Receiving a message sending route
      * If no specific route is registered, the default endpoint route will be returned.
      *
+     * @psalm-return array<array-key, \ServiceBus\Endpoint\Endpoint>
+     *
      * @param string $messageClass
      *
-     * @return array<array-key, \ServiceBus\Endpoint\Endpoint>
+     * @return \ServiceBus\Endpoint\Endpoint[]
      */
     public function route(string $messageClass): array
     {

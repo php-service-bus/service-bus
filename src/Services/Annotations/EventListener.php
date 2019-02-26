@@ -30,7 +30,8 @@ final class EventListener implements ServicesAnnotationsMarker
     /**
      * Validation groups
      *
-     * @var array<int, string>
+     * @psalm-var array<int, string>
+     * @var string[]
      */
     public $groups = [];
 
@@ -40,6 +41,7 @@ final class EventListener implements ServicesAnnotationsMarker
      *
      * If no class is specified, control is passed to user code
      *
+     * @psalm-var class-string|null
      * @var string|null
      */
     public $defaultValidationFailedEvent;
@@ -50,21 +52,21 @@ final class EventListener implements ServicesAnnotationsMarker
      *
      * If no class is specified, control is passed to user code
      *
+     * @psalm-var class-string|null
      * @var string|null
      */
     public $defaultThrowableEvent;
 
     /**
+     * @psalm-param array<string, mixed> $data
+     *
      * @param array $data
      *
      * @throws \InvalidArgumentException
      */
     public function __construct(array $data)
     {
-        /**
-         * @var string     $property
-         * @var array|bool $value
-         */
+        /** @psalm-var array|string|class-string|null $value */
         foreach($data as $property => $value)
         {
             if(false === \property_exists($this, $property))

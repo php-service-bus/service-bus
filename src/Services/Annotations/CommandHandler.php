@@ -52,21 +52,21 @@ final class CommandHandler implements ServicesAnnotationsMarker
     /**
      * Validation groups
      *
-     * @var array<int, string>
+     * @psalm-var array<int, string>
+     * @var string[]
      */
     public $groups = [];
 
     /**
+     * @psalm-param array<string, mixed> $data
+     *
      * @param array $data
      *
      * @throws \InvalidArgumentException
      */
     public function __construct(array $data)
     {
-        /**
-         * @var string     $property
-         * @var array|bool $value
-         */
+        /** @var array|string|null $value */
         foreach($data as $property => $value)
         {
             if(false === \property_exists($this, $property))

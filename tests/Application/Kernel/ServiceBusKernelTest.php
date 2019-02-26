@@ -20,7 +20,6 @@ use Psr\Container\ContainerInterface;
 use ServiceBus\Application\Bootstrap;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use ServiceBus\Application\ServiceBusKernel;
-use ServiceBus\Common\Messages\Message;
 use function ServiceBus\Common\readReflectionPropertyValue;
 use function ServiceBus\Common\uuid;
 use ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer;
@@ -107,7 +106,7 @@ final class ServiceBusKernelTest extends TestCase
             ->stopWhenFilesChange(__DIR__);
 
         $topic = AmqpExchange::direct('test_topic');
-        $queue = new AmqpQueue('test_queue');
+        $queue = AmqpQueue::default('test_queue');
 
         wait($this->kernel->createQueue($queue, QueueBind::create($topic, 'tests')));
 
@@ -158,7 +157,7 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new CommandWithPayload('payload'));
 
-        wait($this->kernel->run(new AmqpQueue('test_queue')));
+        wait($this->kernel->run(AmqpQueue::default('test_queue')));
 
         $records = $this->logHandler->getRecords();
 
@@ -185,7 +184,7 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new TriggerThrowableCommand());
 
-        wait($this->kernel->run(new AmqpQueue('test_queue')));
+        wait($this->kernel->run(AmqpQueue::default('test_queue')));
 
         $records = $this->logHandler->getRecords();
 
@@ -208,7 +207,7 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new TriggerResponseEventCommand());
 
-        wait($this->kernel->run(new AmqpQueue('test_queue')));
+        wait($this->kernel->run(AmqpQueue::default('test_queue')));
     }
 
     /**
@@ -222,7 +221,7 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new SecondEmptyCommand());
 
-        wait($this->kernel->run(new AmqpQueue('test_queue')));
+        wait($this->kernel->run(AmqpQueue::default('test_queue')));
 
         $records = $this->logHandler->getRecords();
 
@@ -243,7 +242,7 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new WithValidationCommand(''));
 
-        wait($this->kernel->run(new AmqpQueue('test_queue')));
+        wait($this->kernel->run(AmqpQueue::default('test_queue')));
 
         $records = $this->logHandler->getRecords();
 
@@ -281,7 +280,7 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new WithValidationRulesCommand(''));
 
-        wait($this->kernel->run(new AmqpQueue('test_queue')));
+        wait($this->kernel->run(AmqpQueue::default('test_queue')));
     }
 
     /**
@@ -295,18 +294,18 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new TriggerThrowableCommandWithResponseEvent());
 
-        wait($this->kernel->run(new AmqpQueue('test_queue')));
+        wait($this->kernel->run(AmqpQueue::default('test_queue')));
     }
 
     /**
-     * @param Message $message
+     * @param object $message
      * @param array   $headers
      *
      * @return void
      *
      * @throws \Throwable
      */
-    private function sendMessage(Message $message, array $headers = []): void
+    private function sendMessage(object $message, array $headers = []): void
     {
         $encoder = new SymfonyMessageSerializer();
 

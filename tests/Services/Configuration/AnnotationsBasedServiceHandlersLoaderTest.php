@@ -118,6 +118,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
         static::assertNotEmpty($handlers);
         static::assertCount(3, $handlers);
 
+        /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
         foreach($handlers as $handler)
         {
             /**
@@ -125,29 +126,29 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              * @var DefaultHandlerOptions                            $options
              */
 
-            $options = $handler->options;
+            $options = $handler->messageHandler->options;
 
-            static::assertNotNull($handler->returnDeclaration);
+            static::assertNotNull($handler->messageHandler->returnDeclaration);
 
-            static::assertTrue($handler->hasArguments);
-            static::assertCount(2, $handler->arguments);
+            static::assertTrue($handler->messageHandler->hasArguments);
+            static::assertCount(2, $handler->messageHandler->arguments);
 
-            if(true === $handler->options->isCommandHandler)
+            if(true === $handler->messageHandler->options->isCommandHandler)
             {
-                static::assertEquals(FirstEmptyCommand::class, $handler->messageClass);
+                static::assertEquals(FirstEmptyCommand::class, $handler->messageHandler->messageClass);
                 /** @noinspection UnnecessaryAssertionInspection */
-                static::assertInstanceOf(\Closure::class, $handler->closure);
+                static::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
 
                 static::assertTrue($options->validationEnabled);
                 static::assertEquals(['qwerty', 'root'], $options->validationGroups);
 
-                static::assertEquals('handle', $handler->methodName);
+                static::assertEquals('handle', $handler->messageHandler->methodName);
             }
             else
             {
-                static::assertEquals(FirstEmptyEvent::class, $handler->messageClass);
+                static::assertEquals(FirstEmptyEvent::class, $handler->messageHandler->messageClass);
                 /** @noinspection UnnecessaryAssertionInspection */
-                static::assertInstanceOf(\Closure::class, $handler->closure);
+                static::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
 
                 static::assertFalse($options->validationEnabled);
                 static::assertEmpty($options->validationGroups);

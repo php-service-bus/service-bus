@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\Endpoint\DefaultDeliveryOptions;
 use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
@@ -62,7 +61,8 @@ final class KernelContext implements ServiceBusContext
      *    ]
      * ]
      *
-     * @var array<string, array<int, string>>
+     * @psalm-var array<string, array<int, string>>
+     * @var array
      */
     private $violations = [];
 
@@ -103,7 +103,7 @@ final class KernelContext implements ServiceBusContext
      *
      * @inheritdoc
      */
-    public function delivery(Message $message, ?DeliveryOptions $deliveryOptions = null): Promise
+    public function delivery(object $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
         $messageClass = \get_class($message);
         $endpoints    = $this->endpointRouter->route($messageClass);
@@ -120,7 +120,7 @@ final class KernelContext implements ServiceBusContext
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(Message $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): \Generator
+            static function(object $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): \Generator
             {
                 foreach($endpoints as $endpoint)
                 {

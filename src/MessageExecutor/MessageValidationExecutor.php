@@ -18,7 +18,6 @@ use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use function ServiceBus\Common\invokeReflectionMethod;
-use ServiceBus\Common\Messages\Message;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -60,7 +59,7 @@ final class MessageValidationExecutor implements MessageExecutor
     /**
      * @inheritdoc
      */
-    public function __invoke(Message $message, ServiceBusContext $context): Promise
+    public function __invoke(object $message, ServiceBusContext $context): Promise
     {
         try
         {

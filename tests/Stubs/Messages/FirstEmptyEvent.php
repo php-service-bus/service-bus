@@ -12,12 +12,10 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Stubs\Messages;
 
-use ServiceBus\Common\Messages\Event;
-
 /**
  *
  */
-final class FirstEmptyEvent implements Event
+final class FirstEmptyEvent
 {
 
 }
