@@ -42,12 +42,12 @@
   },
   "require": {
     "php": ">=7.2",
-    "php-service-bus/common": "v3.0.x-dev",
-    "php-service-bus/transport-common": "v3.0.x-dev",
-    "php-service-bus/storage-common": "v3.0.x-dev",
-    "php-service-bus/message-serializer": "v3.0.x-dev",
-    "php-service-bus/annotations-reader": "v3.0.x-dev",
-    "php-service-bus/messages-router": "v3.0.x-dev",
+    "php-service-bus/common": "v3.0.7",
+    "php-service-bus/transport-common": "v3.0.7",
+    "php-service-bus/storage-common": "v3.0.7",
+    "php-service-bus/message-serializer": "v3.0.7",
+    "php-service-bus/annotations-reader": "v3.0.7",
+    "php-service-bus/messages-router": "v3.0.7",
     "symfony/dependency-injection": "^v4.2",
     "symfony/config": "^v4.2",
     "symfony/dotenv": "^v4.2",
@@ -61,7 +61,7 @@
     "kelunik/retry": "^v1.0"
   },
   "require-dev": {
-    "php-service-bus/module-phpinnacle-transport": "v3.0.x-dev",
+    "php-service-bus/module-phpinnacle-transport": "v3.0.7",
     "kelunik/loop-block": "^1.0",
     "phpunit/phpunit": "^8",
     "vimeo/psalm": "^v3"
