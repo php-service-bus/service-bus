@@ -117,7 +117,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
         static::assertCount(3, $handlers);
 
         /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
-        foreach($handlers as $handler)
+        foreach ($handlers as $handler)
         {
             /**
              * @var \ServiceBus\Common\MessageHandler\MessageHandler $handler
@@ -130,7 +130,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             static::assertTrue($handler->messageHandler->hasArguments);
             static::assertCount(2, $handler->messageHandler->arguments);
 
-            if(true === $handler->messageHandler->options->isCommandHandler)
+            if (true === $handler->messageHandler->options->isCommandHandler)
             {
                 static::assertSame(FirstEmptyCommand::class, $handler->messageHandler->messageClass);
                 /** @noinspection UnnecessaryAssertionInspection */
