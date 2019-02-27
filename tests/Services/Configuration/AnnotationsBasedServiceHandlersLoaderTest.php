@@ -20,6 +20,7 @@ use ServiceBus\Services\Annotations\CommandHandler;
 use ServiceBus\Services\Annotations\EventListener;
 use ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
+use ServiceBus\Services\Exceptions\InvalidHandlerArguments;
 use ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
 use ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
 
@@ -116,7 +117,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
         static::assertCount(3, $handlers);
 
         /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
-        foreach ($handlers as $handler)
+        foreach($handlers as $handler)
         {
             /**
              * @var \ServiceBus\Common\MessageHandler\MessageHandler $handler
@@ -129,7 +130,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             static::assertTrue($handler->messageHandler->hasArguments);
             static::assertCount(2, $handler->messageHandler->arguments);
 
-            if (true === $handler->messageHandler->options->isCommandHandler)
+            if(true === $handler->messageHandler->options->isCommandHandler)
             {
                 static::assertSame(FirstEmptyCommand::class, $handler->messageHandler->messageClass);
                 /** @noinspection UnnecessaryAssertionInspection */
@@ -150,5 +151,65 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
                 static::assertEmpty($options->validationGroups);
             }
         }
+    }
+
+    /**
+     * @test
+     *
+     * @throws \Throwable
+     *
+     * @return void
+     */
+    public function loadHandlerWithNoArguments(): void
+    {
+        $this->expectException(InvalidHandlerArguments::class);
+        $this->expectExceptionMessage('The event handler must have at least 2 arguments: the message object (the first argument) and the context');
+
+        $service = new class()
+        {
+            /**
+             * @CommandHandler(
+             *     validate=true,
+             *     groups={"qwerty", "root"}
+             * )
+             *
+             * @return void
+             */
+            public function handle(): void
+            {
+            }
+        };
+
+        (new AnnotationsBasedServiceHandlersLoader())->load($service);
+    }
+
+    /**
+     * @test
+     *
+     * @throws \Throwable
+     *
+     * @return void
+     */
+    public function loadHandlerWithWrongMessageArgument(): void
+    {
+        $this->expectException(InvalidHandlerArguments::class);
+        $this->expectExceptionMessage('The first argument to the message handler must be the message object');
+
+        $service = new class()
+        {
+            /**
+             * @CommandHandler(
+             *     validate=true,
+             *     groups={"qwerty", "root"}
+             * )
+             *
+             * @return void
+             */
+            public function handle(string $qwerty, KernelContext $context): void
+            {
+            }
+        };
+
+        (new AnnotationsBasedServiceHandlersLoader())->load($service);
     }
 }
