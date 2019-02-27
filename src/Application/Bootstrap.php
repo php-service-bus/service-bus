@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -21,9 +21,9 @@ use ServiceBus\Environment;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  *
@@ -36,15 +36,15 @@ final class Bootstrap
     private $containerBuilder;
 
     /**
-     * Create based on the environment parameters obtained from the ".env" file
+     * Create based on the environment parameters obtained from the ".env" file.
      *
      * @param string $envFilePath
-     *
-     * @return self
      *
      * @throws \Symfony\Component\Dotenv\Exception\FormatException
      * @throws \Symfony\Component\Dotenv\Exception\PathException
      * @throws \LogicException Invalid environment specified
+     *
+     * @return self
      */
     public static function withDotEnv(string $envFilePath): self
     {
@@ -54,11 +54,11 @@ final class Bootstrap
     }
 
     /**
-     * Create based on environment settings
-     *
-     * @return self
+     * Create based on environment settings.
      *
      * @throws \LogicException Invalid environment specified
+     *
+     * @return self
      */
     public static function withEnvironmentValues(): self
     {
@@ -68,9 +68,9 @@ final class Bootstrap
     /**
      * @param ServiceBusModule ...$serviceBusModules
      *
-     * @return $this
-     *
      * @throws \Throwable
+     *
+     * @return $this
      */
     public function applyModules(ServiceBusModule ...$serviceBusModules): self
     {
@@ -80,7 +80,7 @@ final class Bootstrap
     }
 
     /**
-     * All message handlers from the specified directories will be registered automatically
+     * All message handlers from the specified directories will be registered automatically.
      *
      * Note: All files containing user-defined functions must be excluded
      * Note: Increases start time because of the need to scan files
@@ -95,7 +95,7 @@ final class Bootstrap
         $this->importParameters([
             'service_bus.auto_import.handlers_enabled'     => true,
             'service_bus.auto_import.handlers_directories' => $directories,
-            'service_bus.auto_import.handlers_excluded'    => $excludedFiles
+            'service_bus.auto_import.handlers_excluded'    => $excludedFiles,
         ]);
 
         $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass());
@@ -104,13 +104,13 @@ final class Bootstrap
     }
 
     /**
-     * @return ContainerInterface
-     *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
      * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
      * @throws \Throwable Boot module failed
+     *
+     * @return ContainerInterface
      */
     public function boot(): ContainerInterface
     {
@@ -120,7 +120,7 @@ final class Bootstrap
     }
 
     /**
-     * Use custom cache directory
+     * Use custom cache directory.
      *
      * @param string $cacheDirectoryPath
      *
@@ -134,7 +134,7 @@ final class Bootstrap
     }
 
     /**
-     * Import parameters to container
+     * Import parameters to container.
      *
      * @param array<string, bool|string|int|float|array<mixed, mixed>|null> $parameters
      *
@@ -174,7 +174,6 @@ final class Bootstrap
     }
 
     /**
-     *
      * @throws \LogicException
      */
     private function __construct()
@@ -188,7 +187,7 @@ final class Bootstrap
 
         $this->containerBuilder->addParameters([
             'service_bus.environment' => $envValue,
-            'service_bus.entry_point' => $entryPoint
+            'service_bus.entry_point' => $entryPoint,
         ]);
 
         $this->containerBuilder->addExtensions(new ServiceBusExtension());

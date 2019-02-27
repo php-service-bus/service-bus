@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -12,8 +12,8 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests;
 
-use ServiceBus\Environment;
 use PHPUnit\Framework\TestCase;
+use ServiceBus\Environment;
 
 /**
  *
@@ -23,9 +23,9 @@ final class EnvironmentTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function wrongEnvironment(): void
     {
@@ -38,15 +38,15 @@ final class EnvironmentTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function createTestEnv(): void
     {
         $environment = Environment::test();
 
-        static::assertSame('test', (string ) $environment);
+        static::assertSame('test', (string) $environment);
         static::assertTrue($environment->equals(Environment::create('test')));
         static::assertTrue($environment->isTesting());
         static::assertTrue($environment->isDebug());
@@ -57,15 +57,15 @@ final class EnvironmentTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function createDevEnv(): void
     {
         $environment = Environment::dev();
 
-        static::assertSame('dev', (string ) $environment);
+        static::assertSame('dev', (string) $environment);
         static::assertTrue($environment->equals(Environment::create('dev')));
         static::assertTrue($environment->isDevelopment());
         static::assertTrue($environment->isDebug());
@@ -76,15 +76,15 @@ final class EnvironmentTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function createProdEnv(): void
     {
         $environment = Environment::prod();
 
-        static::assertSame('prod', (string ) $environment);
+        static::assertSame('prod', (string) $environment);
         static::assertTrue($environment->equals(Environment::create('prod')));
         static::assertTrue($environment->isProduction());
         static::assertFalse($environment->isDevelopment());

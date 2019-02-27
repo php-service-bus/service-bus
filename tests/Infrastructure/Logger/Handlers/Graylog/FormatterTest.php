@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -12,8 +12,8 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Infrastructure\Logger\Handlers\Graylog;
 
-use PHPUnit\Framework\TestCase;
 use function ServiceBus\Common\datetimeInstantiator;
+use PHPUnit\Framework\TestCase;
 use ServiceBus\Infrastructure\Logger\Handlers\Graylog\Formatter;
 
 /**
@@ -24,9 +24,9 @@ final class FormatterTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function format(): void
     {
@@ -40,15 +40,15 @@ final class FormatterTest extends TestCase
                 'contextKey' => 'contextValue',
                 'secondKey'  => null,
                 'largeKey'   => \str_repeat('x', 40000),
-                'key' => ['qwerty' => 'root']
+                'key' => ['qwerty' => 'root'],
             ],
             'extra'    => [
                 'file' => '/src/tests.php',
-                'line' => __LINE__
-            ]
+                'line' => __LINE__,
+            ],
         ]);
 
-        static::assertEquals(
+        static::assertSame(
             \json_decode(\file_get_contents(__DIR__ . '/expected_format_reult.json'), true),
             $result
         );

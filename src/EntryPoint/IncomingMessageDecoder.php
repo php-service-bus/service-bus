@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -18,14 +18,14 @@ use ServiceBus\Transport\Common\Transport;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
- * Decoding of incoming messages
+ * Decoding of incoming messages.
  */
 final class IncomingMessageDecoder
 {
     public const DEFAULT_DECODER = 'service_bus.decoder.default_handler';
 
     /**
-     * Decoders mapping
+     * Decoders mapping.
      *
      * [
      *   'custom_encoder_key' => 'custom_decoder_id'
@@ -55,10 +55,10 @@ final class IncomingMessageDecoder
      *
      * @param IncomingPackage $package
      *
-     * @return object
-     *
      * @throws \LogicException Could not find decoder in the service container
      * @throws \ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed
+     *
+     * @return object
      */
     public function decode(IncomingPackage $package): object
     {
@@ -72,9 +72,9 @@ final class IncomingMessageDecoder
     /**
      * @param string $encoderKey
      *
-     * @return MessageDecoder
-     *
      * @throws \LogicException Could not find decoder
+     *
+     * @return MessageDecoder
      */
     private function findDecoderByKey(string $encoderKey): MessageDecoder
     {
@@ -89,13 +89,13 @@ final class IncomingMessageDecoder
     /**
      * @param string $decoderId
      *
-     * @return MessageDecoder
-     *
      * @throws \LogicException Could not find decoder
+     *
+     * @return MessageDecoder
      */
     private function obtainDecoder(string $decoderId): MessageDecoder
     {
-        if(true === $this->decodersLocator->has($decoderId))
+        if (true === $this->decodersLocator->has($decoderId))
         {
             /** @var MessageDecoder $decoder */
             $decoder = $this->decodersLocator->get($decoderId);

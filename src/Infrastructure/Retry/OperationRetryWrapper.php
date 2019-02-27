@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -12,17 +12,17 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Infrastructure\Retry;
 
+use function Kelunik\Retry\retry;
 use Amp\Promise;
 use Kelunik\Retry\ConstantBackoff;
-use function Kelunik\Retry\retry;
 
 /**
- * A wrapper on an operation that performs repetitions in case of an error
+ * A wrapper on an operation that performs repetitions in case of an error.
  */
 final class OperationRetryWrapper
 {
     /**
-     * Retry operation options
+     * Retry operation options.
      *
      * @var RetryOptions
      */

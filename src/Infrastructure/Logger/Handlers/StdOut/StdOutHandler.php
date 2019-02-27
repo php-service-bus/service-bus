@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -19,7 +19,7 @@ use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 
 /**
- * Console output handler
+ * Console output handler.
  *
  * @codeCoverageIgnore
  */
@@ -42,7 +42,7 @@ final class StdOutHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @return void
      */
@@ -52,8 +52,8 @@ final class StdOutHandler extends AbstractProcessingHandler
         {
             $this->streamWriter->write((string) $record['formatted']);
         }
-            // @codeCoverageIgnoreStart
-        catch(\Throwable $throwable)
+        // @codeCoverageIgnoreStart
+        catch (\Throwable $throwable)
         {
             /** Not interest */
         }
@@ -61,7 +61,7 @@ final class StdOutHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getFormatter(): LineFormatter
     {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -23,11 +23,12 @@ use ServiceBus\Transport\Common\Queue;
 use ServiceBus\Transport\Common\Transport;
 
 /**
- * Application entry point
+ * Application entry point.
  */
 final class EntryPoint
 {
     private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 60;
+
     private const DEFAULT_AWAIT_DELAY               = 20;
 
     /**
@@ -46,21 +47,21 @@ final class EntryPoint
     private $logger;
 
     /**
-     * The max number of concurrent tasks
+     * The max number of concurrent tasks.
      *
      * @var int
      */
     private $maxConcurrentTaskCount;
 
     /**
-     * The current number of tasks performed
+     * The current number of tasks performed.
      *
      * @var int
      */
     private $currentTasksInProgressCount = 0;
 
     /**
-     * Barrier wait delay (in milliseconds)
+     * Barrier wait delay (in milliseconds).
      *
      * @var int
      */
@@ -79,8 +80,7 @@ final class EntryPoint
         ?LoggerInterface $logger = null,
         ?int $maxConcurrentTaskCount = null,
         ?int $awaitDelay = null
-    )
-    {
+    ) {
         $this->transport              = $transport;
         $this->processor              = $processor;
         $this->logger                 = $logger ?? new NullLogger();
@@ -89,7 +89,7 @@ final class EntryPoint
     }
 
     /**
-     * Start queue listen
+     * Start queue listen.
      *
      * @param Queue ...$queues
      *
@@ -106,13 +106,14 @@ final class EntryPoint
             {
                 /**
                  * @psalm-suppress TooManyTemplateParams Wrong Iterator template
+                 *
                  * @var Queue[] $queues
                  * @var \Amp\Iterator $iterator
                  */
                 $iterator = yield $this->transport->consume(...$queues);
 
                 /** @psalm-suppress TooManyTemplateParams Wrong Promise template */
-                while(yield $iterator->advance())
+                while (yield $iterator->advance())
                 {
                     $this->currentTasksInProgressCount++;
 
@@ -120,7 +121,7 @@ final class EntryPoint
                     $package = $iterator->getCurrent();
 
                     /** Hack for phpUnit */
-                    if(true === $isTestCall)
+                    if (true === $isTestCall)
                     {
                         $this->currentTasksInProgressCount--;
 
@@ -133,7 +134,7 @@ final class EntryPoint
                     $this->deferExecution($package);
 
                     /** Limit the maximum number of concurrently running tasks */
-                    while($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
+                    while ($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
                     {
                         yield new Delayed($this->awaitDelay);
                     }
@@ -188,12 +189,12 @@ final class EntryPoint
 
                     $this->currentTasksInProgressCount--;
                 }
-                catch(\Throwable $throwable)
+                catch (\Throwable $throwable)
                 {
                     $this->logger->critical($throwable->getMessage(), [
                         'packageId'      => $package->id(),
                         'traceId'        => $package->traceId(),
-                        'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
+                        'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
                     ]);
                 }
             }

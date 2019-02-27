@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -16,14 +16,14 @@ use ServiceBus\Common\Module\ServiceBusModule;
 use ServiceBus\Environment;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Symfony DI container builder
+ * Symfony DI container builder.
  *
  * @internal
  */
@@ -32,42 +32,46 @@ final class ContainerBuilder
     private const CONTAINER_NAME_TEMPLATE = '%s%sProjectContainer';
 
     /**
-     * Parameters
+     * Parameters.
      *
      * Key=>value parameters
      *
      * @psalm-var array<string, bool|string|int|float|array<mixed, mixed>|null>
+     *
      * @var array
      */
     private $parameters;
 
     /**
-     * Entry point name
+     * Entry point name.
      *
      * @var string
      */
     private $entryPointName;
 
     /**
-     * Extensions
+     * Extensions.
      *
      * @psalm-var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension, string>
+     *
      * @var \SplObjectStorage
      */
     private $extensions;
 
     /**
-     * CompilerPass collection
+     * CompilerPass collection.
      *
      * @psalm-var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface, string>
+     *
      * @var \SplObjectStorage
      */
     private $compilerPasses;
 
     /**
-     * Modules collection
+     * Modules collection.
      *
      * @psalm-var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule, string>
+     *
      * @var \SplObjectStorage
      */
     private $modules;
@@ -78,14 +82,14 @@ final class ContainerBuilder
     private $environment;
 
     /**
-     * Cache directory path
+     * Cache directory path.
      *
      * @var string|null
      */
     private $cacheDirectory;
 
     /**
-     * ConfigCache caches arbitrary content in files on disk
+     * ConfigCache caches arbitrary content in files on disk.
      *
      * @var ConfigCache|null
      */
@@ -110,7 +114,7 @@ final class ContainerBuilder
     }
 
     /**
-     * Add customer compiler pass
+     * Add customer compiler pass.
      *
      * @noinspection PhpDocSignatureInspection
      *
@@ -120,14 +124,14 @@ final class ContainerBuilder
      */
     public function addCompilerPasses(CompilerPassInterface ...$compilerPasses): void
     {
-        foreach($compilerPasses as $compilerPass)
+        foreach ($compilerPasses as $compilerPass)
         {
             $this->compilerPasses->attach($compilerPass);
         }
     }
 
     /**
-     * Add customer extension
+     * Add customer extension.
      *
      * @noinspection PhpDocSignatureInspection
      *
@@ -137,14 +141,14 @@ final class ContainerBuilder
      */
     public function addExtensions(Extension ...$extensions): void
     {
-        foreach($extensions as $extension)
+        foreach ($extensions as $extension)
         {
             $this->extensions->attach($extension);
         }
     }
 
     /**
-     * Add customer modules
+     * Add customer modules.
      *
      * @param ServiceBusModule ...$serviceBusModules
      *
@@ -152,7 +156,7 @@ final class ContainerBuilder
      */
     public function addModules(ServiceBusModule ...$serviceBusModules): void
     {
-        foreach($serviceBusModules as $serviceBusModule)
+        foreach ($serviceBusModules as $serviceBusModule)
         {
             $this->modules->attach($serviceBusModule);
         }
@@ -167,14 +171,14 @@ final class ContainerBuilder
      */
     public function addParameters(array $parameters): void
     {
-        foreach($parameters as $key => $value)
+        foreach ($parameters as $key => $value)
         {
             $this->parameters[$key] = $value;
         }
     }
 
     /**
-     * Setup cache directory path
+     * Setup cache directory path.
      *
      * @param string $cacheDirectoryPath
      *
@@ -186,13 +190,13 @@ final class ContainerBuilder
     }
 
     /**
-     * Has compiled actual container
+     * Has compiled actual container.
      *
      * @return bool
      */
     public function hasActualContainer(): bool
     {
-        if(false === $this->environment->isDebug())
+        if (false === $this->environment->isDebug())
         {
             return true === $this->configCache()->isFresh();
         }
@@ -201,7 +205,7 @@ final class ContainerBuilder
     }
 
     /**
-     * Receive cached container
+     * Receive cached container.
      *
      * @return ContainerInterface
      */
@@ -223,9 +227,7 @@ final class ContainerBuilder
     }
 
     /**
-     * Build container
-     *
-     * @return ContainerInterface
+     * Build container.
      *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      * @throws \LogicException Cannot dump an uncompiled container
@@ -233,6 +235,8 @@ final class ContainerBuilder
      * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has
      *                                                                                not been dumped
      * @throws \Throwable Boot module failed
+     *
+     * @return ContainerInterface
      */
     public function build(): ContainerInterface
     {
@@ -242,19 +246,19 @@ final class ContainerBuilder
         $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($this->parameters));
 
         /** @var Extension $extension */
-        foreach($this->extensions as $extension)
+        foreach ($this->extensions as $extension)
         {
             $extension->load($this->parameters, $containerBuilder);
         }
 
         /** @var CompilerPassInterface $compilerPass */
-        foreach($this->compilerPasses as $compilerPass)
+        foreach ($this->compilerPasses as $compilerPass)
         {
             $containerBuilder->addCompilerPass($compilerPass);
         }
 
         /** @var ServiceBusModule $module */
-        foreach($this->modules as $module)
+        foreach ($this->modules as $module)
         {
             $module->boot($containerBuilder);
         }
@@ -267,42 +271,42 @@ final class ContainerBuilder
     }
 
     /**
-     * Save container
+     * Save container.
      *
      * @param SymfonyContainerBuilder $builder
      *
-     * @return void
-     *
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
-     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has
-     *                                                                                not been dumped
+     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has     not been dumped
+     *
+     * @return void
      */
     private function dumpContainer(SymfonyContainerBuilder $builder): void
     {
         $dumper = new PhpDumper($builder);
 
-        $content = $dumper->dump([
+        $content = $dumper->dump(
+            [
                 'class'      => $this->getContainerClassName(),
                 'base_class' => 'Container',
-                'file'       => $this->configCache()->getPath()
+                'file'       => $this->configCache()->getPath(),
             ]
         );
 
-        if(true === \is_string($content))
+        if (true === \is_string($content))
         {
             $this->configCache()->write($content, $builder->getResources());
         }
     }
 
     /**
-     * Receive config cache
+     * Receive config cache.
      *
      * @return ConfigCache
      */
     private function configCache(): ConfigCache
     {
-        if(null === $this->configCache)
+        if (null === $this->configCache)
         {
             $this->configCache = new ConfigCache($this->getContainerClassPath(), $this->environment->isDebug());
         }
@@ -311,7 +315,7 @@ final class ContainerBuilder
     }
 
     /**
-     * Receive cache directory path
+     * Receive cache directory path.
      *
      * @return string
      */
@@ -319,7 +323,7 @@ final class ContainerBuilder
     {
         $cacheDirectory = (string) $this->cacheDirectory;
 
-        if('' === $cacheDirectory && false === \is_writable($cacheDirectory))
+        if ('' === $cacheDirectory && false === \is_writable($cacheDirectory))
         {
             $cacheDirectory = \sys_get_temp_dir();
         }
@@ -328,7 +332,7 @@ final class ContainerBuilder
     }
 
     /**
-     * Get the absolute path to the container class
+     * Get the absolute path to the container class.
      *
      * @return string
      */
@@ -338,7 +342,7 @@ final class ContainerBuilder
     }
 
     /**
-     * Get container class name
+     * Get container class name.
      *
      * @return string
      */

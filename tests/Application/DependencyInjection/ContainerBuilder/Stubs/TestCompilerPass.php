@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 final class TestCompilerPass implements CompilerPassInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @throws \Exception
      */

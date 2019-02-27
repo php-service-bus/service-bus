@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -24,18 +24,18 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @param ContainerBuilder $container
      *
-     * @return void
-     *
      * @throws \LogicException
      * @throws \ServiceBus\Common\Exceptions\FileSystemException
+     *
+     * @return void
      */
     public function process(ContainerBuilder $container): void
     {
-        if(true === self::enabled($container))
+        if (true === self::enabled($container))
         {
             $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
 
@@ -53,31 +53,30 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      * @param \Generator       $generator
      * @param string[]         $excludedFiles
      *
-     * @return void
-     *
      * @throws \LogicException
      * @throws \ServiceBus\Common\Exceptions\FileSystemException
+     *
+     * @return void
      */
     private function registerClasses(ContainerBuilder $container, \Generator $generator, array $excludedFiles): void
     {
         /** @var \SplFileInfo $file */
-        foreach($generator as $file)
+        foreach ($generator as $file)
         {
             $filePath = $file->getRealPath();
 
-            if(true === \in_array($filePath, $excludedFiles, true))
+            if (true === \in_array($filePath, $excludedFiles, true))
             {
                 continue;
             }
 
             $class = extractNamespaceFromFile($filePath);
 
-            if(
+            if (
                 null !== $class &&
                 true === self::isMessageHandler($filePath) &&
                 false === $container->hasDefinition($class)
-            )
-            {
+            ) {
                 $container->register($class, $class)->addTag('service_bus.service');
             }
         }
@@ -101,15 +100,15 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     /**
      * @param string $filePath
      *
-     * @return bool
-     *
      * @throws \LogicException Error loading file contents
+     *
+     * @return bool
      */
     private static function isMessageHandler(string $filePath): bool
     {
         $fileContent = \file_get_contents($filePath);
 
-        if(false !== $fileContent)
+        if (false !== $fileContent)
         {
             return false !== \strpos($fileContent, '@CommandHandler') ||
                 false !== \strpos($fileContent, '@EventListener');
@@ -132,6 +131,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
         /**
          * @noinspection PhpUnhandledExceptionInspection
          * @psalm-var    array<int, string> $directories
+         *
          * @var string[] $directories
          */
         $directories = true === $container->hasParameter('service_bus.auto_import.handlers_directories')
@@ -155,6 +155,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
         /**
          * @noinspection PhpUnhandledExceptionInspection
          * @psalm-var    array<int, string> $excludedFiles
+         *
          * @var string[] $excludedFiles
          */
         $excludedFiles = true === $container->hasParameter('service_bus.auto_import.handlers_excluded')

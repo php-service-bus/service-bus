@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Std out logger support
+ * Std out logger support.
  */
 final class StdOutLoggerCompilerPass implements CompilerPassInterface
 {
@@ -38,7 +38,7 @@ final class StdOutLoggerCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @throws \Throwable
      */
@@ -46,12 +46,13 @@ final class StdOutLoggerCompilerPass implements CompilerPassInterface
     {
         $container->setParameter('service_bus.logger.echo.log_level', $this->logLevel);
 
-        $container->addDefinitions([
-                StdOutHandler::class => (new Definition(StdOutHandler::class))->setArguments(['%service_bus.logger.echo.log_level%'])
+        $container->addDefinitions(
+            [
+                StdOutHandler::class => (new Definition(StdOutHandler::class))->setArguments(['%service_bus.logger.echo.log_level%']),
             ]
         );
 
-        (new LoggerCompilerPass)->process($container);
+        (new LoggerCompilerPass())->process($container);
 
         $loggerDefinition = $container->getDefinition('service_bus.logger');
 

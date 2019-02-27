@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -18,7 +18,7 @@ use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 
 /**
- * Graylog UDP handler
+ * Graylog UDP handler.
  *
  * @codeCoverageIgnore
  */
@@ -57,8 +57,7 @@ final class UdpHandler extends AbstractProcessingHandler
         bool $gzipMessage = false,
         $level = Logger::DEBUG,
         $bubble = true
-    )
-    {
+    ) {
         parent::__construct($level, $bubble);
 
         $this->host        = $host;
@@ -67,7 +66,7 @@ final class UdpHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @return void
      */
@@ -78,13 +77,13 @@ final class UdpHandler extends AbstractProcessingHandler
             $body = \json_encode($record);
 
             // @codeCoverageIgnoreStart
-            if(false === \is_string($body))
+            if (false === \is_string($body))
             {
                 return;
             }
             // @codeCoverageIgnoreEnd
 
-            if(true === $this->gzipMessage)
+            if (true === $this->gzipMessage)
             {
                 /** @noinspection UnnecessaryCastingInspection */
                 $body = (string) \gzcompress($body);
@@ -92,8 +91,8 @@ final class UdpHandler extends AbstractProcessingHandler
 
             $this->outputStream()->write($body);
         }
-            // @codeCoverageIgnoreStart
-        catch(\Throwable $throwable)
+        // @codeCoverageIgnoreStart
+        catch (\Throwable $throwable)
         {
             /** Not interest */
         }
@@ -101,7 +100,7 @@ final class UdpHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getFormatter(): NormalizerFormatter
     {
@@ -109,13 +108,13 @@ final class UdpHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @return ResourceOutputStream
-     *
      * @throws \RuntimeException Could not connect
+     *
+     * @return ResourceOutputStream
      */
     private function outputStream(): ResourceOutputStream
     {
-        if(null === $this->outputStream)
+        if (null === $this->outputStream)
         {
             $this->outputStream = new ResourceOutputStream(self::createStream($this->host, $this->port), 65000);
         }
@@ -127,16 +126,16 @@ final class UdpHandler extends AbstractProcessingHandler
      * @param string $host
      * @param int    $port
      *
-     * @return resource
-     *
      * @throws \RuntimeException Could not connect
+     *
+     * @return resource
      */
     private static function createStream(string $host, int $port)
     {
         $uri    = \sprintf('udp://%s:%d', $host, $port);
         $stream = @\stream_socket_client($uri, $errno, $errstr, 0, \STREAM_CLIENT_CONNECT);
 
-        if(false === $stream)
+        if (false === $stream)
         {
             throw new \RuntimeException(\sprintf('Could not connect to %s', $uri));
         }

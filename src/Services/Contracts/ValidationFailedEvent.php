@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -18,7 +18,7 @@ namespace ServiceBus\Services\Contracts;
 interface ValidationFailedEvent
 {
     /**
-     * List of validate violations:
+     * List of validate violations:.
      *
      * [
      *    'propertyPath' => [
@@ -37,14 +37,14 @@ interface ValidationFailedEvent
     public static function create(string $correlationId, array $violations): self;
 
     /**
-     * Receive request correlation id (Message trace id)
+     * Receive request correlation id (Message trace id).
      *
      * @return string
      */
     public function correlationId(): string;
 
     /**
-     * Receive list of validate violations
+     * Receive list of validate violations.
      *
      * @psalm-return array<string, array<int, string>>
      *

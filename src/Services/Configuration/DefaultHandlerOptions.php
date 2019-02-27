@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -18,7 +18,7 @@ use ServiceBus\Services\Contracts\ValidationFailedEvent;
 use ServiceBus\Services\Exceptions\InvalidEventType;
 
 /**
- * Execution options
+ * Execution options.
  *
  * @property-read bool        $isEventListener
  * @property-read bool        $isCommandHandler
@@ -44,38 +44,41 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     public $isCommandHandler;
 
     /**
-     * Validation enabled
+     * Validation enabled.
      *
      * @var bool
      */
     public $validationEnabled = false;
 
     /**
-     * Validation groups
+     * Validation groups.
      *
      * @psalm-var array<array-key, string>
+     *
      * @var string[]
      */
     public $validationGroups = [];
 
     /**
      * In case of validation errors, automatically send the event and stop further execution
-     * The event must implement @see ValidationFailedEvent interface
+     * The event must implement @see ValidationFailedEvent interface.
      *
      * If no class is specified, control is passed to user code
      *
      * @psalm-var class-string|null
+     *
      * @var string|null
      */
     public $defaultValidationFailedEvent;
 
     /**
      * In case of a runtime error, automatically send the specified event with the message received from the exception
-     * The event must implement @see ExecutionFailedEvent interface
+     * The event must implement @see ExecutionFailedEvent interface.
      *
      * If no class is specified, control is passed to user code
      *
      * @psalm-var class-string|null
+     *
      * @var string|null
      */
     public $defaultThrowableEvent;
@@ -97,7 +100,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     }
 
     /**
-     * Enable validation
+     * Enable validation.
      *
      * @psalm-param array<array-key, string> $validationGroups
      *
@@ -127,20 +130,20 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
 
     /**
      * @param class-string $eventClass
-     *
      * @param string $eventClass
      *
-     * @return self
-     *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent
+     *
+     * @return self
      */
     public function withDefaultValidationFailedEvent(string $eventClass): self
     {
-        if(false === \is_a($eventClass, ValidationFailedEvent::class, true))
+        if (false === \is_a($eventClass, ValidationFailedEvent::class, true))
         {
             throw new InvalidEventType(
                 \sprintf(
-                    'Event class "%s" must implement "%s" interface', $eventClass,
+                    'Event class "%s" must implement "%s" interface',
+                    $eventClass,
                     ValidationFailedEvent::class
                 )
             );
@@ -165,20 +168,20 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
 
     /**
      * @param class-string $eventClass
-     *
      * @param string $eventClass
      *
-     * @return self
-     *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent
+     *
+     * @return self
      */
     public function withDefaultThrowableEvent(string $eventClass): self
     {
-        if(false === \is_a($eventClass, ExecutionFailedEvent::class, true))
+        if (false === \is_a($eventClass, ExecutionFailedEvent::class, true))
         {
             throw new InvalidEventType(
                 \sprintf(
-                    'Event class "%s" must implement "%s" interface', $eventClass,
+                    'Event class "%s" must implement "%s" interface',
+                    $eventClass,
                     ExecutionFailedEvent::class
                 )
             );
@@ -220,8 +223,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
         array $validationGroups = [],
         ?string $defaultValidationFailedEvent = null,
         ?string $defaultThrowableEvent = null
-    )
-    {
+    ) {
         $this->isEventListener              = $isEventListener;
         $this->isCommandHandler             = $isCommandHandler;
         $this->validationEnabled            = $validationEnabled;

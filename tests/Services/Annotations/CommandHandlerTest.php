@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -23,9 +23,9 @@ final class CommandHandlerTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function withWrongProperties(): void
     {
@@ -37,9 +37,9 @@ final class CommandHandlerTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function withoutAnyFields(): void
     {
@@ -52,9 +52,9 @@ final class CommandHandlerTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function withValidation(): void
     {
@@ -62,30 +62,31 @@ final class CommandHandlerTest extends TestCase
             'validate' => true,
             'groups'   => [
                 'qwerty',
-                'root'
-            ]
+                'root',
+            ],
         ]);
 
         static::assertTrue($annotation->validate);
-        static::assertEquals(['qwerty', 'root'], $annotation->groups);
+        static::assertSame(['qwerty', 'root'], $annotation->groups);
     }
 
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function withCustomEvents(): void
     {
-        $handler = new CommandHandler([
+        $handler = new CommandHandler(
+            [
                 'defaultValidationFailedEvent' => CommandHandler::class,
-                'defaultThrowableEvent'        => \Throwable::class
+                'defaultThrowableEvent'        => \Throwable::class,
             ]
         );
 
-        self::assertEquals(CommandHandler::class, $handler->defaultValidationFailedEvent);
-        self::assertEquals(\Throwable::class, $handler->defaultThrowableEvent);
+        self::assertSame(CommandHandler::class, $handler->defaultValidationFailedEvent);
+        self::assertSame(\Throwable::class, $handler->defaultThrowableEvent);
     }
 }

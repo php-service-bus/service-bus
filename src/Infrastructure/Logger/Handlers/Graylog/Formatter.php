@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -16,11 +16,12 @@ use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Logger;
 
 /**
- * Log entry formatter
+ * Log entry formatter.
  */
 final class Formatter extends NormalizerFormatter
 {
     private const GRAYLOG_VERSION    = 1.0;
+
     private const DEFAULT_MAX_LENGTH = 32766;
 
     /**
@@ -38,14 +39,14 @@ final class Formatter extends NormalizerFormatter
     ];
 
     /**
-     * The name of the system for the Gelf log message
+     * The name of the system for the Gelf log message.
      *
      * @var string
      */
     private $systemName;
 
     /**
-     * Max length per field
+     * Max length per field.
      *
      * @var int
      */
@@ -67,7 +68,7 @@ final class Formatter extends NormalizerFormatter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @throws \RuntimeException if encoding fails and errors are not ignored
      */
@@ -95,7 +96,7 @@ final class Formatter extends NormalizerFormatter
             'level'         => self::LEVEL_RELATIONS[(int) $normalizedRecord['level']],
             'facility'      => $normalizedRecord['channel'] ?? null,
             'file'          => $normalizedRecord['extra']['file'] ?? null,
-            'line'          => $normalizedRecord['extra']['line'] ?? null
+            'line'          => $normalizedRecord['extra']['line'] ?? null,
         ];
 
         unset($normalizedRecord['extra']['file'], $normalizedRecord['extra']['line']);
@@ -113,7 +114,7 @@ final class Formatter extends NormalizerFormatter
     }
 
     /**
-     * Format message data
+     * Format message data.
      *
      * @param string $message
      * @param array  $formatted
@@ -124,7 +125,7 @@ final class Formatter extends NormalizerFormatter
     {
         $len = 200 + \strlen($message) + \strlen($this->systemName);
 
-        if($len > $this->maxLength)
+        if ($len > $this->maxLength)
         {
             $formatted['short_message'] = \substr($message, 0, $this->maxLength);
             $formatted['full_message']  = $message;
@@ -134,16 +135,16 @@ final class Formatter extends NormalizerFormatter
     }
 
     /**
-     * Format extra\context data
+     * Format extra\context data.
      *
      * @psalm-param array<string, string|int|float|array|null> $collection
      *
      * @param array $collection
      * @param array $formatted
      *
-     * @return array
-     *
      * @throws \RuntimeException if encoding fails and errors are not ignored
+     *
+     * @return array
      */
     private function formatAdditionalData(array $collection, array $formatted): array
     {
@@ -151,18 +152,18 @@ final class Formatter extends NormalizerFormatter
          * @psalm-var string                             $key
          * @psalm-var string|int|float|array|object|null $value
          */
-        foreach($collection as $key => $value)
+        foreach ($collection as $key => $value)
         {
             $value = $this->formatValue($value);
 
-            if(null === $value)
+            if (null === $value)
             {
                 continue;
             }
 
             $len = \strlen($key . $value);
 
-            if(true === \is_string($value) && $len > $this->maxLength)
+            if (true === \is_string($value) && $len > $this->maxLength)
             {
                 $formatted[$key] = \substr($value, 0, $this->maxLength);
 
@@ -176,15 +177,15 @@ final class Formatter extends NormalizerFormatter
     }
 
     /**
-     * @param string|int|float|array|object|null $value
-     *
-     * @return string|int|float|null
+     * @param array|float|int|object|string|null $value
      *
      * @throws \RuntimeException if encoding fails and errors are not ignored
+     *
+     * @return float|int|string|null
      */
     private function formatValue($value)
     {
-        if(null === $value || true === \is_scalar($value))
+        if (null === $value || true === \is_scalar($value))
         {
             return $value;
         }

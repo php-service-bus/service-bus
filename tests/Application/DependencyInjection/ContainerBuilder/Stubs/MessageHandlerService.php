@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -33,8 +33,7 @@ final class MessageHandlerService
         FirstEmptyCommand $command,
         KernelContext $context,
         $mixedParameter
-    ): Promise
-    {
+    ): Promise {
         return new Success([$command, $context, $mixedParameter]);
     }
 }

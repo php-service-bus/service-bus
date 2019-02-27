@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -13,22 +13,23 @@ declare(strict_types = 1);
 namespace ServiceBus\Infrastructure\Retry;
 
 /**
- * Retry operation options
+ * Retry operation options.
  */
 final class RetryOptions
 {
     private const DEFAULT_RETRY_MAX_COUNT = 5;
+
     private const DEFAULT_RETRY_DELAY     = 2000;
 
     /**
-     * Maximum number of repetitions
+     * Maximum number of repetitions.
      *
      * @var int
      */
     public $maxCount;
 
     /**
-     * Delay at repetitions (milliseconds)
+     * Delay at repetitions (milliseconds).
      *
      * @var int
      */

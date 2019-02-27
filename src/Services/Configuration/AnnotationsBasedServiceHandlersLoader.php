@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -20,10 +20,11 @@ use ServiceBus\Common\MessageHandler\MessageHandler;
 use ServiceBus\Services\Annotations\CommandHandler;
 use ServiceBus\Services\Annotations\EventListener;
 use ServiceBus\Services\Annotations\ServicesAnnotationsMarker;
+use ServiceBus\Services\Exceptions\InvalidHandlerArguments;
 use ServiceBus\Services\Exceptions\UnableCreateClosure;
 
 /**
- * Getting a list of command and event handlers
+ * Getting a list of command and event handlers.
  */
 final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoader
 {
@@ -43,14 +44,14 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function load(object $service): \SplObjectStorage
     {
         $collection = new \SplObjectStorage();
 
         /** @var \ServiceBus\AnnotationsReader\Annotation $annotation */
-        foreach($this->loadMethodLevelAnnotations($service) as $annotation)
+        foreach ($this->loadMethodLevelAnnotations($service) as $annotation)
         {
             /** @var CommandHandler|EventListener $handlerAnnotation */
             $handlerAnnotation = $annotation->annotationObject;
@@ -61,7 +62,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
             $closure = $handlerReflectionMethod->getClosure($service);
 
-            if(null === $closure)
+            if (null === $closure)
             {
                 throw new UnableCreateClosure(
                     \sprintf(
@@ -79,6 +80,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
              * @var CommandHandler|EventListener $handlerAnnotation
              */
             $handler = MessageHandler::create(
+                $this->extractMessageClass($handlerReflectionMethod->getParameters()),
                 $closure,
                 $handlerReflectionMethod,
                 $this->createOptions($handlerAnnotation, $isCommandHandler)
@@ -98,35 +100,34 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     }
 
     /**
-     * Create options
+     * Create options.
      *
      * @param ServicesAnnotationsMarker $annotation
      *
-     * @return DefaultHandlerOptions
-     *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
+     *
+     * @return DefaultHandlerOptions
      */
     private function createOptions(ServicesAnnotationsMarker $annotation, bool $isCommandHandler): DefaultHandlerOptions
     {
         /** @var CommandHandler|EventListener $annotation */
-
         $factoryMethod = true === $isCommandHandler ? 'createForCommandHandler' : 'createForEventListener';
 
         /** @var DefaultHandlerOptions $options */
         $options = DefaultHandlerOptions::{$factoryMethod}();
 
-        if(true === $annotation->validate)
+        if (true === $annotation->validate)
         {
             $options = $options->enableValidation($annotation->groups);
         }
 
-        if('' !== (string) $annotation->defaultValidationFailedEvent)
+        if ('' !== (string) $annotation->defaultValidationFailedEvent)
         {
             /** @psalm-suppress PossiblyNullArgument */
             $options = $options->withDefaultValidationFailedEvent($annotation->defaultValidationFailedEvent);
         }
 
-        if('' !== (string) $annotation->defaultThrowableEvent)
+        if ('' !== (string) $annotation->defaultThrowableEvent)
         {
             /** @psalm-suppress PossiblyNullArgument */
             $options = $options->withDefaultThrowableEvent($annotation->defaultThrowableEvent);
@@ -136,13 +137,13 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     }
 
     /**
-     * Load a list of annotations for message handlers
+     * Load a list of annotations for message handlers.
      *
      * @param object $service
      *
-     * @return AnnotationCollection
-     *
      * @throws \ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed
+     *
+     * @return AnnotationCollection
      */
     private function loadMethodLevelAnnotations(object $service): AnnotationCollection
     {
@@ -151,7 +152,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             ->filter(
                 static function(Annotation $annotation): ?Annotation
                 {
-                    if($annotation->annotationObject instanceof ServicesAnnotationsMarker)
+                    if ($annotation->annotationObject instanceof ServicesAnnotationsMarker)
                     {
                         return $annotation;
                     }
@@ -160,5 +161,42 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                 }
             )
             ->methodLevelAnnotations();
+    }
+
+    /**
+     * @psalm-return class-string
+     *
+     * @param \ReflectionParameter[] $parameters
+     *
+     * @throws \ServiceBus\Services\Exceptions\InvalidHandlerArguments
+     *
+     * @return string
+     */
+    private function extractMessageClass(array $parameters): string
+    {
+        if (0 === \count($parameters))
+        {
+            throw InvalidHandlerArguments::emptyArguments();
+        }
+
+        /** @var \ReflectionParameter $firstArgument */
+        $firstArgument = $parameters[0];
+
+        if (null !== $firstArgument->getType())
+        {
+            /** @var \ReflectionType $type */
+            $type = $firstArgument->getType();
+
+            /** @psalm-var class-string $className */
+            $className = $type->getName();
+
+            /** @psalm-suppress RedundantConditionGivenDocblockType */
+            if (true === \class_exists($className))
+            {
+                return $className;
+            }
+        }
+
+        throw InvalidHandlerArguments::invalidFirstArgument();
     }
 }

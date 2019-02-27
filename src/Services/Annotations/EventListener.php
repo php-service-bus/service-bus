@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace ServiceBus\Services\Annotations;
 
 /**
- * Annotation indicating to the event listener
+ * Annotation indicating to the event listener.
  *
  * @Annotation
  * @Target("METHOD")
@@ -21,38 +21,41 @@ namespace ServiceBus\Services\Annotations;
 final class EventListener implements ServicesAnnotationsMarker
 {
     /**
-     * Event validation enabled
+     * Event validation enabled.
      *
      * @var bool
      */
     public $validate = false;
 
     /**
-     * Validation groups
+     * Validation groups.
      *
      * @psalm-var array<int, string>
+     *
      * @var string[]
      */
     public $groups = [];
 
     /**
      * In case of validation errors, automatically send the event and stop further execution
-     * The event must implement @see ValidationFailedEvent interface
+     * The event must implement @see ValidationFailedEvent interface.
      *
      * If no class is specified, control is passed to user code
      *
      * @psalm-var class-string|null
+     *
      * @var string|null
      */
     public $defaultValidationFailedEvent;
 
     /**
      * In case of a runtime error, automatically send the specified event with the message received from the exception
-     * The event must implement @see ExecutionFailedEvent interface
+     * The event must implement @see ExecutionFailedEvent interface.
      *
      * If no class is specified, control is passed to user code
      *
      * @psalm-var class-string|null
+     *
      * @var string|null
      */
     public $defaultThrowableEvent;
@@ -67,9 +70,9 @@ final class EventListener implements ServicesAnnotationsMarker
     public function __construct(array $data)
     {
         /** @psalm-var array|string|class-string|null $value */
-        foreach($data as $property => $value)
+        foreach ($data as $property => $value)
         {
-            if(false === \property_exists($this, $property))
+            if (false === \property_exists($this, $property))
             {
                 throw new \InvalidArgumentException(
                     \sprintf('Unknown property "%s" on annotation "%s"', $property, \get_class($this))

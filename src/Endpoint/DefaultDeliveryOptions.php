@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -15,27 +15,28 @@ namespace ServiceBus\Endpoint;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
 
 /**
- * Sent message options
+ * Sent message options.
  *
  * @property-read array           $headers
  * @property-read bool            $isPersistent
  * @property-read bool            $isMandatory
  * @property-read bool            $isImmediate
  * @property-read int|null        $expiredAfter
- * @property-read string|int|null $traceId
+ * @property-read int|string|null $traceId
  */
 final class DefaultDeliveryOptions implements DeliveryOptions
 {
     /**
-     * Headers bag
+     * Headers bag.
      *
      * @psalm-var array<string, string|int|float>
-     * @var array<string, string|int|float>
+     *
+     * @var array<string, float|int|string>
      */
     public $headers;
 
     /**
-     * The message must be stored in the broker
+     * The message must be stored in the broker.
      *
      * @var bool
      */
@@ -44,7 +45,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     /**
      * This flag tells the server how to react if the message cannot be routed to a queue. If this flag is set, the
      * server will return an unroutable message with a Return method. If this flag is false, the server silently drops
-     * the message
+     * the message.
      *
      * @var bool
      */
@@ -53,28 +54,28 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     /**
      * This flag tells the server how to react if the message cannot be routed to a queue consumer immediately. If this
      * flag is set, the server will return an undeliverable message with a Return method. If this flag is false, the
-     * server will queue the message, but with no guarantee that it will ever be consumed
+     * server will queue the message, but with no guarantee that it will ever be consumed.
      *
      * @var bool
      */
     public $isImmediate = false;
 
     /**
-     * The message will be marked expired after N milliseconds
+     * The message will be marked expired after N milliseconds.
      *
      * @var int|null
      */
     public $expiredAfter;
 
     /**
-     * Trace operation id
+     * Trace operation id.
      *
-     * @var string|int|null
+     * @var int|string|null
      */
     public $traceId;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function create(): DeliveryOptions
     {
@@ -94,7 +95,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function withTraceId($traceId): void
     {
@@ -102,7 +103,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function withHeader(string $key, $value): void
     {
@@ -111,7 +112,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function traceId()
     {
@@ -119,7 +120,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      *
      * @psalm-suppress MixedTypeCoercion
      */
@@ -129,7 +130,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function isPersistent(): bool
     {
@@ -137,7 +138,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function isHighestPriority(): bool
     {
@@ -145,7 +146,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function expirationAfter(): ?int
     {
@@ -169,8 +170,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
         bool $isImmediate = false,
         ?int $expiredAfter = null,
         $traceId = null
-    )
-    {
+    ) {
         $this->headers      = $headers;
         $this->isPersistent = $isPersistent;
         $this->isMandatory  = $isMandatory;

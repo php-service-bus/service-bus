@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Stubs\Context;
 
+use function ServiceBus\Common\uuid;
 use Amp\Promise;
 use Amp\Success;
 use Monolog\Handler\TestHandler;
@@ -20,7 +21,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
-use function ServiceBus\Common\uuid;
 
 /**
  *
@@ -60,7 +60,15 @@ final class TestContext implements ServiceBusContext
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     */
+    public function headers(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function delivery(object $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
@@ -70,7 +78,7 @@ final class TestContext implements ServiceBusContext
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function logContextMessage(string $logMessage, array $extra = [], string $level = LogLevel::INFO): void
     {
@@ -78,7 +86,7 @@ final class TestContext implements ServiceBusContext
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function logContextThrowable(\Throwable $throwable, string $level = LogLevel::ERROR, array $extra = []): void
     {
@@ -86,7 +94,7 @@ final class TestContext implements ServiceBusContext
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function isValid(): bool
     {
@@ -94,7 +102,7 @@ final class TestContext implements ServiceBusContext
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function violations(): array
     {
@@ -102,7 +110,7 @@ final class TestContext implements ServiceBusContext
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function operationId(): string
     {
@@ -110,12 +118,10 @@ final class TestContext implements ServiceBusContext
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function traceId(): string
     {
         return uuid();
     }
-
-
 }

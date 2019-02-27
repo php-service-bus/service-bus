@@ -46,16 +46,13 @@ Documentation can be found in the [documentation](https://github.com/php-service
   - RabbitMQ
   - PostgreSQL 9.5+
 
-## Support
+## Contributing
+Contributions are welcome! Please read [CONTRIBUTING](CONTRIBUTING.md) for details.
+
+## Communication Channels
+You can find help and discussion in the following places:
 * [Telegram chat (RU)](https://t.me/php_service_bus)
 * Create issue [https://github.com/php-service-bus/service-bus/issues](https://github.com/php-service-bus/service-bus/issues)
-
-## Contacts
-* [`dev@async-php.com`](mailto:dev@async-php.com)
-
-## Security
-
-If you discover any security related issues, please email [`dev@async-php.com`](mailto:dev@async-php.com) instead of using the issue tracker.
 
 ## License
 

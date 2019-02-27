@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -20,9 +20,9 @@ namespace ServiceBus\Tests;
 function removeDirectory(string $path): void
 {
     $files = \glob(\preg_replace('/(\*|\?|\[)/', '[$1]', $path) . '/{,.}*', GLOB_BRACE);
-    foreach($files as $file)
+    foreach ($files as $file)
     {
-        if($file === $path . '/.' || $file === $path . '/..')
+        if ($file === $path . '/.' || $file === $path . '/..')
         {
             continue;
         }

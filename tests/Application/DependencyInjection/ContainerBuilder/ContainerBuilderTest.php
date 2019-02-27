@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder;
 
+use function ServiceBus\Tests\removeDirectory;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
@@ -21,7 +22,6 @@ use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\Mess
 use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\SomeTestService;
 use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\TestCompilerPass;
 use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\TestExtension;
-use function ServiceBus\Tests\removeDirectory;
 
 /**
  *
@@ -34,7 +34,7 @@ final class ContainerBuilderTest extends TestCase
     private $cacheDirectory;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp(): void
     {
@@ -42,14 +42,14 @@ final class ContainerBuilderTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/container_test';
 
-        if(false === \file_exists($this->cacheDirectory))
+        if (false === \file_exists($this->cacheDirectory))
         {
             \mkdir($this->cacheDirectory);
         }
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown(): void
     {
@@ -63,9 +63,9 @@ final class ContainerBuilderTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function successfulBuildWithDefaultData(): void
     {
@@ -84,18 +84,16 @@ final class ContainerBuilderTest extends TestCase
         @\unlink(\sys_get_temp_dir() . '/containerBuilderTestProdProjectContainer.php');
         @\unlink(\sys_get_temp_dir() . '/containerBuilderTestProdProjectContainer.php.meta');
 
-        static::assertEquals('prod', $container->getParameter('service_bus.environment'));
-        static::assertEquals('ContainerBuilderTest', $container->getParameter('service_bus.entry_point'));
-
-
+        static::assertSame('prod', $container->getParameter('service_bus.environment'));
+        static::assertSame('ContainerBuilderTest', $container->getParameter('service_bus.entry_point'));
     }
 
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function successfulBuildWithFullConfiguration(): void
     {
@@ -105,8 +103,9 @@ final class ContainerBuilderTest extends TestCase
 
         $containerBuilder->setupCacheDirectoryPath($this->cacheDirectory);
 
-        $containerBuilder->addParameters([
-                'testing.class'               => \get_class($this)
+        $containerBuilder->addParameters(
+            [
+                'testing.class'               => \get_class($this),
             ]
         );
 
@@ -120,9 +119,9 @@ final class ContainerBuilderTest extends TestCase
         static::assertFileExists($this->cacheDirectory . '/containerBuilderTestDevProjectContainer.php');
         static::assertFileExists($this->cacheDirectory . '/containerBuilderTestDevProjectContainer.php.meta');
 
-        static::assertEquals(\get_class($this), $container->getParameter('testing.class'));
-        static::assertEquals('dev', $container->getParameter('service_bus.environment'));
-        static::assertEquals('ContainerBuilderTest', $container->getParameter('service_bus.entry_point'));
+        static::assertSame(\get_class($this), $container->getParameter('testing.class'));
+        static::assertSame('dev', $container->getParameter('service_bus.environment'));
+        static::assertSame('ContainerBuilderTest', $container->getParameter('service_bus.entry_point'));
 
         static::assertTrue($container->has(SomeTestService::class));
         static::assertTrue($container->has(MessageHandlerService::class));
@@ -130,13 +129,13 @@ final class ContainerBuilderTest extends TestCase
         $someTestService = $container->get(SomeTestService::class);
 
         /** @see TestCompilerPass::process() */
-        static::assertEquals('qwerty', $someTestService->env());
+        static::assertSame('qwerty', $someTestService->env());
 
         /** @var array<int, string> $messageHandlerServices */
         $messageHandlerServices = $container->getParameter('service_bus.services_map');
 
         static::assertArrayHasKey(0, $messageHandlerServices);
-        static::assertEquals(MessageHandlerService::class, $messageHandlerServices[0]);
+        static::assertSame(MessageHandlerService::class, $messageHandlerServices[0]);
 
         static::assertTrue($container->has('service_bus.services_locator'));
     }

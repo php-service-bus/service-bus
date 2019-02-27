@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -25,6 +25,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
 {
     /**
      * @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
+     *
      * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
     private $argumentResolvers;
@@ -44,7 +45,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
      */
     public function __construct(array $argumentResolvers, ?ValidatorInterface $validator = null)
     {
-        if(null === $validator)
+        if (null === $validator)
         {
             /** @noinspection PhpUnhandledExceptionInspection */
             $validator = (new ValidatorBuilder())
@@ -57,7 +58,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function create(MessageHandler $messageHandler): MessageExecutor
     {
@@ -71,7 +72,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
             $this->argumentResolvers
         );
 
-        if(true === $options->validationEnabled)
+        if (true === $options->validationEnabled)
         {
             $messageExecutor = new MessageValidationExecutor($messageExecutor, $options, $this->validator);
         }

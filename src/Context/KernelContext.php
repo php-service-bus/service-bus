@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -38,7 +38,7 @@ final class KernelContext implements ServiceBusContext
     private $logger;
 
     /**
-     * Outbound message routing
+     * Outbound message routing.
      *
      * @var EndpointRouter
      */
@@ -52,7 +52,7 @@ final class KernelContext implements ServiceBusContext
     private $isValidMessage = true;
 
     /**
-     * List of validate violations
+     * List of validate violations.
      *
      * [
      *    'propertyPath' => [
@@ -62,6 +62,7 @@ final class KernelContext implements ServiceBusContext
      * ]
      *
      * @psalm-var array<string, array<int, string>>
+     *
      * @var array
      */
     private $violations = [];
@@ -75,15 +76,14 @@ final class KernelContext implements ServiceBusContext
         IncomingPackage $incomingPackage,
         EndpointRouter $endpointRouter,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->incomingPackage = $incomingPackage;
         $this->endpointRouter  = $endpointRouter;
         $this->logger          = $logger;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isValid(): bool
     {
@@ -91,7 +91,7 @@ final class KernelContext implements ServiceBusContext
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function violations(): array
     {
@@ -101,7 +101,7 @@ final class KernelContext implements ServiceBusContext
     /**
      * @psalm-suppress MixedInferredReturnType
      *
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function delivery(object $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
@@ -113,7 +113,7 @@ final class KernelContext implements ServiceBusContext
 
         $options = $deliveryOptions ?? DefaultDeliveryOptions::create();
 
-        if(null === $options->traceId())
+        if (null === $options->traceId())
         {
             $options->withTraceId($traceId);
         }
@@ -122,35 +122,38 @@ final class KernelContext implements ServiceBusContext
         return call(
             static function(object $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): \Generator
             {
-                foreach($endpoints as $endpoint)
+                foreach ($endpoints as $endpoint)
                 {
                     /** @var \ServiceBus\Endpoint\Endpoint $endpoint */
 
                     /** @noinspection DisconnectedForeachInstructionInspection */
                     $logger->debug(
-                        'Send message "{messageClass}" to "{endpoint}"', [
+                        'Send message "{messageClass}" to "{endpoint}"',
+                        [
                             'traceId'      => $traceId,
                             'messageClass' => \get_class($message),
-                            'endpoint'     => $endpoint->name()
+                            'endpoint'     => $endpoint->name(),
                         ]
                     );
 
                     yield $endpoint->delivery($message, $options);
                 }
             },
-            $message, $options
+            $message,
+            $options
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function logContextMessage(string $logMessage, array $extra = [], string $level = LogLevel::INFO): void
     {
         $extra = \array_merge_recursive(
-            $extra, [
+            $extra,
+            [
                 'traceId'   => $this->incomingPackage->traceId(),
-                'packageId' => $this->incomingPackage->id()
+                'packageId' => $this->incomingPackage->id(),
             ]
         );
 
@@ -158,19 +161,20 @@ final class KernelContext implements ServiceBusContext
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function logContextThrowable(\Throwable $throwable, string $level = LogLevel::ERROR, array $extra = []): void
     {
         $extra = \array_merge_recursive(
-            $extra, ['throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())]
+            $extra,
+            ['throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())]
         );
 
         $this->logContextMessage($throwable->getMessage(), $extra, $level);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function operationId(): string
     {
@@ -178,7 +182,7 @@ final class KernelContext implements ServiceBusContext
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function traceId(): string
     {
@@ -186,8 +190,16 @@ final class KernelContext implements ServiceBusContext
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function headers(): array
+    {
+        return $this->incomingPackage->headers();
+    }
+
+    /**
      * Message failed validation
-     * Called by infrastructure components
+     * Called by infrastructure components.
      *
      * @noinspection PhpUnusedPrivateMethodInspection
      *

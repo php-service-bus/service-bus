@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -18,19 +18,19 @@ use Amp\Process\Process;
 use Amp\Promise;
 
 /**
- * File change monitoring
+ * File change monitoring.
  */
 final class FileChangesWatcher
 {
     /**
-     * Path to the directory
+     * Path to the directory.
      *
      * @var string
      */
     private $directory;
 
     /**
-     * Previous hash of files in the directory
+     * Previous hash of files in the directory.
      *
      * @var string|null
      */
@@ -46,7 +46,7 @@ final class FileChangesWatcher
 
     /**
      * Compare hashes
-     * If returned false, the files have not been changed. Otherwise, return true
+     * If returned false, the files have not been changed. Otherwise, return true.
      *
      * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
      *
@@ -65,14 +65,14 @@ final class FileChangesWatcher
 
                 /** A runtime error has occurred */
                 // @codeCoverageIgnoreStart
-                if(null === $hash)
+                if (null === $hash)
                 {
                     return false;
                 }
                 // @codeCoverageIgnoreEnd
 
                 /** New hash is different from previously received */
-                if(null !== $this->previousHash && $this->previousHash !== $hash)
+                if (null !== $this->previousHash && $this->previousHash !== $hash)
                 {
                     return true;
                 }
@@ -85,7 +85,7 @@ final class FileChangesWatcher
     }
 
     /**
-     * Execute calculate hashes
+     * Execute calculate hashes.
      *
      * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
      *
@@ -109,14 +109,15 @@ final class FileChangesWatcher
 
             /**
              * @psalm-suppress TooManyTemplateParams Wrong Promise template
+             *
              * @var string $bufferContent
              */
             $bufferContent = yield buffer($process->getStdout());
 
             return $bufferContent;
         }
-            // @codeCoverageIgnoreStart
-        catch(\Throwable $throwable)
+        // @codeCoverageIgnoreStart
+        catch (\Throwable $throwable)
         {
             return '';
         }
@@ -124,7 +125,7 @@ final class FileChangesWatcher
     }
 
     /**
-     * Get a hash from the stdOut
+     * Get a hash from the stdOut.
      *
      * @param string $response
      *

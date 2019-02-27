@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -30,26 +30,26 @@ use ServiceBus\Transport\Common\Transport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Service bus application kernel
+ * Service bus application kernel.
  */
 final class ServiceBusKernel
 {
     /**
-     * DIC
+     * DIC.
      *
      * @var ContainerInterface
      */
     private $container;
 
     /**
-     * Application entry point
+     * Application entry point.
      *
      * @var EntryPoint
      */
     private $entryPoint;
 
     /**
-     * Transport implementation
+     * Transport implementation.
      *
      * @var Transport
      */
@@ -79,16 +79,16 @@ final class ServiceBusKernel
 
     /**
      * Create queue and bind to topic(s)
-     * If the topic to which we binds does not exist, it will be created
+     * If the topic to which we binds does not exist, it will be created.
      *
      * @param Queue     $queue
      * @param QueueBind ...$binds
      *
-     * @return Promise
-     *
      * @throws \ServiceBus\Transport\Common\Exceptions\BindFailed
      * @throws \ServiceBus\Transport\Common\Exceptions\ConnectionFail
      * @throws \ServiceBus\Transport\Common\Exceptions\CreateQueueFailed
+     *
+     * @return Promise
      */
     public function createQueue(Queue $queue, QueueBind ...$binds): Promise
     {
@@ -97,16 +97,16 @@ final class ServiceBusKernel
 
     /**
      * Create topic and bind them
-     * If the topic to which we binds does not exist, it will be created
+     * If the topic to which we binds does not exist, it will be created.
      *
      * @param Topic     $topic
      * @param TopicBind ...$binds
      *
-     * @return Promise
-     *
      * @throws \ServiceBus\Transport\Common\Exceptions\BindFailed
      * @throws \ServiceBus\Transport\Common\Exceptions\ConnectionFail
      * @throws \ServiceBus\Transport\Common\Exceptions\CreateTopicFailed
+     *
+     * @return Promise
      */
     public function createTopic(Topic $topic, TopicBind ...$binds): Promise
     {
@@ -114,7 +114,7 @@ final class ServiceBusKernel
     }
 
     /**
-     * Run application
+     * Run application.
      *
      * @param Queue ...$queues
      *
@@ -127,11 +127,11 @@ final class ServiceBusKernel
 
     /**
      * Enable watch for event loop blocking
-     * DO NOT USE IN PRODUCTION environment
-     *
-     * @return $this
+     * DO NOT USE IN PRODUCTION environment.
      *
      * @throws \Throwable
+     *
+     * @return $this
      */
     public function monitorLoopBlock(): self
     {
@@ -144,11 +144,11 @@ final class ServiceBusKernel
     }
 
     /**
-     * Enable periodic forced launch of the garbage collector
-     *
-     * @return $this
+     * Enable periodic forced launch of the garbage collector.
      *
      * @throws \Throwable
+     *
+     * @return $this
      */
     public function enableGarbageCleaning(): self
     {
@@ -161,19 +161,18 @@ final class ServiceBusKernel
     }
 
     /**
-     * Use default handler for signal "SIGINT" and "SIGTERM"
+     * Use default handler for signal "SIGINT" and "SIGTERM".
      *
      * @psalm-param array<mixed, int> $signals
      *
      * @param int   $stopDelay The delay before the completion (in seconds)
      * @param int[] $signals   Processed signals
      *
-     * @return $this
-     *
      * @throws Loop\UnsupportedFeatureException This might happen if ext-pcntl is missing and the loop driver doesn't
      *                                          support another way to dispatch signals
-     *
      * @throws \Throwable
+     *
+     * @return $this
      */
     public function useDefaultStopSignalHandler(int $stopDelay = 10, array $signals = [\SIGINT, \SIGTERM]): self
     {
@@ -185,16 +184,17 @@ final class ServiceBusKernel
         $handler = function(string $watcherId, int $signalId) use ($stopDelay, $logger): void
         {
             $logger->info(
-                'A signal "{signalId}" was received', [
+                'A signal "{signalId}" was received',
+                [
                     'signalId'  => $signalId,
-                    'watcherId' => $watcherId
+                    'watcherId' => $watcherId,
                 ]
             );
 
             $this->entryPoint->stop($stopDelay);
         };
 
-        foreach($signals as $signal)
+        foreach ($signals as $signal)
         {
             Loop::onSignal($signal, $handler);
         }
@@ -203,7 +203,7 @@ final class ServiceBusKernel
     }
 
     /**
-     * Shut down after N seconds
+     * Shut down after N seconds.
      *
      * @param int $seconds
      *
@@ -230,7 +230,7 @@ final class ServiceBusKernel
     }
 
     /**
-     * Enable file change monitoring. If the application files have been modified, quit
+     * Enable file change monitoring. If the application files have been modified, quit.
      *
      * @param string $directoryPath
      * @param int    $checkInterval Hash check interval (in seconds)
@@ -250,7 +250,7 @@ final class ServiceBusKernel
                 /** @var bool $changed */
                 $changed = yield $watcher->compare();
 
-                if(true === $changed)
+                if (true === $changed)
                 {
                     /** @var LoggerInterface $logger */
                     $logger = $this->getKernelContainerService('service_bus.logger');
@@ -271,14 +271,14 @@ final class ServiceBusKernel
     /**
      * Apply specific route to deliver a messages
      * By default, messages will be sent to the application transport. If a different option is specified for the
-     * message, it will be sent only to it
+     * message, it will be sent only to it.
      *
      * @param Endpoint $endpoint
      * @param string   ...$messages
      *
-     * @return ServiceBusKernel
-     *
      * @throws \Throwable
+     *
+     * @return ServiceBusKernel
      */
     public function registerEndpointForMessages(Endpoint $endpoint, string ...$messages): self
     {
@@ -286,7 +286,7 @@ final class ServiceBusKernel
         $entryPointRouter = $this->getKernelContainerService(EndpointRouter::class);
 
         /** @psalm-var class-string $messageClass */
-        foreach($messages as $messageClass)
+        foreach ($messages as $messageClass)
         {
             $entryPointRouter->registerRoute($messageClass, $endpoint);
         }
@@ -296,16 +296,15 @@ final class ServiceBusKernel
 
     /**
      * Like the registerEndpointForMessages method, it adds a custom message delivery route.
-     * The only difference is that the route is specified for the current application transport
+     * The only difference is that the route is specified for the current application transport.
      *
      * @param DeliveryDestination $deliveryDestination
      * @param string              ...$messages
      *
+     * @throws \Throwable
+     * @throws \Throwable
+     *
      * @return ServiceBusKernel
-     *
-     * @throws \Throwable
-     *
-     * @throws \Throwable
      */
     public function registerDestinationForMessages(DeliveryDestination $deliveryDestination, string ...$messages): self
     {
@@ -320,9 +319,9 @@ final class ServiceBusKernel
     /**
      * @param string $service
      *
-     * @return object
-     *
      * @throws \Throwable
+     *
+     * @return object
      */
     private function getKernelContainerService(string $service): object
     {

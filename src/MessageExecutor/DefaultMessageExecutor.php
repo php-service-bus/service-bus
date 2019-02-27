@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -26,7 +26,7 @@ use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 final class DefaultMessageExecutor implements MessageExecutor
 {
     /**
-     * Message handler
+     * Message handler.
      *
      * @var \Closure
      */
@@ -34,20 +34,22 @@ final class DefaultMessageExecutor implements MessageExecutor
 
     /**
      * @psalm-var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string>
+     *
      * @var \SplObjectStorage
      */
     private $arguments;
 
     /**
-     * Argument resolvers collection
+     * Argument resolvers collection.
      *
      * @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
+     *
      * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
     private $argumentResolvers;
 
     /**
-     * Execution options
+     * Execution options.
      *
      * @var DefaultHandlerOptions
      */
@@ -68,8 +70,7 @@ final class DefaultMessageExecutor implements MessageExecutor
         \SplObjectStorage $arguments,
         DefaultHandlerOptions $options,
         array $argumentResolvers
-    )
-    {
+    ) {
         $this->closure           = $closure;
         $this->arguments         = $arguments;
         $this->options           = $options;
@@ -77,7 +78,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function __invoke(object $message, ServiceBusContext $context): Promise
     {
@@ -89,7 +90,10 @@ final class DefaultMessageExecutor implements MessageExecutor
          */
         return call(
             static function(
-                \Closure $closure, \SplObjectStorage $arguments, DefaultHandlerOptions $options, object $message,
+                \Closure $closure,
+                \SplObjectStorage $arguments,
+                DefaultHandlerOptions $options,
+                object $message,
                 KernelContext $context
             ) use ($argumentResolvers): \Generator
             {
@@ -99,7 +103,6 @@ final class DefaultMessageExecutor implements MessageExecutor
                      * @psalm-var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
                      * @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
                      */
-
                     $resolvedArgs = self::collectArguments($arguments, $argumentResolvers, $message, $context);
 
                     /** @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args) */
@@ -107,19 +110,20 @@ final class DefaultMessageExecutor implements MessageExecutor
 
                     unset($resolvedArgs);
                 }
-                catch(\Throwable $throwable)
+                catch (\Throwable $throwable)
                 {
-                    if(null === $options->defaultThrowableEvent)
+                    if (null === $options->defaultThrowableEvent)
                     {
                         throw $throwable;
                     }
 
                     $context->logContextMessage(
-                        'Error processing, sending an error event and stopping message processing', [
-                        'eventClass'       => $options->defaultThrowableEvent,
-                        'throwableMessage' => $throwable->getMessage(),
-                        'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())
-                    ],
+                        'Error processing, sending an error event and stopping message processing',
+                        [
+                            'eventClass'       => $options->defaultThrowableEvent,
+                            'throwableMessage' => $throwable->getMessage(),
+                            'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
+                        ],
                         LogLevel::DEBUG
                     );
 
@@ -130,12 +134,16 @@ final class DefaultMessageExecutor implements MessageExecutor
                     );
                 }
             },
-            $this->closure, $this->arguments, $this->options, $message, $context
+            $this->closure,
+            $this->arguments,
+            $this->options,
+            $message,
+            $context
         );
     }
 
     /**
-     * Publish failed response event
+     * Publish failed response event.
      *
      * @param string        $eventClass
      * @param string        $errorMessage
@@ -147,6 +155,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     {
         /**
          * @noinspection VariableFunctionsUsageInspection
+         *
          * @var \ServiceBus\Services\Contracts\ExecutionFailedEvent $event
          */
         $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $errorMessage]);
@@ -155,7 +164,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     }
 
     /**
-     * Collect arguments list
+     * Collect arguments list.
      *
      * @psalm-param \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
      * @psalm-param  array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $resolvers
@@ -173,16 +182,15 @@ final class DefaultMessageExecutor implements MessageExecutor
         array $resolvers,
         object $message,
         KernelContext $context
-    ): array
-    {
+    ): array {
         $preparedArguments = [];
 
         /** @var \ServiceBus\Common\MessageHandler\MessageHandlerArgument $argument */
-        foreach($arguments as $argument)
+        foreach ($arguments as $argument)
         {
-            foreach($resolvers as $argumentResolver)
+            foreach ($resolvers as $argumentResolver)
             {
-                if(true === $argumentResolver->supports($argument))
+                if (true === $argumentResolver->supports($argument))
                 {
                     /** @psalm-suppress MixedAssignment Unknown data type */
                     $preparedArguments[] = $argumentResolver->resolve($message, $context, $argument);

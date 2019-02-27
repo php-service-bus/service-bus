@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -12,18 +12,18 @@ declare(strict_types = 1);
 
 namespace ServiceBus\MessageExecutor;
 
+use function ServiceBus\Common\invokeReflectionMethod;
 use Amp\Failure;
 use Amp\Promise;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
-use function ServiceBus\Common\invokeReflectionMethod;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Executing message validation
+ * Executing message validation.
  */
 final class MessageValidationExecutor implements MessageExecutor
 {
@@ -38,7 +38,7 @@ final class MessageValidationExecutor implements MessageExecutor
     private $validator;
 
     /**
-     * Execution options
+     * Execution options.
      *
      * @var DefaultHandlerOptions
      */
@@ -57,7 +57,7 @@ final class MessageValidationExecutor implements MessageExecutor
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __invoke(object $message, ServiceBusContext $context): Promise
     {
@@ -66,17 +66,17 @@ final class MessageValidationExecutor implements MessageExecutor
             /** @var ConstraintViolationList $violations */
             $violations = $this->validator->validate($message, null, $this->options->validationGroups);
         }
-        catch(\Throwable $throwable)
+        catch (\Throwable $throwable)
         {
             return new Failure($throwable);
         }
 
-        if(0 !== \count($violations))
+        if (0 !== \count($violations))
         {
             self::bindViolations($violations, $context);
 
             /** If a validation error event class is specified, then we abort the execution */
-            if(null !== $this->options->defaultValidationFailedEvent)
+            if (null !== $this->options->defaultValidationFailedEvent)
             {
                 $context->logContextMessage(
                     'Error validation, sending an error event and stopping message processing',
@@ -92,7 +92,7 @@ final class MessageValidationExecutor implements MessageExecutor
     }
 
     /**
-     * Publish failed event
+     * Publish failed event.
      *
      * @param string            $eventClass
      * @param ServiceBusContext $context
@@ -103,6 +103,7 @@ final class MessageValidationExecutor implements MessageExecutor
     {
         /**
          * @noinspection VariableFunctionsUsageInspection
+         *
          * @var \ServiceBus\Services\Contracts\ValidationFailedEvent $event
          */
         $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $context->violations()]);
@@ -111,7 +112,7 @@ final class MessageValidationExecutor implements MessageExecutor
     }
 
     /**
-     * Bind violations to context
+     * Bind violations to context.
      *
      * @param ConstraintViolationList $violations
      * @param ServiceBusContext       $context
@@ -123,7 +124,7 @@ final class MessageValidationExecutor implements MessageExecutor
         $errors = [];
 
         /** @var \Symfony\Component\Validator\ConstraintViolation $violation */
-        foreach($violations as $violation)
+        foreach ($violations as $violation)
         {
             $errors[$violation->getPropertyPath()][] = $violation->getMessage();
         }
@@ -132,8 +133,8 @@ final class MessageValidationExecutor implements MessageExecutor
         {
             invokeReflectionMethod($context, 'validationFailed', $errors);
         }
-            // @codeCoverageIgnoreStart
-        catch(\Throwable $throwable)
+        // @codeCoverageIgnoreStart
+        catch (\Throwable $throwable)
         {
             /** No exceptions can happen */
         }

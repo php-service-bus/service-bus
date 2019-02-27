@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace ServiceBus\Services\Contracts;
 
 /**
- * Error processing message
+ * Error processing message.
  */
 interface ExecutionFailedEvent
 {
@@ -26,14 +26,14 @@ interface ExecutionFailedEvent
     public static function create(string $correlationId, string $errorMessage): self;
 
     /**
-     * Receive request correlation id (Message trace id)
+     * Receive request correlation id (Message trace id).
      *
      * @return string
      */
     public function correlationId(): string;
 
     /**
-     * Receive error message
+     * Receive error message.
      *
      * @return string
      */

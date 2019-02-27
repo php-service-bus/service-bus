@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -16,12 +16,12 @@ use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 
 /**
- * Responsible for resolving the value of an argument
+ * Responsible for resolving the value of an argument.
  */
 interface ArgumentResolver
 {
     /**
-     * Whether this resolver can resolve the value for the given Argument
+     * Whether this resolver can resolve the value for the given Argument.
      *
      * @param MessageHandlerArgument $argument
      *
@@ -30,7 +30,7 @@ interface ArgumentResolver
     public function supports(MessageHandlerArgument $argument): bool;
 
     /**
-     * Resolve argument value
+     * Resolve argument value.
      *
      * @param object                 $message
      * @param ServiceBusContext      $context

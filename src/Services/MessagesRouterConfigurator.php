@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -26,28 +26,28 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 final class MessagesRouterConfigurator implements RouterConfigurator
 {
     /**
-     * Message executor factory
+     * Message executor factory.
      *
      * @var MessageExecutorFactory
      */
     private $executorFactory;
 
     /**
-     * List of registered sagas
+     * List of registered sagas.
      *
      * @var array<mixed, string>
      */
     private $servicesList;
 
     /**
-     * Isolated service locator for registered services
+     * Isolated service locator for registered services.
      *
      * @var ServiceLocator
      */
     private $servicesServiceLocator;
 
     /**
-     * Isolated service locator for routing configuration
+     * Isolated service locator for routing configuration.
      *
      * @var ServiceLocator
      */
@@ -63,8 +63,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
         array $servicesList,
         ServiceLocator $routingServiceLocator,
         ServiceLocator $servicesServiceLocator
-    )
-    {
+    ) {
         $this->executorFactory        = $executorFactory;
         $this->servicesList           = $servicesList;
         $this->routingServiceLocator  = $routingServiceLocator;
@@ -72,7 +71,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function configure(Router $router): void
     {
@@ -81,13 +80,13 @@ final class MessagesRouterConfigurator implements RouterConfigurator
             /** @var ServiceHandlersLoader $serviceConfigurationExtractor */
             $serviceConfigurationExtractor = $this->routingServiceLocator->get(ServiceHandlersLoader::class);
 
-            foreach($this->servicesList as $serviceId)
+            foreach ($this->servicesList as $serviceId)
             {
                 /** @var object $serviceObject */
                 $serviceObject = $this->servicesServiceLocator->get(\sprintf('%s_service', $serviceId));
 
                 /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
-                foreach($serviceConfigurationExtractor->load($serviceObject) as $handler)
+                foreach ($serviceConfigurationExtractor->load($serviceObject) as $handler)
                 {
                     self::assertMessageClassSpecifiedInArguments($serviceObject, $handler->messageHandler);
 
@@ -101,7 +100,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
                 }
             }
         }
-        catch(\Throwable $throwable)
+        catch (\Throwable $throwable)
         {
             throw new MessageRouterConfigurationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
@@ -111,13 +110,13 @@ final class MessagesRouterConfigurator implements RouterConfigurator
      * @param object         $service
      * @param MessageHandler $handler
      *
-     * @return void
-     *
      * @throws \LogicException
+     *
+     * @return void
      */
     private static function assertMessageClassSpecifiedInArguments(object $service, MessageHandler $handler): void
     {
-        if(null === $handler->messageClass || '' === (string) $handler->messageClass)
+        if (null === $handler->messageClass || '' === (string) $handler->messageClass)
         {
             throw new \LogicException(
                 \sprintf(

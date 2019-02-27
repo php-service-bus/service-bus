@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -16,7 +16,7 @@ use ServiceBus\MessageSerializer\MessageEncoder;
 use ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer;
 
 /**
- * Endpoint message encoder
+ * Endpoint message encoder.
  *
  * @property-read string         $tag
  * @property-read MessageEncoder $handler

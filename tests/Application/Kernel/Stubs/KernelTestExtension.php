@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 final class KernelTestExtension extends Extension
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @throws \Exception
      */

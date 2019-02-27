@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -22,7 +22,7 @@ use ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 final class FileChangesWatcherTest extends TestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp(): void
     {
@@ -32,7 +32,7 @@ final class FileChangesWatcherTest extends TestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown(): void
     {
@@ -44,9 +44,9 @@ final class FileChangesWatcherTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function notChanged(): void
     {
@@ -58,9 +58,9 @@ final class FileChangesWatcherTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function changed(): void
     {

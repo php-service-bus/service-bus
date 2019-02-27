@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -26,9 +26,9 @@ final class ImportMessageHandlersCompilerPassTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function process(): void
     {
@@ -45,6 +45,6 @@ final class ImportMessageHandlersCompilerPassTest extends TestCase
         static::assertTrue($containerBuilder->hasParameter('service_bus.services_map'));
 
         static::assertCount(1, $containerBuilder->getParameter('service_bus.services_map'));
-        static::assertEquals([CorrectService::class], $containerBuilder->getParameter('service_bus.services_map'));
+        static::assertSame([CorrectService::class], $containerBuilder->getParameter('service_bus.services_map'));
     }
 }

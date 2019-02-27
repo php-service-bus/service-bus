@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -17,5 +17,4 @@ namespace ServiceBus\Tests\Stubs\Messages;
  */
 final class SecondEmptyEvent
 {
-
 }

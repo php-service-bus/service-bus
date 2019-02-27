@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -22,23 +22,21 @@ use ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
  */
 final class KernelTestService
 {
-
     /**
      * @CommandHandler()
      *
      * @param TriggerThrowableCommand $command
      * @param ServiceBusContext       $context
      *
-     * @return void
-     *
      * @throws \RuntimeException
+     *
+     * @return void
      */
     public function handleWithThrowable(
         /** @noinspection PhpUnusedParameterInspection */
         TriggerThrowableCommand $command,
         ServiceBusContext $context
-    ): void
-    {
+    ): void {
         throw new \RuntimeException(__METHOD__);
     }
 
@@ -54,8 +52,7 @@ final class KernelTestService
         /** @noinspection PhpUnusedParameterInspection */
         TriggerResponseEventCommand $command,
         KernelContext $context
-    ): \Generator
-    {
+    ): \Generator {
         yield $context->delivery(new SuccessResponseEvent());
     }
 
@@ -70,8 +67,7 @@ final class KernelTestService
     public function testContextLogging(
         SecondEmptyCommand $command,
         KernelContext $context
-    ): void
-    {
+    ): void {
         $context->logContextMessage('Test message', ['qwerty' => \get_class($command)]);
         $context->logContextThrowable(new \RuntimeException('test exception message'));
     }
@@ -87,11 +83,10 @@ final class KernelTestService
     public function withFailedValidation(
         WithValidationCommand $command,
         KernelContext $context
-    ): void
-    {
+    ): void {
         $context->logContextMessage(\get_class($command), [
             'isValid'    => $context->isValid(),
-            'violations' => $context->violations()
+            'violations' => $context->violations(),
         ]);
     }
 
@@ -108,7 +103,6 @@ final class KernelTestService
      */
     public function validateWithErrorAndSpecifiedEvent(WithValidationRulesCommand $command, KernelContext $context): void
     {
-
     }
 
     /**
@@ -119,9 +113,9 @@ final class KernelTestService
      * @param TriggerThrowableCommandWithResponseEvent $command
      * @param KernelContext                            $context
      *
-     * @return void
-     *
      * @throws \RuntimeException
+     *
+     * @return void
      */
     public function handleWithSpecifiedThrowableEvent(TriggerThrowableCommandWithResponseEvent $command, KernelContext $context): void
     {

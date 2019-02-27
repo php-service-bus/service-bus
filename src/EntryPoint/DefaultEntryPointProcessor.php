@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -28,14 +28,14 @@ use ServiceBus\Transport\Common\Package\IncomingPackage;
 final class DefaultEntryPointProcessor implements EntryPointProcessor
 {
     /**
-     * Decoding of incoming messages
+     * Decoding of incoming messages.
      *
      * @var IncomingMessageDecoder
      */
     private $messageDecoder;
 
     /**
-     * Outbound message routing
+     * Outbound message routing.
      *
      * @var EndpointRouter
      */
@@ -62,8 +62,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         EndpointRouter $endpointRouter,
         ?Router $messagesRouter = null,
         ?LoggerInterface $logger = null
-    )
-    {
+    ) {
         $this->messageDecoder = $messageDecoder;
         $this->endpointRouter = $endpointRouter;
         $this->messagesRouter = $messagesRouter ?? new Router();
@@ -71,7 +70,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function handle(IncomingPackage $package): Promise
     {
@@ -88,12 +87,12 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 {
                     $message = $messageDecoder->decode($package);
                 }
-                catch(DecodeMessageFailed $exception)
+                catch (DecodeMessageFailed $exception)
                 {
                     $logger->error('Failed to denormalize the message', [
                         'packageId' => $package->id(),
                         'traceId'   => $package->traceId(),
-                        'payload'   => $package->payload()
+                        'payload'   => $package->payload(),
                     ]);
 
                     yield $package->ack();
@@ -104,12 +103,12 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 $logger->debug('Dispatch "{messageClass}" message', [
                     'packageId'    => $package->id(),
                     'traceId'      => $package->traceId(),
-                    'messageClass' => \get_class($message)
+                    'messageClass' => \get_class($message),
                 ]);
 
                 $executors = $messagesRouter->match($message);
 
-                if(0 === \count($executors))
+                if (0 === \count($executors))
                 {
                     $logger->debug(
                         'There are no handlers configured for the message "{messageClass}"',
@@ -118,7 +117,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 }
 
                 /** @var \ServiceBus\Common\MessageExecutor\MessageExecutor $executor */
-                foreach($executors as $executor)
+                foreach ($executors as $executor)
                 {
                     $context = new KernelContext($package, $endpointRouter, $logger);
 
@@ -126,7 +125,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     {
                         yield $executor($message, $context);
                     }
-                    catch(\Throwable $throwable)
+                    catch (\Throwable $throwable)
                     {
                         $context->logContextThrowable($throwable);
                     }

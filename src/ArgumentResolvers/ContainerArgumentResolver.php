@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -35,7 +35,7 @@ final class ContainerArgumentResolver implements ArgumentResolver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function supports(MessageHandlerArgument $argument): bool
     {
@@ -43,7 +43,7 @@ final class ContainerArgumentResolver implements ArgumentResolver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @return object
      */

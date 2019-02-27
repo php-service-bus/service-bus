@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -16,9 +16,9 @@ use Amp\Promise;
 use Amp\Success;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Context\KernelContext;
-use ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader;
 use ServiceBus\Services\Annotations\CommandHandler;
 use ServiceBus\Services\Annotations\EventListener;
+use ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
 use ServiceBus\Tests\Stubs\Messages\FirstEmptyEvent;
@@ -31,15 +31,14 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function loadFromEmptyService(): void
     {
         $object = new class()
         {
-
         };
 
         $handlers = (new AnnotationsBasedServiceHandlersLoader())->load($object);
@@ -50,9 +49,9 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function loadFilledService(): void
     {
@@ -70,7 +69,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              */
             public function handle(FirstEmptyCommand $command, KernelContext $context): void
             {
-
             }
 
             /**
@@ -109,7 +107,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              */
             public function ignoredMethod(FirstEmptyCommand $command, KernelContext $context): void
             {
-
             }
         };
 
@@ -119,13 +116,12 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
         static::assertCount(3, $handlers);
 
         /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
-        foreach($handlers as $handler)
+        foreach ($handlers as $handler)
         {
             /**
              * @var \ServiceBus\Common\MessageHandler\MessageHandler $handler
              * @var DefaultHandlerOptions                            $options
              */
-
             $options = $handler->messageHandler->options;
 
             static::assertNotNull($handler->messageHandler->returnDeclaration);
@@ -133,20 +129,20 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             static::assertTrue($handler->messageHandler->hasArguments);
             static::assertCount(2, $handler->messageHandler->arguments);
 
-            if(true === $handler->messageHandler->options->isCommandHandler)
+            if (true === $handler->messageHandler->options->isCommandHandler)
             {
-                static::assertEquals(FirstEmptyCommand::class, $handler->messageHandler->messageClass);
+                static::assertSame(FirstEmptyCommand::class, $handler->messageHandler->messageClass);
                 /** @noinspection UnnecessaryAssertionInspection */
                 static::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
 
                 static::assertTrue($options->validationEnabled);
-                static::assertEquals(['qwerty', 'root'], $options->validationGroups);
+                static::assertSame(['qwerty', 'root'], $options->validationGroups);
 
-                static::assertEquals('handle', $handler->messageHandler->methodName);
+                static::assertSame('handle', $handler->messageHandler->methodName);
             }
             else
             {
-                static::assertEquals(FirstEmptyEvent::class, $handler->messageHandler->messageClass);
+                static::assertSame(FirstEmptyEvent::class, $handler->messageHandler->messageClass);
                 /** @noinspection UnnecessaryAssertionInspection */
                 static::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
 

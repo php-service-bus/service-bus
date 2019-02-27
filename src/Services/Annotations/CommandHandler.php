@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -13,7 +13,7 @@ declare(strict_types = 1);
 namespace ServiceBus\Services\Annotations;
 
 /**
- * Annotation indicating to the command handler
+ * Annotation indicating to the command handler.
  *
  * The command should implement the interface "\ServiceBus\Common\Messages\Command"
  *
@@ -23,7 +23,7 @@ namespace ServiceBus\Services\Annotations;
 final class CommandHandler implements ServicesAnnotationsMarker
 {
     /**
-     * Command validation enabled
+     * Command validation enabled.
      *
      * @var bool
      */
@@ -31,7 +31,7 @@ final class CommandHandler implements ServicesAnnotationsMarker
 
     /**
      * In case of validation errors, automatically send the event and stop further execution
-     * The event must implement @see ValidationFailedEvent interface
+     * The event must implement @see ValidationFailedEvent interface.
      *
      * If no class is specified, control is passed to user code
      *
@@ -41,7 +41,7 @@ final class CommandHandler implements ServicesAnnotationsMarker
 
     /**
      * In case of a runtime error, automatically send the specified event with the message received from the exception
-     * The event must implement @see ExecutionFailedEvent interface
+     * The event must implement @see ExecutionFailedEvent interface.
      *
      * If no class is specified, control is passed to user code
      *
@@ -50,9 +50,10 @@ final class CommandHandler implements ServicesAnnotationsMarker
     public $defaultThrowableEvent;
 
     /**
-     * Validation groups
+     * Validation groups.
      *
      * @psalm-var array<int, string>
+     *
      * @var string[]
      */
     public $groups = [];
@@ -67,9 +68,9 @@ final class CommandHandler implements ServicesAnnotationsMarker
     public function __construct(array $data)
     {
         /** @var array|string|null $value */
-        foreach($data as $property => $value)
+        foreach ($data as $property => $value)
         {
-            if(false === \property_exists($this, $property))
+            if (false === \property_exists($this, $property))
             {
                 throw new \InvalidArgumentException(
                     \sprintf('Unknown property "%s" on annotation "%s"', $property, \get_class($this))

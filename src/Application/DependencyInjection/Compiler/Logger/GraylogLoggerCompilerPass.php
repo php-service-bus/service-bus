@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Graylog logger support
+ * Graylog logger support.
  */
 final class GraylogLoggerCompilerPass implements CompilerPassInterface
 {
@@ -61,7 +61,7 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @throws \Throwable
      */
@@ -73,12 +73,12 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
             '%service_bus.logger.graylog.udp_host%',
             '%service_bus.logger.graylog.udp_port%',
             '%service_bus.logger.graylog.gzip%',
-            '%service_bus.logger.graylog.log_level%'
+            '%service_bus.logger.graylog.log_level%',
         ]);
 
         $container->addDefinitions([UdpHandler::class => $handlerDefinition]);
 
-        (new LoggerCompilerPass)->process($container);
+        (new LoggerCompilerPass())->process($container);
 
         $loggerDefinition = $container->getDefinition('service_bus.logger');
 
@@ -99,9 +99,9 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
             'service_bus.logger.graylog.udp_host'  => $this->host,
             'service_bus.logger.graylog.udp_port'  => $this->port,
             'service_bus.logger.graylog.gzip'      => $this->gzipMessage,
-            'service_bus.logger.graylog.log_level' => $this->logLevel
+            'service_bus.logger.graylog.log_level' => $this->logLevel,
         ];
-        foreach($parameters as $key => $value)
+        foreach ($parameters as $key => $value)
         {
             $containerBuilder->setParameter($key, $value);
         }

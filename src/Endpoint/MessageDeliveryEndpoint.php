@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -24,7 +24,7 @@ use ServiceBus\Transport\Common\Package\OutboundPackage;
 use ServiceBus\Transport\Common\Transport;
 
 /**
- * Application level transport endpoint
+ * Application level transport endpoint.
  */
 final class MessageDeliveryEndpoint implements Endpoint
 {
@@ -34,28 +34,28 @@ final class MessageDeliveryEndpoint implements Endpoint
     private $transport;
 
     /**
-     * Which exchange (and with which key) the message will be sent to
+     * Which exchange (and with which key) the message will be sent to.
      *
      * @var DeliveryDestination
      */
     private $destination;
 
     /**
-     * Convert message to string
+     * Convert message to string.
      *
      * @var EndpointEncoder
      */
     private $encoder;
 
     /**
-     * A wrapper on an operation that performs repetitions in case of an error
+     * A wrapper on an operation that performs repetitions in case of an error.
      *
      * @var OperationRetryWrapper
      */
     private $deliveryRetryHandler;
 
     /**
-     * Endpoint name
+     * Endpoint name.
      *
      * @var string
      */
@@ -74,8 +74,7 @@ final class MessageDeliveryEndpoint implements Endpoint
         DeliveryDestination $destination,
         ?EndpointEncoder $encoder = null,
         ?OperationRetryWrapper $deliveryRetryHandler = null
-    )
-    {
+    ) {
         $this->name                 = $name;
         $this->transport            = $transport;
         $this->destination          = $destination;
@@ -84,7 +83,7 @@ final class MessageDeliveryEndpoint implements Endpoint
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function name(): string
     {
@@ -92,7 +91,7 @@ final class MessageDeliveryEndpoint implements Endpoint
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function withNewDeliveryDestination(DeliveryDestination $destination): Endpoint
     {
@@ -108,7 +107,7 @@ final class MessageDeliveryEndpoint implements Endpoint
     /**
      * @psalm-suppress MixedInferredReturnType
      *
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function delivery(object $message, DeliveryOptions $options): Promise
     {
@@ -122,7 +121,7 @@ final class MessageDeliveryEndpoint implements Endpoint
     }
 
     /**
-     * Create outbound package with specified parameters
+     * Create outbound package with specified parameters.
      *
      * @param string              $payload
      * @param DeliveryOptions     $options
@@ -134,8 +133,7 @@ final class MessageDeliveryEndpoint implements Endpoint
         string $payload,
         DeliveryOptions $options,
         DeliveryDestination $destination
-    ): OutboundPackage
-    {
+    ): OutboundPackage {
         return OutboundPackage::create(
             $payload,
             $options->headers(),
@@ -175,7 +173,7 @@ final class MessageDeliveryEndpoint implements Endpoint
 
                     $deferred->resolve();
                 }
-                catch(\Throwable $throwable)
+                catch (\Throwable $throwable)
                 {
                     $deferred->fail($throwable);
                 }

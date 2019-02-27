@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -17,19 +17,19 @@ use ServiceBus\Common\Endpoint\DeliveryOptions;
 use ServiceBus\Transport\Common\DeliveryDestination;
 
 /**
- * Destination when sending a message
+ * Destination when sending a message.
  */
 interface Endpoint
 {
     /**
-     * Receive endpoint name
+     * Receive endpoint name.
      *
      * @return string
      */
     public function name(): string;
 
     /**
-     * Create a new endpoint object with the same transport but different delivery routes
+     * Create a new endpoint object with the same transport but different delivery routes.
      *
      * @param DeliveryDestination $destination
      *
@@ -38,15 +38,15 @@ interface Endpoint
     public function withNewDeliveryDestination(DeliveryDestination $destination): Endpoint;
 
     /**
-     * Send message to endpoint
+     * Send message to endpoint.
      *
      * @param object          $message
      * @param DeliveryOptions $options
      *
-     * @return Promise It does not return any result
-     *
      * @throws \ServiceBus\MessageSerializer\Exceptions\EncodeMessageFailed
      * @throws \ServiceBus\Transport\Common\Exceptions\SendMessageFailed Failed to send message
+     *
+     * @return Promise It does not return any result
      */
     public function delivery(object $message, DeliveryOptions $options): Promise;
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -20,14 +20,14 @@ use ServiceBus\Services\Contracts\ValidationFailedEvent;
 final class ValidationFailed implements ValidationFailedEvent
 {
     /**
-     * Request Id
+     * Request Id.
      *
      * @var string
      */
     private $correlationId;
 
     /**
-     * List of validate violations
+     * List of validate violations.
      *
      * [
      *    'propertyPath' => [
@@ -41,7 +41,7 @@ final class ValidationFailed implements ValidationFailedEvent
     private $violations;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function create(string $correlationId, array $violations): ValidationFailedEvent
     {
@@ -54,7 +54,7 @@ final class ValidationFailed implements ValidationFailedEvent
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function correlationId(): string
     {
@@ -62,7 +62,7 @@ final class ValidationFailed implements ValidationFailedEvent
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function violations(): array
     {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -13,24 +13,26 @@ declare(strict_types = 1);
 namespace ServiceBus\Endpoint;
 
 /**
- * Outbound message routing
+ * Outbound message routing.
  */
 final class EndpointRouter
 {
     /**
-     * Endpoints to which messages will be sent
+     * Endpoints to which messages will be sent.
      *
      * name => [destination handler]
      *
      * @psalm-var array<string, array<mixed, \ServiceBus\Endpoint\Endpoint>>
+     *
      * @var \ServiceBus\Endpoint\Endpoint[][]
      */
     private $routes = [];
 
     /**
-     * Destination points for global routes (marked with "*")
+     * Destination points for global routes (marked with "*").
      *
      * @psalm-var array<array-key, \ServiceBus\Endpoint\Endpoint>
+     *
      * @var \ServiceBus\Endpoint\Endpoint[]
      */
     private $globalEndpoints = [];
@@ -44,7 +46,7 @@ final class EndpointRouter
     }
 
     /**
-     * Adding global delivery route
+     * Adding global delivery route.
      *
      * @param Endpoint $endpoint
      *
@@ -56,7 +58,7 @@ final class EndpointRouter
     }
 
     /**
-     * Add custom endpoint for multiple messages
+     * Add custom endpoint for multiple messages.
      *
      * @psalm-param array<array-key, class-string>    $messages
      *
@@ -67,14 +69,14 @@ final class EndpointRouter
      */
     public function registerRoutes(array $messages, Endpoint $endpoint): void
     {
-        foreach($messages as $message)
+        foreach ($messages as $message)
         {
             $this->registerRoute($message, $endpoint);
         }
     }
 
     /**
-     * Add custom endpoint to specified message
+     * Add custom endpoint to specified message.
      *
      * @psalm-param class-string $messageClass
      *
@@ -100,7 +102,7 @@ final class EndpointRouter
      */
     public function route(string $messageClass): array
     {
-        if(false === empty($this->routes[$messageClass]))
+        if (false === empty($this->routes[$messageClass]))
         {
             return $this->routes[$messageClass];
         }

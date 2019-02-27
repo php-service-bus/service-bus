@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -20,21 +20,21 @@ use ServiceBus\Services\Contracts\ExecutionFailedEvent;
 final class ExecutionFailed implements ExecutionFailedEvent
 {
     /**
-     * Request Id
+     * Request Id.
      *
      * @var string
      */
     private $correlationId;
 
     /**
-     * Exception message
+     * Exception message.
      *
      * @var string
      */
     private $reason;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function create(string $correlationId, string $errorMessage): ExecutionFailedEvent
     {
@@ -47,7 +47,7 @@ final class ExecutionFailed implements ExecutionFailedEvent
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function correlationId(): string
     {
@@ -55,7 +55,7 @@ final class ExecutionFailed implements ExecutionFailedEvent
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function errorMessage(): string
     {

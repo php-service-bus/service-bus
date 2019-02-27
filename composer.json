@@ -42,12 +42,12 @@
   },
   "require": {
     "php": ">=7.2",
-    "php-service-bus/common": "v3.0.7",
-    "php-service-bus/transport-common": "v3.0.7",
-    "php-service-bus/storage-common": "v3.0.7",
-    "php-service-bus/message-serializer": "v3.0.7",
-    "php-service-bus/annotations-reader": "v3.0.7",
-    "php-service-bus/messages-router": "v3.0.7",
+    "php-service-bus/common": "v3.0.8",
+    "php-service-bus/transport-common": "v3.0.8",
+    "php-service-bus/storage-common": "v3.0.8",
+    "php-service-bus/message-serializer": "v3.0.8",
+    "php-service-bus/annotations-reader": "v3.0.8",
+    "php-service-bus/messages-router": "v3.0.8",
     "symfony/dependency-injection": "^v4.2",
     "symfony/config": "^v4.2",
     "symfony/dotenv": "^v4.2",
@@ -61,7 +61,8 @@
     "kelunik/retry": "^v1.0"
   },
   "require-dev": {
-    "php-service-bus/module-phpinnacle-transport": "v3.0.7",
+    "php-service-bus/code-style-config": "^v0.1",
+    "php-service-bus/module-phpinnacle-transport": "v3.0.8",
     "kelunik/loop-block": "^1.0",
     "phpunit/phpunit": "^8",
     "vimeo/psalm": "^v3"
@@ -70,11 +71,11 @@
   "minimum-stability": "dev",
   "scripts": {
     "psalm": "./vendor/bin/psalm --config=psalm.xml",
-    "phpunit": "./vendor/bin/phpunit --configuration phpunit.xml --verbose",
+    "tests": "./vendor/bin/phpunit --configuration phpunit.xml --verbose",
     "coverage": "./vendor/bin/phpunit --configuration phpunit.xml --coverage-html ./coverage --verbose",
-    "test": [
-      "@phpunit"
-    ]
+    "cs-check": "./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run",
+    "cs-fix": "./vendor/bin/php-cs-fixer fix --allow-risky=yes",
+    "pre-commit": "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix --allow-risky=yes && ./vendor/bin/psalm --config=psalm.xml && ./vendor/bin/phpunit --configuration phpunit.xml --verbose"
   },
   "config": {
     "optimize-autoloader": true

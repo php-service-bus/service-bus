@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -18,12 +18,12 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
- * Share extension
+ * Share extension.
  */
 final class ServiceBusExtension extends Extension
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      * @psalm-param    array<string, mixed> $configs
@@ -44,7 +44,7 @@ final class ServiceBusExtension extends Extension
          *
          * @psalm-suppress MixedAssignment Cannot assign $value to a mixed type
          */
-        foreach($configs as $key => $value)
+        foreach ($configs as $key => $value)
         {
             $container->setParameter($key, $value);
         }

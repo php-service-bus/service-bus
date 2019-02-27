@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -12,13 +12,13 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Infrastructure\Watchers;
 
+use function ServiceBus\Common\formatBytes;
 use Amp\Loop;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use function ServiceBus\Common\formatBytes;
 
 /**
- * Periodic forced launch of the garbage collector
+ * Periodic forced launch of the garbage collector.
  *
  * @codeCoverageIgnore
  */
@@ -54,7 +54,7 @@ final class GarbageCollectorWatcher
 
     public function __destruct()
     {
-        if(null !== $this->watcherId)
+        if (null !== $this->watcherId)
         {
             Loop::cancel($this->watcherId);
 

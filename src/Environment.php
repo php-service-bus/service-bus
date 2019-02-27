@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -13,29 +13,31 @@ declare(strict_types = 1);
 namespace ServiceBus;
 
 /**
- * Application environment
+ * Application environment.
  */
 final class Environment
 {
     private const ENVIRONMENT_PRODUCTION = 'prod';
+
     private const ENVIRONMENT_SANDBOX    = 'dev';
+
     private const ENVIRONMENT_TESTING    = 'test';
 
     private const LIST                   = [
         self::ENVIRONMENT_PRODUCTION,
         self::ENVIRONMENT_SANDBOX,
-        self::ENVIRONMENT_TESTING
+        self::ENVIRONMENT_TESTING,
     ];
 
     /**
-     * Application environment
+     * Application environment.
      *
      * @var string
      */
     private $environment;
 
     /**
-     * Creating a test environment
+     * Creating a test environment.
      *
      * @return self
      */
@@ -45,7 +47,7 @@ final class Environment
     }
 
     /**
-     * Creating a develop environment
+     * Creating a develop environment.
      *
      * @return self
      */
@@ -55,7 +57,7 @@ final class Environment
     }
 
     /**
-     * Creating a production environment
+     * Creating a production environment.
      *
      * @return self
      */
@@ -65,13 +67,13 @@ final class Environment
     }
 
     /**
-     * Creating the specified environment
+     * Creating the specified environment.
      *
      * @param string $environment
      *
-     * @return Environment
-     *
      * @throws \LogicException The value of the environment is not specified, or is incorrect
+     *
+     * @return Environment
      */
     public static function create(string $environment): self
     {
@@ -123,7 +125,7 @@ final class Environment
     }
 
     /**
-     * Is environments equals
+     * Is environments equals.
      *
      * @param Environment $environment
      *
@@ -135,7 +137,7 @@ final class Environment
     }
 
     /**
-     * Get a textual representation of the current environment
+     * Get a textual representation of the current environment.
      *
      * @return string
      */
@@ -145,24 +147,25 @@ final class Environment
     }
 
     /**
-     * Validate the specified environment
+     * Validate the specified environment.
      *
      * @param string $specifiedEnvironment
      *
+     * @throws \LogicException The value of the environment is not specified, or is incorrect
+     *
      * @return void
      *
-     * @throws \LogicException The value of the environment is not specified, or is incorrect
      */
     private static function validateEnvironment(string $specifiedEnvironment): void
     {
-        if('' === $specifiedEnvironment ||
+        if ('' === $specifiedEnvironment ||
             false === \in_array($specifiedEnvironment, self::LIST, true)
-        )
-        {
+        ) {
             throw new \LogicException(
                 \sprintf(
                     'Provided incorrect value of the environment: "%s". Allowable values: %s',
-                    $specifiedEnvironment, \implode(', ', \array_values(self::LIST))
+                    $specifiedEnvironment,
+                    \implode(', ', \array_values(self::LIST))
                 )
             );
         }

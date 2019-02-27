@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -12,13 +12,13 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Application\Bootstrap;
 
+use function ServiceBus\Tests\removeDirectory;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Application\Bootstrap;
 use ServiceBus\Application\DependencyInjection\Compiler\Logger\GraylogLoggerCompilerPass;
 use ServiceBus\Application\DependencyInjection\Compiler\Logger\StdOutLoggerCompilerPass;
 use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
-use function ServiceBus\Tests\removeDirectory;
 
 /**
  *
@@ -31,7 +31,7 @@ final class WithLoggersBootstrapTest extends TestCase
     private $cacheDirectory;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp(): void
     {
@@ -39,14 +39,14 @@ final class WithLoggersBootstrapTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/bootstrap_test';
 
-        if(false === \file_exists($this->cacheDirectory))
+        if (false === \file_exists($this->cacheDirectory))
         {
             \mkdir($this->cacheDirectory);
         }
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown(): void
     {
@@ -60,9 +60,9 @@ final class WithLoggersBootstrapTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function withDotEnv(): void
     {
@@ -82,9 +82,9 @@ final class WithLoggersBootstrapTest extends TestCase
         $container = $bootstrap->boot();
 
         static::assertTrue($container->hasParameter('qwerty'));
-        static::assertEquals('root', $container->getParameter('qwerty'));
+        static::assertSame('root', $container->getParameter('qwerty'));
 
-        static::assertEquals(\getenv('APP_ENVIRONMENT'), $container->getParameter('service_bus.environment'));
-        static::assertEquals(\getenv('APP_ENTRY_POINT_NAME'), $container->getParameter('service_bus.entry_point'));
+        static::assertSame(\getenv('APP_ENVIRONMENT'), $container->getParameter('service_bus.environment'));
+        static::assertSame(\getenv('APP_ENTRY_POINT_NAME'), $container->getParameter('service_bus.entry_point'));
     }
 }

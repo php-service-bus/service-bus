@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -16,12 +16,12 @@ use Amp\Promise;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 
 /**
- * Handling incoming package processor
+ * Handling incoming package processor.
  */
 interface EntryPointProcessor
 {
     /**
-     * Handle package
+     * Handle package.
      *
      * @param IncomingPackage $package
      *

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -20,10 +20,11 @@ use ServiceBus\Common\MessageHandler\MessageHandler;
 final class ServiceMessageHandler
 {
     private const TYPE_EVENT_LISTENER  = 0;
+
     private const TYPE_COMMAND_HANDLER = 1;
 
     /**
-     * Message handler type
+     * Message handler type.
      *
      * @var int
      */

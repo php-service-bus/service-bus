@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -13,6 +13,9 @@ declare(strict_types = 1);
 namespace ServiceBus\Tests\Application\Kernel;
 
 use function Amp\Promise\wait;
+use function ServiceBus\Common\readReflectionPropertyValue;
+use function ServiceBus\Common\uuid;
+use function ServiceBus\Tests\removeDirectory;
 use Monolog\Handler\TestHandler;
 use PHPinnacle\Ridge\Channel;
 use PHPUnit\Framework\TestCase;
@@ -20,8 +23,6 @@ use Psr\Container\ContainerInterface;
 use ServiceBus\Application\Bootstrap;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use ServiceBus\Application\ServiceBusKernel;
-use function ServiceBus\Common\readReflectionPropertyValue;
-use function ServiceBus\Common\uuid;
 use ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer;
 use ServiceBus\Tests\Application\Kernel\Stubs\KernelTestExtension;
 use ServiceBus\Tests\Application\Kernel\Stubs\KernelTestService;
@@ -30,7 +31,6 @@ use ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommand;
 use ServiceBus\Tests\Application\Kernel\Stubs\TriggerThrowableCommandWithResponseEvent;
 use ServiceBus\Tests\Application\Kernel\Stubs\WithValidationCommand;
 use ServiceBus\Tests\Application\Kernel\Stubs\WithValidationRulesCommand;
-use function ServiceBus\Tests\removeDirectory;
 use ServiceBus\Tests\Stubs\Messages\CommandWithPayload;
 use ServiceBus\Tests\Stubs\Messages\SecondEmptyCommand;
 use ServiceBus\Transport\Amqp\AmqpExchange;
@@ -72,7 +72,7 @@ final class ServiceBusKernelTest extends TestCase
     private $logHandler;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * @throws \Throwable
      */
@@ -82,7 +82,7 @@ final class ServiceBusKernelTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/kernel_test';
 
-        if(false === \file_exists($this->cacheDirectory))
+        if (false === \file_exists($this->cacheDirectory))
         {
             \mkdir($this->cacheDirectory);
         }
@@ -118,7 +118,7 @@ final class ServiceBusKernelTest extends TestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown(): void
     {
@@ -126,8 +126,6 @@ final class ServiceBusKernelTest extends TestCase
 
         try
         {
-
-
             /** @var Channel $channel */
             $channel = readReflectionPropertyValue($this->transport, 'channel');
 
@@ -140,18 +138,17 @@ final class ServiceBusKernelTest extends TestCase
 
             unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
         }
-        catch(\Throwable $throwable)
+        catch (\Throwable $throwable)
         {
-
         }
     }
 
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function listenMessageWithNoHandlers(): void
     {
@@ -165,20 +162,20 @@ final class ServiceBusKernelTest extends TestCase
 
         $latest = \end($records);
 
-        static::assertEquals(
+        static::assertSame(
             'There are no handlers configured for the message "{messageClass}"',
             $latest['message']
         );
 
-        static::assertEquals($latest['context']['messageClass'], CommandWithPayload::class);
+        static::assertSame($latest['context']['messageClass'], CommandWithPayload::class);
     }
 
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function listenFailedMessageExecution(): void
     {
@@ -193,15 +190,15 @@ final class ServiceBusKernelTest extends TestCase
         $latest = \end($records);
         \reset($records);
 
-        static::assertEquals(\sprintf('%s::handleWithThrowable', KernelTestService::class), $latest['message']);
+        static::assertSame(\sprintf('%s::handleWithThrowable', KernelTestService::class), $latest['message']);
     }
 
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function successExecutionWithResponseMessage(): void
     {
@@ -213,9 +210,9 @@ final class ServiceBusKernelTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function contextLogging(): void
     {
@@ -228,15 +225,15 @@ final class ServiceBusKernelTest extends TestCase
         $messageEntry = \end($records);
         \reset($records);
 
-        static::assertEquals('test exception message', $messageEntry['message']);
+        static::assertSame('test exception message', $messageEntry['message']);
     }
 
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function withFailedValidation(): void
     {
@@ -250,15 +247,15 @@ final class ServiceBusKernelTest extends TestCase
         \reset($records);
 
         static::assertFalse($messageEntry['context']['isValid']);
-        static::assertEquals(['This value should not be blank.'], $messageEntry['context']['violations']['value']);
+        static::assertSame(['This value should not be blank.'], $messageEntry['context']['violations']['value']);
     }
 
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function enableWatchers(): void
     {
@@ -272,9 +269,9 @@ final class ServiceBusKernelTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function processMessageWithValidationFailure(): void
     {
@@ -286,9 +283,9 @@ final class ServiceBusKernelTest extends TestCase
     /**
      * @test
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     public function processMessageWithSpecifiedThrowableEvent(): void
     {
@@ -301,9 +298,9 @@ final class ServiceBusKernelTest extends TestCase
      * @param object $message
      * @param array   $headers
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     private function sendMessage(object $message, array $headers = []): void
     {

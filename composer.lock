@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "351fc8a41d82cf61bc02518b94b86df3",
-    "content-hash": "fba8a268ffff8c88ab46e9fe5e5601d7",
+    "hash": "325c28bb681169556a79a01482652b02",
+    "content-hash": "493f5fe5f59718f1568894c8561ce3f5",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1283,16 +1283,16 @@
         },
         {
             "name": "php-service-bus/annotations-reader",
-            "version": "v3.0.7",
+            "version": "v3.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/annotations-reader.git",
-                "reference": "31c9952c21c5f36c5d75472a96f8ea48f46e257b"
+                "reference": "5b3500e8ebef7bcc6e307a52575fb12cefcd758d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/annotations-reader/zipball/31c9952c21c5f36c5d75472a96f8ea48f46e257b",
-                "reference": "31c9952c21c5f36c5d75472a96f8ea48f46e257b",
+                "url": "https://api.github.com/repos/php-service-bus/annotations-reader/zipball/5b3500e8ebef7bcc6e307a52575fb12cefcd758d",
+                "reference": "5b3500e8ebef7bcc6e307a52575fb12cefcd758d",
                 "shasum": ""
             },
             "require": {
@@ -1301,6 +1301,7 @@
                 "php": ">=7.2"
             },
             "require-dev": {
+                "php-service-bus/code-style-config": "^v0.1",
                 "phpunit/phpunit": "^8",
                 "vimeo/psalm": "^3"
             },
@@ -1328,20 +1329,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-26 08:48:18"
+            "time": "2019-02-27 09:09:04"
         },
         {
             "name": "php-service-bus/common",
-            "version": "v3.0.7",
+            "version": "v3.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "2290f2e66b7ea0718a7afccdbcc4d7928e001205"
+                "reference": "e751c2ff5f06f446ee94f0a133e36faff67cc1d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/2290f2e66b7ea0718a7afccdbcc4d7928e001205",
-                "reference": "2290f2e66b7ea0718a7afccdbcc4d7928e001205",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/e751c2ff5f06f446ee94f0a133e36faff67cc1d4",
+                "reference": "e751c2ff5f06f446ee94f0a133e36faff67cc1d4",
                 "shasum": ""
             },
             "require": {
@@ -1350,6 +1351,7 @@
                 "ramsey/uuid": "^3.7"
             },
             "require-dev": {
+                "php-service-bus/code-style-config": "^v0.1",
                 "phpunit/phpunit": "^8",
                 "symfony/dependency-injection": "^v4.2",
                 "vimeo/psalm": "^3"
@@ -1381,30 +1383,31 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-26 13:01:39"
+            "time": "2019-02-27 08:41:11"
         },
         {
             "name": "php-service-bus/message-serializer",
-            "version": "v3.0.7",
+            "version": "v3.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/message-serializer.git",
-                "reference": "c4cab83ef8ac2e79e65f8d95f10b36d7e182f94f"
+                "reference": "829052788df98a08c3e5ef1a445b1346069d0254"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/c4cab83ef8ac2e79e65f8d95f10b36d7e182f94f",
-                "reference": "c4cab83ef8ac2e79e65f8d95f10b36d7e182f94f",
+                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/829052788df98a08c3e5ef1a445b1346069d0254",
+                "reference": "829052788df98a08c3e5ef1a445b1346069d0254",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "php": ">=7.2",
-                "php-service-bus/common": "v3.0.7",
+                "php-service-bus/common": "v3.0.8",
                 "symfony/serializer-pack": "^v1"
             },
             "require-dev": {
                 "ext-iconv": "*",
+                "php-service-bus/code-style-config": "^v0.1",
                 "phpunit/phpunit": "^8",
                 "vimeo/psalm": "^v3"
             },
@@ -1432,27 +1435,28 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-26 13:10:37"
+            "time": "2019-02-27 15:39:27"
         },
         {
             "name": "php-service-bus/messages-router",
-            "version": "v3.0.7",
+            "version": "v3.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/messages-router.git",
-                "reference": "ed8fcbbe1947f6dbd3f9478ea5bca32d4f811262"
+                "reference": "30917ffa13704ce964b523cb24d9c0631acea338"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/messages-router/zipball/ed8fcbbe1947f6dbd3f9478ea5bca32d4f811262",
-                "reference": "ed8fcbbe1947f6dbd3f9478ea5bca32d4f811262",
+                "url": "https://api.github.com/repos/php-service-bus/messages-router/zipball/30917ffa13704ce964b523cb24d9c0631acea338",
+                "reference": "30917ffa13704ce964b523cb24d9c0631acea338",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "php-service-bus/common": "v3.0.7"
+                "php-service-bus/common": "v3.0.8"
             },
             "require-dev": {
+                "php-service-bus/code-style-config": "^v0.1",
                 "phpunit/phpunit": "^8",
                 "symfony/dependency-injection": "^v4.2",
                 "vimeo/psalm": "^v3"
@@ -1481,20 +1485,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-26 13:10:01"
+            "time": "2019-02-27 15:32:56"
         },
         {
             "name": "php-service-bus/storage-common",
-            "version": "v3.0.7",
+            "version": "v3.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/storage-common.git",
-                "reference": "1a2b6a8e1a17bbe2fddd64aa37dc29611069bc07"
+                "reference": "03726451237f89589a5c79519e739cce0cc471f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/1a2b6a8e1a17bbe2fddd64aa37dc29611069bc07",
-                "reference": "1a2b6a8e1a17bbe2fddd64aa37dc29611069bc07",
+                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/03726451237f89589a5c79519e739cce0cc471f4",
+                "reference": "03726451237f89589a5c79519e739cce0cc471f4",
                 "shasum": ""
             },
             "require": {
@@ -1502,6 +1506,7 @@
             },
             "require-dev": {
                 "amphp/amp": "^2",
+                "php-service-bus/code-style-config": "^v0.1",
                 "phpunit/phpunit": "^8",
                 "vimeo/psalm": "^3"
             },
@@ -1529,20 +1534,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-26 13:21:45"
+            "time": "2019-02-27 09:37:08"
         },
         {
             "name": "php-service-bus/transport-common",
-            "version": "v3.0.7",
+            "version": "v3.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-common.git",
-                "reference": "f6917fd625fe6e20342a12e66359d0d237f6be53"
+                "reference": "5fc80c70caf4508c3544a72600271931825f6c42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/f6917fd625fe6e20342a12e66359d0d237f6be53",
-                "reference": "f6917fd625fe6e20342a12e66359d0d237f6be53",
+                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/5fc80c70caf4508c3544a72600271931825f6c42",
+                "reference": "5fc80c70caf4508c3544a72600271931825f6c42",
                 "shasum": ""
             },
             "require": {
@@ -1550,6 +1555,7 @@
                 "php": ">=7.2"
             },
             "require-dev": {
+                "php-service-bus/code-style-config": "^v0.1",
                 "phpunit/phpunit": "^8",
                 "vimeo/psalm": "^v3"
             },
@@ -1577,7 +1583,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-26 07:35:17"
+            "time": "2019-02-27 10:04:09"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -2906,6 +2912,68 @@
     ],
     "packages-dev": [
         {
+            "name": "composer/semver",
+            "version": "1.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/semver.git",
+                "reference": "c7cb9a2095a074d131b65a8a0cd294479d785573"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/semver/zipball/c7cb9a2095a074d131b65a8a0cd294479d785573",
+                "reference": "c7cb9a2095a074d131b65a8a0cd294479d785573",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.2 || ^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.5 || ^5.0.5",
+                "phpunit/phpunit-mock-objects": "2.3.0 || ^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\Semver\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nils Adermann",
+                    "email": "naderman@naderman.de",
+                    "homepage": "http://www.naderman.de"
+                },
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                },
+                {
+                    "name": "Rob Bast",
+                    "email": "rob.bast@gmail.com",
+                    "homepage": "http://robbast.nl"
+                }
+            ],
+            "description": "Semver library that offers utilities, version constraint parsing and validation.",
+            "keywords": [
+                "semantic",
+                "semver",
+                "validation",
+                "versioning"
+            ],
+            "time": "2016-08-30 16:08:34"
+        },
+        {
             "name": "composer/xdebug-handler",
             "version": "1.3.2",
             "source": {
@@ -3090,6 +3158,94 @@
                 "server"
             ],
             "time": "2018-09-25 11:42:25"
+        },
+        {
+            "name": "friendsofphp/php-cs-fixer",
+            "version": "v2.14.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
+                "reference": "ff401e58261ffc5934a58f795b3f95b355e276cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/ff401e58261ffc5934a58f795b3f95b355e276cb",
+                "reference": "ff401e58261ffc5934a58f795b3f95b355e276cb",
+                "shasum": ""
+            },
+            "require": {
+                "composer/semver": "^1.4",
+                "composer/xdebug-handler": "^1.2",
+                "doctrine/annotations": "^1.2",
+                "ext-json": "*",
+                "ext-tokenizer": "*",
+                "php": "^5.6 || ^7.0",
+                "php-cs-fixer/diff": "^1.3",
+                "symfony/console": "^3.4.17 || ^4.1.6",
+                "symfony/event-dispatcher": "^3.0 || ^4.0",
+                "symfony/filesystem": "^3.0 || ^4.0",
+                "symfony/finder": "^3.0 || ^4.0",
+                "symfony/options-resolver": "^3.0 || ^4.0",
+                "symfony/polyfill-php70": "^1.0",
+                "symfony/polyfill-php72": "^1.4",
+                "symfony/process": "^3.0 || ^4.0",
+                "symfony/stopwatch": "^3.0 || ^4.0"
+            },
+            "require-dev": {
+                "johnkary/phpunit-speedtrap": "^1.1 || ^2.0 || ^3.0",
+                "justinrainbow/json-schema": "^5.0",
+                "keradus/cli-executor": "^1.2",
+                "mikey179/vfsstream": "^1.6",
+                "php-coveralls/php-coveralls": "^2.1",
+                "php-cs-fixer/accessible-object": "^1.0",
+                "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.0.1",
+                "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.0.1",
+                "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1",
+                "phpunitgoodpractices/traits": "^1.5.1",
+                "symfony/phpunit-bridge": "^4.0"
+            },
+            "suggest": {
+                "ext-mbstring": "For handling non-UTF8 characters in cache signature.",
+                "php-cs-fixer/phpunit-constraint-isidenticalstring": "For IsIdenticalString constraint.",
+                "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "For XmlMatchesXsd constraint.",
+                "symfony/polyfill-mbstring": "When enabling `ext-mbstring` is not possible."
+            },
+            "bin": [
+                "php-cs-fixer"
+            ],
+            "type": "application",
+            "autoload": {
+                "psr-4": {
+                    "PhpCsFixer\\": "src/"
+                },
+                "classmap": [
+                    "tests/Test/AbstractFixerTestCase.php",
+                    "tests/Test/AbstractIntegrationCaseFactory.php",
+                    "tests/Test/AbstractIntegrationTestCase.php",
+                    "tests/Test/Assert/AssertTokensTrait.php",
+                    "tests/Test/IntegrationCase.php",
+                    "tests/Test/IntegrationCaseFactory.php",
+                    "tests/Test/IntegrationCaseFactoryInterface.php",
+                    "tests/Test/InternalIntegrationCaseFactory.php",
+                    "tests/TestCase.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dariusz Rumiński",
+                    "email": "dariusz.ruminski@gmail.com"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "A tool to automatically fix PHP code style",
+            "time": "2019-02-17 17:44:13"
         },
         {
             "name": "kelunik/loop-block",
@@ -3532,24 +3688,64 @@
             "time": "2018-02-15 16:58:55"
         },
         {
-            "name": "php-service-bus/module-phpinnacle-transport",
-            "version": "v3.0.7",
+            "name": "php-service-bus/code-style-config",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/php-service-bus/module-phpinnacle-transport.git",
-                "reference": "424c271c116bf0945c5e4339ead4800601a188df"
+                "url": "https://github.com/php-service-bus/code-style-config.git",
+                "reference": "cbacc6f24b21874d620d12977985a35a41ed640c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/424c271c116bf0945c5e4339ead4800601a188df",
-                "reference": "424c271c116bf0945c5e4339ead4800601a188df",
+                "url": "https://api.github.com/repos/php-service-bus/code-style-config/zipball/cbacc6f24b21874d620d12977985a35a41ed640c",
+                "reference": "cbacc6f24b21874d620d12977985a35a41ed640c",
+                "shasum": ""
+            },
+            "require": {
+                "friendsofphp/php-cs-fixer": "^2.14",
+                "php": ">=7.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ServiceBus\\CodeStyle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Masiukevich Maksim",
+                    "email": "dev@async-php.com",
+                    "homepage": "https://github.com/mmasiukevich",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "PHP Service Bus code style config",
+            "time": "2019-02-27 07:30:22"
+        },
+        {
+            "name": "php-service-bus/module-phpinnacle-transport",
+            "version": "v3.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-service-bus/module-phpinnacle-transport.git",
+                "reference": "3dd2f68c829a8cbab77ebdcafa69d1d25cecf461"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/3dd2f68c829a8cbab77ebdcafa69d1d25cecf461",
+                "reference": "3dd2f68c829a8cbab77ebdcafa69d1d25cecf461",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "php-service-bus/transport-phpinnacle": "v3.0.7"
+                "php-service-bus/transport-phpinnacle": "v3.0.8"
             },
             "require-dev": {
+                "php-service-bus/code-style-config": "^v0.1",
                 "phpunit/phpunit": "^8",
                 "symfony/dependency-injection": "^v4.2",
                 "vimeo/psalm": "^v3"
@@ -3580,29 +3776,30 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-02-26 13:20:34"
+            "time": "2019-02-27 16:30:08"
         },
         {
             "name": "php-service-bus/transport-amqp",
-            "version": "v3.0.7",
+            "version": "v3.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-amqp.git",
-                "reference": "e17771fa8fb71ac594d023d7c78dbd3124317eb2"
+                "reference": "d94d4b1aed8c61df57f0adf5f1b01966ec7138be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/e17771fa8fb71ac594d023d7c78dbd3124317eb2",
-                "reference": "e17771fa8fb71ac594d023d7c78dbd3124317eb2",
+                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/d94d4b1aed8c61df57f0adf5f1b01966ec7138be",
+                "reference": "d94d4b1aed8c61df57f0adf5f1b01966ec7138be",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
                 "php": ">=7.2",
-                "php-service-bus/common": "v3.0.7",
-                "php-service-bus/transport-common": "v3.0.7"
+                "php-service-bus/common": "v3.0.8",
+                "php-service-bus/transport-common": "v3.0.8"
             },
             "require-dev": {
+                "php-service-bus/code-style-config": "^v0.1",
                 "phpunit/phpunit": "^8",
                 "vimeo/psalm": "^v3"
             },
@@ -3631,29 +3828,30 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-26 13:15:05"
+            "time": "2019-02-27 15:59:03"
         },
         {
             "name": "php-service-bus/transport-phpinnacle",
-            "version": "v3.0.7",
+            "version": "v3.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-phpinnacle.git",
-                "reference": "c42b81090e83a9caa24e80c3dc84f23084c7e545"
+                "reference": "c5072573de5c8d49f131374d55eca0e760b68e76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/c42b81090e83a9caa24e80c3dc84f23084c7e545",
-                "reference": "c42b81090e83a9caa24e80c3dc84f23084c7e545",
+                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/c5072573de5c8d49f131374d55eca0e760b68e76",
+                "reference": "c5072573de5c8d49f131374d55eca0e760b68e76",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "php-service-bus/common": "v3.0.7",
-                "php-service-bus/transport-amqp": "v3.0.7",
+                "php-service-bus/common": "v3.0.8",
+                "php-service-bus/transport-amqp": "v3.0.8",
                 "phpinnacle/ridge": "^0.1"
             },
             "require-dev": {
+                "php-service-bus/code-style-config": "^v0.1",
                 "phpunit/phpunit": "^8",
                 "vimeo/psalm": "^v3"
             },
@@ -3683,7 +3881,7 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-02-26 13:18:13"
+            "time": "2019-02-27 16:15:54"
         },
         {
             "name": "phpinnacle/buffer",
@@ -4833,6 +5031,386 @@
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
             "time": "2019-01-25 14:35:16"
+        },
+        {
+            "name": "symfony/event-dispatcher",
+            "version": "v4.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/event-dispatcher.git",
+                "reference": "bd09ad265cd50b2b9d09d65ce6aba2d29bc81fe1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/bd09ad265cd50b2b9d09d65ce6aba2d29bc81fe1",
+                "reference": "bd09ad265cd50b2b9d09d65ce6aba2d29bc81fe1",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3",
+                "symfony/contracts": "^1.0"
+            },
+            "conflict": {
+                "symfony/dependency-injection": "<3.4"
+            },
+            "require-dev": {
+                "psr/log": "~1.0",
+                "symfony/config": "~3.4|~4.0",
+                "symfony/dependency-injection": "~3.4|~4.0",
+                "symfony/expression-language": "~3.4|~4.0",
+                "symfony/stopwatch": "~3.4|~4.0"
+            },
+            "suggest": {
+                "symfony/dependency-injection": "",
+                "symfony/http-kernel": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\EventDispatcher\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony EventDispatcher Component",
+            "homepage": "https://symfony.com",
+            "time": "2019-01-16 20:35:37"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "v4.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/finder.git",
+                "reference": "ef71816cbb264988bb57fe6a73f610888b9aa70c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/ef71816cbb264988bb57fe6a73f610888b9aa70c",
+                "reference": "ef71816cbb264988bb57fe6a73f610888b9aa70c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Finder\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Finder Component",
+            "homepage": "https://symfony.com",
+            "time": "2019-01-16 20:35:37"
+        },
+        {
+            "name": "symfony/options-resolver",
+            "version": "v4.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/options-resolver.git",
+                "reference": "831b272963a8aa5a0613a1a7f013322d8161bbbb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/options-resolver/zipball/831b272963a8aa5a0613a1a7f013322d8161bbbb",
+                "reference": "831b272963a8aa5a0613a1a7f013322d8161bbbb",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\OptionsResolver\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony OptionsResolver Component",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "config",
+                "configuration",
+                "options"
+            ],
+            "time": "2019-01-16 21:31:25"
+        },
+        {
+            "name": "symfony/polyfill-php70",
+            "version": "v1.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php70.git",
+                "reference": "6b88000cdd431cd2e940caa2cb569201f3f84224"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/6b88000cdd431cd2e940caa2cb569201f3f84224",
+                "reference": "6b88000cdd431cd2e940caa2cb569201f3f84224",
+                "shasum": ""
+            },
+            "require": {
+                "paragonie/random_compat": "~1.0|~2.0|~9.99",
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.9-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php70\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ],
+                "classmap": [
+                    "Resources/stubs"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill backporting some PHP 7.0+ features to lower PHP versions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "time": "2018-09-21 06:26:08"
+        },
+        {
+            "name": "symfony/polyfill-php72",
+            "version": "v1.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php72.git",
+                "reference": "9050816e2ca34a8e916c3a0ae8b9c2fccf68b631"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php72/zipball/9050816e2ca34a8e916c3a0ae8b9c2fccf68b631",
+                "reference": "9050816e2ca34a8e916c3a0ae8b9c2fccf68b631",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.9-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php72\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill backporting some PHP 7.2+ features to lower PHP versions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "time": "2018-09-21 13:07:52"
+        },
+        {
+            "name": "symfony/process",
+            "version": "v4.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/process.git",
+                "reference": "6c05edb11fbeff9e2b324b4270ecb17911a8b7ad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/process/zipball/6c05edb11fbeff9e2b324b4270ecb17911a8b7ad",
+                "reference": "6c05edb11fbeff9e2b324b4270ecb17911a8b7ad",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Process\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Process Component",
+            "homepage": "https://symfony.com",
+            "time": "2019-01-24 22:05:03"
+        },
+        {
+            "name": "symfony/stopwatch",
+            "version": "v4.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/stopwatch.git",
+                "reference": "b1a5f646d56a3290230dbc8edf2a0d62cda23f67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/stopwatch/zipball/b1a5f646d56a3290230dbc8edf2a0d62cda23f67",
+                "reference": "b1a5f646d56a3290230dbc8edf2a0d62cda23f67",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3",
+                "symfony/contracts": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Stopwatch\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Stopwatch Component",
+            "homepage": "https://symfony.com",
+            "time": "2019-01-16 20:31:39"
         },
         {
             "name": "theseer/tokenizer",

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Service Bus (publish-subscribe pattern implementation)
+ * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
  * @license MIT
@@ -61,7 +61,7 @@ final class LoopBlockWatcher
 
         $this->logger->info('Watching the event loop is running', [
             'blockThreshold' => self::BLOCK_THRESHOLD,
-            'checkInterval'  => self::CHECK_INTERVAL
+            'checkInterval'  => self::CHECK_INTERVAL,
         ]);
     }
 
@@ -70,7 +70,7 @@ final class LoopBlockWatcher
      */
     private function getDetector(): BlockDetector
     {
-        if(null === $this->detector)
+        if (null === $this->detector)
         {
             $this->detector = new BlockDetector(
                 self::createOnBlockHandler($this->logger),
@@ -101,7 +101,7 @@ final class LoopBlockWatcher
 
             $i = 0;
 
-            while(isset($trace[$i]['class']))
+            while (isset($trace[$i]['class']))
             {
                 /** @noinspection SlowArrayOperationsInLoopInspection */
                 $traceData['info'] = \array_merge(
@@ -110,7 +110,7 @@ final class LoopBlockWatcher
                         'file'     => $trace[$i - 1]['file'] ?? null,
                         'line'     => $trace[$i - 1]['line'] ?? null,
                         'class'    => $trace[$i]['class'] ?? null,
-                        'function' => $trace[$i]['function'] ?? null
+                        'function' => $trace[$i]['function'] ?? null,
                     ]
                 );
 
