@@ -35,9 +35,9 @@ Documentation can be found in the [documentation](https://github.com/php-service
   * [Sagas](https://github.com/php-service-bus/documentation/blob/master/pages/modules/sagas.md)
   * [Event Sourcing](https://github.com/php-service-bus/documentation/blob/master/pages/modules/event_sourcing.md)
   * [Scheduler](https://github.com/php-service-bus/documentation/blob/master/pages/modules/scheduler.md)
-  * [Transport](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#transport)
-  * [Database](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#database)
-* [Available packages](https://github.com/php-service-bus/documentation/blob/master/pages/available_packages.md)
+  * [Async RabbitMQ Transport](https://github.com/php-service-bus/documentation/blob/master/pages/modules/transport_phpinnacle.md)
+  * [Async PostgreSQL Database](https://github.com/php-service-bus/documentation/blob/master/pages/modules/storage_amp_sql.md)
+* Packages
   * [Http-client](https://github.com/php-service-bus/documentation/blob/master/pages/packages/http_client.md)
   * [Cache](https://github.com/php-service-bus/documentation/blob/master/pages/packages/cache.md)
 
