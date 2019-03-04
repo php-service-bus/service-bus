@@ -31,7 +31,6 @@ Documentation can be found in the [documentation](https://github.com/php-service
 * [Installation](https://github.com/php-service-bus/documentation/blob/master/pages/installation.md)
 * [Basic information](https://github.com/php-service-bus/documentation/blob/master/pages/basic_information.md)
 * [Available modules](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md)
-  * [Components](https://github.com/php-service-bus/documentation/blob/master/pages/available_modules.md#components)
   * [Sagas](https://github.com/php-service-bus/documentation/blob/master/pages/modules/sagas.md)
   * [Event Sourcing](https://github.com/php-service-bus/documentation/blob/master/pages/modules/event_sourcing.md)
   * [Scheduler](https://github.com/php-service-bus/documentation/blob/master/pages/modules/scheduler.md)
