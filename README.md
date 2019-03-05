@@ -35,6 +35,7 @@ Documentation can be found in the [documentation](https://github.com/php-service
   * [Event Sourcing](https://github.com/php-service-bus/documentation/blob/master/pages/modules/event_sourcing.md)
   * [Scheduler](https://github.com/php-service-bus/documentation/blob/master/pages/modules/scheduler.md)
   * [Async RabbitMQ Transport](https://github.com/php-service-bus/documentation/blob/master/pages/modules/transport_phpinnacle.md)
+  * [Async Redis Transport](https://github.com/php-service-bus/documentation/blob/master/pages/modules/redis_transport.md)
   * [Async PostgreSQL Database](https://github.com/php-service-bus/documentation/blob/master/pages/modules/storage_amp_sql.md)
 * Packages
   * [Http-client](https://github.com/php-service-bus/documentation/blob/master/pages/packages/http_client.md)
