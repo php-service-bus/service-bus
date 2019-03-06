@@ -54,9 +54,12 @@ final class MessagesRouterConfigurator implements RouterConfigurator
     private $routingServiceLocator;
 
     /**
-     * @param array<mixed, string> $servicesList
-     * @param ServiceLocator       $routingServiceLocator
-     * @param ServiceLocator       $servicesServiceLocator
+     * @psalm-param array<mixed, string> $servicesList
+     *
+     * @param MessageExecutorFactory $executorFactory
+     * @param array                  $servicesList
+     * @param ServiceLocator         $routingServiceLocator
+     * @param ServiceLocator         $servicesServiceLocator
      */
     public function __construct(
         MessageExecutorFactory $executorFactory,

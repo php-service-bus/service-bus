@@ -103,6 +103,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
      * Create options.
      *
      * @param ServicesAnnotationsMarker $annotation
+     * @param bool $isCommandHandler
      *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
      *

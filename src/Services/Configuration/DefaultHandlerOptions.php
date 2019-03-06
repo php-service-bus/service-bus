@@ -129,7 +129,8 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     }
 
     /**
-     * @param class-string $eventClass
+     * @psalm-param class-string $eventClass
+     *
      * @param string $eventClass
      *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent
@@ -167,7 +168,8 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     }
 
     /**
-     * @param class-string $eventClass
+     * @psalm-param class-string $eventClass
+     *
      * @param string $eventClass
      *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent

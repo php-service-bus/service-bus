@@ -55,7 +55,8 @@ final class Formatter extends NormalizerFormatter
     /**
      * @noinspection PhpDocMissingThrowsInspection
      *
-     * @param int $maxLength
+     * @param string|null $systemName
+     * @param int|null    $maxLength
      */
     public function __construct(?string $systemName = null, ?int $maxLength = null)
     {
