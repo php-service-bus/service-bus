@@ -136,7 +136,7 @@ final class Bootstrap
     /**
      * Import parameters to container.
      *
-     * @param array<string, bool|string|int|float|array<mixed, mixed>|null> $parameters
+     * @param array<string, array<mixed, mixed>|bool|float|int|string|null> $parameters
      *
      * @return self
      */

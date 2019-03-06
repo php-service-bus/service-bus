@@ -163,3 +163,8 @@ services:
       # see TaggedMessageHandlersCompilerPass::process
       $serviceLocator: '@service_bus.services_locator'
     tags: ['service_bus_argument_resolver']
+
+  # Mutexes factory
+  ServiceBus\Mutex\MutexFactory:
+    class: ServiceBus\Mutex\InMemoryMutexFactory
+

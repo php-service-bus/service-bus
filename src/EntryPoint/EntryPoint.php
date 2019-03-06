@@ -153,6 +153,7 @@ final class EntryPoint
     {
         $delay = 0 >= $delay ? 1 : $delay;
 
+        /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
         Loop::defer(
             function() use ($delay): \Generator
             {
@@ -160,6 +161,7 @@ final class EntryPoint
 
                 $this->logger->info('Handler will stop after {duration} seconds', ['duration' => $delay]);
 
+                /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
                 Loop::delay(
                     $delay * 1000,
                     function(): void
@@ -180,6 +182,7 @@ final class EntryPoint
      */
     private function deferExecution(IncomingPackage $package): void
     {
+        /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
         Loop::defer(
             function() use ($package): \Generator
             {

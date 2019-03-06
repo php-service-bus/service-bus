@@ -196,6 +196,7 @@ final class ServiceBusKernel
 
         foreach ($signals as $signal)
         {
+            /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
             Loop::onSignal($signal, $handler);
         }
 
@@ -213,6 +214,7 @@ final class ServiceBusKernel
     {
         $seconds = 0 >= $seconds ? 1 : $seconds;
 
+        /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
         Loop::delay(
             $seconds * 1000,
             function() use ($seconds): void
@@ -243,6 +245,7 @@ final class ServiceBusKernel
         $checkInterval = 0 >= $checkInterval ? 1 : $checkInterval;
         $watcher       = new FileChangesWatcher($directoryPath);
 
+        /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
         Loop::repeat(
             $checkInterval * 1000,
             function() use ($watcher, $stopDelay): \Generator

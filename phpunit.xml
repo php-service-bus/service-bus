@@ -52,6 +52,10 @@
             <directory>./vendor/php-service-bus/storage-common/tests/</directory>
         </testsuite>
 
+        <testsuite name="Mutex implementation">
+            <directory>./vendor/php-service-bus/mutex/tests/</directory>
+        </testsuite>
+
         <testsuite name="Service bus">
             <directory>./tests/</directory>
         </testsuite>

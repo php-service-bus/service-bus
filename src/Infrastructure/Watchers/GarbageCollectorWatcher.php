@@ -69,6 +69,7 @@ final class GarbageCollectorWatcher
     {
         $logger = $this->logger;
 
+        /** @psalm-suppress MixedTypeCoercion Incorrect amphp types watcherId */
         $this->watcherId = Loop::repeat(
             $this->interval,
             static function() use ($logger): void
