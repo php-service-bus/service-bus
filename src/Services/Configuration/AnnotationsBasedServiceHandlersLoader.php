@@ -124,13 +124,19 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
 
         if ('' !== (string) $annotation->defaultValidationFailedEvent)
         {
-            /** @psalm-suppress PossiblyNullArgument */
+            /**
+             * @psalm-suppress TypeCoercion
+             * @psalm-suppress PossiblyNullArgument
+             */
             $options = $options->withDefaultValidationFailedEvent($annotation->defaultValidationFailedEvent);
         }
 
         if ('' !== (string) $annotation->defaultThrowableEvent)
         {
-            /** @psalm-suppress PossiblyNullArgument */
+            /**
+             * @psalm-suppress TypeCoercion
+             * @psalm-suppress PossiblyNullArgument
+             */
             $options = $options->withDefaultThrowableEvent($annotation->defaultThrowableEvent);
         }
 
