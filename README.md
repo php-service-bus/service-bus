@@ -40,6 +40,7 @@ Documentation can be found in the [documentation](https://github.com/php-service
 * Packages
   * [Http-client](https://github.com/php-service-bus/documentation/blob/master/pages/packages/http_client.md)
   * [Cache](https://github.com/php-service-bus/documentation/blob/master/pages/packages/cache.md)
+  * [Mutex](https://github.com/php-service-bus/documentation/blob/master/pages/packages/mutex.md)
 
 ## Requirements
   - PHP 7.2+
