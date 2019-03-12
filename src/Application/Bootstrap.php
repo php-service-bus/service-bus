@@ -38,11 +38,11 @@ final class Bootstrap
     /**
      * Create based on the environment parameters obtained from the ".env" file.
      *
-     * @param string $envFilePath
+     * @param string $envFilePath Absolute path to .env file
      *
-     * @throws \Symfony\Component\Dotenv\Exception\FormatException
-     * @throws \Symfony\Component\Dotenv\Exception\PathException
-     * @throws \LogicException Invalid environment specified
+     * @throws \Symfony\Component\Dotenv\Exception\PathException Incorrect .env file path
+     * @throws \Symfony\Component\Dotenv\Exception\FormatException Incorrect .env file format
+     * @throws \LogicException Incorrect application environment specified
      *
      * @return self
      */
@@ -56,7 +56,7 @@ final class Bootstrap
     /**
      * Create based on environment settings.
      *
-     * @throws \LogicException Invalid environment specified
+     * @throws \LogicException Incorrect application environment specified
      *
      * @return self
      */
@@ -66,6 +66,8 @@ final class Bootstrap
     }
 
     /**
+     * Boot custom module.
+     *
      * @param ServiceBusModule ...$serviceBusModules
      *
      * @throws \Throwable
@@ -104,6 +106,8 @@ final class Bootstrap
     }
 
     /**
+     * Compile container.
+     *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
@@ -148,7 +152,11 @@ final class Bootstrap
     }
 
     /**
-     * @param Extension[] $extensions
+     * Registers custom extensions.
+     *
+     * @see https://symfony.com/doc/current/bundles/extension.html
+     *
+     * @param Extension ...$extensions
      *
      * @return self
      */
@@ -160,7 +168,9 @@ final class Bootstrap
     }
 
     /**
-     * @noinspection PhpDocSignatureInspection
+     * Registers custom compiler passes.
+     *
+     * @see https://symfony.com/doc/current/service_container/compiler_passes.html
      *
      * @param CompilerPassInterface ...$compilerPassInterfaces
      *
@@ -174,7 +184,7 @@ final class Bootstrap
     }
 
     /**
-     * @throws \LogicException
+     * @throws \LogicException Incorrect application environment specified
      */
     private function __construct()
     {

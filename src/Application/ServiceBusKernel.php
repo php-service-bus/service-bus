@@ -114,7 +114,7 @@ final class ServiceBusKernel
     }
 
     /**
-     * Run application.
+     * Run the listener on the specified queues.
      *
      * @param Queue ...$queues
      *
@@ -126,16 +126,20 @@ final class ServiceBusKernel
     }
 
     /**
-     * Enable watch for event loop blocking
+     * Enable watch for event loop blocking.
      * DO NOT USE IN PRODUCTION environment.
      *
-     * @throws \Throwable
+     * @noinspection PhpDocMissingThrowsInspection
      *
      * @return $this
      */
     public function monitorLoopBlock(): self
     {
-        /** @var LoopBlockWatcher $loopBlockWatcher */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var LoopBlockWatcher $loopBlockWatcher
+         */
         $loopBlockWatcher = $this->getKernelContainerService(LoopBlockWatcher::class);
 
         $loopBlockWatcher->run();
@@ -146,13 +150,17 @@ final class ServiceBusKernel
     /**
      * Enable periodic forced launch of the garbage collector.
      *
-     * @throws \Throwable
+     * @noinspection PhpDocMissingThrowsInspection
      *
      * @return $this
      */
     public function enableGarbageCleaning(): self
     {
-        /** @var GarbageCollectorWatcher $garbageCollectorWatcher */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var GarbageCollectorWatcher $garbageCollectorWatcher
+         */
         $garbageCollectorWatcher = $this->getKernelContainerService(GarbageCollectorWatcher::class);
 
         $garbageCollectorWatcher->run();
@@ -163,14 +171,15 @@ final class ServiceBusKernel
     /**
      * Use default handler for signal "SIGINT" and "SIGTERM".
      *
+     * @noinspection PhpDocMissingThrowsInspection
+     *
      * @psalm-param array<mixed, int> $signals
      *
      * @param int   $stopDelay The delay before the completion (in seconds)
      * @param int[] $signals   Processed signals
      *
-     * @throws Loop\UnsupportedFeatureException This might happen if ext-pcntl is missing and the loop driver doesn't
+     * @throws \Amp\Loop\UnsupportedFeatureException This might happen if ext-pcntl is missing and the loop driver doesn't
      *                                          support another way to dispatch signals
-     * @throws \Throwable
      *
      * @return $this
      */
@@ -178,7 +187,11 @@ final class ServiceBusKernel
     {
         $stopDelay = 0 >= $stopDelay ? 1 : $stopDelay;
 
-        /** @var LoggerInterface $logger */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var LoggerInterface $logger
+         */
         $logger = $this->getKernelContainerService('service_bus.logger');
 
         $handler = function(string $watcherId, int $signalId) use ($stopDelay, $logger): void
@@ -276,16 +289,20 @@ final class ServiceBusKernel
      * By default, messages will be sent to the application transport. If a different option is specified for the
      * message, it will be sent only to it.
      *
+     * @noinspection PhpDocMissingThrowsInspection
+     *
      * @param Endpoint $endpoint
      * @param string   ...$messages
-     *
-     * @throws \Throwable
      *
      * @return ServiceBusKernel
      */
     public function registerEndpointForMessages(Endpoint $endpoint, string ...$messages): self
     {
-        /** @var EndpointRouter $entryPointRouter */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var EndpointRouter $entryPointRouter
+         */
         $entryPointRouter = $this->getKernelContainerService(EndpointRouter::class);
 
         /** @psalm-var class-string $messageClass */
@@ -301,17 +318,20 @@ final class ServiceBusKernel
      * Like the registerEndpointForMessages method, it adds a custom message delivery route.
      * The only difference is that the route is specified for the current application transport.
      *
+     * @noinspection PhpDocMissingThrowsInspection
+     *
      * @param DeliveryDestination $deliveryDestination
      * @param string              ...$messages
-     *
-     * @throws \Throwable
-     * @throws \Throwable
      *
      * @return ServiceBusKernel
      */
     public function registerDestinationForMessages(DeliveryDestination $deliveryDestination, string ...$messages): self
     {
-        /** @var Endpoint $applicationEndpoint */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var Endpoint $applicationEndpoint
+         */
         $applicationEndpoint = $this->getKernelContainerService(Endpoint::class);
 
         $newEndpoint = $applicationEndpoint->withNewDeliveryDestination($deliveryDestination);
@@ -322,7 +342,7 @@ final class ServiceBusKernel
     /**
      * @param string $service
      *
-     * @throws \Throwable
+     * @throws \Throwable Unknown service
      *
      * @return object
      */

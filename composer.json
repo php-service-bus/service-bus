@@ -42,6 +42,7 @@
   },
   "require": {
     "php": ">=7.2",
+    "ext-pcntl": "*",
     "php-service-bus/common": "^v3.0",
     "php-service-bus/transport-common": "^v3.0",
     "php-service-bus/storage-common": "^v3.0",
