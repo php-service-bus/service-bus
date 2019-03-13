@@ -17,6 +17,7 @@ use ServiceBus\Transport\Common\Package\IncomingPackage;
 
 /**
  * Handling incoming package processor.
+ * Responsible for deserialization, routing and task execution.
  */
 interface EntryPointProcessor
 {

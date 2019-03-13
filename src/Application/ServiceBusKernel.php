@@ -58,19 +58,31 @@ final class ServiceBusKernel
     /**
      * @param ContainerInterface $globalContainer
      *
-     * @throws \Throwable
+     * @noinspection PhpDocMissingThrowsInspection
      */
     public function __construct(ContainerInterface $globalContainer)
     {
         $this->container = $globalContainer;
 
-        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator
+         */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
-        /** @var EntryPoint $entryPoint */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var EntryPoint $entryPoint
+         */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
-        /** @var Transport $transport */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var Transport $transport
+         */
         $transport = $serviceLocator->get(Transport::class);
 
         $this->entryPoint = $entryPoint;
@@ -84,9 +96,9 @@ final class ServiceBusKernel
      * @param Queue     $queue
      * @param QueueBind ...$binds
      *
-     * @throws \ServiceBus\Transport\Common\Exceptions\BindFailed
      * @throws \ServiceBus\Transport\Common\Exceptions\ConnectionFail
      * @throws \ServiceBus\Transport\Common\Exceptions\CreateQueueFailed
+     * @throws \ServiceBus\Transport\Common\Exceptions\BindFailed
      *
      * @return Promise
      */
@@ -102,9 +114,9 @@ final class ServiceBusKernel
      * @param Topic     $topic
      * @param TopicBind ...$binds
      *
-     * @throws \ServiceBus\Transport\Common\Exceptions\BindFailed
      * @throws \ServiceBus\Transport\Common\Exceptions\ConnectionFail
      * @throws \ServiceBus\Transport\Common\Exceptions\CreateTopicFailed
+     * @throws \ServiceBus\Transport\Common\Exceptions\BindFailed
      *
      * @return Promise
      */
@@ -173,7 +185,7 @@ final class ServiceBusKernel
      *
      * @noinspection PhpDocMissingThrowsInspection
      *
-     * @psalm-param array<mixed, int> $signals
+     * @psalm-param  array<mixed, int> $signals
      *
      * @param int   $stopDelay The delay before the completion (in seconds)
      * @param int[] $signals   Processed signals

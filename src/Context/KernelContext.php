@@ -28,14 +28,11 @@ use ServiceBus\Transport\Common\Package\IncomingPackage;
 final class KernelContext implements ServiceBusContext
 {
     /**
+     * The package containing the incoming message.
+     *
      * @var IncomingPackage
      */
     private $incomingPackage;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * Outbound message routing.
@@ -47,12 +44,20 @@ final class KernelContext implements ServiceBusContext
     /**
      * Is the received message correct?
      *
+     * Note: This value is stamped from the infrastructure level
+     *
+     * @see MessageValidationExecutor::134
+     *
      * @var bool
      */
     private $isValidMessage = true;
 
     /**
      * List of validate violations.
+     *
+     * Note: This value is stamped from the infrastructure level
+     *
+     * @see MessageValidationExecutor::134
      *
      * [
      *    'propertyPath' => [
@@ -66,6 +71,11 @@ final class KernelContext implements ServiceBusContext
      * @var array
      */
     private $violations = [];
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param IncomingPackage $incomingPackage

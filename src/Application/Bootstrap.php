@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
- *
+ * Initial application initialization: loading the main components and compiling the dependency container.
  */
 final class Bootstrap
 {
@@ -36,7 +36,7 @@ final class Bootstrap
     private $containerBuilder;
 
     /**
-     * Create based on the environment parameters obtained from the ".env" file.
+     * Create based on the environment parameters obtained from the ".env" file (via symfony/dotenv component).
      *
      * @param string $envFilePath Absolute path to .env file
      *
@@ -55,6 +55,9 @@ final class Bootstrap
 
     /**
      * Create based on environment settings.
+     * All parameters must be set in the environment.
+     *
+     * @see https://github.com/php-service-bus/documentation/blob/master/pages/installation.md#the-list-of-environment-variables
      *
      * @throws \LogicException Incorrect application environment specified
      *
@@ -125,6 +128,7 @@ final class Bootstrap
 
     /**
      * Use custom cache directory.
+     * If not specified, the directory for storing temporary files will be used (sys_get_temp_dir).
      *
      * @param string $cacheDirectoryPath
      *

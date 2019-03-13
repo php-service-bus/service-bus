@@ -23,7 +23,7 @@ use ServiceBus\MessagesRouter\Router;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 
 /**
- *
+ * Default incoming package processor.
  */
 final class DefaultEntryPointProcessor implements EntryPointProcessor
 {
@@ -42,6 +42,8 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     private $endpointRouter;
 
     /**
+     * Incoming message router.
+     *
      * @var Router
      */
     private $messagesRouter;

@@ -24,19 +24,30 @@ use ServiceBus\Transport\Common\Transport;
 
 /**
  * Application entry point.
+ * It is the entry point for messages coming from a transport. Responsible for processing.
  */
 final class EntryPoint
 {
+    /**
+     * The default value for the maximum number of tasks processed simultaneously.
+     * The value should not be too large and should not exceed the maximum number of available connections to the database.
+     */
     private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 60;
 
-    private const DEFAULT_AWAIT_DELAY               = 20;
+    /** Throttling value (in milliseconds) while achieving the maximum number of simultaneously executed tasks. */
+    private const DEFAULT_AWAIT_DELAY = 20;
 
     /**
+     * Current transport from which messages will be received.
+     *
      * @var Transport
      */
     private $transport;
 
     /**
+     * Handling incoming package processor.
+     * Responsible for deserialization, routing and task execution.
+     *
      * @var EntryPointProcessor
      */
     private $processor;
@@ -55,13 +66,14 @@ final class EntryPoint
 
     /**
      * The current number of tasks performed.
+     * The value should not be too large and should not exceed the maximum number of available connections to the database.
      *
      * @var int
      */
     private $currentTasksInProgressCount = 0;
 
     /**
-     * Barrier wait delay (in milliseconds).
+     * Throttling value (in milliseconds) while achieving the maximum number of simultaneously executed tasks.
      *
      * @var int
      */
@@ -69,7 +81,7 @@ final class EntryPoint
 
     /**
      * @param Transport            $transport
-     * @param  EntryPointProcessor $processor
+     * @param EntryPointProcessor  $processor
      * @param LoggerInterface|null $logger
      * @param int|null             $maxConcurrentTaskCount
      * @param int|null             $awaitDelay Barrier wait delay (in milliseconds)
@@ -89,9 +101,11 @@ final class EntryPoint
     }
 
     /**
-     * Start queue listen.
+     * Start queues listen.
      *
      * @param Queue ...$queues
+     *
+     * @throws \ServiceBus\Transport\Common\Exceptions\ConnectionFail Connection refused
      *
      * @return Promise It does not return any result
      */
@@ -107,7 +121,7 @@ final class EntryPoint
                 /**
                  * @psalm-suppress TooManyTemplateParams Wrong Iterator template
                  *
-                 * @var Queue[] $queues
+                 * @var Queue[]       $queues
                  * @var \Amp\Iterator $iterator
                  */
                 $iterator = yield $this->transport->consume(...$queues);
@@ -145,6 +159,9 @@ final class EntryPoint
     }
 
     /**
+     * Unsubscribe all queues.
+     * Terminates the subscription and stops the daemon after the specified number of seconds.
+     *
      * @param int $delay The delay before the completion (in seconds)
      *
      * @return void
