@@ -45,7 +45,7 @@
     "ext-pcntl": "*",
     "php-service-bus/common": "^v3.0",
     "php-service-bus/transport-common": "^v3.0",
-    "php-service-bus/storage-common": "^v3.0",
+    "php-service-bus/storage-common": "^v3.1",
     "php-service-bus/mutex": "^v3.0",
     "php-service-bus/message-serializer": "^v3.0",
     "php-service-bus/annotations-reader": "^v3.0",
