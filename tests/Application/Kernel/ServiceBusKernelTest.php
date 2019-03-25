@@ -83,7 +83,7 @@ final class ServiceBusKernelTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/kernel_test';
 
-        if (false === \file_exists($this->cacheDirectory))
+        if(false === \file_exists($this->cacheDirectory))
         {
             \mkdir($this->cacheDirectory);
         }
@@ -139,7 +139,7 @@ final class ServiceBusKernelTest extends TestCase
 
             unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
         }
-        catch (\Throwable $throwable)
+        catch(\Throwable $throwable)
         {
         }
     }
@@ -162,18 +162,16 @@ final class ServiceBusKernelTest extends TestCase
             }
         );
 
-        $records = $this->logHandler->getRecords();
-
-        static::assertNotEmpty($records);
-
-        $entry = $records[\count($records) - 3];
-
-        static::assertSame(
-            'There are no handlers configured for the message "{messageClass}"',
-            $entry['message']
+        $messages = \array_map(
+            function(array $entry): string
+            {
+                return $entry['message'];
+            },
+            $this->logHandler->getRecords()
         );
 
-        static::assertSame($entry['context']['messageClass'], CommandWithPayload::class);
+        static::assertContains('There are no handlers configured for the message "{messageClass}"', $messages);
+
     }
 
     /**
@@ -194,13 +192,15 @@ final class ServiceBusKernelTest extends TestCase
             }
         );
 
-        $records = $this->logHandler->getRecords();
+        $messages = \array_map(
+            function(array $entry): string
+            {
+                return $entry['message'];
+            },
+            $this->logHandler->getRecords()
+        );
 
-        static::assertNotEmpty($records);
-
-        $entry = $records[\count($records) - 3];
-
-        static::assertSame(\sprintf('%s::handleWithThrowable', KernelTestService::class), $entry['message']);
+        static::assertContains(\sprintf('%s::handleWithThrowable', KernelTestService::class), $messages);
     }
 
     /**
@@ -235,11 +235,15 @@ final class ServiceBusKernelTest extends TestCase
             }
         );
 
-        $records = $this->logHandler->getRecords();
+        $messages = \array_map(
+            function(array $entry): string
+            {
+                return $entry['message'];
+            },
+            $this->logHandler->getRecords()
+        );
 
-        $messageEntry = $records[\count($records) -3];
-
-        static::assertSame('test exception message', $messageEntry['message']);
+        static::assertContains('test exception message', $messages);
     }
 
     /**
@@ -260,12 +264,27 @@ final class ServiceBusKernelTest extends TestCase
             }
         );
 
-        $records = $this->logHandler->getRecords();
+        $entries = \array_filter(
+            \array_map(
+                function(array $entry): ?array
+                {
+                    if(true === isset($entry['context']['violations']))
+                    {
+                        return $entry;
+                    }
 
-        $messageEntry =  $records[\count($records) -3];
+                    return null;
+                },
+                $this->logHandler->getRecords()
+            )
+        );
 
-        static::assertFalse($messageEntry['context']['isValid']);
-        static::assertSame(['This value should not be blank.'], $messageEntry['context']['violations']['value']);
+        static::assertCount(1, $entries);
+
+        $entry = \reset($entries);
+
+        static::assertFalse($entry['context']['isValid']);
+        static::assertSame(['This value should not be blank.'], $entry['context']['violations']['value']);
     }
 
     /**
