@@ -83,7 +83,7 @@ final class ServiceBusKernelTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/kernel_test';
 
-        if(false === \file_exists($this->cacheDirectory))
+        if (false === \file_exists($this->cacheDirectory))
         {
             \mkdir($this->cacheDirectory);
         }
@@ -139,7 +139,7 @@ final class ServiceBusKernelTest extends TestCase
 
             unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
         }
-        catch(\Throwable $throwable)
+        catch (\Throwable $throwable)
         {
         }
     }
@@ -171,7 +171,6 @@ final class ServiceBusKernelTest extends TestCase
         );
 
         static::assertContains('There are no handlers configured for the message "{messageClass}"', $messages);
-
     }
 
     /**
@@ -268,7 +267,7 @@ final class ServiceBusKernelTest extends TestCase
             \array_map(
                 function(array $entry): ?array
                 {
-                    if(true === isset($entry['context']['violations']))
+                    if (true === isset($entry['context']['violations']))
                     {
                         return $entry;
                     }
