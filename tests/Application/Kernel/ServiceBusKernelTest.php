@@ -16,6 +16,7 @@ use function Amp\Promise\wait;
 use function ServiceBus\Common\readReflectionPropertyValue;
 use function ServiceBus\Common\uuid;
 use function ServiceBus\Tests\removeDirectory;
+use Amp\Loop;
 use Monolog\Handler\TestHandler;
 use PHPinnacle\Ridge\Channel;
 use PHPUnit\Framework\TestCase;
@@ -154,20 +155,25 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new CommandWithPayload('payload'));
 
-        wait($this->kernel->run(AmqpQueue::default('test_queue')));
+        Loop::run(
+            function(): \Generator
+            {
+                yield $this->kernel->run(AmqpQueue::default('test_queue'));
+            }
+        );
 
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
 
-        $latest = \end($records);
+        $entry = $records[\count($records) - 3];
 
         static::assertSame(
             'There are no handlers configured for the message "{messageClass}"',
-            $latest['message']
+            $entry['message']
         );
 
-        static::assertSame($latest['context']['messageClass'], CommandWithPayload::class);
+        static::assertSame($entry['context']['messageClass'], CommandWithPayload::class);
     }
 
     /**
@@ -181,16 +187,20 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new TriggerThrowableCommand());
 
-        wait($this->kernel->run(AmqpQueue::default('test_queue')));
+        Loop::run(
+            function(): \Generator
+            {
+                yield $this->kernel->run(AmqpQueue::default('test_queue'));
+            }
+        );
 
         $records = $this->logHandler->getRecords();
 
         static::assertNotEmpty($records);
 
-        $latest = \end($records);
-        \reset($records);
+        $entry = $records[\count($records) - 3];
 
-        static::assertSame(\sprintf('%s::handleWithThrowable', KernelTestService::class), $latest['message']);
+        static::assertSame(\sprintf('%s::handleWithThrowable', KernelTestService::class), $entry['message']);
     }
 
     /**
@@ -218,12 +228,16 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new SecondEmptyCommand());
 
-        wait($this->kernel->run(AmqpQueue::default('test_queue')));
+        Loop::run(
+            function(): \Generator
+            {
+                yield $this->kernel->run(AmqpQueue::default('test_queue'));
+            }
+        );
 
         $records = $this->logHandler->getRecords();
 
-        $messageEntry = \end($records);
-        \reset($records);
+        $messageEntry = $records[\count($records) -3];
 
         static::assertSame('test exception message', $messageEntry['message']);
     }
@@ -239,12 +253,16 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new WithValidationCommand(''));
 
-        wait($this->kernel->run(AmqpQueue::default('test_queue')));
+        Loop::run(
+            function(): \Generator
+            {
+                yield $this->kernel->run(AmqpQueue::default('test_queue'));
+            }
+        );
 
         $records = $this->logHandler->getRecords();
 
-        $messageEntry = \end($records);
-        \reset($records);
+        $messageEntry =  $records[\count($records) -3];
 
         static::assertFalse($messageEntry['context']['isValid']);
         static::assertSame(['This value should not be blank.'], $messageEntry['context']['violations']['value']);
@@ -296,7 +314,7 @@ final class ServiceBusKernelTest extends TestCase
 
     /**
      * @param object $message
-     * @param array   $headers
+     * @param array  $headers
      *
      * @throws \Throwable
      *

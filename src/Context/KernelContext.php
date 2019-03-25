@@ -57,7 +57,7 @@ final class KernelContext implements ServiceBusContext
      *
      * Note: This value is stamped from the infrastructure level
      *
-     * @see MessageValidationExecutor::134
+     * @see       MessageValidationExecutor::134
      *
      * [
      *    'propertyPath' => [
@@ -130,7 +130,7 @@ final class KernelContext implements ServiceBusContext
 
         /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
-            static function(object $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): \Generator
+            static function(object $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): void
             {
                 foreach ($endpoints as $endpoint)
                 {
@@ -146,7 +146,15 @@ final class KernelContext implements ServiceBusContext
                         ]
                     );
 
-                    yield $endpoint->delivery($message, $options);
+                    $endpoint->delivery($message, $options)->onResolve(
+                        function(?\Throwable $throwable): void
+                        {
+                            if (null !== $throwable)
+                            {
+                                throw  $throwable;
+                            }
+                        }
+                    );
                 }
             },
             $message,

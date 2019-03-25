@@ -112,11 +112,9 @@ services:
 
   # Default transport implementation
   ServiceBus\Transport\Common\Transport:
-    class: ServiceBus\Transport\Common\InMemory\InMemoryTransport
 
   # Default transport level destination
   ServiceBus\Transport\Common\DeliveryDestination:
-    class: ServiceBus\Transport\Common\InMemory\InMemoryDeliveryDestination
 
   # Application level transport endpoint
   ServiceBus\Endpoint\Endpoint:

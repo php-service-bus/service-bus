@@ -1,11 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "3534659e709dc2de795722944e4d2d33",
-    "content-hash": "316831eea132fca647b3ecc5d71bc086",
+    "content-hash": "2a031e01fab365794ffe928355b3ba6d",
     "packages": [
         {
             "name": "amphp/amp",
@@ -81,7 +80,7 @@
                 "non-blocking",
                 "promise"
             ],
-            "time": "2018-12-11 10:31:37"
+            "time": "2018-12-11T10:31:37+00:00"
         },
         {
             "name": "amphp/artax",
@@ -141,7 +140,7 @@
                 "parallel",
                 "rest"
             ],
-            "time": "2018-02-01 20:29:48"
+            "time": "2018-02-01T20:29:48+00:00"
         },
         {
             "name": "amphp/byte-stream",
@@ -200,7 +199,7 @@
                 "non-blocking",
                 "stream"
             ],
-            "time": "2018-12-27 18:08:06"
+            "time": "2018-12-27T18:08:06+00:00"
         },
         {
             "name": "amphp/cache",
@@ -246,7 +245,7 @@
             ],
             "description": "A promise-aware caching API for Amp.",
             "homepage": "https://github.com/amphp/cache",
-            "time": "2017-10-04 19:22:12"
+            "time": "2017-10-04T19:22:12+00:00"
         },
         {
             "name": "amphp/dns",
@@ -322,7 +321,7 @@
                 "dns",
                 "resolve"
             ],
-            "time": "2019-01-25 04:12:31"
+            "time": "2019-01-25T04:12:31+00:00"
         },
         {
             "name": "amphp/file",
@@ -388,7 +387,7 @@
                 "non-blocking",
                 "static"
             ],
-            "time": "2019-03-01 16:38:04"
+            "time": "2019-03-01T16:38:04+00:00"
         },
         {
             "name": "amphp/log",
@@ -449,7 +448,7 @@
                 "logging",
                 "non-blocking"
             ],
-            "time": "2018-03-22 19:39:52"
+            "time": "2018-03-22T19:39:52+00:00"
         },
         {
             "name": "amphp/parallel",
@@ -512,7 +511,7 @@
                 "multi-processing",
                 "multi-threading"
             ],
-            "time": "2019-01-09 21:31:46"
+            "time": "2019-01-09T21:31:46+00:00"
         },
         {
             "name": "amphp/parser",
@@ -563,7 +562,7 @@
                 "parser",
                 "stream"
             ],
-            "time": "2017-06-06 05:29:10"
+            "time": "2017-06-06T05:29:10+00:00"
         },
         {
             "name": "amphp/process",
@@ -618,7 +617,7 @@
             ],
             "description": "Asynchronous process manager.",
             "homepage": "https://github.com/amphp/process",
-            "time": "2019-02-26 16:33:03"
+            "time": "2019-02-26T16:33:03+00:00"
         },
         {
             "name": "amphp/socket",
@@ -685,7 +684,7 @@
                 "tcp",
                 "tls"
             ],
-            "time": "2018-10-17 16:53:02"
+            "time": "2018-10-17T16:53:02+00:00"
         },
         {
             "name": "amphp/sync",
@@ -741,7 +740,7 @@
                 "semaphore",
                 "synchronization"
             ],
-            "time": "2017-11-29 21:48:53"
+            "time": "2017-11-29T21:48:53+00:00"
         },
         {
             "name": "amphp/uri",
@@ -785,7 +784,7 @@
             ],
             "description": "Uri Parser and Resolver.",
             "homepage": "https://github.com/amphp/uri",
-            "time": "2017-10-23 12:40:35"
+            "time": "2017-10-23T12:40:35+00:00"
         },
         {
             "name": "amphp/windows-registry",
@@ -826,7 +825,7 @@
                 }
             ],
             "description": "Windows Registry Reader.",
-            "time": "2018-10-24 03:34:54"
+            "time": "2018-10-24T03:34:54+00:00"
         },
         {
             "name": "daverandom/libdns",
@@ -866,7 +865,7 @@
             "keywords": [
                 "dns"
             ],
-            "time": "2018-01-10 15:56:17"
+            "time": "2018-01-10T15:56:17+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -934,7 +933,7 @@
                 "docblock",
                 "parser"
             ],
-            "time": "2017-12-06 07:11:42"
+            "time": "2017-12-06T07:11:42+00:00"
         },
         {
             "name": "doctrine/cache",
@@ -1009,7 +1008,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2018-08-21 18:01:43"
+            "time": "2018-08-21T18:01:43+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -1063,7 +1062,7 @@
                 "lexer",
                 "parser"
             ],
-            "time": "2014-09-09 13:34:57"
+            "time": "2014-09-09T13:34:57+00:00"
         },
         {
             "name": "kelunik/certificate",
@@ -1112,7 +1111,7 @@
                 "pem",
                 "x509"
             ],
-            "time": "2017-07-04 19:37:30"
+            "time": "2017-07-04T19:37:30+00:00"
         },
         {
             "name": "kelunik/retry",
@@ -1156,7 +1155,7 @@
                 }
             ],
             "description": "A tiny library for retrying failed operations.",
-            "time": "2017-09-22 11:48:40"
+            "time": "2017-09-22T11:48:40+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -1234,7 +1233,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2018-11-05 09:00:11"
+            "time": "2018-11-05T09:00:11+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -1279,25 +1278,25 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2018-07-02 15:55:56"
+            "time": "2018-07-02T15:55:56+00:00"
         },
         {
             "name": "php-service-bus/annotations-reader",
-            "version": "v3.0.8",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/annotations-reader.git",
-                "reference": "5b3500e8ebef7bcc6e307a52575fb12cefcd758d"
+                "reference": "0d65380b0567a8497da2e4c0589730fa66e03bb3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/annotations-reader/zipball/5b3500e8ebef7bcc6e307a52575fb12cefcd758d",
-                "reference": "5b3500e8ebef7bcc6e307a52575fb12cefcd758d",
+                "url": "https://api.github.com/repos/php-service-bus/annotations-reader/zipball/0d65380b0567a8497da2e4c0589730fa66e03bb3",
+                "reference": "0d65380b0567a8497da2e4c0589730fa66e03bb3",
                 "shasum": ""
             },
             "require": {
-                "doctrine/annotations": "~1.0",
-                "doctrine/cache": "~1.0",
+                "doctrine/annotations": "^1.0",
+                "doctrine/cache": "^1.0",
                 "php": ">=7.2"
             },
             "require-dev": {
@@ -1329,20 +1328,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-27 09:09:04"
+            "time": "2019-03-25T10:50:22+00:00"
         },
         {
             "name": "php-service-bus/common",
-            "version": "v3.0.8",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "e751c2ff5f06f446ee94f0a133e36faff67cc1d4"
+                "reference": "01f850ec564b94c7be336a56d535a3612a0d7d40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/e751c2ff5f06f446ee94f0a133e36faff67cc1d4",
-                "reference": "e751c2ff5f06f446ee94f0a133e36faff67cc1d4",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/01f850ec564b94c7be336a56d535a3612a0d7d40",
+                "reference": "01f850ec564b94c7be336a56d535a3612a0d7d40",
                 "shasum": ""
             },
             "require": {
@@ -1383,26 +1382,26 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-27 08:41:11"
+            "time": "2019-03-25T10:26:13+00:00"
         },
         {
             "name": "php-service-bus/message-serializer",
-            "version": "v3.0.8",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/message-serializer.git",
-                "reference": "829052788df98a08c3e5ef1a445b1346069d0254"
+                "reference": "2f542d7b6f4e305a89e480209ba71238c5595f3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/829052788df98a08c3e5ef1a445b1346069d0254",
-                "reference": "829052788df98a08c3e5ef1a445b1346069d0254",
+                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/2f542d7b6f4e305a89e480209ba71238c5595f3c",
+                "reference": "2f542d7b6f4e305a89e480209ba71238c5595f3c",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "php": ">=7.2",
-                "php-service-bus/common": "v3.0.8",
+                "php-service-bus/common": "^v3.2",
                 "symfony/serializer-pack": "^v1"
             },
             "require-dev": {
@@ -1435,25 +1434,25 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-27 15:39:27"
+            "time": "2019-03-25T11:08:58+00:00"
         },
         {
             "name": "php-service-bus/messages-router",
-            "version": "v3.0.8",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/messages-router.git",
-                "reference": "30917ffa13704ce964b523cb24d9c0631acea338"
+                "reference": "01e77ccabe9c197cc8eeb93b78b8c629e8d62d2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/messages-router/zipball/30917ffa13704ce964b523cb24d9c0631acea338",
-                "reference": "30917ffa13704ce964b523cb24d9c0631acea338",
+                "url": "https://api.github.com/repos/php-service-bus/messages-router/zipball/01e77ccabe9c197cc8eeb93b78b8c629e8d62d2d",
+                "reference": "01e77ccabe9c197cc8eeb93b78b8c629e8d62d2d",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "php-service-bus/common": "v3.0.8"
+                "php-service-bus/common": "^v3.2"
             },
             "require-dev": {
                 "php-service-bus/code-style-config": "^v0.1",
@@ -1485,20 +1484,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-27 15:32:56"
+            "time": "2019-03-25T11:04:11+00:00"
         },
         {
             "name": "php-service-bus/mutex",
-            "version": "v3.0.8",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/mutex.git",
-                "reference": "95ee90e99b8a052f306c62ec34d862d073060d51"
+                "reference": "57d761bf2db374a791f0bae84a8727051081255b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/mutex/zipball/95ee90e99b8a052f306c62ec34d862d073060d51",
-                "reference": "95ee90e99b8a052f306c62ec34d862d073060d51",
+                "url": "https://api.github.com/repos/php-service-bus/mutex/zipball/57d761bf2db374a791f0bae84a8727051081255b",
+                "reference": "57d761bf2db374a791f0bae84a8727051081255b",
                 "shasum": ""
             },
             "require": {
@@ -1535,20 +1534,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-03-06 08:23:46"
+            "time": "2019-03-25T11:20:17+00:00"
         },
         {
             "name": "php-service-bus/storage-common",
-            "version": "v3.1.0",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/storage-common.git",
-                "reference": "48eb1fec1e88e5c11fb8030d1f757ec1ff6d16f4"
+                "reference": "b63d5ebd7cb034c3ac183a2ed8906f4059c5dc81"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/48eb1fec1e88e5c11fb8030d1f757ec1ff6d16f4",
-                "reference": "48eb1fec1e88e5c11fb8030d1f757ec1ff6d16f4",
+                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/b63d5ebd7cb034c3ac183a2ed8906f4059c5dc81",
+                "reference": "b63d5ebd7cb034c3ac183a2ed8906f4059c5dc81",
                 "shasum": ""
             },
             "require": {
@@ -1584,20 +1583,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-03-17 19:22:54"
+            "time": "2019-03-25T14:38:43+00:00"
         },
         {
             "name": "php-service-bus/transport-common",
-            "version": "v3.0.8",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-common.git",
-                "reference": "5fc80c70caf4508c3544a72600271931825f6c42"
+                "reference": "501db683f8a82d34b80bb3b26c28b9686c04e8e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/5fc80c70caf4508c3544a72600271931825f6c42",
-                "reference": "5fc80c70caf4508c3544a72600271931825f6c42",
+                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/501db683f8a82d34b80bb3b26c28b9686c04e8e7",
+                "reference": "501db683f8a82d34b80bb3b26c28b9686c04e8e7",
                 "shasum": ""
             },
             "require": {
@@ -1633,7 +1632,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-27 10:04:09"
+            "time": "2019-03-25T14:20:20+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -1687,7 +1686,7 @@
                 "reflection",
                 "static analysis"
             ],
-            "time": "2017-09-11 18:02:19"
+            "time": "2017-09-11T18:02:19+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -1738,7 +1737,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2017-11-30 07:14:17"
+            "time": "2017-11-30T07:14:17+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -1785,7 +1784,7 @@
                     "email": "me@mikevanriel.com"
                 }
             ],
-            "time": "2017-07-14 14:27:02"
+            "time": "2017-07-14T14:27:02+00:00"
         },
         {
             "name": "psr/container",
@@ -1834,7 +1833,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-02-14 16:28:37"
+            "time": "2017-02-14T16:28:37+00:00"
         },
         {
             "name": "psr/log",
@@ -1881,7 +1880,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2018-11-20 15:27:04"
+            "time": "2018-11-20T15:27:04+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -1963,7 +1962,7 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2018-07-19 23:38:55"
+            "time": "2018-07-19T23:38:55+00:00"
         },
         {
             "name": "symfony/config",
@@ -2026,7 +2025,7 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23 15:17:42"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "symfony/contracts",
@@ -2094,7 +2093,7 @@
                 "interoperability",
                 "standards"
             ],
-            "time": "2018-12-05 08:06:11"
+            "time": "2018-12-05T08:06:11+00:00"
         },
         {
             "name": "symfony/debug",
@@ -2150,7 +2149,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2019-03-03 18:11:24"
+            "time": "2019-03-03T18:11:24+00:00"
         },
         {
             "name": "symfony/dependency-injection",
@@ -2223,7 +2222,7 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23 15:17:42"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -2280,7 +2279,7 @@
                 "env",
                 "environment"
             ],
-            "time": "2019-01-24 21:39:51"
+            "time": "2019-01-24T21:39:51+00:00"
         },
         {
             "name": "symfony/filesystem",
@@ -2330,7 +2329,7 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-07 11:40:08"
+            "time": "2019-02-07T11:40:08+00:00"
         },
         {
             "name": "symfony/inflector",
@@ -2388,20 +2387,20 @@
                 "symfony",
                 "words"
             ],
-            "time": "2019-01-16 20:31:39"
+            "time": "2019-01-16T20:31:39+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19"
+                "reference": "82ebae02209c21113908c229e9883c419720738a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/e3d826245268269cd66f8326bd8bc066687b4a19",
-                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/82ebae02209c21113908c229e9883c419720738a",
+                "reference": "82ebae02209c21113908c229e9883c419720738a",
                 "shasum": ""
             },
             "require": {
@@ -2413,7 +2412,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.9-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "autoload": {
@@ -2446,20 +2445,20 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2018-08-06 14:22:27"
+            "time": "2019-02-06T07:57:58+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "c79c051f5b3a46be09205c73b80b346e4153e494"
+                "reference": "fe5e94c604826c35a32fa832f35bd036b6799609"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/c79c051f5b3a46be09205c73b80b346e4153e494",
-                "reference": "c79c051f5b3a46be09205c73b80b346e4153e494",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/fe5e94c604826c35a32fa832f35bd036b6799609",
+                "reference": "fe5e94c604826c35a32fa832f35bd036b6799609",
                 "shasum": ""
             },
             "require": {
@@ -2471,7 +2470,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.9-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "autoload": {
@@ -2505,7 +2504,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-09-21 13:07:52"
+            "time": "2019-02-06T07:57:58+00:00"
         },
         {
             "name": "symfony/property-access",
@@ -2572,7 +2571,7 @@
                 "property path",
                 "reflection"
             ],
-            "time": "2019-02-23 15:17:42"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "symfony/property-info",
@@ -2648,7 +2647,7 @@
                 "type",
                 "validator"
             ],
-            "time": "2019-02-23 15:17:42"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "symfony/serializer",
@@ -2728,7 +2727,7 @@
             ],
             "description": "Symfony Serializer Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23 15:17:42"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "symfony/serializer-pack",
@@ -2758,7 +2757,7 @@
                 "MIT"
             ],
             "description": "A pack for the Symfony serializer",
-            "time": "2018-12-10 12:14:14"
+            "time": "2018-12-10T12:14:14+00:00"
         },
         {
             "name": "symfony/validator",
@@ -2847,7 +2846,7 @@
             ],
             "description": "Symfony Validator Component",
             "homepage": "https://symfony.com",
-            "time": "2019-03-03 18:11:24"
+            "time": "2019-03-03T18:11:24+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -2906,7 +2905,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23 15:17:42"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -2957,22 +2956,22 @@
                 "check",
                 "validate"
             ],
-            "time": "2018-12-25 11:19:39"
+            "time": "2018-12-25T11:19:39+00:00"
         }
     ],
     "packages-dev": [
         {
             "name": "composer/semver",
-            "version": "1.4.2",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/semver.git",
-                "reference": "c7cb9a2095a074d131b65a8a0cd294479d785573"
+                "reference": "46d9139568ccb8d9e7cdd4539cab7347568a5e2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/semver/zipball/c7cb9a2095a074d131b65a8a0cd294479d785573",
-                "reference": "c7cb9a2095a074d131b65a8a0cd294479d785573",
+                "url": "https://api.github.com/repos/composer/semver/zipball/46d9139568ccb8d9e7cdd4539cab7347568a5e2e",
+                "reference": "46d9139568ccb8d9e7cdd4539cab7347568a5e2e",
                 "shasum": ""
             },
             "require": {
@@ -3021,7 +3020,7 @@
                 "validation",
                 "versioning"
             ],
-            "time": "2016-08-30 16:08:34"
+            "time": "2019-03-19T17:25:45+00:00"
         },
         {
             "name": "composer/xdebug-handler",
@@ -3065,31 +3064,33 @@
                 "Xdebug",
                 "performance"
             ],
-            "time": "2019-01-28 20:25:53"
+            "time": "2019-01-28T20:25:53+00:00"
         },
         {
             "name": "doctrine/instantiator",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/instantiator.git",
-                "reference": "185b8868aa9bf7159f5f953ed5afb2d7fcdc3bda"
+                "reference": "a2c590166b2133a4633738648b6b064edae0814a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/185b8868aa9bf7159f5f953ed5afb2d7fcdc3bda",
-                "reference": "185b8868aa9bf7159f5f953ed5afb2d7fcdc3bda",
+                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/a2c590166b2133a4633738648b6b064edae0814a",
+                "reference": "a2c590166b2133a4633738648b6b064edae0814a",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1"
             },
             "require-dev": {
-                "athletic/athletic": "~0.1.8",
+                "doctrine/coding-standard": "^6.0",
                 "ext-pdo": "*",
                 "ext-phar": "*",
-                "phpunit/phpunit": "^6.2.3",
-                "squizlabs/php_codesniffer": "^3.0.2"
+                "phpbench/phpbench": "^0.13",
+                "phpstan/phpstan-phpunit": "^0.11",
+                "phpstan/phpstan-shim": "^0.11",
+                "phpunit/phpunit": "^7.0"
             },
             "type": "library",
             "extra": {
@@ -3114,12 +3115,12 @@
                 }
             ],
             "description": "A small, lightweight utility to instantiate objects in PHP without invoking their constructors",
-            "homepage": "https://github.com/doctrine/instantiator",
+            "homepage": "https://www.doctrine-project.org/projects/instantiator.html",
             "keywords": [
                 "constructor",
                 "instantiate"
             ],
-            "time": "2017-07-22 11:58:36"
+            "time": "2019-03-17T17:37:11+00:00"
         },
         {
             "name": "felixfbecker/advanced-json-rpc",
@@ -3160,7 +3161,7 @@
                 }
             ],
             "description": "A more advanced JSONRPC implementation",
-            "time": "2018-09-10 08:58:41"
+            "time": "2018-09-10T08:58:41+00:00"
         },
         {
             "name": "felixfbecker/language-server-protocol",
@@ -3207,7 +3208,7 @@
                 "php",
                 "server"
             ],
-            "time": "2018-09-25 11:42:25"
+            "time": "2018-09-25T11:42:25+00:00"
         },
         {
             "name": "friendsofphp/php-cs-fixer",
@@ -3295,7 +3296,7 @@
                 }
             ],
             "description": "A tool to automatically fix PHP code style",
-            "time": "2019-02-17 17:44:13"
+            "time": "2019-02-17T17:44:13+00:00"
         },
         {
             "name": "kelunik/loop-block",
@@ -3336,7 +3337,7 @@
                 }
             ],
             "description": "Detect blocking ticks in the Amp event loop.",
-            "time": "2017-06-15 17:41:23"
+            "time": "2017-06-15T17:41:23+00:00"
         },
         {
             "name": "muglug/package-versions-56",
@@ -3392,7 +3393,7 @@
                 }
             ],
             "description": "A backport of ocramius/package-versions that supports php ^5.6. Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
-            "time": "2018-03-26 03:22:13"
+            "time": "2018-03-26T03:22:13+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -3440,7 +3441,7 @@
                 "object",
                 "object graph"
             ],
-            "time": "2018-06-11 23:09:50"
+            "time": "2018-06-11T23:09:50+00:00"
         },
         {
             "name": "netresearch/jsonmapper",
@@ -3482,7 +3483,7 @@
                 }
             ],
             "description": "Map nested JSON structures onto PHP classes",
-            "time": "2017-11-28 21:30:01"
+            "time": "2017-11-28T21:30:01+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -3533,7 +3534,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2019-02-16 20:54:15"
+            "time": "2019-02-16T20:54:15+00:00"
         },
         {
             "name": "openlss/lib-array2xml",
@@ -3582,7 +3583,7 @@
                 "xml",
                 "xml conversion"
             ],
-            "time": "2016-11-10 19:10:18"
+            "time": "2016-11-10T19:10:18+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -3637,7 +3638,7 @@
                 }
             ],
             "description": "Component for reading phar.io manifest information from a PHP Archive (PHAR)",
-            "time": "2018-07-08 19:23:20"
+            "time": "2018-07-08T19:23:20+00:00"
         },
         {
             "name": "phar-io/version",
@@ -3684,7 +3685,7 @@
                 }
             ],
             "description": "Library for handling version information and constraints",
-            "time": "2018-07-08 19:19:57"
+            "time": "2018-07-08T19:19:57+00:00"
         },
         {
             "name": "php-cs-fixer/diff",
@@ -3735,7 +3736,7 @@
             "keywords": [
                 "diff"
             ],
-            "time": "2018-02-15 16:58:55"
+            "time": "2018-02-15T16:58:55+00:00"
         },
         {
             "name": "php-service-bus/code-style-config",
@@ -3774,25 +3775,25 @@
                 }
             ],
             "description": "PHP Service Bus code style config",
-            "time": "2019-02-27 07:30:22"
+            "time": "2019-02-27T07:30:22+00:00"
         },
         {
             "name": "php-service-bus/module-phpinnacle-transport",
-            "version": "v3.0.9",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/module-phpinnacle-transport.git",
-                "reference": "27603a3aeae6c857554f298c0f7c2287539e187d"
+                "reference": "a6136e4c3d61d0b8e679bf10706af380774973ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/27603a3aeae6c857554f298c0f7c2287539e187d",
-                "reference": "27603a3aeae6c857554f298c0f7c2287539e187d",
+                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/a6136e4c3d61d0b8e679bf10706af380774973ed",
+                "reference": "a6136e4c3d61d0b8e679bf10706af380774973ed",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "php-service-bus/transport-phpinnacle": "^v3.0"
+                "php-service-bus/transport-phpinnacle": "^v3.2"
             },
             "require-dev": {
                 "php-service-bus/code-style-config": "^v0.1",
@@ -3826,27 +3827,27 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-03-17 18:09:26"
+            "time": "2019-03-25T14:36:13+00:00"
         },
         {
             "name": "php-service-bus/transport-amqp",
-            "version": "v3.0.8",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-amqp.git",
-                "reference": "d94d4b1aed8c61df57f0adf5f1b01966ec7138be"
+                "reference": "3d91392680d703e6a6383d3529f3c9a7a8d7135e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/d94d4b1aed8c61df57f0adf5f1b01966ec7138be",
-                "reference": "d94d4b1aed8c61df57f0adf5f1b01966ec7138be",
+                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/3d91392680d703e6a6383d3529f3c9a7a8d7135e",
+                "reference": "3d91392680d703e6a6383d3529f3c9a7a8d7135e",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
                 "php": ">=7.2",
-                "php-service-bus/common": "v3.0.8",
-                "php-service-bus/transport-common": "v3.0.8"
+                "php-service-bus/common": "^v3.2",
+                "php-service-bus/transport-common": "^v3.2"
             },
             "require-dev": {
                 "php-service-bus/code-style-config": "^v0.1",
@@ -3878,26 +3879,26 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-02-27 15:59:03"
+            "time": "2019-03-25T14:25:26+00:00"
         },
         {
             "name": "php-service-bus/transport-phpinnacle",
-            "version": "v3.0.9",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-phpinnacle.git",
-                "reference": "36bfc27346563fc0b9e1d02361351c2074eb6b84"
+                "reference": "c01ecf589c2c3fcecca00acccd8097a02493a450"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/36bfc27346563fc0b9e1d02361351c2074eb6b84",
-                "reference": "36bfc27346563fc0b9e1d02361351c2074eb6b84",
+                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/c01ecf589c2c3fcecca00acccd8097a02493a450",
+                "reference": "c01ecf589c2c3fcecca00acccd8097a02493a450",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "php-service-bus/common": "v3.0.8",
-                "php-service-bus/transport-amqp": "v3.0.8",
+                "php-service-bus/transport-amqp": "^v3.2",
+                "php-service-bus/transport-common": "^v3.2",
                 "phpinnacle/ridge": "^0.2"
             },
             "require-dev": {
@@ -3931,7 +3932,7 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-03-17 18:00:01"
+            "time": "2019-03-25T14:31:21+00:00"
         },
         {
             "name": "phpinnacle/buffer",
@@ -3986,7 +3987,7 @@
                 "phpinnacle",
                 "unpack"
             ],
-            "time": "2019-03-14 14:26:32"
+            "time": "2019-03-14T14:26:32+00:00"
         },
         {
             "name": "phpinnacle/ridge",
@@ -4041,7 +4042,7 @@
                 "async",
                 "phpinnacle"
             ],
-            "time": "2019-03-15 15:59:25"
+            "time": "2019-03-15T15:59:25+00:00"
         },
         {
             "name": "phpmyadmin/sql-parser",
@@ -4102,7 +4103,7 @@
                 "parser",
                 "sql"
             ],
-            "time": "2019-01-05 13:46:38"
+            "time": "2019-01-05T13:46:38+00:00"
         },
         {
             "name": "phpspec/prophecy",
@@ -4165,7 +4166,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2018-08-05 17:53:17"
+            "time": "2018-08-05T17:53:17+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -4228,7 +4229,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-02-26 07:38:26"
+            "time": "2019-02-26T07:38:26+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -4278,7 +4279,7 @@
                 "filesystem",
                 "iterator"
             ],
-            "time": "2018-09-13 20:33:42"
+            "time": "2018-09-13T20:33:42+00:00"
         },
         {
             "name": "phpunit/php-text-template",
@@ -4319,7 +4320,7 @@
             "keywords": [
                 "template"
             ],
-            "time": "2015-06-21 13:50:34"
+            "time": "2015-06-21T13:50:34+00:00"
         },
         {
             "name": "phpunit/php-timer",
@@ -4368,7 +4369,7 @@
             "keywords": [
                 "timer"
             ],
-            "time": "2019-02-20 10:12:59"
+            "time": "2019-02-20T10:12:59+00:00"
         },
         {
             "name": "phpunit/php-token-stream",
@@ -4417,7 +4418,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2018-10-30 05:52:18"
+            "time": "2018-10-30T05:52:18+00:00"
         },
         {
             "name": "phpunit/phpunit",
@@ -4499,7 +4500,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-03-16 07:33:46"
+            "time": "2019-03-16T07:33:46+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -4544,7 +4545,7 @@
             ],
             "description": "Looks up which function or method a line of code belongs to",
             "homepage": "https://github.com/sebastianbergmann/code-unit-reverse-lookup/",
-            "time": "2017-03-04 06:30:41"
+            "time": "2017-03-04T06:30:41+00:00"
         },
         {
             "name": "sebastian/comparator",
@@ -4608,7 +4609,7 @@
                 "compare",
                 "equality"
             ],
-            "time": "2018-07-12 15:12:46"
+            "time": "2018-07-12T15:12:46+00:00"
         },
         {
             "name": "sebastian/diff",
@@ -4664,7 +4665,7 @@
                 "unidiff",
                 "unified diff"
             ],
-            "time": "2019-02-04 06:01:07"
+            "time": "2019-02-04T06:01:07+00:00"
         },
         {
             "name": "sebastian/environment",
@@ -4717,7 +4718,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2019-02-01 05:27:49"
+            "time": "2019-02-01T05:27:49+00:00"
         },
         {
             "name": "sebastian/exporter",
@@ -4784,7 +4785,7 @@
                 "export",
                 "exporter"
             ],
-            "time": "2017-04-03 13:19:02"
+            "time": "2017-04-03T13:19:02+00:00"
         },
         {
             "name": "sebastian/global-state",
@@ -4838,7 +4839,7 @@
             "keywords": [
                 "global state"
             ],
-            "time": "2019-02-01 05:30:01"
+            "time": "2019-02-01T05:30:01+00:00"
         },
         {
             "name": "sebastian/object-enumerator",
@@ -4885,7 +4886,7 @@
             ],
             "description": "Traverses array structures and object graphs to enumerate all referenced objects",
             "homepage": "https://github.com/sebastianbergmann/object-enumerator/",
-            "time": "2017-08-03 12:35:26"
+            "time": "2017-08-03T12:35:26+00:00"
         },
         {
             "name": "sebastian/object-reflector",
@@ -4930,7 +4931,7 @@
             ],
             "description": "Allows reflection of object attributes, including inherited and non-public ones",
             "homepage": "https://github.com/sebastianbergmann/object-reflector/",
-            "time": "2017-03-29 09:07:27"
+            "time": "2017-03-29T09:07:27+00:00"
         },
         {
             "name": "sebastian/recursion-context",
@@ -4983,7 +4984,7 @@
             ],
             "description": "Provides functionality to recursively process PHP variables",
             "homepage": "http://www.github.com/sebastianbergmann/recursion-context",
-            "time": "2017-03-03 06:23:57"
+            "time": "2017-03-03T06:23:57+00:00"
         },
         {
             "name": "sebastian/resource-operations",
@@ -5025,7 +5026,7 @@
             ],
             "description": "Provides a list of PHP built-in functions that operate on resources",
             "homepage": "https://www.github.com/sebastianbergmann/resource-operations",
-            "time": "2018-10-04 04:07:39"
+            "time": "2018-10-04T04:07:39+00:00"
         },
         {
             "name": "sebastian/version",
@@ -5068,7 +5069,7 @@
             ],
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
-            "time": "2016-10-03 07:35:21"
+            "time": "2016-10-03T07:35:21+00:00"
         },
         {
             "name": "symfony/console",
@@ -5140,7 +5141,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23 15:17:42"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -5204,7 +5205,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23 15:17:42"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "symfony/finder",
@@ -5253,7 +5254,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23 15:42:05"
+            "time": "2019-02-23T15:42:05+00:00"
         },
         {
             "name": "symfony/options-resolver",
@@ -5307,20 +5308,20 @@
                 "configuration",
                 "options"
             ],
-            "time": "2019-02-23 15:17:42"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "symfony/polyfill-php70",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php70.git",
-                "reference": "6b88000cdd431cd2e940caa2cb569201f3f84224"
+                "reference": "bc4858fb611bda58719124ca079baff854149c89"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/6b88000cdd431cd2e940caa2cb569201f3f84224",
-                "reference": "6b88000cdd431cd2e940caa2cb569201f3f84224",
+                "url": "https://api.github.com/repos/symfony/polyfill-php70/zipball/bc4858fb611bda58719124ca079baff854149c89",
+                "reference": "bc4858fb611bda58719124ca079baff854149c89",
                 "shasum": ""
             },
             "require": {
@@ -5330,7 +5331,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.9-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "autoload": {
@@ -5366,20 +5367,20 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-09-21 06:26:08"
+            "time": "2019-02-06T07:57:58+00:00"
         },
         {
             "name": "symfony/polyfill-php72",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php72.git",
-                "reference": "9050816e2ca34a8e916c3a0ae8b9c2fccf68b631"
+                "reference": "ab50dcf166d5f577978419edd37aa2bb8eabce0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php72/zipball/9050816e2ca34a8e916c3a0ae8b9c2fccf68b631",
-                "reference": "9050816e2ca34a8e916c3a0ae8b9c2fccf68b631",
+                "url": "https://api.github.com/repos/symfony/polyfill-php72/zipball/ab50dcf166d5f577978419edd37aa2bb8eabce0c",
+                "reference": "ab50dcf166d5f577978419edd37aa2bb8eabce0c",
                 "shasum": ""
             },
             "require": {
@@ -5388,7 +5389,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.9-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "autoload": {
@@ -5421,7 +5422,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-09-21 13:07:52"
+            "time": "2019-02-06T07:57:58+00:00"
         },
         {
             "name": "symfony/process",
@@ -5470,7 +5471,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2019-01-24 22:05:03"
+            "time": "2019-01-24T22:05:03+00:00"
         },
         {
             "name": "symfony/stopwatch",
@@ -5520,7 +5521,7 @@
             ],
             "description": "Symfony Stopwatch Component",
             "homepage": "https://symfony.com",
-            "time": "2019-01-16 20:31:39"
+            "time": "2019-01-16T20:31:39+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -5560,20 +5561,20 @@
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
-            "time": "2017-04-07 12:08:54"
+            "time": "2017-04-07T12:08:54+00:00"
         },
         {
             "name": "vimeo/psalm",
-            "version": "3.2",
+            "version": "3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "3704e75049703e861cda4585b66d49e3eb6810bd"
+                "reference": "f0ddc6f3bc35ba7ecb99232903907a1d5ec1c8e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/3704e75049703e861cda4585b66d49e3eb6810bd",
-                "reference": "3704e75049703e861cda4585b66d49e3eb6810bd",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/f0ddc6f3bc35ba7ecb99232903907a1d5ec1c8e8",
+                "reference": "f0ddc6f3bc35ba7ecb99232903907a1d5ec1c8e8",
                 "shasum": ""
             },
             "require": {
@@ -5640,7 +5641,7 @@
                 "inspection",
                 "php"
             ],
-            "time": "2019-03-14 14:23:26"
+            "time": "2019-03-17T22:14:30+00:00"
         },
         {
             "name": "webmozart/glob",
@@ -5687,7 +5688,7 @@
                 }
             ],
             "description": "A PHP implementation of Ant's glob.",
-            "time": "2015-12-29 11:14:33"
+            "time": "2015-12-29T11:14:33+00:00"
         },
         {
             "name": "webmozart/path-util",
@@ -5733,11 +5734,11 @@
                 }
             ],
             "description": "A robust cross-platform utility for normalizing, comparing and modifying file paths.",
-            "time": "2015-12-17 08:42:14"
+            "time": "2015-12-17T08:42:14+00:00"
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,

@@ -114,45 +114,41 @@ final class EntryPoint
         /** Hack for phpunit tests */
         $isTestCall = 'phpunitTests' === (string) \getenv('SERVICE_BUS_TESTING');
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
+        /**
+         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
+         * @psalm-suppress MixedArgument
+         */
         return call(
             function(array $queues) use ($isTestCall): \Generator
             {
-                /**
-                 * @psalm-suppress TooManyTemplateParams Wrong Iterator template
-                 *
-                 * @var Queue[]       $queues
-                 * @var \Amp\Iterator $iterator
-                 */
-                $iterator = yield $this->transport->consume(...$queues);
-
-                /** @psalm-suppress TooManyTemplateParams Wrong Promise template */
-                while (yield $iterator->advance())
-                {
-                    $this->currentTasksInProgressCount++;
-
-                    /** @var IncomingPackage $package */
-                    $package = $iterator->getCurrent();
-
-                    /** Hack for phpUnit */
-                    if (true === $isTestCall)
+                /** @psalm-suppress TooManyTemplateParams */
+                yield $this->transport->consume(
+                    function(IncomingPackage $package) use ($isTestCall): \Generator
                     {
-                        $this->currentTasksInProgressCount--;
+                        $this->currentTasksInProgressCount++;
 
-                        yield $this->processor->handle($package);
+                        /** Hack for phpUnit */
+                        if (true === $isTestCall)
+                        {
+                            $this->currentTasksInProgressCount--;
 
-                        break;
-                    }
+                            yield $this->processor->handle($package);
+                            yield $this->transport->stop();
 
-                    /** Handle incoming package */
-                    $this->deferExecution($package);
+                            Loop::stop();
+                        }
 
-                    /** Limit the maximum number of concurrently running tasks */
-                    while ($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
-                    {
-                        yield new Delayed($this->awaitDelay);
-                    }
-                }
+                        /** Handle incoming package */
+                        $this->deferExecution($package);
+
+                        /** Limit the maximum number of concurrently running tasks */
+                        while ($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
+                        {
+                            yield new Delayed($this->awaitDelay);
+                        }
+                    },
+                    ...$queues
+                );
             },
             $queues
         );
@@ -201,22 +197,23 @@ final class EntryPoint
     {
         /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
         Loop::defer(
-            function() use ($package): \Generator
+            function() use ($package): void
             {
-                try
-                {
-                    yield $this->processor->handle($package);
+                $this->processor->handle($package)->onResolve(
+                    function(?\Throwable $throwable) use ($package): void
+                    {
+                        $this->currentTasksInProgressCount--;
 
-                    $this->currentTasksInProgressCount--;
-                }
-                catch (\Throwable $throwable)
-                {
-                    $this->logger->critical($throwable->getMessage(), [
-                        'packageId'      => $package->id(),
-                        'traceId'        => $package->traceId(),
-                        'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
-                    ]);
-                }
+                        if (null !== $throwable)
+                        {
+                            $this->logger->critical($throwable->getMessage(), [
+                                'packageId'      => $package->id(),
+                                'traceId'        => $package->traceId(),
+                                'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
+                            ]);
+                        }
+                    }
+                );
             }
         );
     }
