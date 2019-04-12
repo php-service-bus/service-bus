@@ -29,6 +29,7 @@ install:
 script:
   - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.clover
   - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then ./vendor/bin/psalm --config=psalm.xml; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then ./vendor/bin/phpstan analyse src --level 7; fi
   - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run; fi
 
 after_script:

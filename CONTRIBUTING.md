@@ -22,9 +22,9 @@ For a simple check of the code standard, there is a command:
 composer cs-check
 ```
 ## Static analysis
-To improve the quality of the code used static analysis (via `psalm`). You can start it with the command:
+To improve the quality of the code used static analysis (via `psalm` and `phpstan`). You can start it with the command:
 ```bash
-composer psalm
+composer psalm && composer phpstan
 ```
 ## Running the tests
 The following tests must pass before we will accept a pull request. If any of these do not pass, it will result in a complete build failure.

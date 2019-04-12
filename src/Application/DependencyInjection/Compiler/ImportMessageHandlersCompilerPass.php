@@ -65,7 +65,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
         {
             $filePath = $file->getRealPath();
 
-            if (true === \in_array($filePath, $excludedFiles, true))
+            if (false === $filePath || true === \in_array($filePath, $excludedFiles, true))
             {
                 continue;
             }

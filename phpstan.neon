@@ -1,0 +1,11 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#expects callable#'
+			path: %currentWorkingDirectory%/src
+		-
+			message: '#PHPDoc tag @return contains unresolvable type#'
+			path: %currentWorkingDirectory%/src
+		-
+			message: '#Access to an undefined property#'
+			path: %currentWorkingDirectory%/src/Services/Configuration/AnnotationsBasedServiceHandlersLoader.php
