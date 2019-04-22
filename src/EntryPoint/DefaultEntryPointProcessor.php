@@ -95,6 +95,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                         'packageId' => $package->id(),
                         'traceId'   => $package->traceId(),
                         'payload'   => $package->payload(),
+                        'throwableMessage' => $exception->getMessage(),
                     ]);
 
                     yield $package->ack();
