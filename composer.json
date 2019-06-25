@@ -58,7 +58,6 @@
     "symfony/debug": "^v4.2",
     "amphp/log": "^1",
     "amphp/file": "^0.3",
-    "amphp/artax": "^3.0",
     "amphp/parallel": "^1",
     "kelunik/retry": "^v1.0"
   },
@@ -68,7 +67,7 @@
     "kelunik/loop-block": "^1.0",
     "phpunit/phpunit": "^8",
     "vimeo/psalm": "^v3",
-    "phpstan/phpstan": "^0.11.5"
+    "phpstan/phpstan": "^0.11"
   },
   "prefer-stable": true,
   "minimum-stability": "stable",

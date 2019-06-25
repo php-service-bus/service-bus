@@ -147,7 +147,7 @@ final class KernelContext implements ServiceBusContext
                     );
 
                     $endpoint->delivery($message, $options)->onResolve(
-                        function(?\Throwable $throwable): void
+                        static function(?\Throwable $throwable): void
                         {
                             if (null !== $throwable)
                             {

@@ -134,7 +134,7 @@ final class MessageDeliveryEndpoint implements Endpoint
         DeliveryOptions $options,
         DeliveryDestination $destination
     ): OutboundPackage {
-        return OutboundPackage::create(
+        return new OutboundPackage(
             $payload,
             $options->headers(),
             $destination,
