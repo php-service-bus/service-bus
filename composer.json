@@ -58,15 +58,15 @@
     "symfony/yaml": "v4.3.*",
     "symfony/validator": "v4.3.*",
     "symfony/debug": "v4.3.*",
-    "amphp/log": "1.0.*",
-    "amphp/file": "0.3.*",
-    "amphp/parallel": "1.2.*",
+    "amphp/log": "v1.0.*",
+    "amphp/file": "v0.3.*",
+    "amphp/parallel": "v1.2.*",
     "kelunik/retry": "v1.0.*"
   },
   "require-dev": {
     "php-service-bus/code-style-config": "v0.1.*",
     "php-service-bus/module-phpinnacle-transport": "v3.3.*",
-    "kelunik/loop-block": "1.0.*",
+    "kelunik/loop-block": "v1.0.*",
     "phpunit/phpunit": "v8.3.*",
     "vimeo/psalm": "v3.4.*",
     "phpstan/phpstan": "v0.11.*"
