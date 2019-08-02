@@ -5,7 +5,7 @@
 [![SymfonyInsight](https://insight.symfony.com/projects/cc0f0f0b-56f1-4ff6-b37d-69ce5db06f32/mini.svg)](https://insight.symfony.com/projects/cc0f0f0b-56f1-4ff6-b37d-69ce5db06f32)
 [![Latest Stable Version](https://poser.pugx.org/php-service-bus/service-bus/v/stable)](https://packagist.org/packages/php-service-bus/service-bus)
 [![License](https://poser.pugx.org/php-service-bus/service-bus/license)](https://packagist.org/packages/php-service-bus/service-bus)
-[![OpenCollective](https://opencollective.com/php-service-bus/sponsors/badge.svg)](#sponsors)
+[![OpenCollective](https://opencollective.com/php-service-bus/sponsors/badge.svg)](https://opencollective.com/php-service-bus)
 
 A concurrency (based on [Amp](https://github.com/amphp)) framework, that lets you implement an asynchronous messaging, a transparent workflow and control of long-lived business transactions by means of the Saga pattern. It implements the [message based architecture](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Messaging.html) and it includes the following patterns: Saga, Publish\Subscribe, Message Bus.
 
