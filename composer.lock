@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69bf9c174c30f21b086c14f92ca34cfc",
+    "content-hash": "241cde7b8c2d0392896a7aca36e86486",
     "packages": [
         {
             "name": "amphp/amp",
@@ -865,28 +865,28 @@
         },
         {
             "name": "php-service-bus/annotations-reader",
-            "version": "v3.3.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/annotations-reader.git",
-                "reference": "2d6c2eefb0678eac40b3d7fb3d6303b7dcc43799"
+                "reference": "4ce2a15f634eb04191efafcf996650e45e5bc673"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/annotations-reader/zipball/2d6c2eefb0678eac40b3d7fb3d6303b7dcc43799",
-                "reference": "2d6c2eefb0678eac40b3d7fb3d6303b7dcc43799",
+                "url": "https://api.github.com/repos/php-service-bus/annotations-reader/zipball/4ce2a15f634eb04191efafcf996650e45e5bc673",
+                "reference": "4ce2a15f634eb04191efafcf996650e45e5bc673",
                 "shasum": ""
             },
             "require": {
-                "doctrine/annotations": "^1.0",
-                "doctrine/cache": "^1.0",
+                "doctrine/annotations": "v1.6.*",
+                "doctrine/cache": "v1.8.*",
                 "php": ">=7.3"
             },
             "require-dev": {
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "0.11.*",
-                "phpunit/phpunit": "^8",
-                "vimeo/psalm": "^3"
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "v0.11.*",
+                "phpunit/phpunit": "v8.3.*",
+                "vimeo/psalm": "v3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -912,33 +912,33 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-07-31T14:53:41+00:00"
+            "time": "2019-08-02T17:45:21+00:00"
         },
         {
             "name": "php-service-bus/common",
-            "version": "v3.3.1",
+            "version": "v3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "2b349e9d51e0a500cefa115a2b8f07d29834f98e"
+                "reference": "47562c7c13d320c4e8ba36ba83f1f20e60ffe48c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/2b349e9d51e0a500cefa115a2b8f07d29834f98e",
-                "reference": "2b349e9d51e0a500cefa115a2b8f07d29834f98e",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/47562c7c13d320c4e8ba36ba83f1f20e60ffe48c",
+                "reference": "47562c7c13d320c4e8ba36ba83f1f20e60ffe48c",
                 "shasum": ""
             },
             "require": {
-                "amphp/amp": "^2",
+                "amphp/amp": "2.1.*",
                 "php": ">=7.3",
-                "ramsey/uuid": "^3.7"
+                "ramsey/uuid": "3.8.*"
             },
             "require-dev": {
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "^0.11",
-                "phpunit/phpunit": "^8",
-                "symfony/dependency-injection": "^v4.3",
-                "vimeo/psalm": "^3"
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "0.11.*",
+                "phpunit/phpunit": "8.3.*",
+                "symfony/dependency-injection": "v4.3.*",
+                "vimeo/psalm": "3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -967,34 +967,34 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-07-31T13:36:08+00:00"
+            "time": "2019-08-02T16:00:22+00:00"
         },
         {
             "name": "php-service-bus/message-serializer",
-            "version": "v3.3.1",
+            "version": "v3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/message-serializer.git",
-                "reference": "3d61455353533d2efdc00f3fc61acc715ab8cf22"
+                "reference": "45079c63d3ef5fb5fa6f7b54572ad35b316eb9da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/3d61455353533d2efdc00f3fc61acc715ab8cf22",
-                "reference": "3d61455353533d2efdc00f3fc61acc715ab8cf22",
+                "url": "https://api.github.com/repos/php-service-bus/message-serializer/zipball/45079c63d3ef5fb5fa6f7b54572ad35b316eb9da",
+                "reference": "45079c63d3ef5fb5fa6f7b54572ad35b316eb9da",
                 "shasum": ""
             },
             "require": {
+                "ext-iconv": "*",
                 "ext-json": "*",
                 "php": ">=7.3",
                 "php-service-bus/common": "v3.3.*",
-                "symfony/serializer-pack": "^v1"
+                "symfony/serializer-pack": "v1.0.*"
             },
             "require-dev": {
-                "ext-iconv": "*",
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "^0.11",
-                "phpunit/phpunit": "^8",
-                "vimeo/psalm": "^v3"
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "v0.11.*",
+                "phpunit/phpunit": "v8.3.*",
+                "vimeo/psalm": "v3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -1020,20 +1020,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-07-31T13:40:43+00:00"
+            "time": "2019-08-02T17:40:08+00:00"
         },
         {
             "name": "php-service-bus/messages-router",
-            "version": "v3.3.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/messages-router.git",
-                "reference": "e1e331b28b4d1bb66ac0a7e7d976df5415ed9c1c"
+                "reference": "f855b78365a87923fd060b92c00eb0e3614aed33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/messages-router/zipball/e1e331b28b4d1bb66ac0a7e7d976df5415ed9c1c",
-                "reference": "e1e331b28b4d1bb66ac0a7e7d976df5415ed9c1c",
+                "url": "https://api.github.com/repos/php-service-bus/messages-router/zipball/f855b78365a87923fd060b92c00eb0e3614aed33",
+                "reference": "f855b78365a87923fd060b92c00eb0e3614aed33",
                 "shasum": ""
             },
             "require": {
@@ -1041,11 +1041,11 @@
                 "php-service-bus/common": "v3.3.*"
             },
             "require-dev": {
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "0.11.*",
-                "phpunit/phpunit": "^8",
-                "symfony/dependency-injection": "^v4.3",
-                "vimeo/psalm": "^v3"
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "v0.11.*",
+                "phpunit/phpunit": "v8.3.*",
+                "symfony/dependency-injection": "v4.3.*",
+                "vimeo/psalm": "v3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -1071,32 +1071,32 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-07-31T15:01:38+00:00"
+            "time": "2019-08-02T17:41:06+00:00"
         },
         {
             "name": "php-service-bus/mutex",
-            "version": "v3.3.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/mutex.git",
-                "reference": "f24754171db3fe93e2e3592661445882de852af5"
+                "reference": "5e230080efeec1840e386b5bc6e10b194b80a9af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/mutex/zipball/f24754171db3fe93e2e3592661445882de852af5",
-                "reference": "f24754171db3fe93e2e3592661445882de852af5",
+                "url": "https://api.github.com/repos/php-service-bus/mutex/zipball/5e230080efeec1840e386b5bc6e10b194b80a9af",
+                "reference": "5e230080efeec1840e386b5bc6e10b194b80a9af",
                 "shasum": ""
             },
             "require": {
-                "amphp/amp": "^2",
-                "amphp/file": "^0.3",
+                "amphp/amp": "v2.1.*",
+                "amphp/file": "v0.3.*",
                 "php": ">=7.3"
             },
             "require-dev": {
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "0.11.*",
-                "phpunit/phpunit": "^8",
-                "vimeo/psalm": "^v3"
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "v0.11.*",
+                "phpunit/phpunit": "v8.3.*",
+                "vimeo/psalm": "v3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -1122,31 +1122,31 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-07-31T15:06:29+00:00"
+            "time": "2019-08-02T17:13:52+00:00"
         },
         {
             "name": "php-service-bus/storage-common",
-            "version": "v3.3.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/storage-common.git",
-                "reference": "7011e901f6d918c2b84f2fc89b6e5627967d9157"
+                "reference": "cf14f7ae666638042ff199c9ff212aa1bb594786"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/7011e901f6d918c2b84f2fc89b6e5627967d9157",
-                "reference": "7011e901f6d918c2b84f2fc89b6e5627967d9157",
+                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/cf14f7ae666638042ff199c9ff212aa1bb594786",
+                "reference": "cf14f7ae666638042ff199c9ff212aa1bb594786",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.3"
             },
             "require-dev": {
-                "amphp/amp": "^2",
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "^0.11",
-                "phpunit/phpunit": "^8",
-                "vimeo/psalm": "^3"
+                "amphp/amp": "2.1.*",
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "0.11.*",
+                "phpunit/phpunit": "8.3.*",
+                "vimeo/psalm": "3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -1172,31 +1172,31 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-07-29T15:05:23+00:00"
+            "time": "2019-08-02T16:42:52+00:00"
         },
         {
             "name": "php-service-bus/transport-common",
-            "version": "v3.3.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-common.git",
-                "reference": "20aaaa52e243def95d4b1dbaeb9a6515cd9f8af0"
+                "reference": "00fd0bf973596b8fa757efc02f4c0b12c623e18b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/20aaaa52e243def95d4b1dbaeb9a6515cd9f8af0",
-                "reference": "20aaaa52e243def95d4b1dbaeb9a6515cd9f8af0",
+                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/00fd0bf973596b8fa757efc02f4c0b12c623e18b",
+                "reference": "00fd0bf973596b8fa757efc02f4c0b12c623e18b",
                 "shasum": ""
             },
             "require": {
-                "amphp/amp": "^2",
+                "amphp/amp": "v2.1.*",
                 "php": ">=7.3"
             },
             "require-dev": {
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "0.11.*",
-                "phpunit/phpunit": "^8",
-                "vimeo/psalm": "^v3"
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "v0.11.*",
+                "phpunit/phpunit": "v8.3.*",
+                "vimeo/psalm": "v3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -1222,7 +1222,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-08-02T10:01:27+00:00"
+            "time": "2019-08-02T17:11:40+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -4303,16 +4303,16 @@
         },
         {
             "name": "php-service-bus/module-phpinnacle-transport",
-            "version": "v3.3.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/module-phpinnacle-transport.git",
-                "reference": "aab9574cc582d7a17c5d1b8f176779e61efaf9e8"
+                "reference": "db8cd30e9c3a76a4a3ce0f4b97e96f1918078887"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/aab9574cc582d7a17c5d1b8f176779e61efaf9e8",
-                "reference": "aab9574cc582d7a17c5d1b8f176779e61efaf9e8",
+                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/db8cd30e9c3a76a4a3ce0f4b97e96f1918078887",
+                "reference": "db8cd30e9c3a76a4a3ce0f4b97e96f1918078887",
                 "shasum": ""
             },
             "require": {
@@ -4320,11 +4320,11 @@
                 "php-service-bus/transport-phpinnacle": "v3.3.*"
             },
             "require-dev": {
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "0.11.*",
-                "phpunit/phpunit": "^8",
-                "symfony/dependency-injection": "4.3.*",
-                "vimeo/psalm": "^v3"
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "v0.11.*",
+                "phpunit/phpunit": "v8.3.*",
+                "symfony/dependency-injection": "v4.3.*",
+                "vimeo/psalm": "v3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -4352,20 +4352,20 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-08-02T13:11:54+00:00"
+            "time": "2019-08-02T17:27:16+00:00"
         },
         {
             "name": "php-service-bus/transport-amqp",
-            "version": "v3.3.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-amqp.git",
-                "reference": "e5072eded010e961366cb23bae3d979e3947a114"
+                "reference": "55885ca1c7a0f09d663e4cd139c743bd22305b70"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/e5072eded010e961366cb23bae3d979e3947a114",
-                "reference": "e5072eded010e961366cb23bae3d979e3947a114",
+                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/55885ca1c7a0f09d663e4cd139c743bd22305b70",
+                "reference": "55885ca1c7a0f09d663e4cd139c743bd22305b70",
                 "shasum": ""
             },
             "require": {
@@ -4375,10 +4375,10 @@
                 "php-service-bus/transport-common": "v3.3.*"
             },
             "require-dev": {
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "0.11.*",
-                "phpunit/phpunit": "^8",
-                "vimeo/psalm": "^v3"
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "v0.11.*",
+                "phpunit/phpunit": "v8.3.*",
+                "vimeo/psalm": "v3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -4405,33 +4405,33 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-08-02T10:11:11+00:00"
+            "time": "2019-08-02T17:18:01+00:00"
         },
         {
             "name": "php-service-bus/transport-phpinnacle",
-            "version": "v3.3.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-phpinnacle.git",
-                "reference": "1e5daa663fe9a37a1bddcc6d847fac6eeefa4184"
+                "reference": "0a35a2a23d7092884f74b3348cbd36e46a78d45e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/1e5daa663fe9a37a1bddcc6d847fac6eeefa4184",
-                "reference": "1e5daa663fe9a37a1bddcc6d847fac6eeefa4184",
+                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/0a35a2a23d7092884f74b3348cbd36e46a78d45e",
+                "reference": "0a35a2a23d7092884f74b3348cbd36e46a78d45e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.3",
                 "php-service-bus/transport-amqp": "v3.3.*",
                 "php-service-bus/transport-common": "v3.3.*",
-                "phpinnacle/ridge": "0.3.*"
+                "phpinnacle/ridge": "v0.3.*"
             },
             "require-dev": {
-                "php-service-bus/code-style-config": "^v0.1",
-                "phpstan/phpstan": "0.11.*",
-                "phpunit/phpunit": "^8",
-                "vimeo/psalm": "^v3"
+                "php-service-bus/code-style-config": "v0.1.*",
+                "phpstan/phpstan": "v0.11.*",
+                "phpunit/phpunit": "v8.3.*",
+                "vimeo/psalm": "v3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -4459,7 +4459,7 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-08-02T12:07:31+00:00"
+            "time": "2019-08-02T17:22:42+00:00"
         },
         {
             "name": "phpinnacle/buffer",

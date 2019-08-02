@@ -13,6 +13,8 @@ declare(strict_types = 1);
 namespace ServiceBus\Context;
 
 use function Amp\call;
+use function ServiceBus\Common\collectThrowableDetails;
+use Amp\Delayed;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -33,6 +35,13 @@ final class KernelContext implements ServiceBusContext
      * @var IncomingPackage
      */
     private $incomingPackage;
+
+    /**
+     * Incoming message object.
+     *
+     * @var object
+     */
+    private $receivedMessage;
 
     /**
      * Outbound message routing.
@@ -79,15 +88,18 @@ final class KernelContext implements ServiceBusContext
 
     /**
      * @param IncomingPackage $incomingPackage
+     * @param object          $receivedMessage
      * @param EndpointRouter  $endpointRouter
      * @param LoggerInterface $logger
      */
     public function __construct(
         IncomingPackage $incomingPackage,
+        object $receivedMessage,
         EndpointRouter $endpointRouter,
         LoggerInterface $logger
     ) {
         $this->incomingPackage = $incomingPackage;
+        $this->receivedMessage = $receivedMessage;
         $this->endpointRouter  = $endpointRouter;
         $this->logger          = $logger;
     }
@@ -165,6 +177,22 @@ final class KernelContext implements ServiceBusContext
     /**
      * {@inheritdoc}
      */
+    public function return(int $secondsDelay = 3): Promise
+    {
+        return call(
+            function(int $delay): \Generator
+            {
+                yield (new Delayed($delay));
+
+                yield $this->delivery($this->receivedMessage);
+            },
+            0 < $secondsDelay ? $secondsDelay * 1000 : 1000
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function logContextMessage(string $logMessage, array $extra = [], string $level = LogLevel::INFO): void
     {
         $extra = \array_merge_recursive(
@@ -181,11 +209,11 @@ final class KernelContext implements ServiceBusContext
     /**
      * {@inheritdoc}
      */
-    public function logContextThrowable(\Throwable $throwable, string $level = LogLevel::ERROR, array $extra = []): void
+    public function logContextThrowable(\Throwable $throwable, array $extra = [], string $level = LogLevel::ERROR): void
     {
         $extra = \array_merge_recursive(
             $extra,
-            ['throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine())]
+            collectThrowableDetails($throwable)
         );
 
         $this->logContextMessage($throwable->getMessage(), $extra, $level);

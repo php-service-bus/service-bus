@@ -43,6 +43,8 @@
   "require": {
     "php": ">=7.3",
     "ext-pcntl": "*",
+    "ext-json": "*",
+    "ext-zlib": "*",
     "php-service-bus/common": "v3.3.*",
     "php-service-bus/transport-common": "v3.3.*",
     "php-service-bus/storage-common": "v3.3.*",
@@ -62,12 +64,12 @@
     "kelunik/retry": "v1.0.*"
   },
   "require-dev": {
-    "php-service-bus/code-style-config": "^v0.1",
+    "php-service-bus/code-style-config": "v0.1.*",
     "php-service-bus/module-phpinnacle-transport": "v3.3.*",
     "kelunik/loop-block": "1.0.*",
-    "phpunit/phpunit": "^8",
-    "vimeo/psalm": "^v3",
-    "phpstan/phpstan": "0.11.*"
+    "phpunit/phpunit": "v8.3.*",
+    "vimeo/psalm": "v3.4.*",
+    "phpstan/phpstan": "v0.11.*"
   },
   "prefer-stable": true,
   "minimum-stability": "stable",

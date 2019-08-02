@@ -13,6 +13,7 @@ declare(strict_types = 1);
 namespace ServiceBus\MessageExecutor;
 
 use function Amp\call;
+use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Promise;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
@@ -119,11 +120,7 @@ final class DefaultMessageExecutor implements MessageExecutor
 
                     $context->logContextMessage(
                         'Error processing, sending an error event and stopping message processing',
-                        [
-                            'eventClass'       => $options->defaultThrowableEvent,
-                            'throwableMessage' => $throwable->getMessage(),
-                            'throwablePoint'   => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
-                        ],
+                        collectThrowableDetails($throwable),
                         LogLevel::DEBUG
                     );
 

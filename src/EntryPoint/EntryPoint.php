@@ -13,6 +13,7 @@ declare(strict_types = 1);
 namespace ServiceBus\EntryPoint;
 
 use function Amp\call;
+use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Delayed;
 use Amp\Loop;
 use Amp\Promise;
@@ -30,7 +31,8 @@ final class EntryPoint
 {
     /**
      * The default value for the maximum number of tasks processed simultaneously.
-     * The value should not be too large and should not exceed the maximum number of available connections to the database.
+     * The value should not be too large and should not exceed the maximum number of available connections to the
+     * database.
      */
     private const DEFAULT_MAX_CONCURRENT_TASK_COUNT = 60;
 
@@ -66,7 +68,8 @@ final class EntryPoint
 
     /**
      * The current number of tasks performed.
-     * The value should not be too large and should not exceed the maximum number of available connections to the database.
+     * The value should not be too large and should not exceed the maximum number of available connections to the
+     * database.
      *
      * @var int
      */
@@ -206,11 +209,16 @@ final class EntryPoint
 
                         if (null !== $throwable)
                         {
-                            $this->logger->critical($throwable->getMessage(), [
-                                'packageId'      => $package->id(),
-                                'traceId'        => $package->traceId(),
-                                'throwablePoint' => \sprintf('%s:%d', $throwable->getFile(), $throwable->getLine()),
-                            ]);
+                            $this->logger->critical(
+                                $throwable->getMessage(),
+                                \array_merge(
+                                    collectThrowableDetails($throwable),
+                                    [
+                                        'packageId' => $package->id(),
+                                        'traceId'   => $package->traceId(),
+                                    ]
+                                )
+                            );
                         }
                     }
                 );

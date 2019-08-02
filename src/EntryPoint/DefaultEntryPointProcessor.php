@@ -13,6 +13,7 @@ declare(strict_types = 1);
 namespace ServiceBus\EntryPoint;
 
 use function Amp\call;
+use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -91,12 +92,17 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 }
                 catch (DecodeMessageFailed $exception)
                 {
-                    $logger->error('Failed to denormalize the message', [
-                        'packageId' => $package->id(),
-                        'traceId'   => $package->traceId(),
-                        'payload'   => $package->payload(),
-                        'throwableMessage' => $exception->getMessage(),
-                    ]);
+                    $logger->error(
+                        'Failed to denormalize the message',
+                        \array_merge(
+                            collectThrowableDetails($exception),
+                            [
+                                'packageId' => $package->id(),
+                                'traceId'   => $package->traceId(),
+                                'payload'   => $package->payload(),
+                            ]
+                        )
+                    );
 
                     yield $package->ack();
 
@@ -122,7 +128,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 /** @var \ServiceBus\Common\MessageExecutor\MessageExecutor $executor */
                 foreach ($executors as $executor)
                 {
-                    $context = new KernelContext($package, $endpointRouter, $logger);
+                    $context = new KernelContext($package, $message, $endpointRouter, $logger);
 
                     try
                     {
