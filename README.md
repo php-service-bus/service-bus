@@ -43,7 +43,7 @@ Documentation can be found in the [documentation](https://github.com/php-service
   * [Mutex](https://github.com/php-service-bus/documentation/blob/master/pages/packages/mutex.md)
 
 ## Requirements
-  - PHP 7.2+
+  - PHP 7.3+
   - RabbitMQ
   - PostgreSQL 9.5+
 
