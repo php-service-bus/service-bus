@@ -63,21 +63,20 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
         /** @var \SplFileInfo $file */
         foreach ($generator as $file)
         {
+            /** @var string $filePath */
             $filePath = $file->getRealPath();
 
-            if (false === $filePath || true === \in_array($filePath, $excludedFiles, true))
+            if (false === \in_array($filePath, $excludedFiles, true))
             {
-                continue;
-            }
+                $class = extractNamespaceFromFile($filePath);
 
-            $class = extractNamespaceFromFile($filePath);
-
-            if (
-                null !== $class &&
-                true === self::isMessageHandler($filePath) &&
-                false === $container->hasDefinition($class)
-            ) {
-                $container->register($class, $class)->addTag('service_bus.service');
+                if (
+                    null !== $class &&
+                    true === self::isMessageHandler($filePath) &&
+                    false === $container->hasDefinition($class)
+                ) {
+                    $container->register($class, $class)->addTag('service_bus.service');
+                }
             }
         }
     }
