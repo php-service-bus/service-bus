@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 7.2
   - 7.3
   - 7.4snapshot
 
@@ -9,8 +8,10 @@ matrix:
   allow_failures:
     - php: 7.4snapshot
 
-services:
-  - rabbitmq
+addons:
+  apt:
+    packages:
+      - rabbitmq-server
 
 cache:
   directories:
@@ -28,10 +29,10 @@ install:
 
 script:
   - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.clover
-  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then ./vendor/bin/psalm --config=psalm.xml; fi
-  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then ./vendor/bin/phpstan analyse src --level 7; fi
-  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.3" ]; then ./vendor/bin/psalm --config=psalm.xml; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.3" ]; then ./vendor/bin/phpstan analyse src --level 7; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.3" ]; then ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run; fi
 
 after_script:
-  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar; fi
-  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.3" ]; then wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.3" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
