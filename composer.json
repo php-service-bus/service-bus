@@ -58,7 +58,7 @@
     "symfony/yaml": "v4.3.*",
     "symfony/validator": "v4.3.*",
     "symfony/debug": "v4.3.*",
-    "amphp/log": "v1.0.*",
+    "amphp/log": "v1.1.*",
     "amphp/file": "v0.3.*",
     "amphp/parallel": "v1.2.*",
     "kelunik/retry": "v1.0.*"
