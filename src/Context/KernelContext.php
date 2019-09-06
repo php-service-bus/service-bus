@@ -179,7 +179,7 @@ final class KernelContext implements ServiceBusContext
         return call(
             function(int $delay): \Generator
             {
-                yield (new Delayed($delay));
+                yield new Delayed($delay);
 
                 yield $this->delivery($this->receivedMessage);
             },
