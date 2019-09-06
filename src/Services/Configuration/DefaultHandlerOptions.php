@@ -26,6 +26,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      * Is this an event listener?
      *
      * @readonly
+     *
      * @var bool
      */
     public $isEventListener;
@@ -34,6 +35,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      * Is this a command handler?
      *
      * @readonly
+     *
      * @var bool
      */
     public $isCommandHandler;
@@ -42,6 +44,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      * Validation enabled.
      *
      * @readonly
+     *
      * @var bool
      */
     public $validationEnabled = false;

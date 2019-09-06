@@ -49,7 +49,7 @@ final class FormatterTest extends TestCase
         ]);
 
         static::assertSame(
-            \json_decode(\file_get_contents(__DIR__ . '/expected_format_reult.json'), true),
+            \json_decode(\file_get_contents(__DIR__ . '/expected_format_result.json'), true),
             $result
         );
     }

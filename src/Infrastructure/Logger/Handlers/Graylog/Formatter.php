@@ -22,7 +22,7 @@ final class Formatter extends NormalizerFormatter
 {
     private const GRAYLOG_VERSION    = 1.0;
 
-    private const DEFAULT_MAX_LENGTH = 32766;
+    private const DEFAULT_MAX_LENGTH = 5000;
 
     /**
      * Translates Monolog log levels to Graylog2 log priorities.
