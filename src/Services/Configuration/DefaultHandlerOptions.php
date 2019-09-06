@@ -19,19 +19,13 @@ use ServiceBus\Services\Exceptions\InvalidEventType;
 
 /**
  * Execution options.
- *
- * @property-read bool        $isEventListener
- * @property-read bool        $isCommandHandler
- * @property-read bool        $validationEnabled
- * @property-read string[]    $validationGroups
- * @property-read string|null $defaultValidationFailedEvent
- * @property-read string|null $defaultThrowableEvent
  */
 final class DefaultHandlerOptions implements MessageHandlerOptions
 {
     /**
      * Is this an event listener?
      *
+     * @readonly
      * @var bool
      */
     public $isEventListener;
@@ -39,6 +33,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * Is this a command handler?
      *
+     * @readonly
      * @var bool
      */
     public $isCommandHandler;
@@ -46,6 +41,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * Validation enabled.
      *
+     * @readonly
      * @var bool
      */
     public $validationEnabled = false;
@@ -53,6 +49,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * Validation groups.
      *
+     * @readonly
      * @psalm-var array<array-key, string>
      *
      * @var string[]
@@ -65,6 +62,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      *
      * If no class is specified, control is passed to user code
      *
+     * @readonly
      * @psalm-var class-string|null
      *
      * @var string|null
@@ -77,6 +75,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      *
      * If no class is specified, control is passed to user code
      *
+     * @readonly
      * @psalm-var class-string|null
      *
      * @var string|null

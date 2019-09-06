@@ -82,7 +82,6 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         $logger         = $this->logger;
         $endpointRouter = $this->endpointRouter;
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function(IncomingPackage $package) use ($messageDecoder, $messagesRouter, $endpointRouter, $logger): \Generator
             {

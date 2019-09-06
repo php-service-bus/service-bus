@@ -117,10 +117,7 @@ final class EntryPoint
         /** Hack for phpunit tests */
         $isTestCall = 'phpunitTests' === (string) \getenv('SERVICE_BUS_TESTING');
 
-        /**
-         * @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress MixedArgument
-         */
+        /** @psalm-suppress MixedArgument */
         return call(
             function(array $queues) use ($isTestCall): \Generator
             {
@@ -169,7 +166,6 @@ final class EntryPoint
     {
         $delay = 0 >= $delay ? 1 : $delay;
 
-        /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
         Loop::defer(
             function() use ($delay): \Generator
             {
@@ -177,7 +173,6 @@ final class EntryPoint
 
                 $this->logger->info('Handler will stop after {duration} seconds', ['duration' => $delay]);
 
-                /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
                 Loop::delay(
                     $delay * 1000,
                     function(): void
@@ -198,7 +193,6 @@ final class EntryPoint
      */
     private function deferExecution(IncomingPackage $package): void
     {
-        /** @psalm-suppress MixedTypeCoercion Incorrect amphp types */
         Loop::defer(
             function() use ($package): void
             {

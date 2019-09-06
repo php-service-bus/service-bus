@@ -105,8 +105,6 @@ final class MessageDeliveryEndpoint implements Endpoint
     }
 
     /**
-     * @psalm-suppress MixedInferredReturnType
-     *
      * {@inheritdoc}
      */
     public function delivery(object $message, DeliveryOptions $options): Promise
@@ -156,10 +154,6 @@ final class MessageDeliveryEndpoint implements Endpoint
     {
         $deferred = new Deferred();
 
-        /**
-         * @psalm-suppress MixedTypeCoercion Incorrect amphp types
-         * @psalm-suppress InvalidArgument
-         */
         Loop::defer(
             function() use ($package, $deferred): \Generator
             {

@@ -17,20 +17,21 @@ use ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer;
 
 /**
  * Endpoint message encoder.
- *
- * @property-read string         $tag
- * @property-read MessageEncoder $handler
  */
 final class EndpointEncoder
 {
     private const DEFAULT_ENCODER = 'service_bus.encoder.default_handler';
 
     /**
+     * @readonly
+     *
      * @var string
      */
     public $tag;
 
     /**
+     * @readonly
+     *
      * @var MessageEncoder
      */
     public $handler;

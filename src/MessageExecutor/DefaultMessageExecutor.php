@@ -85,10 +85,6 @@ final class DefaultMessageExecutor implements MessageExecutor
     {
         $argumentResolvers = $this->argumentResolvers;
 
-        /**
-         * @psalm-suppress  MixedArgument Incorrect psalm unpack parameters (...$args)
-         * @psalm-suppress  InvalidArgument Incorrect psalm unpack parameters (...$args)
-         */
         return call(
             static function(
                 \Closure $closure,
@@ -106,7 +102,6 @@ final class DefaultMessageExecutor implements MessageExecutor
                      */
                     $resolvedArgs = self::collectArguments($arguments, $argumentResolvers, $message, $context);
 
-                    /** @psalm-suppress MixedArgument Incorrect psalm unpack parameters (...$args) */
                     yield call($closure, ...$resolvedArgs);
 
                     unset($resolvedArgs);

@@ -53,8 +53,6 @@ final class IncomingMessageDecoder
     /**
      * Decodes a packet using a handler defined in the headers (or uses a default decoder).
      *
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
      * @param IncomingPackage $package
      *
      * @throws \LogicException Could not find decoder in the service container

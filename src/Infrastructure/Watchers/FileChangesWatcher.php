@@ -54,7 +54,6 @@ final class FileChangesWatcher
      */
     public function compare(): Promise
     {
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             function(): \Generator
             {
@@ -107,11 +106,7 @@ final class FileChangesWatcher
             /** @psalm-suppress TooManyTemplateParams Wrong Promise template */
             yield $process->start();
 
-            /**
-             * @psalm-suppress TooManyTemplateParams Wrong Promise template
-             *
-             * @var string $bufferContent
-             */
+            /** @var string $bufferContent  */
             $bufferContent = yield buffer($process->getStdout());
 
             return $bufferContent;

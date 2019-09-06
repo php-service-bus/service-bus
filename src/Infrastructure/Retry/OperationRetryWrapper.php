@@ -37,9 +37,6 @@ final class OperationRetryWrapper
     }
 
     /**
-     * @psalm-suppress MixedTypeCoercion
-     * @psalm-suppress MixedTypeCoercion
-     *
      * @param callable   $operation     Wrapped operation
      * @param string ...$exceptionClasses Exceptions in which attempts are repeating the operation
      *

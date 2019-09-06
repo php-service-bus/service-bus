@@ -15,7 +15,7 @@ namespace ServiceBus\Services\Configuration;
 use ServiceBus\Common\MessageHandler\MessageHandler;
 
 /**
- * @property-read MessageHandler $messageHandler
+ *
  */
 final class ServiceMessageHandler
 {
@@ -25,6 +25,8 @@ final class ServiceMessageHandler
 
     /**
      * Message handler type.
+     *
+     * @readonly
      *
      * @var int
      */

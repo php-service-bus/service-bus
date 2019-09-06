@@ -121,8 +121,6 @@ final class KernelContext implements ServiceBusContext
     }
 
     /**
-     * @psalm-suppress MixedInferredReturnType
-     *
      * {@inheritdoc}
      */
     public function delivery(object $message, ?DeliveryOptions $deliveryOptions = null): Promise
@@ -140,7 +138,6 @@ final class KernelContext implements ServiceBusContext
             $options->withTraceId($traceId);
         }
 
-        /** @psalm-suppress InvalidArgument Incorrect psalm unpack parameters (...$args) */
         return call(
             static function(object $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): void
             {

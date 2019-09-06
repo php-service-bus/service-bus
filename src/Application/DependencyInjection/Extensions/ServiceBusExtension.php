@@ -41,8 +41,6 @@ final class ServiceBusExtension extends Extension
         /**
          * @var string $key
          * @var mixed  $value
-         *
-         * @psalm-suppress MixedAssignment Cannot assign $value to a mixed type
          */
         foreach ($configs as $key => $value)
         {

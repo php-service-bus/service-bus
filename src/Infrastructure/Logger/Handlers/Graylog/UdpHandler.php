@@ -13,7 +13,6 @@ declare(strict_types = 1);
 namespace ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 
 use Amp\ByteStream\ResourceOutputStream;
-use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 
@@ -63,6 +62,8 @@ final class UdpHandler extends AbstractProcessingHandler
         $this->host        = $host;
         $this->port        = $port;
         $this->gzipMessage = $gzipMessage;
+
+        $this->formatter = new Formatter();
     }
 
     /**
@@ -97,14 +98,6 @@ final class UdpHandler extends AbstractProcessingHandler
             /** Not interest */
         }
         // @codeCoverageIgnoreEnd
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormatter(): NormalizerFormatter
-    {
-        return new Formatter();
     }
 
     /**
