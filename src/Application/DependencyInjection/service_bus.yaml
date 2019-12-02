@@ -75,12 +75,23 @@ services:
       $decodersConfiguration: '%service_bus.decoder_configuration%'
       $decodersLocator: '@service_bus.decoder.service_locator'
 
+  # Context
+  ServiceBus\Endpoint\Options\DeliveryOptionsFactory:
+    class: ServiceBus\Endpoint\Options\DefaultDeliveryOptionsFactory
+
+  ServiceBus\Context\ContextFactory:
+    class: ServiceBus\Context\KernelContextFactory
+    arguments:
+      $endpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
+      $optionsFactory: '@ServiceBus\Endpoint\Options\DeliveryOptionsFactory'
+      $logger: '@service_bus.logger'
+
   # Handling incoming package
   ServiceBus\EntryPoint\EntryPointProcessor:
     class: ServiceBus\EntryPoint\DefaultEntryPointProcessor
     arguments:
       $messageDecoder: '@ServiceBus\EntryPoint\IncomingMessageDecoder'
-      $endpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
+      $contextFactory: '@ServiceBus\Context\ContextFactory'
       $messagesRouter: '@ServiceBus\MessagesRouter\Router'
       $logger: '@service_bus.logger'
 

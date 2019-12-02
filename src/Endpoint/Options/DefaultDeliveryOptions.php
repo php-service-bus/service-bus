@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Endpoint;
+namespace ServiceBus\Endpoint\Options;
 
 use ServiceBus\Common\Endpoint\DeliveryOptions;
 

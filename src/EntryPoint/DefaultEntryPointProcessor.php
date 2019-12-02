@@ -12,13 +12,12 @@ declare(strict_types = 1);
 
 namespace ServiceBus\EntryPoint;
 
+use ServiceBus\Context\ContextFactory;
 use function Amp\call;
 use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use ServiceBus\Context\KernelContext;
-use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed;
 use ServiceBus\MessagesRouter\Router;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
@@ -36,11 +35,9 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     private $messageDecoder;
 
     /**
-     * Outbound message routing.
-     *
-     * @var EndpointRouter
+     * @var ContextFactory
      */
-    private $endpointRouter;
+    private $contextFactory;
 
     /**
      * Incoming message router.
@@ -56,18 +53,18 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
 
     /**
      * @param IncomingMessageDecoder $messageDecoder
-     * @param EndpointRouter         $endpointRouter
+     * @param ContextFactory         $contextFactory
      * @param Router                 $messagesRouter
      * @param LoggerInterface        $logger
      */
     public function __construct(
         IncomingMessageDecoder $messageDecoder,
-        EndpointRouter $endpointRouter,
+        ContextFactory $contextFactory,
         ?Router $messagesRouter = null,
         ?LoggerInterface $logger = null
     ) {
         $this->messageDecoder = $messageDecoder;
-        $this->endpointRouter = $endpointRouter;
+        $this->contextFactory = $contextFactory;
         $this->messagesRouter = $messagesRouter ?? new Router();
         $this->logger         = $logger ?? new NullLogger();
     }
@@ -80,10 +77,10 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         $messageDecoder = $this->messageDecoder;
         $messagesRouter = $this->messagesRouter;
         $logger         = $this->logger;
-        $endpointRouter = $this->endpointRouter;
+        $contextFactory = $this->contextFactory;
 
         return call(
-            static function(IncomingPackage $package) use ($messageDecoder, $messagesRouter, $endpointRouter, $logger): \Generator
+            static function(IncomingPackage $package) use ($messageDecoder, $messagesRouter, $contextFactory, $logger): \Generator
             {
                 try
                 {
@@ -124,11 +121,11 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     );
                 }
 
+                $context = $contextFactory->create($package, $message);
+
                 /** @var \ServiceBus\Common\MessageExecutor\MessageExecutor $executor */
                 foreach ($executors as $executor)
                 {
-                    $context = new KernelContext($package, $message, $endpointRouter, $logger);
-
                     try
                     {
                         yield $executor($message, $context);
@@ -138,6 +135,8 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                         $context->logContextThrowable($throwable);
                     }
                 }
+
+                unset($context);
 
                 yield $package->ack();
             },

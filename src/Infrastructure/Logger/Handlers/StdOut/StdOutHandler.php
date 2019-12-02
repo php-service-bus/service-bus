@@ -14,6 +14,7 @@ namespace ServiceBus\Infrastructure\Logger\Handlers\StdOut;
 
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\Log\ConsoleFormatter;
+use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 
@@ -30,14 +31,15 @@ final class StdOutHandler extends AbstractProcessingHandler
     private $streamWriter;
 
     /**
-     * @param int  $level
-     * @param bool $bubble
+     * @param int                     $level
+     * @param bool                    $bubble
+     * @param FormatterInterface|null $formatter
      */
-    public function __construct(int $level = Logger::DEBUG, bool $bubble = true)
+    public function __construct(int $level = Logger::DEBUG, bool $bubble = true, ?FormatterInterface $formatter = null)
     {
         parent::__construct($level, $bubble);
 
-        $this->formatter = new ConsoleFormatter();
+        $this->formatter    = $formatter ?: new ConsoleFormatter();
         $this->streamWriter = new ResourceOutputStream(\STDOUT, 50000);
     }
 

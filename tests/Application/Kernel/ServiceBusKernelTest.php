@@ -163,7 +163,7 @@ final class ServiceBusKernelTest extends TestCase
         );
 
         $messages = \array_map(
-            function(array $entry): string
+            static function(array $entry): string
             {
                 return $entry['message'];
             },
@@ -192,7 +192,7 @@ final class ServiceBusKernelTest extends TestCase
         );
 
         $messages = \array_map(
-            function(array $entry): string
+            static function(array $entry): string
             {
                 return $entry['message'];
             },
@@ -235,7 +235,7 @@ final class ServiceBusKernelTest extends TestCase
         );
 
         $messages = \array_map(
-            function(array $entry): string
+            static function(array $entry): string
             {
                 return $entry['message'];
             },
@@ -265,7 +265,7 @@ final class ServiceBusKernelTest extends TestCase
 
         $entries = \array_filter(
             \array_map(
-                function(array $entry): ?array
+                static function(array $entry): ?array
                 {
                     if (true === isset($entry['context']['violations']))
                     {

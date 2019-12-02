@@ -18,7 +18,6 @@ use Amp\Promise;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
-use ServiceBus\Context\KernelContext;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 
 /**
@@ -91,7 +90,7 @@ final class DefaultMessageExecutor implements MessageExecutor
                 \SplObjectStorage $arguments,
                 DefaultHandlerOptions $options,
                 object $message,
-                KernelContext $context
+                ServiceBusContext $context
             ) use ($argumentResolvers): \Generator
             {
                 try
@@ -137,13 +136,13 @@ final class DefaultMessageExecutor implements MessageExecutor
     /**
      * Publish failed response event.
      *
-     * @param string        $eventClass
-     * @param string        $errorMessage
-     * @param KernelContext $context
+     * @param string            $eventClass
+     * @param string            $errorMessage
+     * @param ServiceBusContext $context
      *
      * @return \Generator
      */
-    private static function publishThrowable(string $eventClass, string $errorMessage, KernelContext $context): \Generator
+    private static function publishThrowable(string $eventClass, string $errorMessage, ServiceBusContext $context): \Generator
     {
         /**
          * @noinspection VariableFunctionsUsageInspection
@@ -165,7 +164,7 @@ final class DefaultMessageExecutor implements MessageExecutor
      * @param \SplObjectStorage                                $arguments
      * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[] $resolvers
      * @param object                                           $message
-     * @param KernelContext                                    $context
+     * @param ServiceBusContext                                $context
      *
      * @return array
      */
@@ -173,7 +172,7 @@ final class DefaultMessageExecutor implements MessageExecutor
         \SplObjectStorage $arguments,
         array $resolvers,
         object $message,
-        KernelContext $context
+        ServiceBusContext $context
     ): array {
         $preparedArguments = [];
 
