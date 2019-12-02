@@ -17,17 +17,11 @@ namespace ServiceBus\Services\Exceptions;
  */
 final class InvalidHandlerArguments extends \InvalidArgumentException
 {
-    /**
-     * @return self
-     */
     public static function emptyArguments(): self
     {
         return new self('The event handler must have at least 2 arguments: the message object (the first argument) and the context');
     }
 
-    /**
-     * @return self
-     */
     public static function invalidFirstArgument(): self
     {
         return new self('The first argument to the message handler must be the message object');

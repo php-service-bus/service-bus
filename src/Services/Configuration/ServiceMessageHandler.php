@@ -20,55 +20,26 @@ use ServiceBus\Common\MessageHandler\MessageHandler;
 final class ServiceMessageHandler
 {
     private const TYPE_EVENT_LISTENER  = 0;
-
     private const TYPE_COMMAND_HANDLER = 1;
 
-    /**
-     * Message handler type.
-     *
-     * @readonly
-     *
-     * @var int
-     */
-    private $type;
+    private int           $type;
+    public MessageHandler $messageHandler;
 
-    /**
-     * @var MessageHandler
-     */
-    public $messageHandler;
-
-    /**
-     * @param MessageHandler $messageHandler
-     *
-     * @return self
-     */
     public static function createCommandHandler(MessageHandler $messageHandler): self
     {
         return new self(self::TYPE_COMMAND_HANDLER, $messageHandler);
     }
 
-    /**
-     * @param MessageHandler $messageHandler
-     *
-     * @return self
-     */
     public static function createEventListener(MessageHandler $messageHandler): self
     {
         return new self(self::TYPE_EVENT_LISTENER, $messageHandler);
     }
 
-    /**
-     * @return bool
-     */
     public function isCommandHandler(): bool
     {
         return self::TYPE_COMMAND_HANDLER === $this->type;
     }
 
-    /**
-     * @param int            $type
-     * @param MessageHandler $messageHandler
-     */
     private function __construct(int $type, MessageHandler $messageHandler)
     {
         $this->type           = $type;

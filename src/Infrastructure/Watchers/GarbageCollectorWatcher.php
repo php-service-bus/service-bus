@@ -27,24 +27,12 @@ final class GarbageCollectorWatcher
     /** @var int milliseconds */
     private const DEFAULT_INTERVAL = 600000;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
+    private int             $interval;
+    private ?string         $watcherId = null;
 
     /**
-     * @var int
-     */
-    private $interval;
-
-    /**
-     * @var string|null
-     */
-    private $watcherId;
-
-    /**
-     * @param int                  $interval delay in milliseconds
-     * @param LoggerInterface|null $logger
+     * @param int $interval delay in milliseconds
      */
     public function __construct(int $interval = self::DEFAULT_INTERVAL, ?LoggerInterface $logger = null)
     {
@@ -62,16 +50,13 @@ final class GarbageCollectorWatcher
         }
     }
 
-    /**
-     * @return void
-     */
     public function run(): void
     {
         $logger = $this->logger;
 
         $this->watcherId = Loop::repeat(
             $this->interval,
-            static function() use ($logger): void
+            static function () use ($logger): void
             {
                 $logger->info('Forces collection of any existing garbage cycles', ['number' => \gc_collect_cycles()]);
                 $logger->info(

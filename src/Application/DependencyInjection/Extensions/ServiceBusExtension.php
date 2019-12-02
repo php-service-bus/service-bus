@@ -28,9 +28,6 @@ final class ServiceBusExtension extends Extension
      * @psalm-suppress MoreSpecificImplementedParamType
      * @psalm-param    array<string, mixed> $configs
      *
-     * @param array            $configs
-     * @param ContainerBuilder $container
-     *
      * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container): void

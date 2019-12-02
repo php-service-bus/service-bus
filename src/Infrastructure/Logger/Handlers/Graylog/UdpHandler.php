@@ -15,6 +15,7 @@ namespace ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 use Amp\ByteStream\ResourceOutputStream;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use function ServiceBus\Common\jsonEncode;
 
 /**
  * Graylog UDP handler.
@@ -23,40 +24,22 @@ use Monolog\Logger;
  */
 final class UdpHandler extends AbstractProcessingHandler
 {
-    /**
-     * @var string
-     */
-    private $host;
+    private string                $host;
+    private int                   $port;
+    private ?ResourceOutputStream $outputStream = null;
+    private bool                  $gzipMessage;
 
     /**
-     * @var int
-     */
-    private $port;
-
-    /**
-     * @var ResourceOutputStream|null
-     */
-    private $outputStream;
-
-    /**
-     * @var bool
-     */
-    private $gzipMessage;
-
-    /**
-     * @param string $host
-     * @param int    $port
-     * @param bool   $gzipMessage
-     * @param int    $level
-     * @param bool   $bubble
+     * @param int|string $level
      */
     public function __construct(
         string $host = '0.0.0.0',
         int $port = 514,
         bool $gzipMessage = false,
         $level = Logger::DEBUG,
-        $bubble = true
-    ) {
+        bool $bubble = true
+    )
+    {
         parent::__construct($level, $bubble);
 
         $this->host        = $host;
@@ -68,32 +51,22 @@ final class UdpHandler extends AbstractProcessingHandler
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     protected function write(array $record): void
     {
         try
         {
-            $body = \json_encode($record);
+            $body = jsonEncode($record);
 
-            // @codeCoverageIgnoreStart
-            if (false === \is_string($body))
+            if(true === $this->gzipMessage)
             {
-                return;
-            }
-            // @codeCoverageIgnoreEnd
-
-            if (true === $this->gzipMessage)
-            {
-                /** @noinspection UnnecessaryCastingInspection */
                 $body = (string) \gzcompress($body);
             }
 
             $this->outputStream()->write($body);
         }
-        // @codeCoverageIgnoreStart
-        catch (\Throwable $throwable)
+            // @codeCoverageIgnoreStart
+        catch(\Throwable $throwable)
         {
             /** Not interest */
         }
@@ -102,12 +75,10 @@ final class UdpHandler extends AbstractProcessingHandler
 
     /**
      * @throws \RuntimeException Could not connect
-     *
-     * @return ResourceOutputStream
      */
     private function outputStream(): ResourceOutputStream
     {
-        if (null === $this->outputStream)
+        if(null === $this->outputStream)
         {
             $this->outputStream = new ResourceOutputStream(self::createStream($this->host, $this->port), 65000);
         }
@@ -116,9 +87,6 @@ final class UdpHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @param string $host
-     * @param int    $port
-     *
      * @throws \RuntimeException Could not connect
      *
      * @return resource
@@ -128,7 +96,7 @@ final class UdpHandler extends AbstractProcessingHandler
         $uri    = \sprintf('udp://%s:%d', $host, $port);
         $stream = @\stream_socket_client($uri, $errno, $errstr, 0, \STREAM_CLIENT_CONNECT);
 
-        if (false === $stream)
+        if(false === $stream)
         {
             throw new \RuntimeException(\sprintf('Could not connect to %s', $uri));
         }

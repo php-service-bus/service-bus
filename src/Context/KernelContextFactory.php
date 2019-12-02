@@ -17,28 +17,15 @@ use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 
+/**
+ *
+ */
 final class KernelContextFactory implements ContextFactory
 {
-    /**
-     * @var EndpointRouter
-     */
-    private $endpointRouter;
+    private EndpointRouter $endpointRouter;
+    private DeliveryOptionsFactory $optionsFactory;
+    private LoggerInterface $logger;
 
-    /**
-     * @var DeliveryOptionsFactory
-     */
-    private $optionsFactory;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param EndpointRouter         $endpointRouter
-     * @param DeliveryOptionsFactory $optionsFactory
-     * @param LoggerInterface        $logger
-     */
     public function __construct(
         EndpointRouter $endpointRouter,
         DeliveryOptionsFactory $optionsFactory,
@@ -49,12 +36,6 @@ final class KernelContextFactory implements ContextFactory
         $this->logger         = $logger;
     }
 
-    /**
-     * @param IncomingPackage $package
-     * @param object          $message
-     *
-     * @return ServiceBusContext
-     */
     public function create(IncomingPackage $package, object $message): ServiceBusContext
     {
         return new KernelContext($package, $message, $this->endpointRouter, $this->optionsFactory, $this->logger);

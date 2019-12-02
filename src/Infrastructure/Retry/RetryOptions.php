@@ -14,6 +14,8 @@ namespace ServiceBus\Infrastructure\Retry;
 
 /**
  * Retry operation options.
+ *
+ * @psalm-readonly
  */
 final class RetryOptions
 {
@@ -23,22 +25,14 @@ final class RetryOptions
 
     /**
      * Maximum number of repetitions.
-     *
-     * @var int
      */
-    public $maxCount;
+    public int $maxCount;
 
     /**
      * Delay at repetitions (milliseconds).
-     *
-     * @var int
      */
-    public $delay;
+    public int $delay;
 
-    /**
-     * @param int $maxCount
-     * @param int $delay
-     */
     public function __construct(int $maxCount = self::DEFAULT_RETRY_MAX_COUNT, int $delay = self::DEFAULT_RETRY_DELAY)
     {
         $this->maxCount = $maxCount;

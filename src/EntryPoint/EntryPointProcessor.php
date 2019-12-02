@@ -23,10 +23,6 @@ interface EntryPointProcessor
 {
     /**
      * Handle package.
-     *
-     * @param IncomingPackage $package
-     *
-     * @return Promise
      */
     public function handle(IncomingPackage $package): Promise;
 }

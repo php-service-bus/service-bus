@@ -13,13 +13,16 @@ namespace ServiceBus\Endpoint\Options;
 
 use ServiceBus\Common\Endpoint\DeliveryOptions;
 
+/**
+ *
+ */
 interface DeliveryOptionsFactory
 {
     /**
-     * @param int|string|null $traceId
-     * @param string|null     $messageClass
+     * @psalm-param class-string|null $messageClass
      *
-     * @return DeliveryOptions
+     * @param string|int  $traceId
+     * @param string|null $messageClass
      */
     public function create($traceId, ?string $messageClass): DeliveryOptions;
 }

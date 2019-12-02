@@ -22,19 +22,15 @@ final class EventListener implements ServicesAnnotationsMarker
 {
     /**
      * Event validation enabled.
-     *
-     * @var bool
      */
-    public $validate = false;
+    public bool $validate = false;
 
     /**
      * Validation groups.
      *
      * @psalm-var array<int, string>
-     *
-     * @var string[]
      */
-    public $groups = [];
+    public array $groups = [];
 
     /**
      * In case of validation errors, automatically send the event and stop further execution
@@ -43,10 +39,8 @@ final class EventListener implements ServicesAnnotationsMarker
      * If no class is specified, control is passed to user code
      *
      * @psalm-var class-string|null
-     *
-     * @var string|null
      */
-    public $defaultValidationFailedEvent;
+    public ?string $defaultValidationFailedEvent= null;
 
     /**
      * In case of a runtime error, automatically send the specified event with the message received from the exception
@@ -55,15 +49,11 @@ final class EventListener implements ServicesAnnotationsMarker
      * If no class is specified, control is passed to user code
      *
      * @psalm-var class-string|null
-     *
-     * @var string|null
      */
-    public $defaultThrowableEvent;
+    public ?string $defaultThrowableEvent = null;
 
     /**
      * @psalm-param array<string, mixed> $data
-     *
-     * @param array $data
      *
      * @throws \InvalidArgumentException
      */

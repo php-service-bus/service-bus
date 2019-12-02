@@ -28,26 +28,17 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
      *
      * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
-    private $argumentResolvers;
+    private array $argumentResolvers;
+
+    private ValidatorInterface $validator;
 
     /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
-     * @psalm-param  array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
-     *
-     * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[] $argumentResolvers
-     * @param ValidatorInterface|null                          $validator
+     * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
      */
     public function __construct(array $argumentResolvers, ?ValidatorInterface $validator = null)
     {
         if (null === $validator)
         {
-            /** @noinspection PhpUnhandledExceptionInspection */
             $validator = (new ValidatorBuilder())
                 ->enableAnnotationMapping()
                 ->getValidator();

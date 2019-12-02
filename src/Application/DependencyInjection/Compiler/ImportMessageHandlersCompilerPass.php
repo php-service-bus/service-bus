@@ -26,12 +26,8 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      *
-     * @param ContainerBuilder $container
-     *
      * @throws \LogicException
      * @throws \ServiceBus\Common\Exceptions\FileSystemException
-     *
-     * @return void
      */
     public function process(ContainerBuilder $container): void
     {
@@ -49,14 +45,8 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      * @psalm-param \Generator<\SplFileInfo> $generator
      * @psalm-param array<int, string>       $excludedFiles
      *
-     * @param ContainerBuilder $container
-     * @param \Generator       $generator
-     * @param string[]         $excludedFiles
-     *
      * @throws \LogicException
      * @throws \ServiceBus\Common\Exceptions\FileSystemException
-     *
-     * @return void
      */
     private function registerClasses(ContainerBuilder $container, \Generator $generator, array $excludedFiles): void
     {
@@ -81,27 +71,15 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
-     * @param ContainerBuilder $container
-     *
-     * @return bool
-     */
     private static function enabled(ContainerBuilder $container): bool
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         return true === $container->hasParameter('service_bus.auto_import.handlers_enabled')
             ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
             : false;
     }
 
     /**
-     * @param string $filePath
-     *
      * @throws \LogicException Error loading file contents
-     *
-     * @return bool
      */
     private static function isMessageHandler(string $filePath): bool
     {
@@ -119,16 +97,11 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
-     * @param ContainerBuilder $container
-     *
-     * @return string[]
+     * @psalm-return array<int, string>
      */
     private static function getDirectories(ContainerBuilder $container): array
     {
         /**
-         * @noinspection PhpUnhandledExceptionInspection
          * @psalm-var    array<int, string> $directories
          *
          * @var string[] $directories
@@ -141,18 +114,11 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
      * @psalm-return array<int, string>
-     *
-     * @param ContainerBuilder $container
-     *
-     * @return string[]
      */
     private static function getExcludedFiles(ContainerBuilder $container): array
     {
         /**
-         * @noinspection PhpUnhandledExceptionInspection
          * @psalm-var    array<int, string> $excludedFiles
          *
          * @var string[] $excludedFiles

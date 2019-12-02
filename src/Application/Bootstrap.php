@@ -18,22 +18,19 @@ use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use ServiceBus\Common\Module\ServiceBusModule;
 use ServiceBus\Environment;
-use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\ErrorHandler\Debug;
 
 /**
  * Initial application initialization: loading the main components and compiling the dependency container.
  */
 final class Bootstrap
 {
-    /**
-     * @var ContainerBuilder
-     */
-    private $containerBuilder;
+    private ContainerBuilder $containerBuilder;
 
     /**
      * Create based on the environment parameters obtained from the ".env" file (via symfony/dotenv component).
@@ -43,8 +40,6 @@ final class Bootstrap
      * @throws \Symfony\Component\Dotenv\Exception\PathException Incorrect .env file path
      * @throws \Symfony\Component\Dotenv\Exception\FormatException Incorrect .env file format
      * @throws \LogicException Incorrect application environment specified
-     *
-     * @return self
      */
     public static function withDotEnv(string $envFilePath): self
     {
@@ -60,8 +55,6 @@ final class Bootstrap
      * @see https://github.com/php-service-bus/documentation/blob/master/pages/installation.md#the-list-of-environment-variables
      *
      * @throws \LogicException Incorrect application environment specified
-     *
-     * @return self
      */
     public static function withEnvironmentValues(): self
     {
@@ -71,11 +64,7 @@ final class Bootstrap
     /**
      * Boot custom module.
      *
-     * @param ServiceBusModule ...$serviceBusModules
-     *
      * @throws \Throwable
-     *
-     * @return $this
      */
     public function applyModules(ServiceBusModule ...$serviceBusModules): self
     {
@@ -90,10 +79,8 @@ final class Bootstrap
      * Note: All files containing user-defined functions must be excluded
      * Note: Increases start time because of the need to scan files
      *
-     * @param array<int, string> $directories
-     * @param array<int, string> $excludedFiles
-     *
-     * @return self
+     * @psalm-param array<int, string> $directories
+     * @psalm-param array<int, string> $excludedFiles
      */
     public function enableAutoImportMessageHandlers(array $directories, array $excludedFiles = []): self
     {
@@ -114,10 +101,9 @@ final class Bootstrap
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
-     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
+     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has
+     *                                                                                not been dumped
      * @throws \Throwable Boot module failed
-     *
-     * @return ContainerInterface
      */
     public function boot(): ContainerInterface
     {
@@ -129,10 +115,6 @@ final class Bootstrap
     /**
      * Use custom cache directory.
      * If not specified, the directory for storing temporary files will be used (sys_get_temp_dir).
-     *
-     * @param string $cacheDirectoryPath
-     *
-     * @return self
      */
     public function useCustomCacheDirectory(string $cacheDirectoryPath): self
     {
@@ -144,9 +126,7 @@ final class Bootstrap
     /**
      * Import parameters to container.
      *
-     * @param array<string, array<mixed, mixed>|bool|float|int|string|null> $parameters
-     *
-     * @return self
+     * @psalm-param array<string, array<mixed, mixed>|bool|float|int|string|null> $parameters
      */
     public function importParameters(array $parameters): self
     {
@@ -159,10 +139,6 @@ final class Bootstrap
      * Registers custom extensions.
      *
      * @see https://symfony.com/doc/current/bundles/extension.html
-     *
-     * @param Extension ...$extensions
-     *
-     * @return self
      */
     public function addExtensions(Extension ...$extensions): self
     {
@@ -175,10 +151,6 @@ final class Bootstrap
      * Registers custom compiler passes.
      *
      * @see https://symfony.com/doc/current/service_container/compiler_passes.html
-     *
-     * @param CompilerPassInterface ...$compilerPassInterfaces
-     *
-     * @return self
      */
     public function addCompilerPasses(CompilerPassInterface ...$compilerPassInterfaces): self
     {
@@ -207,9 +179,7 @@ final class Bootstrap
         $this->containerBuilder->addExtensions(new ServiceBusExtension());
 
         /**
-         * @noinspection ForgottenDebugOutputInspection
-         *
-         * @todo         : remove SymfonyDebug
+         * @todo: remove SymfonyDebug
          *
          * It is necessary for the correct handling of mistakes concealed by the "@"
          */

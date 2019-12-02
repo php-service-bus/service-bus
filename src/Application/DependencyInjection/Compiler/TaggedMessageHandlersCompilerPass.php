@@ -69,13 +69,9 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
     /**
      * @psalm-param class-string $serviceClass
      *
-     * @param string           $serviceClass
-     * @param ContainerBuilder $container
-     * @param array            $servicesReference (passed by reference)
+     * @param array $servicesReference (passed by reference)
      *
      * @throws \ReflectionException
-     *
-     * @return void
      */
     private function collectServiceDependencies(string $serviceClass, ContainerBuilder $container, array &$servicesReference): void
     {
@@ -90,7 +86,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
                     continue;
                 }
 
-                /** @var \ReflectionType $reflectionType */
+                /** @var \ReflectionNamedType $reflectionType */
                 $reflectionType     = $parameter->getType();
                 $reflectionTypeName = $reflectionType->getName();
 
@@ -102,14 +98,9 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param \ReflectionParameter $parameter
-     *
-     * @return bool
-     */
     private static function supportedType(\ReflectionParameter $parameter): bool
     {
-        /** @var \ReflectionType $reflectionType */
+        /** @var \ReflectionNamedType $reflectionType */
         $reflectionType     = $parameter->getType();
         $reflectionTypeName = $reflectionType->getName();
 

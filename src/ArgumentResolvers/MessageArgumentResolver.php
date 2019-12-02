@@ -26,7 +26,7 @@ final class MessageArgumentResolver implements ArgumentResolver
     public function supports(MessageHandlerArgument $argument): bool
     {
         /** The message object MUST be the first argument */
-        return 1 === $argument->position;
+        return $argument->position === 1;
     }
 
     /**

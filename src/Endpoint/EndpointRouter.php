@@ -26,7 +26,7 @@ final class EndpointRouter
      *
      * @var \ServiceBus\Endpoint\Endpoint[][]
      */
-    private $routes = [];
+    private array $routes = [];
 
     /**
      * Destination points for global routes (marked with "*").
@@ -35,11 +35,8 @@ final class EndpointRouter
      *
      * @var \ServiceBus\Endpoint\Endpoint[]
      */
-    private $globalEndpoints = [];
+    private array $globalEndpoints = [];
 
-    /**
-     * @param Endpoint $defaultEndpoint
-     */
     public function __construct(Endpoint $defaultEndpoint)
     {
         $this->addGlobalDestination($defaultEndpoint);
@@ -47,10 +44,6 @@ final class EndpointRouter
 
     /**
      * Adding global delivery route.
-     *
-     * @param Endpoint $endpoint
-     *
-     * @return void
      */
     public function addGlobalDestination(Endpoint $endpoint): void
     {
@@ -60,12 +53,7 @@ final class EndpointRouter
     /**
      * Add custom endpoint for multiple messages.
      *
-     * @psalm-param array<array-key, class-string>    $messages
-     *
-     * @param string[] $messages
-     * @param Endpoint $endpoint
-     *
-     * @return void
+     * @psalm-param array<array-key, class-string> $messages
      */
     public function registerRoutes(array $messages, Endpoint $endpoint): void
     {
@@ -79,11 +67,6 @@ final class EndpointRouter
      * Add custom endpoint to specified message.
      *
      * @psalm-param class-string $messageClass
-     *
-     * @param string   $messageClass
-     * @param Endpoint $endpoint
-     *
-     * @return void
      */
     public function registerRoute(string $messageClass, Endpoint $endpoint): void
     {
@@ -95,8 +78,6 @@ final class EndpointRouter
      * If no specific route is registered, the default endpoint route will be returned.
      *
      * @psalm-return array<array-key, \ServiceBus\Endpoint\Endpoint>
-     *
-     * @param string $messageClass
      *
      * @return \ServiceBus\Endpoint\Endpoint[]
      */

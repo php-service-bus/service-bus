@@ -24,40 +24,25 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
 {
     /**
      * Is this an event listener?
-     *
-     * @readonly
-     *
-     * @var bool
      */
-    public $isEventListener;
+    public bool $isEventListener;
 
     /**
      * Is this a command handler?
-     *
-     * @readonly
-     *
-     * @var bool
      */
-    public $isCommandHandler;
+    public bool $isCommandHandler;
 
     /**
      * Validation enabled.
-     *
-     * @readonly
-     *
-     * @var bool
      */
-    public $validationEnabled = false;
+    public bool $validationEnabled = false;
 
     /**
      * Validation groups.
      *
-     * @readonly
      * @psalm-var array<array-key, string>
-     *
-     * @var string[]
      */
-    public $validationGroups = [];
+    public array $validationGroups = [];
 
     /**
      * In case of validation errors, automatically send the event and stop further execution
@@ -65,12 +50,9 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      *
      * If no class is specified, control is passed to user code
      *
-     * @readonly
      * @psalm-var class-string|null
-     *
-     * @var string|null
      */
-    public $defaultValidationFailedEvent;
+    public ?string $defaultValidationFailedEvent = null;
 
     /**
      * In case of a runtime error, automatically send the specified event with the message received from the exception
@@ -78,24 +60,15 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      *
      * If no class is specified, control is passed to user code
      *
-     * @readonly
      * @psalm-var class-string|null
-     *
-     * @var string|null
      */
-    public $defaultThrowableEvent;
+    public ?string $defaultThrowableEvent = null;
 
-    /**
-     * @return self
-     */
     public static function createForEventListener(): self
     {
         return new self(true, false);
     }
 
-    /**
-     * @return self
-     */
     public static function createForCommandHandler(): self
     {
         return new self(false, true);
@@ -105,10 +78,6 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      * Enable validation.
      *
      * @psalm-param array<array-key, string> $validationGroups
-     *
-     * @param string[] $validationGroups
-     *
-     * @return self
      */
     public function enableValidation(array $validationGroups = []): self
     {
@@ -133,11 +102,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * @psalm-param class-string $eventClass
      *
-     * @param string $eventClass
-     *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent
-     *
-     * @return self
      */
     public function withDefaultValidationFailedEvent(string $eventClass): self
     {
@@ -172,11 +137,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * @psalm-param class-string $eventClass
      *
-     * @param string $eventClass
-     *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent
-     *
-     * @return self
      */
     public function withDefaultThrowableEvent(string $eventClass): self
     {
@@ -209,16 +170,9 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     }
 
     /**
-     * @psalm-param    array<array-key, string> $validationGroups
-     * @psalm-param    class-string|null $defaultValidationFailedEvent
-     * @psalm-param    class-string|null $defaultThrowableEvent
-     *
-     * @param bool        $isEventListener
-     * @param bool        $isCommandHandler
-     * @param bool        $validationEnabled
-     * @param string[]    $validationGroups
-     * @param string|null $defaultValidationFailedEvent
-     * @param string|null $defaultThrowableEvent
+     * @psalm-param  array<array-key, string> $validationGroups
+     * @psalm-param  class-string|null $defaultValidationFailedEvent
+     * @psalm-param  class-string|null $defaultThrowableEvent
      */
     private function __construct(
         bool $isEventListener,

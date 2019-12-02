@@ -14,13 +14,10 @@ namespace ServiceBus\Context;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 
+/**
+ *
+ */
 interface ContextFactory
 {
-    /**
-     * @param IncomingPackage $package
-     * @param object          $message
-     *
-     * @return ServiceBusContext
-     */
     public function create(IncomingPackage $package, object $message): ServiceBusContext;
 }

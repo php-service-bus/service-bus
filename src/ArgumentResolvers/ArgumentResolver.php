@@ -22,19 +22,11 @@ interface ArgumentResolver
 {
     /**
      * Whether this resolver can resolve the value for the given Argument.
-     *
-     * @param MessageHandlerArgument $argument
-     *
-     * @return bool
      */
     public function supports(MessageHandlerArgument $argument): bool;
 
     /**
      * Resolve argument value.
-     *
-     * @param object                 $message
-     * @param ServiceBusContext      $context
-     * @param MessageHandlerArgument $argument
      *
      * @return mixed
      */

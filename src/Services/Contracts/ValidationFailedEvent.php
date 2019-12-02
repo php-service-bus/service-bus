@@ -28,18 +28,11 @@ interface ValidationFailedEvent
      * ]
      *
      * @psalm-param array<string, array<int, string>> $violations
-     *
-     * @param string $correlationId
-     * @param array  $violations
-     *
-     * @return self
      */
     public static function create(string $correlationId, array $violations): self;
 
     /**
      * Receive request correlation id (Message trace id).
-     *
-     * @return string
      */
     public function correlationId(): string;
 
@@ -47,8 +40,6 @@ interface ValidationFailedEvent
      * Receive list of validate violations.
      *
      * @psalm-return array<string, array<int, string>>
-     *
-     * @return array
      */
     public function violations(): array;
 }

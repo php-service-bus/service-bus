@@ -25,16 +25,8 @@ use Monolog\Logger;
  */
 final class StdOutHandler extends AbstractProcessingHandler
 {
-    /**
-     * @var ResourceOutputStream
-     */
-    private $streamWriter;
+    private ResourceOutputStream $streamWriter;
 
-    /**
-     * @param int                     $level
-     * @param bool                    $bubble
-     * @param FormatterInterface|null $formatter
-     */
     public function __construct(int $level = Logger::DEBUG, bool $bubble = true, ?FormatterInterface $formatter = null)
     {
         parent::__construct($level, $bubble);
@@ -45,8 +37,6 @@ final class StdOutHandler extends AbstractProcessingHandler
 
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     protected function write(array $record): void
     {

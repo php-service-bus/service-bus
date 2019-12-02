@@ -28,46 +28,20 @@ use ServiceBus\Transport\Common\Transport;
  */
 final class MessageDeliveryEndpoint implements Endpoint
 {
-    /**
-     * @var Transport
-     */
-    private $transport;
-
-    /**
-     * Which exchange (and with which key) the message will be sent to.
-     *
-     * @var DeliveryDestination
-     */
-    private $destination;
-
-    /**
-     * Convert message to string.
-     *
-     * @var EndpointEncoder
-     */
-    private $encoder;
+    private Transport $transport;
+    private DeliveryDestination $destination;
+    private EndpointEncoder $encoder;
 
     /**
      * A wrapper on an operation that performs repetitions in case of an error.
-     *
-     * @var OperationRetryWrapper
      */
-    private $deliveryRetryHandler;
+    private OperationRetryWrapper $deliveryRetryHandler;
 
     /**
      * Endpoint name.
-     *
-     * @var string
      */
-    private $name;
+    private string $name;
 
-    /**
-     * @param string                     $name
-     * @param Transport                  $transport
-     * @param DeliveryDestination        $destination
-     * @param EndpointEncoder|null       $encoder
-     * @param OperationRetryWrapper|null $deliveryRetryHandler
-     */
     public function __construct(
         string $name,
         Transport $transport,
@@ -120,12 +94,6 @@ final class MessageDeliveryEndpoint implements Endpoint
 
     /**
      * Create outbound package with specified parameters.
-     *
-     * @param string              $payload
-     * @param DeliveryOptions     $options
-     * @param DeliveryDestination $destination
-     *
-     * @return OutboundPackage
      */
     private static function createPackage(
         string $payload,
@@ -145,23 +113,18 @@ final class MessageDeliveryEndpoint implements Endpoint
         );
     }
 
-    /**
-     * @param OutboundPackage $package
-     *
-     * @return Promise
-     */
     private function deferredDelivery(OutboundPackage $package): Promise
     {
         $deferred = new Deferred();
 
         Loop::defer(
-            function() use ($package, $deferred): \Generator
+            function () use ($package, $deferred): \Generator
             {
                 try
                 {
                     yield call(
                         $this->deliveryRetryHandler,
-                        function() use ($package): \Generator
+                        function () use ($package): \Generator
                         {
                             yield $this->transport->send($package);
                         },

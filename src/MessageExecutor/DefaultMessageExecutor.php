@@ -25,19 +25,8 @@ use ServiceBus\Services\Configuration\DefaultHandlerOptions;
  */
 final class DefaultMessageExecutor implements MessageExecutor
 {
-    /**
-     * Message handler.
-     *
-     * @var \Closure
-     */
-    private $closure;
-
-    /**
-     * @psalm-var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string>
-     *
-     * @var \SplObjectStorage
-     */
-    private $arguments;
+    private \Closure $closure;
+    private \SplObjectStorage $arguments;
 
     /**
      * Argument resolvers collection.
@@ -46,23 +35,13 @@ final class DefaultMessageExecutor implements MessageExecutor
      *
      * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
-    private $argumentResolvers;
+    private array $argumentResolvers;
+
+    private DefaultHandlerOptions $options;
 
     /**
-     * Execution options.
+     * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>  $argumentResolvers
      *
-     * @var DefaultHandlerOptions
-     */
-    private $options;
-
-    /**
-     * @psalm-param \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
-     * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
-     *              $argumentResolvers
-     *
-     * @param \Closure                                         $closure
-     * @param \SplObjectStorage                                $arguments
-     * @param DefaultHandlerOptions                            $options
      * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[] $argumentResolvers
      */
     public function __construct(
@@ -85,7 +64,7 @@ final class DefaultMessageExecutor implements MessageExecutor
         $argumentResolvers = $this->argumentResolvers;
 
         return call(
-            static function(
+            static function (
                 \Closure $closure,
                 \SplObjectStorage $arguments,
                 DefaultHandlerOptions $options,
@@ -135,12 +114,6 @@ final class DefaultMessageExecutor implements MessageExecutor
 
     /**
      * Publish failed response event.
-     *
-     * @param string            $eventClass
-     * @param string            $errorMessage
-     * @param ServiceBusContext $context
-     *
-     * @return \Generator
      */
     private static function publishThrowable(string $eventClass, string $errorMessage, ServiceBusContext $context): \Generator
     {
@@ -161,12 +134,7 @@ final class DefaultMessageExecutor implements MessageExecutor
      * @psalm-param  array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $resolvers
      * @psalm-return array<int, mixed>
      *
-     * @param \SplObjectStorage                                $arguments
      * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[] $resolvers
-     * @param object                                           $message
-     * @param ServiceBusContext                                $context
-     *
-     * @return array
      */
     private static function collectArguments(
         \SplObjectStorage $arguments,

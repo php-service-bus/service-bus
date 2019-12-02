@@ -20,16 +20,10 @@ interface ServiceHandlersLoader
     /**
      * Load specified saga listeners.
      *
-     * @psalm-return \SplObjectStorage<\ServiceBus\Services\Configuration\ServiceMessageHandler, string>
-     *
-     * @param object $service
-     *
      * @throws \ServiceBus\Services\Exceptions\InvalidHandlerArguments
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
      * @throws \ServiceBus\Services\Exceptions\UnableCreateClosure
      * @throws \ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed
-     *
-     * @return \SplObjectStorage
      */
     public function load(object $service): \SplObjectStorage;
 }

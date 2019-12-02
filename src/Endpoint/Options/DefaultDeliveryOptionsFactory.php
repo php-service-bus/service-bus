@@ -1,8 +1,9 @@
 <?php
+
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author Stepan Zolotarev <zsl88.logging@gmail.com>
+ * @author  Stepan Zolotarev <zsl88.logging@gmail.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
@@ -14,13 +15,13 @@ namespace ServiceBus\Endpoint\Options;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
 use function ServiceBus\Common\uuid;
 
+/**
+ *
+ */
 final class DefaultDeliveryOptionsFactory implements DeliveryOptionsFactory
 {
     /**
-     * @param int|string|null $traceId
-     * @param string|null     $messageClass
-     *
-     * @return DeliveryOptions
+     * @inheritDoc
      */
     public function create($traceId, ?string $messageClass): DeliveryOptions
     {

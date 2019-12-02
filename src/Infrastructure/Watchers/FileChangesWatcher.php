@@ -22,23 +22,13 @@ use Amp\Promise;
  */
 final class FileChangesWatcher
 {
-    /**
-     * Path to the directory.
-     *
-     * @var string
-     */
-    private $directory;
+    private string $directory;
 
     /**
      * Previous hash of files in the directory.
-     *
-     * @var string|null
      */
-    private $previousHash;
+    private ?string $previousHash = null;
 
-    /**
-     * @param string $directory
-     */
     public function __construct(string $directory)
     {
         $this->directory = $directory;
@@ -47,15 +37,11 @@ final class FileChangesWatcher
     /**
      * Compare hashes
      * If returned false, the files have not been changed. Otherwise, return true.
-     *
-     * @psalm-suppress MixedTypeCoercion Incorrect resolving the value of the promise
-     *
-     * @return Promise<bool>
      */
     public function compare(): Promise
     {
         return call(
-            function(): \Generator
+            function (): \Generator
             {
                 /** @var string $bufferContent */
                 $bufferContent = yield from self::execute($this->directory);
@@ -85,12 +71,6 @@ final class FileChangesWatcher
 
     /**
      * Execute calculate hashes.
-     *
-     * @psalm-suppress InvalidReturnType Incorrect resolving the value of the generator
-     *
-     * @param string $directory
-     *
-     * @return \Generator<string>
      */
     private static function execute(string $directory): \Generator
     {
@@ -106,7 +86,7 @@ final class FileChangesWatcher
             /** @psalm-suppress TooManyTemplateParams Wrong Promise template */
             yield $process->start();
 
-            /** @var string $bufferContent  */
+            /** @var string $bufferContent */
             $bufferContent = yield buffer($process->getStdout());
 
             return $bufferContent;
@@ -121,10 +101,6 @@ final class FileChangesWatcher
 
     /**
      * Get a hash from the stdOut.
-     *
-     * @param string $response
-     *
-     * @return string|null
      */
     private static function extractHash(string $response): ?string
     {

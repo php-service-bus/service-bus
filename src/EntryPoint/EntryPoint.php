@@ -41,54 +41,34 @@ final class EntryPoint
 
     /**
      * Current transport from which messages will be received.
-     *
-     * @var Transport
      */
-    private $transport;
+    private Transport $transport;
 
     /**
      * Handling incoming package processor.
      * Responsible for deserialization, routing and task execution.
-     *
-     * @var EntryPointProcessor
      */
-    private $processor;
+    private EntryPointProcessor $processor;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * The max number of concurrent tasks.
-     *
-     * @var int
      */
-    private $maxConcurrentTaskCount;
+    private int $maxConcurrentTaskCount;
 
     /**
      * The current number of tasks performed.
      * The value should not be too large and should not exceed the maximum number of available connections to the
      * database.
-     *
-     * @var int
      */
-    private $currentTasksInProgressCount = 0;
+    private int $currentTasksInProgressCount = 0;
 
     /**
      * Throttling value (in milliseconds) while achieving the maximum number of simultaneously executed tasks.
-     *
-     * @var int
      */
-    private $awaitDelay;
+    private int $awaitDelay;
 
-    /**
-     * @param Transport            $transport
-     * @param EntryPointProcessor  $processor
-     * @param LoggerInterface|null $logger
-     * @param int|null             $maxConcurrentTaskCount
-     * @param int|null             $awaitDelay Barrier wait delay (in milliseconds)
-     */
     public function __construct(
         Transport $transport,
         EntryPointProcessor $processor,
@@ -106,24 +86,20 @@ final class EntryPoint
     /**
      * Start queues listen.
      *
-     * @param Queue ...$queues
-     *
      * @throws \ServiceBus\Transport\Common\Exceptions\ConnectionFail Connection refused
-     *
-     * @return Promise It does not return any result
      */
     public function listen(Queue ...$queues): Promise
     {
         /** Hack for phpunit tests */
         $isTestCall = 'phpunitTests' === (string) \getenv('SERVICE_BUS_TESTING');
 
-        /** @psalm-suppress MixedArgument */
         return call(
-            function(array $queues) use ($isTestCall): \Generator
+            function (array $queues) use ($isTestCall): \Generator
             {
-                /** @psalm-suppress TooManyTemplateParams */
+                /** @var Queue[] $queues */
+
                 yield $this->transport->consume(
-                    function(IncomingPackage $package) use ($isTestCall): \Generator
+                    function (IncomingPackage $package) use ($isTestCall): \Generator
                     {
                         $this->currentTasksInProgressCount++;
 
@@ -159,15 +135,13 @@ final class EntryPoint
      * Terminates the subscription and stops the daemon after the specified number of seconds.
      *
      * @param int $delay The delay before the completion (in seconds)
-     *
-     * @return void
      */
     public function stop(int $delay = 10): void
     {
         $delay = 0 >= $delay ? 1 : $delay;
 
         Loop::defer(
-            function() use ($delay): \Generator
+            function () use ($delay): \Generator
             {
                 yield $this->transport->stop();
 
@@ -175,7 +149,7 @@ final class EntryPoint
 
                 Loop::delay(
                     $delay * 1000,
-                    function(): void
+                    function (): void
                     {
                         $this->logger->info('The event loop has been stopped');
 
@@ -186,18 +160,13 @@ final class EntryPoint
         );
     }
 
-    /**
-     * @param IncomingPackage $package
-     *
-     * @return void
-     */
     private function deferExecution(IncomingPackage $package): void
     {
         Loop::defer(
-            function() use ($package): void
+            function () use ($package): void
             {
                 $this->processor->handle($package)->onResolve(
-                    function(?\Throwable $throwable) use ($package): void
+                    function (?\Throwable $throwable) use ($package): void
                     {
                         $this->currentTasksInProgressCount--;
 

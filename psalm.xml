@@ -2,8 +2,10 @@
 <psalm
         totallyTyped="true"
         useDocblockTypes="true"
+        useDocblockPropertyTypes="true"
         allowPhpStormGenerics="true"
         requireVoidReturnType="true"
+        strictBinaryOperands="true"
         ignoreInternalFunctionFalseReturn="false"
         ignoreInternalFunctionNullReturn="false"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

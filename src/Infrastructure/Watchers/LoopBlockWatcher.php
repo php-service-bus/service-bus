@@ -29,19 +29,9 @@ final class LoopBlockWatcher
     /** Check interval, only check one tick every $interval milliseconds */
     private const CHECK_INTERVAL = 0;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
+    private ?BlockDetector $detector = null;
 
-    /**
-     * @var BlockDetector|null
-     */
-    private $detector;
-
-    /**
-     * @param LoggerInterface|null $logger
-     */
     public function __construct(LoggerInterface $logger = null)
     {
         $this->logger = $logger ?? new NullLogger();
@@ -52,9 +42,6 @@ final class LoopBlockWatcher
         $this->getDetector()->stop();
     }
 
-    /**
-     * @return void
-     */
     public function run(): void
     {
         $this->getDetector()->start();
@@ -65,9 +52,6 @@ final class LoopBlockWatcher
         ]);
     }
 
-    /**
-     * @return BlockDetector
-     */
     private function getDetector(): BlockDetector
     {
         if (null === $this->detector)
@@ -83,13 +67,11 @@ final class LoopBlockWatcher
     }
 
     /**
-     * @param LoggerInterface $logger
-     *
-     * @return callable(int):void
+     * @psalm-return callable(int):void
      */
     private static function createOnBlockHandler(LoggerInterface $logger): callable
     {
-        return static function(int $blockInterval) use ($logger): void
+        return static function (int $blockInterval) use ($logger): void
         {
             $trace     = \debug_backtrace();
             $traceData = ['info' => []];
@@ -103,7 +85,6 @@ final class LoopBlockWatcher
 
             while (isset($trace[$i]['class']))
             {
-                /** @noinspection SlowArrayOperationsInLoopInspection */
                 $traceData['info'] = \array_merge(
                     $traceData['info'],
                     [

@@ -30,31 +30,10 @@ use function ServiceBus\Common\collectThrowableDetails;
  */
 final class KernelContext implements ServiceBusContext
 {
-    /**
-     * The package containing the incoming message.
-     *
-     * @var IncomingPackage
-     */
-    private $incomingPackage;
-
-    /**
-     * Incoming message object.
-     *
-     * @var object
-     */
-    private $receivedMessage;
-
-    /**
-     * Outbound message routing.
-     *
-     * @var EndpointRouter
-     */
-    private $endpointRouter;
-
-    /**
-     * @var DeliveryOptionsFactory
-     */
-    private $optionsFactory;
+    private IncomingPackage $incomingPackage;
+    private object $receivedMessage;
+    private EndpointRouter $endpointRouter;
+    private DeliveryOptionsFactory $optionsFactory;
 
     /**
      * Is the received message correct?
@@ -62,10 +41,8 @@ final class KernelContext implements ServiceBusContext
      * Note: This value is stamped from the infrastructure level
      *
      * @see MessageValidationExecutor::134
-     *
-     * @var bool
      */
-    private $isValidMessage = true;
+    private bool $isValidMessage = true;
 
     /**
      * List of validate violations.
@@ -82,23 +59,14 @@ final class KernelContext implements ServiceBusContext
      * ]
      *
      * @psalm-var array<string, array<int, string>>
-     *
-     * @var array
      */
-    private $violations = [];
+    private array $violations = [];
 
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @param IncomingPackage        $incomingPackage
-     * @param object                 $receivedMessage
-     * @param EndpointRouter         $endpointRouter
-     * @param DeliveryOptionsFactory $optionsFactory
-     * @param LoggerInterface        $logger
-     */
     public function __construct(
         IncomingPackage $incomingPackage,
         object $receivedMessage,
@@ -134,6 +102,7 @@ final class KernelContext implements ServiceBusContext
      */
     public function delivery(object $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
+        /** @psalm-var class-string $messageClass */
         $messageClass = \get_class($message);
         $endpoints    = $this->endpointRouter->route($messageClass);
         $logger       = $this->logger;
@@ -141,19 +110,18 @@ final class KernelContext implements ServiceBusContext
         $traceId = $this->incomingPackage->traceId();
         $options = $deliveryOptions ?? $this->optionsFactory->create($traceId, $messageClass);
 
-        if (null === $options->traceId())
+        if ($options->traceId() === null)
         {
             $options->withTraceId($traceId);
         }
 
         return call(
-            static function(object $message, DeliveryOptions $options) use ($endpoints, $logger): void
+            static function (object $message, DeliveryOptions $options) use ($endpoints, $logger): void
             {
                 foreach ($endpoints as $endpoint)
                 {
                     /** @var \ServiceBus\Endpoint\Endpoint $endpoint */
 
-                    /** @noinspection DisconnectedForeachInstructionInspection */
                     $logger->debug(
                         'Send message "{messageClass}" to "{endpoint}"',
                         [
@@ -164,9 +132,9 @@ final class KernelContext implements ServiceBusContext
                     );
 
                     $endpoint->delivery($message, $options)->onResolve(
-                        static function(?\Throwable $throwable): void
+                        static function (?\Throwable $throwable): void
                         {
-                            if (null !== $throwable)
+                            if ($throwable !== null)
                             {
                                 throw  $throwable;
                             }
@@ -185,7 +153,7 @@ final class KernelContext implements ServiceBusContext
     public function return(int $secondsDelay = 3): Promise
     {
         return call(
-            function(int $delay): \Generator
+            function (int $delay): \Generator
             {
                 yield new Delayed($delay);
 
@@ -256,9 +224,7 @@ final class KernelContext implements ServiceBusContext
      *
      * @see          MessageValidationExecutor
      *
-     * @param array<string, array<int, string>> $violations
-     *
-     * @return void
+     * @psalm-param array<string, array<int, string>> $violations
      */
     private function validationFailed(array $violations): void
     {

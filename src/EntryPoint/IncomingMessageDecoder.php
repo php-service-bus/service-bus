@@ -31,18 +31,14 @@ final class IncomingMessageDecoder
      *   'custom_encoder_key' => 'custom_decoder_id'
      * ]
      *
-     * @var array<string, string>
+     * @psalm-var array<string, string>
      */
-    private $decodersConfiguration;
+    private array $decodersConfiguration;
+
+    private ServiceLocator $decodersLocator;
 
     /**
-     * @var ServiceLocator
-     */
-    private $decodersLocator;
-
-    /**
-     * @param array<string, string> $decodersConfiguration
-     * @param ServiceLocator        $decodersLocator
+     * @psalm-param array<string, string> $decodersConfiguration
      */
     public function __construct(array $decodersConfiguration, ServiceLocator $decodersLocator)
     {
@@ -53,12 +49,8 @@ final class IncomingMessageDecoder
     /**
      * Decodes a packet using a handler defined in the headers (or uses a default decoder).
      *
-     * @param IncomingPackage $package
-     *
      * @throws \LogicException Could not find decoder in the service container
      * @throws \ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed
-     *
-     * @return object
      */
     public function decode(IncomingPackage $package): object
     {
@@ -70,11 +62,7 @@ final class IncomingMessageDecoder
     }
 
     /**
-     * @param string $encoderKey
-     *
      * @throws \LogicException Could not find decoder
-     *
-     * @return MessageDecoder
      */
     private function findDecoderByKey(string $encoderKey): MessageDecoder
     {
@@ -87,11 +75,7 @@ final class IncomingMessageDecoder
     }
 
     /**
-     * @param string $decoderId
-     *
      * @throws \LogicException Could not find decoder
-     *
-     * @return MessageDecoder
      */
     private function obtainDecoder(string $decoderId): MessageDecoder
     {
@@ -108,11 +92,6 @@ final class IncomingMessageDecoder
         );
     }
 
-    /**
-     * @param array $headers
-     *
-     * @return string
-     */
     private function extractEncoderKey(array $headers): string
     {
         /** @var string $encoderKey */

@@ -32,95 +32,49 @@ final class ContainerBuilder
     private const CONTAINER_NAME_TEMPLATE = '%s%sProjectContainer';
 
     /**
-     * Parameters.
-     *
      * Key=>value parameters
      *
      * @psalm-var array<string, bool|string|int|float|array<mixed, mixed>|null>
-     *
-     * @var array
      */
-    private $parameters;
+    private array $parameters;
+    private string $entryPointName;
 
     /**
-     * Entry point name.
-     *
-     * @var string
+     * @see \Symfony\Component\DependencyInjection\Extension\Extension
      */
-    private $entryPointName;
+    private \SplObjectStorage $extensions;
 
     /**
-     * Extensions.
-     *
-     * @psalm-var \SplObjectStorage<\Symfony\Component\DependencyInjection\Extension\Extension, string>
-     *
-     * @var \SplObjectStorage
+     * @see \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterfac
      */
-    private $extensions;
+    private \SplObjectStorage  $compilerPasses;
 
     /**
-     * CompilerPass collection.
-     *
-     * @psalm-var \SplObjectStorage<\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface, string>
-     *
-     * @var \SplObjectStorage
+     * @see \ServiceBus\Common\Module\ServiceBusModule
      */
-    private $compilerPasses;
+    private \SplObjectStorage $modules;
 
-    /**
-     * Modules collection.
-     *
-     * @psalm-var \SplObjectStorage<\ServiceBus\Common\Module\ServiceBusModule, string>
-     *
-     * @var \SplObjectStorage
-     */
-    private $modules;
-
-    /**
-     * @var Environment
-     */
-    private $environment;
-
-    /**
-     * Cache directory path.
-     *
-     * @var string|null
-     */
-    private $cacheDirectory;
+    private Environment $environment;
+    private ?string $cacheDirectory = null;
 
     /**
      * ConfigCache caches arbitrary content in files on disk.
-     *
-     * @var ConfigCache|null
      */
-    private $configCache;
+    private ?ConfigCache $configCache = null;
 
-    /**
-     * @param string      $entryPointName
-     * @param Environment $environment
-     */
     public function __construct(string $entryPointName, Environment $environment)
     {
         $this->entryPointName = $entryPointName;
         $this->environment    = $environment;
         $this->parameters     = [];
 
-        /** @psalm-suppress MixedTypeCoercion */
         $this->extensions = new \SplObjectStorage();
-        /** @psalm-suppress MixedTypeCoercion */
         $this->compilerPasses = new \SplObjectStorage();
-        /** @psalm-suppress MixedTypeCoercion */
         $this->modules = new \SplObjectStorage();
     }
 
     /**
      * Add customer compiler pass.
-     *
-     * @noinspection PhpDocSignatureInspection
-     *
-     * @param CompilerPassInterface ...$compilerPasses
-     *
-     * @return void
      */
     public function addCompilerPasses(CompilerPassInterface ...$compilerPasses): void
     {
@@ -132,12 +86,6 @@ final class ContainerBuilder
 
     /**
      * Add customer extension.
-     *
-     * @noinspection PhpDocSignatureInspection
-     *
-     * @param Extension ...$extensions
-     *
-     * @return void
      */
     public function addExtensions(Extension ...$extensions): void
     {
@@ -149,10 +97,6 @@ final class ContainerBuilder
 
     /**
      * Add customer modules.
-     *
-     * @param ServiceBusModule ...$serviceBusModules
-     *
-     * @return void
      */
     public function addModules(ServiceBusModule ...$serviceBusModules): void
     {
@@ -164,10 +108,6 @@ final class ContainerBuilder
 
     /**
      * @psalm-param array<string, bool|string|int|float|array<mixed, mixed>|null> $parameters
-     *
-     * @param array $parameters
-     *
-     * @return void
      */
     public function addParameters(array $parameters): void
     {
@@ -179,10 +119,6 @@ final class ContainerBuilder
 
     /**
      * Setup cache directory path.
-     *
-     * @param string $cacheDirectoryPath
-     *
-     * @return void
      */
     public function setupCacheDirectoryPath(string $cacheDirectoryPath): void
     {
@@ -191,8 +127,6 @@ final class ContainerBuilder
 
     /**
      * Has compiled actual container.
-     *
-     * @return bool
      */
     public function hasActualContainer(): bool
     {
@@ -206,8 +140,6 @@ final class ContainerBuilder
 
     /**
      * Receive cached container.
-     *
-     * @return ContainerInterface
      */
     public function cachedContainer(): ContainerInterface
     {
@@ -235,8 +167,6 @@ final class ContainerBuilder
      * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has
      *                                                                                not been dumped
      * @throws \Throwable Boot module failed
-     *
-     * @return ContainerInterface
      */
     public function build(): ContainerInterface
     {
@@ -273,13 +203,9 @@ final class ContainerBuilder
     /**
      * Save container.
      *
-     * @param SymfonyContainerBuilder $builder
-     *
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
-     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has     not been dumped
-     *
-     * @return void
+     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
      */
     private function dumpContainer(SymfonyContainerBuilder $builder): void
     {
@@ -301,8 +227,6 @@ final class ContainerBuilder
 
     /**
      * Receive config cache.
-     *
-     * @return ConfigCache
      */
     private function configCache(): ConfigCache
     {
@@ -316,8 +240,6 @@ final class ContainerBuilder
 
     /**
      * Receive cache directory path.
-     *
-     * @return string
      */
     private function cacheDirectory(): string
     {
@@ -333,8 +255,6 @@ final class ContainerBuilder
 
     /**
      * Get the absolute path to the container class.
-     *
-     * @return string
      */
     private function getContainerClassPath(): string
     {
@@ -343,8 +263,6 @@ final class ContainerBuilder
 
     /**
      * Get container class name.
-     *
-     * @return string
      */
     private function getContainerClassName(): string
     {

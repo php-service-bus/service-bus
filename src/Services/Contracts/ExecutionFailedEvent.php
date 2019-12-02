@@ -17,25 +17,15 @@ namespace ServiceBus\Services\Contracts;
  */
 interface ExecutionFailedEvent
 {
-    /**
-     * @param string $correlationId
-     * @param string $errorMessage
-     *
-     * @return self
-     */
     public static function create(string $correlationId, string $errorMessage): self;
 
     /**
      * Receive request correlation id (Message trace id).
-     *
-     * @return string
      */
     public function correlationId(): string;
 
     /**
      * Receive error message.
-     *
-     * @return string
      */
     public function errorMessage(): string;
 }

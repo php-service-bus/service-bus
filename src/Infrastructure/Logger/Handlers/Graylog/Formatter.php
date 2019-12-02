@@ -20,7 +20,7 @@ use Monolog\Logger;
  */
 final class Formatter extends NormalizerFormatter
 {
-    private const GRAYLOG_VERSION    = 1.0;
+    private const GRAYLOG_VERSION = 1.0;
 
     private const DEFAULT_MAX_LENGTH = 5000;
 
@@ -40,30 +40,18 @@ final class Formatter extends NormalizerFormatter
 
     /**
      * The name of the system for the Gelf log message.
-     *
-     * @var string
      */
-    private $systemName;
+    private string $systemName;
 
     /**
      * Max length per field.
-     *
-     * @var int
      */
-    private $maxLength;
+    private int $maxLength;
 
-    /**
-     * @noinspection PhpDocMissingThrowsInspection
-     *
-     * @param string|null $systemName
-     * @param int|null    $maxLength
-     */
     public function __construct(?string $systemName = null, ?int $maxLength = null)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         parent::__construct('U.u');
 
-        /** @noinspection UnnecessaryCastingInspection */
         $this->systemName = $systemName ?? (string) \gethostname();
         $this->maxLength  = $maxLength ?? self::DEFAULT_MAX_LENGTH;
     }
@@ -116,17 +104,12 @@ final class Formatter extends NormalizerFormatter
 
     /**
      * Format message data.
-     *
-     * @param string $message
-     * @param array  $formatted
-     *
-     * @return array
      */
     private function formatMessage(string $message, array $formatted): array
     {
         $len = 200 + \strlen($message) + \strlen($this->systemName);
 
-        if ($len > $this->maxLength)
+        if($len > $this->maxLength)
         {
             $formatted['short_message'] = \substr($message, 0, $this->maxLength);
             $formatted['full_message']  = $message;
@@ -140,12 +123,7 @@ final class Formatter extends NormalizerFormatter
      *
      * @psalm-param array<string, string|int|float|array|null> $collection
      *
-     * @param array $collection
-     * @param array $formatted
-     *
      * @throws \RuntimeException if encoding fails and errors are not ignored
-     *
-     * @return array
      */
     private function formatAdditionalData(array $collection, array $formatted): array
     {
@@ -153,18 +131,18 @@ final class Formatter extends NormalizerFormatter
          * @psalm-var string                             $key
          * @psalm-var string|int|float|array|object|null $value
          */
-        foreach ($collection as $key => $value)
+        foreach($collection as $key => $value)
         {
             $value = $this->formatValue($value);
 
-            if (null === $value)
+            if(null === $value)
             {
                 continue;
             }
 
-            $len = \strlen($key . $value);
+            $len = \strlen($key . (string) $value);
 
-            if (true === \is_string($value) && $len > $this->maxLength)
+            if(true === \is_string($value) && $len > $this->maxLength)
             {
                 $formatted[$key] = \substr($value, 0, $this->maxLength);
 
@@ -186,11 +164,12 @@ final class Formatter extends NormalizerFormatter
      */
     private function formatValue($value)
     {
-        if (null === $value || true === \is_scalar($value))
+        if(null === $value || true === \is_scalar($value))
         {
             return $value;
         }
 
+        /** @noinspection UnnecessaryCastingInspection */
         return (string) $this->toJson($value);
     }
 }

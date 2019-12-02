@@ -27,28 +27,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class MessageValidationExecutor implements MessageExecutor
 {
-    /**
-     * @var MessageExecutor
-     */
-    private $executor;
+    private MessageExecutor $executor;
+    private ValidatorInterface $validator;
+    private DefaultHandlerOptions $options;
 
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * Execution options.
-     *
-     * @var DefaultHandlerOptions
-     */
-    private $options;
-
-    /**
-     * @param MessageExecutor       $executor
-     * @param DefaultHandlerOptions $options
-     * @param ValidatorInterface    $validator
-     */
     public function __construct(MessageExecutor $executor, DefaultHandlerOptions $options, ValidatorInterface $validator)
     {
         $this->executor  = $executor;
@@ -93,11 +75,6 @@ final class MessageValidationExecutor implements MessageExecutor
 
     /**
      * Publish failed event.
-     *
-     * @param string            $eventClass
-     * @param ServiceBusContext $context
-     *
-     * @return Promise
      */
     private static function publishViolations(string $eventClass, ServiceBusContext $context): Promise
     {
@@ -113,11 +90,6 @@ final class MessageValidationExecutor implements MessageExecutor
 
     /**
      * Bind violations to context.
-     *
-     * @param ConstraintViolationList $violations
-     * @param ServiceBusContext       $context
-     *
-     * @return void
      */
     private static function bindViolations(ConstraintViolationList $violations, ServiceBusContext $context): void
     {

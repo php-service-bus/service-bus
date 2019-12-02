@@ -21,16 +21,8 @@ use Kelunik\Retry\ConstantBackoff;
  */
 final class OperationRetryWrapper
 {
-    /**
-     * Retry operation options.
-     *
-     * @var RetryOptions
-     */
-    private $options;
+    private RetryOptions $options;
 
-    /**
-     * @param RetryOptions|null $options
-     */
     public function __construct(RetryOptions $options = null)
     {
         $this->options = $options ?? new RetryOptions();
@@ -39,8 +31,6 @@ final class OperationRetryWrapper
     /**
      * @param callable   $operation     Wrapped operation
      * @param string ...$exceptionClasses Exceptions in which attempts are repeating the operation
-     *
-     * @return Promise<mixed>
      */
     public function __invoke(callable $operation, string ...$exceptionClasses): Promise
     {

@@ -12,10 +12,9 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Services\Configuration;
 
-use ServiceBus\AnnotationsReader\Annotation;
-use ServiceBus\AnnotationsReader\AnnotationCollection;
-use ServiceBus\AnnotationsReader\AnnotationsReader;
-use ServiceBus\AnnotationsReader\DoctrineAnnotationsReader;
+use ServiceBus\AnnotationsReader\Annotation\MethodLevel;
+use ServiceBus\AnnotationsReader\DoctrineReader;
+use ServiceBus\AnnotationsReader\Reader;
 use ServiceBus\Common\MessageHandler\MessageHandler;
 use ServiceBus\Services\Annotations\CommandHandler;
 use ServiceBus\Services\Annotations\EventListener;
@@ -28,19 +27,11 @@ use ServiceBus\Services\Exceptions\UnableCreateClosure;
  */
 final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoader
 {
-    /**
-     * @var AnnotationsReader
-     */
-    private $annotationReader;
+    private Reader $annotationReader;
 
-    /**
-     * @param AnnotationsReader $annotationReader
-     *
-     * @throws \ServiceBus\AnnotationsReader\Exceptions\ParserConfigurationError
-     */
-    public function __construct(AnnotationsReader $annotationReader = null)
+    public function __construct(Reader $annotationReader = null)
     {
-        $this->annotationReader = $annotationReader ?? new DoctrineAnnotationsReader(null, ['psalm']);
+        $this->annotationReader = $annotationReader ?? new DoctrineReader(null, ['psalm']);
     }
 
     /**
@@ -50,11 +41,11 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     {
         $collection = new \SplObjectStorage();
 
-        /** @var \ServiceBus\AnnotationsReader\Annotation $annotation */
+        /** @var MethodLevel $annotation */
         foreach ($this->loadMethodLevelAnnotations($service) as $annotation)
         {
             /** @var CommandHandler|EventListener $handlerAnnotation */
-            $handlerAnnotation = $annotation->annotationObject;
+            $handlerAnnotation = $annotation->annotation;
 
             /** @var \ReflectionMethod $handlerReflectionMethod */
             $handlerReflectionMethod = $annotation->reflectionMethod;
@@ -62,12 +53,12 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
             $closure = $handlerReflectionMethod->getClosure($service);
 
-            if (null === $closure)
+            if ($closure === null)
             {
                 throw new UnableCreateClosure(
                     \sprintf(
                         'Unable to create a closure for the "%s" method',
-                        $annotation->reflectionMethod ? $annotation->reflectionMethod->getName() : 'n\a'
+                         $annotation->reflectionMethod->getName()
                     )
                 );
             }
@@ -79,7 +70,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
              * @var MessageHandler               $handler
              * @var CommandHandler|EventListener $handlerAnnotation
              */
-            $handler = MessageHandler::create(
+            $handler = new MessageHandler(
                 $this->extractMessageClass($handlerReflectionMethod->getParameters()),
                 $closure,
                 $handlerReflectionMethod,
@@ -94,8 +85,6 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             $collection->attach($serviceMessageHandler);
         }
 
-        /** @psalm-var \SplObjectStorage<\ServiceBus\Services\Configuration\ServiceMessageHandler, string> $collection */
-
         return $collection;
     }
 
@@ -103,7 +92,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
      * Create options.
      *
      * @param ServicesAnnotationsMarker $annotation
-     * @param bool $isCommandHandler
+     * @param bool                      $isCommandHandler
      *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
      *
@@ -146,28 +135,18 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     /**
      * Load a list of annotations for message handlers.
      *
-     * @param object $service
-     *
      * @throws \ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed
      *
-     * @return AnnotationCollection
+     * @return \SplObjectStorage
      */
-    private function loadMethodLevelAnnotations(object $service): AnnotationCollection
+    private function loadMethodLevelAnnotations(object $service): \SplObjectStorage
     {
-        return $this->annotationReader
-            ->extract(\get_class($service))
-            ->filter(
-                static function(Annotation $annotation): ?Annotation
-                {
-                    if ($annotation->annotationObject instanceof ServicesAnnotationsMarker)
-                    {
-                        return $annotation;
-                    }
+        /** @psalm-var class-string $serviceClass */
+        $serviceClass = \get_class($service);
 
-                    return null;
-                }
-            )
-            ->methodLevelAnnotations();
+        return $this->annotationReader
+            ->extract($serviceClass)
+            ->methodLevelCollection;
     }
 
     /**
@@ -191,7 +170,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
 
         if (null !== $firstArgument->getType())
         {
-            /** @var \ReflectionType $type */
+            /** @var \ReflectionNamedType $type */
             $type = $firstArgument->getType();
 
             /** @psalm-var class-string $className */

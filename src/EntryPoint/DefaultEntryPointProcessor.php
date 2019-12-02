@@ -27,29 +27,10 @@ use ServiceBus\Transport\Common\Package\IncomingPackage;
  */
 final class DefaultEntryPointProcessor implements EntryPointProcessor
 {
-    /**
-     * Decoding of incoming messages.
-     *
-     * @var IncomingMessageDecoder
-     */
-    private $messageDecoder;
-
-    /**
-     * @var ContextFactory
-     */
-    private $contextFactory;
-
-    /**
-     * Incoming message router.
-     *
-     * @var Router
-     */
-    private $messagesRouter;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private IncomingMessageDecoder $messageDecoder;
+    private ContextFactory         $contextFactory;
+    private Router                 $messagesRouter;
+    private LoggerInterface        $logger;
 
     /**
      * @param IncomingMessageDecoder $messageDecoder
@@ -80,7 +61,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         $contextFactory = $this->contextFactory;
 
         return call(
-            static function(IncomingPackage $package) use ($messageDecoder, $messagesRouter, $contextFactory, $logger): \Generator
+            static function (IncomingPackage $package) use ($messageDecoder, $messagesRouter, $contextFactory, $logger): \Generator
             {
                 try
                 {

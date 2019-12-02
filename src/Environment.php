@@ -29,17 +29,10 @@ final class Environment
         self::ENVIRONMENT_TESTING,
     ];
 
-    /**
-     * Application environment.
-     *
-     * @var string
-     */
-    private $environment;
+    private string $environment;
 
     /**
      * Creating a test environment.
-     *
-     * @return self
      */
     public static function test(): self
     {
@@ -48,8 +41,6 @@ final class Environment
 
     /**
      * Creating a develop environment.
-     *
-     * @return self
      */
     public static function dev(): self
     {
@@ -58,8 +49,6 @@ final class Environment
 
     /**
      * Creating a production environment.
-     *
-     * @return self
      */
     public static function prod(): self
     {
@@ -69,11 +58,7 @@ final class Environment
     /**
      * Creating the specified environment.
      *
-     * @param string $environment
-     *
      * @throws \LogicException The value of the environment is not specified, or is incorrect
-     *
-     * @return Environment
      */
     public static function create(string $environment): self
     {
@@ -86,8 +71,6 @@ final class Environment
 
     /**
      * Is this environment for debugging?
-     *
-     * @return bool
      */
     public function isDebug(): bool
     {
@@ -96,8 +79,6 @@ final class Environment
 
     /**
      * Is this environment for testing?
-     *
-     * @return bool
      */
     public function isTesting(): bool
     {
@@ -106,8 +87,6 @@ final class Environment
 
     /**
      * Is this environment for production usage?
-     *
-     * @return bool
      */
     public function isProduction(): bool
     {
@@ -116,8 +95,6 @@ final class Environment
 
     /**
      * Is this environment for development usage?
-     *
-     * @return bool
      */
     public function isDevelopment(): bool
     {
@@ -126,10 +103,6 @@ final class Environment
 
     /**
      * Is environments equals.
-     *
-     * @param Environment $environment
-     *
-     * @return bool
      */
     public function equals(Environment $environment): bool
     {
@@ -138,8 +111,6 @@ final class Environment
 
     /**
      * Get a textual representation of the current environment.
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -149,12 +120,7 @@ final class Environment
     /**
      * Validate the specified environment.
      *
-     * @param string $specifiedEnvironment
-     *
      * @throws \LogicException The value of the environment is not specified, or is incorrect
-     *
-     * @return void
-     *
      */
     private static function validateEnvironment(string $specifiedEnvironment): void
     {
@@ -171,9 +137,6 @@ final class Environment
         }
     }
 
-    /**
-     * @param string $environment
-     */
     private function __construct(string $environment)
     {
         $this->environment = $environment;
