@@ -38,8 +38,7 @@ final class UdpHandler extends AbstractProcessingHandler
         bool $gzipMessage = false,
         $level = Logger::DEBUG,
         bool $bubble = true
-    )
-    {
+    ) {
         parent::__construct($level, $bubble);
 
         $this->host        = $host;
@@ -58,15 +57,15 @@ final class UdpHandler extends AbstractProcessingHandler
         {
             $body = jsonEncode($record);
 
-            if(true === $this->gzipMessage)
+            if (true === $this->gzipMessage)
             {
                 $body = (string) \gzcompress($body);
             }
 
             $this->outputStream()->write($body);
         }
-            // @codeCoverageIgnoreStart
-        catch(\Throwable $throwable)
+        // @codeCoverageIgnoreStart
+        catch (\Throwable $throwable)
         {
             /** Not interest */
         }
@@ -78,7 +77,7 @@ final class UdpHandler extends AbstractProcessingHandler
      */
     private function outputStream(): ResourceOutputStream
     {
-        if(null === $this->outputStream)
+        if (null === $this->outputStream)
         {
             $this->outputStream = new ResourceOutputStream(self::createStream($this->host, $this->port), 65000);
         }
@@ -96,7 +95,7 @@ final class UdpHandler extends AbstractProcessingHandler
         $uri    = \sprintf('udp://%s:%d', $host, $port);
         $stream = @\stream_socket_client($uri, $errno, $errstr, 0, \STREAM_CLIENT_CONNECT);
 
-        if(false === $stream)
+        if (false === $stream)
         {
             throw new \RuntimeException(\sprintf('Could not connect to %s', $uri));
         }

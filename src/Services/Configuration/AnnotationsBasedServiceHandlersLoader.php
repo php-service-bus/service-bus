@@ -58,7 +58,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                 throw new UnableCreateClosure(
                     \sprintf(
                         'Unable to create a closure for the "%s" method',
-                         $annotation->reflectionMethod->getName()
+                        $annotation->reflectionMethod->getName()
                     )
                 );
             }

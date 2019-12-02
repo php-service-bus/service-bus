@@ -109,7 +109,7 @@ final class Formatter extends NormalizerFormatter
     {
         $len = 200 + \strlen($message) + \strlen($this->systemName);
 
-        if($len > $this->maxLength)
+        if ($len > $this->maxLength)
         {
             $formatted['short_message'] = \substr($message, 0, $this->maxLength);
             $formatted['full_message']  = $message;
@@ -131,18 +131,18 @@ final class Formatter extends NormalizerFormatter
          * @psalm-var string                             $key
          * @psalm-var string|int|float|array|object|null $value
          */
-        foreach($collection as $key => $value)
+        foreach ($collection as $key => $value)
         {
             $value = $this->formatValue($value);
 
-            if(null === $value)
+            if (null === $value)
             {
                 continue;
             }
 
             $len = \strlen($key . (string) $value);
 
-            if(true === \is_string($value) && $len > $this->maxLength)
+            if (true === \is_string($value) && $len > $this->maxLength)
             {
                 $formatted[$key] = \substr($value, 0, $this->maxLength);
 
@@ -164,7 +164,7 @@ final class Formatter extends NormalizerFormatter
      */
     private function formatValue($value)
     {
-        if(null === $value || true === \is_scalar($value))
+        if (null === $value || true === \is_scalar($value))
         {
             return $value;
         }

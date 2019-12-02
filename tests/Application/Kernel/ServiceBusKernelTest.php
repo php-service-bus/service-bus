@@ -64,7 +64,7 @@ final class ServiceBusKernelTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/kernel_test';
 
-        if(false === \file_exists($this->cacheDirectory))
+        if (false === \file_exists($this->cacheDirectory))
         {
             \mkdir($this->cacheDirectory);
         }
@@ -120,7 +120,7 @@ final class ServiceBusKernelTest extends TestCase
 
             unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
         }
-        catch(\Throwable $throwable)
+        catch (\Throwable $throwable)
         {
         }
     }
@@ -135,14 +135,14 @@ final class ServiceBusKernelTest extends TestCase
         $this->sendMessage(new CommandWithPayload('payload'));
 
         Loop::run(
-            function(): \Generator
+            function (): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
             }
         );
 
         $messages = \array_map(
-            static function(array $entry): string
+            static function (array $entry): string
             {
                 return $entry['message'];
             },
@@ -162,14 +162,14 @@ final class ServiceBusKernelTest extends TestCase
         $this->sendMessage(new TriggerThrowableCommand());
 
         Loop::run(
-            function(): \Generator
+            function (): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
             }
         );
 
         $messages = \array_map(
-            static function(array $entry): string
+            static function (array $entry): string
             {
                 return $entry['message'];
             },
@@ -201,14 +201,14 @@ final class ServiceBusKernelTest extends TestCase
         $this->sendMessage(new SecondEmptyCommand());
 
         Loop::run(
-            function(): \Generator
+            function (): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
             }
         );
 
         $messages = \array_map(
-            static function(array $entry): string
+            static function (array $entry): string
             {
                 return $entry['message'];
             },
@@ -228,7 +228,7 @@ final class ServiceBusKernelTest extends TestCase
         $this->sendMessage(new WithValidationCommand(''));
 
         Loop::run(
-            function(): \Generator
+            function (): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
             }
@@ -236,9 +236,9 @@ final class ServiceBusKernelTest extends TestCase
 
         $entries = \array_filter(
             \array_map(
-                static function(array $entry): ?array
+                static function (array $entry): ?array
                 {
-                    if(true === isset($entry['context']['violations']))
+                    if (true === isset($entry['context']['violations']))
                     {
                         return $entry;
                     }
