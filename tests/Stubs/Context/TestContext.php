@@ -80,6 +80,14 @@ final class TestContext implements ServiceBusContext
     /**
      * {@inheritdoc}
      */
+    public function return(int $secondsDelay = 3): Promise
+    {
+        return new Success();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function logContextMessage(string $logMessage, array $extra = [], string $level = LogLevel::INFO): void
     {
         $this->logger->log($level, $logMessage, $extra);
@@ -88,9 +96,9 @@ final class TestContext implements ServiceBusContext
     /**
      * {@inheritdoc}
      */
-    public function logContextThrowable(\Throwable $throwable, string $level = LogLevel::ERROR, array $extra = []): void
+    public function logContextThrowable(\Throwable $throwable, array $extra = [], string $level = LogLevel::ERROR): void
     {
-        $this->logContextMessage($throwable->getMessage());
+        $this->logContextMessage($throwable->getMessage(), $extra, $level);
     }
 
     /**

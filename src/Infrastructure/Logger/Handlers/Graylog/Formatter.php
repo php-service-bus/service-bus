@@ -191,6 +191,6 @@ final class Formatter extends NormalizerFormatter
             return $value;
         }
 
-        return (string) $this->toJson($value);
+        return $this->toJson($value);
     }
 }

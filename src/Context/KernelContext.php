@@ -4,6 +4,7 @@
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
  * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Stepan Zolotarev <zsl88.logging@gmail.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
@@ -12,17 +13,17 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Context;
 
-use function Amp\call;
-use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Delayed;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
-use ServiceBus\Endpoint\DefaultDeliveryOptions;
 use ServiceBus\Endpoint\EndpointRouter;
+use ServiceBus\Endpoint\Options\DeliveryOptionsFactory;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
+use function Amp\call;
+use function ServiceBus\Common\collectThrowableDetails;
 
 /**
  *
@@ -49,6 +50,11 @@ final class KernelContext implements ServiceBusContext
      * @var EndpointRouter
      */
     private $endpointRouter;
+
+    /**
+     * @var DeliveryOptionsFactory
+     */
+    private $optionsFactory;
 
     /**
      * Is the received message correct?
@@ -87,20 +93,23 @@ final class KernelContext implements ServiceBusContext
     private $logger;
 
     /**
-     * @param IncomingPackage $incomingPackage
-     * @param object          $receivedMessage
-     * @param EndpointRouter  $endpointRouter
-     * @param LoggerInterface $logger
+     * @param IncomingPackage        $incomingPackage
+     * @param object                 $receivedMessage
+     * @param EndpointRouter         $endpointRouter
+     * @param DeliveryOptionsFactory $optionsFactory
+     * @param LoggerInterface        $logger
      */
     public function __construct(
         IncomingPackage $incomingPackage,
         object $receivedMessage,
         EndpointRouter $endpointRouter,
+        DeliveryOptionsFactory $optionsFactory,
         LoggerInterface $logger
     ) {
         $this->incomingPackage = $incomingPackage;
         $this->receivedMessage = $receivedMessage;
         $this->endpointRouter  = $endpointRouter;
+        $this->optionsFactory  = $optionsFactory;
         $this->logger          = $logger;
     }
 
@@ -130,8 +139,7 @@ final class KernelContext implements ServiceBusContext
         $logger       = $this->logger;
 
         $traceId = $this->incomingPackage->traceId();
-
-        $options = $deliveryOptions ?? DefaultDeliveryOptions::create();
+        $options = $deliveryOptions ?? $this->optionsFactory->create($traceId, $messageClass);
 
         if (null === $options->traceId())
         {
@@ -139,7 +147,7 @@ final class KernelContext implements ServiceBusContext
         }
 
         return call(
-            static function(object $message, DeliveryOptions $options) use ($endpoints, $logger, $traceId): void
+            static function(object $message, DeliveryOptions $options) use ($endpoints, $logger): void
             {
                 foreach ($endpoints as $endpoint)
                 {
@@ -149,7 +157,7 @@ final class KernelContext implements ServiceBusContext
                     $logger->debug(
                         'Send message "{messageClass}" to "{endpoint}"',
                         [
-                            'traceId'      => $traceId,
+                            'traceId'      => $options->traceId(),
                             'messageClass' => \get_class($message),
                             'endpoint'     => $endpoint->name(),
                         ]
