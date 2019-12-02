@@ -23,10 +23,7 @@ use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
  */
 final class BootstrapTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $cacheDirectory;
+    private string $cacheDirectory;
 
     /**
      * {@inheritdoc}
@@ -37,7 +34,7 @@ final class BootstrapTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/bootstrap_test';
 
-        if (false === \file_exists($this->cacheDirectory))
+        if(\file_exists($this->cacheDirectory) === false)
         {
             \mkdir($this->cacheDirectory);
         }
@@ -59,8 +56,6 @@ final class BootstrapTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function withDotEnv(): void
     {

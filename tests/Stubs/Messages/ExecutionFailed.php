@@ -19,19 +19,8 @@ use ServiceBus\Services\Contracts\ExecutionFailedEvent;
  */
 final class ExecutionFailed implements ExecutionFailedEvent
 {
-    /**
-     * Request Id.
-     *
-     * @var string
-     */
-    private $correlationId;
-
-    /**
-     * Exception message.
-     *
-     * @var string
-     */
-    private $reason;
+    private string $correlationId;
+    private string $reason;
 
     /**
      * {@inheritdoc}

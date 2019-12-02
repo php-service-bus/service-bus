@@ -28,10 +28,7 @@ use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\Test
  */
 final class ContainerBuilderTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $cacheDirectory;
+    private string $cacheDirectory;
 
     /**
      * {@inheritdoc}
@@ -42,7 +39,7 @@ final class ContainerBuilderTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/container_test';
 
-        if (false === \file_exists($this->cacheDirectory))
+        if(\file_exists($this->cacheDirectory) === false)
         {
             \mkdir($this->cacheDirectory);
         }
@@ -64,8 +61,6 @@ final class ContainerBuilderTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function successfulBuildWithDefaultData(): void
     {
@@ -92,8 +87,6 @@ final class ContainerBuilderTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function successfulBuildWithFullConfiguration(): void
     {
@@ -105,7 +98,7 @@ final class ContainerBuilderTest extends TestCase
 
         $containerBuilder->addParameters(
             [
-                'testing.class'               => \get_class($this),
+                'testing.class' => \get_class($this),
             ]
         );
 

@@ -24,11 +24,6 @@ final class CorrectService
 {
     /**
      * @CommandHandler()
-     *
-     * @param FirstEmptyCommand $command
-     * @param KernelContext     $context
-     *
-     * @return void
      */
     public function handle(FirstEmptyCommand $command, KernelContext $context): void
     {

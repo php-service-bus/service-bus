@@ -22,13 +22,6 @@ use ServiceBus\Tests\Stubs\Messages\FirstEmptyCommand;
  */
 final class MessageHandlerService
 {
-    /**
-     * @param FirstEmptyCommand $command
-     * @param KernelContext     $context
-     * @param mixed             $mixedParameter
-     *
-     * @return Promise
-     */
     public function someHandler(
         FirstEmptyCommand $command,
         KernelContext $context,

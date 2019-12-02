@@ -27,8 +27,6 @@ final class ImportMessageHandlersCompilerPassTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function process(): void
     {

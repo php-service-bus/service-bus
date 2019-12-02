@@ -21,14 +21,9 @@ final class WithValidationRulesCommand
 {
     /**
      * @Assert\NotBlank()
-     *
-     * @var string
      */
-    private $value;
+    private string $value;
 
-    /**
-     * @param string $value
-     */
     public function __construct(string $value)
     {
         $this->value = $value;

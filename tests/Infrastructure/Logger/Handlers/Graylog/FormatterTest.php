@@ -15,6 +15,7 @@ namespace ServiceBus\Tests\Infrastructure\Logger\Handlers\Graylog;
 use function ServiceBus\Common\datetimeInstantiator;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Infrastructure\Logger\Handlers\Graylog\Formatter;
+use function ServiceBus\Common\jsonDecode;
 
 /**
  *
@@ -25,8 +26,6 @@ final class FormatterTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function format(): void
     {
@@ -49,7 +48,7 @@ final class FormatterTest extends TestCase
         ]);
 
         static::assertSame(
-            \json_decode(\file_get_contents(__DIR__ . '/expected_format_result.json'), true),
+            jsonDecode(\file_get_contents(__DIR__ . '/expected_format_result.json')),
             $result
         );
     }

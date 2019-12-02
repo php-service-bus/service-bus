@@ -24,8 +24,6 @@ final class EnvironmentTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function wrongEnvironment(): void
     {
@@ -39,8 +37,6 @@ final class EnvironmentTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function createTestEnv(): void
     {
@@ -58,8 +54,6 @@ final class EnvironmentTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function createDevEnv(): void
     {
@@ -77,8 +71,6 @@ final class EnvironmentTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function createProdEnv(): void
     {

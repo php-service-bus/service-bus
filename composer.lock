@@ -4377,16 +4377,16 @@
         },
         {
             "name": "php-service-bus/module-phpinnacle-transport",
-            "version": "v4.0.2",
+            "version": "v4.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/module-phpinnacle-transport.git",
-                "reference": "ccf165a6b9f79a66816534543fb19e15c118ecd5"
+                "reference": "ea771ac6a13ee9f0fd5270d9a759c95fa4ed818d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/ccf165a6b9f79a66816534543fb19e15c118ecd5",
-                "reference": "ccf165a6b9f79a66816534543fb19e15c118ecd5",
+                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/ea771ac6a13ee9f0fd5270d9a759c95fa4ed818d",
+                "reference": "ea771ac6a13ee9f0fd5270d9a759c95fa4ed818d",
                 "shasum": ""
             },
             "require": {
@@ -4426,7 +4426,7 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-12-02T19:24:45+00:00"
+            "time": "2019-12-02T22:05:38+00:00"
         },
         {
             "name": "php-service-bus/transport-amqp",

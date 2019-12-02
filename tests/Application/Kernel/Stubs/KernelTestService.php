@@ -25,12 +25,7 @@ final class KernelTestService
     /**
      * @CommandHandler()
      *
-     * @param TriggerThrowableCommand $command
-     * @param ServiceBusContext       $context
-     *
      * @throws \RuntimeException
-     *
-     * @return void
      */
     public function handleWithThrowable(
         /** @noinspection PhpUnusedParameterInspection */
@@ -42,11 +37,6 @@ final class KernelTestService
 
     /**
      * @CommandHandler()
-     *
-     * @param TriggerResponseEventCommand $command
-     * @param KernelContext               $context
-     *
-     * @return \Generator
      */
     public function handleWithSuccessResponse(
         /** @noinspection PhpUnusedParameterInspection */
@@ -58,11 +48,6 @@ final class KernelTestService
 
     /**
      * @CommandHandler(validate=true)
-     *
-     * @param SecondEmptyCommand $command
-     * @param KernelContext      $context
-     *
-     * @return void
      */
     public function testContextLogging(
         SecondEmptyCommand $command,
@@ -74,11 +59,6 @@ final class KernelTestService
 
     /**
      * @CommandHandler(validate=true)
-     *
-     * @param WithValidationCommand $command
-     * @param KernelContext         $context
-     *
-     * @return void
      */
     public function withFailedValidation(
         WithValidationCommand $command,
@@ -95,11 +75,6 @@ final class KernelTestService
      *     validate=true,
      *     defaultValidationFailedEvent="ServiceBus\Tests\Stubs\Messages\ValidationFailed"
      * )
-     *
-     * @param WithValidationRulesCommand $command
-     * @param KernelContext              $context
-     *
-     * @return void
      */
     public function validateWithErrorAndSpecifiedEvent(WithValidationRulesCommand $command, KernelContext $context): void
     {
@@ -109,13 +84,6 @@ final class KernelTestService
      * @CommandHandler(
      *     defaultThrowableEvent="ServiceBus\Tests\Stubs\Messages\ExecutionFailed"
      * )
-     *
-     * @param TriggerThrowableCommandWithResponseEvent $command
-     * @param KernelContext                            $context
-     *
-     * @throws \RuntimeException
-     *
-     * @return void
      */
     public function handleWithSpecifiedThrowableEvent(TriggerThrowableCommandWithResponseEvent $command, KernelContext $context): void
     {

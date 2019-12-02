@@ -47,30 +47,11 @@ use ServiceBus\Transport\Module\PhpInnacleTransportModule;
  */
 final class ServiceBusKernelTest extends TestCase
 {
-    /**
-     * @var ServiceBusKernel
-     */
-    private $kernel;
-
-    /**
-     * @var Transport
-     */
-    private $transport;
-
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @var string
-     */
-    private $cacheDirectory;
-
-    /**
-     * @var TestHandler
-     */
-    private $logHandler;
+    private ServiceBusKernel   $kernel;
+    private Transport          $transport;
+    private ContainerInterface $container;
+    private string             $cacheDirectory;
+    private TestHandler        $logHandler;
 
     /**
      * {@inheritdoc}
@@ -83,7 +64,7 @@ final class ServiceBusKernelTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/kernel_test';
 
-        if (false === \file_exists($this->cacheDirectory))
+        if(false === \file_exists($this->cacheDirectory))
         {
             \mkdir($this->cacheDirectory);
         }
@@ -109,7 +90,7 @@ final class ServiceBusKernelTest extends TestCase
         $topic = AmqpExchange::direct('test_topic');
         $queue = AmqpQueue::default('test_queue');
 
-        wait($this->kernel->createQueue($queue, QueueBind::create($topic, 'tests')));
+        wait($this->kernel->createQueue($queue, new QueueBind($topic, 'tests')));
 
         /** @var Transport $transport */
         $transport = readReflectionPropertyValue($this->kernel, 'transport');
@@ -139,7 +120,7 @@ final class ServiceBusKernelTest extends TestCase
 
             unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
         }
-        catch (\Throwable $throwable)
+        catch(\Throwable $throwable)
         {
         }
     }
@@ -148,22 +129,20 @@ final class ServiceBusKernelTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function listenMessageWithNoHandlers(): void
     {
         $this->sendMessage(new CommandWithPayload('payload'));
 
         Loop::run(
-            function (): \Generator
+            function(): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
             }
         );
 
         $messages = \array_map(
-            static function (array $entry): string
+            static function(array $entry): string
             {
                 return $entry['message'];
             },
@@ -177,22 +156,20 @@ final class ServiceBusKernelTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function listenFailedMessageExecution(): void
     {
         $this->sendMessage(new TriggerThrowableCommand());
 
         Loop::run(
-            function (): \Generator
+            function(): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
             }
         );
 
         $messages = \array_map(
-            static function (array $entry): string
+            static function(array $entry): string
             {
                 return $entry['message'];
             },
@@ -206,8 +183,6 @@ final class ServiceBusKernelTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function successExecutionWithResponseMessage(): void
     {
@@ -220,22 +195,20 @@ final class ServiceBusKernelTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function contextLogging(): void
     {
         $this->sendMessage(new SecondEmptyCommand());
 
         Loop::run(
-            function (): \Generator
+            function(): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
             }
         );
 
         $messages = \array_map(
-            static function (array $entry): string
+            static function(array $entry): string
             {
                 return $entry['message'];
             },
@@ -249,15 +222,13 @@ final class ServiceBusKernelTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function withFailedValidation(): void
     {
         $this->sendMessage(new WithValidationCommand(''));
 
         Loop::run(
-            function (): \Generator
+            function(): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
             }
@@ -265,9 +236,9 @@ final class ServiceBusKernelTest extends TestCase
 
         $entries = \array_filter(
             \array_map(
-                static function (array $entry): ?array
+                static function(array $entry): ?array
                 {
-                    if (true === isset($entry['context']['violations']))
+                    if(true === isset($entry['context']['violations']))
                     {
                         return $entry;
                     }
@@ -290,8 +261,6 @@ final class ServiceBusKernelTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function enableWatchers(): void
     {
@@ -306,8 +275,6 @@ final class ServiceBusKernelTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function processMessageWithValidationFailure(): void
     {
@@ -320,8 +287,6 @@ final class ServiceBusKernelTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function processMessageWithSpecifiedThrowableEvent(): void
     {
@@ -331,19 +296,14 @@ final class ServiceBusKernelTest extends TestCase
     }
 
     /**
-     * @param object $message
-     * @param array  $headers
-     *
      * @throws \Throwable
-     *
-     * @return void
      */
     private function sendMessage(object $message, array $headers = []): void
     {
         $encoder = new SymfonyMessageSerializer();
 
         $promise = $this->transport->send(
-            OutboundPackage::create(
+            new OutboundPackage(
                 $encoder->encode($message),
                 $headers,
                 new AmqpTransportLevelDestination('test_topic', 'tests'),

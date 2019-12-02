@@ -45,8 +45,6 @@ final class FileChangesWatcherTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function notChanged(): void
     {
@@ -59,8 +57,6 @@ final class FileChangesWatcherTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function changed(): void
     {

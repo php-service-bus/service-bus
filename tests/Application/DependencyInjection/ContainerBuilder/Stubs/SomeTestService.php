@@ -17,22 +17,13 @@ namespace ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stub
  */
 final class SomeTestService
 {
-    /**
-     * @var string
-     */
-    private $env;
+    private string $env;
 
-    /**
-     * @param string $env
-     */
     public function __construct(?string $env = null)
     {
         $this->env = $env;
     }
 
-    /**
-     * @return string
-     */
     public function env(): string
     {
         return $this->env;

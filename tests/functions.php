@@ -14,8 +14,6 @@ namespace ServiceBus\Tests;
 
 /**
  * @param string $path
- *
- * @return void
  */
 function removeDirectory(string $path): void
 {

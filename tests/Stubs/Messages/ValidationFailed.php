@@ -19,12 +19,7 @@ use ServiceBus\Services\Contracts\ValidationFailedEvent;
  */
 final class ValidationFailed implements ValidationFailedEvent
 {
-    /**
-     * Request Id.
-     *
-     * @var string
-     */
-    private $correlationId;
+    private string $correlationId;
 
     /**
      * List of validate violations.
@@ -36,9 +31,9 @@ final class ValidationFailed implements ValidationFailedEvent
      *    ]
      * ]
      *
-     * @var array<string, array<int, string>>
+     * @psalm-var array<string, array<int, string>>
      */
-    private $violations;
+    private array $violations;
 
     /**
      * {@inheritdoc}

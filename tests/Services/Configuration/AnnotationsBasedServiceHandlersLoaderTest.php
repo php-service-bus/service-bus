@@ -33,8 +33,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function loadFromEmptyService(): void
     {
@@ -51,8 +49,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function loadFilledService(): void
     {
@@ -63,10 +59,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              *     validate=true,
              *     groups={"qwerty", "root"}
              * )
-             *
-             * @param FirstEmptyCommand $command
-             *
-             * @return void
              */
             public function handle(FirstEmptyCommand $command, KernelContext $context): void
             {
@@ -74,11 +66,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
 
             /**
              * @EventListener()
-             *
-             * @param FirstEmptyEvent $event
-             * @param KernelContext   $context
-             *
-             * @return Promise
              */
             public function firstEventListener(FirstEmptyEvent $event, KernelContext $context): Promise
             {
@@ -87,11 +74,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
 
             /**
              * @EventListener()
-             *
-             * @param FirstEmptyEvent $event
-             * @param KernelContext   $context
-             *
-             * @return \Generator
              */
             public function secondEventListener(FirstEmptyEvent $event, KernelContext $context): \Generator
             {
@@ -100,11 +82,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
 
             /**
              * @ServiceBus\Tests\Services\Configuration\SomeAnotherMethodLevelAnnotation
-             *
-             * @param FirstEmptyCommand $command
-             * @param KernelContext     $context
-             *
-             * @return void
              */
             public function ignoredMethod(FirstEmptyCommand $command, KernelContext $context): void
             {
@@ -133,7 +110,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             if (true === $handler->messageHandler->options->isCommandHandler)
             {
                 static::assertSame(FirstEmptyCommand::class, $handler->messageHandler->messageClass);
-                /** @noinspection UnnecessaryAssertionInspection */
                 static::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
 
                 static::assertTrue($options->validationEnabled);
@@ -144,7 +120,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             else
             {
                 static::assertSame(FirstEmptyEvent::class, $handler->messageHandler->messageClass);
-                /** @noinspection UnnecessaryAssertionInspection */
                 static::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
 
                 static::assertFalse($options->validationEnabled);
@@ -157,8 +132,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function loadHandlerWithNoArguments(): void
     {
@@ -172,8 +145,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              *     validate=true,
              *     groups={"qwerty", "root"}
              * )
-             *
-             * @return void
              */
             public function handle(): void
             {
@@ -187,8 +158,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function loadHandlerWithWrongMessageArgument(): void
     {
@@ -202,8 +171,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
              *     validate=true,
              *     groups={"qwerty", "root"}
              * )
-             *
-             * @return void
              */
             public function handle(string $qwerty, KernelContext $context): void
             {

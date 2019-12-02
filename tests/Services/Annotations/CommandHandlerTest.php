@@ -24,8 +24,6 @@ final class CommandHandlerTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function withWrongProperties(): void
     {
@@ -38,8 +36,6 @@ final class CommandHandlerTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function withoutAnyFields(): void
     {
@@ -53,8 +49,6 @@ final class CommandHandlerTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function withValidation(): void
     {
@@ -74,8 +68,6 @@ final class CommandHandlerTest extends TestCase
      * @test
      *
      * @throws \Throwable
-     *
-     * @return void
      */
     public function withCustomEvents(): void
     {

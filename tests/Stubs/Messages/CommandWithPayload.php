@@ -17,22 +17,13 @@ namespace ServiceBus\Tests\Stubs\Messages;
  */
 final class CommandWithPayload
 {
-    /**
-     * @var string
-     */
-    private $payload;
+    private string $payload;
 
-    /**
-     * @param string $payload
-     */
     public function __construct(string $payload)
     {
         $this->payload = $payload;
     }
 
-    /**
-     * @return string
-     */
     public function payload(): string
     {
         return $this->payload;
