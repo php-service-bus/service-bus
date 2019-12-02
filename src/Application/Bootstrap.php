@@ -43,7 +43,7 @@ final class Bootstrap
      */
     public static function withDotEnv(string $envFilePath): self
     {
-        (new Dotenv())->load($envFilePath);
+        (new Dotenv(true))->load($envFilePath);
 
         return new self();
     }

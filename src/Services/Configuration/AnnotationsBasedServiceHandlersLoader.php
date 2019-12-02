@@ -42,10 +42,18 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         $collection = new \SplObjectStorage();
 
         /** @var MethodLevel $annotation */
-        foreach ($this->loadMethodLevelAnnotations($service) as $annotation)
+        foreach($this->loadMethodLevelAnnotations($service) as $annotation)
         {
             /** @var CommandHandler|EventListener $handlerAnnotation */
             $handlerAnnotation = $annotation->annotation;
+
+            if(
+                ($handlerAnnotation instanceof CommandHandler) === false &&
+                ($handlerAnnotation instanceof EventListener) === false
+            )
+            {
+                continue;
+            }
 
             /** @var \ReflectionMethod $handlerReflectionMethod */
             $handlerReflectionMethod = $annotation->reflectionMethod;
@@ -53,7 +61,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
             $closure = $handlerReflectionMethod->getClosure($service);
 
-            if ($closure === null)
+            if($closure === null)
             {
                 throw new UnableCreateClosure(
                     \sprintf(
@@ -106,12 +114,12 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         /** @var DefaultHandlerOptions $options */
         $options = DefaultHandlerOptions::{$factoryMethod}();
 
-        if (true === $annotation->validate)
+        if(true === $annotation->validate)
         {
             $options = $options->enableValidation($annotation->groups);
         }
 
-        if ('' !== (string) $annotation->defaultValidationFailedEvent)
+        if('' !== (string) $annotation->defaultValidationFailedEvent)
         {
             /**
              * @psalm-suppress TypeCoercion
@@ -120,7 +128,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             $options = $options->withDefaultValidationFailedEvent($annotation->defaultValidationFailedEvent);
         }
 
-        if ('' !== (string) $annotation->defaultThrowableEvent)
+        if('' !== (string) $annotation->defaultThrowableEvent)
         {
             /**
              * @psalm-suppress TypeCoercion
@@ -160,7 +168,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
      */
     private function extractMessageClass(array $parameters): string
     {
-        if (0 === \count($parameters))
+        if(0 === \count($parameters))
         {
             throw InvalidHandlerArguments::emptyArguments();
         }
@@ -168,7 +176,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         /** @var \ReflectionParameter $firstArgument */
         $firstArgument = $parameters[0];
 
-        if (null !== $firstArgument->getType())
+        if(null !== $firstArgument->getType())
         {
             /** @var \ReflectionNamedType $type */
             $type = $firstArgument->getType();
@@ -177,7 +185,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             $className = $type->getName();
 
             /** @psalm-suppress RedundantConditionGivenDocblockType */
-            if (true === \class_exists($className))
+            if(true === \class_exists($className))
             {
                 return $className;
             }
