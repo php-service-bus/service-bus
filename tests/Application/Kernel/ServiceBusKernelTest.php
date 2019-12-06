@@ -197,7 +197,14 @@ final class ServiceBusKernelTest extends TestCase
     {
         $this->sendMessage(new TriggerResponseEventCommand());
 
-        wait($this->kernel->run(AmqpQueue::default('test_queue')));
+        Loop::run(
+            function (): \Generator
+            {
+                yield $this->kernel->run(AmqpQueue::default('test_queue'));
+
+                Loop::stop();
+            }
+        );
     }
 
     /**
@@ -213,6 +220,8 @@ final class ServiceBusKernelTest extends TestCase
             function (): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
+
+                Loop::stop();
             }
         );
 
@@ -240,6 +249,8 @@ final class ServiceBusKernelTest extends TestCase
             function (): \Generator
             {
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
+
+                Loop::stop();
             }
         );
 
