@@ -35,32 +35,47 @@ final class ContainerBuilder
      * Key=>value parameters
      *
      * @psalm-var array<string, bool|string|int|float|array<mixed, mixed>|null>
+     *
+     * @var array
      */
-    private array $parameters;
-    private string $entryPointName;
+    private $parameters;
+
+    /** @var string */
+    private $entryPointName;
 
     /**
      * @see \Symfony\Component\DependencyInjection\Extension\Extension
+     *
+     * @var \SplObjectStorage
      */
-    private \SplObjectStorage $extensions;
+    private $extensions;
 
     /**
      * @see \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterfac
+     *
+     * @var \SplObjectStorage
      */
-    private \SplObjectStorage  $compilerPasses;
+    private $compilerPasses;
 
     /**
      * @see \ServiceBus\Common\Module\ServiceBusModule
+     *
+     * @var \SplObjectStorage
      */
-    private \SplObjectStorage $modules;
+    private $modules;
 
-    private Environment $environment;
-    private ?string $cacheDirectory = null;
+    /** @var Environment */
+    private $environment;
+
+    /** @var string|null */
+    private $cacheDirectory = null;
 
     /**
      * ConfigCache caches arbitrary content in files on disk.
+     *
+     * @var ConfigCache|null
      */
-    private ?ConfigCache $configCache = null;
+    private $configCache = null;
 
     public function __construct(string $entryPointName, Environment $environment)
     {
@@ -68,9 +83,9 @@ final class ContainerBuilder
         $this->environment    = $environment;
         $this->parameters     = [];
 
-        $this->extensions = new \SplObjectStorage();
+        $this->extensions     = new \SplObjectStorage();
         $this->compilerPasses = new \SplObjectStorage();
-        $this->modules = new \SplObjectStorage();
+        $this->modules        = new \SplObjectStorage();
     }
 
     /**
@@ -205,7 +220,8 @@ final class ContainerBuilder
      *
      * @throws \LogicException Cannot dump an uncompiled container
      * @throws \RuntimeException When cache file can't be written
-     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has not been dumped
+     * @throws \Symfony\Component\DependencyInjection\Exception\EnvParameterException When an env var exists but has
+     *                                                                                not been dumped
      */
     private function dumpContainer(SymfonyContainerBuilder $builder): void
     {

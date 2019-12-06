@@ -24,10 +24,17 @@ use function ServiceBus\Common\jsonEncode;
  */
 final class UdpHandler extends AbstractProcessingHandler
 {
-    private string                $host;
-    private int                   $port;
-    private ?ResourceOutputStream $outputStream = null;
-    private bool                  $gzipMessage;
+    /** @var string */
+    private $host;
+
+    /** @var int */
+    private $port;
+
+    /** @var ResourceOutputStream|null */
+    private $outputStream = null;
+
+    /** @var bool */
+    private $gzipMessage;
 
     /**
      * @param int|string $level

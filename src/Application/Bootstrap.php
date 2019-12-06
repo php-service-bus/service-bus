@@ -30,7 +30,8 @@ use Symfony\Component\ErrorHandler\Debug;
  */
 final class Bootstrap
 {
-    private ContainerBuilder $containerBuilder;
+    /** @var ContainerBuilder  */
+    private $containerBuilder;
 
     /**
      * Create based on the environment parameters obtained from the ".env" file (via symfony/dotenv component).

@@ -21,7 +21,8 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 final class ContainerArgumentResolver implements ArgumentResolver
 {
-    private ServiceLocator $serviceLocator;
+    /** @var ServiceLocator  */
+    private $serviceLocator;
 
     public function __construct(ServiceLocator $serviceLocator)
     {

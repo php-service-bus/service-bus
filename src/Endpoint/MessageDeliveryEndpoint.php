@@ -28,19 +28,28 @@ use ServiceBus\Transport\Common\Transport;
  */
 final class MessageDeliveryEndpoint implements Endpoint
 {
-    private Transport $transport;
-    private DeliveryDestination $destination;
-    private EndpointEncoder $encoder;
+    /** @var Transport */
+    private $transport;
+
+    /** @var DeliveryDestination */
+    private $destination;
+
+    /** @var EndpointEncoder */
+    private $encoder;
 
     /**
      * A wrapper on an operation that performs repetitions in case of an error.
+     *
+     * @var OperationRetryWrapper
      */
-    private OperationRetryWrapper $deliveryRetryHandler;
+    private $deliveryRetryHandler;
 
     /**
      * Endpoint name.
+     *
+     * @var string
      */
-    private string $name;
+    private $name;
 
     public function __construct(
         string $name,

@@ -26,7 +26,7 @@ final class EndpointRouter
      *
      * @var \ServiceBus\Endpoint\Endpoint[][]
      */
-    private array $routes = [];
+    private $routes = [];
 
     /**
      * Destination points for global routes (marked with "*").
@@ -35,7 +35,7 @@ final class EndpointRouter
      *
      * @var \ServiceBus\Endpoint\Endpoint[]
      */
-    private array $globalEndpoints = [];
+    private $globalEndpoints = [];
 
     public function __construct(Endpoint $defaultEndpoint)
     {

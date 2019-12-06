@@ -21,8 +21,10 @@ final class WithValidationCommand
 {
     /**
      * @Assert\NotBlank()
+     *
+     * @var string
      */
-    private string $value;
+    private $value;
 
     public function __construct(string $value)
     {

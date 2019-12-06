@@ -27,9 +27,14 @@ final class GarbageCollectorWatcher
     /** @var int milliseconds */
     private const DEFAULT_INTERVAL = 600000;
 
-    private LoggerInterface $logger;
-    private int             $interval;
-    private ?string         $watcherId = null;
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var int */
+    private $interval;
+
+    /** @var string|null */
+    private $watcherId = null;
 
     /**
      * @param int $interval delay in milliseconds

@@ -25,7 +25,8 @@ use Monolog\Logger;
  */
 final class StdOutHandler extends AbstractProcessingHandler
 {
-    private ResourceOutputStream $streamWriter;
+    /** @var ResourceOutputStream  */
+    private $streamWriter;
 
     public function __construct(int $level = Logger::DEBUG, bool $bubble = true, ?FormatterInterface $formatter = null)
     {

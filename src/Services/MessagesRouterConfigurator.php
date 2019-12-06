@@ -25,22 +25,29 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 final class MessagesRouterConfigurator implements RouterConfigurator
 {
-    private MessageExecutorFactory $executorFactory;
+    /** @var MessageExecutorFactory */
+    private $executorFactory;
 
     /**
      * @psalm-var array<mixed, string>
+     *
+     * @var array
      */
-    private array $servicesList;
+    private $servicesList;
 
     /**
      * Isolated service locator for registered services.
+     *
+     * @var ServiceLocator
      */
-    private ServiceLocator $servicesServiceLocator;
+    private $servicesServiceLocator;
 
     /**
      * Isolated service locator for routing configuration.
+     *
+     * @var ServiceLocator
      */
-    private ServiceLocator $routingServiceLocator;
+    private $routingServiceLocator;
 
     /**
      * @psalm-param array<mixed, string> $servicesList

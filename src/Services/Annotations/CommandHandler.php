@@ -24,31 +24,39 @@ final class CommandHandler implements ServicesAnnotationsMarker
 {
     /**
      * Command validation enabled.
+     *
+     * @var bool
      */
-    public bool $validate = false;
+    public $validate = false;
 
     /**
      * In case of validation errors, automatically send the event and stop further execution
      * The event must implement @see ValidationFailedEvent interface.
      *
      * If no class is specified, control is passed to user code
+     *
+     * @var string|null
      */
-    public ?string $defaultValidationFailedEvent = null;
+    public $defaultValidationFailedEvent = null;
 
     /**
      * In case of a runtime error, automatically send the specified event with the message received from the exception
      * The event must implement @see ExecutionFailedEvent interface.
      *
      * If no class is specified, control is passed to user code
+     *
+     * @var string|null
      */
-    public ?string $defaultThrowableEvent= null;
+    public $defaultThrowableEvent = null;
 
     /**
      * Validation groups.
      *
      * @psalm-var array<int, string>
+     *
+     * @var array
      */
-    public array $groups = [];
+    public $groups = [];
 
     /**
      * @psalm-param array<string, mixed> $data

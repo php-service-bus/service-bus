@@ -19,8 +19,11 @@ use ServiceBus\Services\Contracts\ExecutionFailedEvent;
  */
 final class ExecutionFailed implements ExecutionFailedEvent
 {
-    private string $correlationId;
-    private string $reason;
+    /** @var string  */
+    private $correlationId;
+
+    /** @var string  */
+    private $reason;
 
     /**
      * {@inheritdoc}

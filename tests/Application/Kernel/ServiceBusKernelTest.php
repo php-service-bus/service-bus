@@ -47,11 +47,20 @@ use ServiceBus\Transport\Module\PhpInnacleTransportModule;
  */
 final class ServiceBusKernelTest extends TestCase
 {
-    private ServiceBusKernel   $kernel;
-    private Transport          $transport;
-    private ContainerInterface $container;
-    private string             $cacheDirectory;
-    private TestHandler        $logHandler;
+    /** @var ServiceBusKernel */
+    private $kernel;
+
+    /** @var Transport */
+    private $transport;
+
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var string */
+    private $cacheDirectory;
+
+    /** @var TestHandler */
+    private $logHandler;
 
     /**
      * {@inheritdoc}

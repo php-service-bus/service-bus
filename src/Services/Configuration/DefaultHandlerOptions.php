@@ -24,25 +24,33 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
 {
     /**
      * Is this an event listener?
+     *
+     * @var bool
      */
-    public bool $isEventListener;
+    public $isEventListener;
 
     /**
      * Is this a command handler?
+     *
+     * @var bool
      */
-    public bool $isCommandHandler;
+    public $isCommandHandler;
 
     /**
      * Validation enabled.
+     *
+     * @var bool
      */
-    public bool $validationEnabled = false;
+    public $validationEnabled = false;
 
     /**
      * Validation groups.
      *
      * @psalm-var array<array-key, string>
+     *
+     * @var array
      */
-    public array $validationGroups = [];
+    public $validationGroups = [];
 
     /**
      * In case of validation errors, automatically send the event and stop further execution
@@ -51,8 +59,10 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      * If no class is specified, control is passed to user code
      *
      * @psalm-var class-string|null
+     *
+     * @var string|null
      */
-    public ?string $defaultValidationFailedEvent = null;
+    public $defaultValidationFailedEvent = null;
 
     /**
      * In case of a runtime error, automatically send the specified event with the message received from the exception
@@ -61,8 +71,10 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      * If no class is specified, control is passed to user code
      *
      * @psalm-var class-string|null
+     *
+     * @var string|null
      */
-    public ?string $defaultThrowableEvent = null;
+    public $defaultThrowableEvent = null;
 
     public static function createForEventListener(): self
     {

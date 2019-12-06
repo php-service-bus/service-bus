@@ -17,7 +17,8 @@ namespace ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stub
  */
 final class SomeTestService
 {
-    private string $env;
+    /** @var string|null  */
+    private $env;
 
     public function __construct(?string $env = null)
     {

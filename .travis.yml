@@ -1,6 +1,7 @@
 language: php
 
 php:
+  - 7.3
   - 7.4snapshot
 
 addons:
@@ -24,10 +25,9 @@ install:
 
 script:
   - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.clover
-  - ./vendor/bin/psalm --config=psalm.xml
-  - ./vendor/bin/phpstan analyse src --level 7
-  - ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4snapshot"]; then ./vendor/bin/psalm --config=psalm.xml; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4snapshot"]; then ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run; fi
 
 after_script:
-  - wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4snapshot"]; then wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4snapshot"]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi

@@ -17,7 +17,8 @@ namespace ServiceBus\Tests\Stubs\Messages;
  */
 final class CommandWithPayload
 {
-    private string $payload;
+    /** @var string  */
+    private $payload;
 
     public function __construct(string $payload)
     {

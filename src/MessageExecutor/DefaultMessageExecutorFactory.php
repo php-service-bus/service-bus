@@ -28,9 +28,10 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
      *
      * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
-    private array $argumentResolvers;
+    private $argumentResolvers;
 
-    private ValidatorInterface $validator;
+    /** @var ValidatorInterface */
+    private $validator;
 
     /**
      * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers

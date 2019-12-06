@@ -25,7 +25,8 @@ use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
  */
 final class WithLoggersBootstrapTest extends TestCase
 {
-    private string $cacheDirectory;
+    /** @var string */
+    private $cacheDirectory;
 
     /**
      * {@inheritdoc}

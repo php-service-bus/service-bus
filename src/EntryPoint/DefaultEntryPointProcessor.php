@@ -27,10 +27,17 @@ use ServiceBus\Transport\Common\Package\IncomingPackage;
  */
 final class DefaultEntryPointProcessor implements EntryPointProcessor
 {
-    private IncomingMessageDecoder $messageDecoder;
-    private ContextFactory         $contextFactory;
-    private Router                 $messagesRouter;
-    private LoggerInterface        $logger;
+    /** @var IncomingMessageDecoder */
+    private $messageDecoder;
+
+    /** @var ContextFactory */
+    private $contextFactory;
+
+    /** @var Router */
+    private $messagesRouter;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /**
      * @param IncomingMessageDecoder $messageDecoder

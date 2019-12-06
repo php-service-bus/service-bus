@@ -29,8 +29,11 @@ final class LoopBlockWatcher
     /** Check interval, only check one tick every $interval milliseconds */
     private const CHECK_INTERVAL = 0;
 
-    private LoggerInterface $logger;
-    private ?BlockDetector $detector = null;
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var BlockDetector|null */
+    private $detector = null;
 
     public function __construct(LoggerInterface $logger = null)
     {

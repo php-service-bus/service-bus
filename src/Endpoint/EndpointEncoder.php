@@ -24,8 +24,11 @@ final class EndpointEncoder
 {
     private const DEFAULT_ENCODER = 'service_bus.encoder.default_handler';
 
-    public string $tag;
-    public MessageEncoder $handler;
+    /** @var string  */
+    public $tag;
+
+    /** @var MessageEncoder  */
+    public $handler;
 
     public static function createDefault(): self
     {

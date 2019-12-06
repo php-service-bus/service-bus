@@ -21,17 +21,21 @@ final class RetryOptions
 {
     private const DEFAULT_RETRY_MAX_COUNT = 5;
 
-    private const DEFAULT_RETRY_DELAY     = 2000;
+    private const DEFAULT_RETRY_DELAY = 2000;
 
     /**
      * Maximum number of repetitions.
+     *
+     * @var int
      */
-    public int $maxCount;
+    public $maxCount;
 
     /**
      * Delay at repetitions (milliseconds).
+     *
+     * @var int
      */
-    public int $delay;
+    public $delay;
 
     public function __construct(int $maxCount = self::DEFAULT_RETRY_MAX_COUNT, int $delay = self::DEFAULT_RETRY_DELAY)
     {

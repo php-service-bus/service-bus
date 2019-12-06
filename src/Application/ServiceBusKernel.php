@@ -34,9 +34,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class ServiceBusKernel
 {
-    private ContainerInterface $container;
-    private EntryPoint $entryPoint;
-    private Transport $transport;
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var EntryPoint */
+    private $entryPoint;
+
+    /** @var Transport */
+    private $transport;
 
     public function __construct(ContainerInterface $globalContainer)
     {
@@ -48,7 +53,7 @@ final class ServiceBusKernel
         /** @var EntryPoint $entryPoint */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
-        /** @var Transport $transport  */
+        /** @var Transport $transport */
         $transport = $serviceLocator->get(Transport::class);
 
         $this->entryPoint = $entryPoint;

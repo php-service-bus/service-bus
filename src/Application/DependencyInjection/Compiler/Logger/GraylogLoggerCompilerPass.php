@@ -24,10 +24,17 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class GraylogLoggerCompilerPass implements CompilerPassInterface
 {
-    private string $host;
-    private int $port;
-    private int $logLevel;
-    private bool $gzipMessage;
+    /** @var string */
+    private $host;
+
+    /** @var int */
+    private $port;
+
+    /** @var int */
+    private $logLevel;
+
+    /** @var bool */
+    private $gzipMessage;
 
     public function __construct(string $host = '0.0.0.0', int $port = 514, int $logLevel = Logger::DEBUG, bool $gzipMessage = false)
     {

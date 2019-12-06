@@ -40,13 +40,17 @@ final class Formatter extends NormalizerFormatter
 
     /**
      * The name of the system for the Gelf log message.
+     *
+     * @var string
      */
-    private string $systemName;
+    private $systemName;
 
     /**
      * Max length per field.
+     *
+     * @var int
      */
-    private int $maxLength;
+    private $maxLength;
 
     public function __construct(?string $systemName = null, ?int $maxLength = null)
     {

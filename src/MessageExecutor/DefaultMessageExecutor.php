@@ -25,8 +25,11 @@ use ServiceBus\Services\Configuration\DefaultHandlerOptions;
  */
 final class DefaultMessageExecutor implements MessageExecutor
 {
-    private \Closure $closure;
-    private \SplObjectStorage $arguments;
+    /** @var \Closure  */
+    private $closure;
+
+    /** @var \SplObjectStorage  */
+    private $arguments;
 
     /**
      * Argument resolvers collection.
@@ -35,9 +38,10 @@ final class DefaultMessageExecutor implements MessageExecutor
      *
      * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
-    private array $argumentResolvers;
+    private $argumentResolvers;
 
-    private DefaultHandlerOptions $options;
+    /** @var DefaultHandlerOptions  */
+    private $options;
 
     /**
      * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>  $argumentResolvers

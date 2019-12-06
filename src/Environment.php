@@ -29,7 +29,8 @@ final class Environment
         self::ENVIRONMENT_TESTING,
     ];
 
-    private string $environment;
+    /** @var string  */
+    private $environment;
 
     /**
      * Creating a test environment.

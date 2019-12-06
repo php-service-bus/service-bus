@@ -22,8 +22,11 @@ final class ServiceMessageHandler
     private const TYPE_EVENT_LISTENER  = 0;
     private const TYPE_COMMAND_HANDLER = 1;
 
-    private int           $type;
-    public MessageHandler $messageHandler;
+    /** @var int */
+    private $type;
+
+    /** @var MessageHandler */
+    public $messageHandler;
 
     public static function createCommandHandler(MessageHandler $messageHandler): self
     {

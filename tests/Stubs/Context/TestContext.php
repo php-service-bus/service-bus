@@ -30,10 +30,13 @@ final class TestContext implements ServiceBusContext
     /**
      * @var object[]
      */
-    public array $messages = [];
+    public $messages = [];
 
-    public TestHandler $testLogHandler;
-    private LoggerInterface $logger;
+    /** @var TestHandler  */
+    public $testLogHandler;
+
+    /** @var LoggerInterface  */
+    private $logger;
 
     public function __construct()
     {

@@ -24,7 +24,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class StdOutLoggerCompilerPass implements CompilerPassInterface
 {
-    private int $logLevel;
+    /** @var int  */
+    private $logLevel;
 
     public function __construct(int $logLevel = Logger::DEBUG)
     {

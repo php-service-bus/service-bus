@@ -17,7 +17,7 @@ namespace ServiceBus\Tests;
  */
 function removeDirectory(string $path): void
 {
-    $files = \glob(\preg_replace('/(\*|\?|\[)/', '[$1]', $path) . '/{,.}*', GLOB_BRACE);
+    $files = \glob(\preg_replace('/([*?\[])/', '[$1]', $path) . '/{,.}*', GLOB_BRACE);
     foreach ($files as $file)
     {
         if ($file === $path . '/.' || $file === $path . '/..')

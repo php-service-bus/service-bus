@@ -27,9 +27,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class MessageValidationExecutor implements MessageExecutor
 {
-    private MessageExecutor $executor;
-    private ValidatorInterface $validator;
-    private DefaultHandlerOptions $options;
+    /** @var MessageExecutor */
+    private $executor;
+
+    /** @var ValidatorInterface */
+    private $validator;
+
+    /** @var DefaultHandlerOptions */
+    private $options;
 
     public function __construct(MessageExecutor $executor, DefaultHandlerOptions $options, ValidatorInterface $validator)
     {

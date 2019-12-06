@@ -2,7 +2,7 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author Stepan Zolotarev <zsl88.logging@gmail.com>
+ * @author  Stepan Zolotarev <zsl88.logging@gmail.com>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
@@ -22,9 +22,14 @@ use ServiceBus\Transport\Common\Package\IncomingPackage;
  */
 final class KernelContextFactory implements ContextFactory
 {
-    private EndpointRouter $endpointRouter;
-    private DeliveryOptionsFactory $optionsFactory;
-    private LoggerInterface $logger;
+    /** @var EndpointRouter */
+    private $endpointRouter;
+
+    /** @var DeliveryOptionsFactory */
+    private $optionsFactory;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     public function __construct(
         EndpointRouter $endpointRouter,

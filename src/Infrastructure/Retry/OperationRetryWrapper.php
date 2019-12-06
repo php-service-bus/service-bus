@@ -21,7 +21,8 @@ use Kelunik\Retry\ConstantBackoff;
  */
 final class OperationRetryWrapper
 {
-    private RetryOptions $options;
+    /** @var RetryOptions  */
+    private $options;
 
     public function __construct(RetryOptions $options = null)
     {

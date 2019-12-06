@@ -41,33 +41,44 @@ final class EntryPoint
 
     /**
      * Current transport from which messages will be received.
+     *
+     * @var Transport
      */
-    private Transport $transport;
+    private $transport;
 
     /**
      * Handling incoming package processor.
      * Responsible for deserialization, routing and task execution.
+     *
+     * @var EntryPointProcessor
      */
-    private EntryPointProcessor $processor;
+    private $processor;
 
-    private LoggerInterface $logger;
+    /** @var LoggerInterface */
+    private $logger;
 
     /**
      * The max number of concurrent tasks.
+     *
+     * @var int
      */
-    private int $maxConcurrentTaskCount;
+    private $maxConcurrentTaskCount;
 
     /**
      * The current number of tasks performed.
      * The value should not be too large and should not exceed the maximum number of available connections to the
      * database.
+     *
+     * @var int
      */
-    private int $currentTasksInProgressCount = 0;
+    private $currentTasksInProgressCount = 0;
 
     /**
      * Throttling value (in milliseconds) while achieving the maximum number of simultaneously executed tasks.
+     *
+     * @var int
      */
-    private int $awaitDelay;
+    private $awaitDelay;
 
     public function __construct(
         Transport $transport,

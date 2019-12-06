@@ -23,7 +23,8 @@ use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
  */
 final class BootstrapTest extends TestCase
 {
-    private string $cacheDirectory;
+    /** @var string */
+    private $cacheDirectory;
 
     /**
      * {@inheritdoc}

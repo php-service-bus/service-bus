@@ -41,7 +41,7 @@
     ]
   },
   "require": {
-    "php": ">=7.4",
+    "php": ">=7.3",
     "ext-pcntl": "*",
     "ext-json": "*",
     "ext-zlib": "*",

@@ -30,10 +30,17 @@ use function ServiceBus\Common\collectThrowableDetails;
  */
 final class KernelContext implements ServiceBusContext
 {
-    private IncomingPackage $incomingPackage;
-    private object $receivedMessage;
-    private EndpointRouter $endpointRouter;
-    private DeliveryOptionsFactory $optionsFactory;
+    /** @var IncomingPackage */
+    private $incomingPackage;
+
+    /** @var object */
+    private $receivedMessage;
+
+    /** @var EndpointRouter */
+    private $endpointRouter;
+
+    /** @var DeliveryOptionsFactory */
+    private $optionsFactory;
 
     /**
      * Is the received message correct?
@@ -41,8 +48,10 @@ final class KernelContext implements ServiceBusContext
      * Note: This value is stamped from the infrastructure level
      *
      * @see MessageValidationExecutor::134
+     *
+     * @var bool
      */
-    private bool $isValidMessage = true;
+    private $isValidMessage = true;
 
     /**
      * List of validate violations.
@@ -59,13 +68,15 @@ final class KernelContext implements ServiceBusContext
      * ]
      *
      * @psalm-var array<string, array<int, string>>
+     *
+     * @var array
      */
-    private array $violations = [];
+    private $violations = [];
 
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private $logger;
 
     public function __construct(
         IncomingPackage $incomingPackage,
@@ -224,7 +235,7 @@ final class KernelContext implements ServiceBusContext
      *
      * @see          MessageValidationExecutor
      *
-     * @psalm-param array<string, array<int, string>> $violations
+     * @psalm-param  array<string, array<int, string>> $violations
      */
     private function validationFailed(array $violations): void
     {

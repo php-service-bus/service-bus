@@ -23,34 +23,42 @@ final class DefaultDeliveryOptions implements DeliveryOptions
      * Headers bag.
      *
      * @psalm-var array<string, string|int|float>
+     *
+     * @var array
      */
-    public array $headers;
+    public $headers;
 
     /**
      * The message must be stored in the broker.
+     *
+     * @var bool
      */
-    public bool $isPersistent = true;
+    public $isPersistent = true;
 
     /**
      * This flag tells the server how to react if the message cannot be routed to a queue. If this flag is set, the
      * server will return an unroutable message with a Return method. If this flag is false, the server silently drops
      * the message.
+     *
+     * @var bool
      */
-    public bool $isMandatory = true;
+    public $isMandatory = true;
 
     /**
      * This flag tells the server how to react if the message cannot be routed to a queue consumer immediately. If this
      * flag is set, the server will return an undeliverable message with a Return method. If this flag is false, the
      * server will queue the message, but with no guarantee that it will ever be consumed.
+     *
+     * @var bool
      */
-    public bool $isImmediate = false;
+    public $isImmediate = false;
 
     /**
      * The message will be marked expired after N milliseconds.
      *
      * @var int|null
      */
-    public ?int $expiredAfter = null;
+    public $expiredAfter = null;
 
     /**
      * Trace operation id.

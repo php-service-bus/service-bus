@@ -28,7 +28,8 @@ use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\Test
  */
 final class ContainerBuilderTest extends TestCase
 {
-    private string $cacheDirectory;
+    /** @var string  */
+    private $cacheDirectory;
 
     /**
      * {@inheritdoc}

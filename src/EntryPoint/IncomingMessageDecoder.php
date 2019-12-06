@@ -32,10 +32,13 @@ final class IncomingMessageDecoder
      * ]
      *
      * @psalm-var array<string, string>
+     *
+     * @var string[]
      */
-    private array $decodersConfiguration;
+    private $decodersConfiguration;
 
-    private ServiceLocator $decodersLocator;
+    /** @var ServiceLocator  */
+    private $decodersLocator;
 
     /**
      * @psalm-param array<string, string> $decodersConfiguration

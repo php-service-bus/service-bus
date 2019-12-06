@@ -22,12 +22,15 @@ use Amp\Promise;
  */
 final class FileChangesWatcher
 {
-    private string $directory;
+    /** @var string  */
+    private $directory;
 
     /**
      * Previous hash of files in the directory.
+     *
+     * @var string|null
      */
-    private ?string $previousHash = null;
+    private $previousHash = null;
 
     public function __construct(string $directory)
     {

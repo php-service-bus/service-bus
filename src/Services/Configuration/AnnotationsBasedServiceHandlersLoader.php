@@ -27,7 +27,8 @@ use ServiceBus\Services\Exceptions\UnableCreateClosure;
  */
 final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoader
 {
-    private Reader $annotationReader;
+    /** @var Reader  */
+    private $annotationReader;
 
     public function __construct(Reader $annotationReader = null)
     {
@@ -44,7 +45,6 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         /** @var MethodLevel $annotation */
         foreach ($this->loadMethodLevelAnnotations($service) as $annotation)
         {
-            /** @var CommandHandler|EventListener $handlerAnnotation */
             $handlerAnnotation = $annotation->annotation;
 
             if (
@@ -53,6 +53,8 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             ) {
                 continue;
             }
+
+            /** @var CommandHandler|EventListener $handlerAnnotation */
 
             /** @var \ReflectionMethod $handlerReflectionMethod */
             $handlerReflectionMethod = $annotation->reflectionMethod;
