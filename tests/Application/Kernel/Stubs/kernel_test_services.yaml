@@ -1,0 +1,16 @@
+services:
+  Monolog\Handler\TestHandler:
+    public: true
+    arguments:
+      $level: debug
+
+  service_bus.logger:
+    class: Monolog\Logger
+    arguments:
+      $name: 'kernel_test'
+      $handlers:
+      - '@Monolog\Handler\TestHandler'
+      $processors: {}
+
+  ServiceBus\Tests\Application\Kernel\Stubs\KernelTestService:
+    tags: ["service_bus.service"]
