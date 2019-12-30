@@ -17,5 +17,4 @@ namespace ServiceBus\Infrastructure\HttpClient;
  */
 interface Either
 {
-
 }

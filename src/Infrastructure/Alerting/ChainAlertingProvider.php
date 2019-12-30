@@ -37,7 +37,7 @@ final class ChainAlertingProvider implements AlertingProvider
     public function send(AlertMessage $message, ?AlertContext $context = null): Promise
     {
         return call(
-            function() use ($message, $context): \Generator
+            function () use ($message, $context): \Generator
             {
                 try
                 {
@@ -45,17 +45,17 @@ final class ChainAlertingProvider implements AlertingProvider
 
                     $promises = [];
 
-                    foreach($this->providers as $alertingProvider)
+                    foreach ($this->providers as $alertingProvider)
                     {
                         $promises[] = $alertingProvider->send($message, $context);
                     }
 
-                    if(\count($promises) !== 0)
+                    if (\count($promises) !== 0)
                     {
                         yield $promises;
                     }
                 }
-                catch(\Throwable $throwable)
+                catch (\Throwable $throwable)
                 {
                     /** Not interests */
                 }

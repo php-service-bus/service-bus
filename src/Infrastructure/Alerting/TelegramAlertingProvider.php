@@ -69,8 +69,10 @@ final class TelegramAlertingProvider implements AlertingProvider
             return new Success();
         }
 
+        $context = $context ?? new AlertContext();
+
         return call(
-            function (AlertMessage $message, AlertContext $context): \Generator
+            function () use ($message, $context): \Generator
             {
                 try
                 {
@@ -92,9 +94,7 @@ final class TelegramAlertingProvider implements AlertingProvider
                 {
                     $this->logger->error($throwable->getMessage(), collectThrowableDetails($throwable));
                 }
-            },
-            $message,
-            $context ?? new AlertContext()
+            }
         );
     }
 }
