@@ -127,25 +127,30 @@ final class MessageDeliveryEndpoint implements Endpoint
         $deferred = new Deferred();
 
         Loop::defer(
-            function () use ($package, $deferred): \Generator
+            function () use ($package, $deferred): void
             {
-                try
-                {
-                    yield call(
-                        $this->deliveryRetryHandler,
-                        function () use ($package): \Generator
-                        {
-                            yield $this->transport->send($package);
-                        },
-                        SendMessageFailed::class
-                    );
+                $promise = call(
+                    $this->deliveryRetryHandler,
+                    function () use ($package): \Generator
+                    {
+                        yield $this->transport->send($package);
+                    },
+                    SendMessageFailed::class
+                );
 
-                    $deferred->resolve();
-                }
-                catch (\Throwable $throwable)
-                {
-                    $deferred->fail($throwable);
-                }
+                $promise->onResolve(
+                    static function (?\Throwable $throwable) use ($deferred): void
+                    {
+                        if ($throwable === null)
+                        {
+                            $deferred->resolve();
+
+                            return;
+                        }
+
+                        $deferred->fail($throwable);
+                    }
+                );
             }
         );
 

@@ -27,7 +27,7 @@ use ServiceBus\Services\Exceptions\UnableCreateClosure;
  */
 final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoader
 {
-    /** @var Reader  */
+    /** @var Reader */
     private $annotationReader;
 
     public function __construct(Reader $annotationReader = null)
@@ -54,9 +54,10 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                 continue;
             }
 
-            /** @var CommandHandler|EventListener $handlerAnnotation */
-
-            /** @var \ReflectionMethod $handlerReflectionMethod */
+            /**
+             * @var CommandHandler|EventListener $handlerAnnotation
+             * @var \ReflectionMethod            $handlerReflectionMethod
+             */
             $handlerReflectionMethod = $annotation->reflectionMethod;
 
             /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
@@ -83,10 +84,11 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                 $this->extractMessageClass($handlerReflectionMethod->getParameters()),
                 $closure,
                 $handlerReflectionMethod,
-                $this->createOptions($handlerAnnotation, $isCommandHandler)
+                $this->createOptions($handlerAnnotation, $isCommandHandler),
+                $handlerAnnotation->description
             );
 
-            $factoryMethod = true === $isCommandHandler ? 'createCommandHandler' : 'createEventListener';
+            $factoryMethod = $isCommandHandler === true ? 'createCommandHandler' : 'createEventListener';
 
             /** @var ServiceMessageHandler $serviceMessageHandler */
             $serviceMessageHandler = ServiceMessageHandler::{$factoryMethod}($handler);
@@ -100,12 +102,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     /**
      * Create options.
      *
-     * @param ServicesAnnotationsMarker $annotation
-     * @param bool                      $isCommandHandler
-     *
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
-     *
-     * @return DefaultHandlerOptions
      */
     private function createOptions(ServicesAnnotationsMarker $annotation, bool $isCommandHandler): DefaultHandlerOptions
     {
@@ -113,14 +110,14 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         $factoryMethod = true === $isCommandHandler ? 'createForCommandHandler' : 'createForEventListener';
 
         /** @var DefaultHandlerOptions $options */
-        $options = DefaultHandlerOptions::{$factoryMethod}();
+        $options = DefaultHandlerOptions::{$factoryMethod}($annotation->description);
 
-        if (true === $annotation->validate)
+        if ($annotation->validate === true)
         {
             $options = $options->enableValidation($annotation->groups);
         }
 
-        if ('' !== (string) $annotation->defaultValidationFailedEvent)
+        if ((string) $annotation->defaultValidationFailedEvent !== '')
         {
             /**
              * @psalm-suppress TypeCoercion
@@ -129,7 +126,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             $options = $options->withDefaultValidationFailedEvent($annotation->defaultValidationFailedEvent);
         }
 
-        if ('' !== (string) $annotation->defaultThrowableEvent)
+        if ((string) $annotation->defaultThrowableEvent !== '')
         {
             /**
              * @psalm-suppress TypeCoercion
@@ -145,8 +142,6 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
      * Load a list of annotations for message handlers.
      *
      * @throws \ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed
-     *
-     * @return \SplObjectStorage
      */
     private function loadMethodLevelAnnotations(object $service): \SplObjectStorage
     {
@@ -164,12 +159,10 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
      * @param \ReflectionParameter[] $parameters
      *
      * @throws \ServiceBus\Services\Exceptions\InvalidHandlerArguments
-     *
-     * @return string
      */
     private function extractMessageClass(array $parameters): string
     {
-        if (0 === \count($parameters))
+        if (\count($parameters) === 0)
         {
             throw InvalidHandlerArguments::emptyArguments();
         }
@@ -177,7 +170,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         /** @var \ReflectionParameter $firstArgument */
         $firstArgument = $parameters[0];
 
-        if (null !== $firstArgument->getType())
+        if ($firstArgument->getType() !== null)
         {
             /** @var \ReflectionNamedType $type */
             $type = $firstArgument->getType();
@@ -186,7 +179,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             $className = $type->getName();
 
             /** @psalm-suppress RedundantConditionGivenDocblockType */
-            if (true === \class_exists($className))
+            if (\class_exists($className) === true)
             {
                 return $className;
             }

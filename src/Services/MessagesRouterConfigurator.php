@@ -101,12 +101,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
     }
 
     /**
-     * @param object         $service
-     * @param MessageHandler $handler
-     *
      * @throws \LogicException
-     *
-     * @return void
      */
     private static function assertMessageClassSpecifiedInArguments(object $service, MessageHandler $handler): void
     {

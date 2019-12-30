@@ -19,6 +19,8 @@ namespace ServiceBus\Services\Annotations;
  *
  * @Annotation
  * @Target("METHOD")
+ *
+ * @psalm-immutable
  */
 final class CommandHandler implements ServicesAnnotationsMarker
 {
@@ -59,6 +61,14 @@ final class CommandHandler implements ServicesAnnotationsMarker
     public $groups = [];
 
     /**
+     * Message description.
+     * Will be added to the log when the method is called.
+     *
+     * @var string|null
+     */
+    public $description = null;
+
+    /**
      * @psalm-param array<string, mixed> $data
      *
      * @throws \InvalidArgumentException
@@ -68,7 +78,7 @@ final class CommandHandler implements ServicesAnnotationsMarker
         /** @var array|string|null $value */
         foreach ($data as $property => $value)
         {
-            if (false === \property_exists($this, $property))
+            if (\property_exists($this, $property) === false)
             {
                 throw new \InvalidArgumentException(
                     \sprintf('Unknown property "%s" on annotation "%s"', $property, \get_class($this))

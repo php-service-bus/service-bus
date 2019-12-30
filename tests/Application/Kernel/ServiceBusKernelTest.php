@@ -12,14 +12,19 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Application\Kernel;
 
-use function Amp\Promise\wait;
+use Amp\Delayed;
+use Amp\Promise;
+use Monolog\Processor\PsrLogMessageProcessor;
+use PHPUnit\Framework\TestCase;
+use ServiceBus\Tests\Application\Kernel\Stubs\SuccessResponseEvent;
+use ServiceBus\Tests\Stubs\Messages\ExecutionFailed;
+use ServiceBus\Tests\Stubs\Messages\ValidationFailed;
 use function ServiceBus\Common\readReflectionPropertyValue;
 use function ServiceBus\Common\uuid;
 use function ServiceBus\Tests\removeDirectory;
 use Amp\Loop;
 use Monolog\Handler\TestHandler;
 use PHPinnacle\Ridge\Channel;
-use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use ServiceBus\Application\Bootstrap;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
@@ -62,6 +67,12 @@ final class ServiceBusKernelTest extends TestCase
     /** @var TestHandler */
     private $logHandler;
 
+    /** @var AmqpExchange */
+    private $topic;
+
+    /** @var AmqpQueue */
+    private $queue;
+
     /**
      * {@inheritdoc}
      *
@@ -96,16 +107,14 @@ final class ServiceBusKernelTest extends TestCase
             ->monitorLoopBlock()
             ->stopWhenFilesChange(__DIR__);
 
-        $topic = AmqpExchange::direct('test_topic');
-        $queue = AmqpQueue::default('test_queue');
-
-        wait($this->kernel->createQueue($queue, new QueueBind($topic, 'tests')));
-
         /** @var Transport $transport */
         $transport = readReflectionPropertyValue($this->kernel, 'transport');
 
         $this->logHandler = $this->container->get(TestHandler::class);
         $this->transport  = $transport;
+
+        $this->topic = AmqpExchange::direct('test_topic');
+        $this->queue = AmqpQueue::default('test_queue');
     }
 
     /**
@@ -115,23 +124,31 @@ final class ServiceBusKernelTest extends TestCase
     {
         parent::tearDown();
 
-        try
-        {
-            /** @var Channel $channel */
-            $channel = readReflectionPropertyValue($this->transport, 'channel');
+        Loop::run(
+            function (): \Generator
+            {
+                /** @var Channel|null $channel */
+                $channel = readReflectionPropertyValue($this->transport, 'channel');
 
-            wait($channel->exchangeDelete('test_topic'));
-            wait($channel->queueDelete('test_queue'));
+                if ($channel === null)
+                {
+                    Loop::stop();
 
-            wait($this->transport->disconnect());
+                    return;
+                }
 
-            removeDirectory($this->cacheDirectory);
+                yield $channel->exchangeDelete('test_topic');
+                yield $channel->queueDelete('test_queue');
 
-            unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
-        }
-        catch (\Throwable $throwable)
-        {
-        }
+                yield $this->transport->disconnect();
+
+                removeDirectory($this->cacheDirectory);
+
+                unset($this->kernel, $this->container, $this->cacheDirectory, $this->logHandler);
+
+                Loop::stop();
+            }
+        );
     }
 
     /**
@@ -141,24 +158,31 @@ final class ServiceBusKernelTest extends TestCase
      */
     public function listenMessageWithNoHandlers(): void
     {
-        $this->sendMessage(new CommandWithPayload('payload'));
-
         Loop::run(
             function (): \Generator
             {
+                yield $this->kernel->createQueue($this->queue, new QueueBind($this->topic, 'tests'));
+                yield $this->sendMessage(new CommandWithPayload('payload'));
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
+
+                yield new Delayed(2000);
+
+                $messages = \array_map(
+                    static function (array $entry): string
+                    {
+                        return $entry['message'];
+                    },
+                    $this->logHandler->getRecords()
+                );
+
+                static::assertContains(
+                    \sprintf('There are no handlers configured for the message "%s"', CommandWithPayload::class),
+                    $messages
+                );
+
+                Loop::stop();
             }
         );
-
-        $messages = \array_map(
-            static function (array $entry): string
-            {
-                return $entry['message'];
-            },
-            $this->logHandler->getRecords()
-        );
-
-        static::assertContains('There are no handlers configured for the message "{messageClass}"', $messages);
     }
 
     /**
@@ -168,24 +192,28 @@ final class ServiceBusKernelTest extends TestCase
      */
     public function listenFailedMessageExecution(): void
     {
-        $this->sendMessage(new TriggerThrowableCommand());
-
         Loop::run(
             function (): \Generator
             {
+                yield $this->kernel->createQueue($this->queue, new QueueBind($this->topic, 'tests'));
+                yield $this->sendMessage(new TriggerThrowableCommand());
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
+
+                yield new Delayed(2000);
+
+                $messages = \array_map(
+                    static function (array $entry): string
+                    {
+                        return $entry['message'];
+                    },
+                    $this->logHandler->getRecords()
+                );
+
+                static::assertContains(\sprintf('%s::handleWithThrowable', KernelTestService::class), $messages);
+
+                Loop::stop();
             }
         );
-
-        $messages = \array_map(
-            static function (array $entry): string
-            {
-                return $entry['message'];
-            },
-            $this->logHandler->getRecords()
-        );
-
-        static::assertContains(\sprintf('%s::handleWithThrowable', KernelTestService::class), $messages);
     }
 
     /**
@@ -195,12 +223,27 @@ final class ServiceBusKernelTest extends TestCase
      */
     public function successExecutionWithResponseMessage(): void
     {
-        $this->sendMessage(new TriggerResponseEventCommand());
-
         Loop::run(
             function (): \Generator
             {
+                yield $this->kernel->createQueue($this->queue, new QueueBind($this->topic, 'tests'));
+                yield $this->sendMessage(new TriggerResponseEventCommand());
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
+
+                yield new Delayed(2000);
+
+                $messages = \array_map(
+                    static function (array $entry): string
+                    {
+                        return $entry['message'];
+                    },
+                    $this->logHandler->getRecords()
+                );
+
+                static::assertContains(
+                    \sprintf('Send message "%s" to "application"', SuccessResponseEvent::class),
+                    $messages
+                );
 
                 Loop::stop();
             }
@@ -214,26 +257,28 @@ final class ServiceBusKernelTest extends TestCase
      */
     public function contextLogging(): void
     {
-        $this->sendMessage(new SecondEmptyCommand());
-
         Loop::run(
             function (): \Generator
             {
+                yield $this->kernel->createQueue($this->queue, new QueueBind($this->topic, 'tests'));
+                yield $this->sendMessage(new SecondEmptyCommand());
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
+
+                yield new Delayed(2000);
+
+                $messages = \array_map(
+                    static function (array $entry): string
+                    {
+                        return $entry['message'];
+                    },
+                    $this->logHandler->getRecords()
+                );
+
+                static::assertContains('test exception message', $messages);
 
                 Loop::stop();
             }
         );
-
-        $messages = \array_map(
-            static function (array $entry): string
-            {
-                return $entry['message'];
-            },
-            $this->logHandler->getRecords()
-        );
-
-        static::assertContains('test exception message', $messages);
     }
 
     /**
@@ -243,38 +288,40 @@ final class ServiceBusKernelTest extends TestCase
      */
     public function withFailedValidation(): void
     {
-        $this->sendMessage(new WithValidationCommand(''));
-
         Loop::run(
             function (): \Generator
             {
+                yield $this->kernel->createQueue($this->queue, new QueueBind($this->topic, 'tests'));
+                yield $this->sendMessage(new WithValidationCommand(''));
                 yield $this->kernel->run(AmqpQueue::default('test_queue'));
+
+                yield new Delayed(2000);
+
+                $entries = \array_filter(
+                    \array_map(
+                        static function (array $entry): ?array
+                        {
+                            if (true === isset($entry['context']['violations']))
+                            {
+                                return $entry;
+                            }
+
+                            return null;
+                        },
+                        $this->logHandler->getRecords()
+                    )
+                );
+
+                static::assertCount(1, $entries);
+
+                $entry = \reset($entries);
+
+                static::assertFalse($entry['context']['isValid']);
+                static::assertSame(['This value should not be blank.'], $entry['context']['violations']['value']);
 
                 Loop::stop();
             }
         );
-
-        $entries = \array_filter(
-            \array_map(
-                static function (array $entry): ?array
-                {
-                    if (true === isset($entry['context']['violations']))
-                    {
-                        return $entry;
-                    }
-
-                    return null;
-                },
-                $this->logHandler->getRecords()
-            )
-        );
-
-        static::assertCount(1, $entries);
-
-        $entry = \reset($entries);
-
-        static::assertFalse($entry['context']['isValid']);
-        static::assertSame(['This value should not be blank.'], $entry['context']['violations']['value']);
     }
 
     /**
@@ -284,11 +331,18 @@ final class ServiceBusKernelTest extends TestCase
      */
     public function enableWatchers(): void
     {
-        $this->kernel->monitorLoopBlock();
-        $this->kernel->enableGarbageCleaning();
-        $this->kernel->useDefaultStopSignalHandler();
-        $this->kernel->stopAfter(60);
-        $this->kernel->stopWhenFilesChange(__DIR__);
+        Loop::run(
+            function (): void
+            {
+                $this->kernel->monitorLoopBlock();
+                $this->kernel->enableGarbageCleaning();
+                $this->kernel->useDefaultStopSignalHandler();
+                $this->kernel->stopAfter(60);
+                $this->kernel->stopWhenFilesChange(__DIR__);
+
+                Loop::stop();
+            }
+        );
     }
 
     /**
@@ -298,9 +352,31 @@ final class ServiceBusKernelTest extends TestCase
      */
     public function processMessageWithValidationFailure(): void
     {
-        $this->sendMessage(new WithValidationRulesCommand(''));
+        Loop::run(
+            function (): \Generator
+            {
+                yield $this->kernel->createQueue($this->queue, new QueueBind($this->topic, 'tests'));
+                yield $this->sendMessage(new WithValidationRulesCommand(''));
+                yield $this->kernel->run(AmqpQueue::default('test_queue'));
 
-        wait($this->kernel->run(AmqpQueue::default('test_queue')));
+                yield new Delayed(2000);
+
+                $messages = \array_map(
+                    static function (array $entry): string
+                    {
+                        return $entry['message'];
+                    },
+                    $this->logHandler->getRecords()
+                );
+
+                static::assertContains(
+                    \sprintf('Send message "%s" to "application"', ValidationFailed::class),
+                    $messages
+                );
+
+                Loop::stop();
+            }
+        );
     }
 
     /**
@@ -310,19 +386,38 @@ final class ServiceBusKernelTest extends TestCase
      */
     public function processMessageWithSpecifiedThrowableEvent(): void
     {
-        $this->sendMessage(new TriggerThrowableCommandWithResponseEvent());
+        Loop::run(
+            function (): \Generator
+            {
+                yield $this->kernel->createQueue($this->queue, new QueueBind($this->topic, 'tests'));
+                yield $this->sendMessage(new TriggerThrowableCommandWithResponseEvent());
+                yield $this->kernel->run(AmqpQueue::default('test_queue'));
 
-        wait($this->kernel->run(AmqpQueue::default('test_queue')));
+                yield new Delayed(2000);
+
+                $messages = \array_map(
+                    static function (array $entry): string
+                    {
+                        return $entry['message'];
+                    },
+                    $this->logHandler->getRecords()
+                );
+
+                static::assertContains(
+                    \sprintf('Send message "%s" to "application"', ExecutionFailed::class),
+                    $messages
+                );
+
+                Loop::stop();
+            }
+        );
     }
 
-    /**
-     * @throws \Throwable
-     */
-    private function sendMessage(object $message, array $headers = []): void
+    private function sendMessage(object $message, array $headers = []): Promise
     {
         $encoder = new SymfonyMessageSerializer();
 
-        $promise = $this->transport->send(
+        return $this->transport->send(
             new OutboundPackage(
                 $encoder->encode($message),
                 $headers,
@@ -330,7 +425,5 @@ final class ServiceBusKernelTest extends TestCase
                 uuid()
             )
         );
-
-        wait($promise);
     }
 }

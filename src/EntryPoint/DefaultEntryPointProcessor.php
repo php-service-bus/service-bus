@@ -62,21 +62,16 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
      */
     public function handle(IncomingPackage $package): Promise
     {
-        $messageDecoder = $this->messageDecoder;
-        $messagesRouter = $this->messagesRouter;
-        $logger         = $this->logger;
-        $contextFactory = $this->contextFactory;
-
         return call(
-            static function (IncomingPackage $package) use ($messageDecoder, $messagesRouter, $contextFactory, $logger): \Generator
+            function (IncomingPackage $package): \Generator
             {
                 try
                 {
-                    $message = $messageDecoder->decode($package);
+                    $message = $this->messageDecoder->decode($package);
                 }
                 catch (DecodeMessageFailed $exception)
                 {
-                    $logger->error(
+                    $this->logger->error(
                         'Failed to denormalize the message',
                         \array_merge(
                             collectThrowableDetails($exception),
@@ -93,23 +88,19 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     return;
                 }
 
-                $logger->debug('Dispatch "{messageClass}" message', [
-                    'packageId'    => $package->id(),
-                    'traceId'      => $package->traceId(),
-                    'messageClass' => \get_class($message),
-                ]);
+                $executors = $this->messagesRouter->match($message);
 
-                $executors = $messagesRouter->match($message);
-
-                if (0 === \count($executors))
+                if (\count($executors) === 0)
                 {
-                    $logger->debug(
+                    $this->logger->debug(
                         'There are no handlers configured for the message "{messageClass}"',
                         ['messageClass' => \get_class($message)]
                     );
+
+                    return;
                 }
 
-                $context = $contextFactory->create($package, $message);
+                $context = $this->contextFactory->create($package, $message);
 
                 /** @var \ServiceBus\Common\MessageExecutor\MessageExecutor $executor */
                 foreach ($executors as $executor)
@@ -124,7 +115,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     }
                 }
 
-                unset($context);
+                unset($context, $executors, $message);
 
                 yield $package->ack();
             },

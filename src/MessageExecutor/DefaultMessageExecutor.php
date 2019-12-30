@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace ServiceBus\MessageExecutor;
 
+use Psr\Log\LoggerInterface;
 use function Amp\call;
 use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Promise;
@@ -25,10 +26,10 @@ use ServiceBus\Services\Configuration\DefaultHandlerOptions;
  */
 final class DefaultMessageExecutor implements MessageExecutor
 {
-    /** @var \Closure  */
+    /** @var \Closure */
     private $closure;
 
-    /** @var \SplObjectStorage  */
+    /** @var \SplObjectStorage */
     private $arguments;
 
     /**
@@ -40,8 +41,11 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     private $argumentResolvers;
 
-    /** @var DefaultHandlerOptions  */
+    /** @var DefaultHandlerOptions */
     private $options;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /**
      * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>  $argumentResolvers
@@ -52,11 +56,13 @@ final class DefaultMessageExecutor implements MessageExecutor
         \Closure $closure,
         \SplObjectStorage $arguments,
         DefaultHandlerOptions $options,
-        array $argumentResolvers
+        array $argumentResolvers,
+        LoggerInterface $logger
     ) {
         $this->closure           = $closure;
         $this->arguments         = $arguments;
         $this->options           = $options;
+        $this->logger            = $logger;
         $this->argumentResolvers = $argumentResolvers;
     }
 
@@ -65,32 +71,24 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     public function __invoke(object $message, ServiceBusContext $context): Promise
     {
-        $argumentResolvers = $this->argumentResolvers;
-
         return call(
-            static function (
-                \Closure $closure,
-                \SplObjectStorage $arguments,
-                DefaultHandlerOptions $options,
-                object $message,
-                ServiceBusContext $context
-            ) use ($argumentResolvers): \Generator
+            function () use ($message, $context): \Generator
             {
+                /** @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers */
+                $resolvedArgs = self::collectArguments($this->arguments, $this->argumentResolvers, $message, $context);
+
                 try
                 {
-                    /**
-                     * @psalm-var \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
-                     * @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
-                     */
-                    $resolvedArgs = self::collectArguments($arguments, $argumentResolvers, $message, $context);
+                    if ($this->options->description !== null)
+                    {
+                        $this->logger->info($this->options->description);
+                    }
 
-                    yield call($closure, ...$resolvedArgs);
-
-                    unset($resolvedArgs);
+                    yield call($this->closure, ...$resolvedArgs);
                 }
                 catch (\Throwable $throwable)
                 {
-                    if (null === $options->defaultThrowableEvent)
+                    if ($this->options->defaultThrowableEvent === null)
                     {
                         throw $throwable;
                     }
@@ -98,21 +96,18 @@ final class DefaultMessageExecutor implements MessageExecutor
                     $context->logContextMessage(
                         'Error processing, sending an error event and stopping message processing',
                         collectThrowableDetails($throwable),
-                        LogLevel::DEBUG
+                        LogLevel::ERROR
                     );
 
                     yield from self::publishThrowable(
-                        (string) $options->defaultThrowableEvent,
+                        (string) $this->options->defaultThrowableEvent,
                         $throwable->getMessage(),
                         $context
                     );
                 }
-            },
-            $this->closure,
-            $this->arguments,
-            $this->options,
-            $message,
-            $context
+
+                unset($resolvedArgs);
+            }
         );
     }
 
@@ -134,7 +129,6 @@ final class DefaultMessageExecutor implements MessageExecutor
     /**
      * Collect arguments list.
      *
-     * @psalm-param \SplObjectStorage<\ServiceBus\Common\MessageHandler\MessageHandlerArgument, string> $arguments
      * @psalm-param  array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $resolvers
      * @psalm-return array<int, mixed>
      *

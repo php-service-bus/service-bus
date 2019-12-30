@@ -15,7 +15,7 @@ namespace ServiceBus\Infrastructure\Retry;
 /**
  * Retry operation options.
  *
- * @psalm-readonly
+ * @psalm-immutable
  */
 final class RetryOptions
 {

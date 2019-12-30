@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace ServiceBus\EntryPoint;
 
+use Monolog\Processor\PsrLogMessageProcessor;
 use function Amp\call;
 use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Delayed;
@@ -101,43 +102,21 @@ final class EntryPoint
      */
     public function listen(Queue ...$queues): Promise
     {
-        /** Hack for phpunit tests */
-        $isTestCall = 'phpunitTests' === (string) \getenv('SERVICE_BUS_TESTING');
-
-        return call(
-            function (array $queues) use ($isTestCall): \Generator
+        return $this->transport->consume(
+            function (IncomingPackage $package): \Generator
             {
-                /** @var Queue[] $queues */
+                $this->currentTasksInProgressCount++;
 
-                yield $this->transport->consume(
-                    function (IncomingPackage $package) use ($isTestCall): \Generator
-                    {
-                        $this->currentTasksInProgressCount++;
+                /** Handle incoming package */
+                $this->deferExecution($package);
 
-                        /** Hack for phpUnit */
-                        if (true === $isTestCall)
-                        {
-                            $this->currentTasksInProgressCount--;
-
-                            yield $this->processor->handle($package);
-                            yield $this->transport->stop();
-
-                            Loop::stop();
-                        }
-
-                        /** Handle incoming package */
-                        $this->deferExecution($package);
-
-                        /** Limit the maximum number of concurrently running tasks */
-                        while ($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
-                        {
-                            yield new Delayed($this->awaitDelay);
-                        }
-                    },
-                    ...$queues
-                );
+                /** Limit the maximum number of concurrently running tasks */
+                while ($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
+                {
+                    yield new Delayed($this->awaitDelay);
+                }
             },
-            $queues
+            ...$queues
         );
     }
 

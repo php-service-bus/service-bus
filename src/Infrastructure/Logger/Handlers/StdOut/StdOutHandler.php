@@ -13,10 +13,11 @@ declare(strict_types = 1);
 namespace ServiceBus\Infrastructure\Logger\Handlers\StdOut;
 
 use Amp\ByteStream\ResourceOutputStream;
-use Amp\Log\ConsoleFormatter;
 use Monolog\Formatter\FormatterInterface;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use function ServiceBus\Common\jsonEncode;
 
 /**
  * Console output handler.
@@ -25,14 +26,32 @@ use Monolog\Logger;
  */
 final class StdOutHandler extends AbstractProcessingHandler
 {
-    /** @var ResourceOutputStream  */
+    /** @var ResourceOutputStream */
     private $streamWriter;
 
     public function __construct(int $level = Logger::DEBUG, bool $bubble = true, ?FormatterInterface $formatter = null)
     {
         parent::__construct($level, $bubble);
 
-        $this->formatter    = $formatter ?: new ConsoleFormatter();
+        $this->formatter = $formatter
+            ?: new class() extends LineFormatter
+            {
+                public function __construct()
+                {
+                    parent::__construct("[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n");
+                }
+
+                protected function toJson($data, bool $ignoreErrors = false): string
+                {
+                    if (\is_array($data) === true)
+                    {
+                        return jsonEncode($data);
+                    }
+
+                    return '';
+                }
+            };
+
         $this->streamWriter = new ResourceOutputStream(\STDOUT, 50000);
     }
 

@@ -76,14 +76,38 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      */
     public $defaultThrowableEvent = null;
 
-    public static function createForEventListener(): self
+    /**
+     * Message description.
+     * Will be added to the log when the method is called.
+     *
+     * @var string|null
+     */
+    public $description = null;
+
+    public static function createForEventListener(?string $withDescription = null): self
     {
-        return new self(true, false);
+        return new self(
+            true,
+            false,
+            false,
+            [],
+            null,
+            null,
+            $withDescription
+        );
     }
 
-    public static function createForCommandHandler(): self
+    public static function createForCommandHandler(?string $withDescription = null): self
     {
-        return new self(false, true);
+        return new self(
+            false,
+            true,
+            false,
+            [],
+            null,
+            null,
+            $withDescription
+        );
     }
 
     /**
@@ -107,7 +131,8 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
             true,
             $validationGroups,
             $defaultValidationFailedEvent,
-            $defaultThrowableEvent
+            $defaultThrowableEvent,
+            $this->description
         );
     }
 
@@ -142,7 +167,8 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
             $this->validationEnabled,
             $this->validationGroups,
             $eventClass,
-            $defaultThrowableEvent
+            $defaultThrowableEvent,
+            $this->description
         );
     }
 
@@ -177,7 +203,8 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
             $this->validationEnabled,
             $this->validationGroups,
             $defaultValidationFailedEvent,
-            $eventClass
+            $eventClass,
+            $this->description
         );
     }
 
@@ -189,10 +216,11 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     private function __construct(
         bool $isEventListener,
         bool $isCommandHandler,
-        bool $validationEnabled = false,
-        array $validationGroups = [],
-        ?string $defaultValidationFailedEvent = null,
-        ?string $defaultThrowableEvent = null
+        bool $validationEnabled,
+        array $validationGroups,
+        ?string $defaultValidationFailedEvent,
+        ?string $defaultThrowableEvent,
+        ?string $description
     ) {
         $this->isEventListener              = $isEventListener;
         $this->isCommandHandler             = $isCommandHandler;
@@ -200,5 +228,6 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
         $this->validationGroups             = $validationGroups;
         $this->defaultValidationFailedEvent = $defaultValidationFailedEvent;
         $this->defaultThrowableEvent        = $defaultThrowableEvent;
+        $this->description                  = $description;
     }
 }

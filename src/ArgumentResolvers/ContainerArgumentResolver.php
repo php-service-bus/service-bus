@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 final class ContainerArgumentResolver implements ArgumentResolver
 {
-    /** @var ServiceLocator  */
+    /** @var ServiceLocator */
     private $serviceLocator;
 
     public function __construct(ServiceLocator $serviceLocator)
@@ -34,7 +34,7 @@ final class ContainerArgumentResolver implements ArgumentResolver
      */
     public function supports(MessageHandlerArgument $argument): bool
     {
-        return true === $argument->isObject && true === $this->serviceLocator->has((string) $argument->typeClass);
+        return $argument->isObject === true && $this->serviceLocator->has((string) $argument->typeClass) === true;
     }
 
     /**

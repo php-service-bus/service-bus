@@ -47,7 +47,7 @@ final class EndpointRouter
      */
     public function addGlobalDestination(Endpoint $endpoint): void
     {
-        $this->globalEndpoints[\spl_object_hash($endpoint)] = $endpoint;
+        $this->globalEndpoints[$endpoint->name()] = $endpoint;
     }
 
     /**

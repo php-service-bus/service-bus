@@ -1,8 +1,14 @@
 services:
+  Monolog\Processor\PsrLogMessageProcessor:
+
   Monolog\Handler\TestHandler:
     public: true
     arguments:
       $level: debug
+    calls:
+      - method: pushProcessor
+        arguments:
+          - '@Monolog\Processor\PsrLogMessageProcessor'
 
   service_bus.logger:
     class: Monolog\Logger

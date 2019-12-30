@@ -17,7 +17,6 @@ services:
   service_bus.decoder.default_handler:
     class: ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer
     arguments:
-      $serializer: null
       $normalizers: []
 
   service_bus.decoder.service_locator:
@@ -119,6 +118,7 @@ services:
         - '@ServiceBus\ArgumentResolvers\MessageArgumentResolver'
         - '@ServiceBus\ArgumentResolvers\ContextArgumentResolver'
         - '@ServiceBus\ArgumentResolvers\ContainerArgumentResolver'
+      $logger: '@service_bus.logger'
       $validator: ~
 
   # Default transport implementation

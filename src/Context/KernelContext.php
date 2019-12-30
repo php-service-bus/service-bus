@@ -113,27 +113,27 @@ final class KernelContext implements ServiceBusContext
      */
     public function delivery(object $message, ?DeliveryOptions $deliveryOptions = null): Promise
     {
-        /** @psalm-var class-string $messageClass */
-        $messageClass = \get_class($message);
-        $endpoints    = $this->endpointRouter->route($messageClass);
-        $logger       = $this->logger;
-
-        $traceId = $this->incomingPackage->traceId();
-        $options = $deliveryOptions ?? $this->optionsFactory->create($traceId, $messageClass);
-
-        if ($options->traceId() === null)
-        {
-            $options->withTraceId($traceId);
-        }
-
         return call(
-            static function (object $message, DeliveryOptions $options) use ($endpoints, $logger): void
+            function () use ($message, $deliveryOptions): \Generator
             {
+                /** @psalm-var class-string $messageClass */
+                $messageClass = \get_class($message);
+
+                $traceId = $this->incomingPackage->traceId();
+                $options = $deliveryOptions ?? $this->optionsFactory->create($traceId, $messageClass);
+
+                if ($options->traceId() === null)
+                {
+                    $options->withTraceId($traceId);
+                }
+
+                $endpoints = $this->endpointRouter->route($messageClass);
+
+                $promises = [];
+
                 foreach ($endpoints as $endpoint)
                 {
-                    /** @var \ServiceBus\Endpoint\Endpoint $endpoint */
-
-                    $logger->debug(
+                    $this->logger->debug(
                         'Send message "{messageClass}" to "{endpoint}"',
                         [
                             'traceId'      => $options->traceId(),
@@ -142,19 +142,14 @@ final class KernelContext implements ServiceBusContext
                         ]
                     );
 
-                    $endpoint->delivery($message, $options)->onResolve(
-                        static function (?\Throwable $throwable): void
-                        {
-                            if ($throwable !== null)
-                            {
-                                throw  $throwable;
-                            }
-                        }
-                    );
+                    $promises[] = $endpoint->delivery($message, $options);
                 }
-            },
-            $message,
-            $options
+
+                if (\count($promises) !== 0)
+                {
+                    yield $promises;
+                }
+            }
         );
     }
 
@@ -179,13 +174,8 @@ final class KernelContext implements ServiceBusContext
      */
     public function logContextMessage(string $logMessage, array $extra = [], string $level = LogLevel::INFO): void
     {
-        $extra = \array_merge_recursive(
-            $extra,
-            [
-                'traceId'   => $this->incomingPackage->traceId(),
-                'packageId' => $this->incomingPackage->id(),
-            ]
-        );
+        $extra['traceId']   = $this->incomingPackage->traceId();
+        $extra['packageId'] = $this->incomingPackage->id();
 
         $this->logger->log($level, $logMessage, $extra);
     }

@@ -144,6 +144,7 @@ final class Formatter extends NormalizerFormatter
                 continue;
             }
 
+            /** @noinspection UnnecessaryCastingInspection */
             $len = \strlen($key . (string) $value);
 
             if (true === \is_string($value) && $len > $this->maxLength)

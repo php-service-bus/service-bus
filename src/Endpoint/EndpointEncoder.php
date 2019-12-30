@@ -18,16 +18,16 @@ use ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer;
 /**
  * Endpoint message encoder.
  *
- * @psalm-readonly
+ * @psalm-immutable
  */
 final class EndpointEncoder
 {
     private const DEFAULT_ENCODER = 'service_bus.encoder.default_handler';
 
-    /** @var string  */
+    /** @var string */
     public $tag;
 
-    /** @var MessageEncoder  */
+    /** @var MessageEncoder */
     public $handler;
 
     public static function createDefault(): self

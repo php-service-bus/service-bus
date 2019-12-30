@@ -17,6 +17,8 @@ namespace ServiceBus\Services\Annotations;
  *
  * @Annotation
  * @Target("METHOD")
+ *
+ * @psalm-immutable
  */
 final class EventListener implements ServicesAnnotationsMarker
 {
@@ -61,6 +63,14 @@ final class EventListener implements ServicesAnnotationsMarker
     public $defaultThrowableEvent = null;
 
     /**
+     * Message description.
+     * Will be added to the log when the method is called.
+     *
+     * @var string|null
+     */
+    public $description = null;
+
+    /**
      * @psalm-param array<string, mixed> $data
      *
      * @throws \InvalidArgumentException
@@ -70,7 +80,7 @@ final class EventListener implements ServicesAnnotationsMarker
         /** @psalm-var array|string|class-string|null $value */
         foreach ($data as $property => $value)
         {
-            if (false === \property_exists($this, $property))
+            if (\property_exists($this, $property) === false)
             {
                 throw new \InvalidArgumentException(
                     \sprintf('Unknown property "%s" on annotation "%s"', $property, \get_class($this))
