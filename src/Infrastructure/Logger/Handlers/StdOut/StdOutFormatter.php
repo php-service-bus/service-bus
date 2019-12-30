@@ -14,7 +14,6 @@ namespace ServiceBus\Infrastructure\Logger\Handlers\StdOut;
 
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
-use function Amp\Log\hasColorSupport;
 use function ServiceBus\Common\jsonEncode;
 
 /**
