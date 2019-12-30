@@ -12,8 +12,6 @@ declare(strict_types = 1);
 
 namespace ServiceBus\EntryPoint;
 
-use Monolog\Processor\PsrLogMessageProcessor;
-use function Amp\call;
 use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Delayed;
 use Amp\Loop;

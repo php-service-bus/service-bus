@@ -14,7 +14,6 @@ namespace ServiceBus\Tests\Application\Kernel;
 
 use Amp\Delayed;
 use Amp\Promise;
-use Monolog\Processor\PsrLogMessageProcessor;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Tests\Application\Kernel\Stubs\SuccessResponseEvent;
 use ServiceBus\Tests\Stubs\Messages\ExecutionFailed;
