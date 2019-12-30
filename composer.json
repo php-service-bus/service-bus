@@ -6,8 +6,7 @@
     "async-php",
     "command-bus",
     "messaging",
-    "saga",
-    "event-sourcing"
+    "saga"
   ],
   "authors": [
     {
