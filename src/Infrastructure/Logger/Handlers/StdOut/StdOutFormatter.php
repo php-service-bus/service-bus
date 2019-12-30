@@ -22,14 +22,9 @@ use function ServiceBus\Common\jsonEncode;
  */
 final class StdOutFormatter extends LineFormatter
 {
-    /** @var bool */
-    private $colorize;
-
     public function __construct()
     {
         parent::__construct("[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n");
-
-        $this->colorize = hasColorSupport();
     }
 
     /**
@@ -37,11 +32,8 @@ final class StdOutFormatter extends LineFormatter
      */
     public function format(array $record): string
     {
-        if ($this->colorize === true)
-        {
-            $record['level_name'] = $this->ansifyLevel($record['level_name']);
-            $record['channel']    = "\033[1m{$record['channel']}\033[0m";
-        }
+        $record['level_name'] = $this->ansifyLevel($record['level_name']);
+        $record['channel']    = "\033[1m{$record['channel']}\033[0m";
 
         return parent::format($record);
     }
