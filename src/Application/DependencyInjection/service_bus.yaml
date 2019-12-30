@@ -177,3 +177,13 @@ services:
   ServiceBus\Mutex\MutexFactory:
     class: ServiceBus\Mutex\InMemoryMutexFactory
 
+  # Connection pool for http client
+  Amp\Http\Client\Connection\ConnectionPool:
+    factory: ['ServiceBus\Infrastructure\HttpClient\ConnectionPollFactory', 'build']
+
+  # Application http client
+  ServiceBus\HttpClient\HttpClient:
+    class: ServiceBus\HttpClient\Artax\ArtaxHttpClient
+    arguments:
+      $connectionPool: '@Amp\Http\Client\Connection\ConnectionPool'
+      $logger: '@service_bus.logger'
