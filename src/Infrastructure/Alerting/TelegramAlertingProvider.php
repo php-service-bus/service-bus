@@ -88,6 +88,7 @@ final class TelegramAlertingProvider implements AlertingProvider
                         $method->disableNotification();
                     }
 
+                    /** @psalm-suppress TooManyTemplateParams */
                     yield $this->interactionsProvider->call($method, $this->credentials);
                 }
                 catch (\Throwable $throwable)

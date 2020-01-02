@@ -31,7 +31,7 @@ final class StdOutFormatter extends LineFormatter
      */
     public function format(array $record): string
     {
-        $record['level_name'] = $this->ansifyLevel($record['level_name']);
+        $record['level_name'] = $this->ansifyLevel((string)$record['level_name']);
         $record['channel']    = "\033[1m{$record['channel']}\033[0m";
 
         return parent::format($record);

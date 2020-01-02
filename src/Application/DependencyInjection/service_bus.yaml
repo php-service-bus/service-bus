@@ -179,7 +179,7 @@ services:
 
   # Connection pool for http client
   Amp\Http\Client\Connection\ConnectionPool:
-    factory: ['ServiceBus\Infrastructure\HttpClient\ConnectionPollFactory', 'build']
+    factory: ['ServiceBus\HttpClient\Artax\ConnectionPollFactory', 'build']
 
   # Application http client
   ServiceBus\HttpClient\HttpClient:
