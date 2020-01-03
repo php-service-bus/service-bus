@@ -48,7 +48,11 @@ final class MessageDeliveryEndpointTest extends TestCase
     /** @test */
     public function simpleCreate(): void
     {
-        $endpoint = new MessageDeliveryEndpoint(__METHOD__, $this->transport, new EndpointTestDestination('qwerty'));
+        $endpoint = new MessageDeliveryEndpoint(
+            __METHOD__,
+            $this->transport,
+            new EndpointTestDestination('qwerty')
+        );
 
         static::assertSame(__METHOD__, $endpoint->name());
     }
@@ -56,7 +60,12 @@ final class MessageDeliveryEndpointTest extends TestCase
     /** @test */
     public function withNewDeliveryDestination(): void
     {
-        $endpoint = new MessageDeliveryEndpoint(__METHOD__, $this->transport, new EndpointTestDestination('qwerty'));
+        $endpoint = new MessageDeliveryEndpoint(
+            __METHOD__,
+            $this->transport,
+            new EndpointTestDestination('qwerty')
+        );
+
         $endpoint = $endpoint->withNewDeliveryDestination(new EndpointTestDestination('root'));
 
         /** @var EndpointTestDestination $destination */
@@ -71,8 +80,12 @@ final class MessageDeliveryEndpointTest extends TestCase
         $this->transport->expectedDeliveryFailure();
         $this->expectException(MessageDeliveryFailed::class);
 
-        $endpoint = new MessageDeliveryEndpoint(__METHOD__, $this->transport, new EndpointTestDestination('qwerty'));
+        $endpoint = new MessageDeliveryEndpoint(
+            __METHOD__,
+            $this->transport,
+            new EndpointTestDestination('qwerty')
+        );
 
-        wait($endpoint->delivery(new FirstEmptyMessage, DefaultDeliveryOptions::create()));
+        wait($endpoint->delivery(new FirstEmptyMessage, DefaultDeliveryOptions::nonPersistent()));
     }
 }
