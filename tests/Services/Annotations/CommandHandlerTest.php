@@ -20,11 +20,7 @@ use ServiceBus\Services\Annotations\CommandHandler;
  */
 final class CommandHandlerTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function withWrongProperties(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -32,11 +28,7 @@ final class CommandHandlerTest extends TestCase
         new CommandHandler(['qwerty' => 'root']);
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function withoutAnyFields(): void
     {
         $annotation = new CommandHandler([]);
@@ -45,11 +37,7 @@ final class CommandHandlerTest extends TestCase
         static::assertEmpty($annotation->groups);
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function withValidation(): void
     {
         $annotation = new CommandHandler([
@@ -64,11 +52,7 @@ final class CommandHandlerTest extends TestCase
         static::assertSame(['qwerty', 'root'], $annotation->groups);
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function withCustomEvents(): void
     {
         $handler = new CommandHandler(

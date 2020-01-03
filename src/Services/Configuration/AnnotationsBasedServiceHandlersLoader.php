@@ -63,6 +63,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
             $closure = $handlerReflectionMethod->getClosure($service);
 
+            // @codeCoverageIgnoreStart
             if ($closure === null)
             {
                 throw new UnableCreateClosure(
@@ -72,6 +73,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                     )
                 );
             }
+            // @codeCoverageIgnoreEnd
 
             $isCommandHandler = $handlerAnnotation instanceof CommandHandler;
 

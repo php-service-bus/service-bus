@@ -20,11 +20,7 @@ use ServiceBus\Environment;
  */
 final class EnvironmentTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function wrongEnvironment(): void
     {
         $this->expectException(\LogicException::class);
@@ -33,16 +29,12 @@ final class EnvironmentTest extends TestCase
         Environment::create('qwerty');
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function createTestEnv(): void
     {
         $environment = Environment::test();
 
-        static::assertSame('test', (string) $environment);
+        static::assertSame('test', $environment->toString());
         static::assertTrue($environment->equals(Environment::create('test')));
         static::assertTrue($environment->isTesting());
         static::assertTrue($environment->isDebug());
@@ -50,16 +42,12 @@ final class EnvironmentTest extends TestCase
         static::assertFalse($environment->isDevelopment());
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function createDevEnv(): void
     {
         $environment = Environment::dev();
 
-        static::assertSame('dev', (string) $environment);
+        static::assertSame('dev', $environment->toString());
         static::assertTrue($environment->equals(Environment::create('dev')));
         static::assertTrue($environment->isDevelopment());
         static::assertTrue($environment->isDebug());
@@ -67,16 +55,12 @@ final class EnvironmentTest extends TestCase
         static::assertFalse($environment->isProduction());
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function createProdEnv(): void
     {
         $environment = Environment::prod();
 
-        static::assertSame('prod', (string) $environment);
+        static::assertSame('prod', $environment->toString());
         static::assertTrue($environment->equals(Environment::create('prod')));
         static::assertTrue($environment->isProduction());
         static::assertFalse($environment->isDevelopment());

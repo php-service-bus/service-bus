@@ -93,7 +93,7 @@ final class ContainerBuilder
      */
     public function addCompilerPasses(CompilerPassInterface ...$compilerPasses): void
     {
-        foreach ($compilerPasses as $compilerPass)
+        foreach($compilerPasses as $compilerPass)
         {
             $this->compilerPasses->attach($compilerPass);
         }
@@ -104,7 +104,7 @@ final class ContainerBuilder
      */
     public function addExtensions(Extension ...$extensions): void
     {
-        foreach ($extensions as $extension)
+        foreach($extensions as $extension)
         {
             $this->extensions->attach($extension);
         }
@@ -115,7 +115,7 @@ final class ContainerBuilder
      */
     public function addModules(ServiceBusModule ...$serviceBusModules): void
     {
-        foreach ($serviceBusModules as $serviceBusModule)
+        foreach($serviceBusModules as $serviceBusModule)
         {
             $this->modules->attach($serviceBusModule);
         }
@@ -126,7 +126,7 @@ final class ContainerBuilder
      */
     public function addParameters(array $parameters): void
     {
-        foreach ($parameters as $key => $value)
+        foreach($parameters as $key => $value)
         {
             $this->parameters[$key] = $value;
         }
@@ -145,7 +145,7 @@ final class ContainerBuilder
      */
     public function hasActualContainer(): bool
     {
-        if (false === $this->environment->isDebug())
+        if(false === $this->environment->isDebug())
         {
             return true === $this->configCache()->isFresh();
         }
@@ -185,25 +185,25 @@ final class ContainerBuilder
      */
     public function build(): ContainerInterface
     {
-        $this->parameters['service_bus.environment'] = (string) $this->environment;
+        $this->parameters['service_bus.environment'] = $this->environment->toString();
         $this->parameters['service_bus.entry_point'] = $this->entryPointName;
 
         $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($this->parameters));
 
         /** @var Extension $extension */
-        foreach ($this->extensions as $extension)
+        foreach($this->extensions as $extension)
         {
             $extension->load($this->parameters, $containerBuilder);
         }
 
         /** @var CompilerPassInterface $compilerPass */
-        foreach ($this->compilerPasses as $compilerPass)
+        foreach($this->compilerPasses as $compilerPass)
         {
             $containerBuilder->addCompilerPass($compilerPass);
         }
 
         /** @var ServiceBusModule $module */
-        foreach ($this->modules as $module)
+        foreach($this->modules as $module)
         {
             $module->boot($containerBuilder);
         }
@@ -235,7 +235,7 @@ final class ContainerBuilder
             ]
         );
 
-        if (true === \is_string($content))
+        if(true === \is_string($content))
         {
             $this->configCache()->write($content, $builder->getResources());
         }
@@ -246,7 +246,7 @@ final class ContainerBuilder
      */
     private function configCache(): ConfigCache
     {
-        if (null === $this->configCache)
+        if(null === $this->configCache)
         {
             $this->configCache = new ConfigCache($this->getContainerClassPath(), $this->environment->isDebug());
         }
@@ -261,7 +261,7 @@ final class ContainerBuilder
     {
         $cacheDirectory = (string) $this->cacheDirectory;
 
-        if ('' === $cacheDirectory && false === \is_writable($cacheDirectory))
+        if('' === $cacheDirectory && false === \is_writable($cacheDirectory))
         {
             $cacheDirectory = \sys_get_temp_dir();
         }
@@ -285,7 +285,7 @@ final class ContainerBuilder
         return \sprintf(
             self::CONTAINER_NAME_TEMPLATE,
             \lcfirst($this->entryPointName),
-            \ucfirst((string) $this->environment)
+            \ucfirst($this->environment->toString())
         );
     }
 }

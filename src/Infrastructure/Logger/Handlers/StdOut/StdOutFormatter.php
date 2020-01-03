@@ -17,13 +17,13 @@ use Psr\Log\LogLevel;
 use function ServiceBus\Common\jsonEncode;
 
 /**
- * @codeCoverageIgnore
+ *
  */
 final class StdOutFormatter extends LineFormatter
 {
-    public function __construct()
+    public function __construct(string $format = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n")
     {
-        parent::__construct("[%datetime%] %channel%.%level_name%: %message% %context% %extra%\r\n");
+        parent::__construct($format);
     }
 
     /**
@@ -31,7 +31,7 @@ final class StdOutFormatter extends LineFormatter
      */
     public function format(array $record): string
     {
-        $record['level_name'] = $this->ansifyLevel((string)$record['level_name']);
+        $record['level_name'] = $this->ansifyLevel((string) $record['level_name']);
         $record['channel']    = "\033[1m{$record['channel']}\033[0m";
 
         return parent::format($record);
@@ -42,19 +42,21 @@ final class StdOutFormatter extends LineFormatter
      */
     protected function toJson($data, bool $ignoreErrors = false): string
     {
-        if (\is_array($data) === true)
+        if(\is_array($data) === true)
         {
             return jsonEncode($data);
         }
 
+        // @codeCoverageIgnoreStart
         return '';
+        // @codeCoverageIgnoreEnd
     }
 
     private function ansifyLevel(string $level): string
     {
         $level = \strtolower($level);
 
-        switch ($level)
+        switch($level)
         {
             case LogLevel::EMERGENCY:
             case LogLevel::ALERT:
@@ -75,8 +77,9 @@ final class StdOutFormatter extends LineFormatter
                 /** bold + cyan */
                 return "\033[1;36m{$level}\033[0m";
             default:
-                /** bold */
+                // @codeCoverageIgnoreStart
                 return "\033[1m{$level}\033[0m";
+            // @codeCoverageIgnoreEnd
         }
     }
 }

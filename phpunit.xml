@@ -10,56 +10,15 @@
          convertWarningsToExceptions="true"
          failOnRisky="true"
          failOnWarning="true"
-         stopOnFailure="false">
+         stopOnFailure="false"
+         executionOrder="default"
+>
     <php>
         <ini name="error_reporting" value="-1"/>
-        <env name="TRANSPORT_CONNECTION_DSN" value="amqp://guest:guest@localhost:5672"/>
-        <env name="SERVICE_BUS_TESTING" value="phpunitTests"/>
     </php>
 
     <testsuites>
-
-        <testsuite name="PHP Service Bus common component">
-            <directory>./vendor/php-service-bus/common/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Common transport implementation interfaces">
-            <directory>./vendor/php-service-bus/transport-common/tests/</directory>
-        </testsuite>
-
-        <testsuite name="AMQP transport common implementation">
-            <directory>./vendor/php-service-bus/transport-amqp/tests/</directory>
-        </testsuite>
-
-        <testsuite name="phpinnacle RabbitMQ adapter">
-            <directory>./vendor/php-service-bus/transport-phpinnacle/tests/</directory>
-        </testsuite>
-
-        <testsuite name="phpinnacle RabbitMQ transport module">
-            <directory>./vendor/php-service-bus/module-phpinnacle-transport/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Service Bus annotations reader component">
-            <directory>./vendor/php-service-bus/annotations-reader/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Messages serializer">
-            <directory>./vendor/php-service-bus/message-serializer/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Messages router">
-            <directory>./vendor/php-service-bus/messages-router/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Common storage parts">
-            <directory>./vendor/php-service-bus/storage-common/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Mutex implementation">
-            <directory>./vendor/php-service-bus/mutex/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Service bus">
+        <testsuite name="PHP Service Bus">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>

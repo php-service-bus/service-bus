@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
 use ServiceBus\Endpoint\Endpoint;
 use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\EntryPoint\EntryPoint;
-use ServiceBus\Infrastructure\Watchers\FileChangesWatcher;
 use ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
 use ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
 use ServiceBus\Transport\Common\DeliveryDestination;
@@ -189,43 +188,6 @@ final class ServiceBusKernel
                 $logger->info('The demon\'s lifetime has expired ({lifetime} seconds)', ['lifetime' => $seconds]);
 
                 $this->entryPoint->stop();
-            }
-        );
-
-        return $this;
-    }
-
-    /**
-     * Enable file change monitoring. If the application files have been modified, quit.
-     *
-     * @param string $directoryPath
-     * @param int    $checkInterval Hash check interval (in seconds)
-     * @param int    $stopDelay     The delay before the completion (in seconds)
-     */
-    public function stopWhenFilesChange(string $directoryPath, int $checkInterval = 30, int $stopDelay = 5): self
-    {
-        $checkInterval = 0 >= $checkInterval ? 1 : $checkInterval;
-        $watcher       = new FileChangesWatcher($directoryPath);
-
-        Loop::repeat(
-            $checkInterval * 1000,
-            function () use ($watcher, $stopDelay): \Generator
-            {
-                /** @var bool $changed */
-                $changed = yield $watcher->compare();
-
-                if (true === $changed)
-                {
-                    /** @var LoggerInterface $logger */
-                    $logger = $this->getKernelContainerService('service_bus.logger');
-
-                    $logger->info(
-                        'Application files have been changed. Shut down after {delay} seconds',
-                        ['delay' => $stopDelay]
-                    );
-
-                    $this->entryPoint->stop($stopDelay);
-                }
             }
         );
 

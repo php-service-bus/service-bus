@@ -15,7 +15,7 @@ namespace ServiceBus\Tests\Application\DependencyInjection\Compiler;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Application\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
 use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
-use ServiceBus\Tests\Stubs\Services\CorrectService;
+use ServiceBus\Tests\Application\DependencyInjection\Compiler\services\CorrectService;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -23,17 +23,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 final class ImportMessageHandlersCompilerPassTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function process(): void
     {
         $containerBuilder = new ContainerBuilder();
-
         $containerBuilder->setParameter('service_bus.auto_import.handlers_enabled', true);
-        $containerBuilder->setParameter('service_bus.auto_import.handlers_directories', [__DIR__ . '/../../../Stubs']);
+        $containerBuilder->setParameter('service_bus.auto_import.handlers_directories', [__DIR__ . '/services']);
         $containerBuilder->setParameter('service_bus.auto_import.handlers_excluded', []);
 
         (new ImportMessageHandlersCompilerPass())->process($containerBuilder);
@@ -41,7 +36,6 @@ final class ImportMessageHandlersCompilerPassTest extends TestCase
 
         static::assertTrue($containerBuilder->has('service_bus.services_locator'));
         static::assertTrue($containerBuilder->hasParameter('service_bus.services_map'));
-
         static::assertCount(1, $containerBuilder->getParameter('service_bus.services_map'));
         static::assertSame([CorrectService::class], $containerBuilder->getParameter('service_bus.services_map'));
     }

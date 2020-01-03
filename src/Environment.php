@@ -113,7 +113,7 @@ final class Environment
     /**
      * Get a textual representation of the current environment.
      */
-    public function __toString(): string
+    public function toString(): string
     {
         return $this->environment;
     }

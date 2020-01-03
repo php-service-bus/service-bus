@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -12,23 +12,19 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder;
 
-use function ServiceBus\Tests\removeDirectory;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use ServiceBus\Environment;
-use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\MessageHandlerService;
-use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\SomeTestService;
-use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\TestCompilerPass;
-use ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\Stubs\TestExtension;
+use function ServiceBus\Tests\removeDirectory;
 
 /**
  *
  */
 final class ContainerBuilderTest extends TestCase
 {
-    /** @var string  */
+    /** @var string */
     private $cacheDirectory;
 
     /**
@@ -37,10 +33,8 @@ final class ContainerBuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->cacheDirectory = \sys_get_temp_dir() . '/container_test';
-
-        if (\file_exists($this->cacheDirectory) === false)
+        if(\file_exists($this->cacheDirectory) === false)
         {
             \mkdir($this->cacheDirectory);
         }
@@ -58,16 +52,10 @@ final class ContainerBuilderTest extends TestCase
         unset($this->cacheDirectory);
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function successfulBuildWithDefaultData(): void
     {
         $containerBuilder = new ContainerBuilder('ContainerBuilderTest', Environment::prod());
-
-        static::assertFalse($containerBuilder->hasActualContainer());
 
         /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $containerBuilder->build();
@@ -84,11 +72,7 @@ final class ContainerBuilderTest extends TestCase
         static::assertSame('ContainerBuilderTest', $container->getParameter('service_bus.entry_point'));
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function successfulBuildWithFullConfiguration(): void
     {
         $containerBuilder = new ContainerBuilder('ContainerBuilderTest', Environment::dev());

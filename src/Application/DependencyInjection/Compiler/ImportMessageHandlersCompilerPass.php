@@ -31,7 +31,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        if (true === self::enabled($container))
+        if(self::enabled($container) === true)
         {
             $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
 
@@ -45,26 +45,26 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      * @psalm-param \Generator<\SplFileInfo> $generator
      * @psalm-param array<int, string>       $excludedFiles
      *
-     * @throws \LogicException
      * @throws \ServiceBus\Common\Exceptions\FileSystemException
      */
     private function registerClasses(ContainerBuilder $container, \Generator $generator, array $excludedFiles): void
     {
         /** @var \SplFileInfo $file */
-        foreach ($generator as $file)
+        foreach($generator as $file)
         {
             /** @var string $filePath */
             $filePath = $file->getRealPath();
 
-            if (false === \in_array($filePath, $excludedFiles, true))
+            if(\in_array($filePath, $excludedFiles, true) === false)
             {
                 $class = extractNamespaceFromFile($filePath);
 
-                if (
-                    null !== $class &&
-                    true === self::isMessageHandler($filePath) &&
-                    false === $container->hasDefinition($class)
-                ) {
+                if(
+                    $class !== null &&
+                    self::isMessageHandler($filePath) === true &&
+                    $container->hasDefinition($class) === false
+                )
+                {
                     $container->register($class, $class)->addTag('service_bus.service');
                 }
             }
@@ -73,27 +73,17 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 
     private static function enabled(ContainerBuilder $container): bool
     {
-        return true === $container->hasParameter('service_bus.auto_import.handlers_enabled')
+        return $container->hasParameter('service_bus.auto_import.handlers_enabled') === true
             ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
             : false;
     }
 
-    /**
-     * @throws \LogicException Error loading file contents
-     */
     private static function isMessageHandler(string $filePath): bool
     {
-        $fileContent = \file_get_contents($filePath);
+        $fileContent = (string) \file_get_contents($filePath);
 
-        if (false !== $fileContent)
-        {
-            return false !== \strpos($fileContent, '@CommandHandler') ||
-                false !== \strpos($fileContent, '@EventListener');
-        }
-
-        throw new \LogicException(
-            \sprintf('Error loading "%s" file contents', $filePath)
-        );
+        return \strpos($fileContent, '@CommandHandler') !== false ||
+            \strpos($fileContent, '@EventListener') !== false;
     }
 
     /**
@@ -106,7 +96,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
          *
          * @var string[] $directories
          */
-        $directories = true === $container->hasParameter('service_bus.auto_import.handlers_directories')
+        $directories = $container->hasParameter('service_bus.auto_import.handlers_directories') === true
             ? $container->getParameter('service_bus.auto_import.handlers_directories')
             : [];
 
@@ -123,7 +113,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
          *
          * @var string[] $excludedFiles
          */
-        $excludedFiles = true === $container->hasParameter('service_bus.auto_import.handlers_excluded')
+        $excludedFiles = $container->hasParameter('service_bus.auto_import.handlers_excluded') === true
             ? $container->getParameter('service_bus.auto_import.handlers_excluded')
             : [];
 

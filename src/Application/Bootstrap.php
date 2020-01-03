@@ -16,6 +16,7 @@ use ServiceBus\Application\DependencyInjection\Compiler\ImportMessageHandlersCom
 use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
+use ServiceBus\Application\Exceptions\ConfigurationCheckFailed;
 use ServiceBus\Common\Module\ServiceBusModule;
 use ServiceBus\Environment;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -30,7 +31,7 @@ use Symfony\Component\ErrorHandler\Debug;
  */
 final class Bootstrap
 {
-    /** @var ContainerBuilder  */
+    /** @var ContainerBuilder */
     private $containerBuilder;
 
     /**
@@ -38,15 +39,23 @@ final class Bootstrap
      *
      * @param string $envFilePath Absolute path to .env file
      *
-     * @throws \Symfony\Component\Dotenv\Exception\PathException Incorrect .env file path
-     * @throws \Symfony\Component\Dotenv\Exception\FormatException Incorrect .env file format
-     * @throws \LogicException Incorrect application environment specified
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect .env file path
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect .env file format
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty entry point name
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty/incorrect environment value
      */
     public static function withDotEnv(string $envFilePath): self
     {
-        (new Dotenv(true))->load($envFilePath);
+        try
+        {
+            (new Dotenv(true))->load($envFilePath);
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new ConfigurationCheckFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
+        }
 
-        return new self();
+        return self::withEnvironmentValues();
     }
 
     /**
@@ -55,11 +64,38 @@ final class Bootstrap
      *
      * @see https://github.com/php-service-bus/documentation/blob/master/pages/installation.md#the-list-of-environment-variables
      *
-     * @throws \LogicException Incorrect application environment specified
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty entry point name
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty/incorrect environment value
      */
     public static function withEnvironmentValues(): self
     {
-        return new self();
+        return self::create(
+            (string) \getenv('APP_ENTRY_POINT_NAME'),
+            (string) \getenv('APP_ENVIRONMENT')
+        );
+    }
+
+    /**
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty entry point name
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty/incorrect environment value
+     */
+    public static function create(string $entryPointName, string $environment): self
+    {
+        if($entryPointName === '')
+        {
+            throw ConfigurationCheckFailed::emptyEntryPointName();
+        }
+
+        try
+        {
+            $env = Environment::create($environment);
+        }
+        catch(\Throwable $throwable)
+        {
+            throw new ConfigurationCheckFailed($throwable->getMessage());
+        }
+
+        return new self($entryPointName, $env);
     }
 
     /**
@@ -160,21 +196,13 @@ final class Bootstrap
         return $this;
     }
 
-    /**
-     * @throws \LogicException Incorrect application environment specified
-     */
-    private function __construct()
+    private function __construct(string $entryPointName, Environment $environment)
     {
-        $entryPoint = (string) \getenv('APP_ENTRY_POINT_NAME');
-        $envValue   = '' !== (string) \getenv('APP_ENVIRONMENT')
-            ? (string) \getenv('APP_ENVIRONMENT')
-            : 'dev';
-
-        $this->containerBuilder = new ContainerBuilder($entryPoint, Environment::create($envValue));
+        $this->containerBuilder = new ContainerBuilder($entryPointName, $environment);
 
         $this->containerBuilder->addParameters([
-            'service_bus.environment' => $envValue,
-            'service_bus.entry_point' => $entryPoint,
+            'service_bus.environment' => $environment->toString(),
+            'service_bus.entry_point' => $entryPointName,
         ]);
 
         $this->containerBuilder->addExtensions(new ServiceBusExtension());

@@ -37,27 +37,20 @@ final class ChainAlertingProvider implements AlertingProvider
     public function send(AlertMessage $message, ?AlertContext $context = null): Promise
     {
         return call(
-            function () use ($message, $context): \Generator
+            function() use ($message, $context): \Generator
             {
-                try
+                $context = $context ?? new AlertContext();
+
+                foreach($this->providers as $alertingProvider)
                 {
-                    $context = $context ?? new AlertContext();
-
-                    $promises = [];
-
-                    foreach ($this->providers as $alertingProvider)
+                    try
                     {
-                        $promises[] = $alertingProvider->send($message, $context);
+                        yield $alertingProvider->send($message, $context);
                     }
-
-                    if (\count($promises) !== 0)
+                    catch(\Throwable $throwable)
                     {
-                        yield $promises;
+                        /** Not interests */
                     }
-                }
-                catch (\Throwable $throwable)
-                {
-                    /** Not interests */
                 }
             }
         );

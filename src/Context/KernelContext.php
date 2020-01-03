@@ -221,6 +221,7 @@ final class KernelContext implements ServiceBusContext
      * Message failed validation
      * Called by infrastructure components.
      *
+     * @codeCoverageIgnore
      * @noinspection PhpUnusedPrivateMethodInspection
      *
      * @see          MessageValidationExecutor

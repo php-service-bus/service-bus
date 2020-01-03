@@ -20,11 +20,7 @@ use ServiceBus\Services\Annotations\EventListener;
  */
 final class EventListenerTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function withWrongProperties(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -32,11 +28,7 @@ final class EventListenerTest extends TestCase
         new EventListener(['qwerty' => 'root']);
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function withoutAnyFields(): void
     {
         $annotation = new EventListener([]);
@@ -45,11 +37,7 @@ final class EventListenerTest extends TestCase
         static::assertEmpty($annotation->groups);
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function withValidation(): void
     {
         $annotation = new EventListener([
@@ -64,11 +52,7 @@ final class EventListenerTest extends TestCase
         static::assertSame(['qwerty', 'root'], $annotation->groups);
     }
 
-    /**
-     * @test
-     *
-     * @throws \Throwable
-     */
+    /** @test */
     public function withCustomEvents(): void
     {
         $handler = new EventListener(

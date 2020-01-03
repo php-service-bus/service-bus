@@ -13,6 +13,7 @@ declare(strict_types = 1);
 namespace ServiceBus\MessageExecutor;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Common\MessageExecutor\MessageExecutorFactory;
 use ServiceBus\Common\MessageHandler\MessageHandler;
@@ -42,7 +43,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
      */
     public function __construct(
         array $argumentResolvers,
-        LoggerInterface $logger,
+        ?LoggerInterface $logger = null,
         ?ValidatorInterface $validator = null
     ) {
         if (null === $validator)
@@ -53,7 +54,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
         }
 
         $this->argumentResolvers = $argumentResolvers;
-        $this->logger            = $logger;
+        $this->logger            = $logger ?? new NullLogger();
         $this->validator         = $validator;
     }
 
@@ -73,7 +74,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
             $this->logger
         );
 
-        if (true === $options->validationEnabled)
+        if ($options->validationEnabled === true)
         {
             $messageExecutor = new MessageValidationExecutor($messageExecutor, $options, $this->validator);
         }

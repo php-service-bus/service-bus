@@ -19,8 +19,6 @@ use Psr\Log\NullLogger;
 
 /**
  * Periodic forced launch of the garbage collector.
- *
- * @codeCoverageIgnore
  */
 final class GarbageCollectorWatcher
 {
