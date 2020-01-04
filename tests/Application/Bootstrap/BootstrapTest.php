@@ -128,7 +128,7 @@ final class BootstrapTest extends TestCase
         $bootstrap->addExtensions(new ServiceBusExtension());
         $bootstrap->addCompilerPasses(new TaggedMessageHandlersCompilerPass());
         $bootstrap->importParameters(['qwerty' => 'root']);
-        $bootstrap->enableAutoImportMessageHandlers([__DIR__]);
+        $bootstrap->enableAutoImportMessageHandlers([__DIR__ . '/services']);
         $bootstrap->applyModules($module);
 
         $container = $bootstrap->boot();
