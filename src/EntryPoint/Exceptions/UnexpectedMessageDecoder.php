@@ -10,11 +10,11 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Tests\Services\Configuration;
+namespace ServiceBus\EntryPoint\Exceptions;
 
 /**
  *
  */
-final class IncorrectDefaultThrowableEvent
+final class UnexpectedMessageDecoder extends \LogicException
 {
 }

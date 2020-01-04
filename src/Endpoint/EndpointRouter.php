@@ -57,7 +57,7 @@ final class EndpointRouter
      */
     public function registerRoutes(array $messages, Endpoint $endpoint): void
     {
-        foreach($messages as $message)
+        foreach ($messages as $message)
         {
             $this->registerRoute($message, $endpoint);
         }
@@ -83,7 +83,7 @@ final class EndpointRouter
      */
     public function route(string $messageClass): array
     {
-        if(empty($this->routes[$messageClass]) === false)
+        if (empty($this->routes[$messageClass]) === false)
         {
             return $this->routes[$messageClass];
         }

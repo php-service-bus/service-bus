@@ -25,8 +25,7 @@ final class MessageHandlerService
         EmptyMessage $command,
         ServiceBusContext $context,
         $mixedParameter
-    ): Promise
-    {
+    ): Promise {
         return new Success([$command, $context, $mixedParameter]);
     }
 }

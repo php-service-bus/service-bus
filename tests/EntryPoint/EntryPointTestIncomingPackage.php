@@ -10,17 +10,18 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Tests\Context;
+namespace ServiceBus\Tests\EntryPoint;
 
 use Amp\Promise;
 use Amp\Success;
 use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
+use function ServiceBus\Common\uuid;
 
 /**
  *
  */
-final class ContextTestIncomingPackage implements IncomingPackage
+final class EntryPointTestIncomingPackage implements IncomingPackage
 {
     /** @var string */
     private $id;
@@ -34,10 +35,10 @@ final class ContextTestIncomingPackage implements IncomingPackage
     /** @var string */
     private $payload;
 
-    public function __construct(string $id, string $traceId, string $payload = '', array $headers = [])
+    public function __construct(string $payload = '', array $headers = [], ?string $id = null, ?string $traceId = null)
     {
-        $this->id      = $id;
-        $this->traceId = $traceId;
+        $this->id      = $id ?? uuid();
+        $this->traceId = $traceId ?? uuid();
         $this->payload = $payload;
         $this->headers = $headers;
     }
@@ -55,7 +56,7 @@ final class ContextTestIncomingPackage implements IncomingPackage
      */
     public function origin(): DeliveryDestination
     {
-        return new ContextTestDestination();
+        return new EntryPointTestDestination();
     }
 
     /**

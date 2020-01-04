@@ -34,7 +34,7 @@ final class GarbageCollectorWatcherTest extends TestCase
         $watcher = new GarbageCollectorWatcher(200, $logger);
 
         Loop::run(
-            static function() use ($watcher): \Generator
+            static function () use ($watcher): \Generator
             {
                 $watcher->run();
 

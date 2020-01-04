@@ -53,19 +53,19 @@ final class MessageValidationExecutor implements MessageExecutor
             /** @var ConstraintViolationList $violations */
             $violations = $this->validator->validate($message, null, $this->options->validationGroups);
         }
-            // @codeCoverageIgnoreStart
-        catch(\Throwable $throwable)
+        // @codeCoverageIgnoreStart
+        catch (\Throwable $throwable)
         {
             return new Failure($throwable);
         }
         // @codeCoverageIgnoreEnd
 
-        if(\count($violations) !== 0)
+        if (\count($violations) !== 0)
         {
             self::bindViolations($violations, $context);
 
             /** If a validation error event class is specified, then we abort the execution */
-            if($this->options->defaultValidationFailedEvent !== null)
+            if ($this->options->defaultValidationFailedEvent !== null)
             {
                 $context->logContextMessage(
                     'Error validation, sending an error event and stopping message processing',
@@ -103,7 +103,7 @@ final class MessageValidationExecutor implements MessageExecutor
         $errors = [];
 
         /** @var \Symfony\Component\Validator\ConstraintViolation $violation */
-        foreach($violations as $violation)
+        foreach ($violations as $violation)
         {
             $errors[$violation->getPropertyPath()][] = $violation->getMessage();
         }
@@ -112,8 +112,8 @@ final class MessageValidationExecutor implements MessageExecutor
         {
             invokeReflectionMethod($context, 'validationFailed', $errors);
         }
-            // @codeCoverageIgnoreStart
-        catch(\Throwable $throwable)
+        // @codeCoverageIgnoreStart
+        catch (\Throwable $throwable)
         {
             /** No exceptions can happen */
         }

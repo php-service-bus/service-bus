@@ -83,7 +83,7 @@ final class MessageValidationExecutorTest extends TestCase
 
         $options = DefaultHandlerOptions::createForCommandHandler();
         $closure = \Closure::fromCallable(
-            static function(): void
+            static function (): void
             {
                 throw new \LogicException('ups...');
             }
@@ -111,13 +111,13 @@ final class MessageValidationExecutorTest extends TestCase
 
         $options = DefaultHandlerOptions::createForCommandHandler();
         $closure = \Closure::fromCallable(
-            static function(): void
+            static function (): void
             {
-
             }
         );
 
-        $message = new class() {
+        $message = new class()
+        {
             /** @\Symfony\Component\Validator\Constraints\NotNull */
             public $value;
         };
@@ -149,13 +149,13 @@ final class MessageValidationExecutorTest extends TestCase
         $options = $options->withDefaultValidationFailedEvent(TestMessageValidationFailed::class);
 
         $closure = \Closure::fromCallable(
-            static function(): void
+            static function (): void
             {
-
             }
         );
 
-        $message = new class() {
+        $message = new class()
+        {
             /** @\Symfony\Component\Validator\Constraints\NotNull */
             public $value;
         };

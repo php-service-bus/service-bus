@@ -17,5 +17,4 @@ namespace ServiceBus\Tests\Endpoint;
  */
 final class FirstEmptyMessage
 {
-
 }

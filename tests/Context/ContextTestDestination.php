@@ -19,5 +19,4 @@ use ServiceBus\Transport\Common\DeliveryDestination;
  */
 final class ContextTestDestination implements DeliveryDestination
 {
-
 }

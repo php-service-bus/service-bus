@@ -34,7 +34,7 @@ final class LoopBlockWatcherTest extends TestCase
         $watcher = new LoopBlockWatcher($logger);
 
         Loop::run(
-            static function() use ($watcher): \Generator
+            static function () use ($watcher): \Generator
             {
                 $watcher->run();
 
@@ -56,14 +56,14 @@ final class LoopBlockWatcherTest extends TestCase
         $watcher = new LoopBlockWatcher($logger);
 
         Loop::run(
-            static function() use ($watcher): void
+            static function () use ($watcher): void
             {
                 $watcher->run();
 
 
                 Loop::repeat(
                     0,
-                    static function()
+                    static function ()
                     {
                         \usleep(100 * 1000);
                     }
@@ -71,7 +71,7 @@ final class LoopBlockWatcherTest extends TestCase
 
                 Loop::delay(
                     300,
-                    static function()
+                    static function ()
                     {
                         Loop::stop();
                     }

@@ -72,7 +72,7 @@ final class EndpointTestTransport implements Transport
      */
     public function send(OutboundPackage $outboundPackage): Promise
     {
-        if($this->failDelivery === true)
+        if ($this->failDelivery === true)
         {
             return new Failure(new MessageDeliveryFailed('ups', new \stdClass(), uuid()));
         }

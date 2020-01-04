@@ -34,7 +34,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
     /** @test */
     public function loadFromEmptyService(): void
     {
-        $object = new class() {
+        $object = new class()
+        {
         };
 
         $handlers = (new AnnotationsBasedServiceHandlersLoader())->load($object);
@@ -45,7 +46,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
     /** @test */
     public function loadFilledService(): void
     {
-        $service = new class() {
+        $service = new class()
+        {
             /**
              * @CommandHandler(
              *     validate=true,
@@ -76,7 +78,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
         static::assertCount(3, $handlers);
 
         /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
-        foreach($handlers as $handler)
+        foreach ($handlers as $handler)
         {
             /**
              * @var \ServiceBus\Common\MessageHandler\MessageHandler $handler
@@ -91,7 +93,7 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             static::assertTrue($handler->messageHandler->hasArguments);
             static::assertCount(2, $handler->messageHandler->arguments);
 
-            if(true === $handler->messageHandler->options->isCommandHandler)
+            if (true === $handler->messageHandler->options->isCommandHandler)
             {
                 static::assertSame(EmptyMessage::class, $handler->messageHandler->messageClass);
                 static::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
@@ -118,7 +120,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
         $this->expectException(InvalidHandlerArguments::class);
         $this->expectExceptionMessage('The event handler must have at least 2 arguments: the message object (the first argument) and the context');
 
-        $service = new class() {
+        $service = new class()
+        {
             /**
              * @CommandHandler(
              *     validate=true,
@@ -139,7 +142,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
         $this->expectException(InvalidHandlerArguments::class);
         $this->expectExceptionMessage('The first argument to the message handler must be the message object');
 
-        $service = new class() {
+        $service = new class()
+        {
             /**
              * @CommandHandler(
              *     validate=true,
@@ -157,7 +161,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
     /** @test */
     public function withUnsupportedAnnotation(): void
     {
-        $service = new class() {
+        $service = new class()
+        {
             /** @\ServiceBus\Tests\Services\Configuration\UnsupportedAnnotation() */
             public function handle(): void
             {
@@ -186,7 +191,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
     {
         $this->expectException(ParseAnnotationFailed::class);
 
-        $service = new class() {
+        $service = new class()
+        {
             /** @sefsefsef */
             public function handle(): void
             {
@@ -201,7 +207,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
     {
         $this->expectException(InvalidEventType::class);
 
-        $service = new class() {
+        $service = new class()
+        {
             /**
              * @CommandHandler(
              *     validate=true,
@@ -213,7 +220,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             public function handle(EmptyMessage $command, ServiceBusContext $context): void
             {
             }
-
         };
 
         (new AnnotationsBasedServiceHandlersLoader())->load($service);
@@ -224,7 +230,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
     {
         $this->expectException(InvalidEventType::class);
 
-        $service = new class() {
+        $service = new class()
+        {
             /**
              * @CommandHandler(
              *     validate=true,
@@ -236,7 +243,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             public function handle(EmptyMessage $command, ServiceBusContext $context): void
             {
             }
-
         };
 
         (new AnnotationsBasedServiceHandlersLoader())->load($service);
@@ -245,7 +251,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
     /** @test */
     public function withDefaultValidationFailedEvent(): void
     {
-        $service = new class() {
+        $service = new class()
+        {
             /**
              * @CommandHandler(
              *     validate=true,
@@ -257,7 +264,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             public function handle(EmptyMessage $command, ServiceBusContext $context): void
             {
             }
-
         };
 
         $handlers = \iterator_to_array((new AnnotationsBasedServiceHandlersLoader())->load($service));
@@ -271,14 +277,16 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
         $options = $handler->messageHandler->options;
 
         static::assertSame(
-            '\\' . CorrectValidationFailedEvent::class, $options->defaultValidationFailedEvent
+            '\\' . CorrectValidationFailedEvent::class,
+            $options->defaultValidationFailedEvent
         );
     }
 
     /** @test */
     public function withDefaultThrowableEvent(): void
     {
-        $service = new class() {
+        $service = new class()
+        {
             /**
              * @CommandHandler(
              *     validate=true,
@@ -290,7 +298,6 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
             public function handle(EmptyMessage $command, ServiceBusContext $context): void
             {
             }
-
         };
 
         $handlers = \iterator_to_array((new AnnotationsBasedServiceHandlersLoader())->load($service));
@@ -304,7 +311,8 @@ final class AnnotationsBasedServiceHandlersLoaderTest extends TestCase
         $options = $handler->messageHandler->options;
 
         static::assertSame(
-            '\\' . CorrectDefaultThrowableEvent::class, $options->defaultThrowableEvent
+            '\\' . CorrectDefaultThrowableEvent::class,
+            $options->defaultThrowableEvent
         );
     }
 }

@@ -17,5 +17,4 @@ namespace ServiceBus\Tests\Context;
  */
 final class EmptyMessage
 {
-
 }

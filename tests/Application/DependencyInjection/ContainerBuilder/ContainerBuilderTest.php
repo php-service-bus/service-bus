@@ -34,7 +34,8 @@ final class ContainerBuilderTest extends TestCase
     {
         parent::setUp();
         $this->cacheDirectory = \sys_get_temp_dir() . '/container_test';
-        if(\file_exists($this->cacheDirectory) === false)
+
+        if (\file_exists($this->cacheDirectory) === false)
         {
             \mkdir($this->cacheDirectory);
         }

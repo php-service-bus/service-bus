@@ -57,8 +57,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
         array $servicesList,
         ServiceLocator $routingServiceLocator,
         ServiceLocator $servicesServiceLocator
-    )
-    {
+    ) {
         $this->executorFactory        = $executorFactory;
         $this->servicesList           = $servicesList;
         $this->routingServiceLocator  = $routingServiceLocator;
@@ -75,13 +74,13 @@ final class MessagesRouterConfigurator implements RouterConfigurator
             /** @var ServiceHandlersLoader $serviceConfigurationExtractor */
             $serviceConfigurationExtractor = $this->routingServiceLocator->get(ServiceHandlersLoader::class);
 
-            foreach($this->servicesList as $serviceId)
+            foreach ($this->servicesList as $serviceId)
             {
                 /** @var object $serviceObject */
                 $serviceObject = $this->servicesServiceLocator->get(\sprintf('%s_service', $serviceId));
 
                 /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
-                foreach($serviceConfigurationExtractor->load($serviceObject) as $handler)
+                foreach ($serviceConfigurationExtractor->load($serviceObject) as $handler)
                 {
                     self::assertMessageClassSpecifiedInArguments($serviceObject, $handler->messageHandler);
 
@@ -95,7 +94,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
                 }
             }
         }
-        catch(\Throwable $throwable)
+        catch (\Throwable $throwable)
         {
             throw new MessageRouterConfigurationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
@@ -106,7 +105,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
      */
     private static function assertMessageClassSpecifiedInArguments(object $service, MessageHandler $handler): void
     {
-        if($handler->messageClass === null || (string) $handler->messageClass === '')
+        if ($handler->messageClass === null || (string) $handler->messageClass === '')
         {
             throw new \LogicException(
                 \sprintf(

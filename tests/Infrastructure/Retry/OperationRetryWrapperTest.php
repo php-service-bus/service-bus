@@ -28,7 +28,7 @@ final class OperationRetryWrapperTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectDeprecationMessage('qwerty');
 
-        $closure = static function()
+        $closure = static function ()
         {
             throw new \LogicException('qwerty');
         };

@@ -52,8 +52,7 @@ final class TelegramAlertingProvider implements AlertingProvider
         Environment $environment,
         string $defaultChatId,
         ?LoggerInterface $logger = null
-    )
-    {
+    ) {
         $this->interactionsProvider = $interactionsProvider;
         $this->credentials          = $credentials;
         $this->environment          = $environment;
@@ -66,7 +65,7 @@ final class TelegramAlertingProvider implements AlertingProvider
      */
     public function send(AlertMessage $message, ?AlertContext $context = null): Promise
     {
-        if($this->environment->isDebug() === true)
+        if ($this->environment->isDebug() === true)
         {
             return new Success();
         }
@@ -74,7 +73,7 @@ final class TelegramAlertingProvider implements AlertingProvider
         $context = $context ?? new AlertContext();
 
         return call(
-            function() use ($message, $context): \Generator
+            function () use ($message, $context): \Generator
             {
                 try
                 {
@@ -85,7 +84,7 @@ final class TelegramAlertingProvider implements AlertingProvider
                     $method = SendMessage::create(new ChatId($toChat), $message->content);
                     $method->useMarkdown();
 
-                    if($context->toDrawAttention === false)
+                    if ($context->toDrawAttention === false)
                     {
                         $method->disableNotification();
                     }
@@ -96,14 +95,14 @@ final class TelegramAlertingProvider implements AlertingProvider
                      */
                     $result = yield $this->interactionsProvider->call($method, $this->credentials);
 
-                    if($result instanceof Fail)
+                    if ($result instanceof Fail)
                     {
                         throw new \RuntimeException(
                             \sprintf('Delivery to Telegram failed: %s', $result->errorMessage)
                         );
                     }
                 }
-                catch(\Throwable $throwable)
+                catch (\Throwable $throwable)
                 {
                     $this->logger->error($throwable->getMessage(), collectThrowableDetails($throwable));
                 }

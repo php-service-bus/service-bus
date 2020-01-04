@@ -12,10 +12,11 @@ declare(strict_types = 1);
 
 namespace ServiceBus\EntryPoint;
 
+use Psr\Container\ContainerInterface;
+use ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder;
 use ServiceBus\MessageSerializer\MessageDecoder;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 use ServiceBus\Transport\Common\Transport;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Decoding of incoming messages.
@@ -37,13 +38,13 @@ final class IncomingMessageDecoder
      */
     private $decodersConfiguration;
 
-    /** @var ServiceLocator  */
+    /** @var ContainerInterface  */
     private $decodersLocator;
 
     /**
      * @psalm-param array<string, string> $decodersConfiguration
      */
-    public function __construct(array $decodersConfiguration, ServiceLocator $decodersLocator)
+    public function __construct(array $decodersConfiguration, ContainerInterface $decodersLocator)
     {
         $this->decodersConfiguration = $decodersConfiguration;
         $this->decodersLocator       = $decodersLocator;
@@ -52,7 +53,7 @@ final class IncomingMessageDecoder
     /**
      * Decodes a packet using a handler defined in the headers (or uses a default decoder).
      *
-     * @throws \LogicException Could not find decoder in the service container
+     * @throws \ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder Could not find decoder in the service container
      * @throws \ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed
      */
     public function decode(IncomingPackage $package): object
@@ -65,7 +66,7 @@ final class IncomingMessageDecoder
     }
 
     /**
-     * @throws \LogicException Could not find decoder
+     * @throws \ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder Could not find decoder
      */
     private function findDecoderByKey(string $encoderKey): MessageDecoder
     {
@@ -78,7 +79,7 @@ final class IncomingMessageDecoder
     }
 
     /**
-     * @throws \LogicException Could not find decoder
+     * @throws \ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder Could not find decoder
      */
     private function obtainDecoder(string $decoderId): MessageDecoder
     {
@@ -90,7 +91,7 @@ final class IncomingMessageDecoder
             return $decoder;
         }
 
-        throw new \LogicException(
+        throw new UnexpectedMessageDecoder(
             \sprintf('Could not find decoder "%s" in the service container', $decoderId)
         );
     }

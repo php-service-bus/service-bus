@@ -17,5 +17,4 @@ namespace ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder;
  */
 final class EmptyMessage
 {
-
 }

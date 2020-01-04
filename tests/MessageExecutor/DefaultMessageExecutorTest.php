@@ -60,7 +60,7 @@ final class DefaultMessageExecutorTest extends TestCase
     {
         $variable = 'qwerty';
         $closure  = \Closure::fromCallable(
-            static function() use (&$variable): void
+            static function () use (&$variable): void
             {
                 $variable = 'handled';
             }
@@ -89,7 +89,7 @@ final class DefaultMessageExecutorTest extends TestCase
         $context = new TestContext();
 
         $closure = \Closure::fromCallable(
-            static function(): void
+            static function (): void
             {
                 throw new \LogicException('ups...');
             }
@@ -123,7 +123,7 @@ final class DefaultMessageExecutorTest extends TestCase
         $this->expectDeprecationMessage('ups...');
 
         $closure = \Closure::fromCallable(
-            static function(): void
+            static function (): void
             {
                 throw new \LogicException('ups...');
             }

@@ -34,14 +34,16 @@ final class ChainAlertingProviderTest extends TestCase
 
         @\unlink($expectedFilePath);
 
-        $first = new class() implements AlertingProvider {
+        $first = new class() implements AlertingProvider
+        {
             public function send(AlertMessage $message, ?AlertContext $context = null): Promise
             {
                 return new Failure(new \RuntimeException('qwerty'));
             }
         };
 
-        $second = new class($expectedFilePath) implements AlertingProvider {
+        $second = new class($expectedFilePath) implements AlertingProvider
+        {
             /** @var string */
             private $expectedFilePath;
 
@@ -53,7 +55,7 @@ final class ChainAlertingProviderTest extends TestCase
             public function send(AlertMessage $message, ?AlertContext $context = null): Promise
             {
                 return call(
-                    function() use ($message): \Generator
+                    function () use ($message): \Generator
                     {
                         yield put($this->expectedFilePath, $message->content);
                     }

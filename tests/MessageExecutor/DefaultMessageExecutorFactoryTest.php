@@ -40,7 +40,8 @@ final class DefaultMessageExecutorFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $service = new class() {
+        $service = new class()
+        {
             /**
              * @CommandHandler(
              *     validate=true,

@@ -50,7 +50,7 @@ final class Bootstrap
         {
             (new Dotenv(true))->load($envFilePath);
         }
-        catch(\Throwable $throwable)
+        catch (\Throwable $throwable)
         {
             throw new ConfigurationCheckFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
@@ -81,7 +81,7 @@ final class Bootstrap
      */
     public static function create(string $entryPointName, string $environment): self
     {
-        if($entryPointName === '')
+        if ($entryPointName === '')
         {
             throw ConfigurationCheckFailed::emptyEntryPointName();
         }
@@ -90,7 +90,7 @@ final class Bootstrap
         {
             $env = Environment::create($environment);
         }
-        catch(\Throwable $throwable)
+        catch (\Throwable $throwable)
         {
             throw new ConfigurationCheckFailed($throwable->getMessage());
         }

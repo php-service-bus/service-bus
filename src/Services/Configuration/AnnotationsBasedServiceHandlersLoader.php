@@ -45,12 +45,11 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         /** @var MethodLevel $annotation */
         foreach ($this->loadMethodLevelAnnotations($service) as $annotation)
         {
+            /** @var object $handlerAnnotation */
             $handlerAnnotation = $annotation->annotation;
 
-            if (
-                ($handlerAnnotation instanceof CommandHandler) === false &&
-                ($handlerAnnotation instanceof EventListener) === false
-            ) {
+            if (self::supports($handlerAnnotation) === false)
+            {
                 continue;
             }
 
@@ -60,20 +59,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
              */
             $handlerReflectionMethod = $annotation->reflectionMethod;
 
-            /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
-            $closure = $handlerReflectionMethod->getClosure($service);
-
-            // @codeCoverageIgnoreStart
-            if ($closure === null)
-            {
-                throw new UnableCreateClosure(
-                    \sprintf(
-                        'Unable to create a closure for the "%s" method',
-                        $annotation->reflectionMethod->getName()
-                    )
-                );
-            }
-            // @codeCoverageIgnoreEnd
+            $closure = self::buildClosure($handlerReflectionMethod, $service);
 
             $isCommandHandler = $handlerAnnotation instanceof CommandHandler;
 
@@ -188,5 +174,34 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         }
 
         throw InvalidHandlerArguments::invalidFirstArgument();
+    }
+
+    /**
+     * @throws \ServiceBus\Services\Exceptions\UnableCreateClosure
+     */
+    private static function buildClosure(\ReflectionMethod $handlerReflectionMethod, object $service): \Closure
+    {
+        /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
+        $closure = $handlerReflectionMethod->getClosure($service);
+
+        // @codeCoverageIgnoreStart
+        if ($closure === null)
+        {
+            throw new UnableCreateClosure(
+                \sprintf(
+                    'Unable to create a closure for the "%s" method',
+                    $handlerReflectionMethod->getName()
+                )
+            );
+        }
+        // @codeCoverageIgnoreEnd
+
+        return $closure;
+    }
+
+    private static function supports(object $annotation): bool
+    {
+        return ($annotation instanceof CommandHandler) === true ||
+            ($annotation instanceof EventListener) === true;
     }
 }

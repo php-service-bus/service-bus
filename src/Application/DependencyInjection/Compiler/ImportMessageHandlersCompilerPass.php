@@ -31,7 +31,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        if(self::enabled($container) === true)
+        if (self::enabled($container) === true)
         {
             $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
 
@@ -50,21 +50,20 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     private function registerClasses(ContainerBuilder $container, \Generator $generator, array $excludedFiles): void
     {
         /** @var \SplFileInfo $file */
-        foreach($generator as $file)
+        foreach ($generator as $file)
         {
             /** @var string $filePath */
             $filePath = $file->getRealPath();
 
-            if(\in_array($filePath, $excludedFiles, true) === false)
+            if (\in_array($filePath, $excludedFiles, true) === false)
             {
                 $class = extractNamespaceFromFile($filePath);
 
-                if(
+                if (
                     $class !== null &&
                     self::isMessageHandler($filePath) === true &&
                     $container->hasDefinition($class) === false
-                )
-                {
+                ) {
                     $container->register($class, $class)->addTag('service_bus.service');
                 }
             }

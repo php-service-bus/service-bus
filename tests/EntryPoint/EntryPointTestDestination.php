@@ -10,11 +10,13 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Tests\Services\Configuration;
+namespace ServiceBus\Tests\EntryPoint;
+
+use ServiceBus\Transport\Common\DeliveryDestination;
 
 /**
  *
  */
-final class IncorrectDefaultThrowableEvent
+final class EntryPointTestDestination implements DeliveryDestination
 {
 }
