@@ -2,7 +2,7 @@ language: php
 
 php:
   - 7.3
-  - 7.4snapshot
+  - 7.4
 
 addons:
   apt:
@@ -25,9 +25,9 @@ install:
 
 script:
   - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.clover --debug
-  - if [ "$TRAVIS_PHP_VERSION" == "7.4snapshot"]; then ./vendor/bin/psalm --config=psalm.xml; fi
-  - if [ "$TRAVIS_PHP_VERSION" == "7.4snapshot"]; then ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then ./vendor/bin/psalm --config=psalm.xml; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run; fi
 
 after_script:
-  - if [ "$TRAVIS_PHP_VERSION" == "7.4snapshot"]; then wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar; fi
-  - if [ "$TRAVIS_PHP_VERSION" == "7.4snapshot"]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
