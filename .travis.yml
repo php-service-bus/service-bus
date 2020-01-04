@@ -28,6 +28,4 @@ script:
   - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then ./vendor/bin/psalm --config=psalm.xml; fi
   - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then ./vendor/bin/phpstan analyse src --level 7; fi
   - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run; fi
-
-after_script:
   - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
