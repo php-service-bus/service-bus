@@ -19,13 +19,14 @@ before_script:
 
 install:
   - travis_retry composer install --no-interaction --no-suggest
-  - travis_retry wget -c -nc --retry-connrefused --tries=0 https://scrutinizer-ci.com/ocular.phar
-  - chmod +x ocular.phar
-  - composer show
 
 script:
-  - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.clover --debug
+  - ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.clover
   - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then ./vendor/bin/psalm --config=psalm.xml; fi
   - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then ./vendor/bin/phpstan analyse src --level 7; fi
   - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run; fi
-  - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then ./ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+
+after_script:
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then wget https://scrutinizer-ci.com/ocular.phar; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.4"]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+
