@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace ServiceBus\EntryPoint;
 
+use function Amp\delay;
 use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Delayed;
 use Amp\Loop;
@@ -85,7 +86,8 @@ final class EntryPoint
         ?LoggerInterface $logger = null,
         ?int $maxConcurrentTaskCount = null,
         ?int $awaitDelay = null
-    ) {
+    )
+    {
         $this->transport              = $transport;
         $this->processor              = $processor;
         $this->logger                 = $logger ?? new NullLogger();
@@ -101,18 +103,26 @@ final class EntryPoint
     public function listen(Queue ...$queues): Promise
     {
         return $this->transport->consume(
-            function (IncomingPackage $package): \Generator
+            function(IncomingPackage $package): \Generator
             {
-                $this->currentTasksInProgressCount++;
-
                 /** Handle incoming package */
                 $this->deferExecution($package);
 
                 /** Limit the maximum number of concurrently running tasks */
-                while ($this->maxConcurrentTaskCount <= $this->currentTasksInProgressCount)
+                await:
+
+                if(
+                    ($this->currentTasksInProgressCount !== 0) &&
+                    $this->currentTasksInProgressCount >= $this->maxConcurrentTaskCount
+                )
                 {
-                    yield new Delayed($this->awaitDelay);
+                    $this->logger->debug('The maximum number of tasks has been reached');
+
+                    yield delay($this->awaitDelay);
+
+                    goto await;
                 }
+
             },
             ...$queues
         );
@@ -120,45 +130,48 @@ final class EntryPoint
 
     /**
      * Unsubscribe all queues.
-     * Terminates the subscription and stops the daemon after the specified number of seconds.
-     *
-     * @param int $delay The delay before the completion (in seconds)
+     * Terminates the subscription and stops the daemon.
      */
-    public function stop(int $delay = 10): void
+    public function stop(): void
     {
-        $delay = 0 >= $delay ? 1 : $delay;
-
         Loop::defer(
-            function () use ($delay): \Generator
+            function(): \Generator
             {
+                $this->logger->info('Subscriber stop command received');
+
                 yield $this->transport->stop();
 
-                $this->logger->info('Handler will stop after {duration} seconds', ['duration' => $delay]);
+                await:
 
-                Loop::delay(
-                    $delay * 1000,
-                    function (): void
-                    {
-                        $this->logger->info('The event loop has been stopped');
+                if($this->currentTasksInProgressCount !== 0)
+                {
+                    $this->logger->info('Waiting for the completion of all tasks taken');
 
-                        Loop::stop();
-                    }
-                );
+                    yield delay(1000);
+                    goto await;
+                }
+
+                $this->logger->info('The event loop has been stopped');
+
+                Loop::stop();
             }
         );
     }
 
     private function deferExecution(IncomingPackage $package): void
     {
+        $this->currentTasksInProgressCount++;
+
         Loop::defer(
-            function () use ($package): void
+            function() use ($package): void
             {
                 $this->processor->handle($package)->onResolve(
-                    function (?\Throwable $throwable) use ($package): void
+                    function(?\Throwable $throwable) use ($package): void
                     {
                         $this->currentTasksInProgressCount--;
 
-                        if (null !== $throwable)
+                        // @codeCoverageIgnoreStart
+                        if($throwable !== null)
                         {
                             $this->logger->critical(
                                 $throwable->getMessage(),
@@ -171,6 +184,7 @@ final class EntryPoint
                                 )
                             );
                         }
+                        // @codeCoverageIgnoreEnd
                     }
                 );
             }

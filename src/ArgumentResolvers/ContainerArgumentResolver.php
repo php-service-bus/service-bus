@@ -12,19 +12,19 @@ declare(strict_types = 1);
 
 namespace ServiceBus\ArgumentResolvers;
 
+use Psr\Container\ContainerInterface;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  *
  */
 final class ContainerArgumentResolver implements ArgumentResolver
 {
-    /** @var ServiceLocator */
+    /** @var ContainerInterface */
     private $serviceLocator;
 
-    public function __construct(ServiceLocator $serviceLocator)
+    public function __construct(ContainerInterface $serviceLocator)
     {
         $this->serviceLocator = $serviceLocator;
     }

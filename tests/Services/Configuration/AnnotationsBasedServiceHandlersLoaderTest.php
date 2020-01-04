@@ -17,7 +17,6 @@ use Amp\Success;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed;
 use ServiceBus\Common\Context\ServiceBusContext;
-use ServiceBus\Common\MessageExecutor\MessageHandlerOptions;
 use ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader;
 use ServiceBus\Services\Annotations\CommandHandler;
 use ServiceBus\Services\Annotations\EventListener;

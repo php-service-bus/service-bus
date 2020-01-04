@@ -16,12 +16,11 @@ use Amp\Promise;
 use Amp\Success;
 use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
-use function ServiceBus\Common\uuid;
 
 /**
  *
  */
-final class EntryPointTestIncomingPackage implements IncomingPackage
+final class EntryPointTestIncomingMessage implements IncomingPackage
 {
     /** @var string */
     private $id;
@@ -37,8 +36,8 @@ final class EntryPointTestIncomingPackage implements IncomingPackage
 
     public function __construct(string $payload = '', array $headers = [], ?string $id = null, ?string $traceId = null)
     {
-        $this->id      = $id ?? uuid();
-        $this->traceId = $traceId ?? uuid();
+        $this->id      = $id;
+        $this->traceId = $traceId;
         $this->payload = $payload;
         $this->headers = $headers;
     }

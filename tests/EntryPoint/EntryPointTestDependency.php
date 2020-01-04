@@ -12,11 +12,10 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\EntryPoint;
 
-use ServiceBus\Transport\Common\DeliveryDestination;
-
 /**
  *
  */
-final class EntryPointTestDestination implements DeliveryDestination
+final class EntryPointTestDependency
 {
+
 }
