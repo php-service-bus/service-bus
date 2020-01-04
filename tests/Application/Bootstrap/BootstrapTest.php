@@ -14,6 +14,8 @@ namespace ServiceBus\Tests\Application\Bootstrap;
 
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Application\Bootstrap;
+use ServiceBus\Application\DependencyInjection\Compiler\Logger\GraylogLoggerCompilerPass;
+use ServiceBus\Application\DependencyInjection\Compiler\Logger\StdOutLoggerCompilerPass;
 use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use ServiceBus\Application\Exceptions\ConfigurationCheckFailed;
@@ -136,5 +138,38 @@ final class BootstrapTest extends TestCase
 
         static::assertSame('exists', $container->getParameter('TestModule'));
         static::assertSame('root', $container->getParameter('qwerty'));
+    }
+
+    /** @test */
+    public function withLogger(): void
+    {
+        $bootstrap = Bootstrap::create('withLogger', 'dev');
+        $bootstrap->addCompilerPasses(new StdOutLoggerCompilerPass());
+
+        $bootstrap->boot();
+
+        static::assertTrue(true);
+    }
+
+    /** @test */
+    public function withStdOutLogger(): void
+    {
+        $bootstrap = Bootstrap::create('withStdOutLogger', 'dev');
+        $bootstrap->addCompilerPasses(new StdOutLoggerCompilerPass());
+
+        $bootstrap->boot();
+
+        static::assertTrue(true);
+    }
+
+    /** @test */
+    public function withGraylogLogger(): void
+    {
+        $bootstrap = Bootstrap::create('withGraylogLogger', 'dev');
+        $bootstrap->addCompilerPasses(new GraylogLoggerCompilerPass());
+
+        $bootstrap->boot();
+
+        static::assertTrue(true);
     }
 }

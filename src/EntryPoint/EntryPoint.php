@@ -86,8 +86,7 @@ final class EntryPoint
         ?LoggerInterface $logger = null,
         ?int $maxConcurrentTaskCount = null,
         ?int $awaitDelay = null
-    )
-    {
+    ) {
         $this->transport              = $transport;
         $this->processor              = $processor;
         $this->logger                 = $logger ?? new NullLogger();
@@ -103,7 +102,7 @@ final class EntryPoint
     public function listen(Queue ...$queues): Promise
     {
         return $this->transport->consume(
-            function(IncomingPackage $package): \Generator
+            function (IncomingPackage $package): \Generator
             {
                 /** Handle incoming package */
                 $this->deferExecution($package);
@@ -111,18 +110,16 @@ final class EntryPoint
                 /** Limit the maximum number of concurrently running tasks */
                 await:
 
-                if(
+                if (
                     ($this->currentTasksInProgressCount !== 0) &&
                     $this->currentTasksInProgressCount >= $this->maxConcurrentTaskCount
-                )
-                {
+                ) {
                     $this->logger->debug('The maximum number of tasks has been reached');
 
                     yield delay($this->awaitDelay);
 
                     goto await;
                 }
-
             },
             ...$queues
         );
@@ -135,7 +132,7 @@ final class EntryPoint
     public function stop(): void
     {
         Loop::defer(
-            function(): \Generator
+            function (): \Generator
             {
                 $this->logger->info('Subscriber stop command received');
 
@@ -143,11 +140,12 @@ final class EntryPoint
 
                 await:
 
-                if($this->currentTasksInProgressCount !== 0)
+                if ($this->currentTasksInProgressCount !== 0)
                 {
                     $this->logger->info('Waiting for the completion of all tasks taken');
 
                     yield delay(1000);
+
                     goto await;
                 }
 
@@ -163,15 +161,15 @@ final class EntryPoint
         $this->currentTasksInProgressCount++;
 
         Loop::defer(
-            function() use ($package): void
+            function () use ($package): void
             {
                 $this->processor->handle($package)->onResolve(
-                    function(?\Throwable $throwable) use ($package): void
+                    function (?\Throwable $throwable) use ($package): void
                     {
                         $this->currentTasksInProgressCount--;
 
                         // @codeCoverageIgnoreStart
-                        if($throwable !== null)
+                        if ($throwable !== null)
                         {
                             $this->logger->critical(
                                 $throwable->getMessage(),

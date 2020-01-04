@@ -27,6 +27,7 @@ use ServiceBus\Transport\Common\Topic;
 use ServiceBus\Transport\Common\TopicBind;
 use ServiceBus\Transport\Common\Transport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use function Amp\delay;
 
 /**
  * Service bus application kernel.
@@ -149,8 +150,10 @@ final class ServiceBusKernel
          */
         $logger = $this->getKernelContainerService('service_bus.logger');
 
-        $handler = function (string $watcherId, int $signalId) use ($stopDelay, $logger): void
+        $handler = function (string $watcherId, int $signalId) use ($stopDelay, $logger): \Generator
         {
+            yield delay($stopDelay * 1000);
+
             $logger->info(
                 'A signal "{signalId}" was received',
                 [
@@ -159,7 +162,7 @@ final class ServiceBusKernel
                 ]
             );
 
-            $this->entryPoint->stop($stopDelay);
+            $this->entryPoint->stop();
         };
 
         foreach ($signals as $signal)

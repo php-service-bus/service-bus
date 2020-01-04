@@ -53,10 +53,10 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                 continue;
             }
 
-            /**
-             * @var CommandHandler|EventListener $handlerAnnotation
-             * @var \ReflectionMethod            $handlerReflectionMethod
-             */
+            /** @var CommandHandler|EventListener $handlerAnnotation */
+            $handlerAnnotation = $annotation->annotation;
+
+            /** @var \ReflectionMethod $handlerReflectionMethod */
             $handlerReflectionMethod = $annotation->reflectionMethod;
 
             $closure = self::buildClosure($handlerReflectionMethod, $service);
@@ -177,6 +177,8 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     }
 
     /**
+     * @psalm-return \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise
+     *
      * @throws \ServiceBus\Services\Exceptions\UnableCreateClosure
      */
     private static function buildClosure(\ReflectionMethod $handlerReflectionMethod, object $service): \Closure
