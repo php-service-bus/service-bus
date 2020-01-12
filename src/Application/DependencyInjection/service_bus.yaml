@@ -175,7 +175,7 @@ services:
 
   # Mutexes factory
   ServiceBus\Mutex\MutexFactory:
-    class: ServiceBus\Mutex\InMemoryMutexFactory
+    class: ServiceBus\Mutex\InMemory\InMemoryMutexFactory
 
   # Connection pool for http client
   Amp\Http\Client\Connection\ConnectionPool:
