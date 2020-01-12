@@ -340,16 +340,16 @@
         },
         {
             "name": "amphp/hpack",
-            "version": "v3.0.0",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/hpack.git",
-                "reference": "84fb1373b8a3cfdf7462a87a3e79efe503f0e101"
+                "reference": "0dcd35f9a8d9fc04d5fb8af0aeb109d4474cfad8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/hpack/zipball/84fb1373b8a3cfdf7462a87a3e79efe503f0e101",
-                "reference": "84fb1373b8a3cfdf7462a87a3e79efe503f0e101",
+                "url": "https://api.github.com/repos/amphp/hpack/zipball/0dcd35f9a8d9fc04d5fb8af0aeb109d4474cfad8",
+                "reference": "0dcd35f9a8d9fc04d5fb8af0aeb109d4474cfad8",
                 "shasum": ""
             },
             "require": {
@@ -394,7 +394,7 @@
                 "hpack",
                 "http-2"
             ],
-            "time": "2019-12-12T21:37:06+00:00"
+            "time": "2020-01-11T19:33:14+00:00"
         },
         {
             "name": "amphp/http",
@@ -742,6 +742,63 @@
             "description": "Asynchronous process manager.",
             "homepage": "https://github.com/amphp/process",
             "time": "2019-02-26T16:33:03+00:00"
+        },
+        {
+            "name": "amphp/redis",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/amphp/redis.git",
+                "reference": "a3d976bce81f709a1f07ee6e5f3ccdee9bcb4f5c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/amphp/redis/zipball/a3d976bce81f709a1f07ee6e5f3ccdee9bcb4f5c",
+                "reference": "a3d976bce81f709a1f07ee6e5f3ccdee9bcb4f5c",
+                "shasum": ""
+            },
+            "require": {
+                "amphp/amp": "^2.2.1",
+                "amphp/cache": "^1.2.1",
+                "amphp/socket": "^1",
+                "amphp/sync": "^1.1",
+                "league/uri-parser": "^1.4",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "amphp/php-cs-fixer-config": "dev-master",
+                "amphp/phpunit-util": "^1.1.2",
+                "phpunit/phpunit": "^7 | ^8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Amp\\Redis\\": "src"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Niklas Keller",
+                    "email": "me@kelunik.com"
+                }
+            ],
+            "description": "A non-blocking Redis client for Amp.",
+            "homepage": "https://github.com/amphp/redis",
+            "keywords": [
+                "amp",
+                "amphp",
+                "async",
+                "client",
+                "redis"
+            ],
+            "time": "2019-10-24T22:03:44+00:00"
         },
         {
             "name": "amphp/socket",
@@ -2010,21 +2067,22 @@
         },
         {
             "name": "php-service-bus/mutex",
-            "version": "v4.0.5",
+            "version": "v4.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/mutex.git",
-                "reference": "ce1089c3e827545fb69e7b24331634a4e16d3c4a"
+                "reference": "35746d076d5392ece0b6b11574344d79bd56498b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/mutex/zipball/ce1089c3e827545fb69e7b24331634a4e16d3c4a",
-                "reference": "ce1089c3e827545fb69e7b24331634a4e16d3c4a",
+                "url": "https://api.github.com/repos/php-service-bus/mutex/zipball/35746d076d5392ece0b6b11574344d79bd56498b",
+                "reference": "35746d076d5392ece0b6b11574344d79bd56498b",
                 "shasum": ""
             },
             "require": {
                 "amphp/amp": "v2.4.*",
                 "amphp/file": "v1.0.*",
+                "amphp/redis": "v1.0.*",
                 "php": ">=7.3"
             },
             "require-dev": {
@@ -2057,20 +2115,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-12-30T21:03:07+00:00"
+            "time": "2020-01-12T20:14:47+00:00"
         },
         {
             "name": "php-service-bus/storage-common",
-            "version": "v4.0.2",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/storage-common.git",
-                "reference": "f593cc64775c5867d35e97cf3ff388dd85f08246"
+                "reference": "400ea811a987bb8846957354b3726ba4a67fdfe1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/f593cc64775c5867d35e97cf3ff388dd85f08246",
-                "reference": "f593cc64775c5867d35e97cf3ff388dd85f08246",
+                "url": "https://api.github.com/repos/php-service-bus/storage-common/zipball/400ea811a987bb8846957354b3726ba4a67fdfe1",
+                "reference": "400ea811a987bb8846957354b3726ba4a67fdfe1",
                 "shasum": ""
             },
             "require": {
@@ -2107,7 +2165,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-12-04T00:00:45+00:00"
+            "time": "2020-01-10T09:45:40+00:00"
         },
         {
             "name": "php-service-bus/telegram-bot-core",
@@ -2175,16 +2233,16 @@
         },
         {
             "name": "php-service-bus/transport-common",
-            "version": "v4.0.3",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-common.git",
-                "reference": "568b0cdc437ad21a6f62173bfff3566073c64378"
+                "reference": "2ab6bea7bdc1f961ab9153dbc3e8e701a539d6a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/568b0cdc437ad21a6f62173bfff3566073c64378",
-                "reference": "568b0cdc437ad21a6f62173bfff3566073c64378",
+                "url": "https://api.github.com/repos/php-service-bus/transport-common/zipball/2ab6bea7bdc1f961ab9153dbc3e8e701a539d6a9",
+                "reference": "2ab6bea7bdc1f961ab9153dbc3e8e701a539d6a9",
                 "shasum": ""
             },
             "require": {
@@ -2221,7 +2279,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-12-04T00:44:46+00:00"
+            "time": "2020-01-04T15:55:00+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -4657,31 +4715,30 @@
         },
         {
             "name": "nette/schema",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/schema.git",
-                "reference": "337117df1dade22e2ba1fdc4a4b832c1e9b06b76"
+                "reference": "febf71fb4052c824046f5a33f4f769a6e7fa0cb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/schema/zipball/337117df1dade22e2ba1fdc4a4b832c1e9b06b76",
-                "reference": "337117df1dade22e2ba1fdc4a4b832c1e9b06b76",
+                "url": "https://api.github.com/repos/nette/schema/zipball/febf71fb4052c824046f5a33f4f769a6e7fa0cb4",
+                "reference": "febf71fb4052c824046f5a33f4f769a6e7fa0cb4",
                 "shasum": ""
             },
             "require": {
-                "nette/utils": "^3.0.1",
+                "nette/utils": "^3.1",
                 "php": ">=7.1"
             },
             "require-dev": {
                 "nette/tester": "^2.2",
+                "phpstan/phpstan-nette": "^0.12",
                 "tracy/tracy": "^2.3"
             },
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
+                "branch-alias": []
             },
             "autoload": {
                 "classmap": [
@@ -4710,7 +4767,7 @@
                 "config",
                 "nette"
             ],
-            "time": "2019-10-31T20:52:19+00:00"
+            "time": "2020-01-06T22:52:48+00:00"
         },
         {
             "name": "nette/utils",
@@ -5136,16 +5193,16 @@
         },
         {
             "name": "php-service-bus/module-phpinnacle-transport",
-            "version": "v4.0.4",
+            "version": "v4.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/module-phpinnacle-transport.git",
-                "reference": "37ed26da0eef4229fcd92c8f76ca2cb61f204344"
+                "reference": "f98f7b61cc2a281217e34ffb0e6c1e7728b1cc62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/37ed26da0eef4229fcd92c8f76ca2cb61f204344",
-                "reference": "37ed26da0eef4229fcd92c8f76ca2cb61f204344",
+                "url": "https://api.github.com/repos/php-service-bus/module-phpinnacle-transport/zipball/f98f7b61cc2a281217e34ffb0e6c1e7728b1cc62",
+                "reference": "f98f7b61cc2a281217e34ffb0e6c1e7728b1cc62",
                 "shasum": ""
             },
             "require": {
@@ -5185,20 +5242,20 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-12-06T00:13:50+00:00"
+            "time": "2020-01-04T16:12:50+00:00"
         },
         {
             "name": "php-service-bus/transport-amqp",
-            "version": "v4.0.3",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-amqp.git",
-                "reference": "0ff423780bd56b70f10a52f5162be323dc18e0ea"
+                "reference": "4716f6e2ab86001fba4e0f95d2cb1f50cb4d8825"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/0ff423780bd56b70f10a52f5162be323dc18e0ea",
-                "reference": "0ff423780bd56b70f10a52f5162be323dc18e0ea",
+                "url": "https://api.github.com/repos/php-service-bus/transport-amqp/zipball/4716f6e2ab86001fba4e0f95d2cb1f50cb4d8825",
+                "reference": "4716f6e2ab86001fba4e0f95d2cb1f50cb4d8825",
                 "shasum": ""
             },
             "require": {
@@ -5238,20 +5295,20 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-12-05T23:55:35+00:00"
+            "time": "2020-01-04T15:58:07+00:00"
         },
         {
             "name": "php-service-bus/transport-phpinnacle",
-            "version": "v4.0.3",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/transport-phpinnacle.git",
-                "reference": "35929350e8285b8ccda82f0ef28237eaba30e8ab"
+                "reference": "86e75eb82e58b375c4286899b25242a53dc6ef6c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/35929350e8285b8ccda82f0ef28237eaba30e8ab",
-                "reference": "35929350e8285b8ccda82f0ef28237eaba30e8ab",
+                "url": "https://api.github.com/repos/php-service-bus/transport-phpinnacle/zipball/86e75eb82e58b375c4286899b25242a53dc6ef6c",
+                "reference": "86e75eb82e58b375c4286899b25242a53dc6ef6c",
                 "shasum": ""
             },
             "require": {
@@ -5292,7 +5349,7 @@
                 "messaging",
                 "rabbitmq"
             ],
-            "time": "2019-12-06T00:09:27+00:00"
+            "time": "2020-01-04T16:08:00+00:00"
         },
         {
             "name": "phpinnacle/buffer",
@@ -5844,16 +5901,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.5.1",
+            "version": "8.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "7870c78da3c5e4883eaef36ae47853ebb3cb86f2"
+                "reference": "018b6ac3c8ab20916db85fa91bf6465acb64d1e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/7870c78da3c5e4883eaef36ae47853ebb3cb86f2",
-                "reference": "7870c78da3c5e4883eaef36ae47853ebb3cb86f2",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/018b6ac3c8ab20916db85fa91bf6465acb64d1e0",
+                "reference": "018b6ac3c8ab20916db85fa91bf6465acb64d1e0",
                 "shasum": ""
             },
             "require": {
@@ -5923,7 +5980,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-12-25T14:49:39+00:00"
+            "time": "2020-01-08T08:49:49+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
