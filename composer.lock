@@ -1847,16 +1847,16 @@
         },
         {
             "name": "php-service-bus/common",
-            "version": "v4.0.3",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-service-bus/common.git",
-                "reference": "3697a609d60342e17cea687544ebdd8f5eea39e4"
+                "reference": "6015b42653163a42d73fb78d6fd423b39be47af0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-service-bus/common/zipball/3697a609d60342e17cea687544ebdd8f5eea39e4",
-                "reference": "3697a609d60342e17cea687544ebdd8f5eea39e4",
+                "url": "https://api.github.com/repos/php-service-bus/common/zipball/6015b42653163a42d73fb78d6fd423b39be47af0",
+                "reference": "6015b42653163a42d73fb78d6fd423b39be47af0",
                 "shasum": ""
             },
             "require": {
@@ -1899,7 +1899,7 @@
                 "command-bus",
                 "messaging"
             ],
-            "time": "2019-12-30T12:14:30+00:00"
+            "time": "2020-01-13T15:31:54+00:00"
         },
         {
             "name": "php-service-bus/http-client",
@@ -3792,24 +3792,23 @@
     "packages-dev": [
         {
             "name": "composer/semver",
-            "version": "1.5.0",
+            "version": "1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/semver.git",
-                "reference": "46d9139568ccb8d9e7cdd4539cab7347568a5e2e"
+                "reference": "c6bea70230ef4dd483e6bbcab6005f682ed3a8de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/semver/zipball/46d9139568ccb8d9e7cdd4539cab7347568a5e2e",
-                "reference": "46d9139568ccb8d9e7cdd4539cab7347568a5e2e",
+                "url": "https://api.github.com/repos/composer/semver/zipball/c6bea70230ef4dd483e6bbcab6005f682ed3a8de",
+                "reference": "c6bea70230ef4dd483e6bbcab6005f682ed3a8de",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.3.2 || ^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.5 || ^5.0.5",
-                "phpunit/phpunit-mock-objects": "2.3.0 || ^3.0"
+                "phpunit/phpunit": "^4.5 || ^5.0.5"
             },
             "type": "library",
             "extra": {
@@ -3850,7 +3849,7 @@
                 "validation",
                 "versioning"
             ],
-            "time": "2019-03-19T17:25:45+00:00"
+            "time": "2020-01-13T12:06:48+00:00"
         },
         {
             "name": "composer/xdebug-handler",

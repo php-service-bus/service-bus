@@ -12,7 +12,6 @@ declare(strict_types = 1);
 
 namespace ServiceBus\MessageExecutor;
 
-use Psr\Log\LoggerInterface;
 use function Amp\call;
 use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Promise;
@@ -44,9 +43,6 @@ final class DefaultMessageExecutor implements MessageExecutor
     /** @var DefaultHandlerOptions */
     private $options;
 
-    /** @var LoggerInterface */
-    private $logger;
-
     /**
      * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>  $argumentResolvers
      *
@@ -56,13 +52,11 @@ final class DefaultMessageExecutor implements MessageExecutor
         \Closure $closure,
         \SplObjectStorage $arguments,
         DefaultHandlerOptions $options,
-        array $argumentResolvers,
-        LoggerInterface $logger
+        array $argumentResolvers
     ) {
         $this->closure           = $closure;
         $this->arguments         = $arguments;
         $this->options           = $options;
-        $this->logger            = $logger;
         $this->argumentResolvers = $argumentResolvers;
     }
 
@@ -81,7 +75,7 @@ final class DefaultMessageExecutor implements MessageExecutor
                 {
                     if ($this->options->description !== null)
                     {
-                        $this->logger->info($this->options->description);
+                        $context->logContextMessage($this->options->description);
                     }
 
                     yield call($this->closure, ...$resolvedArgs);

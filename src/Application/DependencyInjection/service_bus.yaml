@@ -118,7 +118,6 @@ services:
         - '@ServiceBus\ArgumentResolvers\MessageArgumentResolver'
         - '@ServiceBus\ArgumentResolvers\ContextArgumentResolver'
         - '@ServiceBus\ArgumentResolvers\ContainerArgumentResolver'
-      $logger: '@service_bus.logger'
       $validator: ~
 
   # Default transport implementation
