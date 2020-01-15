@@ -31,7 +31,6 @@ use ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader;
 use ServiceBus\Services\Configuration\ServiceMessageHandler;
 use ServiceBus\Transport\Common\Queue;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use function Amp\delay;
 use function ServiceBus\Tests\filterLogMessages;
 
 /**
@@ -77,8 +76,7 @@ final class EntryPointTest extends TestCase
                 new MessageArgumentResolver(),
                 new ContextArgumentResolver(),
                 new ContainerArgumentResolver($containerBuilder)
-            ],
-            $this->logger
+            ]
         );
 
         $messageRouter = new Router();

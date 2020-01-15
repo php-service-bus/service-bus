@@ -31,7 +31,7 @@ final class TestBootstrapService
     /**
      * @EventListener()
      */
-    public function when(TestBootstrapEvent $event, ServiceBusContext $context): void
+    public function when(TestBootstrapEven $event, ServiceBusContext $context): void
     {
     }
 }

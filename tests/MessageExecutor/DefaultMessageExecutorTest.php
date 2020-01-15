@@ -70,15 +70,16 @@ final class DefaultMessageExecutorTest extends TestCase
             $closure,
             new \SplObjectStorage(),
             DefaultHandlerOptions::createForCommandHandler('some description'),
-            $this->argumentResolvers,
-            $this->logger
+            $this->argumentResolvers
         );
 
-        wait($processor(new EmptyMessage(), new TestContext()));
+        $context = new TestContext();
+
+        wait($processor(new EmptyMessage(), $context));
 
         static::assertSame('handled', $variable);
 
-        $messages = filterLogMessages($this->logHandler);
+        $messages = filterLogMessages($context->testLogHandler);
 
         static::assertContains('some description', $messages);
     }
@@ -102,8 +103,7 @@ final class DefaultMessageExecutorTest extends TestCase
             $closure,
             new \SplObjectStorage(),
             $options,
-            $this->argumentResolvers,
-            $this->logger
+            $this->argumentResolvers
         );
 
         wait($processor(new EmptyMessage(), $context));
@@ -133,8 +133,7 @@ final class DefaultMessageExecutorTest extends TestCase
             $closure,
             new \SplObjectStorage(),
             DefaultHandlerOptions::createForCommandHandler('some description'),
-            $this->argumentResolvers,
-            $this->logger
+            $this->argumentResolvers
         );
 
         wait($processor(new EmptyMessage(), new TestContext()));

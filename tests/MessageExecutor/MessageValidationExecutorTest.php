@@ -94,8 +94,7 @@ final class MessageValidationExecutorTest extends TestCase
                 $closure,
                 new \SplObjectStorage(),
                 $options,
-                $this->argumentResolvers,
-                $this->logger
+                $this->argumentResolvers
             ),
             $options,
             $this->validator
@@ -127,8 +126,7 @@ final class MessageValidationExecutorTest extends TestCase
                 $closure,
                 new \SplObjectStorage(),
                 $options,
-                $this->argumentResolvers,
-                $this->logger
+                $this->argumentResolvers
             ),
             $options,
             $this->validator
@@ -165,8 +163,7 @@ final class MessageValidationExecutorTest extends TestCase
                 $closure,
                 new \SplObjectStorage(),
                 $options,
-                $this->argumentResolvers,
-                $this->logger
+                $this->argumentResolvers
             ),
             $options,
             $this->validator
