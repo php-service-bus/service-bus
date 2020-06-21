@@ -48,7 +48,9 @@ final class Bootstrap
     {
         try
         {
-            (new Dotenv(true))->load($envFilePath);
+            (new Dotenv())
+                ->usePutenv(true)
+                ->load($envFilePath);
         }
         catch (\Throwable $throwable)
         {

@@ -48,17 +48,8 @@ final class MessageValidationExecutor implements MessageExecutor
      */
     public function __invoke(object $message, ServiceBusContext $context): Promise
     {
-        try
-        {
-            /** @var ConstraintViolationList $violations */
-            $violations = $this->validator->validate($message, null, $this->options->validationGroups);
-        }
-        // @codeCoverageIgnoreStart
-        catch (\Throwable $throwable)
-        {
-            return new Failure($throwable);
-        }
-        // @codeCoverageIgnoreEnd
+        /** @var ConstraintViolationList $violations */
+        $violations = $this->validator->validate($message, null, $this->options->validationGroups);
 
         if (\count($violations) !== 0)
         {
@@ -82,15 +73,15 @@ final class MessageValidationExecutor implements MessageExecutor
 
     /**
      * Publish failed event.
+     *
+     * @return Promise<void>
      */
     private static function publishViolations(string $eventClass, ServiceBusContext $context): Promise
     {
-        /**
-         * @noinspection VariableFunctionsUsageInspection
-         *
-         * @var \ServiceBus\Services\Contracts\ValidationFailedEvent $event
-         */
-        $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $context->violations()]);
+        /** @psalm-var callable(string, array):\ServiceBus\Services\Contracts\ValidationFailedEvent $factory */
+        $factory = [$eventClass, 'create'];
+
+        $event = $factory($context->traceId(), $context->violations());
 
         return $context->delivery($event);
     }

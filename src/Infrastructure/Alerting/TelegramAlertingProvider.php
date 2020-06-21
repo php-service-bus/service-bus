@@ -60,9 +60,6 @@ final class TelegramAlertingProvider implements AlertingProvider
         $this->logger               = $logger ?? new NullLogger();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function send(AlertMessage $message, ?AlertContext $context = null): Promise
     {
         if ($this->environment->isDebug() === true)
@@ -89,10 +86,7 @@ final class TelegramAlertingProvider implements AlertingProvider
                         $method->disableNotification();
                     }
 
-                    /**
-                     * @psalm-suppress TooManyTemplateParams
-                     * @var \ServiceBus\TelegramBot\Interaction\Result\Result
-                     */
+                    /** @var \ServiceBus\TelegramBot\Interaction\Result\Result */
                     $result = yield $this->interactionsProvider->call($method, $this->credentials);
 
                     if ($result instanceof Fail)

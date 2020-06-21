@@ -70,6 +70,9 @@ final class Formatter extends NormalizerFormatter
         /** @var array{datetime:int, message:string, level:int, channel:string, extra:array|null, context:array|null} $normalizedRecord */
         $normalizedRecord = parent::format($record);
 
+        /** @var array $extraData */
+        $extraData = $normalizedRecord['extra'] ?? [];
+
         /** @psalm-var array{
          *    version:float|int,
          *    host:string,
@@ -78,9 +81,11 @@ final class Formatter extends NormalizerFormatter
          *    level:int,
          *    facility:string,
          *    file:string|null,
-         *    line:int|null
+         *    line:int|null,
+         *    extra:array|null
          * } $formatted
          */
+
         $formatted = [
             'version'       => self::GRAYLOG_VERSION,
             'host'          => $this->systemName,
@@ -88,14 +93,11 @@ final class Formatter extends NormalizerFormatter
             'short_message' => (string) $normalizedRecord['message'],
             'level'         => self::LEVEL_RELATIONS[(int) $normalizedRecord['level']],
             'facility'      => $normalizedRecord['channel'] ?? null,
-            'file'          => $normalizedRecord['extra']['file'] ?? null,
-            'line'          => $normalizedRecord['extra']['line'] ?? null,
+            'file'          => $extraData['file'] ?? null,
+            'line'          => $extraData['line'] ?? null,
         ];
 
-        unset($normalizedRecord['extra']['file'], $normalizedRecord['extra']['line']);
-
-        /** @psalm-var array<string, string|int|float|array|null> $extraData */
-        $extraData = $normalizedRecord['extra'] ?? [];
+        unset($normalizedRecord['extra']);
 
         /** @psalm-var array<string, string|int|float|array|null> $contextData */
         $contextData = $normalizedRecord['context'] ?? [];
@@ -125,7 +127,7 @@ final class Formatter extends NormalizerFormatter
     /**
      * Format extra\context data.
      *
-     * @psalm-param array<string, string|int|float|array|null> $collection
+     * @psalm-param array $collection
      *
      * @throws \RuntimeException if encoding fails and errors are not ignored
      */

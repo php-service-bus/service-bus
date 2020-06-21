@@ -31,9 +31,6 @@ final class ChainAlertingProvider implements AlertingProvider
         $this->providers = $providers;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function send(AlertMessage $message, ?AlertContext $context = null): Promise
     {
         return call(

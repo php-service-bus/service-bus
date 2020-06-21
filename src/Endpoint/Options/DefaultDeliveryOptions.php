@@ -70,7 +70,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     /**
      * {@inheritdoc}
      */
-    public static function create(): DeliveryOptions
+    public static function create(): self
     {
         return new self();
     }

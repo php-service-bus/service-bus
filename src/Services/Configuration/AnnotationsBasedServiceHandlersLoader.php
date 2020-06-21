@@ -45,7 +45,6 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
         /** @var MethodLevel $annotation */
         foreach ($this->loadMethodLevelAnnotations($service) as $annotation)
         {
-            /** @var object $handlerAnnotation */
             $handlerAnnotation = $annotation->annotation;
 
             if (self::supports($handlerAnnotation) === false)
@@ -56,18 +55,12 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             /** @var CommandHandler|EventListener $handlerAnnotation */
             $handlerAnnotation = $annotation->annotation;
 
-            /** @var \ReflectionMethod $handlerReflectionMethod */
             $handlerReflectionMethod = $annotation->reflectionMethod;
 
             $closure = self::buildClosure($handlerReflectionMethod, $service);
 
             $isCommandHandler = $handlerAnnotation instanceof CommandHandler;
 
-            /**
-             * @var \ReflectionMethod            $handlerReflectionMethod
-             * @var MessageHandler               $handler
-             * @var CommandHandler|EventListener $handlerAnnotation
-             */
             $handler = new MessageHandler(
                 $this->extractMessageClass($handlerReflectionMethod->getParameters()),
                 $closure,
@@ -95,7 +88,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     private function createOptions(ServicesAnnotationsMarker $annotation, bool $isCommandHandler): DefaultHandlerOptions
     {
         /** @var CommandHandler|EventListener $annotation */
-        $factoryMethod = true === $isCommandHandler ? 'createForCommandHandler' : 'createForEventListener';
+        $factoryMethod = $isCommandHandler === true ? 'createForCommandHandler' : 'createForEventListener';
 
         /** @var DefaultHandlerOptions $options */
         $options = DefaultHandlerOptions::{$factoryMethod}($annotation->description);
@@ -105,22 +98,22 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             $options = $options->enableValidation($annotation->groups);
         }
 
-        if ((string) $annotation->defaultValidationFailedEvent !== '')
+        $defaultValidationFailedEvent = $annotation->defaultValidationFailedEvent;
+
+        if ($defaultValidationFailedEvent !== null)
         {
-            /**
-             * @psalm-suppress TypeCoercion
-             * @psalm-suppress PossiblyNullArgument
-             */
-            $options = $options->withDefaultValidationFailedEvent($annotation->defaultValidationFailedEvent);
+            $options = $options->withDefaultValidationFailedEvent($defaultValidationFailedEvent);
         }
 
-        if ((string) $annotation->defaultThrowableEvent !== '')
+        $defaultThrowableEvent = $annotation->defaultThrowableEvent;
+
+        if ($defaultThrowableEvent !== null)
         {
             /**
              * @psalm-suppress TypeCoercion
              * @psalm-suppress PossiblyNullArgument
              */
-            $options = $options->withDefaultThrowableEvent($annotation->defaultThrowableEvent);
+            $options = $options->withDefaultThrowableEvent($defaultThrowableEvent);
         }
 
         return $options;
@@ -177,13 +170,13 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     }
 
     /**
-     * @psalm-return \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise
+     * @psalm-return \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise<void>
      *
      * @throws \ServiceBus\Services\Exceptions\UnableCreateClosure
      */
     private static function buildClosure(\ReflectionMethod $handlerReflectionMethod, object $service): \Closure
     {
-        /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise|null $closure */
+        /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise<void>|null $closure */
         $closure = $handlerReflectionMethod->getClosure($service);
 
         // @codeCoverageIgnoreStart

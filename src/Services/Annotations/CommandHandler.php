@@ -37,6 +37,8 @@ final class CommandHandler implements ServicesAnnotationsMarker
      *
      * If no class is specified, control is passed to user code
      *
+     * @psalm-var class-string|null
+     *
      * @var string|null
      */
     public $defaultValidationFailedEvent = null;
@@ -46,6 +48,8 @@ final class CommandHandler implements ServicesAnnotationsMarker
      * The event must implement @see ExecutionFailedEvent interface.
      *
      * If no class is specified, control is passed to user code
+     *
+     * @psalm-var class-string|null
      *
      * @var string|null
      */

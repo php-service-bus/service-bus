@@ -51,9 +51,6 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
         $this->validator         = $validator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(MessageHandler $messageHandler): MessageExecutor
     {
         /** @var \ServiceBus\Services\Configuration\DefaultHandlerOptions $options */

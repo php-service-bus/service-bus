@@ -36,8 +36,6 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 
         /**
          * @psalm-var array<string, array<mixed, string>> $taggedServices
-         *
-         * @var array $taggedServices
          */
         $taggedServices = $container->findTaggedServiceIds('service_bus.service');
 

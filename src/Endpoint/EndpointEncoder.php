@@ -18,7 +18,7 @@ use ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer;
 /**
  * Endpoint message encoder.
  *
- * @psalm-immutable
+ * @psalm-readonly
  */
 final class EndpointEncoder
 {

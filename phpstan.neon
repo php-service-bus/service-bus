@@ -1,8 +1,8 @@
 parameters:
-	ignoreErrors:
-		-
-			message: '#expects callable#'
-			path: %currentWorkingDirectory%/src
-		-
-			message: '#Access to an undefined property#'
-			path: %currentWorkingDirectory%/src/Services/Configuration/AnnotationsBasedServiceHandlersLoader.php
+    checkGenericClassInNonGenericObjectType: false
+    checkMissingIterableValueType: false
+    ignoreErrors:
+        -
+            message: '#Unable to resolve the template type#'
+            path: %currentWorkingDirectory%/src
+

@@ -68,7 +68,6 @@ final class DefaultMessageExecutor implements MessageExecutor
         return call(
             function () use ($message, $context): \Generator
             {
-                /** @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers */
                 $resolvedArgs = self::collectArguments($this->arguments, $this->argumentResolvers, $message, $context);
 
                 try
@@ -110,12 +109,10 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     private static function publishThrowable(string $eventClass, string $errorMessage, ServiceBusContext $context): \Generator
     {
-        /**
-         * @noinspection VariableFunctionsUsageInspection
-         *
-         * @var \ServiceBus\Services\Contracts\ExecutionFailedEvent $event
-         */
-        $event = \forward_static_call_array([$eventClass, 'create'], [$context->traceId(), $errorMessage]);
+        /** @psalm-var callable(string, string):\ServiceBus\Services\Contracts\ExecutionFailedEvent $factory */
+        $factory = [$eventClass, 'create'];
+
+        $event = $factory($context->traceId(), $errorMessage);
 
         yield $context->delivery($event);
     }
@@ -149,7 +146,7 @@ final class DefaultMessageExecutor implements MessageExecutor
             }
         }
 
-        /** @var array<int, mixed> $preparedArguments */
+        /** @psalm-var array<int, mixed> $preparedArguments */
 
         return $preparedArguments;
     }

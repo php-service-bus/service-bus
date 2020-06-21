@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Services\Configuration;
 
-use ServiceBus\Common\MessageExecutor\MessageHandlerOptions;
+use ServiceBus\Common\MessageHandler\MessageHandlerOptions;
 use ServiceBus\Services\Contracts\ExecutionFailedEvent;
 use ServiceBus\Services\Contracts\ValidationFailedEvent;
 use ServiceBus\Services\Exceptions\InvalidEventType;
@@ -143,7 +143,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      */
     public function withDefaultValidationFailedEvent(string $eventClass): self
     {
-        if (false === \is_a($eventClass, ValidationFailedEvent::class, true))
+        if (\is_a($eventClass, ValidationFailedEvent::class, true) === false)
         {
             throw new InvalidEventType(
                 \sprintf(
@@ -179,7 +179,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      */
     public function withDefaultThrowableEvent(string $eventClass): self
     {
-        if (false === \is_a($eventClass, ExecutionFailedEvent::class, true))
+        if (\is_a($eventClass, ExecutionFailedEvent::class, true) === false)
         {
             throw new InvalidEventType(
                 \sprintf(

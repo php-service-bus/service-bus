@@ -14,7 +14,6 @@ namespace ServiceBus\EntryPoint;
 
 use function Amp\delay;
 use function ServiceBus\Common\collectThrowableDetails;
-use Amp\Delayed;
 use Amp\Loop;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
@@ -65,13 +64,13 @@ final class EntryPoint
     private $maxConcurrentTaskCount;
 
     /**
-     * The current number of tasks performed.
-     * The value should not be too large and should not exceed the maximum number of available connections to the
-     * database.
+     * Collection of identifier of tasks that are being processed
      *
-     * @var int
+     * @psalm-var array<string, bool>
+     *
+     * @var array
      */
-    private $currentTasksInProgressCount = 0;
+    private $currentTasksInProgress = [];
 
     /**
      * Throttling value (in milliseconds) while achieving the maximum number of simultaneously executed tasks.
@@ -101,6 +100,7 @@ final class EntryPoint
      */
     public function listen(Queue ...$queues): Promise
     {
+        /** @psalm-suppress InvalidArgument */
         return $this->transport->consume(
             function (IncomingPackage $package): \Generator
             {
@@ -110,11 +110,17 @@ final class EntryPoint
                 /** Limit the maximum number of concurrently running tasks */
                 await:
 
-                if (
-                    ($this->currentTasksInProgressCount !== 0) &&
-                    $this->currentTasksInProgressCount >= $this->maxConcurrentTaskCount
-                ) {
-                    $this->logger->debug('The maximum number of tasks has been reached');
+                $inProgressCount = \count($this->currentTasksInProgress);
+
+                if (($inProgressCount !== 0) && $inProgressCount >= $this->maxConcurrentTaskCount)
+                {
+                    $this->logger->debug(
+                        'The maximum number of tasks has been reached',
+                        [
+                            'currentCount'      => $inProgressCount,
+                            'currentCollection' => \array_keys($this->currentTasksInProgress)
+                        ]
+                    );
 
                     yield delay($this->awaitDelay);
 
@@ -140,9 +146,17 @@ final class EntryPoint
 
                 await:
 
-                if ($this->currentTasksInProgressCount !== 0)
+                $inProgressCount = \count($this->currentTasksInProgress);
+
+                if ($inProgressCount !== 0)
                 {
-                    $this->logger->info('Waiting for the completion of all tasks taken');
+                    $this->logger->info(
+                        'Waiting for the completion of all tasks taken',
+                        [
+                            'currentCount'      => $inProgressCount,
+                            'currentCollection' => \array_keys($this->currentTasksInProgress)
+                        ]
+                    );
 
                     yield delay(1000);
 
@@ -158,7 +172,7 @@ final class EntryPoint
 
     private function deferExecution(IncomingPackage $package): void
     {
-        $this->currentTasksInProgressCount++;
+        $this->currentTasksInProgress[$package->id()] = true;
 
         Loop::defer(
             function () use ($package): void
@@ -166,7 +180,7 @@ final class EntryPoint
                 $this->processor->handle($package)->onResolve(
                     function (?\Throwable $throwable) use ($package): void
                     {
-                        $this->currentTasksInProgressCount--;
+                        unset($this->currentTasksInProgress[$package->id()]);
 
                         // @codeCoverageIgnoreStart
                         if ($throwable !== null)

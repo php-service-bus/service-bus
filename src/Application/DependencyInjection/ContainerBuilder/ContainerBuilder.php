@@ -159,7 +159,6 @@ final class ContainerBuilder
     public function cachedContainer(): ContainerInterface
     {
         /**
-         * @noinspection   PhpIncludeInspection Include generated file
          * @psalm-suppress UnresolvableInclude Include generated file
          */
         include_once $this->getContainerClassPath();
