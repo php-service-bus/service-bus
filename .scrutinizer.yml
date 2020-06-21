@@ -59,6 +59,9 @@ checks:
 build:
   nodes:
     analysis:
+      environment:
+        php:
+          version: 7.4.5
       project_setup:
         override: true
       tests:
