@@ -31,7 +31,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        if (self::enabled($container) === true)
+        if (self::enabled($container))
         {
             $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
 
@@ -61,7 +61,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 
                 if (
                     $class !== null &&
-                    self::isMessageHandler($filePath) === true &&
+                    self::isMessageHandler($filePath)  &&
                     $container->hasDefinition($class) === false
                 ) {
                     $container->register($class, $class)->addTag('service_bus.service');
@@ -72,7 +72,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 
     private static function enabled(ContainerBuilder $container): bool
     {
-        return $container->hasParameter('service_bus.auto_import.handlers_enabled') === true
+        return $container->hasParameter('service_bus.auto_import.handlers_enabled')
             ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
             : false;
     }
@@ -112,7 +112,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
          *
          * @var string[] $excludedFiles
          */
-        $excludedFiles = $container->hasParameter('service_bus.auto_import.handlers_excluded') === true
+        $excludedFiles = $container->hasParameter('service_bus.auto_import.handlers_excluded')
             ? $container->getParameter('service_bus.auto_import.handlers_excluded')
             : [];
 

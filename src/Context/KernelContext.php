@@ -23,7 +23,7 @@ use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\Endpoint\Options\DeliveryOptionsFactory;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 use function Amp\call;
-use function ServiceBus\Common\collectThrowableDetails;
+use function ServiceBus\Common\throwableDetails;
 
 /**
  *
@@ -187,7 +187,7 @@ final class KernelContext implements ServiceBusContext
     {
         $extra = \array_merge_recursive(
             $extra,
-            collectThrowableDetails($throwable)
+            throwableDetails($throwable)
         );
 
         $this->logContextMessage($throwable->getMessage(), $extra, $level);

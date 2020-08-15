@@ -13,7 +13,6 @@ declare(strict_types = 1);
 namespace ServiceBus\MessageExecutor;
 
 use function ServiceBus\Common\invokeReflectionMethod;
-use Amp\Failure;
 use Amp\Promise;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;

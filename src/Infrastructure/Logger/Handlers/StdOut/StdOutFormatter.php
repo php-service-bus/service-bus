@@ -54,7 +54,7 @@ final class StdOutFormatter extends LineFormatter
      */
     protected function toJson($data, bool $ignoreErrors = false): string
     {
-        if (\is_array($data) === true)
+        if (\is_array($data))
         {
             return jsonEncode($data);
         }

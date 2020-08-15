@@ -67,8 +67,8 @@
   "require-dev": {
     "php-service-bus/code-style-config": "v1.2.*",
     "kelunik/loop-block": "v1.0.*",
-    "phpunit/phpunit": "v9.1.*",
-    "vimeo/psalm": "v3.11.*",
+    "phpunit/phpunit": "v9.2.*",
+    "vimeo/psalm": "v3.13.*",
     "phpstan/phpstan": "v0.12.*"
   },
   "prefer-stable": true,

@@ -14,13 +14,13 @@ namespace ServiceBus\EntryPoint;
 
 use ServiceBus\Context\ContextFactory;
 use function Amp\call;
-use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed;
 use ServiceBus\MessagesRouter\Router;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
+use function ServiceBus\Common\throwableDetails;
 
 /**
  * Default incoming package processor.
@@ -74,7 +74,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     $this->logger->error(
                         'Failed to denormalize the message',
                         \array_merge(
-                            collectThrowableDetails($exception),
+                            throwableDetails($exception),
                             [
                                 'packageId' => $package->id(),
                                 'traceId'   => $package->traceId(),

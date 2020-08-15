@@ -86,7 +86,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
 
                     $messageExecutor = $this->executorFactory->create($handler->messageHandler);
 
-                    $registerMethod = $handler->isCommandHandler() === true
+                    $registerMethod = $handler->isCommandHandler()
                         ? 'registerHandler'
                         : 'registerListener';
 

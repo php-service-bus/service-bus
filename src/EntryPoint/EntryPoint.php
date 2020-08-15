@@ -13,7 +13,6 @@ declare(strict_types = 1);
 namespace ServiceBus\EntryPoint;
 
 use function Amp\delay;
-use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Loop;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
@@ -21,6 +20,8 @@ use Psr\Log\NullLogger;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 use ServiceBus\Transport\Common\Queue;
 use ServiceBus\Transport\Common\Transport;
+use function ServiceBus\Common\throwableDetails;
+use function ServiceBus\Common\throwableMessage;
 
 /**
  * Application entry point.
@@ -186,9 +187,9 @@ final class EntryPoint
                         if ($throwable !== null)
                         {
                             $this->logger->critical(
-                                $throwable->getMessage(),
+                                throwableMessage($throwable),
                                 \array_merge(
-                                    collectThrowableDetails($throwable),
+                                    throwableDetails($throwable),
                                     [
                                         'packageId' => $package->id(),
                                         'traceId'   => $package->traceId(),

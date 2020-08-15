@@ -149,7 +149,7 @@ final class Formatter extends NormalizerFormatter
             /** @noinspection UnnecessaryCastingInspection */
             $len = \strlen($key . (string) $value);
 
-            if (true === \is_string($value) && $len > $this->maxLength)
+            if (\is_string($value) && $len > $this->maxLength)
             {
                 $formatted[$key] = \substr($value, 0, $this->maxLength);
 
@@ -171,7 +171,7 @@ final class Formatter extends NormalizerFormatter
      */
     private function formatValue($value)
     {
-        if (null === $value || true === \is_scalar($value))
+        if ($value === null || \is_scalar($value))
         {
             return $value;
         }

@@ -13,12 +13,13 @@ declare(strict_types = 1);
 namespace ServiceBus\MessageExecutor;
 
 use function Amp\call;
-use function ServiceBus\Common\collectThrowableDetails;
 use Amp\Promise;
 use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
+use function ServiceBus\Common\throwableDetails;
+use function ServiceBus\Common\throwableMessage;
 
 /**
  *
@@ -88,13 +89,13 @@ final class DefaultMessageExecutor implements MessageExecutor
 
                     $context->logContextMessage(
                         'Error processing, sending an error event and stopping message processing',
-                        collectThrowableDetails($throwable),
+                        throwableDetails($throwable),
                         LogLevel::ERROR
                     );
 
                     yield from self::publishThrowable(
                         (string) $this->options->defaultThrowableEvent,
-                        $throwable->getMessage(),
+                        throwableMessage($throwable),
                         $context
                     );
                 }
@@ -138,7 +139,7 @@ final class DefaultMessageExecutor implements MessageExecutor
         {
             foreach ($resolvers as $argumentResolver)
             {
-                if (true === $argumentResolver->supports($argument))
+                if ($argumentResolver->supports($argument))
                 {
                     /** @psalm-suppress MixedAssignment Unknown data type */
                     $preparedArguments[] = $argumentResolver->resolve($message, $context, $argument);

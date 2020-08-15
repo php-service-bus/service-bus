@@ -23,7 +23,8 @@ use ServiceBus\TelegramBot\Interaction\InteractionsProvider;
 use ServiceBus\TelegramBot\Interaction\Result\Fail;
 use ServiceBus\TelegramBot\TelegramCredentials;
 use function Amp\call;
-use function ServiceBus\Common\collectThrowableDetails;
+use function ServiceBus\Common\throwableDetails;
+use function ServiceBus\Common\throwableMessage;
 
 /**
  * The notification will be sent to the Telegram channel.
@@ -62,7 +63,7 @@ final class TelegramAlertingProvider implements AlertingProvider
 
     public function send(AlertMessage $message, ?AlertContext $context = null): Promise
     {
-        if ($this->environment->isDebug() === true)
+        if ($this->environment->isDebug())
         {
             return new Success();
         }
@@ -98,7 +99,7 @@ final class TelegramAlertingProvider implements AlertingProvider
                 }
                 catch (\Throwable $throwable)
                 {
-                    $this->logger->error($throwable->getMessage(), collectThrowableDetails($throwable));
+                    $this->logger->error(throwableMessage($throwable), throwableDetails($throwable));
                 }
             }
         );

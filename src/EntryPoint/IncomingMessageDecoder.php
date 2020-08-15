@@ -71,7 +71,7 @@ final class IncomingMessageDecoder
     private function findDecoderByKey(string $encoderKey): MessageDecoder
     {
         /** @var string $encoderContainerId */
-        $encoderContainerId = true === !empty($this->decodersConfiguration[$encoderKey])
+        $encoderContainerId = !empty($this->decodersConfiguration[$encoderKey])
             ? $this->decodersConfiguration[$encoderKey]
             : self::DEFAULT_DECODER;
 
@@ -83,7 +83,7 @@ final class IncomingMessageDecoder
      */
     private function obtainDecoder(string $decoderId): MessageDecoder
     {
-        if (true === $this->decodersLocator->has($decoderId))
+        if ($this->decodersLocator->has($decoderId))
         {
             /** @var MessageDecoder $decoder */
             $decoder = $this->decodersLocator->get($decoderId);

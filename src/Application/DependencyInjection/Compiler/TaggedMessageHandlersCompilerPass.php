@@ -88,7 +88,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
                 $reflectionType     = $parameter->getType();
                 $reflectionTypeName = $reflectionType->getName();
 
-                if (self::supportedType($parameter) === true && $container->has($reflectionTypeName) === true)
+                if (self::supportedType($parameter) && $container->has($reflectionTypeName))
                 {
                     $servicesReference[$reflectionTypeName] = new ServiceClosureArgument(new Reference($reflectionTypeName));
                 }
@@ -102,7 +102,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
         $reflectionType     = $parameter->getType();
         $reflectionTypeName = $reflectionType->getName();
 
-        return (\class_exists($reflectionTypeName) === true || \interface_exists($reflectionTypeName) === true) &&
+        return (\class_exists($reflectionTypeName) || \interface_exists($reflectionTypeName)) &&
             \is_a($reflectionTypeName, ServiceBusContext::class, true) === false &&
             \is_a($reflectionTypeName, \Throwable::class, true) === false;
     }

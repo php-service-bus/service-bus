@@ -69,7 +69,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                 $handlerAnnotation->description
             );
 
-            $factoryMethod = $isCommandHandler === true ? 'createCommandHandler' : 'createEventListener';
+            $factoryMethod = $isCommandHandler ? 'createCommandHandler' : 'createEventListener';
 
             /** @var ServiceMessageHandler $serviceMessageHandler */
             $serviceMessageHandler = ServiceMessageHandler::{$factoryMethod}($handler);
@@ -88,12 +88,12 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
     private function createOptions(ServicesAnnotationsMarker $annotation, bool $isCommandHandler): DefaultHandlerOptions
     {
         /** @var CommandHandler|EventListener $annotation */
-        $factoryMethod = $isCommandHandler === true ? 'createForCommandHandler' : 'createForEventListener';
+        $factoryMethod = $isCommandHandler ? 'createForCommandHandler' : 'createForEventListener';
 
         /** @var DefaultHandlerOptions $options */
         $options = DefaultHandlerOptions::{$factoryMethod}($annotation->description);
 
-        if ($annotation->validate === true)
+        if ($annotation->validate)
         {
             $options = $options->enableValidation($annotation->groups);
         }
@@ -160,7 +160,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
             $className = $type->getName();
 
             /** @psalm-suppress RedundantConditionGivenDocblockType */
-            if (\class_exists($className) === true)
+            if (\class_exists($className))
             {
                 return $className;
             }
@@ -196,7 +196,6 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
 
     private static function supports(object $annotation): bool
     {
-        return ($annotation instanceof CommandHandler) === true ||
-            ($annotation instanceof EventListener) === true;
+        return $annotation instanceof CommandHandler || $annotation instanceof EventListener;
     }
 }
