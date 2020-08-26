@@ -12,6 +12,7 @@ declare(strict_types = 1);
 
 namespace ServiceBus\MessageExecutor;
 
+use Amp\TimeoutCancellationToken;
 use function Amp\call;
 use Amp\Promise;
 use Psr\Log\LogLevel;

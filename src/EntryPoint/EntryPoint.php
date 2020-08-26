@@ -12,6 +12,11 @@ declare(strict_types = 1);
 
 namespace ServiceBus\EntryPoint;
 
+use Amp\CancellationToken;
+use Amp\CancellationTokenSource;
+use Amp\NullCancellationToken;
+use Amp\TimeoutCancellationToken;
+use Amp\TimeoutException;
 use function Amp\delay;
 use Amp\Loop;
 use Amp\Promise;
@@ -67,7 +72,7 @@ final class EntryPoint
     /**
      * Collection of identifier of tasks that are being processed
      *
-     * @psalm-var array<string, bool>
+     * @psalm-var array<string, string>
      *
      * @var array
      */
@@ -80,18 +85,27 @@ final class EntryPoint
      */
     private $awaitDelay;
 
+    /**
+     * Message execution timeout (in milliseconds)
+     *
+     * @var int|null
+     */
+    private $executionTimeout;
+
     public function __construct(
         Transport $transport,
         EntryPointProcessor $processor,
         ?LoggerInterface $logger = null,
         ?int $maxConcurrentTaskCount = null,
-        ?int $awaitDelay = null
+        ?int $awaitDelay = null,
+        ?int $executionTimeout = null
     ) {
         $this->transport              = $transport;
         $this->processor              = $processor;
         $this->logger                 = $logger ?? new NullLogger();
         $this->maxConcurrentTaskCount = $maxConcurrentTaskCount ?? self::DEFAULT_MAX_CONCURRENT_TASK_COUNT;
         $this->awaitDelay             = $awaitDelay ?? self::DEFAULT_AWAIT_DELAY;
+        $this->executionTimeout       = $executionTimeout;
     }
 
     /**
@@ -101,7 +115,6 @@ final class EntryPoint
      */
     public function listen(Queue ...$queues): Promise
     {
-        /** @psalm-suppress InvalidArgument */
         return $this->transport->consume(
             function (IncomingPackage $package): \Generator
             {
@@ -119,7 +132,7 @@ final class EntryPoint
                         'The maximum number of tasks has been reached',
                         [
                             'currentCount'      => $inProgressCount,
-                            'currentCollection' => \array_keys($this->currentTasksInProgress)
+                            'currentCollection' => \array_values($this->currentTasksInProgress)
                         ]
                     );
 
@@ -173,34 +186,65 @@ final class EntryPoint
 
     private function deferExecution(IncomingPackage $package): void
     {
-        $this->currentTasksInProgress[$package->id()] = true;
+        $this->currentTasksInProgress[$package->id()] = (string) $package->traceId();
 
         Loop::defer(
             function () use ($package): void
             {
-                $this->processor->handle($package)->onResolve(
-                    function (?\Throwable $throwable) use ($package): void
-                    {
-                        unset($this->currentTasksInProgress[$package->id()]);
+                $cancellation = $this->createCancellationToken();
 
-                        // @codeCoverageIgnoreStart
-                        if ($throwable !== null)
+                $this->processor->handle($package)->onResolve(
+                    function (?\Throwable $throwable) use ($cancellation, $package): \Generator
+                    {
+                        try
                         {
-                            $this->logger->critical(
-                                throwableMessage($throwable),
-                                \array_merge(
-                                    throwableDetails($throwable),
-                                    [
-                                        'packageId' => $package->id(),
-                                        'traceId'   => $package->traceId(),
-                                    ]
-                                )
-                            );
+                            if ($throwable !== null)
+                            {
+                                throw $throwable;
+                            }
+
+                            $cancellation->throwIfRequested();
                         }
-                        // @codeCoverageIgnoreEnd
+                        catch (TimeoutException $exception)
+                        {
+                            $this->logThrowable($exception, $package);
+
+                            yield $package->reject(true);
+                        }
+                        catch (\Throwable $throwable)
+                        {
+                            $this->logThrowable($throwable, $package);
+                        }
+                        finally
+                        {
+                            unset($this->currentTasksInProgress[$package->id()]);
+                        }
                     }
                 );
             }
+        );
+    }
+
+    private function createCancellationToken(): CancellationToken
+    {
+        $timeout = $this->executionTimeout;
+
+        return $timeout !== null
+            ? new TimeoutCancellationToken($timeout)
+            : new NullCancellationToken();
+    }
+
+    private function logThrowable(\Throwable $throwable, IncomingPackage $package): void
+    {
+        $this->logger->critical(
+            throwableMessage($throwable),
+            \array_merge(
+                throwableDetails($throwable),
+                [
+                    'packageId' => $package->id(),
+                    'traceId'   => $package->traceId(),
+                ]
+            )
         );
     }
 }

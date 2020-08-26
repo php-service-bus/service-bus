@@ -198,4 +198,35 @@ final class EntryPointTest extends TestCase
 
         static::assertContains('Waiting for the completion of all tasks taken', filterLogMessages($this->logHandler));
     }
+
+    /** @test */
+    public function listenWithExecutionTimeout()
+    {
+        $entryPoint = new EntryPoint(
+            new EntryPointTestTransport([new EntryPointTestMessage('await')]),
+            $this->entryPointProcessor,
+            $this->logger,
+            null,
+            null,
+            1500
+        );
+
+        Loop::run(
+            function () use ($entryPoint): \Generator
+            {
+                yield $entryPoint->listen($this->queue);
+                $entryPoint->stop();
+            }
+        );
+
+        foreach (filterLogMessages($this->logHandler) as $message)
+        {
+            if (\strpos($message, 'operation was cancelled') !== false)
+            {
+                return;
+            }
+        }
+
+        static::fail('Timeout expected');
+    }
 }

@@ -109,10 +109,6 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
 
         if ($defaultThrowableEvent !== null)
         {
-            /**
-             * @psalm-suppress TypeCoercion
-             * @psalm-suppress PossiblyNullArgument
-             */
             $options = $options->withDefaultThrowableEvent($defaultThrowableEvent);
         }
 
@@ -189,6 +185,7 @@ final class AnnotationsBasedServiceHandlersLoader implements ServiceHandlersLoad
                 )
             );
         }
+
         // @codeCoverageIgnoreEnd
 
         return $closure;

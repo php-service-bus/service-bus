@@ -15,8 +15,6 @@ namespace ServiceBus\Tests\Application;
 use Amp\Loop;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Application\Bootstrap;
-use ServiceBus\Application\DependencyInjection\Compiler\Logger\LoggerCompilerPass;
-use ServiceBus\Application\DependencyInjection\Compiler\Logger\StdOutLoggerCompilerPass;
 use ServiceBus\Application\ServiceBusKernel;
 use ServiceBus\Common\Module\ServiceBusModule;
 use ServiceBus\Transport\Common\DeliveryDestination;

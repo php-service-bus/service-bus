@@ -36,11 +36,9 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
     /**
      * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
      */
-    public function __construct(
-        array $argumentResolvers,
-        ?ValidatorInterface $validator = null
-    ) {
-        if (null === $validator)
+    public function __construct(array $argumentResolvers, ?ValidatorInterface $validator = null)
+    {
+        if ($validator === null)
         {
             $validator = (new ValidatorBuilder())
                 ->enableAnnotationMapping()
