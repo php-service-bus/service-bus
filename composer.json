@@ -44,7 +44,7 @@
     "ext-pcntl": "*",
     "ext-json": "*",
     "ext-zlib": "*",
-    "php-service-bus/http-client": "v4.1.*",
+    "php-service-bus/http-client": "v4.2.*",
     "php-service-bus/common": "v4.1.*",
     "php-service-bus/transport": "v4.1.*",
     "php-service-bus/storage": "v4.1.*",
