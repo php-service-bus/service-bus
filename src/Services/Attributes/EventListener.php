@@ -37,6 +37,9 @@ final class EventListener implements HasDescription, HasValidation
      */
     private $description;
 
+    /**
+     * @psalm-param array<string, string> $validationGroups
+     */
     public function __construct(
         ?string $description = null,
         bool $validationEnabled = false,

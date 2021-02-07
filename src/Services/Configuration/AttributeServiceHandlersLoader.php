@@ -55,10 +55,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
                 service: $service
             );
 
-            /** @psalm-suppress DocblockTypeContradiction */
-            $processorDescription = $attribute instanceof HasDescription
-                ? $attribute->description()
-                : null;
+            $processorDescription = $attribute->description();
 
             $handlerOptions = $this->createOptions(
                 attribute: $attribute,
