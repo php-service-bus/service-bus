@@ -25,7 +25,10 @@
   "autoload-dev": {
     "psr-4": {
       "ServiceBus\\Tests\\": "tests/"
-    }
+    },
+    "files": [
+      "tests/functions.php"
+    ]
   },
   "require": {
     "php": ">=8.0",

@@ -10,15 +10,17 @@
 
 declare(strict_types = 0);
 
-namespace ServiceBus\Services\Attributes;
+namespace ServiceBus\Services\Attributes\Options;
 
 /**
- *
+ * @psalm-immutable
  */
-final class Cancellation
+final class WithCancellation
 {
     /**
      * Operation timeout (in seconds).
+     *
+     * @psalm-readonly
      *
      * @var int
      */

@@ -12,47 +12,67 @@ declare(strict_types = 0);
 
 namespace ServiceBus\Services\Attributes;
 
+use ServiceBus\Services\Attributes\Options\HasCancellation;
+use ServiceBus\Services\Attributes\Options\HasDescription;
+use ServiceBus\Services\Attributes\Options\HasValidation;
+use ServiceBus\Services\Attributes\Options\WithCancellation;
+use ServiceBus\Services\Attributes\Options\WithValidation;
+
 /**
  * @psalm-immutable
  */
 #[\Attribute(\Attribute::TARGET_METHOD)]
-final class CommandHandler
+final class CommandHandler implements HasDescription, HasValidation, HasCancellation
 {
     /**
      * Command validation configuration.
      *
-     * @psalm-readonly
-     *
      * @var WithValidation|null
      */
-    public $validation;
+    private $validation;
 
     /**
      * Message description.
      * Will be added to the log when the method is called.
      *
-     * @psalm-readonly
-     *
      * @var string|null
      */
-    public $description;
+    private $description;
 
     /**
      * Execution cancellation configuration.
      *
-     * @psalm-readonly
-     *
-     * @var Cancellation|null
+     * @var WithCancellation|null
      */
-    public $cancellation;
+    private $cancellation;
 
+    /**
+     * @param string[] $validationGroups
+     */
     public function __construct(
-        ?WithValidation $validation = null,
-        ?string $description= null,
-        ?Cancellation $cancellation= null
-    ) {
-        $this->validation   = $validation;
+        ?string $description = null,
+        bool $validationEnabled = false,
+        array $validationGroups = [],
+        ?int $executionTimeout = null
+    )
+    {
         $this->description  = $description;
-        $this->cancellation = $cancellation;
+        $this->validation   = $validationEnabled ? new WithValidation($validationGroups) : null;
+        $this->cancellation = $executionTimeout ? new WithCancellation($executionTimeout) : null;
+    }
+
+    public function cancellation(): ?WithCancellation
+    {
+        return $this->cancellation;
+    }
+
+    public function description(): ?string
+    {
+        return $this->description;
+    }
+
+    public function validation(): ?WithValidation
+    {
+        return $this->validation;
     }
 }

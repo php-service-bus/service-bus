@@ -15,7 +15,7 @@ services:
 
   # Symfony serializer message decoder
   service_bus.decoder.default_handler:
-    class: ServiceBus\MessageSerializer\Symfony\SymfonyMessageSerializer
+    class: ServiceBus\MessageSerializer\Symfony\SymfonySerializer
     arguments:
       $normalizers: []
 
@@ -50,9 +50,15 @@ services:
       $interval: 600000
       $logger: '@service_bus.logger'
 
+  # Attributes reader
+  ServiceBus\AnnotationsReader\Reader:
+    class: ServiceBus\AnnotationsReader\AttributesReader
+
   # Retrieving a list of message handlers for the specified object
   ServiceBus\Services\Configuration\ServiceHandlersLoader:
-    class: ServiceBus\Services\Configuration\AnnotationsBasedServiceHandlersLoader
+    class: ServiceBus\Services\Configuration\AttributeServiceHandlersLoader
+    arguments:
+      $attributesReader: '@ServiceBus\AnnotationsReader\Reader'
 
   # Internal kernel locator
   service_bus.public_services_locator:

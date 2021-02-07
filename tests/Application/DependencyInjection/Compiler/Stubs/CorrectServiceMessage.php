@@ -8,17 +8,14 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types = 1);
 
-namespace ServiceBus\Services\Attributes;
+namespace ServiceBus\Tests\Application\DependencyInjection\Compiler\Stubs;
 
 /**
  *
  */
-final class WithValidation
+final class CorrectServiceMessage
 {
-    /**
-     * @var string[]
-     */
-    public $groups = [];
+
 }

@@ -15,6 +15,7 @@ namespace ServiceBus\EntryPoint;
 use Psr\Container\ContainerInterface;
 use ServiceBus\Common\Context\IncomingMessageMetadata;
 use ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder;
+use ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed;
 use ServiceBus\MessageSerializer\MessageDecoder;
 use ServiceBus\Metadata\ServiceBusMetadata;
 
@@ -64,7 +65,7 @@ final class IncomingMessageDecoder
 
         if ($toMessageClass === null)
         {
-            throw new \RuntimeException('Unable to find message classFQN declaration');
+            throw new DecodeMessageFailed('Unable to find message classFQN declaration');
         }
 
         return $this

@@ -43,7 +43,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
         if ($validator === null)
         {
             $validator = (new ValidatorBuilder())
-                ->enableAnnotationMapping()
+                ->enableAnnotationMapping(true)
                 ->getValidator();
         }
 

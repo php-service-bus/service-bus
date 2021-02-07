@@ -59,6 +59,15 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     public $validationGroups;
 
     /**
+     * Execution timeout (in seconds).
+     *
+     * @psalm-readonly
+     *
+     * @var int|null
+     */
+    public $executionTimeout;
+
+    /**
      * Message description.
      * Will be added to the log when the method is called.
      *
@@ -75,6 +84,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
             isCommandHandler: false,
             validationEnabled: false,
             validationGroups: [],
+            executionTimeout: null,
             description: $withDescription,
         );
     }
@@ -86,13 +96,12 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
             isCommandHandler: true,
             validationEnabled: false,
             validationGroups: [],
+            executionTimeout: null,
             description: $withDescription,
         );
     }
 
     /**
-     * Enable validation.
-     *
      * @psalm-param array<array-key, string> $validationGroups
      */
     public function enableValidation(array $validationGroups = []): self
@@ -102,6 +111,18 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
             isCommandHandler: $this->isCommandHandler,
             validationEnabled: true,
             validationGroups: $validationGroups,
+            executionTimeout: $this->executionTimeout,
+            description: $this->description,
+        );
+    }
+
+    public function limitExecutionTime(int $executionTimeout): self {
+        return new self(
+            isEventListener: $this->isEventListener,
+            isCommandHandler: $this->isCommandHandler,
+            validationEnabled: $this->validationEnabled,
+            validationGroups: $this->validationGroups,
+            executionTimeout: $executionTimeout,
             description: $this->description,
         );
     }
@@ -114,12 +135,15 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
         bool $isCommandHandler,
         bool $validationEnabled = false,
         array $validationGroups = [],
+        int|null $executionTimeout = null,
         ?string $description = null
-    ) {
+    )
+    {
         $this->isEventListener   = $isEventListener;
         $this->isCommandHandler  = $isCommandHandler;
         $this->validationEnabled = $validationEnabled;
         $this->validationGroups  = $validationGroups;
+        $this->executionTimeout  = $executionTimeout;
         $this->description       = $description;
     }
 }
