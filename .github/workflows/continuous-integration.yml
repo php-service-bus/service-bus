@@ -76,6 +76,15 @@ jobs:
           RABBITMQ_DEFAULT_USER: guest
           RABBITMQ_DEFAULT_PASS: guest
         options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: 123456789
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: --name=postgres --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
 
     env:
       PHP_EXTENSIONS: bstring, dom, intl, json, libxml, xml, xmlwriter, sockets

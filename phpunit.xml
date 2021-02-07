@@ -16,8 +16,46 @@
         <ini name="error_reporting" value="-1"/>
         <env name="REDIS_CONNECTION_DSN" value="tcp://localhost:6379"/>
         <env name="TRANSPORT_CONNECTION_DSN" value="amqp://guest:guest@127.0.0.1:5672/?heartbeat=0"/>
+        <env name="TEST_POSTGRES_DSN" value="pgsql://test:123456789@localhost:5432/test"/>
     </php>
     <testsuites>
+
+        <testsuite name="Component: common">
+            <directory>./vendor/php-service-bus/common/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: annotations (attributes) reader">
+            <directory>./vendor/php-service-bus/annotations-reader/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: cache">
+            <directory>./vendor/php-service-bus/cache/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: http client">
+            <directory>./vendor/php-service-bus/http-client/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: message serializer">
+            <directory>./vendor/php-service-bus/message-serializer/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: messages router">
+            <directory>./vendor/php-service-bus/messages-router/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: mutex">
+            <directory>./vendor/php-service-bus/mutex/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: storage">
+            <directory>./vendor/php-service-bus/storage/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: transport">
+            <directory>./vendor/php-service-bus/transport/tests/</directory>
+        </testsuite>
+
         <testsuite name="PHP Service Bus">
             <directory>./tests/</directory>
         </testsuite>

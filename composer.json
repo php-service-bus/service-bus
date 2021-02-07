@@ -24,7 +24,16 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "ServiceBus\\Tests\\": "tests/"
+      "ServiceBus\\Tests\\": "tests/",
+      "ServiceBus\\AnnotationsReader\\Tests\\": "vendor/php-service-bus/annotations-reader/tests/",
+      "ServiceBus\\Cache\\Tests\\": "vendor/php-service-bus/cache/tests/",
+      "ServiceBus\\Common\\Tests\\": "vendor/php-service-bus/common/tests/",
+      "ServiceBus\\HttpClient\\Tests\\": "vendor/php-service-bus/http-client/tests/",
+      "ServiceBus\\MessageSerializer\\Tests\\": "vendor/php-service-bus/message-serializer/tests/",
+      "ServiceBus\\MessagesRouter\\Tests\\": "vendor/php-service-bus/messages-router/tests/",
+      "ServiceBus\\Mutex\\Tests\\": "vendor/php-service-bus/mutex/tests/",
+      "ServiceBus\\Storage\\Tests\\": "vendor/php-service-bus/storage/tests/",
+      "ServiceBus\\Transport\\Tests\\": "vendor/php-service-bus/transport/tests/"
     },
     "files": [
       "tests/functions.php"
