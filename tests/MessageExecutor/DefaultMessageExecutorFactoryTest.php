@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -38,8 +38,8 @@ final class DefaultMessageExecutorFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $service = new class() {
-
+        $service = new class()
+        {
             #[CommandHandler(
                 validationEnabled: true,
                 validationGroups: ['qwerty']
@@ -47,17 +47,15 @@ final class DefaultMessageExecutorFactoryTest extends TestCase
             public function handle(
                 TestMessageExecutorMessage $command,
                 ServiceBusContext $context
-            ): void
-            {
-
+            ): void {
             }
 
+            /** @noinspection PhpUnusedParameterInspection */
             #[EventListener]
             public function when(
                 TestMessageExecutorMessage $event,
                 ServiceBusContext $context
-            ): \Generator
-            {
+            ): \Generator {
                 yield from [];
             }
         };
@@ -67,7 +65,9 @@ final class DefaultMessageExecutorFactoryTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function createHandler(): void
     {
         $messageHandlerFactory = new DefaultMessageExecutorFactory([]);

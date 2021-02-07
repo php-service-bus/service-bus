@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -25,7 +25,9 @@ use function ServiceBus\Tests\filterLogMessages;
  */
 final class LoopBlockWatcherTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function listenWithoutBlock(): void
     {
         $testHandler = new TestHandler();
@@ -44,10 +46,12 @@ final class LoopBlockWatcherTest extends TestCase
             }
         );
 
-        static::assertCount(1, $testHandler->getRecords());
+        self::assertCount(1, $testHandler->getRecords());
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function listenWithBlock(): void
     {
         $testHandler = new TestHandler();
@@ -79,7 +83,7 @@ final class LoopBlockWatcherTest extends TestCase
             }
         );
 
-        static::assertContains(
+        self::assertContains(
             'A lock event loop has been detected. Blocking time: {lockTime} seconds',
             filterLogMessages($testHandler)
         );

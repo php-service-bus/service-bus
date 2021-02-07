@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use ServiceBus\Common\Context\IncomingMessageMetadata;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Context\ContextFactory;
-use ServiceBus\Transport\Common\Package\IncomingPackage;
 
 /**
  *

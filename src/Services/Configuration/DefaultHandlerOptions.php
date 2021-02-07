@@ -116,7 +116,8 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
         );
     }
 
-    public function limitExecutionTime(int $executionTimeout): self {
+    public function limitExecutionTime(int $executionTimeout): self
+    {
         return new self(
             isEventListener: $this->isEventListener,
             isCommandHandler: $this->isCommandHandler,
@@ -137,8 +138,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
         array $validationGroups = [],
         int|null $executionTimeout = null,
         ?string $description = null
-    )
-    {
+    ) {
         $this->isEventListener   = $isEventListener;
         $this->isCommandHandler  = $isCommandHandler;
         $this->validationEnabled = $validationEnabled;

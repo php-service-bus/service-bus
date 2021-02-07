@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -14,15 +14,15 @@ namespace ServiceBus\Tests\Services\Attributes;
 
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Services\Attributes\CommandHandler;
-use ServiceBus\Services\Attributes\WithCancellation;
-use ServiceBus\Services\Attributes\WithValidation;
 
 /**
  *
  */
 final class CommandAttributesTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function withoutAnyFields(): void
     {
         $attribute = new CommandHandler();
@@ -32,7 +32,9 @@ final class CommandAttributesTest extends TestCase
         self::assertNull($attribute->cancellation());
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withValidation(): void
     {
         $attribute = new CommandHandler(
@@ -45,7 +47,9 @@ final class CommandAttributesTest extends TestCase
         self::assertSame(['qwerty', 'root'], $attribute->validation()?->groups);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withCancellation(): void
     {
         $attribute = new CommandHandler(

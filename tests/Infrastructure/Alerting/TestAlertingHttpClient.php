@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -24,10 +24,14 @@ use ServiceBus\HttpClient\RequestContext;
  */
 final class TestAlertingHttpClient implements HttpClient
 {
-    /** @var HttpRequest */
+    /**
+     * @var HttpRequest
+     */
     public $requestData;
 
-    /** @var Response */
+    /**
+     * @var Response
+     */
     private $withResponse;
 
     public function __construct(Response $withResponse)
@@ -35,9 +39,6 @@ final class TestAlertingHttpClient implements HttpClient
         $this->withResponse = $withResponse;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function execute(HttpRequest $requestData, ?RequestContext $context = null): Promise
     {
         $this->requestData = $requestData;
@@ -45,10 +46,12 @@ final class TestAlertingHttpClient implements HttpClient
         return new Success($this->withResponse);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function download(string $filePath, string $destinationDirectory, string $fileName, ?RequestContext $context = null): Promise
+    public function download(
+        string $fileUrl,
+        string $destinationDirectory,
+        string $fileName,
+        ?RequestContext $context = null
+    ): Promise
     {
         return new Success();
     }

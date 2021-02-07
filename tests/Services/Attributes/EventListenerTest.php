@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -20,7 +20,9 @@ use ServiceBus\Services\Attributes\EventListener;
  */
 final class EventListenerTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function withoutAnyFields(): void
     {
         $attribute = new EventListener();
@@ -29,7 +31,9 @@ final class EventListenerTest extends TestCase
         self::assertNull($attribute->validation());
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withValidation(): void
     {
         $attribute = new EventListener(

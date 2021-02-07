@@ -24,7 +24,7 @@ final class MessageHandlerService
     public function someHandler(
         EmptyMessage $command,
         ServiceBusContext $context,
-        $mixedParameter
+        mixed $mixedParameter
     ): Promise {
         return new Success([$command, $context, $mixedParameter]);
     }

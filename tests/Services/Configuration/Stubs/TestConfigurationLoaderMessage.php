@@ -17,5 +17,4 @@ namespace ServiceBus\Tests\Services\Configuration\Stubs;
  */
 final class TestConfigurationLoaderMessage
 {
-
 }

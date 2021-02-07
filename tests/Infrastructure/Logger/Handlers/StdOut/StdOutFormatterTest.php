@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -42,7 +42,7 @@ final class StdOutFormatterTest extends TestCase
 
         $message = \end($messages);
 
-        static::assertSame($expected, $message['formatted'], 'tests.emergency: qwerty [] []');
+        self::assertSame($expected, $message['formatted'], 'tests.emergency: qwerty [] []');
     }
 
     public function logDataProvider(): array

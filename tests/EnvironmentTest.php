@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -20,7 +20,9 @@ use ServiceBus\Environment;
  */
 final class EnvironmentTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function wrongEnvironment(): void
     {
         $this->expectException(\LogicException::class);
@@ -29,7 +31,9 @@ final class EnvironmentTest extends TestCase
         Environment::create('qwerty');
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function createTestEnv(): void
     {
         $environment = Environment::test();
@@ -42,7 +46,9 @@ final class EnvironmentTest extends TestCase
         self::assertFalse($environment->isDevelopment());
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function createDevEnv(): void
     {
         $environment = Environment::dev();

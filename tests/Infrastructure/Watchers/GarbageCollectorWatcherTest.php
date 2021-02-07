@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -25,7 +25,9 @@ use function ServiceBus\Tests\filterLogMessages;
  */
 final class GarbageCollectorWatcherTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function register(): void
     {
         $testHandler = new TestHandler();
@@ -46,7 +48,7 @@ final class GarbageCollectorWatcherTest extends TestCase
             }
         );
 
-        static::assertContains(
+        self::assertContains(
             'Forces collection of any existing garbage cycles',
             filterLogMessages($testHandler)
         );

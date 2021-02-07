@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -49,12 +49,13 @@ final class ContainerBuilderTest extends TestCase
         unset($this->cacheDirectory);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function successfulBuildWithDefaultData(): void
     {
         $containerBuilder = new ContainerBuilder('ContainerBuilderTest', Environment::prod());
 
-        /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $containerBuilder->build();
 
         self::assertFileExists(\sys_get_temp_dir() . '/containerBuilderTestProdProjectContainer.php');
@@ -69,7 +70,9 @@ final class ContainerBuilderTest extends TestCase
         self::assertSame('ContainerBuilderTest', $container->getParameter('service_bus.entry_point'));
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function successfulBuildWithFullConfiguration(): void
     {
         $containerBuilder = new ContainerBuilder('ContainerBuilderTest', Environment::dev());
@@ -88,7 +91,6 @@ final class ContainerBuilderTest extends TestCase
 
         $containerBuilder->addCompilerPasses(new TestCompilerPass(), new TaggedMessageHandlersCompilerPass());
 
-        /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
         $container = $containerBuilder->build();
 
         self::assertFileExists($this->cacheDirectory . '/containerBuilderTestDevProjectContainer.php');

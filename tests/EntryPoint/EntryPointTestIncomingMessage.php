@@ -22,37 +22,33 @@ use ServiceBus\Transport\Common\Package\IncomingPackage;
  */
 final class EntryPointTestIncomingMessage implements IncomingPackage
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     private $id;
 
-    /** @var string */
-    private $traceId;
-
-    /** @var array */
+    /**
+     * @var array
+     */
     private $headers;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $payload;
 
-    public function __construct(string $payload = '', array $headers = [], ?string $id = null, ?string $traceId = null)
+    public function __construct(string $payload, array $headers, string $id)
     {
         $this->id      = $id;
-        $this->traceId = $traceId;
         $this->payload = $payload;
         $this->headers = $headers;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function id(): string
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function origin(): DeliveryDestination
     {
         return new class() implements DeliveryDestination
@@ -60,51 +56,28 @@ final class EntryPointTestIncomingMessage implements IncomingPackage
         };
     }
 
-    /**
-     * @inheritDoc
-     */
     public function payload(): string
     {
         return $this->payload;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function headers(): array
     {
         return $this->headers;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function ack(): Promise
     {
         return new Success();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function nack(bool $requeue, ?string $withReason = null): Promise
     {
         return new Success();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function reject(bool $requeue, ?string $withReason = null): Promise
     {
         return new Success();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function traceId()
-    {
-        return $this->traceId;
     }
 }

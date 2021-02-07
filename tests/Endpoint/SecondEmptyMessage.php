@@ -10,11 +10,11 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Tests\Application\DependencyInjection\Compiler\Stubs;
+namespace ServiceBus\Tests\Endpoint;
 
 /**
  *
  */
-final class CorrectServiceMessage
+final class SecondEmptyMessage
 {
 }

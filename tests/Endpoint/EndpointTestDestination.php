@@ -10,25 +10,22 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Tests\EntryPoint;
+namespace ServiceBus\Tests\Endpoint;
+
+use ServiceBus\Transport\Common\DeliveryDestination;
 
 /**
  *
  */
-final class EntryPointTestMessage implements \JsonSerializable
+final class EndpointTestDestination implements DeliveryDestination
 {
     /**
      * @var string
      */
-    public $id;
+    public $data;
 
-    public function __construct(string $id)
+    public function __construct(string $data)
     {
-        $this->id = $id;
-    }
-
-    public function jsonSerialize(): array
-    {
-        return ['id' => $this->id];
+        $this->data = $data;
     }
 }

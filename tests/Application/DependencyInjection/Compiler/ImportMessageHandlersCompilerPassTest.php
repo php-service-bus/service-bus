@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -23,7 +23,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 final class ImportMessageHandlersCompilerPassTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function process(): void
     {
         $containerBuilder = new ContainerBuilder();
@@ -34,9 +36,9 @@ final class ImportMessageHandlersCompilerPassTest extends TestCase
         (new ImportMessageHandlersCompilerPass())->process($containerBuilder);
         (new TaggedMessageHandlersCompilerPass())->process($containerBuilder);
 
-        static::assertTrue($containerBuilder->has('service_bus.services_locator'));
-        static::assertTrue($containerBuilder->hasParameter('service_bus.services_map'));
-        static::assertCount(1, $containerBuilder->getParameter('service_bus.services_map'));
-        static::assertSame([CorrectService::class], $containerBuilder->getParameter('service_bus.services_map'));
+        self::assertTrue($containerBuilder->has('service_bus.services_locator'));
+        self::assertTrue($containerBuilder->hasParameter('service_bus.services_map'));
+        self::assertCount(1, (array) $containerBuilder->getParameter('service_bus.services_map'));
+        self::assertSame([CorrectService::class], $containerBuilder->getParameter('service_bus.services_map'));
     }
 }

@@ -24,12 +24,10 @@ final class CorrectService
     #[CommandHandler]
     public function handle(CorrectServiceMessage $command, ServiceBusContext $context): void
     {
-
     }
 
     #[EventListener]
     public function when(CorrectServiceMessage $event, ServiceBusContext $context): void
     {
-
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -22,13 +22,15 @@ use function Amp\Promise\wait;
  */
 final class OperationRetryWrapperTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function failedRetry(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectDeprecationMessage('qwerty');
 
-        $closure = static function ()
+        $closure = static function (): void
         {
             throw new \LogicException('qwerty');
         };

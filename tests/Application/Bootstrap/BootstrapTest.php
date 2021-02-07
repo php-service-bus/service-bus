@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -12,7 +12,7 @@ declare(strict_types = 1);
 
 namespace ServiceBus\Tests\Application\Bootstrap;
 
-use PHPStan\Testing\TestCase;
+use PHPUnit\Framework\TestCase;
 use ServiceBus\Application\Bootstrap;
 use ServiceBus\Application\DependencyInjection\Compiler\Logger\GraylogLoggerCompilerPass;
 use ServiceBus\Application\DependencyInjection\Compiler\Logger\StdOutLoggerCompilerPass;
@@ -35,8 +35,6 @@ final class BootstrapTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->cacheDirectory = \sys_get_temp_dir() . '/bootstrap_test';
 
         if (\file_exists($this->cacheDirectory) === false)
@@ -47,14 +45,14 @@ final class BootstrapTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         removeDirectory($this->cacheDirectory);
 
         unset($this->cacheDirectory);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withEmptyEnEntryPointName(): void
     {
         $this->expectException(ConfigurationCheckFailed::class);
@@ -63,7 +61,9 @@ final class BootstrapTest extends TestCase
         Bootstrap::withEnvironmentValues();
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withIncorrectEnvironmentKey(): void
     {
         $this->expectException(ConfigurationCheckFailed::class);
@@ -74,7 +74,9 @@ final class BootstrapTest extends TestCase
         Bootstrap::create('ssss', 'qwerty');
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withIncorrectDotEnvPath(): void
     {
         $this->expectException(ConfigurationCheckFailed::class);
@@ -82,7 +84,9 @@ final class BootstrapTest extends TestCase
         Bootstrap::withDotEnv(__DIR__ . '/qwertyuiop.env');
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withIncorrectDotEnvFormat(): void
     {
         $this->expectException(ConfigurationCheckFailed::class);
@@ -90,7 +94,9 @@ final class BootstrapTest extends TestCase
         Bootstrap::withDotEnv(__FILE__);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function buildWithCorrectParameters(): void
     {
         $bootstrap = Bootstrap::create('abube', 'dev');
@@ -108,7 +114,9 @@ final class BootstrapTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function fullConfigure(): void
     {
         $module = new class() implements ServiceBusModule
@@ -136,7 +144,9 @@ final class BootstrapTest extends TestCase
         self::assertSame('root', $container->getParameter('qwerty'));
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withLogger(): void
     {
         $bootstrap = Bootstrap::create('withLogger', 'dev');
@@ -147,7 +157,9 @@ final class BootstrapTest extends TestCase
         self::assertTrue(true);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withStdOutLogger(): void
     {
         $bootstrap = Bootstrap::create('withStdOutLogger', 'dev');
@@ -158,7 +170,9 @@ final class BootstrapTest extends TestCase
         self::assertTrue(true);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withGraylogLogger(): void
     {
         $bootstrap = Bootstrap::create('withGraylogLogger', 'dev');

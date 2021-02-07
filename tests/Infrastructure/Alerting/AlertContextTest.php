@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -20,21 +20,25 @@ use ServiceBus\Infrastructure\Alerting\AlertContext;
  */
 final class AlertContextTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function createDefault(): void
     {
         $context = new AlertContext();
 
-        static::assertFalse($context->toDrawAttention);
-        static::assertNull($context->toTopic);
+        self::assertFalse($context->toDrawAttention);
+        self::assertNull($context->toTopic);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function createCustom(): void
     {
         $context = new AlertContext(true, 'topic');
 
-        static::assertTrue($context->toDrawAttention);
-        static::assertSame('topic', $context->toTopic);
+        self::assertTrue($context->toDrawAttention);
+        self::assertSame('topic', $context->toTopic);
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -46,10 +46,13 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function loadFromEmptyService(): void
     {
-        $object = new class() {
+        $object = new class()
+        {
         };
 
         $handlers = $this->loader->load($object);
@@ -57,21 +60,23 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
         self::assertEmpty($handlers);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function loadFilledService(): void
     {
-        $service = new class() {
-
+        $service = new class()
+        {
             #[CommandHandler(
                 description: 'handle',
                 validationEnabled: true,
                 validationGroups: ['qwerty', 'root'],
                 executionTimeout: 120
             )]
-            public function handle(TestConfigurationLoaderMessage $command, ServiceBusContext $context
-            ): void
-            {
-
+            public function handle(
+                TestConfigurationLoaderMessage $command,
+                ServiceBusContext $context
+            ): void {
             }
 
             #[EventListener(
@@ -80,8 +85,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
             public function firstEventListener(
                 TestConfigurationLoaderMessage $event,
                 ServiceBusContext $context
-            ): Promise
-            {
+            ): Promise {
                 return new Success([$event, $context]);
             }
 
@@ -91,8 +95,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
             public function secondEventListener(
                 TestConfigurationLoaderMessage $event,
                 ServiceBusContext $context
-            ): \Generator
-            {
+            ): \Generator {
                 yield from [$event, $context];
             }
         };
@@ -103,7 +106,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
         self::assertCount(3, $handlers);
 
         /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
-        foreach($handlers as $handler)
+        foreach ($handlers as $handler)
         {
             /**
              * @var \ServiceBus\Common\MessageHandler\MessageHandler $handler
@@ -118,7 +121,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
             self::assertTrue($handler->messageHandler->hasArguments);
             self::assertCount(2, $handler->messageHandler->arguments);
 
-            if($handler->messageHandler->options->isCommandHandler)
+            if ($handler->messageHandler->options->isCommandHandler)
             {
                 self::assertSame(TestConfigurationLoaderMessage::class, $handler->messageHandler->messageClass);
                 self::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
@@ -139,7 +142,9 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
         }
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function loadHandlerWithNoArguments(): void
     {
         $this->expectException(InvalidHandlerArguments::class);
@@ -147,7 +152,8 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
             'The event handler must have at least 2 arguments: the message object (the first argument) and the context'
         );
 
-        $service = new class() {
+        $service = new class()
+        {
             #[CommandHandler]
             public function handle(): void
             {
@@ -157,29 +163,34 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
         $this->loader->load($service);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function loadHandlerWithWrongMessageArgument(): void
     {
         $this->expectException(InvalidHandlerArguments::class);
         $this->expectExceptionMessage('The first argument to the message handler must be the message object');
 
-        $service = new class() {
-
+        $service = new class()
+        {
             #[CommandHandler]
-            public function handle(string $qwerty, ServiceBusContext $context
-            ): void
-            {
+            public function handle(
+                string $qwerty,
+                ServiceBusContext $context
+            ): void {
             }
         };
 
         $this->loader->load($service);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withUnsupportedAttribute(): void
     {
-        $service = new class() {
-
+        $service = new class()
+        {
             #[UnsupportedAttribute]
             public function handle(): void
             {
@@ -189,8 +200,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
             public function firstEventListener(
                 TestConfigurationLoaderMessage $event,
                 ServiceBusContext $context
-            ): Promise
-            {
+            ): Promise {
                 return new Success([$event, $context]);
             }
         };
@@ -206,13 +216,16 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
         self::assertSame('firstEventListener', $handler->messageHandler->methodName);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withUnknownAttribute(): void
     {
         $this->expectException(ParseAttributesFailed::class);
 
         $service = new class()
         {
+            /** @noinspection PhpUndefinedClassInspection */
             #[AAsdfsf]
             public function handle(): void
             {

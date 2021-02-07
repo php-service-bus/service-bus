@@ -44,8 +44,7 @@ final class EventListener implements HasDescription, HasValidation
         ?string $description = null,
         bool $validationEnabled = false,
         array $validationGroups = [],
-    )
-    {
+    ) {
         $this->validation   = $validationEnabled ? new WithValidation($validationGroups) : null;
         $this->description = $description;
     }

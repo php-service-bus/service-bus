@@ -30,15 +30,16 @@ use function ServiceBus\Tests\removeDirectory;
  */
 final class ServiceBusKernelTest extends TestCase
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     private $cacheDirectory;
 
-    /** @var Bootstrap */
+    /**
+     * @var Bootstrap
+     */
     private $bootstrap;
 
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -72,9 +73,6 @@ final class ServiceBusKernelTest extends TestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -84,7 +82,9 @@ final class ServiceBusKernelTest extends TestCase
         unset($this->cacheDirectory);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function simpleConfigure(): void
     {
         $kernel = new ServiceBusKernel($this->bootstrap->boot());

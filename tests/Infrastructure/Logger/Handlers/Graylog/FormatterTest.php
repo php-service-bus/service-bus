@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -24,8 +24,6 @@ final class FormatterTest extends TestCase
 {
     /**
      * @test
-     *
-     * @throws \Throwable
      */
     public function format(): void
     {
@@ -47,7 +45,7 @@ final class FormatterTest extends TestCase
             ],
         ]);
 
-        static::assertSame(
+        self::assertSame(
             jsonDecode(\file_get_contents(__DIR__ . '/expected_format_result.json')),
             $result
         );

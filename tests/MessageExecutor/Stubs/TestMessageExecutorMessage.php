@@ -17,5 +17,4 @@ namespace ServiceBus\Tests\MessageExecutor\Stubs;
  */
 final class TestMessageExecutorMessage
 {
-
 }

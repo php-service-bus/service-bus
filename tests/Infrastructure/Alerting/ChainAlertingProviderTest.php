@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -27,7 +27,9 @@ use function Amp\File\put;
  */
 final class ChainAlertingProviderTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function flow(): void
     {
         $expectedFilePath = \sys_get_temp_dir() . '/' . \sha1(__METHOD__);
@@ -47,7 +49,7 @@ final class ChainAlertingProviderTest extends TestCase
             /** @var string */
             private $expectedFilePath;
 
-            public function __construct($expectedFilePath)
+            public function __construct(string $expectedFilePath)
             {
                 $this->expectedFilePath = $expectedFilePath;
             }
@@ -67,7 +69,7 @@ final class ChainAlertingProviderTest extends TestCase
 
         Promise\wait($chainProvider->send(new AlertMessage('qwerty')));
 
-        static::assertFileExists($expectedFilePath);
+        self::assertFileExists($expectedFilePath);
 
         @\unlink($expectedFilePath);
     }

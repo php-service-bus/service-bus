@@ -42,8 +42,7 @@ final class KernelContextFactory implements ContextFactory
         EndpointRouter $endpointRouter,
         DeliveryOptionsFactory $optionsFactory,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->endpointRouter = $endpointRouter;
         $this->optionsFactory = $optionsFactory;
         $this->logger         = $logger;

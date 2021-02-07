@@ -30,7 +30,9 @@ use function ServiceBus\Tests\filterLogMessages;
  */
 final class TelegramAlertingProviderTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function inTestEnvironment(): void
     {
         $httpClient       = new TestAlertingHttpClient(new Response());
@@ -44,7 +46,9 @@ final class TelegramAlertingProviderTest extends TestCase
         wait($alertingProvider->send(new AlertMessage('qwerty')));
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function successDelivery(): void
     {
         $httpClient       = new TestAlertingHttpClient(new Response());
@@ -57,10 +61,12 @@ final class TelegramAlertingProviderTest extends TestCase
 
         wait($alertingProvider->send(new AlertMessage('qwerty'), new AlertContext(false)));
 
-        static::assertNotNull($httpClient->requestData);
+        self::assertNotNull($httpClient->requestData);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function failedDelivery(): void
     {
         $logHandler = new TestHandler();
@@ -77,9 +83,9 @@ final class TelegramAlertingProviderTest extends TestCase
 
         wait($alertingProvider->send(new AlertMessage('qwerty'), new AlertContext(false)));
 
-        static::assertNotNull($httpClient->requestData);
+        self::assertNotNull($httpClient->requestData);
 
-        static::assertContains(
+        self::assertContains(
             'Delivery to Telegram failed: Incorrect server response code: 400',
             filterLogMessages($logHandler)
         );

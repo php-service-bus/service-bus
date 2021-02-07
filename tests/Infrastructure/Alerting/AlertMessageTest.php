@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -20,11 +20,13 @@ use ServiceBus\Infrastructure\Alerting\AlertMessage;
  */
 final class AlertMessageTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     */
     public function create(): void
     {
         $message = new AlertMessage('Some {keyword} example', ['{keyword}' => 'root']);
 
-        static::assertSame('Some root example', $message->content);
+        self::assertSame('Some root example', $message->content);
     }
 }

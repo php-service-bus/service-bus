@@ -27,7 +27,7 @@ final class SomeTestService
         $this->env = $env;
     }
 
-    public function env(): string
+    public function env(): ?string
     {
         return $this->env;
     }

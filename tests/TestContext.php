@@ -75,10 +75,9 @@ final class TestContext implements ServiceBusContext
         object $message,
         ?DeliveryOptions $deliveryOptions = null,
         ?OutcomeMessageMetadata $withMetadata = null
-    ): Promise
-    {
+    ): Promise {
         return call(
-            function() use ($message)
+            function () use ($message)
             {
                 $this->messages[] = $message;
             }
@@ -89,12 +88,11 @@ final class TestContext implements ServiceBusContext
         array $messages,
         ?DeliveryOptions $deliveryOptions = null,
         ?OutcomeMessageMetadata $withMetadata = null
-    ): Promise
-    {
+    ): Promise {
         return call(
-            function() use ($messages)
+            function () use ($messages)
             {
-                foreach($messages as $message)
+                foreach ($messages as $message)
                 {
                     $this->messages[] = $message;
                 }
@@ -105,7 +103,7 @@ final class TestContext implements ServiceBusContext
     public function return(int $secondsDelay = 3, ?OutcomeMessageMetadata $withMetadata = null): Promise
     {
         return call(
-            function()
+            function ()
             {
                 $this->messages[] = $this->incomeMessage;
             }

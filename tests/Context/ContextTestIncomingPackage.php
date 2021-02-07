@@ -10,7 +10,7 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Tests\EntryPoint;
+namespace ServiceBus\Tests\Context;
 
 use Amp\Promise;
 use Amp\Success;
@@ -20,7 +20,7 @@ use ServiceBus\Transport\Common\Package\IncomingPackage;
 /**
  *
  */
-final class EntryPointTestIncomingPackage implements IncomingPackage
+final class ContextTestIncomingPackage implements IncomingPackage
 {
     /**
      * @var string
@@ -37,69 +37,43 @@ final class EntryPointTestIncomingPackage implements IncomingPackage
      */
     private $payload;
 
-    public function __construct(
-        string $payload,
-        array $headers,
-        string $messageId
-    ) {
-        $this->payload = $payload;
+    public function __construct(string $id, array $headers, string $payload)
+    {
+        $this->id      = $id;
         $this->headers = $headers;
-        $this->id      = $messageId;
+        $this->payload = $payload;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function id(): string
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function origin(): DeliveryDestination
     {
-        return new class() implements DeliveryDestination
-        {
-        };
+        return new ContextTestDestination();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function payload(): string
     {
         return $this->payload;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function headers(): array
     {
         return $this->headers;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function ack(): Promise
     {
         return new Success();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function nack(bool $requeue, ?string $withReason = null): Promise
     {
         return new Success();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function reject(bool $requeue, ?string $withReason = null): Promise
     {
         return new Success();

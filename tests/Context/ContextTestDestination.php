@@ -10,11 +10,13 @@
 
 declare(strict_types = 1);
 
-namespace ServiceBus\Tests\Application\DependencyInjection\Compiler\Stubs;
+namespace ServiceBus\Tests\Context;
+
+use ServiceBus\Transport\Common\DeliveryDestination;
 
 /**
  *
  */
-final class CorrectServiceMessage
+final class ContextTestDestination implements DeliveryDestination
 {
 }

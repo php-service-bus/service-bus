@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -118,7 +118,9 @@ final class EntryPointTest extends TestCase
         };
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function listenWithNoMessages(): void
     {
         $entryPoint = new EntryPoint(
@@ -138,7 +140,9 @@ final class EntryPointTest extends TestCase
         self::assertContains('Subscriber stop command received', filterLogMessages($this->logHandler));
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function listWithToMatchMessages(): void
     {
         $messages = [];
@@ -166,12 +170,14 @@ final class EntryPointTest extends TestCase
         );
 
         $logMessages = filterLogMessages($this->logHandler);
-;
+
         self::assertContains('handled', $logMessages);
         self::assertContains('The maximum number of tasks has been reached', $logMessages);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function listenWithFailedExecution(): void
     {
         $entryPoint = new EntryPoint(
@@ -191,7 +197,9 @@ final class EntryPointTest extends TestCase
         self::assertContains('ups...', filterLogMessages($this->logHandler));
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function listenWithAwaitUnfinishedTasks(): void
     {
         $entryPoint = new EntryPoint(
@@ -211,7 +219,9 @@ final class EntryPointTest extends TestCase
         self::assertContains('Waiting for the completion of all tasks taken', filterLogMessages($this->logHandler));
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function listenWithExecutionTimeout(): void
     {
         $entryPoint = new EntryPoint(
@@ -233,7 +243,7 @@ final class EntryPointTest extends TestCase
 
         foreach (filterLogMessages($this->logHandler) as $message)
         {
-            if (\strpos($message, 'operation was cancelled') !== false)
+            if (\str_contains($message, 'operation was cancelled'))
             {
                 return;
             }

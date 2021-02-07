@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -26,6 +26,7 @@ use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use function Amp\Promise\wait;
 use function ServiceBus\Common\jsonEncode;
+use function ServiceBus\Common\uuid;
 use function ServiceBus\Tests\filterLogMessages;
 
 /**
@@ -33,21 +34,26 @@ use function ServiceBus\Tests\filterLogMessages;
  */
 final class DefaultEntryPointProcessorTest extends TestCase
 {
-    /** @var TestHandler */
+    /**
+     * @var TestHandler
+     */
     private $logHandler;
 
-    /** @var LoggerInterface */
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
-    /** @var EntryPointTestContextFactory */
+    /**
+     * @var EntryPointTestContextFactory
+     */
     private $contextFactory;
 
-    /** @var IncomingMessageDecoder */
+    /**
+     * @var IncomingMessageDecoder
+     */
     private $messageDecoder;
 
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -66,7 +72,9 @@ final class DefaultEntryPointProcessorTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function decodeFailed(): void
     {
         $processor = new DefaultEntryPointProcessor(
@@ -76,12 +84,20 @@ final class DefaultEntryPointProcessorTest extends TestCase
             $this->logger
         );
 
-        wait($processor->handle(new EntryPointTestIncomingPackage('qwerty')));
+        $package = new EntryPointTestIncomingPackage(
+            payload: 'qwerty',
+            headers: [ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE => EntryPointTestMessage::class],
+            messageId: uuid()
+        );
+
+        wait($processor->handle($package));
 
         self::assertContains('Failed to denormalize the message', filterLogMessages($this->logHandler));
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withoutHandlers(): void
     {
         $processor = new DefaultEntryPointProcessor(
@@ -94,7 +110,8 @@ final class DefaultEntryPointProcessorTest extends TestCase
         $payload = self::serialize(new EntryPointTestMessage('id'));
         $package = new EntryPointTestIncomingPackage(
             payload: $payload,
-            headers: [ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE => EntryPointTestMessage::class]
+            headers: [ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE => EntryPointTestMessage::class],
+            messageId: uuid()
         );
 
         wait($processor->handle($package));
@@ -105,7 +122,9 @@ final class DefaultEntryPointProcessorTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function withFailedHandler(): void
     {
         $router = new Router();
@@ -136,7 +155,8 @@ final class DefaultEntryPointProcessorTest extends TestCase
         $payload = self::serialize(new EntryPointTestMessage('id'));
         $package = new EntryPointTestIncomingPackage(
             payload: $payload,
-            headers: [ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE => EntryPointTestMessage::class]
+            headers: [ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE => EntryPointTestMessage::class],
+            messageId: uuid()
         );
 
         wait($processor->handle($package));
@@ -144,7 +164,9 @@ final class DefaultEntryPointProcessorTest extends TestCase
         self::assertContains('Some message execution failed', filterLogMessages($this->logHandler));
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function successExecution(): void
     {
         $variable = 'processing';
@@ -177,7 +199,8 @@ final class DefaultEntryPointProcessorTest extends TestCase
         $payload = self::serialize(new EntryPointTestMessage('id'));
         $package = new EntryPointTestIncomingPackage(
             payload: $payload,
-            headers: [ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE => EntryPointTestMessage::class]
+            headers: [ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE => EntryPointTestMessage::class],
+            messageId: uuid()
         );
 
         wait($processor->handle($package));

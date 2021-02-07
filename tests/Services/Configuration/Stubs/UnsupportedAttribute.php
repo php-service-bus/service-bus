@@ -15,5 +15,4 @@ namespace ServiceBus\Tests\Services\Configuration\Stubs;
 #[\Attribute(\Attribute::TARGET_METHOD)]
 final class UnsupportedAttribute
 {
-
 }

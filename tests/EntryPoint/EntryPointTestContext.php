@@ -45,8 +45,8 @@ final class EntryPointTestContext implements ServiceBusContext
 
     public function __construct(LoggerInterface $logger, object $message, IncomingMessageMetadata $metadata)
     {
-        $this->logger = $logger;
-        $this->message = $message;
+        $this->logger   = $logger;
+        $this->message  = $message;
         $this->metadata = $metadata;
     }
 
@@ -55,13 +55,19 @@ final class EntryPointTestContext implements ServiceBusContext
         return null;
     }
 
-    public function delivery(object $message, ?DeliveryOptions $deliveryOptions = null, ?OutcomeMessageMetadata $withMetadata = null): Promise
-    {
+    public function delivery(
+        object $message,
+        ?DeliveryOptions $deliveryOptions = null,
+        ?OutcomeMessageMetadata $withMetadata = null
+    ): Promise {
         return new Success();
     }
 
-    public function deliveryBulk(array $messages, ?DeliveryOptions $deliveryOptions = null, ?OutcomeMessageMetadata $withMetadata = null): Promise
-    {
+    public function deliveryBulk(
+        array $messages,
+        ?DeliveryOptions $deliveryOptions = null,
+        ?OutcomeMessageMetadata $withMetadata = null
+    ): Promise {
         return new Success();
     }
 
@@ -72,7 +78,7 @@ final class EntryPointTestContext implements ServiceBusContext
 
     public function logger(): ContextLogger
     {
-       return new DefaultContextLogger($this->logger, $this->message, $this->metadata());
+        return new DefaultContextLogger($this->logger, $this->message, $this->metadata());
     }
 
     public function headers(): array
@@ -82,6 +88,6 @@ final class EntryPointTestContext implements ServiceBusContext
 
     public function metadata(): IncomingMessageMetadata
     {
-       return $this->metadata;
+        return $this->metadata;
     }
 }

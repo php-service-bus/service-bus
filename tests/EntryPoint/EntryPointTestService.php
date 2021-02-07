@@ -21,6 +21,7 @@ use function Amp\delay;
  */
 final class EntryPointTestService
 {
+    /** @noinspection PhpUnusedParameterInspection */
     #[CommandHandler]
     public function handle(
         EntryPointTestMessage $command,

@@ -19,7 +19,6 @@ use ServiceBus\Common\MessageHandler\MessageHandler;
 use ServiceBus\Services\Attributes\CommandHandler;
 use ServiceBus\Services\Attributes\EventListener;
 use ServiceBus\Services\Attributes\Options\HasCancellation;
-use ServiceBus\Services\Attributes\Options\HasDescription;
 use ServiceBus\Services\Attributes\Options\HasValidation;
 use ServiceBus\Services\Exceptions\InvalidHandlerArguments;
 use ServiceBus\Services\Exceptions\UnableCreateClosure;
@@ -44,7 +43,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
         /** @psalm-var \SplObjectStorage<ServiceMessageHandler, int> $messageProcessors */
         $messageProcessors = new \SplObjectStorage();
 
-        foreach($this->readMethodLevelAttributes($service) as $methodLevelAnnotation)
+        foreach ($this->readMethodLevelAttributes($service) as $methodLevelAnnotation)
         {
             /** @var CommandHandler|EventListener $attribute */
             $attribute = $methodLevelAnnotation->attribute;
@@ -86,28 +85,27 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
         EventListener | CommandHandler $attribute,
         bool $isCommandHandler,
         ?string $description
-    ): DefaultHandlerOptions
-    {
+    ): DefaultHandlerOptions {
         $factoryMethod = $isCommandHandler ? 'createForCommandHandler' : 'createForEventListener';
 
         /** @var DefaultHandlerOptions $options */
         $options = DefaultHandlerOptions::{$factoryMethod}($description);
 
-        if($attribute instanceof HasValidation)
+        if ($attribute instanceof HasValidation)
         {
             $validationConfiguration = $attribute->validation();
 
-            if($validationConfiguration !== null)
+            if ($validationConfiguration !== null)
             {
                 $options = $options->enableValidation($validationConfiguration->groups);
             }
         }
 
-        if($attribute instanceof HasCancellation)
+        if ($attribute instanceof HasCancellation)
         {
             $cancellationConfiguration = $attribute->cancellation();
 
-            if($cancellationConfiguration !== null)
+            if ($cancellationConfiguration !== null)
             {
                 $options = $options->limitExecutionTime($cancellationConfiguration->timeout);
             }
@@ -125,7 +123,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
      */
     private function extractMessageClass(array $parameters): string
     {
-        if(\count($parameters) === 0)
+        if (\count($parameters) === 0)
         {
             throw InvalidHandlerArguments::emptyArguments();
         }
@@ -133,7 +131,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
         /** @var \ReflectionParameter $firstArgument */
         $firstArgument = $parameters[0];
 
-        if($firstArgument->getType() !== null)
+        if ($firstArgument->getType() !== null)
         {
             /** @var \ReflectionNamedType $type */
             $type = $firstArgument->getType();
@@ -142,7 +140,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
             $className = $type->getName();
 
             /** @psalm-suppress RedundantConditionGivenDocblockType */
-            if(\class_exists($className))
+            if (\class_exists($className))
             {
                 return $className;
             }
@@ -160,7 +158,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
         $closure = $reflectionMethod->getClosure($service);
 
         // @codeCoverageIgnoreStart
-        if($closure === null)
+        if ($closure === null)
         {
             throw new UnableCreateClosure(
                 \sprintf(
@@ -185,9 +183,9 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
         $readAttributes = $this->attributesReader->extract(\get_class($service));
 
         /** @var MethodLevel $methodLevelAttribute */
-        foreach($readAttributes->methodLevelCollection as $methodLevelAttribute)
+        foreach ($readAttributes->methodLevelCollection as $methodLevelAttribute)
         {
-            if($this->supports($methodLevelAttribute->attribute))
+            if ($this->supports($methodLevelAttribute->attribute))
             {
                 $result[] = $methodLevelAttribute;
             }

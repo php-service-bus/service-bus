@@ -54,8 +54,7 @@ final class CommandHandler implements HasDescription, HasValidation, HasCancella
         bool $validationEnabled = false,
         array $validationGroups = [],
         ?int $executionTimeout = null
-    )
-    {
+    ) {
         $this->description  = $description;
         $this->validation   = $validationEnabled ? new WithValidation($validationGroups) : null;
         $this->cancellation = $executionTimeout ? new WithCancellation($executionTimeout) : null;
