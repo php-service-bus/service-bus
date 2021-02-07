@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Application\DependencyInjection\Compiler\Logger;
 
@@ -24,7 +24,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class StdOutLoggerCompilerPass implements CompilerPassInterface
 {
-    /** @var int  */
+    /**
+     * @var int
+     */
     private $logLevel;
 
     public function __construct(int $logLevel = Logger::DEBUG)
@@ -32,28 +34,22 @@ final class StdOutLoggerCompilerPass implements CompilerPassInterface
         $this->logLevel = $logLevel;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Throwable
-     */
     public function process(ContainerBuilder $container): void
     {
         $container->setParameter('service_bus.logger.echo.log_level', $this->logLevel);
 
-        $container->addDefinitions(
-            [
-                StdOutHandler::class => (new Definition(StdOutHandler::class))->setArguments(['%service_bus.logger.echo.log_level%']),
-            ]
-        );
+        $definition = (new Definition(StdOutHandler::class))
+            ->setArguments(['%service_bus.logger.echo.log_level%']);
+
+        $container->addDefinitions([StdOutHandler::class => $definition]);
 
         (new LoggerCompilerPass())->process($container);
 
         $loggerDefinition = $container->getDefinition('service_bus.logger');
 
         $loggerDefinition->addMethodCall(
-            'pushHandler',
-            [new Reference(StdOutHandler::class)]
+            method: 'pushHandler',
+            arguments: [new Reference(StdOutHandler::class)]
         );
     }
 }

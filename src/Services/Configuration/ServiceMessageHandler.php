@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Services\Configuration;
 
@@ -22,10 +22,14 @@ final class ServiceMessageHandler
     private const TYPE_EVENT_LISTENER  = 0;
     private const TYPE_COMMAND_HANDLER = 1;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     private $type;
 
-    /** @var MessageHandler */
+    /**
+     * @var MessageHandler
+     */
     public $messageHandler;
 
     public static function createCommandHandler(MessageHandler $messageHandler): self

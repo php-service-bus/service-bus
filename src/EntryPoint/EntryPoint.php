@@ -3,17 +3,16 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\EntryPoint;
 
 use Amp\CancellationToken;
-use Amp\CancellationTokenSource;
 use Amp\NullCancellationToken;
 use Amp\TimeoutCancellationToken;
 use Amp\TimeoutException;
@@ -59,7 +58,9 @@ final class EntryPoint
      */
     private $processor;
 
-    /** @var LoggerInterface */
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
     /**
@@ -186,7 +187,7 @@ final class EntryPoint
 
     private function deferExecution(IncomingPackage $package): void
     {
-        $this->currentTasksInProgress[$package->id()] = (string) $package->traceId();
+        $this->currentTasksInProgress[$package->id()] = $package->id();
 
         Loop::defer(
             function () use ($package): void
@@ -242,7 +243,7 @@ final class EntryPoint
                 throwableDetails($throwable),
                 [
                     'packageId' => $package->id(),
-                    'traceId'   => $package->traceId(),
+                    'headers'   => $package->headers(),
                 ]
             )
         );

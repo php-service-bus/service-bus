@@ -3,20 +3,20 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Endpoint;
 
+use ServiceBus\Metadata\ServiceBusMetadata;
 use function Amp\call;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
-use ServiceBus\Common\Endpoint\DeliveryOptions;
 use ServiceBus\Infrastructure\Retry\OperationRetryWrapper;
 use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Exceptions\SendMessageFailed;
@@ -28,13 +28,19 @@ use ServiceBus\Transport\Common\Transport;
  */
 final class MessageDeliveryEndpoint implements Endpoint
 {
-    /** @var Transport */
+    /**
+     * @var Transport
+     */
     private $transport;
 
-    /** @var DeliveryDestination */
+    /**
+     * @var DeliveryDestination
+     */
     private $destination;
 
-    /** @var EndpointEncoder */
+    /**
+     * @var EndpointEncoder
+     */
     private $encoder;
 
     /**
@@ -65,17 +71,11 @@ final class MessageDeliveryEndpoint implements Endpoint
         $this->deliveryRetryHandler = $deliveryRetryHandler ?? new OperationRetryWrapper();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function name(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function withNewDeliveryDestination(DeliveryDestination $destination): Endpoint
     {
         return new self(
@@ -87,53 +87,76 @@ final class MessageDeliveryEndpoint implements Endpoint
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delivery(object $message, DeliveryOptions $options): Promise
+    public function delivery(DeliveryPackage $package): Promise
     {
-        $encoded = $this->encoder->handler->encode($message);
+        return $this->deferredDelivery(
+            $this->createOutboundPackage(
+                package: $package,
+                destination: $this->destination
+            )
+        );
+    }
 
-        $options->withHeader(Transport::SERVICE_BUS_SERIALIZER_HEADER, $this->encoder->tag);
+    public function deliveryBulk(array $packages): Promise
+    {
+        $outboundPackages = \array_map(
+            function (DeliveryPackage $package): OutboundPackage
+            {
+                return $this->createOutboundPackage(
+                    package: $package,
+                    destination: $this->destination
+                );
+            },
+            $packages
+        );
 
         return $this->deferredDelivery(
-            self::createPackage($encoded, $options, $this->destination)
+            ...$outboundPackages
         );
     }
 
     /**
      * Create outbound package with specified parameters.
      */
-    private static function createPackage(
-        string $payload,
-        DeliveryOptions $options,
+    private function createOutboundPackage(
+        DeliveryPackage $package,
         DeliveryDestination $destination
     ): OutboundPackage {
+        $payload = $this->encoder->handler->encode($package->message);
+
+        /** @psalm-var array<string, int|float|string|null> $headers */
+        $headers = \array_merge(
+            $package->options->headers(),
+            $package->metadata->variables(),
+            [
+                ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE    => \get_class($package->message),
+                ServiceBusMetadata::SERVICE_BUS_SERIALIZER_TYPE => $this->encoder->tag
+            ]
+        );
+
         return new OutboundPackage(
-            $payload,
-            $options->headers(),
-            $destination,
-            $options->traceId(),
-            $options->isPersistent(),
-            // @todo: fixme
-            false,
-            false,
-            $options->expirationAfter()
+            payload: $payload,
+            headers: $headers,
+            destination: $destination,
+            persist: $package->options->isPersistent(),
+            mandatory: false,
+            immediate: $package->options->isHighestPriority(),
+            expiredAfter: $package->options->expirationAfter()
         );
     }
 
-    private function deferredDelivery(OutboundPackage $package): Promise
+    private function deferredDelivery(OutboundPackage ...$packages): Promise
     {
         $deferred = new Deferred();
 
         Loop::defer(
-            function () use ($package, $deferred): void
+            function () use ($packages, $deferred): void
             {
                 $promise = call(
                     $this->deliveryRetryHandler,
-                    function () use ($package): \Generator
+                    function () use ($packages): \Generator
                     {
-                        yield $this->transport->send($package);
+                        yield $this->transport->send(...$packages);
                     },
                     SendMessageFailed::class
                 );

@@ -11,7 +11,7 @@
   "authors": [
     {
       "name": "Masiukevich Maksim",
-      "email": "dev@async-php.com",
+      "email": "contacts@desperado.dev",
       "homepage": "https://github.com/mmasiukevich",
       "role": "Maintainer"
     }
@@ -24,51 +24,39 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "ServiceBus\\Common\\Tests\\": "vendor/php-service-bus/common/tests",
-      "ServiceBus\\AnnotationsReader\\Tests\\": "vendor/php-service-bus/annotations-reader/tests",
-      "ServiceBus\\MessageSerializer\\Tests\\": "vendor/php-service-bus/message-serializer/tests",
-      "ServiceBus\\MessagesRouter\\Tests\\": "vendor/php-service-bus/messages-router/tests",
-      "ServiceBus\\Transport\\Common\\Tests\\": "vendor/php-service-bus/transport-common/tests",
-      "ServiceBus\\Transport\\Amqp\\Tests\\": "vendor/php-service-bus/transport-amqp/tests",
-      "ServiceBus\\Transport\\PhpInnacle\\Tests\\": "vendor/php-service-bus/transport-phpinnacle/tests",
-      "ServiceBus\\Transport\\Module\\Tests\\": "vendor/php-service-bus/module-phpinnacle-transport/tests",
-      "ServiceBus\\Storage\\Common\\Tests\\": "vendor/php-service-bus/storage-common/tests",
       "ServiceBus\\Tests\\": "tests/"
-    },
-    "files": [
-      "tests/functions.php"
-    ]
+    }
   },
   "require": {
-    "php": ">=7.4",
+    "php": ">=8.0",
     "ext-pcntl": "*",
     "ext-json": "*",
     "ext-zlib": "*",
-    "php-service-bus/http-client": "v4.2.*",
-    "php-service-bus/common": "v4.1.*",
-    "php-service-bus/transport": "v4.1.*",
-    "php-service-bus/storage": "v4.1.*",
-    "php-service-bus/mutex": "v4.1.*",
-    "php-service-bus/message-serializer": "v4.1.*",
-    "php-service-bus/annotations-reader":"v4.1.*",
-    "php-service-bus/messages-router": "v4.1.*",
-    "php-service-bus/telegram-bot-core": "v4.1.*",
-    "symfony/dependency-injection": "v5.1.*",
-    "symfony/config": "v5.1.*",
-    "symfony/dotenv": "v5.1.*",
-    "symfony/yaml": "v5.1.*",
-    "symfony/validator": "v5.1.*",
-    "symfony/error-handler": "v5.1.*",
+    "php-service-bus/http-client": "v5.0.*",
+    "php-service-bus/common": "v5.0.*",
+    "php-service-bus/transport": "v5.0.*",
+    "php-service-bus/storage": "v5.0.*",
+    "php-service-bus/mutex": "v5.0.*",
+    "php-service-bus/message-serializer": "v5.0.*",
+    "php-service-bus/annotations-reader":"v5.0.*",
+    "php-service-bus/messages-router": "v5.0.*",
+    "php-service-bus/telegram-bot-core": "v5.0.*",
+    "symfony/dependency-injection": "v5.2.*",
+    "symfony/config": "v5.2.*",
+    "symfony/dotenv": "v5.2.*",
+    "symfony/yaml": "v5.2.*",
+    "symfony/validator": "v5.2.*",
+    "symfony/error-handler": "v5.2.*",
     "amphp/log": "v1.1.*",
     "amphp/file": "v1.0.*",
     "amphp/parallel": "v1.4.*",
     "kelunik/retry": "v1.0.*"
   },
   "require-dev": {
-    "php-service-bus/code-style-config": "v1.2.*",
+    "php-service-bus/code-style-config": "v1.3.*",
     "kelunik/loop-block": "v1.0.*",
-    "phpunit/phpunit": "v9.2.*",
-    "vimeo/psalm": "v3.13.*",
+    "phpunit/phpunit": "v9.5.*",
+    "vimeo/psalm": "v4.4.*",
     "phpstan/phpstan": "v0.12.*"
   },
   "prefer-stable": true,

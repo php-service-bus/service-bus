@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Infrastructure\Logger\Handlers\StdOut;
 
@@ -38,9 +38,6 @@ final class StdOutFormatter extends LineFormatter
         parent::__construct($format);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function format(array $record): string
     {
         $record['level_name'] = $this->ansifyLevel((string) $record['level_name']);
@@ -49,9 +46,6 @@ final class StdOutFormatter extends LineFormatter
         return parent::format($record);
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function toJson($data, bool $ignoreErrors = false): string
     {
         if (\is_array($data))

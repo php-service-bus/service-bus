@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\ArgumentResolvers;
 
@@ -21,14 +21,12 @@ use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 interface ArgumentResolver
 {
     /**
-     * Whether this resolver can resolve the value for the given Argument.
+     * Whether this resolver can resolve the value for the given argument.
      */
     public function supports(MessageHandlerArgument $argument): bool;
 
     /**
      * Resolve argument value.
-     *
-     * @return mixed
      */
-    public function resolve(object $message, ServiceBusContext $context, MessageHandlerArgument $argument);
+    public function resolve(object $message, ServiceBusContext $context, MessageHandlerArgument $argument): mixed;
 }

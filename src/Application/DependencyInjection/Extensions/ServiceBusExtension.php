@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Application\DependencyInjection\Extensions;
 
@@ -23,8 +23,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 final class ServiceBusExtension extends Extension
 {
     /**
-     * {@inheritdoc}
-     *
      * @psalm-suppress MoreSpecificImplementedParamType
      * @psalm-param    array<string, mixed> $configs
      *

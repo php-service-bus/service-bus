@@ -3,17 +3,16 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Endpoint;
 
 use Amp\Promise;
-use ServiceBus\Common\Endpoint\DeliveryOptions;
 use ServiceBus\Transport\Common\DeliveryDestination;
 
 /**
@@ -36,5 +35,14 @@ interface Endpoint
      *
      * @throws \ServiceBus\MessageSerializer\Exceptions\EncodeMessageFailed
      */
-    public function delivery(object $message, DeliveryOptions $options): Promise;
+    public function delivery(DeliveryPackage $package): Promise;
+
+    /**
+     * Send messages to endpoint.
+     *
+     * @param DeliveryPackage[] $packages
+     *
+     * @throws \ServiceBus\MessageSerializer\Exceptions\EncodeMessageFailed
+     */
+    public function deliveryBulk(array $packages): Promise;
 }

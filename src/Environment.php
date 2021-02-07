@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus;
 
@@ -19,17 +19,19 @@ final class Environment
 {
     private const ENVIRONMENT_PRODUCTION = 'prod';
 
-    private const ENVIRONMENT_SANDBOX    = 'dev';
+    private const ENVIRONMENT_SANDBOX = 'dev';
 
-    private const ENVIRONMENT_TESTING    = 'test';
+    private const ENVIRONMENT_TESTING = 'test';
 
-    private const LIST                   = [
+    private const LIST                = [
         self::ENVIRONMENT_PRODUCTION,
         self::ENVIRONMENT_SANDBOX,
         self::ENVIRONMENT_TESTING,
     ];
 
-    /** @var string  */
+    /**
+     * @var string
+     */
     private $environment;
 
     /**
@@ -125,9 +127,8 @@ final class Environment
      */
     private static function validateEnvironment(string $specifiedEnvironment): void
     {
-        if ('' === $specifiedEnvironment ||
-            false === \in_array($specifiedEnvironment, self::LIST, true)
-        ) {
+        if (\in_array($specifiedEnvironment, self::LIST, true) === false)
+        {
             throw new \LogicException(
                 \sprintf(
                     'Provided incorrect value of the environment: "%s". Allowable values: %s',

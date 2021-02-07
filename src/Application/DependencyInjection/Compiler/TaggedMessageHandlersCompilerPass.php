@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Application\DependencyInjection\Compiler;
 
@@ -25,14 +25,11 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Exception
+     * @throws \ReflectionException
      */
     public function process(ContainerBuilder $container): void
     {
-        $servicesReference = [];
-        $serviceIds        = [];
+        $servicesReference = $serviceIds = [];
 
         /**
          * @psalm-var array<string, array<mixed, string>> $taggedServices
@@ -46,7 +43,11 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 
             if ($serviceClass !== null)
             {
-                $this->collectServiceDependencies($serviceClass, $container, $servicesReference);
+                $this->collectServiceDependencies(
+                    serviceClass: $serviceClass,
+                    container: $container,
+                    servicesReference: $servicesReference
+                );
 
                 $serviceIds[] = $serviceClass;
 
@@ -56,7 +57,10 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
             }
         }
 
-        $container->setParameter('service_bus.services_map', $serviceIds);
+        $container->setParameter(
+            name: 'service_bus.services_map',
+            value: $serviceIds
+        );
 
         $container
             ->register('service_bus.services_locator', ServiceLocator::class)
@@ -67,12 +71,13 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
     /**
      * @psalm-param class-string $serviceClass
      *
-     * @param array $servicesReference (passed by reference)
-     *
      * @throws \ReflectionException
      */
-    private function collectServiceDependencies(string $serviceClass, ContainerBuilder $container, array &$servicesReference): void
-    {
+    private function collectServiceDependencies(
+        string $serviceClass,
+        ContainerBuilder $container,
+        array &$servicesReference
+    ): void {
         $reflectionClass = new \ReflectionClass($serviceClass);
 
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod)
@@ -90,7 +95,9 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 
                 if (self::supportedType($parameter) && $container->has($reflectionTypeName))
                 {
-                    $servicesReference[$reflectionTypeName] = new ServiceClosureArgument(new Reference($reflectionTypeName));
+                    $servicesReference[$reflectionTypeName] = new ServiceClosureArgument(
+                        new Reference($reflectionTypeName)
+                    );
                 }
             }
         }

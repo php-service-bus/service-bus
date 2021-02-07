@@ -3,20 +3,20 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\EntryPoint;
 
 use Psr\Container\ContainerInterface;
+use ServiceBus\Common\Context\IncomingMessageMetadata;
 use ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder;
 use ServiceBus\MessageSerializer\MessageDecoder;
-use ServiceBus\Transport\Common\Package\IncomingPackage;
-use ServiceBus\Transport\Common\Transport;
+use ServiceBus\Metadata\ServiceBusMetadata;
 
 /**
  * Decoding of incoming messages.
@@ -38,7 +38,9 @@ final class IncomingMessageDecoder
      */
     private $decodersConfiguration;
 
-    /** @var ContainerInterface  */
+    /**
+     * @var ContainerInterface
+     */
     private $decodersLocator;
 
     /**
@@ -50,19 +52,27 @@ final class IncomingMessageDecoder
         $this->decodersLocator       = $decodersLocator;
     }
 
-    /**
-     * Decodes a packet using a handler defined in the headers (or uses a default decoder).
-     *
-     * @throws \ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder Could not find decoder in the service container
-     * @throws \ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed
-     */
-    public function decode(IncomingPackage $package): object
+    public function decode(string $payload, IncomingMessageMetadata $metadata): object
     {
-        $encoderKey = $this->extractEncoderKey($package->headers());
+        $encoderKey = (string) $metadata->get(
+            key: ServiceBusMetadata::SERVICE_BUS_SERIALIZER_TYPE,
+            default: self::DEFAULT_DECODER
+        );
+
+        /** @psalm-var class-string|null $toMessageClass */
+        $toMessageClass = $metadata->get(ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE);
+
+        if ($toMessageClass === null)
+        {
+            throw new \RuntimeException('Unable to find message classFQN declaration');
+        }
 
         return $this
             ->findDecoderByKey($encoderKey)
-            ->decode($package->payload());
+            ->decode(
+                serializedMessage: $payload,
+                messageClass: $toMessageClass
+            );
     }
 
     /**
@@ -70,12 +80,9 @@ final class IncomingMessageDecoder
      */
     private function findDecoderByKey(string $encoderKey): MessageDecoder
     {
-        /** @var string $encoderContainerId */
-        $encoderContainerId = !empty($this->decodersConfiguration[$encoderKey])
-            ? $this->decodersConfiguration[$encoderKey]
-            : self::DEFAULT_DECODER;
-
-        return $this->obtainDecoder($encoderContainerId);
+        return $this->obtainDecoder(
+            $this->decodersConfiguration[$encoderKey] ?? self::DEFAULT_DECODER
+        );
     }
 
     /**
@@ -94,13 +101,5 @@ final class IncomingMessageDecoder
         throw new UnexpectedMessageDecoder(
             \sprintf('Could not find decoder "%s" in the service container', $decoderId)
         );
-    }
-
-    private function extractEncoderKey(array $headers): string
-    {
-        /** @var string $encoderKey */
-        $encoderKey = $headers[Transport::SERVICE_BUS_SERIALIZER_HEADER] ?? self::DEFAULT_DECODER;
-
-        return $encoderKey;
     }
 }

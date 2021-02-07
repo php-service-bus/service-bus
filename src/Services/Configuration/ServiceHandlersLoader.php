@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Services\Configuration;
 
@@ -23,7 +23,6 @@ interface ServiceHandlersLoader
      * @throws \ServiceBus\Services\Exceptions\InvalidHandlerArguments
      * @throws \ServiceBus\Services\Exceptions\InvalidEventType
      * @throws \ServiceBus\Services\Exceptions\UnableCreateClosure
-     * @throws \ServiceBus\AnnotationsReader\Exceptions\ParseAnnotationFailed
      */
     public function load(object $service): \SplObjectStorage;
 }

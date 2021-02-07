@@ -10,15 +10,15 @@
 
 declare(strict_types = 0);
 
-namespace ServiceBus\Application\Exceptions;
+namespace ServiceBus\Services\Attributes;
 
 /**
  *
  */
-final class ConfigurationCheckFailed extends \LogicException
+final class WithValidation
 {
-    public static function emptyEntryPointName(): self
-    {
-        return new self('Entry point name must be specified');
-    }
+    /**
+     * @var string[]
+     */
+    public $groups = [];
 }

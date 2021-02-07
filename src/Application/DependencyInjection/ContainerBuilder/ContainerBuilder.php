@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Application\DependencyInjection\ContainerBuilder;
 
@@ -40,7 +40,9 @@ final class ContainerBuilder
      */
     private $parameters;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $entryPointName;
 
     /**
@@ -64,18 +66,22 @@ final class ContainerBuilder
      */
     private $modules;
 
-    /** @var Environment */
+    /**
+     * @var Environment
+     */
     private $environment;
 
-    /** @var string|null */
-    private $cacheDirectory = null;
+    /**
+     * @var string|null
+     */
+    private $cacheDirectory;
 
     /**
      * ConfigCache caches arbitrary content in files on disk.
      *
      * @var ConfigCache|null
      */
-    private $configCache = null;
+    private $configCache ;
 
     public function __construct(string $entryPointName, Environment $environment)
     {
@@ -145,9 +151,9 @@ final class ContainerBuilder
      */
     public function hasActualContainer(): bool
     {
-        if (false === $this->environment->isDebug())
+        if ($this->environment->isDebug() === false)
         {
-            return true === $this->configCache()->isFresh();
+            return $this->configCache()->isFresh();
         }
 
         return false;
@@ -167,7 +173,10 @@ final class ContainerBuilder
         /** @psalm-var class-string<\Symfony\Component\DependencyInjection\Container> $containerClassName */
         $containerClassName = $this->getContainerClassName();
 
-        /** @var ContainerInterface $container */
+        /**
+         * @psalm-suppress UnsafeInstantiation
+         * @var ContainerInterface $container
+         */
         $container = new $containerClassName();
 
         return $container;
@@ -193,7 +202,10 @@ final class ContainerBuilder
         /** @var Extension $extension */
         foreach ($this->extensions as $extension)
         {
-            $extension->load($this->parameters, $containerBuilder);
+            $extension->load(
+                configs: $this->parameters,
+                container: $containerBuilder
+            );
         }
 
         /** @var CompilerPassInterface $compilerPass */
@@ -237,7 +249,10 @@ final class ContainerBuilder
 
         if (\is_string($content))
         {
-            $this->configCache()->write($content, $builder->getResources());
+            $this->configCache()->write(
+                content: $content,
+                metadata: $builder->getResources()
+            );
         }
     }
 
@@ -246,9 +261,12 @@ final class ContainerBuilder
      */
     private function configCache(): ConfigCache
     {
-        if (null === $this->configCache)
+        if ($this->configCache === null)
         {
-            $this->configCache = new ConfigCache($this->getContainerClassPath(), $this->environment->isDebug());
+            $this->configCache = new ConfigCache(
+                file: $this->getContainerClassPath(),
+                debug: $this->environment->isDebug()
+            );
         }
 
         return $this->configCache;
@@ -261,7 +279,7 @@ final class ContainerBuilder
     {
         $cacheDirectory = (string) $this->cacheDirectory;
 
-        if ('' === $cacheDirectory && false === \is_writable($cacheDirectory))
+        if ($cacheDirectory === '' && false === \is_writable($cacheDirectory))
         {
             $cacheDirectory = \sys_get_temp_dir();
         }

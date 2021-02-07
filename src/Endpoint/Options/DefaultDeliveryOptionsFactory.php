@@ -8,26 +8,19 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Endpoint\Options;
 
 use ServiceBus\Common\Endpoint\DeliveryOptions;
-use function ServiceBus\Common\uuid;
 
 /**
  *
  */
 final class DefaultDeliveryOptionsFactory implements DeliveryOptionsFactory
 {
-    /**
-     * @inheritDoc
-     */
-    public function create($traceId, ?string $messageClass): DeliveryOptions
+    public function create(?string $messageClass = null): DeliveryOptions
     {
-        $options = DefaultDeliveryOptions::create();
-        $options->withTraceId($traceId ?: uuid());
-
-        return $options;
+        return DefaultDeliveryOptions::create();
     }
 }

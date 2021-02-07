@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Infrastructure\Alerting;
 
@@ -20,7 +20,9 @@ use function Amp\call;
  */
 final class ChainAlertingProvider implements AlertingProvider
 {
-    /** @var AlertingProvider[] */
+    /**
+     * @var AlertingProvider[]
+     */
     private $providers;
 
     /**
@@ -44,7 +46,7 @@ final class ChainAlertingProvider implements AlertingProvider
                     {
                         yield $alertingProvider->send($message, $context);
                     }
-                    catch (\Throwable $throwable)
+                    catch (\Throwable)
                     {
                         /** Not interests */
                     }

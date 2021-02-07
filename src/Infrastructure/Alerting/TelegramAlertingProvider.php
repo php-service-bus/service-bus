@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Infrastructure\Alerting;
 
@@ -32,19 +32,29 @@ use function ServiceBus\Common\throwableMessage;
  */
 final class TelegramAlertingProvider implements AlertingProvider
 {
-    /** @var InteractionsProvider */
+    /**
+     * @var InteractionsProvider
+     */
     private $interactionsProvider;
 
-    /** @var TelegramCredentials */
+    /**
+     * @var TelegramCredentials
+     */
     private $credentials;
 
-    /** @var Environment */
+    /**
+     * @var Environment
+     */
     private $environment;
 
-    /** @var LoggerInterface */
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $defaultChatId;
 
     public function __construct(
@@ -79,8 +89,10 @@ final class TelegramAlertingProvider implements AlertingProvider
                         ? (string) $context->toTopic
                         : $this->defaultChatId;
 
-                    $method = SendMessage::create(new ChatId($toChat), $message->content);
-                    $method->useMarkdown();
+                    $method = SendMessage::create(
+                        chatId: new ChatId($toChat),
+                        text: $message->content
+                    )->useMarkdown();
 
                     if ($context->toDrawAttention === false)
                     {
@@ -88,7 +100,10 @@ final class TelegramAlertingProvider implements AlertingProvider
                     }
 
                     /** @var \ServiceBus\TelegramBot\Interaction\Result\Result */
-                    $result = yield $this->interactionsProvider->call($method, $this->credentials);
+                    $result = yield $this->interactionsProvider->call(
+                        method: $method,
+                        credentials: $this->credentials
+                    );
 
                     if ($result instanceof Fail)
                     {

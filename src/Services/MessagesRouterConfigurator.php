@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Services;
 
@@ -25,7 +25,9 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 final class MessagesRouterConfigurator implements RouterConfigurator
 {
-    /** @var MessageExecutorFactory */
+    /**
+     * @var MessageExecutorFactory
+     */
     private $executorFactory;
 
     /**
@@ -105,7 +107,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
      */
     private static function assertMessageClassSpecifiedInArguments(object $service, MessageHandler $handler): void
     {
-        if ($handler->messageClass === null || (string) $handler->messageClass === '')
+        if ((string) $handler->messageClass === '')
         {
             throw new \LogicException(
                 \sprintf(

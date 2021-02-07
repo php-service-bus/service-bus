@@ -3,16 +3,17 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\EntryPoint;
 
 use ServiceBus\Context\ContextFactory;
+use ServiceBus\Metadata\ServiceBusMetadata;
 use function Amp\call;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
@@ -27,16 +28,24 @@ use function ServiceBus\Common\throwableDetails;
  */
 final class DefaultEntryPointProcessor implements EntryPointProcessor
 {
-    /** @var IncomingMessageDecoder */
+    /**
+     * @var IncomingMessageDecoder
+     */
     private $messageDecoder;
 
-    /** @var ContextFactory */
+    /**
+     * @var ContextFactory
+     */
     private $contextFactory;
 
-    /** @var Router */
+    /**
+     * @var Router
+     */
     private $messagesRouter;
 
-    /** @var LoggerInterface */
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
     /**
@@ -63,11 +72,18 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     public function handle(IncomingPackage $package): Promise
     {
         return call(
-            function (IncomingPackage $package): \Generator
+            function () use ($package): \Generator
             {
+                [$headers, $metadataVariables] = self::splitHeaders($package);
+
+                $metadata = ReceivedMessageMetadata::create($package->id(), $metadataVariables);
+
                 try
                 {
-                    $message = $this->messageDecoder->decode($package);
+                    $message = $this->messageDecoder->decode(
+                        payload: $package->payload(),
+                        metadata: $metadata
+                    );
                 }
                 catch (DecodeMessageFailed $exception)
                 {
@@ -77,7 +93,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                             throwableDetails($exception),
                             [
                                 'packageId' => $package->id(),
-                                'traceId'   => $package->traceId(),
+                                'traceId'   => $metadata->get(ServiceBusMetadata::SERVICE_BUS_TRACE_ID),
                                 'payload'   => $package->payload(),
                             ]
                         )
@@ -94,7 +110,10 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 {
                     $this->logger->debug(
                         'There are no handlers configured for the message "{messageClass}"',
-                        ['messageClass' => \get_class($message)]
+                        [
+                            'messageClass' => \get_class($message),
+                            'traceId'      => $metadata->get(ServiceBusMetadata::SERVICE_BUS_TRACE_ID),
+                        ]
                     );
 
                     yield $package->ack();
@@ -102,7 +121,11 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     return;
                 }
 
-                $context = $this->contextFactory->create($package, $message);
+                $context = $this->contextFactory->create(
+                    message: $message,
+                    headers: $headers,
+                    metadata: $metadata
+                );
 
                 /** @var \ServiceBus\Common\MessageExecutor\MessageExecutor $executor */
                 foreach ($executors as $executor)
@@ -113,15 +136,34 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     }
                     catch (\Throwable $throwable)
                     {
-                        $context->logContextThrowable($throwable);
+                        $context->logger()->throwable($throwable);
                     }
                 }
 
-                unset($context, $executors, $message);
-
                 yield $package->ack();
-            },
-            $package
+            }
         );
+    }
+
+    /**
+     * @psalm-return array<int, array<string, int|float|string|null>>
+     */
+    private function splitHeaders(IncomingPackage $package): array
+    {
+        $headers = $package->headers();
+
+        $metadataVariables = [];
+
+        foreach (ServiceBusMetadata::INTERNAL_METADATA_KEYS as $metadataHeader)
+        {
+            if (\array_key_exists($metadataHeader, $headers))
+            {
+                $metadataVariables[$metadataHeader] = $headers[$metadataHeader];
+
+                unset($headers[$metadataHeader]);
+            }
+        }
+
+        return [$headers, $metadataVariables];
     }
 }

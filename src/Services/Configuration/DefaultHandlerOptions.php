@@ -3,27 +3,28 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Services\Configuration;
 
 use ServiceBus\Common\MessageHandler\MessageHandlerOptions;
-use ServiceBus\Services\Contracts\ExecutionFailedEvent;
-use ServiceBus\Services\Contracts\ValidationFailedEvent;
-use ServiceBus\Services\Exceptions\InvalidEventType;
 
 /**
  * Execution options.
+ *
+ * @psalm-immutable
  */
 final class DefaultHandlerOptions implements MessageHandlerOptions
 {
     /**
      * Is this an event listener?
+     *
+     * @psalm-readonly
      *
      * @var bool
      */
@@ -32,6 +33,8 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * Is this a command handler?
      *
+     * @psalm-readonly
+     *
      * @var bool
      */
     public $isCommandHandler;
@@ -39,74 +42,51 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     /**
      * Validation enabled.
      *
+     * @psalm-readonly
+     *
      * @var bool
      */
-    public $validationEnabled = false;
+    public $validationEnabled;
 
     /**
      * Validation groups.
      *
+     * @psalm-readonly
      * @psalm-var array<array-key, string>
      *
      * @var array
      */
-    public $validationGroups = [];
-
-    /**
-     * In case of validation errors, automatically send the event and stop further execution
-     * The event must implement @see ValidationFailedEvent interface.
-     *
-     * If no class is specified, control is passed to user code
-     *
-     * @psalm-var class-string|null
-     *
-     * @var string|null
-     */
-    public $defaultValidationFailedEvent = null;
-
-    /**
-     * In case of a runtime error, automatically send the specified event with the message received from the exception
-     * The event must implement @see ExecutionFailedEvent interface.
-     *
-     * If no class is specified, control is passed to user code
-     *
-     * @psalm-var class-string|null
-     *
-     * @var string|null
-     */
-    public $defaultThrowableEvent = null;
+    public $validationGroups;
 
     /**
      * Message description.
      * Will be added to the log when the method is called.
      *
+     * @psalm-readonly
+     *
      * @var string|null
      */
-    public $description = null;
+    public $description;
 
     public static function createForEventListener(?string $withDescription = null): self
     {
         return new self(
-            true,
-            false,
-            false,
-            [],
-            null,
-            null,
-            $withDescription
+            isEventListener: true,
+            isCommandHandler: false,
+            validationEnabled: false,
+            validationGroups: [],
+            description: $withDescription,
         );
     }
 
     public static function createForCommandHandler(?string $withDescription = null): self
     {
         return new self(
-            false,
-            true,
-            false,
-            [],
-            null,
-            null,
-            $withDescription
+            isEventListener: false,
+            isCommandHandler: true,
+            validationEnabled: false,
+            validationGroups: [],
+            description: $withDescription,
         );
     }
 
@@ -117,117 +97,29 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      */
     public function enableValidation(array $validationGroups = []): self
     {
-        $defaultValidationFailedEvent = $this->defaultValidationFailedEvent;
-        $defaultThrowableEvent        = $this->defaultThrowableEvent;
-
-        /**
-         * @psalm-var class-string|null $defaultValidationFailedEvent
-         * @psalm-var class-string|null $defaultThrowableEvent
-         */
-
         return new self(
-            $this->isEventListener,
-            $this->isCommandHandler,
-            true,
-            $validationGroups,
-            $defaultValidationFailedEvent,
-            $defaultThrowableEvent,
-            $this->description
-        );
-    }
-
-    /**
-     * @psalm-param class-string $eventClass
-     *
-     * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent
-     */
-    public function withDefaultValidationFailedEvent(string $eventClass): self
-    {
-        if (\is_a($eventClass, ValidationFailedEvent::class, true) === false)
-        {
-            throw new InvalidEventType(
-                \sprintf(
-                    'Event class "%s" must implement "%s" interface',
-                    $eventClass,
-                    ValidationFailedEvent::class
-                )
-            );
-        }
-
-        $defaultThrowableEvent = $this->defaultThrowableEvent;
-
-        /**
-         * @psalm-var class-string $eventClass
-         * @psalm-var class-string|null $defaultThrowableEvent
-         */
-
-        return new self(
-            $this->isEventListener,
-            $this->isCommandHandler,
-            $this->validationEnabled,
-            $this->validationGroups,
-            $eventClass,
-            $defaultThrowableEvent,
-            $this->description
-        );
-    }
-
-    /**
-     * @psalm-param class-string $eventClass
-     *
-     * @throws \ServiceBus\Services\Exceptions\InvalidEventType Event class must implement @see ExecutionFailedEvent
-     */
-    public function withDefaultThrowableEvent(string $eventClass): self
-    {
-        if (\is_a($eventClass, ExecutionFailedEvent::class, true) === false)
-        {
-            throw new InvalidEventType(
-                \sprintf(
-                    'Event class "%s" must implement "%s" interface',
-                    $eventClass,
-                    ExecutionFailedEvent::class
-                )
-            );
-        }
-
-        $defaultValidationFailedEvent = $this->defaultValidationFailedEvent;
-
-        /**
-         * @psalm-var class-string $eventClass
-         * @psalm-var class-string|null $defaultValidationFailedEvent
-         */
-
-        return new self(
-            $this->isEventListener,
-            $this->isCommandHandler,
-            $this->validationEnabled,
-            $this->validationGroups,
-            $defaultValidationFailedEvent,
-            $eventClass,
-            $this->description
+            isEventListener: $this->isEventListener,
+            isCommandHandler: $this->isCommandHandler,
+            validationEnabled: true,
+            validationGroups: $validationGroups,
+            description: $this->description,
         );
     }
 
     /**
      * @psalm-param  array<array-key, string> $validationGroups
-     * @psalm-param  class-string|null $defaultValidationFailedEvent
-     * @psalm-param  class-string|null $defaultThrowableEvent
      */
     private function __construct(
         bool $isEventListener,
         bool $isCommandHandler,
-        bool $validationEnabled,
-        array $validationGroups,
-        ?string $defaultValidationFailedEvent,
-        ?string $defaultThrowableEvent,
-        ?string $description
+        bool $validationEnabled = false,
+        array $validationGroups = [],
+        ?string $description = null
     ) {
-        $this->isEventListener              = $isEventListener;
-        $this->isCommandHandler             = $isCommandHandler;
-        $this->validationEnabled            = $validationEnabled;
-        $this->validationGroups             = $validationGroups;
-        $this->defaultValidationFailedEvent = $defaultValidationFailedEvent;
-        $this->defaultThrowableEvent        = $defaultThrowableEvent;
-        $this->description                  = $description;
+        $this->isEventListener   = $isEventListener;
+        $this->isCommandHandler  = $isCommandHandler;
+        $this->validationEnabled = $validationEnabled;
+        $this->validationGroups  = $validationGroups;
+        $this->description       = $description;
     }
 }

@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Infrastructure\Watchers;
 
@@ -22,17 +22,25 @@ use Psr\Log\NullLogger;
  */
 final class GarbageCollectorWatcher
 {
-    /** @var int milliseconds */
+    /**
+     * @var int milliseconds
+     */
     private const DEFAULT_INTERVAL = 600000;
 
-    /** @var LoggerInterface */
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     private $interval;
 
-    /** @var string|null */
-    private $watcherId = null;
+    /**
+     * @var string|null
+     */
+    private $watcherId;
 
     /**
      * @param int $interval delay in milliseconds
@@ -45,7 +53,7 @@ final class GarbageCollectorWatcher
 
     public function __destruct()
     {
-        if (null !== $this->watcherId)
+        if ($this->watcherId !== null)
         {
             Loop::cancel($this->watcherId);
 

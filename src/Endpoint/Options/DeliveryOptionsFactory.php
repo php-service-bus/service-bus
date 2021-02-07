@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
@@ -7,7 +8,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Endpoint\Options;
 
@@ -20,9 +21,6 @@ interface DeliveryOptionsFactory
 {
     /**
      * @psalm-param class-string|null $messageClass
-     *
-     * @param string|int  $traceId
-     * @param string|null $messageClass
      */
-    public function create($traceId, ?string $messageClass): DeliveryOptions;
+    public function create(?string $messageClass = null): DeliveryOptions;
 }

@@ -10,15 +10,22 @@
 
 declare(strict_types = 0);
 
-namespace ServiceBus\Application\Exceptions;
+namespace ServiceBus\Services\Attributes;
 
 /**
  *
  */
-final class ConfigurationCheckFailed extends \LogicException
+final class Cancellation
 {
-    public static function emptyEntryPointName(): self
+    /**
+     * Operation timeout (in seconds).
+     *
+     * @var int
+     */
+    public $timeout;
+
+    public function __construct(int $timeout)
     {
-        return new self('Entry point name must be specified');
+        $this->timeout = $timeout;
     }
 }

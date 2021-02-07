@@ -1,8 +1,10 @@
 ## What is it?
-[![Build Status](https://travis-ci.org/php-service-bus/service-bus.svg?branch=v4.1)](https://travis-ci.org/php-service-bus/service-bus)
-[![Code Coverage](https://scrutinizer-ci.com/g/php-service-bus/service-bus/badges/coverage.png?b=v4.1)](https://scrutinizer-ci.com/g/php-service-bus/service-bus/?branch=v4.1)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/php-service-bus/service-bus/badges/quality-score.png?b=v4.1)](https://scrutinizer-ci.com/g/php-service-bus/service-bus/?branch=v4.1)
-[![SymfonyInsight](https://insight.symfony.com/projects/cc0f0f0b-56f1-4ff6-b37d-69ce5db06f32/mini.svg)](https://insight.symfony.com/projects/cc0f0f0b-56f1-4ff6-b37d-69ce5db06f32)
+
+[![Packagist](https://img.shields.io/packagist/v/php-service-bus/service-bus.svg)](https://packagist.org/packages/php-service-bus/service-bus)
+[![Packagist](https://img.shields.io/packagist/dt/php-service-bus/service-bus.svg)](https://packagist.org/packages/php-service-bus/service-bus)
+![Continuous Integration](https://github.com/php-service-bus/service-bus/workflows/Continuous%20Integration/badge.svg)
+[![codecov](https://codecov.io/gh/php-service-bus/service-bus/branch/v5.0/graph/badge.svg?token=0bKwdiuo0S)](https://codecov.io/gh/php-service-bus/service-bus)
+[![Shepherd](https://shepherd.dev/github/php-service-bus/service-bus/coverage.svg)](https://shepherd.dev/github/php-service-bus/service-bus)
 [![Latest Stable Version](https://poser.pugx.org/php-service-bus/service-bus/v/stable)](https://packagist.org/packages/php-service-bus/service-bus)
 [![License](https://poser.pugx.org/php-service-bus/service-bus/license)](https://packagist.org/packages/php-service-bus/service-bus)
 [![Financial Contributors on Open Collective](https://opencollective.com/php-service-bus/all/badge.svg?label=financial+contributors)](https://opencollective.com/php-service-bus) 
@@ -49,7 +51,7 @@ Documentation can be found in the [documentation](https://github.com/php-service
   - PostgreSQL 9.5+
 
 ## Contributing
-Contributions are welcome! Please read [CONTRIBUTING](CONTRIBUTING.md) for details.
+Contributions are welcome! Please read [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
 
 ## Communication Channels
 You can find help and discussion in the following places:

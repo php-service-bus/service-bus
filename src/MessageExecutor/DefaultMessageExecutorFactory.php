@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\MessageExecutor;
 
@@ -30,7 +30,9 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
      */
     private $argumentResolvers;
 
-    /** @var ValidatorInterface */
+    /**
+     * @var ValidatorInterface
+     */
     private $validator;
 
     /**
@@ -55,15 +57,19 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
         $options = $messageHandler->options;
 
         $messageExecutor = new DefaultMessageExecutor(
-            $messageHandler->closure,
-            $messageHandler->arguments,
-            $options,
-            $this->argumentResolvers
+            closure: $messageHandler->closure,
+            arguments: $messageHandler->arguments,
+            options: $options,
+            argumentResolvers: $this->argumentResolvers
         );
 
-        if ($options->validationEnabled === true)
+        if ($options->validationEnabled)
         {
-            $messageExecutor = new MessageValidationExecutor($messageExecutor, $options, $this->validator);
+            $messageExecutor = new MessageValidationExecutor(
+                executor: $messageExecutor,
+                options: $options,
+                validator: $this->validator
+            );
         }
 
         return $messageExecutor;

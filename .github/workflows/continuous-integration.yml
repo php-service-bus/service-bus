@@ -1,0 +1,116 @@
+name: "Continuous Integration"
+
+on: [ push, pull_request ]
+
+jobs:
+  code-style:
+    name: Code style
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies with composer
+        run: composer update --no-ansi --no-interaction --no-progress
+
+      - name: Run php-cs-fixer
+        run: PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run --using-cache=no --verbose
+
+  psalm:
+    name: Psalm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies with composer
+        run: composer update --no-ansi --no-interaction --no-progress
+
+      - name: Run vimeo/psalm
+        run: ./vendor/bin/psalm --config=psalm.xml --shepherd
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies with composer
+        run: composer update --no-ansi --no-interaction --no-progress
+
+      - name: Run phpstan/phpstan
+        run: ./vendor/bin/phpstan analyse src --level 7
+
+  phpunit:
+    name: PHPUnit
+
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:alpine
+        ports:
+          - 5672:5672
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      PHP_EXTENSIONS: bstring, dom, intl, json, libxml, xml, xmlwriter, sockets
+      PHP_INI_VALUES: assert.exception=1, zend.assertions=1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Override PHP ini values for JIT compiler
+        run: echo "PHP_INI_VALUES::assert.exception=1, zend.assertions=1, opcache.enable=1, opcache.enable_cli=1, opcache.optimization_level=-1, opcache.jit=1255, opcache.jit_buffer_size=32M" >> $GITHUB_ENV
+
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          ini-values: ${{ env.PHP_INI_VALUES }}
+          tools: composer:v2
+
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.1.0
+        with:
+          redis-version: 6
+
+      - name: Install dependencies
+        run: composer update --no-ansi --no-interaction --no-progress
+
+      - name: Await
+        uses: jakejarvis/wait-action@master
+
+      - name: Run tests with phpunit
+        run: XDEBUG_MODE=coverage php ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.xml
+
+      - name: Send code coverage report to Codecov.io
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

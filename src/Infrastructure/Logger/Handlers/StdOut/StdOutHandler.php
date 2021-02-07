@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Infrastructure\Logger\Handlers\StdOut;
 
@@ -24,7 +24,9 @@ use Monolog\Logger;
  */
 final class StdOutHandler extends AbstractProcessingHandler
 {
-    /** @var ResourceOutputStream */
+    /**
+     * @var ResourceOutputStream
+     */
     private $streamWriter;
 
     public function __construct(int $level = Logger::DEBUG, bool $bubble = true, ?FormatterInterface $formatter = null)
@@ -33,12 +35,12 @@ final class StdOutHandler extends AbstractProcessingHandler
 
         $this->formatter = $formatter ?? new StdOutFormatter();
 
-        $this->streamWriter = new ResourceOutputStream(\STDOUT, 50000);
+        $this->streamWriter = new ResourceOutputStream(
+            stream: \STDOUT,
+            chunkSize: 50000
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function write(array $record): void
     {
         try
@@ -46,7 +48,7 @@ final class StdOutHandler extends AbstractProcessingHandler
             $this->streamWriter->write((string) $record['formatted']);
         }
         // @codeCoverageIgnoreStart
-        catch (\Throwable $throwable)
+        catch (\Throwable)
         {
             /** Not interest */
         }

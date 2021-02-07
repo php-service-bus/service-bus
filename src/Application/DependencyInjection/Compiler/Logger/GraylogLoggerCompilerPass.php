@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Application\DependencyInjection\Compiler\Logger;
 
@@ -24,31 +24,38 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class GraylogLoggerCompilerPass implements CompilerPassInterface
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     private $host;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     private $port;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     private $logLevel;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     private $gzipMessage;
 
-    public function __construct(string $host = '0.0.0.0', int $port = 514, int $logLevel = Logger::DEBUG, bool $gzipMessage = false)
-    {
+    public function __construct(
+        string $host = '0.0.0.0',
+        int $port = 514,
+        int $logLevel = Logger::DEBUG,
+        bool $gzipMessage = false
+    ) {
         $this->host        = $host;
         $this->port        = $port;
         $this->logLevel    = $logLevel;
         $this->gzipMessage = $gzipMessage;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Throwable
-     */
     public function process(ContainerBuilder $container): void
     {
         $this->injectParameters($container);
@@ -67,8 +74,8 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
         $loggerDefinition = $container->getDefinition('service_bus.logger');
 
         $loggerDefinition->addMethodCall(
-            'pushHandler',
-            [new Reference(UdpHandler::class)]
+            method: 'pushHandler',
+            arguments: [new Reference(UdpHandler::class)]
         );
     }
 
@@ -82,7 +89,10 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
         ];
         foreach ($parameters as $key => $value)
         {
-            $containerBuilder->setParameter($key, $value);
+            $containerBuilder->setParameter(
+                name: $key,
+                value: $value
+            );
         }
     }
 }

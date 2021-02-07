@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Endpoint\Options;
 
@@ -16,13 +16,16 @@ use ServiceBus\Common\Endpoint\DeliveryOptions;
 
 /**
  * Sent message options.
+ *
+ * @psalm-immutable
  */
 final class DefaultDeliveryOptions implements DeliveryOptions
 {
     /**
      * Headers bag.
      *
-     * @psalm-var array<string, string|int|float>
+     * @psalm-readonly
+     * @psalm-var array<string, int|float|string|null>
      *
      * @var array
      */
@@ -30,6 +33,8 @@ final class DefaultDeliveryOptions implements DeliveryOptions
 
     /**
      * The message must be stored in the broker.
+     *
+     * @psalm-readonly
      *
      * @var bool
      */
@@ -40,6 +45,8 @@ final class DefaultDeliveryOptions implements DeliveryOptions
      * server will return an unroutable message with a Return method. If this flag is false, the server silently drops
      * the message.
      *
+     * @psalm-readonly
+     *
      * @var bool
      */
     public $isMandatory = true;
@@ -49,6 +56,8 @@ final class DefaultDeliveryOptions implements DeliveryOptions
      * flag is set, the server will return an undeliverable message with a Return method. If this flag is false, the
      * server will queue the message, but with no guarantee that it will ever be consumed.
      *
+     * @psalm-readonly
+     *
      * @var bool
      */
     public $isImmediate = false;
@@ -56,108 +65,76 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     /**
      * The message will be marked expired after N milliseconds.
      *
+     * @psalm-readonly
+     *
      * @var int|null
      */
-    public $expiredAfter = null;
+    public $expiredAfter;
 
-    /**
-     * Trace operation id.
-     *
-     * @var int|string|null
-     */
-    public $traceId = null;
-
-    /**
-     * {@inheritdoc}
-     */
     public static function create(): self
     {
         return new self();
     }
 
     /**
-     * @psalm-param array<string, string|int|float> $headers
+     * @psalm-param array<string, int|float|string|null> $headers
      */
     public static function nonPersistent(array $headers = []): self
     {
-        return new self($headers, false);
+        return new self(
+            headers: $headers,
+            isPersistent: false,
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function withTraceId($traceId): void
+    public function withHeader(string $key, int|float|string|null $value): self
     {
-        $this->traceId = $traceId;
+        $headers = $this->headers;
+        $headers[$key] = $value;
+
+        return new self(
+            headers: $headers,
+            isPersistent: $this->isPersistent(),
+            isMandatory: $this->isMandatory,
+            isImmediate: $this->isImmediate,
+            expiredAfter: $this->expiredAfter
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function withHeader(string $key, $value): void
-    {
-        /** @psalm-suppress MixedTypeCoercion */
-        $this->headers[$key] = $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function traceId()
-    {
-        return $this->traceId;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function headers(): array
     {
         return $this->headers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isPersistent(): bool
     {
         return $this->isPersistent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isHighestPriority(): bool
     {
         return $this->isImmediate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function expirationAfter(): ?int
     {
         return $this->expiredAfter;
     }
 
     /**
-     * @psalm-param array<string, string|int|float> $headers
-     *
-     * @param int|string|null $traceId
+     * @psalm-param array<string, int|float|string|null> $headers
      */
     private function __construct(
         array $headers = [],
         bool $isPersistent = true,
         bool $isMandatory = true,
         bool $isImmediate = false,
-        ?int $expiredAfter = null,
-        $traceId = null
+        ?int $expiredAfter = null
     ) {
         $this->headers      = $headers;
         $this->isPersistent = $isPersistent;
         $this->isMandatory  = $isMandatory;
         $this->isImmediate  = $isImmediate;
         $this->expiredAfter = $expiredAfter;
-        $this->traceId      = $traceId;
     }
 }

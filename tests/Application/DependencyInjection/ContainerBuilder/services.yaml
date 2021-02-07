@@ -1,7 +1,0 @@
-services:
-  ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\SomeTestService:
-    public: true
-
-  ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder\MessageHandlerService:
-    public: true
-    tags: ["service_bus.service"]

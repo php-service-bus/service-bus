@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Infrastructure\Retry;
 
@@ -26,12 +26,16 @@ final class RetryOptions
     /**
      * Maximum number of repetitions.
      *
+     * @psalm-readonly
+     *
      * @var int
      */
     public $maxCount;
 
     /**
      * Delay at repetitions (milliseconds).
+     *
+     * @psalm-readonly
      *
      * @var int
      */

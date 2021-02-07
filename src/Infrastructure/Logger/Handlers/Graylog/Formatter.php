@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 
@@ -67,13 +67,23 @@ final class Formatter extends NormalizerFormatter
      */
     public function format(array $record): array
     {
-        /** @var array{datetime:int, message:string, level:int, channel:string, extra:array|null, context:array|null} $normalizedRecord */
+        /**
+         * @psalm-var array{
+         *     datetime:int,
+         *     message:string,
+         *     level:int,
+         *     channel:string,
+         *     extra:array|null,
+         *     context:array|null
+         * } $normalizedRecord
+         */
         $normalizedRecord = parent::format($record);
 
         /** @var array $extraData */
         $extraData = $normalizedRecord['extra'] ?? [];
 
-        /** @psalm-var array{
+        /**
+         * @psalm-var array{
          *    version:float|int,
          *    host:string,
          *    timestamp:int,
@@ -90,8 +100,8 @@ final class Formatter extends NormalizerFormatter
             'version'       => self::GRAYLOG_VERSION,
             'host'          => $this->systemName,
             'timestamp'     => $normalizedRecord['datetime'],
-            'short_message' => (string) $normalizedRecord['message'],
-            'level'         => self::LEVEL_RELATIONS[(int) $normalizedRecord['level']],
+            'short_message' => $normalizedRecord['message'],
+            'level'         => self::LEVEL_RELATIONS[$normalizedRecord['level']],
             'facility'      => $normalizedRecord['channel'] ?? null,
             'file'          => $extraData['file'] ?? null,
             'line'          => $extraData['line'] ?? null,
@@ -101,7 +111,7 @@ final class Formatter extends NormalizerFormatter
 
         /** @psalm-var array<string, string|int|float|array|null> $contextData */
         $contextData = $normalizedRecord['context'] ?? [];
-        $formatted   = $this->formatMessage((string) $normalizedRecord['message'], $formatted);
+        $formatted   = $this->formatMessage($normalizedRecord['message'], $formatted);
         $formatted   = $this->formatAdditionalData($extraData, $formatted);
         $formatted   = $this->formatAdditionalData($contextData, $formatted);
 
@@ -169,14 +179,13 @@ final class Formatter extends NormalizerFormatter
      *
      * @return float|int|string|null
      */
-    private function formatValue($value)
+    private function formatValue(array|float|int|object|string|null $value): float|int|string|null
     {
         if ($value === null || \is_scalar($value))
         {
             return $value;
         }
 
-        /** @noinspection UnnecessaryCastingInspection */
-        return (string) $this->toJson($value);
+        return $this->toJson($value);
     }
 }

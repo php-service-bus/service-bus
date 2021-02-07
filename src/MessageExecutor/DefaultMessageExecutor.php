@@ -3,34 +3,34 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\MessageExecutor;
 
-use Amp\TimeoutCancellationToken;
 use function Amp\call;
 use Amp\Promise;
-use Psr\Log\LogLevel;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
-use function ServiceBus\Common\throwableDetails;
-use function ServiceBus\Common\throwableMessage;
 
 /**
  *
  */
 final class DefaultMessageExecutor implements MessageExecutor
 {
-    /** @var \Closure */
+    /**
+     * @var \Closure
+     */
     private $closure;
 
-    /** @var \SplObjectStorage */
+    /**
+     * @var \SplObjectStorage
+     */
     private $arguments;
 
     /**
@@ -42,13 +42,15 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     private $argumentResolvers;
 
-    /** @var DefaultHandlerOptions */
+    /**
+     * @var DefaultHandlerOptions
+     */
     private $options;
 
     /**
-     * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>  $argumentResolvers
+     * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
      *
-     * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[] $argumentResolvers
+     * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[]                    $argumentResolvers
      */
     public function __construct(
         \Closure $closure,
@@ -62,74 +64,32 @@ final class DefaultMessageExecutor implements MessageExecutor
         $this->argumentResolvers = $argumentResolvers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(object $message, ServiceBusContext $context): Promise
     {
         return call(
             function () use ($message, $context): \Generator
             {
-                $resolvedArgs = self::collectArguments($this->arguments, $this->argumentResolvers, $message, $context);
+                $resolvedArgs = $this->collectArguments(
+                    arguments: $this->arguments,
+                    message: $message,
+                    context: $context
+                );
 
-                try
+                if ($this->options->description !== null)
                 {
-                    if ($this->options->description !== null)
-                    {
-                        $context->logContextMessage($this->options->description);
-                    }
-
-                    yield call($this->closure, ...$resolvedArgs);
-                }
-                catch (\Throwable $throwable)
-                {
-                    if ($this->options->defaultThrowableEvent === null)
-                    {
-                        throw $throwable;
-                    }
-
-                    $context->logContextMessage(
-                        'Error processing, sending an error event and stopping message processing',
-                        throwableDetails($throwable),
-                        LogLevel::ERROR
-                    );
-
-                    yield from self::publishThrowable(
-                        (string) $this->options->defaultThrowableEvent,
-                        throwableMessage($throwable),
-                        $context
-                    );
+                    $context->logger()->info($this->options->description);
                 }
 
-                unset($resolvedArgs);
+                yield call($this->closure, ...$resolvedArgs);
             }
         );
     }
 
     /**
-     * Publish failed response event.
-     */
-    private static function publishThrowable(string $eventClass, string $errorMessage, ServiceBusContext $context): \Generator
-    {
-        /** @psalm-var callable(string, string):\ServiceBus\Services\Contracts\ExecutionFailedEvent $factory */
-        $factory = [$eventClass, 'create'];
-
-        $event = $factory($context->traceId(), $errorMessage);
-
-        yield $context->delivery($event);
-    }
-
-    /**
      * Collect arguments list.
-     *
-     * @psalm-param  array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $resolvers
-     * @psalm-return array<int, mixed>
-     *
-     * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[] $resolvers
      */
-    private static function collectArguments(
+    private function collectArguments(
         \SplObjectStorage $arguments,
-        array $resolvers,
         object $message,
         ServiceBusContext $context
     ): array {
@@ -138,12 +98,16 @@ final class DefaultMessageExecutor implements MessageExecutor
         /** @var \ServiceBus\Common\MessageHandler\MessageHandlerArgument $argument */
         foreach ($arguments as $argument)
         {
-            foreach ($resolvers as $argumentResolver)
+            foreach ($this->argumentResolvers as $argumentResolver)
             {
                 if ($argumentResolver->supports($argument))
                 {
                     /** @psalm-suppress MixedAssignment Unknown data type */
-                    $preparedArguments[] = $argumentResolver->resolve($message, $context, $argument);
+                    $preparedArguments[] = $argumentResolver->resolve(
+                        message: $message,
+                        context: $context,
+                        argument: $argument
+                    );
                 }
             }
         }

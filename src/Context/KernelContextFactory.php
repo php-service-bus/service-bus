@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
@@ -7,42 +8,60 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Context;
 
+use ServiceBus\Common\Context\IncomingMessageMetadata;
 use ServiceBus\Endpoint\Options\DeliveryOptionsFactory;
 use Psr\Log\LoggerInterface;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Endpoint\EndpointRouter;
-use ServiceBus\Transport\Common\Package\IncomingPackage;
 
 /**
  *
  */
 final class KernelContextFactory implements ContextFactory
 {
-    /** @var EndpointRouter */
+    /**
+     * @var EndpointRouter
+     */
     private $endpointRouter;
 
-    /** @var DeliveryOptionsFactory */
+    /**
+     * @var DeliveryOptionsFactory
+     */
     private $optionsFactory;
 
-    /** @var LoggerInterface */
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
     public function __construct(
         EndpointRouter $endpointRouter,
         DeliveryOptionsFactory $optionsFactory,
         LoggerInterface $logger
-    ) {
+    )
+    {
         $this->endpointRouter = $endpointRouter;
         $this->optionsFactory = $optionsFactory;
         $this->logger         = $logger;
     }
 
-    public function create(IncomingPackage $package, object $message): ServiceBusContext
+    public function create(object $message, array $headers, IncomingMessageMetadata $metadata): ServiceBusContext
     {
-        return new KernelContext($package, $message, $this->endpointRouter, $this->optionsFactory, $this->logger);
+        return new KernelContext(
+            message: $message,
+            headers: $headers,
+            metadata: $metadata,
+            endpointRouter: $this->endpointRouter,
+            optionsFactory: $this->optionsFactory,
+            logger: new DefaultContextLogger(
+                logger: $this->logger,
+                message: $message,
+                metadata: $metadata
+            )
+        );
     }
 }

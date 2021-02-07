@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Endpoint;
 
@@ -89,5 +89,20 @@ final class EndpointRouter
         }
 
         return $this->globalEndpoints;
+    }
+
+    /**
+     * Receive endpoint by index.
+     *
+     * @throws \RuntimeException
+     */
+    public function endpoint(string $withIndex): Endpoint
+    {
+        if (isset($this->globalEndpoints[$withIndex]))
+        {
+            return $this->globalEndpoints[$withIndex];
+        }
+
+        throw new \RuntimeException(\sprintf('Unable to find endpoint with index `%s`', $withIndex));
     }
 }

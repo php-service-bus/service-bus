@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Infrastructure\Watchers;
 
@@ -27,11 +27,15 @@ final class LoopBlockWatcher
     /** Check interval, only check one tick every $interval milliseconds */
     private const CHECK_INTERVAL = 0;
 
-    /** @var LoggerInterface */
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
-    /** @var BlockDetector|null */
-    private $detector = null;
+    /**
+     * @var BlockDetector|null
+     */
+    private $detector;
 
     public function __construct(LoggerInterface $logger = null)
     {
@@ -55,12 +59,12 @@ final class LoopBlockWatcher
 
     private function getDetector(): BlockDetector
     {
-        if (null === $this->detector)
+        if ($this->detector === null)
         {
             $this->detector = new BlockDetector(
-                self::createOnBlockHandler($this->logger),
-                self::BLOCK_THRESHOLD,
-                self::CHECK_INTERVAL
+                onBlock: self::createOnBlockHandler($this->logger),
+                blockThreshold: self::BLOCK_THRESHOLD,
+                checkInterval: self::CHECK_INTERVAL
             );
         }
 
@@ -79,6 +83,7 @@ final class LoopBlockWatcher
 
             /** skip first since it's always the current method */
             \array_shift($trace);
+
             /** the call_user_func call is also skipped */
             \array_shift($trace);
 
@@ -102,8 +107,6 @@ final class LoopBlockWatcher
             $traceData['lockTime'] = 0 !== $blockInterval ? $blockInterval / 1000 : 0;
 
             $logger->error('A lock event loop has been detected. Blocking time: {lockTime} seconds', $traceData);
-
-            unset($traceData, $trace, $i);
         };
     }
 }

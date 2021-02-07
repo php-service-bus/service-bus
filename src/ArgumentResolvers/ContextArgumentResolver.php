@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\ArgumentResolvers;
 
@@ -20,21 +20,16 @@ use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
  */
 final class ContextArgumentResolver implements ArgumentResolver
 {
-    /**
-     * {@inheritdoc}
-     */
     public function supports(MessageHandlerArgument $argument): bool
     {
         return $argument->isA(ServiceBusContext::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return ServiceBusContext
-     */
-    public function resolve(object $message, ServiceBusContext $context, MessageHandlerArgument $argument): ServiceBusContext
-    {
+    public function resolve(
+        object $message,
+        ServiceBusContext $context,
+        MessageHandlerArgument $argument
+    ): ServiceBusContext {
         return $context;
     }
 }

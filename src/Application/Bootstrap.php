@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Application;
 
@@ -31,7 +31,9 @@ use Symfony\Component\ErrorHandler\Debug;
  */
 final class Bootstrap
 {
-    /** @var ContainerBuilder */
+    /**
+     * @var ContainerBuilder
+     */
     private $containerBuilder;
 
     /**
@@ -94,7 +96,7 @@ final class Bootstrap
         }
         catch (\Throwable $throwable)
         {
-            throw new ConfigurationCheckFailed($throwable->getMessage());
+            throw new ConfigurationCheckFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
 
         return new self($entryPointName, $env);
@@ -146,7 +148,10 @@ final class Bootstrap
      */
     public function boot(): ContainerInterface
     {
-        $this->containerBuilder->addCompilerPasses(new TaggedMessageHandlersCompilerPass(), new ServiceLocatorTagPass());
+        $this->containerBuilder->addCompilerPasses(
+            new TaggedMessageHandlersCompilerPass(),
+            new ServiceLocatorTagPass()
+        );
 
         return $this->containerBuilder->build();
     }
@@ -200,7 +205,10 @@ final class Bootstrap
 
     private function __construct(string $entryPointName, Environment $environment)
     {
-        $this->containerBuilder = new ContainerBuilder($entryPointName, $environment);
+        $this->containerBuilder = new ContainerBuilder(
+            entryPointName: $entryPointName,
+            environment: $environment
+        );
 
         $this->containerBuilder->addParameters([
             'service_bus.environment' => $environment->toString(),

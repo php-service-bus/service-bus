@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Infrastructure\Retry;
 
@@ -21,7 +21,9 @@ use Kelunik\Retry\ConstantBackoff;
  */
 final class OperationRetryWrapper
 {
-    /** @var RetryOptions  */
+    /**
+     * @var RetryOptions
+     */
     private $options;
 
     public function __construct(RetryOptions $options = null)
@@ -30,16 +32,16 @@ final class OperationRetryWrapper
     }
 
     /**
-     * @param callable   $operation     Wrapped operation
-     * @param string ...$exceptionClasses Exceptions in which attempts are repeating the operation
+     * @param callable $operation           Wrapped operation
+     * @param string   ...$exceptionClasses Exceptions in which attempts are repeating the operation
      */
     public function __invoke(callable $operation, string ...$exceptionClasses): Promise
     {
         return retry(
-            $this->options->maxCount,
-            $operation,
-            $exceptionClasses,
-            new ConstantBackoff($this->options->delay)
+            maxAttempts: $this->options->maxCount,
+            actor: $operation,
+            throwable: $exceptionClasses,
+            backoff: new ConstantBackoff($this->options->delay)
         );
     }
 }

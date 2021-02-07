@@ -3,12 +3,12 @@
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
  *
- * @author  Maksim Masiukevich <dev@async-php.com>
+ * @author  Maksim Masiukevich <contacts@desperado.dev>
  * @license MIT
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types = 0);
 
 namespace ServiceBus\Application\DependencyInjection\Compiler\Logger;
 
@@ -27,16 +27,11 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class LoggerCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Throwable
-     */
     public function process(ContainerBuilder $container): void
     {
         $loggerDefinition = $container->getDefinition('service_bus.logger');
 
-        if (NullLogger::class === $loggerDefinition->getClass())
+        if ($loggerDefinition->getClass() === NullLogger::class)
         {
             $loggerDefinition->setClass(Logger::class);
             $loggerDefinition->setArguments(['%service_bus.entry_point%']);
@@ -52,8 +47,8 @@ final class LoggerCompilerPass implements CompilerPassInterface
         {
             $container->addDefinitions([$processor => new Definition($processor)]);
             $loggerDefinition->addMethodCall(
-                'pushProcessor',
-                [new Reference($processor)]
+                method: 'pushProcessor',
+                arguments: [new Reference($processor)]
             );
         }
     }
