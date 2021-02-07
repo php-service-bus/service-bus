@@ -33,7 +33,8 @@
       "ServiceBus\\MessagesRouter\\Tests\\": "vendor/php-service-bus/messages-router/tests/",
       "ServiceBus\\Mutex\\Tests\\": "vendor/php-service-bus/mutex/tests/",
       "ServiceBus\\Storage\\Tests\\": "vendor/php-service-bus/storage/tests/",
-      "ServiceBus\\Transport\\Tests\\": "vendor/php-service-bus/transport/tests/"
+      "ServiceBus\\Transport\\Tests\\": "vendor/php-service-bus/transport/tests/",
+      "ServiceBus\\TelegramBot\\Tests\\": "vendor/php-service-bus/telegram-bot-core/tests/"
     },
     "files": [
       "tests/functions.php"
