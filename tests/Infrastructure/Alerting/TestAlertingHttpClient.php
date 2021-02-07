@@ -51,8 +51,7 @@ final class TestAlertingHttpClient implements HttpClient
         string $destinationDirectory,
         string $fileName,
         ?RequestContext $context = null
-    ): Promise
-    {
+    ): Promise {
         return new Success();
     }
 }

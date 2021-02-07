@@ -130,7 +130,7 @@ final class DefaultEntryPointProcessorTest extends TestCase
         $router = new Router();
 
         $closure = \Closure::fromCallable(
-            static function(): void
+            static function (): void
             {
                 throw new \RuntimeException('Some message execution failed');
             }
@@ -174,7 +174,7 @@ final class DefaultEntryPointProcessorTest extends TestCase
         $router = new Router();
 
         $closure = \Closure::fromCallable(
-            static function() use (&$variable): void
+            static function () use (&$variable): void
             {
                 $variable = 'handled';
             }
