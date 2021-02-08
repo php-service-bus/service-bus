@@ -189,6 +189,7 @@ services:
   # Application http client
   ServiceBus\HttpClient\HttpClient:
     class: ServiceBus\HttpClient\Artax\ArtaxHttpClient
+    factory: ['ServiceBus\HttpClient\Artax\ArtaxHttpClient', 'build']
     arguments:
       $connectionPool: '@Amp\Http\Client\Connection\ConnectionPool'
       $logger: '@service_bus.logger'
