@@ -137,6 +137,7 @@ final class DefaultEntryPointProcessorTest extends TestCase
         );
 
         $executor = new DefaultMessageExecutor(
+            handlerHash: '',
             closure: $closure,
             arguments: new \SplObjectStorage(),
             options: DefaultHandlerOptions::createForCommandHandler(),
@@ -181,6 +182,7 @@ final class DefaultEntryPointProcessorTest extends TestCase
         );
 
         $executor = new DefaultMessageExecutor(
+            handlerHash: '',
             closure: $closure,
             arguments: new \SplObjectStorage(),
             options: DefaultHandlerOptions::createForCommandHandler(),

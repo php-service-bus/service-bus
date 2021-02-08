@@ -17,6 +17,8 @@ namespace ServiceBus\Services\Attributes\Options;
  */
 final class WithCancellation
 {
+    private const DEFAULT_EXECUTION_TIMEOUT = 600;
+
     /**
      * Operation timeout (in seconds).
      *
@@ -25,6 +27,13 @@ final class WithCancellation
      * @var int
      */
     public $timeout;
+
+    public static function default(): self
+    {
+        return new self(
+            self::DEFAULT_EXECUTION_TIMEOUT
+        );
+    }
 
     public function __construct(int $timeout)
     {

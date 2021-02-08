@@ -40,7 +40,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
      */
     public function __construct(array $argumentResolvers, ?ValidatorInterface $validator = null)
     {
-        if ($validator === null)
+        if($validator === null)
         {
             /** @psalm-suppress TooManyArguments */
             $validator = (new ValidatorBuilder())
@@ -58,18 +58,27 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
         $options = $messageHandler->options;
 
         $messageExecutor = new DefaultMessageExecutor(
+            handlerHash: $messageHandler->hash(),
             closure: $messageHandler->closure,
             arguments: $messageHandler->arguments,
             options: $options,
             argumentResolvers: $this->argumentResolvers
         );
 
-        if ($options->validationEnabled)
+        if($options->validationEnabled)
         {
             $messageExecutor = new MessageValidationExecutor(
                 executor: $messageExecutor,
                 options: $options,
                 validator: $this->validator
+            );
+        }
+
+        if($options->executionTimeout !== null)
+        {
+            $messageExecutor = new TimeLimitedExecutor(
+                executor: $messageExecutor,
+                options: $options
             );
         }
 

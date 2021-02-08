@@ -82,7 +82,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
     }
 
     private function createOptions(
-        EventListener | CommandHandler $attribute,
+        EventListener|CommandHandler $attribute,
         bool $isCommandHandler,
         ?string $description
     ): DefaultHandlerOptions {
@@ -103,12 +103,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
 
         if ($attribute instanceof HasCancellation)
         {
-            $cancellationConfiguration = $attribute->cancellation();
-
-            if ($cancellationConfiguration !== null)
-            {
-                $options = $options->limitExecutionTime($cancellationConfiguration->timeout);
-            }
+            $options = $options->limitExecutionTime($attribute->cancellation()->timeout);
         }
 
         return $options;

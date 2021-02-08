@@ -229,21 +229,21 @@ final class EntryPointTest extends TestCase
             $this->entryPointProcessor,
             $this->logger,
             null,
-            null,
-            1500
+            null
         );
 
         Loop::run(
             function () use ($entryPoint): \Generator
             {
                 yield $entryPoint->listen($this->queue);
+
                 $entryPoint->stop();
             }
         );
 
         foreach (filterLogMessages($this->logHandler) as $message)
         {
-            if (\str_contains($message, 'operation was cancelled'))
+            if (\str_contains($message, 'message processing canceled by timeout (`10` seconds)'))
             {
                 return;
             }

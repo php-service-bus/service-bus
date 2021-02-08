@@ -17,5 +17,5 @@ namespace ServiceBus\Services\Attributes\Options;
  */
 interface HasCancellation
 {
-    public function cancellation(): ?WithCancellation;
+    public function cancellation(): WithCancellation;
 }

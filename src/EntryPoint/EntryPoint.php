@@ -12,9 +12,7 @@ declare(strict_types = 0);
 
 namespace ServiceBus\EntryPoint;
 
-use Amp\CancellationToken;
-use Amp\NullCancellationToken;
-use Amp\TimeoutCancellationToken;
+use Amp\CancelledException;
 use Amp\TimeoutException;
 use function Amp\delay;
 use Amp\Loop;
@@ -86,27 +84,18 @@ final class EntryPoint
      */
     private $awaitDelay;
 
-    /**
-     * Message execution timeout (in milliseconds)
-     *
-     * @var int|null
-     */
-    private $executionTimeout;
-
     public function __construct(
         Transport $transport,
         EntryPointProcessor $processor,
         ?LoggerInterface $logger = null,
         ?int $maxConcurrentTaskCount = null,
-        ?int $awaitDelay = null,
-        ?int $executionTimeout = null
+        ?int $awaitDelay = null
     ) {
         $this->transport              = $transport;
         $this->processor              = $processor;
         $this->logger                 = $logger ?? new NullLogger();
         $this->maxConcurrentTaskCount = $maxConcurrentTaskCount ?? self::DEFAULT_MAX_CONCURRENT_TASK_COUNT;
         $this->awaitDelay             = $awaitDelay ?? self::DEFAULT_AWAIT_DELAY;
-        $this->executionTimeout       = $executionTimeout;
     }
 
     /**
@@ -192,10 +181,8 @@ final class EntryPoint
         Loop::defer(
             function () use ($package): void
             {
-                $cancellation = $this->createCancellationToken();
-
                 $this->processor->handle($package)->onResolve(
-                    function (?\Throwable $throwable) use ($cancellation, $package): \Generator
+                    function (?\Throwable $throwable) use ($package): \Generator
                     {
                         try
                         {
@@ -203,13 +190,9 @@ final class EntryPoint
                             {
                                 throw $throwable;
                             }
-
-                            $cancellation->throwIfRequested();
                         }
-                        catch (TimeoutException $exception)
+                        catch (CancelledException | TimeoutException)
                         {
-                            $this->logThrowable($exception, $package);
-
                             yield $package->reject(true);
                         }
                         catch (\Throwable $throwable)
@@ -224,15 +207,6 @@ final class EntryPoint
                 );
             }
         );
-    }
-
-    private function createCancellationToken(): CancellationToken
-    {
-        $timeout = $this->executionTimeout;
-
-        return $timeout !== null
-            ? new TimeoutCancellationToken($timeout)
-            : new NullCancellationToken();
     }
 
     private function logThrowable(\Throwable $throwable, IncomingPackage $package): void

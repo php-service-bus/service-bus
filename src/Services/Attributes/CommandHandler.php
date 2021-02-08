@@ -42,7 +42,7 @@ final class CommandHandler implements HasDescription, HasValidation, HasCancella
     /**
      * Execution cancellation configuration.
      *
-     * @var WithCancellation|null
+     * @var WithCancellation
      */
     private $cancellation;
 
@@ -57,10 +57,12 @@ final class CommandHandler implements HasDescription, HasValidation, HasCancella
     ) {
         $this->description  = $description;
         $this->validation   = $validationEnabled ? new WithValidation($validationGroups) : null;
-        $this->cancellation = $executionTimeout ? new WithCancellation($executionTimeout) : null;
+        $this->cancellation = $executionTimeout !== null
+            ? new WithCancellation($executionTimeout)
+            : WithCancellation::default();
     }
 
-    public function cancellation(): ?WithCancellation
+    public function cancellation(): WithCancellation
     {
         return $this->cancellation;
     }

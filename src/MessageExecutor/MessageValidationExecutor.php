@@ -14,6 +14,7 @@ namespace ServiceBus\MessageExecutor;
 
 use ServiceBus\Common\Context\ValidationViolation;
 use ServiceBus\Common\Context\ValidationViolations;
+use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
 use function ServiceBus\Common\invokeReflectionMethod;
 use Amp\Promise;
 use ServiceBus\Common\Context\ServiceBusContext;
@@ -46,10 +47,21 @@ final class MessageValidationExecutor implements MessageExecutor
         MessageExecutor $executor,
         DefaultHandlerOptions $options,
         ValidatorInterface $validator
-    ) {
+    )
+    {
         $this->executor  = $executor;
         $this->options   = $options;
         $this->validator = $validator;
+    }
+
+    public function id(): string
+    {
+        return $this->executor->id();
+    }
+
+    public function retryStrategy(): ?RetryStrategy
+    {
+        return $this->executor->retryStrategy();
     }
 
     public function __invoke(object $message, ServiceBusContext $context): Promise
@@ -60,7 +72,7 @@ final class MessageValidationExecutor implements MessageExecutor
             groups: $this->options->validationGroups
         );
 
-        if (\count($violations) !== 0)
+        if(\count($violations) !== 0)
         {
             self::bindViolations($violations, $context);
         }
@@ -77,7 +89,7 @@ final class MessageValidationExecutor implements MessageExecutor
         $errors = [];
 
         /** @var \Symfony\Component\Validator\ConstraintViolation $violation */
-        foreach ($violations as $violation)
+        foreach($violations as $violation)
         {
             $errors[] = new ValidationViolation($violation->getPropertyPath(), (string) $violation->getMessage());
         }
@@ -90,8 +102,8 @@ final class MessageValidationExecutor implements MessageExecutor
                 parameters: new ValidationViolations($errors)
             );
         }
-        // @codeCoverageIgnoreStart
-        catch (\Throwable)
+            // @codeCoverageIgnoreStart
+        catch(\Throwable)
         {
             /** No exceptions can happen */
         }

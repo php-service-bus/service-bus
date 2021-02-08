@@ -21,21 +21,26 @@ use function Amp\delay;
  */
 final class EntryPointTestService
 {
-    /** @noinspection PhpUnusedParameterInspection */
-    #[CommandHandler]
+    #[CommandHandler(
+        description: 'abube',
+        validationEnabled: true,
+        validationGroups: ['qwerty', 'root'],
+        executionTimeout: 10
+    )]
     public function handle(
         EntryPointTestMessage $command,
         ServiceBusContext $context,
         EntryPointTestDependency $dependency
-    ): \Generator {
-        if ($command->id === 'throw')
+    ): \Generator
+    {
+        if($command->id === 'throw')
         {
             throw new \RuntimeException('ups...');
         }
 
-        if ($command->id === 'await')
+        if($command->id === 'await')
         {
-            yield delay(3000);
+            yield delay(60000);
 
             return;
         }

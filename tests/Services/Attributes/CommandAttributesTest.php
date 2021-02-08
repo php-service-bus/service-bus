@@ -29,7 +29,7 @@ final class CommandAttributesTest extends TestCase
 
         self::assertNull($attribute->description());
         self::assertNull($attribute->validation());
-        self::assertNull($attribute->cancellation());
+        self::assertNotNull($attribute->cancellation());
     }
 
     /**
@@ -43,7 +43,7 @@ final class CommandAttributesTest extends TestCase
         );
 
         self::assertNull($attribute->description());
-        self::assertNull($attribute->cancellation());
+        self::assertNotNull($attribute->cancellation());
         self::assertSame(['qwerty', 'root'], $attribute->validation()?->groups);
     }
 
@@ -60,7 +60,7 @@ final class CommandAttributesTest extends TestCase
         );
 
         self::assertSame('qwerty', $attribute->description());
-        self::assertSame(5, $attribute->cancellation()?->timeout);
+        self::assertSame(5, $attribute->cancellation()->timeout);
         self::assertSame(['qwerty', 'root'], $attribute->validation()?->groups);
     }
 }
