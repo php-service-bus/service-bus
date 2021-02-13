@@ -19,6 +19,11 @@ services:
     arguments:
       $normalizers: []
 
+  ServiceBus\MessageSerializer\MessageSerializer:
+    class: ServiceBus\MessageSerializer\Symfony\SymfonySerializer
+    arguments:
+      $normalizers: []
+
   service_bus.decoder.service_locator:
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: ['container.service_locator']
@@ -91,6 +96,10 @@ services:
       $optionsFactory: '@ServiceBus\Endpoint\Options\DeliveryOptionsFactory'
       $logger: '@service_bus.logger'
 
+  # Default message retry strategy
+  ServiceBus\Common\EntryPoint\Retry\RetryStrategy:
+    class: ServiceBus\Retry\NullRetryStrategy
+
   # Handling incoming package
   ServiceBus\EntryPoint\EntryPointProcessor:
     class: ServiceBus\EntryPoint\DefaultEntryPointProcessor
@@ -99,6 +108,7 @@ services:
       $contextFactory: '@ServiceBus\Context\ContextFactory'
       $messagesRouter: '@ServiceBus\MessagesRouter\Router'
       $logger: '@service_bus.logger'
+      $retryStrategy: '@ServiceBus\Common\EntryPoint\Retry\RetryStrategy'
 
   # Application entry point
   ServiceBus\EntryPoint\EntryPoint:

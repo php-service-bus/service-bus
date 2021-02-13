@@ -68,13 +68,13 @@ final class TimeLimitedExecutor implements MessageExecutor
         $cancellationToken = $this->createCancellationToken();
 
         $this->cancellationWatcher = $cancellationToken->subscribe(
-            function() use ($message, $context, $cancellationToken, $deferred)
+            function () use ($message, $context, $cancellationToken, $deferred)
             {
                 try
                 {
                     $cancellationToken->throwIfRequested();
                 }
-                catch(\Throwable $throwable)
+                catch (\Throwable $throwable)
                 {
                     $context->logger()->error(
                         '`{incomingMessage}` message processing canceled by timeout (`{timeout}` seconds)',
@@ -90,7 +90,7 @@ final class TimeLimitedExecutor implements MessageExecutor
         );
 
         asyncCall(
-            function() use ($cancellationToken, $deferred, $timeStart, $message, $context)
+            function () use ($cancellationToken, $deferred, $timeStart, $message, $context)
             {
                 try
                 {
@@ -98,13 +98,13 @@ final class TimeLimitedExecutor implements MessageExecutor
 
                     $deferred->resolve();
                 }
-                catch(\Throwable $throwable)
+                catch (\Throwable $throwable)
                 {
                     $deferred->resolve($throwable);
                 }
                 finally
                 {
-                    if($this->cancellationWatcher !== null)
+                    if ($this->cancellationWatcher !== null)
                     {
                         $cancellationToken->unsubscribe($this->cancellationWatcher);
                     }
@@ -113,14 +113,20 @@ final class TimeLimitedExecutor implements MessageExecutor
                         'The processing of the `{incomingMessage}` message is complete. Elapsed time: `{executionTime}`',
                         [
                             'incomingMessage' => \get_class($message),
-                            'executionTime'   => \sprintf('%.2f', (string) (\microtime(true) - $timeStart))
+                            'executionTime'   => \sprintf('%.5f', (string) (\microtime(true) - $timeStart))
                         ]
                     );
                 }
             }
         );
 
-        return $deferred->promise();
+        /**
+         * @noinspection OneTimeUseVariablesInspection PhpUnnecessaryLocalVariableInspection
+         * @psalm-var Promise<void> $promise
+         */
+        $promise = $deferred->promise();
+
+        return $promise;
     }
 
     private function createCancellationToken(): CancellationToken

@@ -13,6 +13,7 @@ declare(strict_types = 0);
 namespace ServiceBus\Application;
 
 use ServiceBus\Application\DependencyInjection\Compiler\ImportMessageHandlersCompilerPass;
+use ServiceBus\Application\DependencyInjection\Compiler\Retry\SimpleRetryCompilerPass;
 use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
@@ -73,9 +74,12 @@ final class Bootstrap
      */
     public static function withEnvironmentValues(): self
     {
+        $entryPoint     = \getenv('APP_ENTRY_POINT_NAME');
+        $appEnvironment = \getenv('APP_ENVIRONMENT');
+
         return self::create(
-            (string) \getenv('APP_ENTRY_POINT_NAME'),
-            (string) \getenv('APP_ENVIRONMENT')
+            \is_string($entryPoint) ? $entryPoint : throw new ConfigurationCheckFailed('Incorrect endpoint name'),
+            \is_string($appEnvironment) ? $appEnvironment : throw new ConfigurationCheckFailed('Incorrect env'),
         );
     }
 
@@ -132,6 +136,23 @@ final class Bootstrap
         ]);
 
         $this->containerBuilder->addCompilerPasses(new ImportMessageHandlersCompilerPass());
+
+        return $this;
+    }
+
+    /**
+     * Enable simple message retrying strategy
+     *
+     * @var int $retryDelay Retry interval (in seconds)
+     */
+    public function enableSimpleRetryStrategy(int $maxRetryCount = 10, int $retryDelay = 3): self
+    {
+        $this->containerBuilder->addCompilerPasses(
+            new SimpleRetryCompilerPass(
+                maxRetryCount: $maxRetryCount,
+                retryDelay: $retryDelay
+            )
+        );
 
         return $this;
     }

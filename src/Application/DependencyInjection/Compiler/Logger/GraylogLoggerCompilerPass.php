@@ -87,6 +87,7 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
             'service_bus.logger.graylog.gzip'      => $this->gzipMessage,
             'service_bus.logger.graylog.log_level' => $this->logLevel,
         ];
+
         foreach ($parameters as $key => $value)
         {
             $containerBuilder->setParameter(

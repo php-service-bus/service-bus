@@ -18,6 +18,7 @@ use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Context\ContextFactory;
 use ServiceBus\Metadata\ServiceBusMetadata;
+use ServiceBus\Retry\NullRetryStrategy;
 use function Amp\call;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
@@ -67,14 +68,13 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     public function __construct(
         IncomingMessageDecoder $messageDecoder,
         ContextFactory $contextFactory,
-        RetryStrategy $retryStrategy,
+        ?RetryStrategy $retryStrategy = null,
         ?Router $messagesRouter = null,
         ?LoggerInterface $logger = null
-    )
-    {
+    ) {
         $this->messageDecoder = $messageDecoder;
         $this->contextFactory = $contextFactory;
-        $this->retryStrategy  = $retryStrategy;
+        $this->retryStrategy  = $retryStrategy ?? new NullRetryStrategy();
         $this->messagesRouter = $messagesRouter ?? new Router();
         $this->logger         = $logger ?? new NullLogger();
     }
@@ -82,11 +82,11 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     public function handle(IncomingPackage $package): Promise
     {
         return call(
-            function() use ($package): \Generator
+            function () use ($package): \Generator
             {
                 $messageInfo = $this->collectMessageInfo($package);
 
-                if($messageInfo === null)
+                if ($messageInfo === null)
                 {
                     yield $package->ack();
 
@@ -112,7 +112,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     filterByRecipient: self::isRetrying($metadata) ? self::failedInContext($metadata) : []
                 );
 
-                if($executors === null)
+                if ($executors === null)
                 {
                     yield $package->ack();
 
@@ -121,25 +121,25 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
 
                 $globalRetryQueue = [];
 
-                foreach($executors as $executor)
+                foreach ($executors as $executor)
                 {
                     try
                     {
                         /** @var \Throwable|null $result */
                         $result = yield $executor($message, $context);
 
-                        if($result instanceof \Throwable)
+                        if ($result instanceof \Throwable)
                         {
                             throw $result;
                         }
                     }
-                    catch(\Throwable $throwable)
+                    catch (\Throwable $throwable)
                     {
                         $context->logger()->throwable($throwable);
 
                         $handlerRetryStrategy = $executor->retryStrategy();
 
-                        if($handlerRetryStrategy !== null)
+                        if ($handlerRetryStrategy !== null)
                         {
                             yield $handlerRetryStrategy->retry(
                                 message: $message,
@@ -154,7 +154,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     }
                 }
 
-                if(!empty($globalRetryQueue))
+                if (!empty($globalRetryQueue))
                 {
                     yield $this->retryStrategy->retry(
                         message: $message,
@@ -182,11 +182,10 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         object $message,
         IncomingMessageMetadata $metadata,
         array $filterByRecipient = []
-    ): ?array
-    {
+    ): ?array {
         $executors = $this->messagesRouter->match($message);
 
-        if(\count($executors) === 0)
+        if (\count($executors) === 0)
         {
             $this->logger->debug(
                 'There are no handlers configured for the message "{messageClass}"',
@@ -199,11 +198,11 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
             return null;
         }
 
-        if(!empty($filterByRecipient))
+        if (!empty($filterByRecipient))
         {
             return \array_filter(
                 \array_map(
-                    static function(MessageExecutor $messageExecutor) use ($filterByRecipient)
+                    static function (MessageExecutor $messageExecutor) use ($filterByRecipient)
                     {
                         return \in_array($messageExecutor->id(), $filterByRecipient, true)
                             ? $messageExecutor
@@ -230,7 +229,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 metadata: $metadata
             );
         }
-        catch(DecodeMessageFailed $exception)
+        catch (DecodeMessageFailed $exception)
         {
             $this->logger->error(
                 'Failed to denormalize the message',
@@ -259,9 +258,9 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
 
         $metadataVariables = [];
 
-        foreach(ServiceBusMetadata::INTERNAL_METADATA_KEYS as $metadataHeader)
+        foreach (ServiceBusMetadata::INTERNAL_METADATA_KEYS as $metadataHeader)
         {
-            if(\array_key_exists($metadataHeader, $headers))
+            if (\array_key_exists($metadataHeader, $headers))
             {
                 $metadataVariables[$metadataHeader] = $headers[$metadataHeader];
 

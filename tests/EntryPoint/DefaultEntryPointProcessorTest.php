@@ -78,10 +78,11 @@ final class DefaultEntryPointProcessorTest extends TestCase
     public function decodeFailed(): void
     {
         $processor = new DefaultEntryPointProcessor(
-            $this->messageDecoder,
-            $this->contextFactory,
-            null,
-            $this->logger
+            messageDecoder: $this->messageDecoder,
+            contextFactory: $this->contextFactory,
+            retryStrategy: null,
+            messagesRouter: null,
+            logger: $this->logger
         );
 
         $package = new EntryPointTestIncomingPackage(
@@ -101,10 +102,11 @@ final class DefaultEntryPointProcessorTest extends TestCase
     public function withoutHandlers(): void
     {
         $processor = new DefaultEntryPointProcessor(
-            $this->messageDecoder,
-            $this->contextFactory,
-            null,
-            $this->logger
+            messageDecoder: $this->messageDecoder,
+            contextFactory: $this->contextFactory,
+            retryStrategy: null,
+            messagesRouter: null,
+            logger: $this->logger
         );
 
         $payload = self::serialize(new EntryPointTestMessage('id'));
@@ -147,10 +149,11 @@ final class DefaultEntryPointProcessorTest extends TestCase
         $router->registerHandler(EntryPointTestMessage::class, $executor);
 
         $processor = new DefaultEntryPointProcessor(
-            $this->messageDecoder,
-            $this->contextFactory,
-            $router,
-            $this->logger
+            messageDecoder: $this->messageDecoder,
+            contextFactory: $this->contextFactory,
+            retryStrategy: null,
+            messagesRouter: $router,
+            logger: $this->logger
         );
 
         $payload = self::serialize(new EntryPointTestMessage('id'));
@@ -192,10 +195,11 @@ final class DefaultEntryPointProcessorTest extends TestCase
         $router->registerHandler(EntryPointTestMessage::class, $executor);
 
         $processor = new DefaultEntryPointProcessor(
-            $this->messageDecoder,
-            $this->contextFactory,
-            $router,
-            $this->logger
+            messageDecoder: $this->messageDecoder,
+            contextFactory: $this->contextFactory,
+            retryStrategy: null,
+            messagesRouter: $router,
+            logger: $this->logger
         );
 
         $payload = self::serialize(new EntryPointTestMessage('id'));

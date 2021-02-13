@@ -64,8 +64,7 @@ final class DefaultMessageExecutor implements MessageExecutor
         \SplObjectStorage $arguments,
         DefaultHandlerOptions $options,
         array $argumentResolvers
-    )
-    {
+    ) {
         $this->handlerHash       = $handlerHash;
         $this->closure           = $closure;
         $this->arguments         = $arguments;
@@ -86,7 +85,7 @@ final class DefaultMessageExecutor implements MessageExecutor
     public function __invoke(object $message, ServiceBusContext $context): Promise
     {
         return call(
-            function() use ($message, $context): \Generator
+            function () use ($message, $context): \Generator
             {
                 $resolvedArgs = $this->collectArguments(
                     arguments: $this->arguments,
@@ -94,7 +93,7 @@ final class DefaultMessageExecutor implements MessageExecutor
                     context: $context
                 );
 
-                if($this->options->description !== null)
+                if ($this->options->description !== null)
                 {
                     $context->logger()->info($this->options->description);
                 }
@@ -111,16 +110,15 @@ final class DefaultMessageExecutor implements MessageExecutor
         \SplObjectStorage $arguments,
         object $message,
         ServiceBusContext $context
-    ): array
-    {
+    ): array {
         $preparedArguments = [];
 
         /** @var \ServiceBus\Common\MessageHandler\MessageHandlerArgument $argument */
-        foreach($arguments as $argument)
+        foreach ($arguments as $argument)
         {
-            foreach($this->argumentResolvers as $argumentResolver)
+            foreach ($this->argumentResolvers as $argumentResolver)
             {
-                if($argumentResolver->supports($argument))
+                if ($argumentResolver->supports($argument))
                 {
                     /** @psalm-suppress MixedAssignment Unknown data type */
                     $preparedArguments[] = $argumentResolver->resolve(

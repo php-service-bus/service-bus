@@ -34,13 +34,19 @@ use function Amp\delay;
  */
 final class ServiceBusKernel
 {
-    /** @var ContainerInterface */
+    /**
+     * @var ContainerInterface
+     */
     private $container;
 
-    /** @var EntryPoint */
+    /**
+     * @var EntryPoint
+     */
     private $entryPoint;
 
-    /** @var Transport */
+    /**
+     * @var Transport
+     */
     private $transport;
 
     public function __construct(ContainerInterface $globalContainer)

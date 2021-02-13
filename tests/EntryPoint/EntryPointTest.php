@@ -103,10 +103,11 @@ final class EntryPointTest extends TestCase
         }
 
         $this->entryPointProcessor = new DefaultEntryPointProcessor(
-            $messageDecoder,
-            new EntryPointTestContextFactory($this->logger),
-            $messageRouter,
-            $this->logger
+            messageDecoder: $messageDecoder,
+            contextFactory: new EntryPointTestContextFactory($this->logger),
+            retryStrategy: null,
+            messagesRouter: $messageRouter,
+            logger: $this->logger
         );
 
         $this->queue = new class() implements Queue

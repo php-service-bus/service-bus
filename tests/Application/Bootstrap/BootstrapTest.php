@@ -56,7 +56,7 @@ final class BootstrapTest extends TestCase
     public function withEmptyEnEntryPointName(): void
     {
         $this->expectException(ConfigurationCheckFailed::class);
-        $this->expectExceptionMessage('Entry point name must be specified');
+        $this->expectExceptionMessage('Incorrect endpoint name');
 
         Bootstrap::withEnvironmentValues();
     }
