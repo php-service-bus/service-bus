@@ -229,9 +229,9 @@ final class Bootstrap
      *
      * @see https://symfony.com/doc/current/service_container/compiler_passes.html
      */
-    public function addCompilerPasses(CompilerPassInterface ...$compilerPassInterfaces): self
+    public function addCompilerPasses(CompilerPassInterface ...$compilerPasses): self
     {
-        $this->containerBuilder->addCompilerPasses(...$compilerPassInterfaces);
+        $this->containerBuilder->addCompilerPasses(...$compilerPasses);
 
         return $this;
     }
