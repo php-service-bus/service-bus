@@ -1,0 +1,3 @@
+parameters:
+  some_parameter: '%env(SOME_VALUE)%'
+services:

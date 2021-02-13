@@ -51,7 +51,7 @@ final class ServiceBusKernelTest extends TestCase
             \mkdir($this->cacheDirectory);
         }
 
-        $this->bootstrap = Bootstrap::create('kernelTest', 'test');
+        $this->bootstrap = Bootstrap::create(__DIR__, 'kernelTest', 'test');
         $this->bootstrap->useCustomCacheDirectory($this->cacheDirectory);
 
         $this->bootstrap->applyModules(

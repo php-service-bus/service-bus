@@ -20,6 +20,7 @@ use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCom
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use ServiceBus\Application\Exceptions\ConfigurationCheckFailed;
 use ServiceBus\Common\Module\ServiceBusModule;
+use ServiceBus\Tests\Application\Bootstrap\Stubs\TestBootstrapExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use function ServiceBus\Tests\removeDirectory;
 
@@ -58,7 +59,7 @@ final class BootstrapTest extends TestCase
         $this->expectException(ConfigurationCheckFailed::class);
         $this->expectExceptionMessage('Incorrect endpoint name');
 
-        Bootstrap::withEnvironmentValues();
+        Bootstrap::withEnvironmentValues(__DIR__);
     }
 
     /**
@@ -71,7 +72,7 @@ final class BootstrapTest extends TestCase
             'Provided incorrect value of the environment: "qwerty". Allowable values: prod, dev, test'
         );
 
-        Bootstrap::create('ssss', 'qwerty');
+        Bootstrap::create(__DIR__, 'ssss', 'qwerty');
     }
 
     /**
@@ -81,7 +82,7 @@ final class BootstrapTest extends TestCase
     {
         $this->expectException(ConfigurationCheckFailed::class);
 
-        Bootstrap::withDotEnv(__DIR__ . '/qwertyuiop.env');
+        Bootstrap::withDotEnv(__DIR__, __DIR__ . '/qwertyuiop.env');
     }
 
     /**
@@ -91,7 +92,17 @@ final class BootstrapTest extends TestCase
     {
         $this->expectException(ConfigurationCheckFailed::class);
 
-        Bootstrap::withDotEnv(__FILE__);
+        Bootstrap::withDotEnv(__DIR__, __FILE__);
+    }
+
+    /**
+     * @test
+     */
+    public function withIncorrectRootDirectoryPath(): void
+    {
+        $this->expectException(ConfigurationCheckFailed::class);
+
+        Bootstrap::create('/dfssf', 'abube', 'dev');
     }
 
     /**
@@ -99,7 +110,7 @@ final class BootstrapTest extends TestCase
      */
     public function buildWithCorrectParameters(): void
     {
-        $bootstrap = Bootstrap::create('abube', 'dev');
+        $bootstrap = Bootstrap::create(__DIR__, 'abube', 'dev');
 
         $container = $bootstrap->boot();
 
@@ -127,7 +138,7 @@ final class BootstrapTest extends TestCase
             }
         };
 
-        $bootstrap = Bootstrap::withDotEnv(__DIR__ . '/valid_dot_env_file.env');
+        $bootstrap = Bootstrap::withDotEnv(__DIR__, __DIR__ . '/valid_dot_env_file.env');
         $bootstrap->useCustomCacheDirectory($this->cacheDirectory);
         $bootstrap->addExtensions(new ServiceBusExtension());
         $bootstrap->addCompilerPasses(new TaggedMessageHandlersCompilerPass());
@@ -149,7 +160,7 @@ final class BootstrapTest extends TestCase
      */
     public function withLogger(): void
     {
-        $bootstrap = Bootstrap::create('withLogger', 'dev');
+        $bootstrap = Bootstrap::create(__DIR__, 'withLogger', 'dev');
         $bootstrap->addCompilerPasses(new StdOutLoggerCompilerPass());
 
         $bootstrap->boot();
@@ -162,7 +173,7 @@ final class BootstrapTest extends TestCase
      */
     public function withStdOutLogger(): void
     {
-        $bootstrap = Bootstrap::create('withStdOutLogger', 'dev');
+        $bootstrap = Bootstrap::create(__DIR__, 'withStdOutLogger', 'dev');
         $bootstrap->addCompilerPasses(new StdOutLoggerCompilerPass());
 
         $bootstrap->boot();
@@ -175,11 +186,31 @@ final class BootstrapTest extends TestCase
      */
     public function withGraylogLogger(): void
     {
-        $bootstrap = Bootstrap::create('withGraylogLogger', 'dev');
+        $bootstrap = Bootstrap::create(__DIR__, 'withGraylogLogger', 'dev');
         $bootstrap->addCompilerPasses(new GraylogLoggerCompilerPass());
 
         $bootstrap->boot();
 
         self::assertTrue(true);
+    }
+
+    /**
+     * @test
+     */
+    public function resolveEnvValue(): void
+    {
+        \putenv("SOME_VALUE=100500");
+
+        $bootstrap = Bootstrap::create(__DIR__, 'tests', 'dev');
+        $bootstrap->addExtensions(
+            new TestBootstrapExtension()
+        );
+
+        $container = $bootstrap->boot();
+
+        self::assertSame(
+            '100500',
+            $container->getParameter('some_parameter')
+        );
     }
 }

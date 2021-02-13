@@ -42,12 +42,13 @@ final class Bootstrap
      *
      * @param string $envFilePath Absolute path to .env file
      *
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect root directory path
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect .env file path
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect .env file format
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty entry point name
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty/incorrect environment value
      */
-    public static function withDotEnv(string $envFilePath): self
+    public static function withDotEnv(string $rootDirectoryPath, string $envFilePath): self
     {
         try
         {
@@ -60,7 +61,7 @@ final class Bootstrap
             throw new ConfigurationCheckFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
 
-        return self::withEnvironmentValues();
+        return self::withEnvironmentValues($rootDirectoryPath);
     }
 
     /**
@@ -69,25 +70,32 @@ final class Bootstrap
      *
      * @see https://github.com/php-service-bus/documentation/blob/master/pages/installation.md#the-list-of-environment-variables
      *
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect root directory path
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty entry point name
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty/incorrect environment value
      */
-    public static function withEnvironmentValues(): self
+    public static function withEnvironmentValues(string $rootDirectoryPath): self
     {
         $entryPoint     = \getenv('APP_ENTRY_POINT_NAME');
         $appEnvironment = \getenv('APP_ENVIRONMENT');
 
         return self::create(
-            \is_string($entryPoint) ? $entryPoint : throw new ConfigurationCheckFailed('Incorrect endpoint name'),
-            \is_string($appEnvironment) ? $appEnvironment : throw new ConfigurationCheckFailed('Incorrect env'),
+            rootDirectoryPath: $rootDirectoryPath,
+            entryPointName: \is_string($entryPoint)
+            ? $entryPoint
+            : throw new ConfigurationCheckFailed('Incorrect endpoint name'),
+            environment: \is_string($appEnvironment)
+            ? $appEnvironment
+            : throw new ConfigurationCheckFailed('Incorrect env'),
         );
     }
 
     /**
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect root directory path
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty entry point name
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty/incorrect environment value
      */
-    public static function create(string $entryPointName, string $environment): self
+    public static function create(string $rootDirectoryPath, string $entryPointName, string $environment): self
     {
         if ($entryPointName === '')
         {
@@ -103,7 +111,11 @@ final class Bootstrap
             throw new ConfigurationCheckFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
 
-        return new self($entryPointName, $env);
+        return new self(
+            rootDirectoryPath: $rootDirectoryPath,
+            entryPointName: $entryPointName,
+            environment: $env
+        );
     }
 
     /**
@@ -224,16 +236,22 @@ final class Bootstrap
         return $this;
     }
 
-    private function __construct(string $entryPointName, Environment $environment)
+    private function __construct(string $rootDirectoryPath, string $entryPointName, Environment $environment)
     {
+        if (\is_dir($rootDirectoryPath) === false || \is_readable($rootDirectoryPath) === false)
+        {
+            throw new ConfigurationCheckFailed('Incorrect root directory path');
+        }
+
         $this->containerBuilder = new ContainerBuilder(
             entryPointName: $entryPointName,
             environment: $environment
         );
 
         $this->containerBuilder->addParameters([
-            'service_bus.environment' => $environment->toString(),
-            'service_bus.entry_point' => $entryPointName,
+            'service_bus.environment'    => $environment->toString(),
+            'service_bus.entry_point'    => $entryPointName,
+            'service_bus.root_directory' => $rootDirectoryPath
         ]);
 
         $this->containerBuilder->addExtensions(new ServiceBusExtension());

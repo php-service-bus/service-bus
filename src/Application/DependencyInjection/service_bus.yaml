@@ -3,6 +3,10 @@ parameters:
   service_bus.default_destination_topic: ''
   service_bus.default_destination_key: ''
 
+  service_bus.environment: ''
+  service_bus.entry_point: ''
+  service_bus.root_directory: ''
+
   # Decoder relation
   service_bus.decoder_configuration: []
   # -'custom_encoder_key': 'custom_decoder_id'

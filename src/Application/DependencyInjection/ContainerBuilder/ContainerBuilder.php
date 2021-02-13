@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBu
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 
 /**
  * Symfony DI container builder.
@@ -197,7 +197,7 @@ final class ContainerBuilder
         $this->parameters['service_bus.environment'] = $this->environment->toString();
         $this->parameters['service_bus.entry_point'] = $this->entryPointName;
 
-        $containerBuilder = new SymfonyContainerBuilder(new ParameterBag($this->parameters));
+        $containerBuilder = new SymfonyContainerBuilder(new EnvPlaceholderParameterBag($this->parameters));
 
         /** @var Extension $extension */
         foreach ($this->extensions as $extension)
@@ -220,7 +220,7 @@ final class ContainerBuilder
             $module->boot($containerBuilder);
         }
 
-        $containerBuilder->compile();
+        $containerBuilder->compile(true);
 
         $this->dumpContainer($containerBuilder);
 
