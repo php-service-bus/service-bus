@@ -117,7 +117,7 @@ jobs:
         uses: jakejarvis/wait-action@master
 
       - name: Run tests with phpunit
-        run: XDEBUG_MODE=coverage php ./vendor/bin/phpunit --configuration ./phpunit.xml --coverage-clover=coverage.xml
+        run: XDEBUG_MODE=coverage php ./vendor/bin/phpunit --configuration ./phpunit.xml -- debug --coverage-clover=coverage.xml
 
       - name: Send code coverage report to Codecov.io
         uses: codecov/codecov-action@v1

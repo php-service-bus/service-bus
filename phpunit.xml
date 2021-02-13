@@ -56,6 +56,22 @@
             <directory>./vendor/php-service-bus/transport/tests/</directory>
         </testsuite>
 
+        <testsuite name="Component: telegram core">
+            <directory>./vendor/php-service-bus/telegram-bot-core/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: saga">
+            <directory>./vendor/php-service-bus/sagas/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: event sourcing">
+            <directory>./vendor/php-service-bus/event-sourcing/tests/</directory>
+        </testsuite>
+
+        <testsuite name="Component: scheduler">
+            <directory>./vendor/php-service-bus/scheduler/tests/</directory>
+        </testsuite>
+
         <testsuite name="PHP Service Bus">
             <directory>./tests/</directory>
         </testsuite>

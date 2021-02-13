@@ -34,7 +34,10 @@
       "ServiceBus\\Mutex\\Tests\\": "vendor/php-service-bus/mutex/tests/",
       "ServiceBus\\Storage\\Tests\\": "vendor/php-service-bus/storage/tests/",
       "ServiceBus\\Transport\\Tests\\": "vendor/php-service-bus/transport/tests/",
-      "ServiceBus\\TelegramBot\\Tests\\": "vendor/php-service-bus/telegram-bot-core/tests/"
+      "ServiceBus\\TelegramBot\\Tests\\": "vendor/php-service-bus/telegram-bot-core/tests/",
+      "ServiceBus\\EventSourcing\\Tests\\": "vendor/php-service-bus/event-sourcing/tests/",
+      "ServiceBus\\Sagas\\Tests\\": "vendor/php-service-bus/sagas/tests/",
+      "ServiceBus\\Scheduler\\Tests\\": "vendor/php-service-bus/scheduler/tests/"
     },
     "files": [
       "tests/functions.php"
@@ -70,7 +73,10 @@
     "kelunik/loop-block": "v1.0.*",
     "phpunit/phpunit": "v9.5.*",
     "vimeo/psalm": "v4.4.*",
-    "phpstan/phpstan": "v0.12.*"
+    "phpstan/phpstan": "v0.12.*",
+    "php-service-bus/sagas": "v5.0.*",
+    "php-service-bus/event-sourcing":"v5.0.*",
+    "php-service-bus/scheduler": "v5.0.*"
   },
   "prefer-stable": true,
   "minimum-stability": "stable",
