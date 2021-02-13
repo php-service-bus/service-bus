@@ -25,6 +25,16 @@ use function ServiceBus\Common\throwableMessage;
 final class DefaultContextLogger implements ContextLogger
 {
     /**
+     * @var string
+     */
+    private $messageId;
+
+    /**
+     * @var string
+     */
+    private $traceId;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -44,6 +54,9 @@ final class DefaultContextLogger implements ContextLogger
         $this->logger   = $logger;
         $this->message  = $message;
         $this->metadata = $metadata;
+
+        $this->messageId = $metadata->messageId();
+        $this->traceId   = $metadata->traceId();
     }
 
     public function throwable(\Throwable $throwable, array $extra = [], string $level = LogLevel::ERROR): void
@@ -140,8 +153,8 @@ final class DefaultContextLogger implements ContextLogger
     {
         return \array_merge($extra, [
             'incomingMessage' => \get_class($this->message),
-            'messageId'       => $this->metadata->messageId(),
-            'traceId'         => $this->metadata->get(ServiceBusMetadata::SERVICE_BUS_TRACE_ID),
+            'messageId'       => $this->messageId,
+            'traceId'         => $this->traceId,
             'retries'         => (int) $this->metadata->get(
                 key: ServiceBusMetadata::SERVICE_BUS_MESSAGE_RETRY_COUNT,
                 default: 0

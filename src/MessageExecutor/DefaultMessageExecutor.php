@@ -87,6 +87,7 @@ final class DefaultMessageExecutor implements MessageExecutor
         return call(
             function () use ($message, $context): \Generator
             {
+                /** @psalm-suppress MixedArgumentTypeCoercion */
                 $resolvedArgs = $this->collectArguments(
                     arguments: $this->arguments,
                     message: $message,

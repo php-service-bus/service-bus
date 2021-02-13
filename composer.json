@@ -72,7 +72,7 @@
     "php-service-bus/code-style-config": "v1.3.*",
     "kelunik/loop-block": "v1.0.*",
     "phpunit/phpunit": "v9.5.*",
-    "vimeo/psalm": "v4.4.*",
+    "vimeo/psalm": "v4.5.*",
     "phpstan/phpstan": "v0.12.*",
     "php-service-bus/sagas": "v5.0.*",
     "php-service-bus/event-sourcing":"v5.0.*",
@@ -83,11 +83,11 @@
   "scripts": {
     "psalm": "./vendor/bin/psalm --config=psalm.xml",
     "phpstan": "./vendor/bin/phpstan analyse src --level 7",
-    "tests": "./vendor/bin/phpunit --configuration phpunit.xml --verbose",
-    "coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --configuration phpunit.xml --coverage-html ./coverage --verbose --debug",
+    "tests": "./vendor/bin/phpunit --configuration phpunit.xml --debug --verbose --debug",
+    "coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --configuration phpunit.xml --coverage-html ./coverage --debug --verbose --debug",
     "cs-check": "./vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run",
     "cs-fix": "./vendor/bin/php-cs-fixer fix --allow-risky=yes",
-    "pre-commit": "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix --allow-risky=yes && ./vendor/bin/psalm --config=psalm.xml && ./vendor/bin/phpstan analyse src --level 7 && ./vendor/bin/phpunit --configuration phpunit.xml --verbose"
+    "pre-commit": "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix --allow-risky=yes && ./vendor/bin/psalm --config=psalm.xml && ./vendor/bin/phpstan analyse src --level 7 && ./vendor/bin/phpunit --configuration phpunit.xml --debug --verbose"
   },
   "config": {
     "optimize-autoloader": true

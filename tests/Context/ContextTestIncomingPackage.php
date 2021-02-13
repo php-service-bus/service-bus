@@ -16,6 +16,7 @@ use Amp\Promise;
 use Amp\Success;
 use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
+use function ServiceBus\Common\uuid;
 
 /**
  *
@@ -42,6 +43,11 @@ final class ContextTestIncomingPackage implements IncomingPackage
         $this->id      = $id;
         $this->headers = $headers;
         $this->payload = $payload;
+    }
+
+    public function traceId(): string
+    {
+        return uuid();
     }
 
     public function id(): string

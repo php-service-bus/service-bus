@@ -25,33 +25,34 @@ final class ReceivedMessageMetadata implements IncomingMessageMetadata
     private $messageId;
 
     /**
+     * @var string
+     */
+    private $traceId;
+
+    /**
      * @psalm-var array<string, string|int|float|bool|null>
      * @var array
      */
     private $variables;
 
-    public static function create(string $messageId, array $variables): self
+    /**
+     * @psalm-param array<string, string|int|float|bool|null> $variables
+     */
+    public function __construct(string $messageId, string $traceId, array $variables)
     {
-        return new self(
-            messageId: $messageId,
-            variables: $variables
-        );
-    }
-
-    public function with(string $key, float|bool|int|string|null $value): self
-    {
-        $variables       = $this->variables;
-        $variables[$key] = $value;
-
-        return new self(
-            messageId: $this->messageId,
-            variables: $variables
-        );
+        $this->messageId = $messageId;
+        $this->traceId   = $traceId;
+        $this->variables = $variables;
     }
 
     public function messageId(): string
     {
         return $this->messageId;
+    }
+
+    public function traceId(): string
+    {
+        return $this->traceId;
     }
 
     public function variables(): array
@@ -67,14 +68,5 @@ final class ReceivedMessageMetadata implements IncomingMessageMetadata
     public function get(string $key, float|bool|int|string|null $default = null): string|int|float|bool|null
     {
         return $this->variables[$key] ?? $default;
-    }
-
-    /**
-     * @psalm-param array<string, string|int|float|bool|null> $variables
-     */
-    private function __construct(string $messageId, array $variables)
-    {
-        $this->messageId = $messageId;
-        $this->variables = $variables;
     }
 }

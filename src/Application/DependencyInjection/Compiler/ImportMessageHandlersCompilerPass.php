@@ -85,7 +85,8 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     {
         $fileContent = (string) \file_get_contents($filePath);
 
-        return \str_contains($fileContent, 'CommandHandler') || \str_contains($fileContent, 'EventListener');
+        return (\str_contains($fileContent, '#[CommandHandler') || \str_contains($fileContent, '#[EventListener')) &&
+            \str_contains($fileContent, '#[SagaEventListener') === false;
     }
 
     /**

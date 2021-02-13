@@ -22,6 +22,7 @@ use ServiceBus\Endpoint\MessageDeliveryEndpoint;
 use ServiceBus\Endpoint\Options\DefaultDeliveryOptions;
 use function Amp\Promise\wait;
 use function ServiceBus\Common\readReflectionPropertyValue;
+use function ServiceBus\Common\uuid;
 
 /**
  *
@@ -99,7 +100,7 @@ final class MessageDeliveryEndpointTest extends TestCase
             new DeliveryPackage(
                 message: new FirstEmptyMessage,
                 options: DefaultDeliveryOptions::nonPersistent(),
-                metadata: DeliveryMessageMetadata::create()
+                metadata: DeliveryMessageMetadata::create(uuid())
             )
         ));
     }

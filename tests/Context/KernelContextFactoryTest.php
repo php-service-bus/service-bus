@@ -47,7 +47,7 @@ final class KernelContextFactoryTest extends TestCase
         $context = $factory->create(
             new \stdClass(),
             [],
-            ReceivedMessageMetadata::create(uuid(), [])
+            new ReceivedMessageMetadata(uuid(), uuid(), [])
         );
 
         self::assertInstanceOf(KernelContext::class, $context);

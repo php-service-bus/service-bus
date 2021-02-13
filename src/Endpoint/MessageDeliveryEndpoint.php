@@ -135,6 +135,7 @@ final class MessageDeliveryEndpoint implements Endpoint
         );
 
         return new OutboundPackage(
+            traceId: $package->metadata->traceId(),
             payload: $payload,
             headers: $headers,
             destination: $destination,

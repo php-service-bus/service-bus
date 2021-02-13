@@ -80,11 +80,13 @@ final class SimpleRetryStrategy implements RetryStrategy
                     try
                     {
                         $messageExecutors = \implode(',', \array_keys($details->executors));
-                        $outcomeMetadata  = DeliveryMessageMetadata::create([
-                            ServiceBusMetadata::SERVICE_BUS_MESSAGE_RETRY_COUNT => $currentRetryCount,
-                            ServiceBusMetadata::SERVICE_BUS_MESSAGE_FAILED_IN   => $messageExecutors,
-                            ServiceBusMetadata::SERVICE_BUS_TRACE_ID            => self::traceId($context)
-                        ]);
+                        $outcomeMetadata  = DeliveryMessageMetadata::create(
+                            traceId: $context->metadata()->traceId(),
+                            variables: [
+                                ServiceBusMetadata::SERVICE_BUS_MESSAGE_RETRY_COUNT => $currentRetryCount,
+                                ServiceBusMetadata::SERVICE_BUS_MESSAGE_FAILED_IN   => $messageExecutors,
+                            ]
+                        );
 
                         $context->logger()->info(
                             'Resending an `{messageClass}` message to the queue wit delay `{delay}`',
@@ -160,7 +162,7 @@ final class SimpleRetryStrategy implements RetryStrategy
                     $insertQuery = insertQuery('failed_messages', [
                         'id'              => uuid(),
                         'message_id'      => $context->metadata()->messageId(),
-                        'trace_id'        => self::traceId($context),
+                        'trace_id'        => $context->metadata()->traceId(),
                         'message_hash'    => $messageHash,
                         'message_class'   => \get_class($message),
                         'message_payload' => $messagePayload,
@@ -194,13 +196,6 @@ final class SimpleRetryStrategy implements RetryStrategy
                 }
             }
         );
-    }
-
-    private static function traceId(ServiceBusContext $context): ?string
-    {
-        $traceId = $context->metadata()->get(ServiceBusMetadata::SERVICE_BUS_TRACE_ID);
-
-        return $traceId !== null ? (string) $traceId : null;
     }
 
     private static function currentRetryCount(ServiceBusContext $context): int

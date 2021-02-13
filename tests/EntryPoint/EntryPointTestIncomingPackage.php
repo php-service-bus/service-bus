@@ -16,6 +16,7 @@ use Amp\Promise;
 use Amp\Success;
 use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
+use function ServiceBus\Common\uuid;
 
 /**
  *
@@ -47,17 +48,16 @@ final class EntryPointTestIncomingPackage implements IncomingPackage
         $this->id      = $messageId;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function id(): string
     {
         return $this->id;
     }
 
-    /**
-     * @inheritDoc
-     */
+    public function traceId(): string
+    {
+        return uuid();
+    }
+
     public function origin(): DeliveryDestination
     {
         return new class() implements DeliveryDestination
@@ -65,41 +65,26 @@ final class EntryPointTestIncomingPackage implements IncomingPackage
         };
     }
 
-    /**
-     * @inheritDoc
-     */
     public function payload(): string
     {
         return $this->payload;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function headers(): array
     {
         return $this->headers;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function ack(): Promise
     {
         return new Success();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function nack(bool $requeue, ?string $withReason = null): Promise
     {
         return new Success();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function reject(bool $requeue, ?string $withReason = null): Promise
     {
         return new Success();

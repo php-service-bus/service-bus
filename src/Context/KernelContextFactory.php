@@ -51,7 +51,6 @@ final class KernelContextFactory implements ContextFactory
     public function create(object $message, array $headers, IncomingMessageMetadata $metadata): ServiceBusContext
     {
         return new KernelContext(
-            message: $message,
             headers: $headers,
             metadata: $metadata,
             endpointRouter: $this->endpointRouter,

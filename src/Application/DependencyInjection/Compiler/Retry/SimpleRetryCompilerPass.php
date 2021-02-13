@@ -77,6 +77,7 @@ final class SimpleRetryCompilerPass implements CompilerPassInterface
 
     private function checkConfiguration(ContainerBuilder $container): void
     {
+        /** @noinspection ClassConstantCanBeUsedInspection */
         if (
             \interface_exists('ServiceBus\Storage\Common\DatabaseAdapter') === false ||
             $container->has(DatabaseAdapter::class) === false

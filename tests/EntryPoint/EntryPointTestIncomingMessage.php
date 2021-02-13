@@ -16,6 +16,7 @@ use Amp\Promise;
 use Amp\Success;
 use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
+use function ServiceBus\Common\uuid;
 
 /**
  *
@@ -47,6 +48,11 @@ final class EntryPointTestIncomingMessage implements IncomingPackage
     public function id(): string
     {
         return $this->id;
+    }
+
+    public function traceId(): string
+    {
+        return uuid();
     }
 
     public function origin(): DeliveryDestination

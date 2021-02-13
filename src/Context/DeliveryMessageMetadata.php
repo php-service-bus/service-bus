@@ -20,14 +20,19 @@ use ServiceBus\Common\Context\OutcomeMessageMetadata;
 final class DeliveryMessageMetadata implements OutcomeMessageMetadata
 {
     /**
+     * @var string
+     */
+    private $traceId;
+
+    /**
      * @psalm-var array<string, string|int|float|bool|null>
      * @var array
      */
     private $variables;
 
-    public static function create(array $variables = []): self
+    public static function create(string $traceId, array $variables = []): self
     {
-        return new self($variables);
+        return new self($traceId, $variables);
     }
 
     public function with(string $key, float|bool|int|string|null $value): self
@@ -35,7 +40,12 @@ final class DeliveryMessageMetadata implements OutcomeMessageMetadata
         $variables       = $this->variables;
         $variables[$key] = $value;
 
-        return new self($variables);
+        return new self($this->traceId, $variables);
+    }
+
+    public function traceId(): string
+    {
+        return $this->traceId;
     }
 
     public function variables(): array
@@ -56,8 +66,9 @@ final class DeliveryMessageMetadata implements OutcomeMessageMetadata
     /**
      * @psalm-param array<string, string|int|float|bool|null> $variables
      */
-    private function __construct(array $variables)
+    private function __construct(string $traceId, array $variables)
     {
+        $this->traceId   = $traceId;
         $this->variables = $variables;
     }
 }

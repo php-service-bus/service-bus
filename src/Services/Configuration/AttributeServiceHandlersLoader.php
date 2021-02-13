@@ -103,6 +103,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
 
         if ($attribute instanceof HasCancellation)
         {
+            /** @psalm-suppress PossiblyUndefinedMethod */
             $options = $options->limitExecutionTime($attribute->cancellation()->timeout);
         }
 

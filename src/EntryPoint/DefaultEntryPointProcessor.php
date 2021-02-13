@@ -108,7 +108,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
 
                 $executors = $this->collectExecutors(
                     message: $message,
-                    metadata: $metadata,
+                    traceId: $package->traceId(),
                     filterByRecipient: self::isRetrying($metadata) ? self::failedInContext($metadata) : []
                 );
 
@@ -180,7 +180,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
      */
     private function collectExecutors(
         object $message,
-        IncomingMessageMetadata $metadata,
+        string $traceId,
         array $filterByRecipient = []
     ): ?array {
         $executors = $this->messagesRouter->match($message);
@@ -191,7 +191,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 'There are no handlers configured for the message "{messageClass}"',
                 [
                     'messageClass' => \get_class($message),
-                    'traceId'      => self::traceId($metadata),
+                    'traceId'      => $traceId,
                 ]
             );
 
@@ -220,7 +220,11 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     {
         [$headers, $metadataVariables] = $this->splitHeaders($package);
 
-        $metadata = ReceivedMessageMetadata::create($package->id(), $metadataVariables);
+        $metadata = new ReceivedMessageMetadata(
+            messageId: $package->id(),
+            traceId: $package->traceId(),
+            variables: $metadataVariables
+        );
 
         try
         {
@@ -237,7 +241,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     throwableDetails($exception),
                     [
                         'packageId' => $package->id(),
-                        'traceId'   => self::traceId($metadata),
+                        'traceId'   => $package->traceId(),
                         'payload'   => $package->payload(),
                     ]
                 )
@@ -269,13 +273,6 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         }
 
         return [$headers, $metadataVariables];
-    }
-
-    private static function traceId(IncomingMessageMetadata $metadata): ?string
-    {
-        $traceId = $metadata->get(ServiceBusMetadata::SERVICE_BUS_TRACE_ID);
-
-        return $traceId !== null ? (string) $traceId : null;
     }
 
     /**

@@ -13,7 +13,6 @@ declare(strict_types = 0);
 
 namespace ServiceBus\Context;
 
-use Amp\Delayed;
 use Amp\Promise;
 use ServiceBus\Common\Context\ContextLogger;
 use ServiceBus\Common\Context\IncomingMessageMetadata;
@@ -32,11 +31,6 @@ use function Amp\call;
  */
 final class KernelContext implements ServiceBusContext
 {
-    /**
-     * @var object
-     */
-    private $message;
-
     /**
      * @psalm-var array<string, int|float|string|null>
      * @var array
@@ -72,14 +66,12 @@ final class KernelContext implements ServiceBusContext
      * @psalm-param  array<string, int|float|string|null> $headers
      */
     public function __construct(
-        object $message,
         array $headers,
         IncomingMessageMetadata $metadata,
         EndpointRouter $endpointRouter,
         DeliveryOptionsFactory $optionsFactory,
         ContextLogger $logger
     ) {
-        $this->message        = $message;
         $this->headers        = $headers;
         $this->metadata       = $metadata;
         $this->endpointRouter = $endpointRouter;
@@ -101,7 +93,7 @@ final class KernelContext implements ServiceBusContext
                 $endpoints       = $this->endpointRouter->route($messageClass);
                 $deliveryOptions = $deliveryOptions ?? $this->optionsFactory->create($messageClass);
                 $metadata        = $this->enrichOutcomeMessageMetadata(
-                    metadata: $withMetadata ?? DeliveryMessageMetadata::create(),
+                    metadata: $withMetadata ?? DeliveryMessageMetadata::create($this->metadata->traceId()),
                     isRetry: false
                 );
 
@@ -143,7 +135,7 @@ final class KernelContext implements ServiceBusContext
             function () use ($messages, $deliveryOptions, $withMetadata): \Generator
             {
                 $metadata = $this->enrichOutcomeMessageMetadata(
-                    metadata: $withMetadata ?? DeliveryMessageMetadata::create(),
+                    metadata: $withMetadata ?? DeliveryMessageMetadata::create($this->metadata->traceId()),
                     isRetry: false
                 );
 
@@ -190,27 +182,6 @@ final class KernelContext implements ServiceBusContext
         );
     }
 
-    public function return(int $secondsDelay = 3, ?OutcomeMessageMetadata $withMetadata = null): Promise
-    {
-        return call(
-            function () use ($secondsDelay, $withMetadata): \Generator
-            {
-                $delay    = 0 < $secondsDelay ? $secondsDelay * 1000 : 1000;
-                $metadata = $this->enrichOutcomeMessageMetadata(
-                    metadata: $withMetadata ?? DeliveryMessageMetadata::create(),
-                    isRetry: true
-                );
-
-                yield new Delayed($delay);
-
-                yield $this->delivery(
-                    message: $this->message,
-                    withMetadata: $metadata
-                );
-            }
-        );
-    }
-
     public function violations(): ?ValidationViolations
     {
         return $this->validationViolations;
@@ -233,11 +204,6 @@ final class KernelContext implements ServiceBusContext
 
     private function enrichOutcomeMessageMetadata(OutcomeMessageMetadata $metadata, bool $isRetry): OutcomeMessageMetadata
     {
-        $metadata = $metadata->with(
-            key: ServiceBusMetadata::SERVICE_BUS_TRACE_ID,
-            value: $this->metadata->get(ServiceBusMetadata::SERVICE_BUS_TRACE_ID)
-        );
-
         if ($isRetry)
         {
             $metadata = $metadata->with(

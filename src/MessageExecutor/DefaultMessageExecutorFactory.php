@@ -61,6 +61,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
             \sprintf('%s:%s', (string) $messageHandler->messageClass, $messageHandler->methodName)
         );
 
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         $messageExecutor = new DefaultMessageExecutor(
             handlerHash: $handlerHash,
             closure: $messageHandler->closure,
