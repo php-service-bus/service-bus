@@ -17,11 +17,11 @@ namespace ServiceBus\Metadata;
  */
 interface ServiceBusMetadata
 {
-    public const SERVICE_BUS_SERIALIZER_TYPE = 'X-SERVICE-BUS-ENCODER';
-    public const SERVICE_BUS_MESSAGE_TYPE    = 'X-SERVICE-BUS-MESSAGE-TYPE';
+    public const SERVICE_BUS_SERIALIZER_TYPE = 'x-encoder-type';
+    public const SERVICE_BUS_MESSAGE_TYPE    = 'x-message-type';
 
-    public const SERVICE_BUS_MESSAGE_FAILED_IN   = 'X-SERVICE-BUS-FAILED_IN';
-    public const SERVICE_BUS_MESSAGE_RETRY_COUNT = 'X-SERVICE-BUS-RETRY-COUNT';
+    public const SERVICE_BUS_MESSAGE_FAILED_IN   = 'x-failed-in';
+    public const SERVICE_BUS_MESSAGE_RETRY_COUNT = 'x-retry-count';
 
     public const INTERNAL_METADATA_KEYS = [
         self::SERVICE_BUS_SERIALIZER_TYPE,
