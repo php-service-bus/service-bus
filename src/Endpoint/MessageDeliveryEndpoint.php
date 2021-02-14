@@ -130,7 +130,8 @@ final class MessageDeliveryEndpoint implements Endpoint
             $package->metadata->variables(),
             [
                 ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE    => \get_class($package->message),
-                ServiceBusMetadata::SERVICE_BUS_SERIALIZER_TYPE => $this->encoder->tag
+                ServiceBusMetadata::SERVICE_BUS_SERIALIZER_TYPE => $this->encoder->tag,
+                'content-type' => $this->encoder->handler->contentType()
             ]
         );
 
