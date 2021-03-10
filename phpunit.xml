@@ -16,6 +16,7 @@
         <ini name="error_reporting" value="-1"/>
         <env name="REDIS_CONNECTION_DSN" value="tcp://localhost:6379"/>
         <env name="TRANSPORT_CONNECTION_DSN" value="amqp://guest:guest@127.0.0.1:5672/?heartbeat=0"/>
+        <env name="NSQ_CONNECTION_DSN" value="tcp://localhost:4150"/>
         <env name="TEST_POSTGRES_DSN" value="pgsql://test:123456789@localhost:5432/test"/>
     </php>
     <testsuites>
