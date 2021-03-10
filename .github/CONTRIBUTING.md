@@ -41,4 +41,4 @@ If you discover any security related issues, please email [`contacts@desperado.d
 
 ## Reporting issues
 * [General problems](https://github.com/php-service-bus/service-bus/issues)
-* [Documentation](https://github.com/php-service-bus/documentation/issues)
+* [Documentation](https://github.com/php-service-bus/service-bus/issues)

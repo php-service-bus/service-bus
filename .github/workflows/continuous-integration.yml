@@ -41,7 +41,7 @@ jobs:
         run: composer update --no-ansi --no-interaction --no-progress
 
       - name: Run vimeo/psalm
-        run: ./vendor/bin/psalm --config=psalm.xml --shepherd
+        run: rm -rf ~/.cache/psalm/ && ./vendor/bin/psalm --config=psalm.xml --shepherd
 
   phpstan:
     name: PHPStan
