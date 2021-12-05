@@ -56,10 +56,18 @@ final class ServiceBusKernel
         /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
-        /** @var EntryPoint $entryPoint */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var EntryPoint $entryPoint
+         */
         $entryPoint = $serviceLocator->get(EntryPoint::class);
 
-        /** @var Transport $transport */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         *
+         * @var Transport $transport
+         */
         $transport = $serviceLocator->get(Transport::class);
 
         $this->entryPoint = $entryPoint;
@@ -138,55 +146,56 @@ final class ServiceBusKernel
     /**
      * Use default handler for signal "SIGINT" and "SIGTERM".
      *
-     * @noinspection PhpDocMissingThrowsInspection
-     *
-     * @psalm-param  array<mixed, int> $signals
-     *
-     * @param int   $stopDelay The delay before the completion (in seconds)
-     * @param int[] $signals   Processed signals
+     * @psalm-param positive-int $stopDelay The delay before the completion (in seconds)
+     * @psalm-param list<int>    $signals   Processed signals
      */
     public function useDefaultStopSignalHandler(int $stopDelay = 10, array $signals = [\SIGINT, \SIGTERM]): self
     {
-        $stopDelay = 0 >= $stopDelay ? 1 : $stopDelay;
-
-        /**
-         * @noinspection PhpUnhandledExceptionInspection
-         *
-         * @var LoggerInterface $logger
-         */
-        $logger = $this->getKernelContainerService('service_bus.logger');
-
-        $handler = function (string $watcherId, int $signalId) use ($stopDelay, $logger): \Generator
+        try
         {
-            yield delay($stopDelay * 1000);
+            /**
+             * @noinspection PhpUnhandledExceptionInspection
+             *
+             * @var LoggerInterface $logger
+             */
+            $logger = $this->getKernelContainerService('service_bus.logger');
 
-            $logger->info(
-                'A signal "{signalId}" was received',
-                [
-                    'signalId'  => $signalId,
-                    'watcherId' => $watcherId,
-                ]
-            );
+            $handler = function (string $watcherId, int $signalId) use ($stopDelay, $logger): \Generator
+            {
+                yield delay($stopDelay * 1000);
 
-            $this->entryPoint->stop();
-        };
+                $logger->info(
+                    'A signal "{signalId}" was received',
+                    [
+                        'signalId'  => $signalId,
+                        'watcherId' => $watcherId,
+                    ]
+                );
 
-        foreach ($signals as $signal)
-        {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            Loop::onSignal($signal, $handler);
+                $this->entryPoint->stop();
+            };
+
+            foreach ($signals as $signal)
+            {
+                /** @noinspection PhpUnhandledExceptionInspection */
+                Loop::onSignal($signal, $handler);
+            }
+
+            return $this;
         }
-
-        return $this;
+        catch (\Throwable $throwable)
+        {
+            throw new \LogicException(\sprintf('Incorrect signals configuration: %s', $throwable->getMessage()));
+        }
     }
 
     /**
      * Shut down after N seconds.
+     *
+     * @psalm-param positive-int $seconds
      */
     public function stopAfter(int $seconds): self
     {
-        $seconds = 0 >= $seconds ? 1 : $seconds;
-
         Loop::delay(
             $seconds * 1000,
             function () use ($seconds): void
@@ -252,7 +261,11 @@ final class ServiceBusKernel
         /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
-        /** @var object $object */
+        /**
+         * @noinspection PhpUnnecessaryLocalVariableInspection
+         *
+         * @var object $object
+         */
         $object = $serviceLocator->get($service);
 
         return $object;

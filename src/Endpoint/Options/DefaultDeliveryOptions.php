@@ -25,7 +25,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
      * Headers bag.
      *
      * @psalm-readonly
-     * @psalm-var array<string, int|float|string|null>
+     * @psalm-var array<non-empty-string, int|float|string|null>
      *
      * @var array
      */
@@ -77,7 +77,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @psalm-param array<string, int|float|string|null> $headers
+     * @psalm-param array<non-empty-string, int|float|string|null> $headers
      */
     public static function nonPersistent(array $headers = []): self
     {
@@ -122,7 +122,7 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     }
 
     /**
-     * @psalm-param array<string, int|float|string|null> $headers
+     * @psalm-param array<non-empty-string, int|float|string|null> $headers
      */
     private function __construct(
         array $headers = [],

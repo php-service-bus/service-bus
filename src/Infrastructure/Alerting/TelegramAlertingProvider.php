@@ -53,10 +53,15 @@ final class TelegramAlertingProvider implements AlertingProvider
     private $logger;
 
     /**
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $defaultChatId;
 
+    /**
+     * @psalm-param non-empty-string $defaultChatId
+     */
     public function __construct(
         InteractionsProvider $interactionsProvider,
         TelegramCredentials $credentials,

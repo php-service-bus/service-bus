@@ -26,7 +26,7 @@ final class ChainAlertingProvider implements AlertingProvider
     private $providers;
 
     /**
-     * @param AlertingProvider[] $providers
+     * @psalm-param list<AlertingProvider> $providers
      */
     public function __construct(array $providers)
     {

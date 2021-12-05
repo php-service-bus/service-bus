@@ -13,7 +13,7 @@ declare(strict_types = 0);
 namespace ServiceBus\Application\DependencyInjection\Compiler\Retry;
 
 use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
-use ServiceBus\MessageSerializer\MessageSerializer;
+use ServiceBus\MessageSerializer\ObjectSerializer;
 use ServiceBus\Retry\SimpleRetryStrategy;
 use ServiceBus\Storage\Common\DatabaseAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -21,23 +21,26 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
- *
- */
 final class SimpleRetryCompilerPass implements CompilerPassInterface
 {
     /**
+     * @psalm-var positive-int
+     *
      * @var int
      */
     private $maxRetryCount;
 
     /**
-     * Retry delay (in seconds)
+     * @psalm-var positive-int
      *
      * @var int
      */
     private $retryDelay;
 
+    /**
+     * @psalm-param positive-int $maxRetryCount
+     * @psalm-param positive-int $retryDelay
+     */
     public function __construct(int $maxRetryCount, int $retryDelay)
     {
         $this->maxRetryCount = $maxRetryCount;
@@ -51,7 +54,7 @@ final class SimpleRetryCompilerPass implements CompilerPassInterface
 
         $definition = new Definition(SimpleRetryStrategy::class, [
             new Reference(DatabaseAdapter::class),
-            new Reference(MessageSerializer::class),
+            new Reference(ObjectSerializer::class),
             '%service_bus.retry.simple.max_retry_count%',
             '%service_bus.retry.simple.retry_delay%'
         ]);

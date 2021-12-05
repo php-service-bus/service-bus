@@ -18,9 +18,6 @@ use function ServiceBus\Common\searchFiles;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-/**
- *
- */
 final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
@@ -31,9 +28,6 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 
             $projectFilesIterator = searchFiles(self::getDirectories($container), '/\.php/i');
 
-            /**
-             * @psalm-suppress MixedArgumentTypeCoercion
-             */
             $this->registerClasses(
                 container: $container,
                 projectFilesIterator: $projectFilesIterator,
@@ -44,14 +38,14 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 
     /**
      * @psalm-param \Generator<\SplFileInfo> $projectFilesIterator
-     * @psalm-param array<int, string>       $excludedFiles
+     * @psalm-param list<string>             $excludedFiles
      *
      * @throws \ServiceBus\Common\Exceptions\FileSystemException
      */
     private function registerClasses(
         ContainerBuilder $container,
-        \Generator $projectFilesIterator,
-        array $excludedFiles
+        \Generator       $projectFilesIterator,
+        array            $excludedFiles
     ): void {
         /** @var \SplFileInfo $file */
         foreach ($projectFilesIterator as $file)
@@ -59,7 +53,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
             /** @var string $filePath */
             $filePath = $file->getRealPath();
 
-            if (\in_array($filePath, $excludedFiles, true) === false)
+            if ($filePath !== '' && \in_array($filePath, $excludedFiles, true) === false)
             {
                 $class = extractNamespaceFromFile($filePath);
 
@@ -76,9 +70,8 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 
     private static function enabled(ContainerBuilder $container): bool
     {
-        return $container->hasParameter('service_bus.auto_import.handlers_enabled')
-            ? (bool) $container->getParameter('service_bus.auto_import.handlers_enabled')
-            : false;
+        return $container->hasParameter('service_bus.auto_import.handlers_enabled') &&
+            (bool) $container->getParameter('service_bus.auto_import.handlers_enabled');
     }
 
     private static function isMessageHandler(string $filePath): bool
@@ -90,13 +83,14 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @psalm-return array<int, string>
+     * @psalm-return list<non-empty-string>
      */
     private static function getDirectories(ContainerBuilder $container): array
     {
         /**
-         * @var string[]                  $directories
-         * @psalm-var  array<int, string> $directories
+         * @noinspection PhpUnnecessaryLocalVariableInspection
+         *
+         * @psalm-var list<non-empty-string> $directories
          */
         $directories = $container->hasParameter('service_bus.auto_import.handlers_directories') === true
             ? $container->getParameter('service_bus.auto_import.handlers_directories')
@@ -106,13 +100,14 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @psalm-return array<int, string>
+     * @psalm-return list<non-empty-string>
      */
     private static function getExcludedFiles(ContainerBuilder $container): array
     {
         /**
-         * @var string[]                 $excludedFiles
-         * @psalm-var array<int, string> $excludedFiles
+         * @noinspection PhpUnnecessaryLocalVariableInspection
+         *
+         * @psalm-var list<non-empty-string> $excludedFiles
          */
         $excludedFiles = $container->hasParameter('service_bus.auto_import.handlers_excluded')
             ? $container->getParameter('service_bus.auto_import.handlers_excluded')

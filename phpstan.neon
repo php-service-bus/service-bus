@@ -1,3 +1,7 @@
 parameters:
-    checkGenericClassInNonGenericObjectType: false
-    checkMissingIterableValueType: false
+	checkMissingIterableValueType: false
+	checkGenericClassInNonGenericObjectType: false
+	ignoreErrors:
+		- '#Cannot cast mixed to int#'
+		- '#Access to .* ServiceBus\\Services\\Configuration\\ServiceMessageHandlerType(.*)#'
+		- '#Method ServiceBus\\Context\\KernelContext::validationFailed\(\) is unused#'

@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="vendor/autoload.php" backupGlobals="false"
-         backupStaticAttributes="false" beStrictAboutTestsThatDoNotTestAnything="false" colors="true" verbose="true"
-         convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true"
-         failOnRisky="true" failOnWarning="true" stopOnFailure="false"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         colors="true"
+         cacheResult="false"
+         convertDeprecationsToExceptions="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="true"
+         stopOnError="false"
+         stopOnFailure="false"
+         beStrictAboutChangesToGlobalState="true"
+         beStrictAboutOutputDuringTests="true"
+         verbose="true"
+>
     <coverage>
         <include>
             <directory>./src</directory>
@@ -21,56 +31,44 @@
     </php>
     <testsuites>
 
-        <testsuite name="Component: common">
+        <testsuite name="PHP Service Bus: Common component">
             <directory>./vendor/php-service-bus/common/tests/</directory>
         </testsuite>
 
-        <testsuite name="Component: annotations (attributes) reader">
+        <testsuite name="PHP Service Bus: Annotations (attributes) reader component">
             <directory>./vendor/php-service-bus/annotations-reader/tests/</directory>
         </testsuite>
 
-        <testsuite name="Component: cache">
+        <testsuite name="PHP Service Bus: Cache component">
             <directory>./vendor/php-service-bus/cache/tests/</directory>
         </testsuite>
 
-        <testsuite name="Component: http client">
+        <testsuite name="PHP Service Bus: Http client component">
             <directory>./vendor/php-service-bus/http-client/tests/</directory>
         </testsuite>
 
-        <testsuite name="Component: message serializer">
+        <testsuite name="PHP Service Bus: Message serializer component">
             <directory>./vendor/php-service-bus/message-serializer/tests/</directory>
         </testsuite>
 
-        <testsuite name="Component: messages router">
+        <testsuite name="PHP Service Bus: Message router component">
             <directory>./vendor/php-service-bus/messages-router/tests/</directory>
         </testsuite>
 
-        <testsuite name="Component: mutex">
+        <testsuite name="PHP Service Bus: Mutex component">
             <directory>./vendor/php-service-bus/mutex/tests/</directory>
         </testsuite>
 
-        <testsuite name="Component: storage">
+        <testsuite name="PHP Service Bus: Storage component">
             <directory>./vendor/php-service-bus/storage/tests/</directory>
         </testsuite>
 
-        <testsuite name="Component: transport">
+        <testsuite name="PHP Service Bus: Transport component">
             <directory>./vendor/php-service-bus/transport/tests/</directory>
         </testsuite>
 
-        <testsuite name="Component: telegram core">
+        <testsuite name="PHP Service Bus: Telegram core component">
             <directory>./vendor/php-service-bus/telegram-bot-core/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Component: saga">
-            <directory>./vendor/php-service-bus/sagas/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Component: event sourcing">
-            <directory>./vendor/php-service-bus/event-sourcing/tests/</directory>
-        </testsuite>
-
-        <testsuite name="Component: scheduler">
-            <directory>./vendor/php-service-bus/scheduler/tests/</directory>
         </testsuite>
 
         <testsuite name="PHP Service Bus">

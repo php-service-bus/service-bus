@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnusedParameterInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -16,12 +16,12 @@ use Amp\Promise;
 use Amp\Success;
 use Psr\Log\LoggerInterface;
 use ServiceBus\Common\Context\ContextLogger;
+use ServiceBus\Common\Context\DefaultContextLogger;
 use ServiceBus\Common\Context\IncomingMessageMetadata;
 use ServiceBus\Common\Context\OutcomeMessageMetadata;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Context\ValidationViolations;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
-use ServiceBus\Context\DefaultContextLogger;
 
 /**
  *

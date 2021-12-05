@@ -3,7 +3,6 @@
         totallyTyped="true"
         useDocblockTypes="true"
         useDocblockPropertyTypes="true"
-        allowPhpStormGenerics="true"
         strictBinaryOperands="true"
         findUnusedPsalmSuppress="true"
         ignoreInternalFunctionFalseReturn="false"
@@ -21,5 +20,9 @@
 
     <issueHandlers>
         <PropertyNotSetInConstructor errorLevel="suppress"/>
+        <UnnecessaryVarAnnotation errorLevel="suppress"/>
     </issueHandlers>
+    <plugins>
+        <pluginClass class="Boesing\PsalmPluginStringf\Plugin"/>
+    </plugins>
 </psalm>

@@ -19,12 +19,11 @@ use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 
-/**
- *
- */
 final class DefaultMessageExecutor implements MessageExecutor
 {
     /**
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $handlerHash;
@@ -42,8 +41,6 @@ final class DefaultMessageExecutor implements MessageExecutor
     /**
      * Argument resolvers collection.
      *
-     * @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
-     *
      * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
     private $argumentResolvers;
@@ -54,16 +51,15 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $options;
 
     /**
-     * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
-     *
-     * @param \ServiceBus\ArgumentResolvers\ArgumentResolver[]                    $argumentResolvers
+     * @psalm-param non-empty-string                                     $handlerHash
+     * @psalm-param list<\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
      */
     public function __construct(
-        string $handlerHash,
-        \Closure $closure,
-        \SplObjectStorage $arguments,
+        string                $handlerHash,
+        \Closure              $closure,
+        \SplObjectStorage     $arguments,
         DefaultHandlerOptions $options,
-        array $argumentResolvers
+        array                 $argumentResolvers
     ) {
         $this->handlerHash       = $handlerHash;
         $this->closure           = $closure;
@@ -109,7 +105,7 @@ final class DefaultMessageExecutor implements MessageExecutor
      */
     private function collectArguments(
         \SplObjectStorage $arguments,
-        object $message,
+        object            $message,
         ServiceBusContext $context
     ): array {
         $preparedArguments = [];

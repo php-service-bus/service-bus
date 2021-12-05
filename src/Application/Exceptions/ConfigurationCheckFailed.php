@@ -12,13 +12,20 @@ declare(strict_types = 0);
 
 namespace ServiceBus\Application\Exceptions;
 
-/**
- *
- */
 final class ConfigurationCheckFailed extends \LogicException
 {
     public static function emptyEntryPointName(): self
     {
         return new self('Entry point name must be specified');
+    }
+
+    public static function emptyRootDirectoryPath(): self
+    {
+        return new self('Root directory path must be specified');
+    }
+
+    public static function emptyEnvironment(): self
+    {
+        return new self('Environment key must be specified');
     }
 }

@@ -40,7 +40,7 @@ final class Bootstrap
     /**
      * Create based on the environment parameters obtained from the ".env" file (via symfony/dotenv component).
      *
-     * @param string $envFilePath Absolute path to .env file
+     * @psalm-param non-empty-string $envFilePath Absolute path to .env file
      *
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect root directory path
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect .env file path
@@ -91,6 +91,7 @@ final class Bootstrap
     }
 
     /**
+     * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Environment key must be specified
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Incorrect root directory path
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty entry point name
      * @throws \ServiceBus\Application\Exceptions\ConfigurationCheckFailed Empty/incorrect environment value
@@ -100,6 +101,16 @@ final class Bootstrap
         if ($entryPointName === '')
         {
             throw ConfigurationCheckFailed::emptyEntryPointName();
+        }
+
+        if ($environment === '')
+        {
+            throw ConfigurationCheckFailed::emptyEnvironment();
+        }
+
+        if ($rootDirectoryPath === '')
+        {
+            throw ConfigurationCheckFailed::emptyRootDirectoryPath();
         }
 
         try
@@ -136,8 +147,8 @@ final class Bootstrap
      * Note: All files containing user-defined functions must be excluded
      * Note: Increases start time because of the need to scan files
      *
-     * @psalm-param array<int, string> $directories
-     * @psalm-param array<int, string> $excludedFiles
+     * @psalm-param list<non-empty-string> $directories
+     * @psalm-param list<non-empty-string> $excludedFiles
      */
     public function enableAutoImportMessageHandlers(array $directories, array $excludedFiles = []): self
     {
@@ -155,7 +166,8 @@ final class Bootstrap
     /**
      * Enable simple message retrying strategy
      *
-     * @var int $retryDelay Retry interval (in seconds)
+     * @psalm-param positive-int $maxRetryCount
+     * @psalm-param positive-int $retryDelay Retry interval (in seconds)
      */
     public function enableSimpleRetryStrategy(int $maxRetryCount = 10, int $retryDelay = 3): self
     {
@@ -192,6 +204,8 @@ final class Bootstrap
     /**
      * Use custom cache directory.
      * If not specified, the directory for storing temporary files will be used (sys_get_temp_dir).
+     *
+     * @psalm-param non-empty-string $cacheDirectoryPath
      */
     public function useCustomCacheDirectory(string $cacheDirectoryPath): self
     {
@@ -203,7 +217,7 @@ final class Bootstrap
     /**
      * Import parameters to container.
      *
-     * @psalm-param array<string, array<mixed, mixed>|bool|float|int|string|null> $parameters
+     * @psalm-param array<non-empty-string, array|bool|float|int|string|null> $parameters
      */
     public function importParameters(array $parameters): self
     {
@@ -236,6 +250,10 @@ final class Bootstrap
         return $this;
     }
 
+    /**
+     * @psalm-param non-empty-string $rootDirectoryPath
+     * @psalm-param non-empty-string $entryPointName
+     */
     private function __construct(string $rootDirectoryPath, string $entryPointName, Environment $environment)
     {
         if (\is_dir($rootDirectoryPath) === false || \is_readable($rootDirectoryPath) === false)

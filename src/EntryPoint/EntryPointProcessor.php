@@ -23,6 +23,8 @@ interface EntryPointProcessor
 {
     /**
      * Handle package.
+     *
+     * @psalm-return Promise<void>
      */
     public function handle(IncomingPackage $package): Promise;
 }

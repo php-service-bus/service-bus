@@ -24,9 +24,6 @@ use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use function Amp\asyncCall;
 use function Amp\call;
 
-/**
- *
- */
 final class TimeLimitedExecutor implements MessageExecutor
 {
     /**
@@ -40,7 +37,7 @@ final class TimeLimitedExecutor implements MessageExecutor
     private $options;
 
     /**
-     * @var string|null
+     * @var non-empty-string|null
      */
     private $cancellationWatcher;
 
@@ -67,7 +64,8 @@ final class TimeLimitedExecutor implements MessageExecutor
 
         $cancellationToken = $this->createCancellationToken();
 
-        $this->cancellationWatcher = $cancellationToken->subscribe(
+        /** @psalm-var non-empty-string $cancellationWatcher */
+        $cancellationWatcher = $cancellationToken->subscribe(
             function () use ($message, $context, $cancellationToken, $deferred)
             {
                 try
@@ -88,6 +86,8 @@ final class TimeLimitedExecutor implements MessageExecutor
                 }
             }
         );
+
+        $this->cancellationWatcher = $cancellationWatcher;
 
         asyncCall(
             function () use ($cancellationToken, $deferred, $timeStart, $message, $context)

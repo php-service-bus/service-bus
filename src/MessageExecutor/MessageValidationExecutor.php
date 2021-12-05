@@ -44,9 +44,9 @@ final class MessageValidationExecutor implements MessageExecutor
     private $options;
 
     public function __construct(
-        MessageExecutor $executor,
+        MessageExecutor       $executor,
         DefaultHandlerOptions $options,
-        ValidatorInterface $validator
+        ValidatorInterface    $validator
     ) {
         $this->executor  = $executor;
         $this->options   = $options;
@@ -90,7 +90,12 @@ final class MessageValidationExecutor implements MessageExecutor
         /** @var \Symfony\Component\Validator\ConstraintViolation $violation */
         foreach ($violations as $violation)
         {
-            $errors[] = new ValidationViolation($violation->getPropertyPath(), (string) $violation->getMessage());
+            $propertyPath = $violation->getPropertyPath();
+
+            if ($propertyPath !== '')
+            {
+                $errors[] = new ValidationViolation($propertyPath, (string) $violation->getMessage());
+            }
         }
 
         try

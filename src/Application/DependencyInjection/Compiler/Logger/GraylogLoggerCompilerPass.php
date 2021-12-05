@@ -25,16 +25,22 @@ use Symfony\Component\DependencyInjection\Reference;
 final class GraylogLoggerCompilerPass implements CompilerPassInterface
 {
     /**
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $host;
 
     /**
+     * @psalm-var positive-int
+     *
      * @var int
      */
     private $port;
 
     /**
+     * @psalm-var Logger::DEBUG | Logger::INFO | Logger::NOTICE | Logger::WARNING | Logger::ERROR | Logger::CRITICAL | Logger::ALERT | Logger::EMERGENCY
+     *
      * @var int
      */
     private $logLevel;
@@ -44,6 +50,11 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
      */
     private $gzipMessage;
 
+    /**
+     * @psalm-param non-empty-string $host
+     * @psalm-param positive-int $port
+     * @psalm-param Logger::DEBUG | Logger::INFO | Logger::NOTICE | Logger::WARNING | Logger::ERROR | Logger::CRITICAL | Logger::ALERT | Logger::EMERGENCY $logLevel
+     */
     public function __construct(
         string $host = '0.0.0.0',
         int $port = 514,

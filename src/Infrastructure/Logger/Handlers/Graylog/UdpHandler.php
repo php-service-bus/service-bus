@@ -44,6 +44,10 @@ final class UdpHandler extends AbstractProcessingHandler
      */
     private $gzipMessage;
 
+    /**
+     * @psalm-param non-empty-string $host
+     * @psalm-param Logger::DEBUG | Logger::INFO | Logger::NOTICE | Logger::WARNING | Logger::ERROR | Logger::CRITICAL | Logger::ALERT | Logger::EMERGENCY $level
+     */
     public function __construct(
         string $host = '0.0.0.0',
         int $port = 514,
@@ -112,8 +116,7 @@ final class UdpHandler extends AbstractProcessingHandler
             $uri,
             $errno,
             $errstr,
-            0,
-            \STREAM_CLIENT_CONNECT
+            0
         );
 
         if ($stream === false)

@@ -19,24 +19,16 @@ services:
 
   # Symfony serializer message decoder
   service_bus.decoder.default_handler:
-    class: ServiceBus\MessageSerializer\Symfony\SymfonySerializer
-    arguments:
-      $normalizers: []
+    class: ServiceBus\MessageSerializer\Symfony\SymfonyJsonObjectSerializer
 
-  ServiceBus\MessageSerializer\MessageSerializer:
-    class: ServiceBus\MessageSerializer\Symfony\SymfonySerializer
-    arguments:
-      $normalizers: []
+  ServiceBus\MessageSerializer\ObjectSerializer:
+    class: ServiceBus\MessageSerializer\Symfony\SymfonyJsonObjectSerializer
 
   service_bus.decoder.service_locator:
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: ['container.service_locator']
     arguments:
       - service_bus.decoder.default_handler: '@service_bus.decoder.default_handler'
-
-  # @see TaggedMessageHandlersCompilerPass
-  service_bus.services_locator:
-    public: true
 
   # Application environment
   ServiceBus\Environment:
@@ -130,6 +122,19 @@ services:
     arguments:
       - ServiceBus\Services\Configuration\ServiceHandlersLoader: '@ServiceBus\Services\Configuration\ServiceHandlersLoader'
 
+  # Resolve message object
+  ServiceBus\ArgumentResolvers\MessageArgumentResolver:
+
+  # Resolve execution context
+  ServiceBus\ArgumentResolvers\ContextArgumentResolver:
+
+  # Resolve autowire dependencies
+  ServiceBus\ArgumentResolvers\ContainerArgumentResolver:
+    arguments:
+      # see TaggedMessageHandlersCompilerPass::process
+      $serviceLocator: '@service_bus.services_locator'
+    tags: ['service_bus_argument_resolver']
+
   # Default message executor factory
   ServiceBus\Common\MessageExecutor\MessageExecutorFactory:
     class: ServiceBus\MessageExecutor\DefaultMessageExecutorFactory
@@ -179,22 +184,9 @@ services:
   ServiceBus\MessagesRouter\Router:
     configurator: ['@ServiceBus\MessagesRouter\ChainRouterConfigurator', configure]
 
-  # Passing message to arguments
-  ServiceBus\ArgumentResolvers\MessageArgumentResolver:
-
-  # Passing context to arguments
-  ServiceBus\ArgumentResolvers\ContextArgumentResolver:
-
-  # Autowiring of registered services in arguments
-  ServiceBus\ArgumentResolvers\ContainerArgumentResolver:
-    arguments:
-      # see TaggedMessageHandlersCompilerPass::process
-      $serviceLocator: '@service_bus.services_locator'
-    tags: ['service_bus_argument_resolver']
-
-  # Mutexes factory
-  ServiceBus\Mutex\MutexFactory:
-    class: ServiceBus\Mutex\InMemory\InMemoryMutexFactory
+  # Mutexes service
+  ServiceBus\Mutex\MutexService:
+    class: ServiceBus\Mutex\InMemory\InMemoryMutexService
 
   # Connection pool for http client
   Amp\Http\Client\Connection\ConnectionPool:

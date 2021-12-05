@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUndefinedClassInspection */
+<?php
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -38,7 +38,7 @@ final class EventListener implements HasDescription, HasValidation
     private $description;
 
     /**
-     * @psalm-param array<string, string> $validationGroups
+     * @psalm-param list<non-empty-string> $validationGroups
      */
     public function __construct(
         ?string $description = null,

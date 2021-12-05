@@ -30,6 +30,8 @@ final class Environment
     ];
 
     /**
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $environment;
@@ -60,6 +62,8 @@ final class Environment
 
     /**
      * Creating the specified environment.
+     *
+     * @psalm-param non-empty-string $environment
      *
      * @throws \LogicException The value of the environment is not specified, or is incorrect
      */
@@ -114,6 +118,8 @@ final class Environment
 
     /**
      * Get a textual representation of the current environment.
+     *
+     * @psalm-return non-empty-string
      */
     public function toString(): string
     {
@@ -139,6 +145,9 @@ final class Environment
         }
     }
 
+    /**
+     * @psalm-param non-empty-string $environment
+     */
     private function __construct(string $environment)
     {
         $this->environment = $environment;

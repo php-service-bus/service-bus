@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUndefinedClassInspection */
+<?php
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -47,7 +47,8 @@ final class CommandHandler implements HasDescription, HasValidation, HasCancella
     private $cancellation;
 
     /**
-     * @param string[] $validationGroups
+     * @psalm-param list<non-empty-string> $validationGroups
+     * @psalm-param positive-int|int $executionTimeout
      */
     public function __construct(
         ?string $description = null,
@@ -57,7 +58,7 @@ final class CommandHandler implements HasDescription, HasValidation, HasCancella
     ) {
         $this->description  = $description;
         $this->validation   = $validationEnabled ? new WithValidation($validationGroups) : null;
-        $this->cancellation = $executionTimeout !== null
+        $this->cancellation = $executionTimeout !== null && $executionTimeout > 0
             ? new WithCancellation($executionTimeout)
             : WithCancellation::default();
     }

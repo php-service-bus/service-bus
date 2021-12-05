@@ -22,9 +22,6 @@ use Psr\Log\NullLogger;
  */
 final class GarbageCollectorWatcher
 {
-    /**
-     * @var int milliseconds
-     */
     private const DEFAULT_INTERVAL = 600000;
 
     /**
@@ -33,17 +30,21 @@ final class GarbageCollectorWatcher
     private $logger;
 
     /**
+     * @psalm-var positive-int
+     *
      * @var int
      */
     private $interval;
 
     /**
+     * @psalm-var non-empty-string|null
+     *
      * @var string|null
      */
     private $watcherId;
 
     /**
-     * @param int $interval delay in milliseconds
+     * @psalm-param positive-int $interval delay in milliseconds
      */
     public function __construct(int $interval = self::DEFAULT_INTERVAL, ?LoggerInterface $logger = null)
     {
@@ -65,7 +66,8 @@ final class GarbageCollectorWatcher
     {
         $logger = $this->logger;
 
-        $this->watcherId = Loop::repeat(
+        /** @psalm-var non-empty-string $watcherId */
+        $watcherId = Loop::repeat(
             $this->interval,
             static function () use ($logger): void
             {
@@ -77,6 +79,8 @@ final class GarbageCollectorWatcher
             }
         );
 
-        Loop::unreference($this->watcherId);
+        Loop::unreference($watcherId);
+
+        $this->watcherId = $watcherId;
     }
 }

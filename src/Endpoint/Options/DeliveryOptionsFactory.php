@@ -14,9 +14,6 @@ namespace ServiceBus\Endpoint\Options;
 
 use ServiceBus\Common\Endpoint\DeliveryOptions;
 
-/**
- *
- */
 interface DeliveryOptionsFactory
 {
     /**

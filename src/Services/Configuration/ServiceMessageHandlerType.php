@@ -10,8 +10,10 @@
 
 declare(strict_types = 0);
 
-namespace ServiceBus\EntryPoint\Exceptions;
+namespace ServiceBus\Services\Configuration;
 
-final class UnexpectedMessageDecoder extends \LogicException
+enum ServiceMessageHandlerType: int
 {
+    case EVENT_LISTENER = 0;
+    case COMMAND_HANDLER = 1;
 }

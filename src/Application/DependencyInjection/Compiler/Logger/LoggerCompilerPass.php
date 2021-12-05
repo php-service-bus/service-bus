@@ -22,9 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
- *
- */
 final class LoggerCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void

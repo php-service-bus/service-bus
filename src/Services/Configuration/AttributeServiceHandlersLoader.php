@@ -23,9 +23,6 @@ use ServiceBus\Services\Attributes\Options\HasValidation;
 use ServiceBus\Services\Exceptions\InvalidHandlerArguments;
 use ServiceBus\Services\Exceptions\UnableCreateClosure;
 
-/**
- *
- */
 final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
 {
     /**
@@ -110,7 +107,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
     }
 
     /**
-     * @param \ReflectionParameter[] $parameters
+     * @psalm-param list<\ReflectionParameter> $parameters
      *
      * @psalm-return class-string
      *
@@ -152,6 +149,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
         /** @psalm-var \Closure(object, \ServiceBus\Common\Context\ServiceBusContext):\Amp\Promise<void>|null $closure */
         $closure = $reflectionMethod->getClosure($service);
 
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
         // @codeCoverageIgnoreStart
         if ($closure === null)
         {
@@ -169,7 +167,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
     }
 
     /**
-     * @return MethodLevel[]
+     * @psalm-return list<MethodLevel>
      */
     private function readMethodLevelAttributes(object $service): array
     {

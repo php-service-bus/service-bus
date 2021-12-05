@@ -19,16 +19,21 @@ final class AlertMessage
 {
     /**
      * @psalm-readonly
+     * @psalm-var non-empty-string
      *
      * @var string
      */
     public $content;
 
     /**
+     * @psalm-param non-empty-string                $template
      * @psalm-param array<string, string|float|int> $placeholders
      */
     public function __construct(string $template, array $placeholders = [])
     {
-        $this->content = \str_replace(\array_keys($placeholders), \array_values($placeholders), $template);
+        /** @psalm-var non-empty-string $preparedContent */
+        $preparedContent = \str_replace(\array_keys($placeholders), \array_values($placeholders), $template);
+
+        $this->content = $preparedContent;
     }
 }

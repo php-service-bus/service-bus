@@ -64,6 +64,8 @@ final class EntryPoint
     /**
      * The max number of concurrent tasks.
      *
+     * @psalm-var positive-int
+     *
      * @var int
      */
     private $maxConcurrentTaskCount;
@@ -71,7 +73,7 @@ final class EntryPoint
     /**
      * Collection of identifier of tasks that are being processed
      *
-     * @psalm-var array<string, string>
+     * @psalm-var array<non-empty-string, non-empty-string>
      *
      * @var array
      */
@@ -80,10 +82,16 @@ final class EntryPoint
     /**
      * Throttling value (in milliseconds) while achieving the maximum number of simultaneously executed tasks.
      *
+     * @psalm-var positive-int $awaitDelay
+     *
      * @var int
      */
     private $awaitDelay;
 
+    /**
+     * @psalm-param positive-int $maxConcurrentTaskCount
+     * @psalm-param positive-int $awaitDelay
+     */
     public function __construct(
         Transport $transport,
         EntryPointProcessor $processor,
@@ -182,6 +190,7 @@ final class EntryPoint
             function () use ($package): void
             {
                 $this->processor->handle($package)->onResolve(
+                    /** @phpstan-ignore-next-line */
                     function (?\Throwable $throwable) use ($package): \Generator
                     {
                         try

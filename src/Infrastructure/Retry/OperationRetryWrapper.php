@@ -31,15 +31,11 @@ final class OperationRetryWrapper
         $this->options = $options ?? new RetryOptions();
     }
 
-    /**
-     * @param callable $operation           Wrapped operation
-     * @param string   ...$exceptionClasses Exceptions in which attempts are repeating the operation
-     */
-    public function __invoke(callable $operation, string ...$exceptionClasses): Promise
+    public function __invoke(callable $wrappedOperation, string ...$exceptionClasses): Promise
     {
         return retry(
             maxAttempts: $this->options->maxCount,
-            actor: $operation,
+            actor: $wrappedOperation,
             throwable: $exceptionClasses,
             backoff: new ConstantBackoff($this->options->delay)
         );

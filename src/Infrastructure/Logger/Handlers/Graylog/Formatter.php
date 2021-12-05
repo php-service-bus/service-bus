@@ -41,6 +41,8 @@ final class Formatter extends NormalizerFormatter
     /**
      * The name of the system for the Gelf log message.
      *
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $systemName;
@@ -48,21 +50,28 @@ final class Formatter extends NormalizerFormatter
     /**
      * Max length per field.
      *
+     * @psalm-var positive-int
+     *
      * @var int
      */
     private $maxLength;
 
+    /**
+     * @psalm-param non-empty-string|null $systemName
+     * @psalm-param positive-int|null $maxLength
+     */
     public function __construct(?string $systemName = null, ?int $maxLength = null)
     {
         parent::__construct('U.u');
 
-        $this->systemName = $systemName ?? (string) \gethostname();
+        $hostName = $systemName ?? \gethostname();
+        $hostName = $hostName !== false && $hostName !== '' ? $hostName : 'n/d';
+
+        $this->systemName = $hostName;
         $this->maxLength  = $maxLength ?? self::DEFAULT_MAX_LENGTH;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \RuntimeException if encoding fails and errors are not ignored
      */
     public function format(array $record): array
@@ -72,7 +81,7 @@ final class Formatter extends NormalizerFormatter
          *     datetime:int,
          *     message:string,
          *     level:int,
-         *     channel:string,
+         *     channel:string|null,
          *     extra:array|null,
          *     context:array|null
          * } $normalizedRecord
@@ -173,11 +182,7 @@ final class Formatter extends NormalizerFormatter
     }
 
     /**
-     * @param array|float|int|object|string|null $value
-     *
      * @throws \RuntimeException if encoding fails and errors are not ignored
-     *
-     * @return float|int|string|null
      */
     private function formatValue(array|float|int|object|string|null $value): float|int|string|null
     {

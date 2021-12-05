@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).

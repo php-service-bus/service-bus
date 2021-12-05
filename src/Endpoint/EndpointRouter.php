@@ -22,7 +22,7 @@ final class EndpointRouter
      *
      * name => [destination handler]
      *
-     * @psalm-var array<string, array<mixed, \ServiceBus\Endpoint\Endpoint>>
+     * @psalm-var array<class-string, list<\ServiceBus\Endpoint\Endpoint>>
      *
      * @var \ServiceBus\Endpoint\Endpoint[][]
      */
@@ -31,7 +31,7 @@ final class EndpointRouter
     /**
      * Destination points for global routes (marked with "*").
      *
-     * @psalm-var array<array-key, \ServiceBus\Endpoint\Endpoint>
+     * @psalm-var array<non-empty-string,\ServiceBus\Endpoint\Endpoint>
      *
      * @var \ServiceBus\Endpoint\Endpoint[]
      */
@@ -53,7 +53,7 @@ final class EndpointRouter
     /**
      * Add custom endpoint for multiple messages.
      *
-     * @psalm-param array<array-key, class-string> $messages
+     * @psalm-param list<class-string> $messages
      */
     public function registerRoutes(array $messages, Endpoint $endpoint): void
     {
@@ -77,9 +77,7 @@ final class EndpointRouter
      * Receiving a message sending route
      * If no specific route is registered, the default endpoint route will be returned.
      *
-     * @psalm-return array<array-key, \ServiceBus\Endpoint\Endpoint>
-     *
-     * @return \ServiceBus\Endpoint\Endpoint[]
+     * @psalm-return list<\ServiceBus\Endpoint\Endpoint>
      */
     public function route(string $messageClass): array
     {
@@ -88,11 +86,13 @@ final class EndpointRouter
             return $this->routes[$messageClass];
         }
 
-        return $this->globalEndpoints;
+        return \array_values($this->globalEndpoints);
     }
 
     /**
      * Receive endpoint by index.
+     *
+     * @psalm-param non-empty-string $withIndex
      *
      * @throws \RuntimeException
      */

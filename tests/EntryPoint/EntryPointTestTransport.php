@@ -14,7 +14,7 @@ namespace ServiceBus\Tests\EntryPoint;
 
 use Amp\Promise;
 use Amp\Success;
-use ServiceBus\Metadata\ServiceBusMetadata;
+use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\Transport\Common\Package\OutboundPackage;
 use ServiceBus\Transport\Common\Queue;
 use ServiceBus\Transport\Common\QueueBind;

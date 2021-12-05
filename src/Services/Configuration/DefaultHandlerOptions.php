@@ -52,7 +52,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      * Validation groups.
      *
      * @psalm-readonly
-     * @psalm-var array<array-key, string>
+     * @psalm-var list<non-empty-string>
      *
      * @var array
      */
@@ -62,6 +62,7 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
      * Execution timeout (in seconds).
      *
      * @psalm-readonly
+     * @psalm-var positive-int|null
      *
      * @var int|null
      */
@@ -102,9 +103,9 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     }
 
     /**
-     * @psalm-param array<array-key, string> $validationGroups
+     * @psalm-param list<non-empty-string> $validationGroups
      */
-    public function enableValidation(array $validationGroups = []): self
+    public function enableValidation(array $validationGroups): self
     {
         return new self(
             isEventListener: $this->isEventListener,
@@ -116,6 +117,9 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
         );
     }
 
+    /**
+     * @psalm-param positive-int $executionTimeout
+     */
     public function limitExecutionTime(int $executionTimeout): self
     {
         return new self(
@@ -129,13 +133,14 @@ final class DefaultHandlerOptions implements MessageHandlerOptions
     }
 
     /**
-     * @psalm-param  array<array-key, string> $validationGroups
+     * @psalm-param list<non-empty-string> $validationGroups
+     * @psalm-param positive-int|null $executionTimeout
      */
     private function __construct(
         bool $isEventListener,
         bool $isCommandHandler,
-        bool $validationEnabled = false,
-        array $validationGroups = [],
+        bool $validationEnabled,
+        array $validationGroups,
         int|null $executionTimeout = null,
         ?string $description = null
     ) {

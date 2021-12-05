@@ -12,9 +12,6 @@ declare(strict_types = 0);
 
 namespace ServiceBus\Services\Exceptions;
 
-/**
- *
- */
 final class UnableCreateClosure extends \RuntimeException
 {
 }

@@ -14,9 +14,6 @@ namespace ServiceBus\Infrastructure\Alerting;
 
 use Amp\Promise;
 
-/**
- *
- */
 interface AlertingProvider
 {
     public function send(AlertMessage $message, ?AlertContext $context = null): Promise;

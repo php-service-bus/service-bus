@@ -16,14 +16,14 @@ use ServiceBus\Common\Context\IncomingMessageMetadata;
 use ServiceBus\Common\EntryPoint\Retry\FailureContext;
 use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
+use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\Context\ContextFactory;
-use ServiceBus\Metadata\ServiceBusMetadata;
 use ServiceBus\Retry\NullRetryStrategy;
 use function Amp\call;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed;
+use ServiceBus\MessageSerializer\Exceptions\DecodeObjectFailed;
 use ServiceBus\MessagesRouter\Router;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 use function ServiceBus\Common\throwableDetails;
@@ -59,18 +59,12 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
      */
     private $retryStrategy;
 
-    /**
-     * @param IncomingMessageDecoder $messageDecoder
-     * @param ContextFactory         $contextFactory
-     * @param Router                 $messagesRouter
-     * @param LoggerInterface        $logger
-     */
     public function __construct(
         IncomingMessageDecoder $messageDecoder,
-        ContextFactory $contextFactory,
-        ?RetryStrategy $retryStrategy = null,
-        ?Router $messagesRouter = null,
-        ?LoggerInterface $logger = null
+        ContextFactory         $contextFactory,
+        ?RetryStrategy         $retryStrategy = null,
+        ?Router                $messagesRouter = null,
+        ?LoggerInterface       $logger = null
     ) {
         $this->messageDecoder = $messageDecoder;
         $this->contextFactory = $contextFactory;
@@ -93,23 +87,18 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     return;
                 }
 
-                /**
-                 * @psalm-var object                               $message
-                 * @psalm-var array<string, int|float|string|null> $headers
-                 * @psalm-var IncomingMessageMetadata              $metadata
-                 */
-                [$message, $headers, $metadata] = $messageInfo;
-
                 $context = $this->contextFactory->create(
-                    message: $message,
-                    headers: $headers,
-                    metadata: $metadata
+                    message: $messageInfo['message'],
+                    headers: $messageInfo['headers'],
+                    metadata: $messageInfo['metadata']
                 );
 
                 $executors = $this->collectExecutors(
-                    message: $message,
+                    message: $messageInfo['message'],
                     traceId: $package->traceId(),
-                    filterByRecipient: self::isRetrying($metadata) ? self::failedInContext($metadata) : []
+                    filterByRecipient: self::isRetrying($messageInfo['metadata'])
+                        ? self::failedInContext($messageInfo['metadata'])
+                        : []
                 );
 
                 if ($executors === null)
@@ -126,7 +115,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     try
                     {
                         /** @var \Throwable|null $result */
-                        $result = yield $executor($message, $context);
+                        $result = yield $executor($messageInfo['message'], $context);
 
                         if ($result instanceof \Throwable)
                         {
@@ -142,7 +131,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                         if ($handlerRetryStrategy !== null)
                         {
                             yield $handlerRetryStrategy->retry(
-                                message: $message,
+                                message: $messageInfo['message'],
                                 context: $context,
                                 details: new FailureContext([$executor->id() => throwableMessage($throwable)])
                             );
@@ -154,10 +143,10 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     }
                 }
 
-                if (!empty($globalRetryQueue))
+                if (\count($globalRetryQueue) !== 0)
                 {
                     yield $this->retryStrategy->retry(
-                        message: $message,
+                        message: $messageInfo['message'],
                         context: $context,
                         details: new FailureContext($globalRetryQueue)
                     );
@@ -174,14 +163,15 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
      * which the processing ended with an error.
      * If not, return all handlers.
      *
-     * @param string[] $filterByRecipient
+     * @psalm-param non-empty-string       $traceId
+     * @psalm-param list<non-empty-string> $filterByRecipient
      *
-     * @return MessageExecutor[]
+     * @psalm-return non-empty-list<MessageExecutor>
      */
     private function collectExecutors(
         object $message,
         string $traceId,
-        array $filterByRecipient = []
+        array  $filterByRecipient = []
     ): ?array {
         $executors = $this->messagesRouter->match($message);
 
@@ -198,11 +188,13 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
             return null;
         }
 
+        /** In case of reprocessing */
         if (!empty($filterByRecipient))
         {
-            return \array_filter(
+            /** @psalm-var list<MessageExecutor> $specificHandlers */
+            $specificHandlers = \array_filter(
                 \array_map(
-                    static function (MessageExecutor $messageExecutor) use ($filterByRecipient)
+                    static function (MessageExecutor $messageExecutor) use ($filterByRecipient): ?MessageExecutor
                     {
                         return \in_array($messageExecutor->id(), $filterByRecipient, true)
                             ? $messageExecutor
@@ -211,19 +203,33 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                     $executors
                 )
             );
+
+            if (\count($specificHandlers) !== 0)
+            {
+                return $specificHandlers;
+            }
+
+            return null;
         }
 
         return $executors;
     }
 
+    /**
+     * @psalm-return array{
+     *     message:object,
+     *     headers:array<non-empty-string, int|float|string|null>,
+     *     metadata:ReceivedMessageMetadata
+     * }|null
+     */
     private function collectMessageInfo(IncomingPackage $package): ?array
     {
-        [$headers, $metadataVariables] = $this->splitHeaders($package);
+        $typedHeaders = $this->splitHeaders($package);
 
         $metadata = new ReceivedMessageMetadata(
             messageId: $package->id(),
             traceId: $package->traceId(),
-            variables: $metadataVariables
+            variables: $typedHeaders['metadata']
         );
 
         try
@@ -233,7 +239,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 metadata: $metadata
             );
         }
-        catch (DecodeMessageFailed $exception)
+        catch (DecodeObjectFailed $exception)
         {
             $this->logger->error(
                 'Failed to denormalize the message',
@@ -250,11 +256,18 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
             return null;
         }
 
-        return [$message, $headers, $metadata];
+        return [
+            'message'  => $message,
+            'headers'  => $typedHeaders['headers'],
+            'metadata' => $metadata
+        ];
     }
 
     /**
-     * @psalm-return array<int, array<string, int|float|string|null>>
+     * @psalm-return array{
+     *     headers:array<non-empty-string, int|float|string|null>,
+     *     metadata:array<non-empty-string, string|int|float|bool|null>
+     * }
      */
     private function splitHeaders(IncomingPackage $package): array
     {
@@ -272,7 +285,10 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
             }
         }
 
-        return [$headers, $metadataVariables];
+        return [
+            'headers'  => $headers,
+            'metadata' => $metadataVariables
+        ];
     }
 
     /**
@@ -286,12 +302,25 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     /**
      * Handlers in which message processing was completed with an error.
      *
-     * @return string[]
+     * @psalm-return list<non-empty-string>
      */
     private static function failedInContext(IncomingMessageMetadata $metadata): array
     {
         $value = (string) ($metadata->get(ServiceBusMetadata::SERVICE_BUS_MESSAGE_FAILED_IN, ''));
 
-        return \explode(',', $value);
+        /**
+         * @psalm-var list<non-empty-string> $messageExecutorIds
+         */
+        $messageExecutorIds = \array_filter(
+            \array_map(
+                static function (string $each): ?string
+                {
+                    return $each !== '' ? $each : null;
+                },
+                \explode(',', $value)
+            )
+        );
+
+        return $messageExecutorIds;
     }
 }

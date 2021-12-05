@@ -19,13 +19,14 @@ final class WithValidation
 {
     /**
      * @psalm-readonly
+     * @psalm-var list<non-empty-string>
      *
      * @var string[]
      */
     public $groups = [];
 
     /**
-     * @param string[] $groups
+     * @psalm-param list<non-empty-string> $groups
      */
     public function __construct(array $groups)
     {

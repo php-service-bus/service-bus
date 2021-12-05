@@ -23,9 +23,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 final class ServiceBusExtension extends Extension
 {
     /**
-     * @psalm-suppress MoreSpecificImplementedParamType
-     * @psalm-param    array<string, mixed> $configs
-     *
      * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
@@ -34,8 +31,8 @@ final class ServiceBusExtension extends Extension
         $loader->load(__DIR__ . '/../service_bus.yaml');
 
         /**
-         * @var string $key
-         * @var mixed  $value
+         * @psalm-var non-empty-string                 $key
+         * @psalm-var array|bool|string|int|float|null $value
          */
         foreach ($configs as $key => $value)
         {

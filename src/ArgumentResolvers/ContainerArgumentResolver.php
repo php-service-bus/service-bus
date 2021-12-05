@@ -16,9 +16,6 @@ use Psr\Container\ContainerInterface;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 
-/**
- *
- */
 final class ContainerArgumentResolver implements ArgumentResolver
 {
     /**
@@ -38,7 +35,12 @@ final class ContainerArgumentResolver implements ArgumentResolver
 
     public function resolve(object $message, ServiceBusContext $context, MessageHandlerArgument $argument): object
     {
-        /** @var object $object */
+        /**
+         * @noinspection PhpUnhandledExceptionInspection
+         * @noinspection PhpUnnecessaryLocalVariableInspection
+         *
+         * @var object $object
+         */
         $object = $this->serviceLocator->get((string) $argument->typeClass);
 
         return $object;

@@ -27,6 +27,7 @@ final class RetryOptions
      * Maximum number of repetitions.
      *
      * @psalm-readonly
+     * @psalm-var positive-int
      *
      * @var int
      */
@@ -36,11 +37,16 @@ final class RetryOptions
      * Delay at repetitions (milliseconds).
      *
      * @psalm-readonly
+     * @psalm-var positive-int
      *
      * @var int
      */
     public $delay;
 
+    /**
+     * @psalm-param positive-int $maxCount
+     * @psalm-param positive-int $delay
+     */
     public function __construct(int $maxCount = self::DEFAULT_RETRY_MAX_COUNT, int $delay = self::DEFAULT_RETRY_DELAY)
     {
         $this->maxCount = $maxCount;

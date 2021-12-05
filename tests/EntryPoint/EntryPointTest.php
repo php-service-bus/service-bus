@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -27,7 +27,7 @@ use ServiceBus\EntryPoint\EntryPoint;
 use ServiceBus\EntryPoint\EntryPointProcessor;
 use ServiceBus\EntryPoint\IncomingMessageDecoder;
 use ServiceBus\MessageExecutor\DefaultMessageExecutorFactory;
-use ServiceBus\MessageSerializer\Symfony\SymfonySerializer;
+use ServiceBus\MessageSerializer\Symfony\SymfonyJsonObjectSerializer;
 use ServiceBus\MessagesRouter\Router;
 use ServiceBus\Services\Configuration\AttributeServiceHandlersLoader;
 use ServiceBus\Services\Configuration\ServiceMessageHandler;
@@ -73,7 +73,7 @@ final class EntryPointTest extends TestCase
         $this->logger->pushProcessor(new PsrLogMessageProcessor());
 
         $containerBuilder = new ContainerBuilder();
-        $containerBuilder->set('default_serializer', new SymfonySerializer());
+        $containerBuilder->set('default_serializer', new SymfonyJsonObjectSerializer());
         $containerBuilder->set(EntryPointTestDependency::class, new EntryPointTestDependency);
 
         $messageDecoder = new IncomingMessageDecoder(
@@ -246,6 +246,8 @@ final class EntryPointTest extends TestCase
         {
             if (\str_contains($message, 'message processing canceled by timeout (`10` seconds)'))
             {
+                self::assertTrue(true);
+
                 return;
             }
         }

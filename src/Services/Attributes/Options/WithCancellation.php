@@ -23,6 +23,7 @@ final class WithCancellation
      * Operation timeout (in seconds).
      *
      * @psalm-readonly
+     * @psalm-var positive-int
      *
      * @var int
      */
@@ -35,6 +36,9 @@ final class WithCancellation
         );
     }
 
+    /**
+     * @psalm-param positive-int $timeout
+     */
     public function __construct(int $timeout)
     {
         $this->timeout = $timeout;

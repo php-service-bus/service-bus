@@ -14,22 +14,26 @@ namespace ServiceBus\Context;
 
 use ServiceBus\Common\Context\OutcomeMessageMetadata;
 
-/**
- *
- */
 final class DeliveryMessageMetadata implements OutcomeMessageMetadata
 {
     /**
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $traceId;
 
     /**
-     * @psalm-var array<string, string|int|float|bool|null>
+     * @psalm-var array<non-empty-string, string|int|float|bool|null>
+     *
      * @var array
      */
     private $variables;
 
+    /**
+     * @psalm-param non-empty-string                                    $traceId
+     * @psalm-param array<non-empty-string, string|int|float|bool|null> $variables
+     */
     public static function create(string $traceId, array $variables = []): self
     {
         return new self($traceId, $variables);
@@ -64,7 +68,8 @@ final class DeliveryMessageMetadata implements OutcomeMessageMetadata
     }
 
     /**
-     * @psalm-param array<string, string|int|float|bool|null> $variables
+     * @psalm-param non-empty-string                                    $traceId
+     * @psalm-param array<non-empty-string, string|int|float|bool|null> $variables
      */
     private function __construct(string $traceId, array $variables)
     {

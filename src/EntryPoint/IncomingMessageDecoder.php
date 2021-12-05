@@ -14,10 +14,10 @@ namespace ServiceBus\EntryPoint;
 
 use Psr\Container\ContainerInterface;
 use ServiceBus\Common\Context\IncomingMessageMetadata;
+use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder;
-use ServiceBus\MessageSerializer\Exceptions\DecodeMessageFailed;
-use ServiceBus\MessageSerializer\MessageDecoder;
-use ServiceBus\Metadata\ServiceBusMetadata;
+use ServiceBus\MessageSerializer\Exceptions\DecodeObjectFailed;
+use ServiceBus\MessageSerializer\ObjectSerializer;
 
 /**
  * Decoding of incoming messages.
@@ -33,7 +33,7 @@ final class IncomingMessageDecoder
      *   'custom_encoder_key' => 'custom_decoder_id'
      * ]
      *
-     * @psalm-var array<string, string>
+     * @psalm-var array<non-empty-string, non-empty-string>
      *
      * @var string[]
      */
@@ -45,7 +45,7 @@ final class IncomingMessageDecoder
     private $decodersLocator;
 
     /**
-     * @psalm-param array<string, string> $decodersConfiguration
+     * @psalm-param array<non-empty-string, non-empty-string> $decodersConfiguration
      */
     public function __construct(array $decodersConfiguration, ContainerInterface $decodersLocator)
     {
@@ -53,6 +53,11 @@ final class IncomingMessageDecoder
         $this->decodersLocator       = $decodersLocator;
     }
 
+    /**
+     * @psalm-param non-empty-string $payload
+     *
+     * @throws \ServiceBus\MessageSerializer\Exceptions\DecodeObjectFailed
+     */
     public function decode(string $payload, IncomingMessageMetadata $metadata): object
     {
         $encoderKey = (string) $metadata->get(
@@ -60,26 +65,30 @@ final class IncomingMessageDecoder
             default: self::DEFAULT_DECODER
         );
 
+        $encoderKey = $encoderKey !== '' ? $encoderKey : self::DEFAULT_DECODER;
+
         /** @psalm-var class-string|null $toMessageClass */
         $toMessageClass = $metadata->get(ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE);
 
         if ($toMessageClass === null)
         {
-            throw new DecodeMessageFailed('Unable to find message classFQN declaration');
+            throw new DecodeObjectFailed('Unable to find message classFQN declaration');
         }
 
         return $this
             ->findDecoderByKey($encoderKey)
             ->decode(
-                serializedMessage: $payload,
-                messageClass: $toMessageClass
+                serializedObject: $payload,
+                objectClass: $toMessageClass
             );
     }
 
     /**
+     * @psalm-param non-empty-string $encoderKey
+     *
      * @throws \ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder Could not find decoder
      */
-    private function findDecoderByKey(string $encoderKey): MessageDecoder
+    private function findDecoderByKey(string $encoderKey): ObjectSerializer
     {
         return $this->obtainDecoder(
             $this->decodersConfiguration[$encoderKey] ?? self::DEFAULT_DECODER
@@ -87,13 +96,20 @@ final class IncomingMessageDecoder
     }
 
     /**
+     * @psalm-param non-empty-string $decoderId
+     *
      * @throws \ServiceBus\EntryPoint\Exceptions\UnexpectedMessageDecoder Could not find decoder
      */
-    private function obtainDecoder(string $decoderId): MessageDecoder
+    private function obtainDecoder(string $decoderId): ObjectSerializer
     {
         if ($this->decodersLocator->has($decoderId))
         {
-            /** @var MessageDecoder $decoder */
+            /**
+             * @noinspection PhpUnhandledExceptionInspection
+             * @noinspection PhpUnnecessaryLocalVariableInspection
+             *
+             * @var ObjectSerializer $decoder
+             */
             $decoder = $this->decodersLocator->get($decoderId);
 
             return $decoder;

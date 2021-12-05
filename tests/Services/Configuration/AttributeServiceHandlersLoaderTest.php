@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -121,6 +121,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
             self::assertTrue($handler->messageHandler->hasArguments);
             self::assertCount(2, $handler->messageHandler->arguments);
 
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             if ($handler->messageHandler->options->isCommandHandler)
             {
                 self::assertSame(TestConfigurationLoaderMessage::class, $handler->messageHandler->messageClass);

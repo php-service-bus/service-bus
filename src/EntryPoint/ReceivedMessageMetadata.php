@@ -14,29 +14,33 @@ namespace ServiceBus\EntryPoint;
 
 use ServiceBus\Common\Context\IncomingMessageMetadata;
 
-/**
- *
- */
 final class ReceivedMessageMetadata implements IncomingMessageMetadata
 {
     /**
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $messageId;
 
     /**
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $traceId;
 
     /**
-     * @psalm-var array<string, string|int|float|bool|null>
+     * @psalm-var array<non-empty-string, string|int|float|bool|null>
+     *
      * @var array
      */
     private $variables;
 
     /**
-     * @psalm-param array<string, string|int|float|bool|null> $variables
+     * @psalm-param non-empty-string                                    $messageId
+     * @psalm-param non-empty-string                                    $traceId
+     * @psalm-param array<non-empty-string, string|int|float|bool|null> $variables
      */
     public function __construct(string $messageId, string $traceId, array $variables)
     {

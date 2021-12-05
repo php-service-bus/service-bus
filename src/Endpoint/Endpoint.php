@@ -22,6 +22,8 @@ interface Endpoint
 {
     /**
      * Receive endpoint name.
+     *
+     * @psalm-return non-empty-string
      */
     public function name(): string;
 
@@ -33,16 +35,16 @@ interface Endpoint
     /**
      * Send message to endpoint.
      *
-     * @throws \ServiceBus\MessageSerializer\Exceptions\EncodeMessageFailed
+     * @throws \ServiceBus\MessageSerializer\Exceptions\EncodeObjectFailed
      */
     public function delivery(DeliveryPackage $package): Promise;
 
     /**
      * Send messages to endpoint.
      *
-     * @param DeliveryPackage[] $packages
+     * @psalm-param list<DeliveryPackage> $packages
      *
-     * @throws \ServiceBus\MessageSerializer\Exceptions\EncodeMessageFailed
+     * @throws \ServiceBus\MessageSerializer\Exceptions\EncodeObjectFailed
      */
     public function deliveryBulk(array $packages): Promise;
 }

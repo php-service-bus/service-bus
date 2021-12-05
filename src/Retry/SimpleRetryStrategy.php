@@ -16,9 +16,9 @@ use Amp\Promise;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\EntryPoint\Retry\FailureContext;
 use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
+use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\Context\DeliveryMessageMetadata;
-use ServiceBus\MessageSerializer\MessageSerializer;
-use ServiceBus\Metadata\ServiceBusMetadata;
+use ServiceBus\MessageSerializer\ObjectSerializer;
 use ServiceBus\Storage\Common\DatabaseAdapter;
 use function Amp\call;
 use function Amp\delay;
@@ -27,9 +27,6 @@ use function ServiceBus\Common\throwableDetails;
 use function ServiceBus\Common\uuid;
 use function ServiceBus\Storage\Sql\insertQuery;
 
-/**
- *
- */
 final class SimpleRetryStrategy implements RetryStrategy
 {
     /**
@@ -38,7 +35,7 @@ final class SimpleRetryStrategy implements RetryStrategy
     private $databaseAdapter;
 
     /**
-     * @var MessageSerializer
+     * @var ObjectSerializer
      */
     private $messageSerializer;
 
@@ -56,7 +53,7 @@ final class SimpleRetryStrategy implements RetryStrategy
 
     public function __construct(
         DatabaseAdapter $databaseAdapter,
-        MessageSerializer $messageSerializer,
+        ObjectSerializer $messageSerializer,
         int $maxRetryCount,
         int $retryDelay
     ) {

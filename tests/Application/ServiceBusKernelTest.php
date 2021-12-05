@@ -118,6 +118,8 @@ final class ServiceBusKernelTest extends TestCase
                 $kernel->stopAfter(2);
 
                 yield $kernel->run($queue);
+
+                self::assertTrue(true);
             }
         );
     }

@@ -17,10 +17,8 @@ use ServiceBus\Endpoint\Options\DeliveryOptionsFactory;
 use Psr\Log\LoggerInterface;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Endpoint\EndpointRouter;
+use ServiceBus\Common\Context\DefaultContextLogger;
 
-/**
- *
- */
 final class KernelContextFactory implements ContextFactory
 {
     /**

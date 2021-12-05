@@ -1,7 +1,7 @@
 [![Packagist](https://img.shields.io/packagist/v/php-service-bus/service-bus.svg)](https://packagist.org/packages/php-service-bus/service-bus)
 [![Packagist](https://img.shields.io/packagist/dt/php-service-bus/service-bus.svg)](https://packagist.org/packages/php-service-bus/service-bus)
 ![Continuous Integration](https://github.com/php-service-bus/service-bus/workflows/Continuous%20Integration/badge.svg)
-[![codecov](https://codecov.io/gh/php-service-bus/service-bus/branch/v5.0/graph/badge.svg?token=0bKwdiuo0S)](https://codecov.io/gh/php-service-bus/service-bus)
+[![codecov](https://codecov.io/gh/php-service-bus/service-bus/branch/v5.1/graph/badge.svg?token=0bKwdiuo0S)](https://codecov.io/gh/php-service-bus/service-bus)
 [![Shepherd](https://shepherd.dev/github/php-service-bus/service-bus/coverage.svg)](https://shepherd.dev/github/php-service-bus/service-bus)
 [![Latest Stable Version](https://poser.pugx.org/php-service-bus/service-bus/v/stable)](https://packagist.org/packages/php-service-bus/service-bus)
 [![License](https://poser.pugx.org/php-service-bus/service-bus/license)](https://packagist.org/packages/php-service-bus/service-bus)

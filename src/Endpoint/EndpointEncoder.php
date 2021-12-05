@@ -12,8 +12,8 @@ declare(strict_types = 0);
 
 namespace ServiceBus\Endpoint;
 
-use ServiceBus\MessageSerializer\MessageEncoder;
-use ServiceBus\MessageSerializer\Symfony\SymfonySerializer;
+use ServiceBus\MessageSerializer\ObjectSerializer;
+use ServiceBus\MessageSerializer\Symfony\SymfonyJsonObjectSerializer;
 
 /**
  * Endpoint message encoder.
@@ -34,7 +34,7 @@ final class EndpointEncoder
     /**
      * @psalm-readonly
      *
-     * @var MessageEncoder
+     * @var ObjectSerializer
      */
     public $handler;
 
@@ -42,11 +42,11 @@ final class EndpointEncoder
     {
         return new self(
             tag: self::DEFAULT_ENCODER,
-            handler: new SymfonySerializer()
+            handler: new SymfonyJsonObjectSerializer()
         );
     }
 
-    public function __construct(string $tag, MessageEncoder $handler)
+    public function __construct(string $tag, ObjectSerializer $handler)
     {
         $this->tag     = $tag;
         $this->handler = $handler;

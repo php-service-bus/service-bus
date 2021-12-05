@@ -34,13 +34,15 @@ final class ContainerBuilder
     /**
      * Key=>value parameters
      *
-     * @psalm-var array<string, bool|string|int|float|array<mixed, mixed>|null>
+     * @psalm-var array<string, bool|string|int|float|array|null>
      *
      * @var array
      */
     private $parameters;
 
     /**
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $entryPointName;
@@ -72,6 +74,8 @@ final class ContainerBuilder
     private $environment;
 
     /**
+     * @psalm-var non-empty-string|null
+     *
      * @var string|null
      */
     private $cacheDirectory;
@@ -81,8 +85,11 @@ final class ContainerBuilder
      *
      * @var ConfigCache|null
      */
-    private $configCache ;
+    private $configCache;
 
+    /**
+     * @psalm-param non-empty-string $entryPointName
+     */
     public function __construct(string $entryPointName, Environment $environment)
     {
         $this->entryPointName = $entryPointName;
@@ -128,7 +135,7 @@ final class ContainerBuilder
     }
 
     /**
-     * @psalm-param array<string, bool|string|int|float|array<mixed, mixed>|null> $parameters
+     * @psalm-param array<string, bool|string|int|float|array|null> $parameters
      */
     public function addParameters(array $parameters): void
     {
@@ -140,10 +147,15 @@ final class ContainerBuilder
 
     /**
      * Setup cache directory path.
+     *
+     * @psalm-param non-empty-string $cacheDirectoryPath
      */
     public function setupCacheDirectoryPath(string $cacheDirectoryPath): void
     {
-        $this->cacheDirectory = \rtrim($cacheDirectoryPath, '/');
+        /** @psalm-var non-empty-string $cacheDirectoryPath */
+        $cacheDirectoryPath = \rtrim($cacheDirectoryPath, '/');
+
+        $this->cacheDirectory = $cacheDirectoryPath;
     }
 
     /**
@@ -166,7 +178,6 @@ final class ContainerBuilder
     {
         /**
          * @psalm-suppress UnresolvableInclude Include generated file
-         * @noinspection   PhpIncludeInspection
          */
         include_once $this->getContainerClassPath();
 
@@ -175,6 +186,7 @@ final class ContainerBuilder
 
         /**
          * @psalm-suppress UnsafeInstantiation
+         * @noinspection   PhpUnnecessaryLocalVariableInspection
          * @var ContainerInterface $container
          */
         $container = new $containerClassName();

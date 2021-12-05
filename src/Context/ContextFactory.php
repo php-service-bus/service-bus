@@ -15,13 +15,10 @@ namespace ServiceBus\Context;
 use ServiceBus\Common\Context\IncomingMessageMetadata;
 use ServiceBus\Common\Context\ServiceBusContext;
 
-/**
- *
- */
 interface ContextFactory
 {
     /**
-     * @psalm-param  array<string, int|float|string|null> $headers
+     * @psalm-param array<non-empty-string, int|float|string|null> $headers
      */
     public function create(object $message, array $headers, IncomingMessageMetadata $metadata): ServiceBusContext;
 }

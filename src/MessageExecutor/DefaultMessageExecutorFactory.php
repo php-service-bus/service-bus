@@ -18,14 +18,9 @@ use ServiceBus\Common\MessageHandler\MessageHandler;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 
-/**
- *
- */
 final class DefaultMessageExecutorFactory implements MessageExecutorFactory
 {
     /**
-     * @psalm-var array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver>
-     *
      * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
      */
     private $argumentResolvers;
@@ -36,7 +31,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
     private $validator;
 
     /**
-     * @psalm-param array<string, \ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
+     * @psalm-param list<\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
      */
     public function __construct(array $argumentResolvers, ?ValidatorInterface $validator = null)
     {
@@ -57,8 +52,9 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
         /** @var \ServiceBus\Services\Configuration\DefaultHandlerOptions $options */
         $options = $messageHandler->options;
 
+        /** @psalm-var non-empty-string $handlerHash */
         $handlerHash = \sha1(
-            \sprintf('%s:%s', (string) $messageHandler->messageClass, $messageHandler->methodName)
+            \sprintf('%s:%s', $messageHandler->messageClass, $messageHandler->methodName)
         );
 
         /** @psalm-suppress MixedArgumentTypeCoercion */

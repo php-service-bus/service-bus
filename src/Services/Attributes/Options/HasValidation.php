@@ -12,9 +12,6 @@ declare(strict_types = 0);
 
 namespace ServiceBus\Services\Attributes\Options;
 
-/**
- *
- */
 interface HasValidation
 {
     public function validation(): ?WithValidation;

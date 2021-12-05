@@ -32,10 +32,14 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
         $servicesReference = $serviceIds = [];
 
         /**
-         * @psalm-var array<string, array<mixed, string>> $taggedServices
+         * @psalm-var array<array-key, array<mixed, string>> $taggedServices
          */
         $taggedServices = $container->findTaggedServiceIds('service_bus.service');
 
+        /**
+         * @psalm-var non-empty-string $id
+         * @psalm-var list<non-empty-string> $tags
+         */
         foreach ($taggedServices as $id => $tags)
         {
             /** @psalm-var class-string|null $serviceClass */
@@ -55,6 +59,8 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
                     new Reference($id)
                 );
             }
+
+            unset($tags);
         }
 
         $container->setParameter(

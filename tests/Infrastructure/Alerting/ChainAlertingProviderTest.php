@@ -20,7 +20,7 @@ use ServiceBus\Infrastructure\Alerting\AlertingProvider;
 use ServiceBus\Infrastructure\Alerting\AlertMessage;
 use ServiceBus\Infrastructure\Alerting\ChainAlertingProvider;
 use function Amp\call;
-use function Amp\File\put;
+use function Amp\File\write;
 
 /**
  *
@@ -59,7 +59,7 @@ final class ChainAlertingProviderTest extends TestCase
                 return call(
                     function () use ($message): \Generator
                     {
-                        yield put($this->expectedFilePath, $message->content);
+                        yield write($this->expectedFilePath, $message->content);
                     }
                 );
             }

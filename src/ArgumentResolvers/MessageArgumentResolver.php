@@ -15,9 +15,6 @@ namespace ServiceBus\ArgumentResolvers;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 
-/**
- *
- */
 final class MessageArgumentResolver implements ArgumentResolver
 {
     public function supports(MessageHandlerArgument $argument): bool

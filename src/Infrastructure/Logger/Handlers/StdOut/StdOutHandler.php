@@ -29,6 +29,9 @@ final class StdOutHandler extends AbstractProcessingHandler
      */
     private $streamWriter;
 
+    /**
+     * @psalm-param Logger::DEBUG | Logger::INFO | Logger::NOTICE | Logger::WARNING | Logger::ERROR | Logger::CRITICAL | Logger::ALERT | Logger::EMERGENCY $level
+     */
     public function __construct(int $level = Logger::DEBUG, bool $bubble = true, ?FormatterInterface $formatter = null)
     {
         parent::__construct($level, $bubble);
@@ -43,9 +46,11 @@ final class StdOutHandler extends AbstractProcessingHandler
 
     protected function write(array $record): void
     {
+        /** @psalm-var array{formatted:string} $record */
+
         try
         {
-            $this->streamWriter->write((string) $record['formatted']);
+            $this->streamWriter->write($record['formatted']);
         }
         // @codeCoverageIgnoreStart
         catch (\Throwable)

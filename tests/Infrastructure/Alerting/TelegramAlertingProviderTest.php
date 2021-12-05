@@ -44,6 +44,8 @@ final class TelegramAlertingProviderTest extends TestCase
         );
 
         wait($alertingProvider->send(new AlertMessage('qwerty')));
+
+        self::assertTrue(true);
     }
 
     /**

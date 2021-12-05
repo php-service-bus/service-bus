@@ -16,12 +16,12 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\EntryPoint\DefaultEntryPointProcessor;
 use ServiceBus\EntryPoint\IncomingMessageDecoder;
 use ServiceBus\MessageExecutor\DefaultMessageExecutor;
-use ServiceBus\MessageSerializer\Symfony\SymfonySerializer;
+use ServiceBus\MessageSerializer\Symfony\SymfonyJsonObjectSerializer;
 use ServiceBus\MessagesRouter\Router;
-use ServiceBus\Metadata\ServiceBusMetadata;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use function Amp\Promise\wait;
@@ -64,7 +64,7 @@ final class DefaultEntryPointProcessorTest extends TestCase
         $this->contextFactory = new EntryPointTestContextFactory($this->logger);
 
         $containerBuilder = new ContainerBuilder();
-        $containerBuilder->set('default_serializer', new SymfonySerializer());
+        $containerBuilder->set('default_serializer', new SymfonyJsonObjectSerializer());
 
         $this->messageDecoder = new IncomingMessageDecoder(
             ['service_bus.decoder.default_handler' => 'default_serializer'],
@@ -131,12 +131,10 @@ final class DefaultEntryPointProcessorTest extends TestCase
     {
         $router = new Router();
 
-        $closure = \Closure::fromCallable(
-            static function (): void
-            {
-                throw new \RuntimeException('Some message execution failed');
-            }
-        );
+        $closure = (static function (): void
+        {
+            throw new \RuntimeException('Some message execution failed');
+        })(...);
 
         $executor = new DefaultMessageExecutor(
             handlerHash: '',
@@ -177,12 +175,10 @@ final class DefaultEntryPointProcessorTest extends TestCase
 
         $router = new Router();
 
-        $closure = \Closure::fromCallable(
-            static function () use (&$variable): void
-            {
-                $variable = 'handled';
-            }
-        );
+        $closure = (static function () use (&$variable): void
+        {
+            $variable = 'handled';
+        })(...);
 
         $executor = new DefaultMessageExecutor(
             handlerHash: '',

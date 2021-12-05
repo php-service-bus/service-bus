@@ -13,16 +13,13 @@ declare(strict_types = 0);
 namespace ServiceBus\Services;
 
 use ServiceBus\Common\MessageExecutor\MessageExecutorFactory;
-use ServiceBus\Common\MessageHandler\MessageHandler;
 use ServiceBus\MessagesRouter\Exceptions\MessageRouterConfigurationFailed;
 use ServiceBus\MessagesRouter\Router;
 use ServiceBus\MessagesRouter\RouterConfigurator;
 use ServiceBus\Services\Configuration\ServiceHandlersLoader;
+use ServiceBus\Services\Configuration\ServiceMessageHandlerType;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-/**
- *
- */
 final class MessagesRouterConfigurator implements RouterConfigurator
 {
     /**
@@ -56,9 +53,9 @@ final class MessagesRouterConfigurator implements RouterConfigurator
      */
     public function __construct(
         MessageExecutorFactory $executorFactory,
-        array $servicesList,
-        ServiceLocator $routingServiceLocator,
-        ServiceLocator $servicesServiceLocator
+        array                  $servicesList,
+        ServiceLocator         $routingServiceLocator,
+        ServiceLocator         $servicesServiceLocator
     ) {
         $this->executorFactory        = $executorFactory;
         $this->servicesList           = $servicesList;
@@ -84,38 +81,19 @@ final class MessagesRouterConfigurator implements RouterConfigurator
                 /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
                 foreach ($serviceConfigurationExtractor->load($serviceObject) as $handler)
                 {
-                    self::assertMessageClassSpecifiedInArguments($serviceObject, $handler->messageHandler);
-
                     $messageExecutor = $this->executorFactory->create($handler->messageHandler);
 
-                    $registerMethod = $handler->isCommandHandler()
+                    $registerMethod = $handler->type === ServiceMessageHandlerType::COMMAND_HANDLER
                         ? 'registerHandler'
                         : 'registerListener';
 
-                    $router->{$registerMethod}((string) $handler->messageHandler->messageClass, $messageExecutor);
+                    $router->{$registerMethod}($handler->messageHandler->messageClass, $messageExecutor);
                 }
             }
         }
         catch (\Throwable $throwable)
         {
             throw new MessageRouterConfigurationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
-        }
-    }
-
-    /**
-     * @throws \LogicException
-     */
-    private static function assertMessageClassSpecifiedInArguments(object $service, MessageHandler $handler): void
-    {
-        if ((string) $handler->messageClass === '')
-        {
-            throw new \LogicException(
-                \sprintf(
-                    'The message argument was not found in the "%s:%s" method',
-                    \get_class($service),
-                    $handler->methodName
-                )
-            );
         }
     }
 }

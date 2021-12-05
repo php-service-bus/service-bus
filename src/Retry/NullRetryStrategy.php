@@ -18,9 +18,6 @@ use ServiceBus\Common\EntryPoint\Retry\FailureContext;
 use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
 use function Amp\call;
 
-/**
- *
- */
 final class NullRetryStrategy implements RetryStrategy
 {
     public function retry(object $message, ServiceBusContext $context, FailureContext $details): Promise

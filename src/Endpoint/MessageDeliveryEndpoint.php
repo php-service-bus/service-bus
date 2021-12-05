@@ -12,7 +12,7 @@ declare(strict_types = 0);
 
 namespace ServiceBus\Endpoint;
 
-use ServiceBus\Metadata\ServiceBusMetadata;
+use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use function Amp\call;
 use Amp\Deferred;
 use Amp\Loop;
@@ -53,10 +53,15 @@ final class MessageDeliveryEndpoint implements Endpoint
     /**
      * Endpoint name.
      *
+     * @psalm-var non-empty-string
+     *
      * @var string
      */
     private $name;
 
+    /**
+     * @psalm-param non-empty-string $name
+     */
     public function __construct(
         string $name,
         Transport $transport,

@@ -20,19 +20,17 @@ use ServiceBus\Common\Context\OutcomeMessageMetadata;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Context\ValidationViolations;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
+use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\Endpoint\DeliveryPackage;
 use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\Endpoint\Options\DeliveryOptionsFactory;
-use ServiceBus\Metadata\ServiceBusMetadata;
 use function Amp\call;
 
-/**
- *
- */
 final class KernelContext implements ServiceBusContext
 {
     /**
-     * @psalm-var array<string, int|float|string|null>
+     * @psalm-var array<non-empty-string, int|float|string|null>
+     *
      * @var array
      */
     private $headers;
@@ -63,7 +61,7 @@ final class KernelContext implements ServiceBusContext
     private $validationViolations;
 
     /**
-     * @psalm-param  array<string, int|float|string|null> $headers
+     * @psalm-param array<non-empty-string, int|float|string|null> $headers
      */
     public function __construct(
         array $headers,
