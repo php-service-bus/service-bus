@@ -13,7 +13,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.1
           coverage: none
           tools: composer:v2
 
@@ -33,7 +33,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.1
           coverage: none
           tools: composer:v2
 
@@ -53,7 +53,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.1
           coverage: none
           tools: composer:v2
 
@@ -61,7 +61,7 @@ jobs:
         run: composer update --no-ansi --no-interaction --no-progress
 
       - name: Run phpstan/phpstan
-        run: ./vendor/bin/phpstan analyse src --level 7
+        run: ./vendor/bin/phpstan analyse src --level 9
 
   phpunit:
     name: PHPUnit
@@ -105,7 +105,7 @@ jobs:
       - name: Install PHP with extensions
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.1
           extensions: ${{ env.PHP_EXTENSIONS }}
           ini-values: ${{ env.PHP_INI_VALUES }}
           tools: composer:v2
