@@ -35,7 +35,6 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
     {
         if ($validator === null)
         {
-            /** @psalm-suppress TooManyArguments */
             $validator = (new ValidatorBuilder())
                 ->enableAnnotationMapping()
                 ->getValidator();
