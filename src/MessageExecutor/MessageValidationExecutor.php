@@ -8,20 +8,20 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus\MessageExecutor;
 
 use ServiceBus\Common\Context\ValidationViolation;
 use ServiceBus\Common\Context\ValidationViolations;
 use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
-use function ServiceBus\Common\invokeReflectionMethod;
 use Amp\Promise;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use function ServiceBus\Common\invokeReflectionMethod;
 
 /**
  * Executing message validation.

@@ -8,7 +8,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus\Application;
 
@@ -18,6 +18,7 @@ use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCom
 use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use ServiceBus\Application\Exceptions\ConfigurationCheckFailed;
+use ServiceBus\ArgumentResolver\ArgumentResolverModule;
 use ServiceBus\Common\Module\ServiceBusModule;
 use ServiceBus\Environment;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -82,11 +83,11 @@ final class Bootstrap
         return self::create(
             rootDirectoryPath: $rootDirectoryPath,
             entryPointName: \is_string($entryPoint)
-            ? $entryPoint
-            : throw new ConfigurationCheckFailed('Incorrect endpoint name'),
+                ? $entryPoint
+                : throw new ConfigurationCheckFailed('Incorrect endpoint name'),
             environment: \is_string($appEnvironment)
-            ? $appEnvironment
-            : throw new ConfigurationCheckFailed('Incorrect env'),
+                ? $appEnvironment
+                : throw new ConfigurationCheckFailed('Incorrect env'),
         );
     }
 
@@ -193,6 +194,7 @@ final class Bootstrap
      */
     public function boot(): ContainerInterface
     {
+        $this->containerBuilder->addModules(new ArgumentResolverModule());
         $this->containerBuilder->addCompilerPasses(
             new TaggedMessageHandlersCompilerPass(),
             new ServiceLocatorTagPass()
@@ -273,6 +275,7 @@ final class Bootstrap
         ]);
 
         $this->containerBuilder->addExtensions(new ServiceBusExtension());
+        $this->containerBuilder->addModules(new ArgumentResolverModule());
 
         /**
          * @todo: remove SymfonyDebug

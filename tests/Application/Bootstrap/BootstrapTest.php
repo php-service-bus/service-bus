@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
+
+/** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -8,7 +10,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\Application\Bootstrap;
 
@@ -130,7 +132,7 @@ final class BootstrapTest extends TestCase
      */
     public function fullConfigure(): void
     {
-        $module = new class() implements ServiceBusModule
+        $module = new class () implements ServiceBusModule
         {
             public function boot(ContainerBuilder $containerBuilder): void
             {

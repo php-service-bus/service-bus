@@ -122,27 +122,19 @@ services:
     arguments:
       - ServiceBus\Services\Configuration\ServiceHandlersLoader: '@ServiceBus\Services\Configuration\ServiceHandlersLoader'
 
-  # Resolve message object
-  ServiceBus\ArgumentResolvers\MessageArgumentResolver:
-
-  # Resolve execution context
-  ServiceBus\ArgumentResolvers\ContextArgumentResolver:
-
-  # Resolve autowire dependencies
-  ServiceBus\ArgumentResolvers\ContainerArgumentResolver:
+  service_bus.argument_resolver:
+    class: ServiceBus\ArgumentResolver\ChainArgumentResolver
     arguments:
-      # see TaggedMessageHandlersCompilerPass::process
-      $serviceLocator: '@service_bus.services_locator'
-    tags: ['service_bus_argument_resolver']
+      $resolvers:
+        - '@ServiceBus\ArgumentResolver\MessageArgumentResolver'
+        - '@ServiceBus\ArgumentResolver\ContextArgumentResolver'
+        - '@ServiceBus\ArgumentResolver\ContainerArgumentResolver'
 
   # Default message executor factory
   ServiceBus\Common\MessageExecutor\MessageExecutorFactory:
     class: ServiceBus\MessageExecutor\DefaultMessageExecutorFactory
     arguments:
-      $argumentResolvers:
-        - '@ServiceBus\ArgumentResolvers\MessageArgumentResolver'
-        - '@ServiceBus\ArgumentResolvers\ContextArgumentResolver'
-        - '@ServiceBus\ArgumentResolvers\ContainerArgumentResolver'
+      $argumentResolver: '@service_bus.argument_resolver'
       $validator: ~
 
   # Default transport implementation

@@ -8,13 +8,13 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus\Infrastructure\Retry;
 
-use function Kelunik\Retry\retry;
 use Amp\Promise;
 use Kelunik\Retry\ConstantBackoff;
+use function Kelunik\Retry\retry;
 
 /**
  * A wrapper on an operation that performs repetitions in case of an error.

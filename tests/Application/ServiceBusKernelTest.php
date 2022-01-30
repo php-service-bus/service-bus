@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
+
+/** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -8,7 +10,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\Application;
 
@@ -55,7 +57,7 @@ final class ServiceBusKernelTest extends TestCase
         $this->bootstrap->useCustomCacheDirectory($this->cacheDirectory);
 
         $this->bootstrap->applyModules(
-            new class() implements ServiceBusModule
+            new class () implements ServiceBusModule
             {
                 public function boot(ContainerBuilder $containerBuilder): void
                 {
@@ -92,7 +94,7 @@ final class ServiceBusKernelTest extends TestCase
         Loop::run(
             static function () use ($kernel): \Generator
             {
-                $queue = new class() implements Queue
+                $queue = new class () implements Queue
                 {
                     public function toString(): string
                     {
@@ -103,7 +105,7 @@ final class ServiceBusKernelTest extends TestCase
                 yield $kernel->createQueue($queue);
 
                 yield $kernel->createTopic(
-                    new class() implements Topic
+                    new class () implements Topic
                     {
                         public function toString(): string
                         {

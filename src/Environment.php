@@ -8,7 +8,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus;
 
@@ -139,7 +139,7 @@ final class Environment
                 \sprintf(
                     'Provided incorrect value of the environment: "%s". Allowable values: %s',
                     $specifiedEnvironment,
-                    \implode(', ', \array_values(self::LIST))
+                    \implode(', ', self::LIST)
                 )
             );
         }

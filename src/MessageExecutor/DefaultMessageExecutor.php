@@ -8,16 +8,18 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus\MessageExecutor;
 
+use ServiceBus\ArgumentResolver\ChainArgumentResolver;
 use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
-use function Amp\call;
+use ServiceBus\Common\MessageHandler\MessageHandlerArgument;
 use Amp\Promise;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
+use function Amp\call;
 
 final class DefaultMessageExecutor implements MessageExecutor
 {
@@ -34,16 +36,16 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $closure;
 
     /**
+     * @psalm-var \SplObjectStorage<MessageHandlerArgument, null>
+     *
      * @var \SplObjectStorage
      */
     private $arguments;
 
     /**
-     * Argument resolvers collection.
-     *
-     * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
+     * @var ChainArgumentResolver
      */
-    private $argumentResolvers;
+    private $argumentResolver;
 
     /**
      * @var DefaultHandlerOptions
@@ -51,21 +53,21 @@ final class DefaultMessageExecutor implements MessageExecutor
     private $options;
 
     /**
-     * @psalm-param non-empty-string                                     $handlerHash
-     * @psalm-param list<\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
+     * @psalm-param non-empty-string                                $handlerHash
+     * @psalm-param \SplObjectStorage<MessageHandlerArgument, null> $arguments
      */
     public function __construct(
         string                $handlerHash,
         \Closure              $closure,
         \SplObjectStorage     $arguments,
         DefaultHandlerOptions $options,
-        array                 $argumentResolvers
+        ChainArgumentResolver $argumentResolver
     ) {
-        $this->handlerHash       = $handlerHash;
-        $this->closure           = $closure;
-        $this->arguments         = $arguments;
-        $this->options           = $options;
-        $this->argumentResolvers = $argumentResolvers;
+        $this->handlerHash      = $handlerHash;
+        $this->closure          = $closure;
+        $this->arguments        = $arguments;
+        $this->options          = $options;
+        $this->argumentResolver = $argumentResolver;
     }
 
     public function id(): string
@@ -83,8 +85,7 @@ final class DefaultMessageExecutor implements MessageExecutor
         return call(
             function () use ($message, $context): \Generator
             {
-                /** @psalm-suppress MixedArgumentTypeCoercion */
-                $resolvedArgs = $this->collectArguments(
+                $resolvedArgs = $this->argumentResolver->resolve(
                     arguments: $this->arguments,
                     message: $message,
                     context: $context
@@ -98,37 +99,5 @@ final class DefaultMessageExecutor implements MessageExecutor
                 yield call($this->closure, ...$resolvedArgs);
             }
         );
-    }
-
-    /**
-     * Collect arguments list.
-     */
-    private function collectArguments(
-        \SplObjectStorage $arguments,
-        object            $message,
-        ServiceBusContext $context
-    ): array {
-        $preparedArguments = [];
-
-        /** @var \ServiceBus\Common\MessageHandler\MessageHandlerArgument $argument */
-        foreach ($arguments as $argument)
-        {
-            foreach ($this->argumentResolvers as $argumentResolver)
-            {
-                if ($argumentResolver->supports($argument))
-                {
-                    /** @psalm-suppress MixedAssignment Unknown data type */
-                    $preparedArguments[] = $argumentResolver->resolve(
-                        message: $message,
-                        context: $context,
-                        argument: $argument
-                    );
-                }
-            }
-        }
-
-        /** @psalm-var array<int, mixed> $preparedArguments */
-
-        return $preparedArguments;
     }
 }

@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
+
+/** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -8,7 +10,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\Application\DependencyInjection\ContainerBuilder;
 
@@ -16,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use ServiceBus\Application\DependencyInjection\Compiler\TaggedMessageHandlersCompilerPass;
 use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder;
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
+use ServiceBus\ArgumentResolver\ArgumentResolverModule;
 use ServiceBus\Environment;
 use function ServiceBus\Tests\removeDirectory;
 
@@ -87,8 +90,8 @@ final class ContainerBuilderTest extends TestCase
             ]
         );
 
+        $containerBuilder->addModules(new ArgumentResolverModule());
         $containerBuilder->addExtensions(new ServiceBusExtension(), new TestExtension());
-
         $containerBuilder->addCompilerPasses(new TestCompilerPass(), new TaggedMessageHandlersCompilerPass());
 
         $container = $containerBuilder->build();

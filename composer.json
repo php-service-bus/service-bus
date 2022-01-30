@@ -57,23 +57,24 @@
     "php-service-bus/annotations-reader":"v5.1.*",
     "php-service-bus/messages-router": "v5.1.*",
     "php-service-bus/telegram-bot-core": "v5.1.*",
-    "symfony/dependency-injection": "v5.4.*",
-    "symfony/config": "v5.4.*",
-    "symfony/dotenv": "v5.4.*",
-    "symfony/yaml": "v5.4.*",
-    "symfony/validator": "v5.4.*",
-    "symfony/error-handler": "v5.4.*",
+    "php-service-bus/argument-resolver": "v5.1.*",
+    "symfony/dependency-injection": "v6.0.*",
+    "symfony/config": "v6.0.*",
+    "symfony/dotenv": "v6.0.*",
+    "symfony/yaml": "v6.0.*",
+    "symfony/validator": "v6.0.*",
+    "symfony/error-handler": "v6.0.*",
     "amphp/log": "v1.1.*",
     "amphp/file": "v2.0.*",
     "amphp/parallel": "v1.4.*",
     "kelunik/retry": "v1.0.*"
   },
   "require-dev": {
-    "php-service-bus/code-style-config": "v1.3.*",
+    "php-service-bus/code-style-config": "v5.1.*",
     "kelunik/loop-block": "v1.0.*",
     "phpunit/phpunit": "v9.5.*",
-    "vimeo/psalm": "v4.13.*",
-    "phpstan/phpstan": "v1.2.*",
+    "vimeo/psalm": "v4.19.*",
+    "phpstan/phpstan": "v1.4.*",
     "boesing/psalm-plugin-stringf": "v1.1.*"
   },
   "prefer-stable": true,
@@ -88,6 +89,9 @@
     "pre-commit": "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix --allow-risky=yes && ./vendor/bin/psalm --config=psalm.xml && ./vendor/bin/phpstan analyse src --level 9 && ./vendor/bin/phpunit --configuration phpunit.xml --verbose"
   },
   "config": {
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true
+    }
   }
 }

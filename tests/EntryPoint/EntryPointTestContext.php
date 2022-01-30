@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnusedParameterInspection */
+<?php
+
+/** @noinspection PhpUnusedParameterInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -8,7 +10,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\EntryPoint;
 

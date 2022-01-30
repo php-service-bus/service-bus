@@ -8,14 +8,14 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus\Infrastructure\Watchers;
 
-use function ServiceBus\Common\formatBytes;
 use Amp\Loop;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use function ServiceBus\Common\formatBytes;
 
 /**
  * Periodic forced launch of the garbage collector.

@@ -8,7 +8,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\EntryPoint;
 
@@ -19,9 +19,10 @@ use Monolog\Processor\PsrLogMessageProcessor;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ServiceBus\AnnotationsReader\AttributesReader;
-use ServiceBus\ArgumentResolvers\ContainerArgumentResolver;
-use ServiceBus\ArgumentResolvers\ContextArgumentResolver;
-use ServiceBus\ArgumentResolvers\MessageArgumentResolver;
+use ServiceBus\ArgumentResolver\ChainArgumentResolver;
+use ServiceBus\ArgumentResolver\ContainerArgumentResolver;
+use ServiceBus\ArgumentResolver\ContextArgumentResolver;
+use ServiceBus\ArgumentResolver\MessageArgumentResolver;
 use ServiceBus\EntryPoint\DefaultEntryPointProcessor;
 use ServiceBus\EntryPoint\EntryPoint;
 use ServiceBus\EntryPoint\EntryPointProcessor;
@@ -35,9 +36,6 @@ use ServiceBus\Transport\Common\Queue;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use function ServiceBus\Tests\filterLogMessages;
 
-/**
- *
- */
 final class EntryPointTest extends TestCase
 {
     /**
@@ -74,7 +72,7 @@ final class EntryPointTest extends TestCase
 
         $containerBuilder = new ContainerBuilder();
         $containerBuilder->set('default_serializer', new SymfonyJsonObjectSerializer());
-        $containerBuilder->set(EntryPointTestDependency::class, new EntryPointTestDependency);
+        $containerBuilder->set(EntryPointTestDependency::class, new EntryPointTestDependency());
 
         $messageDecoder = new IncomingMessageDecoder(
             ['service_bus.decoder.default_handler' => 'default_serializer'],
@@ -84,11 +82,11 @@ final class EntryPointTest extends TestCase
         $handlers = (new AttributeServiceHandlersLoader(new AttributesReader()))->load(new EntryPointTestService());
 
         $messageExecutorsFactory = new DefaultMessageExecutorFactory(
-            [
+            new ChainArgumentResolver([
                 new MessageArgumentResolver(),
                 new ContextArgumentResolver(),
                 new ContainerArgumentResolver($containerBuilder)
-            ]
+            ])
         );
 
         $messageRouter = new Router();
@@ -110,7 +108,7 @@ final class EntryPointTest extends TestCase
             logger: $this->logger
         );
 
-        $this->queue = new class() implements Queue
+        $this->queue = new class () implements Queue
         {
             public function toString(): string
             {

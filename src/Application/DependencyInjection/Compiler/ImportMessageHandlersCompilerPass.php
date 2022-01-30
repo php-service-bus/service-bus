@@ -8,15 +8,15 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus\Application\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use function ServiceBus\Common\canonicalizeFilesPath;
 use function ServiceBus\Common\extractNamespaceFromFile;
 use function ServiceBus\Common\searchFiles;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 {
@@ -92,7 +92,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
          *
          * @psalm-var list<non-empty-string> $directories
          */
-        $directories = $container->hasParameter('service_bus.auto_import.handlers_directories') === true
+        $directories = $container->hasParameter('service_bus.auto_import.handlers_directories')
             ? $container->getParameter('service_bus.auto_import.handlers_directories')
             : [];
 

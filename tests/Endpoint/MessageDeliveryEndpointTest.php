@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
+
+/** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -8,7 +10,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\Endpoint;
 
@@ -98,7 +100,7 @@ final class MessageDeliveryEndpointTest extends TestCase
 
         wait($endpoint->delivery(
             new DeliveryPackage(
-                message: new FirstEmptyMessage,
+                message: new FirstEmptyMessage(),
                 options: DefaultDeliveryOptions::nonPersistent(),
                 metadata: DeliveryMessageMetadata::create(uuid())
             )

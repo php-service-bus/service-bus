@@ -8,13 +8,13 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\Infrastructure\Logger\Handlers\Graylog;
 
-use function ServiceBus\Common\datetimeInstantiator;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Infrastructure\Logger\Handlers\Graylog\Formatter;
+use function ServiceBus\Common\datetimeInstantiator;
 use function ServiceBus\Common\jsonDecode;
 
 /**

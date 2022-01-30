@@ -8,7 +8,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\Services\Configuration;
 
@@ -51,7 +51,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
      */
     public function loadFromEmptyService(): void
     {
-        $object = new class()
+        $object = new class ()
         {
         };
 
@@ -65,7 +65,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
      */
     public function loadFilledService(): void
     {
-        $service = new class()
+        $service = new class ()
         {
             #[CommandHandler(
                 description: 'handle',
@@ -153,7 +153,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
             'The event handler must have at least 2 arguments: the message object (the first argument) and the context'
         );
 
-        $service = new class()
+        $service = new class ()
         {
             #[CommandHandler]
             public function handle(): void
@@ -172,7 +172,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
         $this->expectException(InvalidHandlerArguments::class);
         $this->expectExceptionMessage('The first argument to the message handler must be the message object');
 
-        $service = new class()
+        $service = new class ()
         {
             #[CommandHandler]
             public function handle(
@@ -190,7 +190,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
      */
     public function withUnsupportedAttribute(): void
     {
-        $service = new class()
+        $service = new class ()
         {
             #[UnsupportedAttribute]
             public function handle(): void
@@ -224,7 +224,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
     {
         $this->expectException(ParseAttributesFailed::class);
 
-        $service = new class()
+        $service = new class ()
         {
             /** @noinspection PhpUndefinedClassInspection */
             #[AAsdfsf]

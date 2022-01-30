@@ -8,12 +8,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus\Endpoint;
 
 use ServiceBus\Common\Metadata\ServiceBusMetadata;
-use function Amp\call;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
@@ -22,6 +21,7 @@ use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Exceptions\SendMessageFailed;
 use ServiceBus\Transport\Common\Package\OutboundPackage;
 use ServiceBus\Transport\Common\Transport;
+use function Amp\call;
 
 /**
  * Application level transport endpoint.

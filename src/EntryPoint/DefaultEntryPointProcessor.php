@@ -8,7 +8,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus\EntryPoint;
 
@@ -19,13 +19,13 @@ use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\Context\ContextFactory;
 use ServiceBus\Retry\NullRetryStrategy;
-use function Amp\call;
 use Amp\Promise;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ServiceBus\MessageSerializer\Exceptions\DecodeObjectFailed;
 use ServiceBus\MessagesRouter\Router;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
+use function Amp\call;
 use function ServiceBus\Common\throwableDetails;
 use function ServiceBus\Common\throwableMessage;
 
@@ -166,7 +166,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
      * @psalm-param non-empty-string       $traceId
      * @psalm-param list<non-empty-string> $filterByRecipient
      *
-     * @psalm-return non-empty-list<MessageExecutor>
+     * @psalm-return non-empty-array<array-key, \ServiceBus\Common\MessageExecutor\MessageExecutor>|null
      */
     private function collectExecutors(
         object $message,

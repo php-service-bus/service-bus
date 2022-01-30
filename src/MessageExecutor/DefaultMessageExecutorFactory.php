@@ -8,10 +8,11 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 0);
+declare(strict_types=0);
 
 namespace ServiceBus\MessageExecutor;
 
+use ServiceBus\ArgumentResolver\ChainArgumentResolver;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Common\MessageExecutor\MessageExecutorFactory;
 use ServiceBus\Common\MessageHandler\MessageHandler;
@@ -21,30 +22,27 @@ use Symfony\Component\Validator\ValidatorBuilder;
 final class DefaultMessageExecutorFactory implements MessageExecutorFactory
 {
     /**
-     * @var \ServiceBus\ArgumentResolvers\ArgumentResolver[]
+     * @var ChainArgumentResolver
      */
-    private $argumentResolvers;
+    private $argumentResolver;
 
     /**
      * @var ValidatorInterface
      */
     private $validator;
 
-    /**
-     * @psalm-param list<\ServiceBus\ArgumentResolvers\ArgumentResolver> $argumentResolvers
-     */
-    public function __construct(array $argumentResolvers, ?ValidatorInterface $validator = null)
+    public function __construct(ChainArgumentResolver $argumentResolver, ?ValidatorInterface $validator = null)
     {
         if ($validator === null)
         {
             /** @psalm-suppress TooManyArguments */
             $validator = (new ValidatorBuilder())
-                ->enableAnnotationMapping(true)
+                ->enableAnnotationMapping()
                 ->getValidator();
         }
 
-        $this->argumentResolvers = $argumentResolvers;
-        $this->validator         = $validator;
+        $this->argumentResolver = $argumentResolver;
+        $this->validator        = $validator;
     }
 
     public function create(MessageHandler $messageHandler): MessageExecutor
@@ -57,13 +55,12 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
             \sprintf('%s:%s', $messageHandler->messageClass, $messageHandler->methodName)
         );
 
-        /** @psalm-suppress MixedArgumentTypeCoercion */
         $messageExecutor = new DefaultMessageExecutor(
             handlerHash: $handlerHash,
             closure: $messageHandler->closure,
             arguments: $messageHandler->arguments,
             options: $options,
-            argumentResolvers: $this->argumentResolvers
+            argumentResolver: $this->argumentResolver
         );
 
         if ($options->validationEnabled)

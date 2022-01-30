@@ -8,7 +8,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\EntryPoint;
 
@@ -57,7 +57,7 @@ final class EntryPointTestIncomingMessage implements IncomingPackage
 
     public function origin(): DeliveryDestination
     {
-        return new class() implements DeliveryDestination
+        return new class () implements DeliveryDestination
         {
         };
     }

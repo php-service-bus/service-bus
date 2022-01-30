@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
+
+/** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -8,7 +10,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\EntryPoint;
 
@@ -16,6 +18,7 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use ServiceBus\ArgumentResolver\ChainArgumentResolver;
 use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\EntryPoint\DefaultEntryPointProcessor;
 use ServiceBus\EntryPoint\IncomingMessageDecoder;
@@ -141,7 +144,7 @@ final class DefaultEntryPointProcessorTest extends TestCase
             closure: $closure,
             arguments: new \SplObjectStorage(),
             options: DefaultHandlerOptions::createForCommandHandler(),
-            argumentResolvers: []
+            argumentResolver: new ChainArgumentResolver([])
         );
 
         $router->registerHandler(EntryPointTestMessage::class, $executor);
@@ -185,7 +188,7 @@ final class DefaultEntryPointProcessorTest extends TestCase
             closure: $closure,
             arguments: new \SplObjectStorage(),
             options: DefaultHandlerOptions::createForCommandHandler(),
-            argumentResolvers: []
+            argumentResolver: new ChainArgumentResolver([])
         );
 
         $router->registerHandler(EntryPointTestMessage::class, $executor);

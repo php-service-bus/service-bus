@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
+
+/** @noinspection PhpUnhandledExceptionInspection */
 
 /**
  * PHP Service Bus (publish-subscribe pattern implementation).
@@ -8,7 +10,7 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace ServiceBus\Tests\Infrastructure\Alerting;
 
@@ -36,7 +38,7 @@ final class ChainAlertingProviderTest extends TestCase
 
         @\unlink($expectedFilePath);
 
-        $first = new class() implements AlertingProvider
+        $first = new class () implements AlertingProvider
         {
             public function send(AlertMessage $message, ?AlertContext $context = null): Promise
             {
@@ -44,7 +46,7 @@ final class ChainAlertingProviderTest extends TestCase
             }
         };
 
-        $second = new class($expectedFilePath) implements AlertingProvider
+        $second = new class ($expectedFilePath) implements AlertingProvider
         {
             /** @var string */
             private $expectedFilePath;
