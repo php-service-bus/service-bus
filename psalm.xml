@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <psalm
-        totallyTyped="true"
         useDocblockTypes="true"
         useDocblockPropertyTypes="true"
         strictBinaryOperands="true"

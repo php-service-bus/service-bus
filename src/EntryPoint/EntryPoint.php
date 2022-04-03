@@ -190,7 +190,6 @@ final class EntryPoint
             function () use ($package): void
             {
                 $this->processor->handle($package)->onResolve(
-                    /** @phpstan-ignore-next-line */
                     function (?\Throwable $throwable) use ($package): \Generator
                     {
                         try

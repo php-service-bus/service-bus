@@ -73,8 +73,8 @@
     "php-service-bus/code-style-config": "v5.1.*",
     "kelunik/loop-block": "v1.0.*",
     "phpunit/phpunit": "v9.5.*",
-    "vimeo/psalm": "v4.19.*",
-    "phpstan/phpstan": "v1.4.*",
+    "vimeo/psalm": "v4.22.*",
+    "phpstan/phpstan": "v1.5.*",
     "boesing/psalm-plugin-stringf": "v1.1.*"
   },
   "prefer-stable": true,
