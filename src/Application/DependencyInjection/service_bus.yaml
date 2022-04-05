@@ -38,7 +38,6 @@ services:
 
   # Default logger instance
   Psr\Log\LoggerInterface:
-    alias: Psr\Log\LoggerInterface
     class: Psr\Log\NullLogger
 
   # Detect blocking ticks in an event loop
