@@ -37,7 +37,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds('service_bus.service');
 
         /**
-         * @psalm-var non-empty-string $id
+         * @psalm-var non-empty-string       $id
          * @psalm-var list<non-empty-string> $tags
          */
         foreach ($taggedServices as $id => $tags)
@@ -68,6 +68,22 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
             value: $serviceIds
         );
 
+        /** Sagas dependencies */
+        if ($container->hasParameter('saga_dependencies'))
+        {
+            /**
+             * @var string[]
+             */
+            $externalDependencies = $container->getParameter('saga_dependencies');
+
+            foreach ($externalDependencies as $dependency)
+            {
+                $servicesReference[\sprintf('%s_service', $dependency)] = new ServiceClosureArgument(
+                    new Reference($dependency)
+                );
+            }
+        }
+
         $container
             ->register('service_bus.services_locator', ServiceLocator::class)
             ->setPublic(true)
@@ -80,9 +96,9 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
      * @throws \ReflectionException
      */
     private function collectServiceDependencies(
-        string $serviceClass,
+        string           $serviceClass,
         ContainerBuilder $container,
-        array &$servicesReference
+        array            &$servicesReference
     ): void {
         $reflectionClass = new \ReflectionClass($serviceClass);
 
