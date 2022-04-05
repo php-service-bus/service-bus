@@ -63,11 +63,6 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
             unset($tags);
         }
 
-        $container->setParameter(
-            name: 'service_bus.services_map',
-            value: $serviceIds
-        );
-
         /** Sagas dependencies */
         if ($container->hasParameter('saga_dependencies'))
         {
@@ -78,11 +73,16 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
 
             foreach ($externalDependencies as $dependency)
             {
-                $servicesReference[\sprintf('%s_service', $dependency)] = new ServiceClosureArgument(
+                $servicesReference[$dependency] = new ServiceClosureArgument(
                     new Reference($dependency)
                 );
             }
         }
+
+        $container->setParameter(
+            name: 'service_bus.services_map',
+            value: $serviceIds
+        );
 
         $container
             ->register('service_bus.services_locator', ServiceLocator::class)

@@ -122,6 +122,11 @@ services:
     arguments:
       - ServiceBus\Services\Configuration\ServiceHandlersLoader: '@ServiceBus\Services\Configuration\ServiceHandlersLoader'
 
+  ServiceBus\ArgumentResolver\ContainerArgumentResolver:
+    arguments:
+      $serviceLocator: '@service_bus.services_locator'
+    tags: ['service_bus_argument_resolver']
+
   service_bus.argument_resolver:
     class: ServiceBus\ArgumentResolver\ChainArgumentResolver
     arguments:
