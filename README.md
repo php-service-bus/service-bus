@@ -27,18 +27,10 @@ Jump into our [Quick Start](.documentation/quick_start.md) and build your first 
 
 Documentation can be found in the `.documentation` directory
 
-* [Configuration](.documentation/configuration.md)
-* [Transport](.documentation/transport.md)
-* [Storage](.documentation/database.md)
-* [Sagas](.documentation/sagas.md)
-* [EventSourcing](.documentation/event_sourcing.md)
-* [HttpClient](.documentation/http_client.md)
-* [Scheduler](.documentation/scheduler.md)
-* [Cache](.documentation/cache.md)
-* [Mutex](.documentation/mutex.md)
+* [Installation](.documentation/installation.md)
 
 ### Requirements
-  - PHP >=8.0
+  - PHP >=8.1
   - RabbitMQ/Redis/Nsq
   - PostgreSQL
 
