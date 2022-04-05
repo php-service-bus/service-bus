@@ -158,7 +158,7 @@ final class ServiceBusKernel
              *
              * @var LoggerInterface $logger
              */
-            $logger = $this->getKernelContainerService('service_bus.logger');
+            $logger = $this->getKernelContainerService(LoggerInterface::class);
 
             $handler = function (string $watcherId, int $signalId) use ($stopDelay, $logger): \Generator
             {
@@ -201,7 +201,7 @@ final class ServiceBusKernel
             function () use ($seconds): void
             {
                 /** @var LoggerInterface $logger */
-                $logger = $this->getKernelContainerService('service_bus.logger');
+                $logger = $this->getKernelContainerService(LoggerInterface::class);
 
                 $logger->info('The demon\'s lifetime has expired ({lifetime} seconds)', ['lifetime' => $seconds]);
 

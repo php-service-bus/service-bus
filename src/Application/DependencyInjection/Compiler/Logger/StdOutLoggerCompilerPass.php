@@ -13,6 +13,7 @@ declare(strict_types=0);
 namespace ServiceBus\Application\DependencyInjection\Compiler\Logger;
 
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use ServiceBus\Infrastructure\Logger\Handlers\StdOut\StdOutHandler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -45,7 +46,7 @@ final class StdOutLoggerCompilerPass implements CompilerPassInterface
 
         (new LoggerCompilerPass())->process($container);
 
-        $loggerDefinition = $container->getDefinition('service_bus.logger');
+        $loggerDefinition = $container->getDefinition(LoggerInterface::class);
 
         $loggerDefinition->addMethodCall(
             method: 'pushHandler',

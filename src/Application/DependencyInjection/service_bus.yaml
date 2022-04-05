@@ -37,19 +37,20 @@ services:
       $environment: '%service_bus.environment%'
 
   # Default logger instance
-  service_bus.logger:
+  Psr\Log\LoggerInterface:
+    alias: Psr\Log\LoggerInterface
     class: Psr\Log\NullLogger
 
   # Detect blocking ticks in an event loop
   ServiceBus\Infrastructure\Watchers\LoopBlockWatcher:
     arguments:
-      $logger: '@service_bus.logger'
+      $logger: '@Psr\Log\LoggerInterface'
 
   # Periodic forced launch of the garbage collector
   ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher:
     arguments:
       $interval: 600000
-      $logger: '@service_bus.logger'
+      $logger: '@Psr\Log\LoggerInterface'
 
   # Attributes reader
   ServiceBus\AnnotationsReader\Reader:
@@ -67,7 +68,7 @@ services:
     class: Symfony\Component\DependencyInjection\ServiceLocator
     tags: ['container.service_locator']
     arguments:
-      - service_bus.logger: '@service_bus.logger'
+      - Psr\Log\LoggerInterface: '@Psr\Log\LoggerInterface'
         ServiceBus\Transport\Common\Transport: '@ServiceBus\Transport\Common\Transport'
         ServiceBus\EntryPoint\EntryPoint: '@ServiceBus\EntryPoint\EntryPoint'
         ServiceBus\Infrastructure\Watchers\LoopBlockWatcher: '@ServiceBus\Infrastructure\Watchers\LoopBlockWatcher'
@@ -90,7 +91,7 @@ services:
     arguments:
       $endpointRouter: '@ServiceBus\Endpoint\EndpointRouter'
       $optionsFactory: '@ServiceBus\Endpoint\Options\DeliveryOptionsFactory'
-      $logger: '@service_bus.logger'
+      $logger: '@Psr\Log\LoggerInterface'
 
   # Default message retry strategy
   ServiceBus\Common\EntryPoint\Retry\RetryStrategy:
@@ -103,7 +104,7 @@ services:
       $messageDecoder: '@ServiceBus\EntryPoint\IncomingMessageDecoder'
       $contextFactory: '@ServiceBus\Context\ContextFactory'
       $messagesRouter: '@ServiceBus\MessagesRouter\Router'
-      $logger: '@service_bus.logger'
+      $logger: '@Psr\Log\LoggerInterface'
       $retryStrategy: '@ServiceBus\Common\EntryPoint\Retry\RetryStrategy'
 
   # Application entry point
@@ -111,7 +112,7 @@ services:
     arguments:
       $transport: '@ServiceBus\Transport\Common\Transport'
       $processor: '@ServiceBus\EntryPoint\EntryPointProcessor'
-      $logger: '@service_bus.logger'
+      $logger: '@Psr\Log\LoggerInterface'
       $maxConcurrentTaskCount: 60
       $awaitDelay: 40
 
@@ -190,4 +191,4 @@ services:
     factory: ['ServiceBus\HttpClient\Artax\ArtaxHttpClient', 'build']
     arguments:
       $connectionPool: '@Amp\Http\Client\Connection\ConnectionPool'
-      $logger: '@service_bus.logger'
+      $logger: '@Psr\Log\LoggerInterface'

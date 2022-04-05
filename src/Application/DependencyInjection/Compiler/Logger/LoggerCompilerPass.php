@@ -16,6 +16,7 @@ use Monolog\Logger;
 use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\ProcessIdProcessor;
 use Monolog\Processor\PsrLogMessageProcessor;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,7 +27,7 @@ final class LoggerCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $loggerDefinition = $container->getDefinition('service_bus.logger');
+        $loggerDefinition = $container->getDefinition(LoggerInterface::class);
 
         if ($loggerDefinition->getClass() === NullLogger::class)
         {
