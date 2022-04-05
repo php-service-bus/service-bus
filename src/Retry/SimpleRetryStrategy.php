@@ -151,7 +151,7 @@ final class SimpleRetryStrategy implements RetryStrategy
                     ]
                 );
 
-                $messagePayload = (string) \gzcompress($this->messageSerializer->encode($message));
+                $messagePayload = \base64_encode((string) \gzcompress($this->messageSerializer->encode($message)));
                 $messageHash    = \sha1($messagePayload);
 
                 try
