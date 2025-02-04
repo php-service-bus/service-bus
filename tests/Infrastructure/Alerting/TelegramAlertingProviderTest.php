@@ -77,7 +77,7 @@ final class TelegramAlertingProviderTest extends TestCase
         $logHandler = new TestHandler();
         $logger     = new Logger('tests', [$logHandler]);
 
-        $httpClient       = new TestAlertingHttpClient(new Response(400));
+        $httpClient       = new TestAlertingHttpClient(new Response(400, [], '{}'));
         $alertingProvider = new TelegramAlertingProvider(
             new InteractionsProvider($httpClient),
             new TelegramCredentials('927366182:AAHsjMy7u13tvCTgzSP-fPlIR89lhWgCOvn'),
@@ -91,7 +91,7 @@ final class TelegramAlertingProviderTest extends TestCase
         self::assertNotNull($httpClient->requestData);
 
         self::assertContains(
-            'Delivery to Telegram failed: Incorrect server response code: 400',
+            'Delivery to Telegram failed: Method sendMessage has invalid parameters',
             filterLogMessages($logHandler)
         );
     }
