@@ -14,7 +14,11 @@ namespace ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 
 use Amp\ByteStream\ResourceOutputStream;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
+use Psr\Log\LogLevel;
+
 use function ServiceBus\Common\jsonEncode;
 
 /**
@@ -46,43 +50,39 @@ final class UdpHandler extends AbstractProcessingHandler
 
     /**
      * @psalm-param non-empty-string $host
-     * @psalm-param Logger::DEBUG | Logger::INFO | Logger::NOTICE | Logger::WARNING | Logger::ERROR | Logger::CRITICAL | Logger::ALERT | Logger::EMERGENCY $level
      */
     public function __construct(
         string $host = '0.0.0.0',
         int $port = 514,
         bool $gzipMessage = false,
-        int $level = Logger::DEBUG,
+        int|string|Level $level = Level::Debug,
         bool $bubble = true
     ) {
+        /** @psalm-suppress ArgumentTypeCoercion */
         parent::__construct($level, $bubble);
 
         $this->host        = $host;
         $this->port        = $port;
         $this->gzipMessage = $gzipMessage;
-
         $this->formatter = new Formatter();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
-        try
-        {
-            $body = jsonEncode($record);
+        try {
+            $body = jsonEncode($record->toArray());
 
-            if ($this->gzipMessage)
-            {
+            if ($this->gzipMessage) {
                 $body = (string) \gzcompress($body);
             }
 
             $this->outputStream()->write($body);
         }
         // @codeCoverageIgnoreStart
-        catch (\Throwable)
-        {
+        catch (\Throwable) {
             /** Not interest */
         }
         // @codeCoverageIgnoreEnd
@@ -93,8 +93,7 @@ final class UdpHandler extends AbstractProcessingHandler
      */
     private function outputStream(): ResourceOutputStream
     {
-        if ($this->outputStream === null)
-        {
+        if ($this->outputStream === null) {
             $this->outputStream = new ResourceOutputStream(
                 stream: self::createStream($this->host, $this->port),
                 chunkSize: 65000
@@ -119,8 +118,7 @@ final class UdpHandler extends AbstractProcessingHandler
             0
         );
 
-        if ($stream === false)
-        {
+        if ($stream === false) {
             throw new \RuntimeException(\sprintf('Could not connect to %s', $uri));
         }
 

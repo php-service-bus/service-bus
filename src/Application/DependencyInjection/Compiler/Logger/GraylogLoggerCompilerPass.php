@@ -12,6 +12,7 @@ declare(strict_types=0);
 
 namespace ServiceBus\Application\DependencyInjection\Compiler\Logger;
 
+use Monolog\Level;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use ServiceBus\Infrastructure\Logger\Handlers\Graylog\UdpHandler;
@@ -40,9 +41,7 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
     private $port;
 
     /**
-     * @psalm-var Logger::DEBUG | Logger::INFO | Logger::NOTICE | Logger::WARNING | Logger::ERROR | Logger::CRITICAL | Logger::ALERT | Logger::EMERGENCY
-     *
-     * @var int
+     * @var Level
      */
     private $logLevel;
 
@@ -54,17 +53,18 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
     /**
      * @psalm-param non-empty-string $host
      * @psalm-param positive-int $port
-     * @psalm-param Logger::DEBUG | Logger::INFO | Logger::NOTICE | Logger::WARNING | Logger::ERROR | Logger::CRITICAL | Logger::ALERT | Logger::EMERGENCY $logLevel
+     * @psalm-param 100|200|250|300|400|500|550|600|'ALERT'|'alert'|'CRITICAL'|'critical'|'DEBUG'|'debug'|'EMERGENCY'|'emergency'|'ERROR'|'error'|'INFO'|'info'|'NOTICE'|'notice'|'WARNING'|'warning'|Level $level
      */
     public function __construct(
         string $host = '0.0.0.0',
         int $port = 514,
-        int $logLevel = Logger::DEBUG,
+        int|string|Level $level = Level::Debug,
         bool $gzipMessage = false
     ) {
         $this->host        = $host;
         $this->port        = $port;
-        $this->logLevel    = $logLevel;
+        /** @psalm-suppress PossiblyInvalidArgument */
+        $this->logLevel    = Logger::toMonologLevel($level);
         $this->gzipMessage = $gzipMessage;
     }
 
@@ -97,11 +97,10 @@ final class GraylogLoggerCompilerPass implements CompilerPassInterface
             'service_bus.logger.graylog.udp_host'  => $this->host,
             'service_bus.logger.graylog.udp_port'  => $this->port,
             'service_bus.logger.graylog.gzip'      => $this->gzipMessage,
-            'service_bus.logger.graylog.log_level' => $this->logLevel,
+            'service_bus.logger.graylog.log_level' => $this->logLevel->value,
         ];
 
-        foreach ($parameters as $key => $value)
-        {
+        foreach ($parameters as $key => $value) {
             $containerBuilder->setParameter(
                 name: $key,
                 value: $value

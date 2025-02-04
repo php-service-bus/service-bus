@@ -22,6 +22,7 @@ use ServiceBus\Transport\Common\QueueBind;
 use ServiceBus\Transport\Common\Topic;
 use ServiceBus\Transport\Common\TopicBind;
 use ServiceBus\Transport\Common\Transport;
+
 use function ServiceBus\Common\uuid;
 
 /**
@@ -61,8 +62,7 @@ final class EndpointTestTransport implements Transport
 
     public function send(OutboundPackage ...$outboundPackages): Promise
     {
-        if ($this->failDelivery === true)
-        {
+        if ($this->failDelivery === true) {
             return new Failure(new MessageDeliveryFailed('ups', new \stdClass(), uuid()));
         }
 

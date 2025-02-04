@@ -14,6 +14,7 @@ namespace ServiceBus\Infrastructure\Retry;
 
 use Amp\Promise;
 use Kelunik\Retry\ConstantBackoff;
+
 use function Kelunik\Retry\retry;
 
 /**

@@ -27,6 +27,7 @@ use ServiceBus\MessageSerializer\Symfony\SymfonyJsonObjectSerializer;
 use ServiceBus\MessagesRouter\Router;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 use function Amp\Promise\wait;
 use function ServiceBus\Common\jsonEncode;
 use function ServiceBus\Common\uuid;
@@ -134,8 +135,7 @@ final class DefaultEntryPointProcessorTest extends TestCase
     {
         $router = new Router();
 
-        $closure = (static function (): void
-        {
+        $closure = (static function (): void {
             throw new \RuntimeException('Some message execution failed');
         })(...);
 
@@ -178,8 +178,7 @@ final class DefaultEntryPointProcessorTest extends TestCase
 
         $router = new Router();
 
-        $closure = (static function () use (&$variable): void
-        {
+        $closure = (static function () use (&$variable): void {
             $variable = 'handled';
         })(...);
 

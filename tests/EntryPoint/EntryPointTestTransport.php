@@ -21,6 +21,7 @@ use ServiceBus\Transport\Common\QueueBind;
 use ServiceBus\Transport\Common\Topic;
 use ServiceBus\Transport\Common\TopicBind;
 use ServiceBus\Transport\Common\Transport;
+
 use function Amp\call;
 use function ServiceBus\Common\jsonEncode;
 use function ServiceBus\Common\uuid;
@@ -43,8 +44,7 @@ final class EntryPointTestTransport implements Transport
     public function __construct(array $incomingMessages = [])
     {
         $this->incomingMessages = \array_map(
-            static function (object $message): array
-            {
+            static function (object $message): array {
                 return [$message, \get_class($message)];
             },
             $incomingMessages
@@ -64,10 +64,8 @@ final class EntryPointTestTransport implements Transport
     public function consume(callable $onMessage, Queue ...$queues): Promise
     {
         return call(
-            function () use ($onMessage): \Generator
-            {
-                foreach ($this->incomingMessages as $index => $messageData)
-                {
+            function () use ($onMessage): \Generator {
+                foreach ($this->incomingMessages as $index => $messageData) {
                     [$message, $type] = $messageData;
 
                     yield from $onMessage(

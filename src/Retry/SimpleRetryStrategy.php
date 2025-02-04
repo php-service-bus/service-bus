@@ -20,6 +20,7 @@ use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\Context\DeliveryMessageMetadata;
 use ServiceBus\MessageSerializer\ObjectSerializer;
 use ServiceBus\Storage\Common\DatabaseAdapter;
+
 use function Amp\call;
 use function Amp\delay;
 use function ServiceBus\Common\now;
@@ -66,16 +67,13 @@ final class SimpleRetryStrategy implements RetryStrategy
     public function retry(object $message, ServiceBusContext $context, FailureContext $details): Promise
     {
         return call(
-            function () use ($message, $context, $details): \Generator
-            {
+            function () use ($message, $context, $details): \Generator {
                 $currentRetryCount = self::currentRetryCount($context) + 1;
 
-                if ($currentRetryCount <= $this->maxRetryCount)
-                {
+                if ($currentRetryCount <= $this->maxRetryCount) {
                     $delay = $this->retryDelay * 1000;
 
-                    try
-                    {
+                    try {
                         $messageExecutors = \implode(',', \array_keys($details->executors));
                         $outcomeMetadata  = DeliveryMessageMetadata::create(
                             traceId: $context->metadata()->traceId(),
@@ -101,9 +99,7 @@ final class SimpleRetryStrategy implements RetryStrategy
                             message: $message,
                             withMetadata: $outcomeMetadata
                         );
-                    }
-                    catch (\Throwable $throwable)
-                    {
+                    } catch (\Throwable $throwable) {
                         $context->logger()->error(
                             '`{messageClass}` message resending error: {throwableMessage}',
                             [
@@ -141,8 +137,7 @@ final class SimpleRetryStrategy implements RetryStrategy
     public function backoff(object $message, ServiceBusContext $context, FailureContext $details): Promise
     {
         return call(
-            function () use ($message, $context, $details): \Generator
-            {
+            function () use ($message, $context, $details): \Generator {
                 $context->logger()->info(
                     'Saving `{messageClass}` message that could not be processed to spare storage',
                     [
@@ -154,8 +149,7 @@ final class SimpleRetryStrategy implements RetryStrategy
                 $messagePayload = \base64_encode((string) \gzcompress($this->messageSerializer->encode($message)));
                 $messageHash    = \sha1($messagePayload);
 
-                try
-                {
+                try {
                     $insertQuery = insertQuery('failed_messages', [
                         'id'              => uuid(),
                         'message_id'      => $context->metadata()->messageId(),
@@ -174,9 +168,7 @@ final class SimpleRetryStrategy implements RetryStrategy
                         queryString: $compiledQuery->sql(),
                         parameters: $compiledQuery->params()
                     );
-                }
-                catch (\Throwable $throwable)
-                {
+                } catch (\Throwable $throwable) {
                     $context->logger()->critical(
                         'Error saving `{messageClass}` message to spare storage: {throwableMessage}',
                         \array_merge(

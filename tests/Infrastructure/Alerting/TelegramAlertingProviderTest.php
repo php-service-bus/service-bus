@@ -24,6 +24,7 @@ use ServiceBus\Infrastructure\Alerting\AlertMessage;
 use ServiceBus\Infrastructure\Alerting\TelegramAlertingProvider;
 use ServiceBus\TelegramBot\Interaction\InteractionsProvider;
 use ServiceBus\TelegramBot\TelegramCredentials;
+
 use function Amp\Promise\wait;
 use function ServiceBus\Tests\filterLogMessages;
 

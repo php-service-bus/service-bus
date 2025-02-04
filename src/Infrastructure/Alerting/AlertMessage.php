@@ -31,7 +31,10 @@ final class AlertMessage
      */
     public function __construct(string $template, array $placeholders = [])
     {
-        /** @psalm-var non-empty-string $preparedContent */
+        /**
+         * @psalm-var non-empty-string $preparedContent
+         * @phpstan-ignore argument.type
+         */
         $preparedContent = \str_replace(\array_keys($placeholders), \array_values($placeholders), $template);
 
         $this->content = $preparedContent;

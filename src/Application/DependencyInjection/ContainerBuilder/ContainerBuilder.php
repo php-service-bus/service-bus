@@ -48,23 +48,17 @@ final class ContainerBuilder
     private $entryPointName;
 
     /**
-     * @see \Symfony\Component\DependencyInjection\Extension\Extension
-     *
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage<Extension, null>
      */
     private $extensions;
 
     /**
-     * @see \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterfac
-     *
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage<CompilerPassInterface, null>
      */
     private $compilerPasses;
 
     /**
-     * @see \ServiceBus\Common\Module\ServiceBusModule
-     *
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage<ServiceBusModule, null>
      */
     private $modules;
 
@@ -106,8 +100,7 @@ final class ContainerBuilder
      */
     public function addCompilerPasses(CompilerPassInterface ...$compilerPasses): void
     {
-        foreach ($compilerPasses as $compilerPass)
-        {
+        foreach ($compilerPasses as $compilerPass) {
             $this->compilerPasses->attach($compilerPass);
         }
     }
@@ -117,8 +110,7 @@ final class ContainerBuilder
      */
     public function addExtensions(Extension ...$extensions): void
     {
-        foreach ($extensions as $extension)
-        {
+        foreach ($extensions as $extension) {
             $this->extensions->attach($extension);
         }
     }
@@ -128,8 +120,7 @@ final class ContainerBuilder
      */
     public function addModules(ServiceBusModule ...$serviceBusModules): void
     {
-        foreach ($serviceBusModules as $serviceBusModule)
-        {
+        foreach ($serviceBusModules as $serviceBusModule) {
             $this->modules->attach($serviceBusModule);
         }
     }
@@ -139,8 +130,7 @@ final class ContainerBuilder
      */
     public function addParameters(array $parameters): void
     {
-        foreach ($parameters as $key => $value)
-        {
+        foreach ($parameters as $key => $value) {
             $this->parameters[$key] = $value;
         }
     }
@@ -163,8 +153,7 @@ final class ContainerBuilder
      */
     public function hasActualContainer(): bool
     {
-        if ($this->environment->isDebug() === false)
-        {
+        if ($this->environment->isDebug() === false) {
             return $this->configCache()->isFresh();
         }
 
@@ -212,23 +201,22 @@ final class ContainerBuilder
         $containerBuilder = new SymfonyContainerBuilder(new EnvPlaceholderParameterBag($this->parameters));
 
         /** @var Extension $extension */
-        foreach ($this->extensions as $extension)
-        {
+        foreach ($this->extensions as $extension) {
+            /** @psalm-suppress InvalidArgument */
             $extension->load(
+                /** @phpstan-ignore argument.type */
                 configs: $this->parameters,
                 container: $containerBuilder
             );
         }
 
         /** @var CompilerPassInterface $compilerPass */
-        foreach ($this->compilerPasses as $compilerPass)
-        {
+        foreach ($this->compilerPasses as $compilerPass) {
             $containerBuilder->addCompilerPass($compilerPass);
         }
 
         /** @var ServiceBusModule $module */
-        foreach ($this->modules as $module)
-        {
+        foreach ($this->modules as $module) {
             $module->boot($containerBuilder);
         }
 
@@ -259,8 +247,7 @@ final class ContainerBuilder
             ]
         );
 
-        if (\is_string($content))
-        {
+        if (\is_string($content)) {
             $this->configCache()->write(
                 content: $content,
                 metadata: $builder->getResources()
@@ -273,8 +260,7 @@ final class ContainerBuilder
      */
     private function configCache(): ConfigCache
     {
-        if ($this->configCache === null)
-        {
+        if ($this->configCache === null) {
             $this->configCache = new ConfigCache(
                 file: $this->getContainerClassPath(),
                 debug: $this->environment->isDebug()
@@ -291,8 +277,7 @@ final class ContainerBuilder
     {
         $cacheDirectory = (string) $this->cacheDirectory;
 
-        if ($cacheDirectory === '' && false === \is_writable($cacheDirectory))
-        {
+        if ($cacheDirectory === '' && false === \is_writable($cacheDirectory)) {
             $cacheDirectory = \sys_get_temp_dir();
         }
 

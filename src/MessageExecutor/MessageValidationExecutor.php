@@ -21,6 +21,7 @@ use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 use function ServiceBus\Common\invokeReflectionMethod;
 
 /**
@@ -71,8 +72,7 @@ final class MessageValidationExecutor implements MessageExecutor
             groups: $this->options->validationGroups
         );
 
-        if (\count($violations) !== 0)
-        {
+        if (\count($violations) !== 0) {
             self::bindViolations($violations, $context);
         }
 
@@ -88,18 +88,15 @@ final class MessageValidationExecutor implements MessageExecutor
         $errors = [];
 
         /** @var \Symfony\Component\Validator\ConstraintViolation $violation */
-        foreach ($violations as $violation)
-        {
+        foreach ($violations as $violation) {
             $propertyPath = $violation->getPropertyPath();
 
-            if ($propertyPath !== '')
-            {
+            if ($propertyPath !== '') {
                 $errors[] = new ValidationViolation($propertyPath, (string) $violation->getMessage());
             }
         }
 
-        try
-        {
+        try {
             invokeReflectionMethod(
                 object: $context,
                 methodName: 'validationFailed',
@@ -107,8 +104,7 @@ final class MessageValidationExecutor implements MessageExecutor
             );
         }
         // @codeCoverageIgnoreStart
-        catch (\Throwable)
-        {
+        catch (\Throwable) {
             /** No exceptions can happen */
         }
         // @codeCoverageIgnoreEnd

@@ -21,6 +21,7 @@ use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
+
 use function Amp\asyncCall;
 use function Amp\call;
 
@@ -66,14 +67,10 @@ final class TimeLimitedExecutor implements MessageExecutor
 
         /** @psalm-var non-empty-string $cancellationWatcher */
         $cancellationWatcher = $cancellationToken->subscribe(
-            function () use ($message, $context, $cancellationToken, $deferred)
-            {
-                try
-                {
+            function () use ($message, $context, $cancellationToken, $deferred) {
+                try {
                     $cancellationToken->throwIfRequested();
-                }
-                catch (\Throwable $throwable)
-                {
+                } catch (\Throwable $throwable) {
                     $context->logger()->error(
                         '`{incomingMessage}` message processing canceled by timeout (`{timeout}` seconds)',
                         [
@@ -90,22 +87,15 @@ final class TimeLimitedExecutor implements MessageExecutor
         $this->cancellationWatcher = $cancellationWatcher;
 
         asyncCall(
-            function () use ($cancellationToken, $deferred, $timeStart, $message, $context)
-            {
-                try
-                {
+            function () use ($cancellationToken, $deferred, $timeStart, $message, $context) {
+                try {
                     yield call($this->executor, $message, $context);
 
                     $deferred->resolve();
-                }
-                catch (\Throwable $throwable)
-                {
+                } catch (\Throwable $throwable) {
                     $deferred->resolve($throwable);
-                }
-                finally
-                {
-                    if ($this->cancellationWatcher !== null)
-                    {
+                } finally {
+                    if ($this->cancellationWatcher !== null) {
                         $cancellationToken->unsubscribe($this->cancellationWatcher);
                     }
 

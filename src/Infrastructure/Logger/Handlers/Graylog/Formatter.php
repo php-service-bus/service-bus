@@ -13,7 +13,9 @@ declare(strict_types=0);
 namespace ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 
 use Monolog\Formatter\NormalizerFormatter;
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
 
 /**
  * Log entry formatter.
@@ -28,14 +30,14 @@ final class Formatter extends NormalizerFormatter
      * Translates Monolog log levels to Graylog2 log priorities.
      */
     private const LEVEL_RELATIONS = [
-        Logger::DEBUG     => 7,
-        Logger::INFO      => 6,
-        Logger::NOTICE    => 5,
-        Logger::WARNING   => 4,
-        Logger::ERROR     => 3,
-        Logger::CRITICAL  => 2,
-        Logger::ALERT     => 1,
-        Logger::EMERGENCY => 0,
+        Level::Debug->value     => 7,
+        Level::Info->value      => 6,
+        Level::Notice->value    => 5,
+        Level::Warning->value   => 4,
+        Level::Error->value     => 3,
+        Level::Critical->value  => 2,
+        Level::Alert->value     => 1,
+        Level::Emergency->value  => 0,
     ];
 
     /**
@@ -74,7 +76,7 @@ final class Formatter extends NormalizerFormatter
     /**
      * @throws \RuntimeException if encoding fails and errors are not ignored
      */
-    public function format(array $record): array
+    public function format(LogRecord $record): array
     {
         /**
          * @psalm-var array{
@@ -134,8 +136,7 @@ final class Formatter extends NormalizerFormatter
     {
         $len = 200 + \strlen($message) + \strlen($this->systemName);
 
-        if ($len > $this->maxLength)
-        {
+        if ($len > $this->maxLength) {
             $formatted['short_message'] = \substr($message, 0, $this->maxLength);
             $formatted['full_message']  = $message;
         }
@@ -156,20 +157,17 @@ final class Formatter extends NormalizerFormatter
          * @psalm-var string                             $key
          * @psalm-var string|int|float|array|object|null $value
          */
-        foreach ($collection as $key => $value)
-        {
+        foreach ($collection as $key => $value) {
             $value = $this->formatValue($value);
 
-            if (null === $value)
-            {
+            if (null === $value) {
                 continue;
             }
 
             /** @noinspection UnnecessaryCastingInspection */
             $len = \strlen($key . (string) $value);
 
-            if (\is_string($value) && $len > $this->maxLength)
-            {
+            if (\is_string($value) && $len > $this->maxLength) {
                 $formatted[$key] = \substr($value, 0, $this->maxLength);
 
                 continue;
@@ -186,8 +184,7 @@ final class Formatter extends NormalizerFormatter
      */
     private function formatValue(array|float|int|object|string|null $value): float|int|string|null
     {
-        if ($value === null || \is_scalar($value))
-        {
+        if ($value === null || \is_scalar($value)) {
             return $value;
         }
 

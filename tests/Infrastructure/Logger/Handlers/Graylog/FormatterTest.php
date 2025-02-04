@@ -14,6 +14,7 @@ namespace ServiceBus\Tests\Infrastructure\Logger\Handlers\Graylog;
 
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Infrastructure\Logger\Handlers\Graylog\Formatter;
+
 use function ServiceBus\Common\datetimeInstantiator;
 use function ServiceBus\Common\jsonDecode;
 

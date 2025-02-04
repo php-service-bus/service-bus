@@ -17,6 +17,7 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Infrastructure\Watchers\GarbageCollectorWatcher;
+
 use function Amp\delay;
 use function ServiceBus\Tests\filterLogMessages;
 
@@ -36,8 +37,7 @@ final class GarbageCollectorWatcherTest extends TestCase
         $watcher = new GarbageCollectorWatcher(200, $logger);
 
         Loop::run(
-            static function () use ($watcher): \Generator
-            {
+            static function () use ($watcher): \Generator {
                 $watcher->run();
 
                 yield delay(300);

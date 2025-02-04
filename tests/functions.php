@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace ServiceBus\Tests;
 
 use Monolog\Handler\TestHandler;
+use Monolog\LogRecord;
 
 /**
  * @param string $path
@@ -20,10 +21,8 @@ use Monolog\Handler\TestHandler;
 function removeDirectory(string $path): void
 {
     $files = \glob(\preg_replace('/([*?\[])/', '[$1]', $path) . '/{,.}*', GLOB_BRACE);
-    foreach ($files as $file)
-    {
-        if ($file === $path . '/.' || $file === $path . '/..')
-        {
+    foreach ($files as $file) {
+        if ($file === $path . '/.' || $file === $path . '/..') {
             continue;
         }
         \is_dir($file) ? removeDirectory($file) : \unlink($file);
@@ -34,9 +33,8 @@ function removeDirectory(string $path): void
 function filterLogMessages(TestHandler $testHandler): array
 {
     return \array_map(
-        static function (array $entry): string
-        {
-            return $entry['message'];
+        static function (LogRecord $logRecord): string {
+            return $logRecord->message;
         },
         $testHandler->getRecords()
     );

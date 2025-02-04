@@ -24,6 +24,7 @@ use ServiceBus\Common\Metadata\ServiceBusMetadata;
 use ServiceBus\Endpoint\DeliveryPackage;
 use ServiceBus\Endpoint\EndpointRouter;
 use ServiceBus\Endpoint\Options\DeliveryOptionsFactory;
+
 use function Amp\call;
 
 final class KernelContext implements ServiceBusContext
@@ -83,8 +84,7 @@ final class KernelContext implements ServiceBusContext
         ?OutcomeMessageMetadata $withMetadata = null
     ): Promise {
         return call(
-            function () use ($message, $deliveryOptions, $withMetadata): \Generator
-            {
+            function () use ($message, $deliveryOptions, $withMetadata): \Generator {
                 /** @psalm-var class-string $messageClass */
                 $messageClass = \get_class($message);
 
@@ -97,8 +97,7 @@ final class KernelContext implements ServiceBusContext
 
                 $promises = [];
 
-                foreach ($endpoints as $endpoint)
-                {
+                foreach ($endpoints as $endpoint) {
                     $this->logger()->debug(
                         'Send message "{outcomeMessage}" to "{endpoint}"',
                         [
@@ -116,8 +115,7 @@ final class KernelContext implements ServiceBusContext
                     );
                 }
 
-                if (\count($promises) !== 0)
-                {
+                if (\count($promises) !== 0) {
                     yield $promises;
                 }
             }
@@ -130,8 +128,7 @@ final class KernelContext implements ServiceBusContext
         ?OutcomeMessageMetadata $withMetadata = null
     ): Promise {
         return call(
-            function () use ($messages, $deliveryOptions, $withMetadata): \Generator
-            {
+            function () use ($messages, $deliveryOptions, $withMetadata): \Generator {
                 $metadata = $this->enrichOutcomeMessageMetadata(
                     metadata: $withMetadata ?? DeliveryMessageMetadata::create($this->metadata->traceId()),
                     isRetry: false
@@ -139,15 +136,13 @@ final class KernelContext implements ServiceBusContext
 
                 $deliveryQueue = [];
 
-                foreach ($messages as $message)
-                {
+                foreach ($messages as $message) {
                     /** @psalm-var class-string $messageClass */
                     $messageClass    = \get_class($message);
                     $deliveryOptions = $deliveryOptions ?? $this->optionsFactory->create($messageClass);
                     $endpoints       = $this->endpointRouter->route($messageClass);
 
-                    foreach ($endpoints as $endpoint)
-                    {
+                    foreach ($endpoints as $endpoint) {
                         $deliveryQueue[$endpoint->name()][] = new DeliveryPackage(
                             message: $message,
                             options: $deliveryOptions,
@@ -156,8 +151,7 @@ final class KernelContext implements ServiceBusContext
                     }
                 }
 
-                foreach ($deliveryQueue as $endpointIndex => $packages)
-                {
+                foreach ($deliveryQueue as $endpointIndex => $packages) {
                     $endpoint = $this->endpointRouter->endpoint($endpointIndex);
 
                     $this->logger()->debug(
@@ -165,8 +159,7 @@ final class KernelContext implements ServiceBusContext
                         [
                             'endpoint'        => $endpoint->name(),
                             'outcomeMessages' => \implode(',', \array_map(
-                                static function (DeliveryPackage $package): string
-                                {
+                                static function (DeliveryPackage $package): string {
                                     return \get_class($package->message);
                                 },
                                 $packages
@@ -202,8 +195,7 @@ final class KernelContext implements ServiceBusContext
 
     private function enrichOutcomeMessageMetadata(OutcomeMessageMetadata $metadata, bool $isRetry): OutcomeMessageMetadata
     {
-        if ($isRetry)
-        {
+        if ($isRetry) {
             $metadata = $metadata->with(
                 key: ServiceBusMetadata::SERVICE_BUS_MESSAGE_RETRY_COUNT,
                 value: ((int) $this->metadata->get(ServiceBusMetadata::SERVICE_BUS_MESSAGE_RETRY_COUNT, 0)) + 1
@@ -217,10 +209,10 @@ final class KernelContext implements ServiceBusContext
      * Message failed validation
      * Called by infrastructure components.
      *
-     * @codeCoverageIgnore
-     * @noinspection PhpUnusedPrivateMethodInspection
+     * @see MessageValidationExecutor
      *
-     * @see          MessageValidationExecutor
+     * @codeCoverageIgnore
+     * @phpstan-ignore  method.unused
      */
     private function validationFailed(ValidationViolations $validationViolations): void
     {

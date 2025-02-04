@@ -51,8 +51,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
      */
     public function loadFromEmptyService(): void
     {
-        $object = new class ()
-        {
+        $object = new class () {
         };
 
         $handlers = $this->loader->load($object);
@@ -65,8 +64,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
      */
     public function loadFilledService(): void
     {
-        $service = new class ()
-        {
+        $service = new class () {
             #[CommandHandler(
                 description: 'handle',
                 validationEnabled: true,
@@ -106,8 +104,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
         self::assertCount(3, $handlers);
 
         /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
-        foreach ($handlers as $handler)
-        {
+        foreach ($handlers as $handler) {
             /**
              * @var \ServiceBus\Common\MessageHandler\MessageHandler $handler
              * @var DefaultHandlerOptions                            $options
@@ -122,8 +119,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
             self::assertCount(2, $handler->messageHandler->arguments);
 
             /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-            if ($handler->messageHandler->options->isCommandHandler)
-            {
+            if ($handler->messageHandler->options->isCommandHandler) {
                 self::assertSame(TestConfigurationLoaderMessage::class, $handler->messageHandler->messageClass);
                 self::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
 
@@ -131,9 +127,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
                 self::assertSame(['qwerty', 'root'], $options->validationGroups);
 
                 self::assertSame('handle', $handler->messageHandler->methodName);
-            }
-            else
-            {
+            } else {
                 self::assertSame(TestConfigurationLoaderMessage::class, $handler->messageHandler->messageClass);
                 self::assertInstanceOf(\Closure::class, $handler->messageHandler->closure);
 
@@ -153,8 +147,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
             'The event handler must have at least 2 arguments: the message object (the first argument) and the context'
         );
 
-        $service = new class ()
-        {
+        $service = new class () {
             #[CommandHandler]
             public function handle(): void
             {
@@ -172,8 +165,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
         $this->expectException(InvalidHandlerArguments::class);
         $this->expectExceptionMessage('The first argument to the message handler must be the message object');
 
-        $service = new class ()
-        {
+        $service = new class () {
             #[CommandHandler]
             public function handle(
                 string $qwerty,
@@ -190,8 +182,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
      */
     public function withUnsupportedAttribute(): void
     {
-        $service = new class ()
-        {
+        $service = new class () {
             #[UnsupportedAttribute]
             public function handle(): void
             {
@@ -224,8 +215,7 @@ final class AttributeServiceHandlersLoaderTest extends TestCase
     {
         $this->expectException(ParseAttributesFailed::class);
 
-        $service = new class ()
-        {
+        $service = new class () {
             /** @noinspection PhpUndefinedClassInspection */
             #[AAsdfsf]
             public function handle(): void

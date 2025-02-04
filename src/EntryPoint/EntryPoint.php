@@ -21,6 +21,7 @@ use Psr\Log\NullLogger;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
 use ServiceBus\Transport\Common\Queue;
 use ServiceBus\Transport\Common\Transport;
+
 use function Amp\delay;
 use function ServiceBus\Common\throwableDetails;
 use function ServiceBus\Common\throwableMessage;
@@ -114,8 +115,7 @@ final class EntryPoint
     public function listen(Queue ...$queues): Promise
     {
         return $this->transport->consume(
-            function (IncomingPackage $package): \Generator
-            {
+            function (IncomingPackage $package): \Generator {
                 /** Handle incoming package */
                 $this->deferExecution($package);
 
@@ -124,8 +124,7 @@ final class EntryPoint
 
                 $inProgressCount = \count($this->currentTasksInProgress);
 
-                if (($inProgressCount !== 0) && $inProgressCount >= $this->maxConcurrentTaskCount)
-                {
+                if (($inProgressCount !== 0) && $inProgressCount >= $this->maxConcurrentTaskCount) {
                     $this->logger->debug(
                         'The maximum number of tasks has been reached',
                         [
@@ -150,8 +149,7 @@ final class EntryPoint
     public function stop(): void
     {
         Loop::defer(
-            function (): \Generator
-            {
+            function (): \Generator {
                 $this->logger->info('Subscriber stop command received');
 
                 yield $this->transport->stop();
@@ -160,8 +158,7 @@ final class EntryPoint
 
                 $inProgressCount = \count($this->currentTasksInProgress);
 
-                if ($inProgressCount !== 0)
-                {
+                if ($inProgressCount !== 0) {
                     $this->logger->info(
                         'Waiting for the completion of all tasks taken',
                         [
@@ -187,28 +184,18 @@ final class EntryPoint
         $this->currentTasksInProgress[$package->id()] = $package->id();
 
         Loop::defer(
-            function () use ($package): void
-            {
+            function () use ($package): void {
                 $this->processor->handle($package)->onResolve(
-                    function (?\Throwable $throwable) use ($package): \Generator
-                    {
-                        try
-                        {
-                            if ($throwable !== null)
-                            {
+                    function (?\Throwable $throwable) use ($package): \Generator {
+                        try {
+                            if ($throwable !== null) {
                                 throw $throwable;
                             }
-                        }
-                        catch (CancelledException | TimeoutException)
-                        {
+                        } catch (CancelledException | TimeoutException) {
                             yield $package->reject(true);
-                        }
-                        catch (\Throwable $throwable)
-                        {
+                        } catch (\Throwable $throwable) {
                             $this->logThrowable($throwable, $package);
-                        }
-                        finally
-                        {
+                        } finally {
                             unset($this->currentTasksInProgress[$package->id()]);
                         }
                     }

@@ -16,8 +16,6 @@ use ServiceBus\Common\Endpoint\DeliveryOptions;
 
 /**
  * Sent message options.
- *
- * @psalm-immutable
  */
 final class DefaultDeliveryOptions implements DeliveryOptions
 {
@@ -34,8 +32,6 @@ final class DefaultDeliveryOptions implements DeliveryOptions
     /**
      * The message must be stored in the broker.
      *
-     * @psalm-readonly
-     *
      * @var bool
      */
     public $isPersistent = true;
@@ -45,8 +41,6 @@ final class DefaultDeliveryOptions implements DeliveryOptions
      * server will return an unroutable message with a Return method. If this flag is false, the server silently drops
      * the message.
      *
-     * @psalm-readonly
-     *
      * @var bool
      */
     public $isMandatory = true;
@@ -55,8 +49,6 @@ final class DefaultDeliveryOptions implements DeliveryOptions
      * This flag tells the server how to react if the message cannot be routed to a queue consumer immediately. If this
      * flag is set, the server will return an undeliverable message with a Return method. If this flag is false, the
      * server will queue the message, but with no guarantee that it will ever be consumed.
-     *
-     * @psalm-readonly
      *
      * @var bool
      */

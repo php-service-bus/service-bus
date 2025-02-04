@@ -34,6 +34,7 @@ use ServiceBus\Services\Configuration\AttributeServiceHandlersLoader;
 use ServiceBus\Services\Configuration\ServiceMessageHandler;
 use ServiceBus\Transport\Common\Queue;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 use function ServiceBus\Tests\filterLogMessages;
 
 final class EntryPointTest extends TestCase
@@ -92,8 +93,7 @@ final class EntryPointTest extends TestCase
         $messageRouter = new Router();
 
         /** @var ServiceMessageHandler $handler */
-        foreach ($handlers as $handler)
-        {
+        foreach ($handlers as $handler) {
             $messageRouter->registerHandler(
                 $handler->messageHandler->messageClass,
                 $messageExecutorsFactory->create($handler->messageHandler)
@@ -108,8 +108,7 @@ final class EntryPointTest extends TestCase
             logger: $this->logger
         );
 
-        $this->queue = new class () implements Queue
-        {
+        $this->queue = new class () implements Queue {
             public function toString(): string
             {
                 return 'testing';
@@ -129,8 +128,7 @@ final class EntryPointTest extends TestCase
         );
 
         Loop::run(
-            function () use ($entryPoint): void
-            {
+            function () use ($entryPoint): void {
                 $entryPoint->listen($this->queue);
                 $entryPoint->stop();
             }
@@ -146,8 +144,7 @@ final class EntryPointTest extends TestCase
     {
         $messages = [];
 
-        for ($i = 1; $i <= 100; $i++)
-        {
+        for ($i = 1; $i <= 100; $i++) {
             $messages[] = new EntryPointTestMessage((string) $i);
         }
 
@@ -160,8 +157,7 @@ final class EntryPointTest extends TestCase
         );
 
         Loop::run(
-            function () use ($entryPoint): \Generator
-            {
+            function () use ($entryPoint): \Generator {
                 yield $entryPoint->listen($this->queue);
 
                 $entryPoint->stop();
@@ -186,8 +182,7 @@ final class EntryPointTest extends TestCase
         );
 
         Loop::run(
-            function () use ($entryPoint): \Generator
-            {
+            function () use ($entryPoint): \Generator {
                 yield $entryPoint->listen($this->queue);
                 $entryPoint->stop();
             }
@@ -208,8 +203,7 @@ final class EntryPointTest extends TestCase
         );
 
         Loop::run(
-            function () use ($entryPoint): \Generator
-            {
+            function () use ($entryPoint): \Generator {
                 yield $entryPoint->listen($this->queue);
                 $entryPoint->stop();
             }
@@ -232,18 +226,15 @@ final class EntryPointTest extends TestCase
         );
 
         Loop::run(
-            function () use ($entryPoint): \Generator
-            {
+            function () use ($entryPoint): \Generator {
                 yield $entryPoint->listen($this->queue);
 
                 $entryPoint->stop();
             }
         );
 
-        foreach (filterLogMessages($this->logHandler) as $message)
-        {
-            if (\str_contains($message, 'message processing canceled by timeout (`10` seconds)'))
-            {
+        foreach (filterLogMessages($this->logHandler) as $message) {
+            if (\str_contains($message, 'message processing canceled by timeout (`10` seconds)')) {
                 self::assertTrue(true);
 
                 return;

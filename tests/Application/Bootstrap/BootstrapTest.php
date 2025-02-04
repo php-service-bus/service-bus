@@ -24,6 +24,7 @@ use ServiceBus\Application\Exceptions\ConfigurationCheckFailed;
 use ServiceBus\Common\Module\ServiceBusModule;
 use ServiceBus\Tests\Application\Bootstrap\Stubs\TestBootstrapExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 use function ServiceBus\Tests\removeDirectory;
 
 /**
@@ -40,8 +41,7 @@ final class BootstrapTest extends TestCase
     {
         $this->cacheDirectory = \sys_get_temp_dir() . '/bootstrap_test';
 
-        if (\file_exists($this->cacheDirectory) === false)
-        {
+        if (\file_exists($this->cacheDirectory) === false) {
             \mkdir($this->cacheDirectory);
         }
     }
@@ -132,8 +132,7 @@ final class BootstrapTest extends TestCase
      */
     public function fullConfigure(): void
     {
-        $module = new class () implements ServiceBusModule
-        {
+        $module = new class () implements ServiceBusModule {
             public function boot(ContainerBuilder $containerBuilder): void
             {
                 $containerBuilder->setParameter('TestModule', 'exists');

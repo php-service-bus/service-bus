@@ -25,6 +25,7 @@ use Psr\Log\NullLogger;
 use ServiceBus\MessageSerializer\Exceptions\DecodeObjectFailed;
 use ServiceBus\MessagesRouter\Router;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
+
 use function Amp\call;
 use function ServiceBus\Common\throwableDetails;
 use function ServiceBus\Common\throwableMessage;
@@ -73,15 +74,17 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         $this->logger         = $logger ?? new NullLogger();
     }
 
+    /**
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
+     */
     public function handle(IncomingPackage $package): Promise
     {
         return call(
-            function () use ($package): \Generator
-            {
+            function () use ($package): \Generator {
                 $messageInfo = $this->collectMessageInfo($package);
 
-                if ($messageInfo === null)
-                {
+                if ($messageInfo === null) {
                     yield $package->ack();
 
                     return;
@@ -101,8 +104,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                         : []
                 );
 
-                if ($executors === null)
-                {
+                if ($executors === null) {
                     yield $package->ack();
 
                     return;
@@ -110,41 +112,32 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
 
                 $globalRetryQueue = [];
 
-                foreach ($executors as $executor)
-                {
-                    try
-                    {
+                foreach ($executors as $executor) {
+                    try {
                         /** @var \Throwable|null $result */
                         $result = yield $executor($messageInfo['message'], $context);
 
-                        if ($result instanceof \Throwable)
-                        {
+                        if ($result instanceof \Throwable) {
                             throw $result;
                         }
-                    }
-                    catch (\Throwable $throwable)
-                    {
+                    } catch (\Throwable $throwable) {
                         $context->logger()->throwable($throwable);
 
                         $handlerRetryStrategy = $executor->retryStrategy();
 
-                        if ($handlerRetryStrategy !== null)
-                        {
+                        if ($handlerRetryStrategy !== null) {
                             yield $handlerRetryStrategy->retry(
                                 message: $messageInfo['message'],
                                 context: $context,
                                 details: new FailureContext([$executor->id() => throwableMessage($throwable)])
                             );
-                        }
-                        else
-                        {
+                        } else {
                             $globalRetryQueue[$executor->id()] = throwableMessage($throwable);
                         }
                     }
                 }
 
-                if (\count($globalRetryQueue) !== 0)
-                {
+                if (\count($globalRetryQueue) !== 0) {
                     yield $this->retryStrategy->retry(
                         message: $messageInfo['message'],
                         context: $context,
@@ -175,8 +168,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
     ): ?array {
         $executors = $this->messagesRouter->match($message);
 
-        if (\count($executors) === 0)
-        {
+        if (\count($executors) === 0) {
             $this->logger->debug(
                 'There are no handlers configured for the message "{messageClass}"',
                 [
@@ -189,13 +181,11 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
         }
 
         /** In case of reprocessing */
-        if (!empty($filterByRecipient))
-        {
+        if (!empty($filterByRecipient)) {
             /** @psalm-var list<MessageExecutor> $specificHandlers */
             $specificHandlers = \array_filter(
                 \array_map(
-                    static function (MessageExecutor $messageExecutor) use ($filterByRecipient): ?MessageExecutor
-                    {
+                    static function (MessageExecutor $messageExecutor) use ($filterByRecipient): ?MessageExecutor {
                         return \in_array($messageExecutor->id(), $filterByRecipient, true)
                             ? $messageExecutor
                             : null;
@@ -204,8 +194,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
                 )
             );
 
-            if (\count($specificHandlers) !== 0)
-            {
+            if (\count($specificHandlers) !== 0) {
                 return $specificHandlers;
             }
 
@@ -232,15 +221,12 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
             variables: $typedHeaders['metadata']
         );
 
-        try
-        {
+        try {
             $message = $this->messageDecoder->decode(
                 payload: $package->payload(),
                 metadata: $metadata
             );
-        }
-        catch (DecodeObjectFailed $exception)
-        {
+        } catch (DecodeObjectFailed $exception) {
             $this->logger->error(
                 'Failed to denormalize the message',
                 \array_merge(
@@ -275,10 +261,8 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
 
         $metadataVariables = [];
 
-        foreach (ServiceBusMetadata::INTERNAL_METADATA_KEYS as $metadataHeader)
-        {
-            if (\array_key_exists($metadataHeader, $headers))
-            {
+        foreach (ServiceBusMetadata::INTERNAL_METADATA_KEYS as $metadataHeader) {
+            if (\array_key_exists($metadataHeader, $headers)) {
                 $metadataVariables[$metadataHeader] = $headers[$metadataHeader];
 
                 unset($headers[$metadataHeader]);
@@ -313,8 +297,7 @@ final class DefaultEntryPointProcessor implements EntryPointProcessor
          */
         $messageExecutorIds = \array_filter(
             \array_map(
-                static function (string $each): ?string
-                {
+                static function (string $each): ?string {
                     return $each !== '' ? $each : null;
                 },
                 \explode(',', $value)

@@ -17,6 +17,7 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Infrastructure\Watchers\LoopBlockWatcher;
+
 use function Amp\delay;
 use function ServiceBus\Tests\filterLogMessages;
 
@@ -36,8 +37,7 @@ final class LoopBlockWatcherTest extends TestCase
         $watcher = new LoopBlockWatcher($logger);
 
         Loop::run(
-            static function () use ($watcher): \Generator
-            {
+            static function () use ($watcher): \Generator {
                 $watcher->run();
 
                 yield delay(500);
@@ -60,23 +60,20 @@ final class LoopBlockWatcherTest extends TestCase
         $watcher = new LoopBlockWatcher($logger);
 
         Loop::run(
-            static function () use ($watcher): void
-            {
+            static function () use ($watcher): void {
                 $watcher->run();
 
 
                 Loop::repeat(
                     0,
-                    static function ()
-                    {
+                    static function () {
                         \usleep(100 * 1000);
                     }
                 );
 
                 Loop::delay(
                     300,
-                    static function ()
-                    {
+                    static function () {
                         Loop::stop();
                     }
                 );

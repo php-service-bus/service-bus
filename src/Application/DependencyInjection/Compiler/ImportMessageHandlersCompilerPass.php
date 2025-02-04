@@ -14,6 +14,7 @@ namespace ServiceBus\Application\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 use function ServiceBus\Common\canonicalizeFilesPath;
 use function ServiceBus\Common\extractNamespaceFromFile;
 use function ServiceBus\Common\searchFiles;
@@ -22,8 +23,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (self::enabled($container))
-        {
+        if (self::enabled($container)) {
             $excludedFiles = canonicalizeFilesPath(self::getExcludedFiles($container));
 
             $projectFilesIterator = searchFiles(self::getDirectories($container), '/\.php/i');
@@ -38,7 +38,7 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
 
     /**
      * @psalm-param \Generator<\SplFileInfo> $projectFilesIterator
-     * @psalm-param list<string>             $excludedFiles
+     * @psalm-param string[]                 $excludedFiles
      *
      * @throws \ServiceBus\Common\Exceptions\FileSystemException
      */
@@ -48,13 +48,11 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
         array            $excludedFiles
     ): void {
         /** @var \SplFileInfo $file */
-        foreach ($projectFilesIterator as $file)
-        {
+        foreach ($projectFilesIterator as $file) {
             /** @var string $filePath */
             $filePath = $file->getRealPath();
 
-            if ($filePath !== '' && \in_array($filePath, $excludedFiles, true) === false)
-            {
+            if ($filePath !== '' && \in_array($filePath, $excludedFiles, true) === false) {
                 $class = extractNamespaceFromFile($filePath);
 
                 if (
@@ -105,8 +103,6 @@ final class ImportMessageHandlersCompilerPass implements CompilerPassInterface
     private static function getExcludedFiles(ContainerBuilder $container): array
     {
         /**
-         * @noinspection PhpUnnecessaryLocalVariableInspection
-         *
          * @psalm-var list<non-empty-string> $excludedFiles
          */
         $excludedFiles = $container->hasParameter('service_bus.auto_import.handlers_excluded')

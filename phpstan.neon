@@ -1,5 +1,6 @@
 parameters:
-	checkMissingIterableValueType: false
-	checkGenericClassInNonGenericObjectType: false
-	ignoreErrors:
-		- '#Method ServiceBus\\Context\\KernelContext::validationFailed\(\) is unused#'
+    level: 9
+    ignoreErrors:
+         - identifier: missingType.iterableValue
+         - identifier: missingType.generics
+         - identifier: varTag.nativeType

@@ -21,6 +21,7 @@ use ServiceBus\Infrastructure\Alerting\AlertContext;
 use ServiceBus\Infrastructure\Alerting\AlertingProvider;
 use ServiceBus\Infrastructure\Alerting\AlertMessage;
 use ServiceBus\Infrastructure\Alerting\ChainAlertingProvider;
+
 use function Amp\call;
 use function Amp\File\write;
 
@@ -38,16 +39,14 @@ final class ChainAlertingProviderTest extends TestCase
 
         @\unlink($expectedFilePath);
 
-        $first = new class () implements AlertingProvider
-        {
+        $first = new class () implements AlertingProvider {
             public function send(AlertMessage $message, ?AlertContext $context = null): Promise
             {
                 return new Failure(new \RuntimeException('qwerty'));
             }
         };
 
-        $second = new class ($expectedFilePath) implements AlertingProvider
-        {
+        $second = new class ($expectedFilePath) implements AlertingProvider {
             /** @var string */
             private $expectedFilePath;
 
@@ -59,8 +58,7 @@ final class ChainAlertingProviderTest extends TestCase
             public function send(AlertMessage $message, ?AlertContext $context = null): Promise
             {
                 return call(
-                    function () use ($message): \Generator
-                    {
+                    function () use ($message): \Generator {
                         yield write($this->expectedFilePath, $message->content);
                     }
                 );

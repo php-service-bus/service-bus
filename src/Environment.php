@@ -133,8 +133,7 @@ final class Environment
      */
     private static function validateEnvironment(string $specifiedEnvironment): void
     {
-        if (\in_array($specifiedEnvironment, self::LIST, true) === false)
-        {
+        if (\in_array($specifiedEnvironment, self::LIST, true) === false) {
             throw new \LogicException(
                 \sprintf(
                     'Provided incorrect value of the environment: "%s". Allowable values: %s',

@@ -70,8 +70,7 @@ final class IncomingMessageDecoder
         /** @psalm-var class-string|null $toMessageClass */
         $toMessageClass = $metadata->get(ServiceBusMetadata::SERVICE_BUS_MESSAGE_TYPE);
 
-        if ($toMessageClass === null)
-        {
+        if ($toMessageClass === null) {
             throw new DecodeObjectFailed('Unable to find message classFQN declaration');
         }
 
@@ -102,8 +101,7 @@ final class IncomingMessageDecoder
      */
     private function obtainDecoder(string $decoderId): ObjectSerializer
     {
-        if ($this->decodersLocator->has($decoderId))
-        {
+        if ($this->decodersLocator->has($decoderId)) {
             /**
              * @noinspection PhpUnhandledExceptionInspection
              * @noinspection PhpUnnecessaryLocalVariableInspection

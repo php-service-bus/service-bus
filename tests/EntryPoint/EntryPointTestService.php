@@ -14,6 +14,7 @@ namespace ServiceBus\Tests\EntryPoint;
 
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Services\Attributes\CommandHandler;
+
 use function Amp\delay;
 
 /**
@@ -32,13 +33,11 @@ final class EntryPointTestService
         ServiceBusContext $context,
         EntryPointTestDependency $dependency
     ): \Generator {
-        if ($command->id === 'throw')
-        {
+        if ($command->id === 'throw') {
             throw new \RuntimeException('ups...');
         }
 
-        if ($command->id === 'await')
-        {
+        if ($command->id === 'await') {
             yield delay(60000);
 
             return;

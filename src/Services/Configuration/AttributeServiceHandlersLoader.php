@@ -40,8 +40,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
         /** @psalm-var \SplObjectStorage<ServiceMessageHandler, int> $messageProcessors */
         $messageProcessors = new \SplObjectStorage();
 
-        foreach ($this->readMethodLevelAttributes($service) as $methodLevelAnnotation)
-        {
+        foreach ($this->readMethodLevelAttributes($service) as $methodLevelAnnotation) {
             /** @var CommandHandler|EventListener $attribute */
             $attribute = $methodLevelAnnotation->attribute;
 
@@ -88,18 +87,13 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
         /** @var DefaultHandlerOptions $options */
         $options = DefaultHandlerOptions::{$factoryMethod}($description);
 
-        if ($attribute instanceof HasValidation)
-        {
-            $validationConfiguration = $attribute->validation();
+        $validationConfiguration = $attribute->validation();
 
-            if ($validationConfiguration !== null)
-            {
-                $options = $options->enableValidation($validationConfiguration->groups);
-            }
+        if ($validationConfiguration !== null) {
+            $options = $options->enableValidation($validationConfiguration->groups);
         }
 
-        if ($attribute instanceof HasCancellation)
-        {
+        if ($attribute instanceof HasCancellation) {
             $options = $options->limitExecutionTime($attribute->cancellation()->timeout);
         }
 
@@ -115,25 +109,21 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
      */
     private function extractMessageClass(array $parameters): string
     {
-        if (\count($parameters) === 0)
-        {
+        if (\count($parameters) === 0) {
             throw InvalidHandlerArguments::emptyArguments();
         }
 
         /** @var \ReflectionParameter $firstArgument */
         $firstArgument = $parameters[0];
 
-        if ($firstArgument->getType() !== null)
-        {
+        if ($firstArgument->getType() !== null) {
             /** @var \ReflectionNamedType $type */
             $type = $firstArgument->getType();
 
             /** @psalm-var class-string $className */
             $className = $type->getName();
 
-            /** @psalm-suppress RedundantConditionGivenDocblockType */
-            if (\class_exists($className))
-            {
+            if (\class_exists($className)) {
                 return $className;
             }
         }
@@ -151,8 +141,7 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
 
         /** @noinspection PhpConditionAlreadyCheckedInspection */
         // @codeCoverageIgnoreStart
-        if ($closure === null)
-        {
+        if ($closure === null) {
             throw new UnableCreateClosure(
                 \sprintf(
                     'Unable to create a closure for the "%s" method',
@@ -176,10 +165,8 @@ final class AttributeServiceHandlersLoader implements ServiceHandlersLoader
         $readAttributes = $this->attributesReader->extract(\get_class($service));
 
         /** @var MethodLevel $methodLevelAttribute */
-        foreach ($readAttributes->methodLevelCollection as $methodLevelAttribute)
-        {
-            if ($this->supports($methodLevelAttribute->attribute))
-            {
+        foreach ($readAttributes->methodLevelCollection as $methodLevelAttribute) {
+            if ($this->supports($methodLevelAttribute->attribute)) {
                 $result[] = $methodLevelAttribute;
             }
         }

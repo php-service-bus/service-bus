@@ -15,6 +15,7 @@ namespace ServiceBus\Infrastructure\Watchers;
 use Amp\Loop;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+
 use function ServiceBus\Common\formatBytes;
 
 /**
@@ -54,8 +55,7 @@ final class GarbageCollectorWatcher
 
     public function __destruct()
     {
-        if ($this->watcherId !== null)
-        {
+        if ($this->watcherId !== null) {
             Loop::cancel($this->watcherId);
 
             $this->watcherId = null;
@@ -69,8 +69,7 @@ final class GarbageCollectorWatcher
         /** @psalm-var non-empty-string $watcherId */
         $watcherId = Loop::repeat(
             $this->interval,
-            static function () use ($logger): void
-            {
+            static function () use ($logger): void {
                 $logger->info('Forces collection of any existing garbage cycles', ['number' => \gc_collect_cycles()]);
                 $logger->info(
                     'Reclaims memory used by the Zend Engine memory manager',

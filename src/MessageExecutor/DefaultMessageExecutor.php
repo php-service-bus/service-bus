@@ -19,6 +19,7 @@ use Amp\Promise;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\MessageExecutor\MessageExecutor;
 use ServiceBus\Services\Configuration\DefaultHandlerOptions;
+
 use function Amp\call;
 
 final class DefaultMessageExecutor implements MessageExecutor
@@ -83,16 +84,14 @@ final class DefaultMessageExecutor implements MessageExecutor
     public function __invoke(object $message, ServiceBusContext $context): Promise
     {
         return call(
-            function () use ($message, $context): \Generator
-            {
+            function () use ($message, $context): \Generator {
                 $resolvedArgs = $this->argumentResolver->resolve(
                     arguments: $this->arguments,
                     message: $message,
                     context: $context
                 );
 
-                if ($this->options->description !== null)
-                {
+                if ($this->options->description !== null) {
                     $context->logger()->info($this->options->description);
                 }
 

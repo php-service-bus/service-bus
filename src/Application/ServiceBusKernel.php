@@ -27,6 +27,7 @@ use ServiceBus\Transport\Common\Topic;
 use ServiceBus\Transport\Common\TopicBind;
 use ServiceBus\Transport\Common\Transport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use function Amp\delay;
 
 /**
@@ -53,7 +54,7 @@ final class ServiceBusKernel
     {
         $this->container = $globalContainer;
 
-        /** @var \Symfony\Component\DependencyInjection\ServiceLocator $serviceLocator */
+        /** @var \Symfony\Component\DependencyInjection\ServiceLocator<mixed> $serviceLocator */
         $serviceLocator = $this->container->get('service_bus.public_services_locator');
 
         /**
@@ -151,8 +152,7 @@ final class ServiceBusKernel
      */
     public function useDefaultStopSignalHandler(int $stopDelay = 10, array $signals = [\SIGINT, \SIGTERM]): self
     {
-        try
-        {
+        try {
             /**
              * @noinspection PhpUnhandledExceptionInspection
              *
@@ -160,8 +160,7 @@ final class ServiceBusKernel
              */
             $logger = $this->getKernelContainerService(LoggerInterface::class);
 
-            $handler = function (string $watcherId, int $signalId) use ($stopDelay, $logger): \Generator
-            {
+            $handler = function (string $watcherId, int $signalId) use ($stopDelay, $logger): \Generator {
                 yield delay($stopDelay * 1000);
 
                 $logger->info(
@@ -175,16 +174,13 @@ final class ServiceBusKernel
                 $this->entryPoint->stop();
             };
 
-            foreach ($signals as $signal)
-            {
+            foreach ($signals as $signal) {
                 /** @noinspection PhpUnhandledExceptionInspection */
                 Loop::onSignal($signal, $handler);
             }
 
             return $this;
-        }
-        catch (\Throwable $throwable)
-        {
+        } catch (\Throwable $throwable) {
             throw new \LogicException(\sprintf('Incorrect signals configuration: %s', $throwable->getMessage()));
         }
     }
@@ -198,8 +194,7 @@ final class ServiceBusKernel
     {
         Loop::delay(
             $seconds * 1000,
-            function () use ($seconds): void
-            {
+            function () use ($seconds): void {
                 /** @var LoggerInterface $logger */
                 $logger = $this->getKernelContainerService(LoggerInterface::class);
 
@@ -227,8 +222,7 @@ final class ServiceBusKernel
         $entryPointRouter = $this->getKernelContainerService(EndpointRouter::class);
 
         /** @psalm-var class-string $messageClass */
-        foreach ($messages as $messageClass)
-        {
+        foreach ($messages as $messageClass) {
             $entryPointRouter->registerRoute($messageClass, $endpoint);
         }
 

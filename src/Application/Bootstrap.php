@@ -51,14 +51,11 @@ final class Bootstrap
      */
     public static function withDotEnv(string $rootDirectoryPath, string $envFilePath): self
     {
-        try
-        {
+        try {
             (new Dotenv())
                 ->usePutenv(true)
                 ->load($envFilePath);
-        }
-        catch (\Throwable $throwable)
-        {
+        } catch (\Throwable $throwable) {
             throw new ConfigurationCheckFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
 
@@ -99,27 +96,21 @@ final class Bootstrap
      */
     public static function create(string $rootDirectoryPath, string $entryPointName, string $environment): self
     {
-        if ($entryPointName === '')
-        {
+        if ($entryPointName === '') {
             throw ConfigurationCheckFailed::emptyEntryPointName();
         }
 
-        if ($environment === '')
-        {
+        if ($environment === '') {
             throw ConfigurationCheckFailed::emptyEnvironment();
         }
 
-        if ($rootDirectoryPath === '')
-        {
+        if ($rootDirectoryPath === '') {
             throw ConfigurationCheckFailed::emptyRootDirectoryPath();
         }
 
-        try
-        {
+        try {
             $env = Environment::create($environment);
-        }
-        catch (\Throwable $throwable)
-        {
+        } catch (\Throwable $throwable) {
             throw new ConfigurationCheckFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
 
@@ -258,8 +249,7 @@ final class Bootstrap
      */
     private function __construct(string $rootDirectoryPath, string $entryPointName, Environment $environment)
     {
-        if (\is_dir($rootDirectoryPath) === false || \is_readable($rootDirectoryPath) === false)
-        {
+        if (\is_dir($rootDirectoryPath) === false || \is_readable($rootDirectoryPath) === false) {
             throw new ConfigurationCheckFailed('Incorrect root directory path');
         }
 

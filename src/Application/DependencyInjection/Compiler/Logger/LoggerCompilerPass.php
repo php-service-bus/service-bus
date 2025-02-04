@@ -29,8 +29,7 @@ final class LoggerCompilerPass implements CompilerPassInterface
     {
         $loggerDefinition = $container->getDefinition(LoggerInterface::class);
 
-        if ($loggerDefinition->getClass() === NullLogger::class)
-        {
+        if ($loggerDefinition->getClass() === NullLogger::class) {
             $loggerDefinition->setClass(Logger::class);
             $loggerDefinition->setArguments(['%service_bus.entry_point%']);
         }
@@ -41,8 +40,7 @@ final class LoggerCompilerPass implements CompilerPassInterface
             ProcessIdProcessor::class,
         ];
 
-        foreach ($processors as $processor)
-        {
+        foreach ($processors as $processor) {
             $container->addDefinitions([$processor => new Definition($processor)]);
             $loggerDefinition->addMethodCall(
                 method: 'pushProcessor',

@@ -16,6 +16,7 @@ use Amp\Promise;
 use Amp\Success;
 use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Package\IncomingPackage;
+
 use function ServiceBus\Common\uuid;
 
 /**
@@ -60,8 +61,7 @@ final class EntryPointTestIncomingPackage implements IncomingPackage
 
     public function origin(): DeliveryDestination
     {
-        return new class () implements DeliveryDestination
-        {
+        return new class () implements DeliveryDestination {
         };
     }
 

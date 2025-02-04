@@ -21,6 +21,7 @@ use ServiceBus\Transport\Common\DeliveryDestination;
 use ServiceBus\Transport\Common\Exceptions\SendMessageFailed;
 use ServiceBus\Transport\Common\Package\OutboundPackage;
 use ServiceBus\Transport\Common\Transport;
+
 use function Amp\call;
 
 /**
@@ -105,8 +106,7 @@ final class MessageDeliveryEndpoint implements Endpoint
     public function deliveryBulk(array $packages): Promise
     {
         $outboundPackages = \array_map(
-            function (DeliveryPackage $package): OutboundPackage
-            {
+            function (DeliveryPackage $package): OutboundPackage {
                 return $this->createOutboundPackage(
                     package: $package,
                     destination: $this->destination
@@ -157,22 +157,19 @@ final class MessageDeliveryEndpoint implements Endpoint
         $deferred = new Deferred();
 
         Loop::defer(
-            function () use ($packages, $deferred): void
-            {
+            function () use ($packages, $deferred): void {
+                /** @psalm-suppress PossiblyInvalidArgument */
                 $promise = call(
                     $this->deliveryRetryHandler,
-                    function () use ($packages): \Generator
-                    {
+                    function () use ($packages): \Generator {
                         yield $this->transport->send(...$packages);
                     },
                     SendMessageFailed::class
                 );
 
                 $promise->onResolve(
-                    static function (?\Throwable $throwable) use ($deferred): void
-                    {
-                        if ($throwable === null)
-                        {
+                    static function (?\Throwable $throwable) use ($deferred): void {
+                        if ($throwable === null) {
                             $deferred->resolve();
 
                             return;

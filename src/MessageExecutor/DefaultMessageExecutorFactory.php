@@ -33,10 +33,9 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
 
     public function __construct(ChainArgumentResolver $argumentResolver, ?ValidatorInterface $validator = null)
     {
-        if ($validator === null)
-        {
+        if ($validator === null) {
             $validator = (new ValidatorBuilder())
-                ->enableAnnotationMapping()
+                ->enableAttributeMapping()
                 ->getValidator();
         }
 
@@ -62,8 +61,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
             argumentResolver: $this->argumentResolver
         );
 
-        if ($options->validationEnabled)
-        {
+        if ($options->validationEnabled) {
             $messageExecutor = new MessageValidationExecutor(
                 executor: $messageExecutor,
                 options: $options,
@@ -71,8 +69,7 @@ final class DefaultMessageExecutorFactory implements MessageExecutorFactory
             );
         }
 
-        if ($options->executionTimeout !== null)
-        {
+        if ($options->executionTimeout !== null) {
             $messageExecutor = new TimeLimitedExecutor(
                 executor: $messageExecutor,
                 options: $options

@@ -12,7 +12,7 @@ declare(strict_types=0);
 
 namespace ServiceBus\Application\DependencyInjection\Compiler\Logger;
 
-use Monolog\Logger;
+use Monolog\Level;
 use Psr\Log\LoggerInterface;
 use ServiceBus\Infrastructure\Logger\Handlers\StdOut\StdOutHandler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -26,11 +26,11 @@ use Symfony\Component\DependencyInjection\Reference;
 final class StdOutLoggerCompilerPass implements CompilerPassInterface
 {
     /**
-     * @var int
+     * @var Level
      */
     private $logLevel;
 
-    public function __construct(int $logLevel = Logger::DEBUG)
+    public function __construct(Level $logLevel = Level::Debug)
     {
         $this->logLevel = $logLevel;
     }

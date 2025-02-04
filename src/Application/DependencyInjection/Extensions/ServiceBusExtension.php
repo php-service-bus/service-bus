@@ -34,8 +34,7 @@ final class ServiceBusExtension extends Extension
          * @psalm-var non-empty-string                 $key
          * @psalm-var array|bool|string|int|float|null $value
          */
-        foreach ($configs as $key => $value)
-        {
+        foreach ($configs as $key => $value) {
             $container->setParameter($key, $value);
         }
     }

@@ -12,18 +12,14 @@ declare(strict_types=0);
 
 namespace ServiceBus\Services\Attributes\Options;
 
-/**
- * @psalm-immutable
- */
 final class WithValidation
 {
     /**
-     * @psalm-readonly
      * @psalm-var list<non-empty-string>
      *
      * @var string[]
      */
-    public $groups = [];
+    public array $groups = [];
 
     /**
      * @psalm-param list<non-empty-string> $groups

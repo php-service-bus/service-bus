@@ -40,13 +40,11 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
          * @psalm-var non-empty-string       $id
          * @psalm-var list<non-empty-string> $tags
          */
-        foreach ($taggedServices as $id => $tags)
-        {
+        foreach ($taggedServices as $id => $tags) {
             /** @psalm-var class-string|null $serviceClass */
             $serviceClass = $container->getDefinition($id)->getClass();
 
-            if ($serviceClass !== null)
-            {
+            if ($serviceClass !== null) {
                 $this->collectServiceDependencies(
                     serviceClass: $serviceClass,
                     container: $container,
@@ -64,15 +62,13 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
         }
 
         /** Sagas dependencies */
-        if ($container->hasParameter('saga_dependencies'))
-        {
+        if ($container->hasParameter('saga_dependencies')) {
             /**
              * @var string[]
              */
             $externalDependencies = $container->getParameter('saga_dependencies');
 
-            foreach ($externalDependencies as $dependency)
-            {
+            foreach ($externalDependencies as $dependency) {
                 $servicesReference[$dependency] = new ServiceClosureArgument(
                     new Reference($dependency)
                 );
@@ -102,12 +98,9 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
     ): void {
         $reflectionClass = new \ReflectionClass($serviceClass);
 
-        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod)
-        {
-            foreach ($reflectionMethod->getParameters() as $parameter)
-            {
-                if ($parameter->hasType() === false)
-                {
+        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            foreach ($reflectionMethod->getParameters() as $parameter) {
+                if ($parameter->hasType() === false) {
                     continue;
                 }
 
@@ -115,8 +108,7 @@ final class TaggedMessageHandlersCompilerPass implements CompilerPassInterface
                 $reflectionType     = $parameter->getType();
                 $reflectionTypeName = $reflectionType->getName();
 
-                if (self::supportedType($parameter) && $container->has($reflectionTypeName))
-                {
+                if (self::supportedType($parameter) && $container->has($reflectionTypeName)) {
                     $servicesReference[$reflectionTypeName] = new ServiceClosureArgument(
                         new Reference($reflectionTypeName)
                     );

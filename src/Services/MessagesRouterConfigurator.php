@@ -68,19 +68,16 @@ final class MessagesRouterConfigurator implements RouterConfigurator
      */
     public function configure(Router $router): void
     {
-        try
-        {
+        try {
             /** @var ServiceHandlersLoader $serviceConfigurationExtractor */
             $serviceConfigurationExtractor = $this->routingServiceLocator->get(ServiceHandlersLoader::class);
 
-            foreach ($this->servicesList as $serviceId)
-            {
+            foreach ($this->servicesList as $serviceId) {
                 /** @var object $serviceObject */
                 $serviceObject = $this->servicesServiceLocator->get(\sprintf('%s_service', $serviceId));
 
                 /** @var \ServiceBus\Services\Configuration\ServiceMessageHandler $handler */
-                foreach ($serviceConfigurationExtractor->load($serviceObject) as $handler)
-                {
+                foreach ($serviceConfigurationExtractor->load($serviceObject) as $handler) {
                     $messageExecutor = $this->executorFactory->create($handler->messageHandler);
 
                     $registerMethod = $handler->type === ServiceMessageHandlerType::COMMAND_HANDLER
@@ -90,9 +87,7 @@ final class MessagesRouterConfigurator implements RouterConfigurator
                     $router->{$registerMethod}($handler->messageHandler->messageClass, $messageExecutor);
                 }
             }
-        }
-        catch (\Throwable $throwable)
-        {
+        } catch (\Throwable $throwable) {
             throw new MessageRouterConfigurationFailed($throwable->getMessage(), (int) $throwable->getCode(), $throwable);
         }
     }

@@ -24,6 +24,7 @@ use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\Context\ValidationViolations;
 use ServiceBus\Common\Endpoint\DeliveryOptions;
 use ServiceBus\EntryPoint\ReceivedMessageMetadata;
+
 use function Amp\call;
 use function ServiceBus\Common\uuid;
 
@@ -78,8 +79,7 @@ final class TestContext implements ServiceBusContext
         ?OutcomeMessageMetadata $withMetadata = null
     ): Promise {
         return call(
-            function () use ($message)
-            {
+            function () use ($message) {
                 $this->messages[] = $message;
             }
         );
@@ -91,10 +91,8 @@ final class TestContext implements ServiceBusContext
         ?OutcomeMessageMetadata $withMetadata = null
     ): Promise {
         return call(
-            function () use ($messages)
-            {
-                foreach ($messages as $message)
-                {
+            function () use ($messages) {
+                foreach ($messages as $message) {
                     $this->messages[] = $message;
                 }
             }

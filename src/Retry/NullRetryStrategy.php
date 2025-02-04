@@ -16,15 +16,16 @@ use Amp\Promise;
 use ServiceBus\Common\Context\ServiceBusContext;
 use ServiceBus\Common\EntryPoint\Retry\FailureContext;
 use ServiceBus\Common\EntryPoint\Retry\RetryStrategy;
+
 use function Amp\call;
 
 final class NullRetryStrategy implements RetryStrategy
 {
     public function retry(object $message, ServiceBusContext $context, FailureContext $details): Promise
     {
+        /** @phpstan-ignore return.type */
         return call(
-            static function () use ($context): void
-            {
+            static function () use ($context): void {
                 $context->logger()->debug('Message reprocessing not configured');
             }
         );
@@ -32,9 +33,9 @@ final class NullRetryStrategy implements RetryStrategy
 
     public function backoff(object $message, ServiceBusContext $context, FailureContext $details): Promise
     {
+        /** @phpstan-ignore return.type */
         return call(
-            static function () use ($context): void
-            {
+            static function () use ($context): void {
                 $context->logger()->debug('Message reprocessing not configured');
             }
         );

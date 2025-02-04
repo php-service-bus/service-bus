@@ -20,6 +20,7 @@ use ServiceBus\Application\DependencyInjection\ContainerBuilder\ContainerBuilder
 use ServiceBus\Application\DependencyInjection\Extensions\ServiceBusExtension;
 use ServiceBus\ArgumentResolver\ArgumentResolverModule;
 use ServiceBus\Environment;
+
 use function ServiceBus\Tests\removeDirectory;
 
 /**
@@ -37,8 +38,7 @@ final class ContainerBuilderTest extends TestCase
         parent::setUp();
         $this->cacheDirectory = \sys_get_temp_dir() . '/container_test';
 
-        if (\file_exists($this->cacheDirectory) === false)
-        {
+        if (\file_exists($this->cacheDirectory) === false) {
             \mkdir($this->cacheDirectory);
         }
     }

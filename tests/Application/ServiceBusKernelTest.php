@@ -25,6 +25,7 @@ use ServiceBus\Transport\Common\Topic;
 use ServiceBus\Transport\Common\Transport;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+
 use function ServiceBus\Tests\removeDirectory;
 
 /**
@@ -48,8 +49,7 @@ final class ServiceBusKernelTest extends TestCase
 
         $this->cacheDirectory = \sys_get_temp_dir() . '/kernel_test';
 
-        if (\file_exists($this->cacheDirectory) === false)
-        {
+        if (\file_exists($this->cacheDirectory) === false) {
             \mkdir($this->cacheDirectory);
         }
 
@@ -57,8 +57,7 @@ final class ServiceBusKernelTest extends TestCase
         $this->bootstrap->useCustomCacheDirectory($this->cacheDirectory);
 
         $this->bootstrap->applyModules(
-            new class () implements ServiceBusModule
-            {
+            new class () implements ServiceBusModule {
                 public function boot(ContainerBuilder $containerBuilder): void
                 {
                     $containerBuilder->setDefinition(
@@ -92,10 +91,8 @@ final class ServiceBusKernelTest extends TestCase
         $kernel = new ServiceBusKernel($this->bootstrap->boot());
 
         Loop::run(
-            static function () use ($kernel): \Generator
-            {
-                $queue = new class () implements Queue
-                {
+            static function () use ($kernel): \Generator {
+                $queue = new class () implements Queue {
                     public function toString(): string
                     {
                         return 'kernelQueue';
@@ -105,8 +102,7 @@ final class ServiceBusKernelTest extends TestCase
                 yield $kernel->createQueue($queue);
 
                 yield $kernel->createTopic(
-                    new class () implements Topic
-                    {
+                    new class () implements Topic {
                         public function toString(): string
                         {
                             return 'kernelTopic';

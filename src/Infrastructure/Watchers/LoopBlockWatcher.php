@@ -59,8 +59,7 @@ final class LoopBlockWatcher
 
     private function getDetector(): BlockDetector
     {
-        if ($this->detector === null)
-        {
+        if ($this->detector === null) {
             $this->detector = new BlockDetector(
                 onBlock: self::createOnBlockHandler($this->logger),
                 blockThreshold: self::BLOCK_THRESHOLD,
@@ -76,8 +75,7 @@ final class LoopBlockWatcher
      */
     private static function createOnBlockHandler(LoggerInterface $logger): callable
     {
-        return static function (float|int $blockInterval) use ($logger): void
-        {
+        return static function (float|int $blockInterval) use ($logger): void {
             $trace     = \debug_backtrace();
             $traceData = ['info' => []];
 
@@ -88,16 +86,14 @@ final class LoopBlockWatcher
             \array_shift($trace);
 
             $i = 0;
-
-            while (isset($trace[$i]['class']))
-            {
+            while (isset($trace[$i]['class'], $trace[$i]['function'])) {
                 $traceData['info'] = \array_merge(
                     $traceData['info'],
                     [
-                        'file'     => $trace[$i - 1]['file'] ?? null,
-                        'line'     => $trace[$i - 1]['line'] ?? null,
-                        'class'    => $trace[$i]['class'] ?? null,
-                        'function' => $trace[$i]['function'] ?? null,
+                        'file'     => $trace[$i]['file'] ?? null,
+                        'line'     => $trace[$i]['line'] ?? null,
+                        'class'    => $trace[$i]['class'],
+                        'function' => $trace[$i]['function'],
                     ]
                 );
 

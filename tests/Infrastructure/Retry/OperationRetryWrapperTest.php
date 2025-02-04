@@ -17,6 +17,7 @@ namespace ServiceBus\Tests\Infrastructure\Retry;
 use PHPUnit\Framework\TestCase;
 use ServiceBus\Infrastructure\Retry\OperationRetryWrapper;
 use ServiceBus\Infrastructure\Retry\RetryOptions;
+
 use function Amp\Promise\wait;
 
 /**
@@ -30,10 +31,9 @@ final class OperationRetryWrapperTest extends TestCase
     public function failedRetry(): void
     {
         $this->expectException(\LogicException::class);
-        $this->expectDeprecationMessage('qwerty');
+        $this->expectExceptionMessage('qwerty');
 
-        $closure = static function (): void
-        {
+        $closure = static function (): void {
             throw new \LogicException('qwerty');
         };
 

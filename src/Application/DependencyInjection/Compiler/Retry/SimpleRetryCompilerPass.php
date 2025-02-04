@@ -69,8 +69,7 @@ final class SimpleRetryCompilerPass implements CompilerPassInterface
             'service_bus.retry.simple.retry_delay'     => $this->retryDelay
         ];
 
-        foreach ($parameters as $key => $value)
-        {
+        foreach ($parameters as $key => $value) {
             $containerBuilder->setParameter(
                 name: $key,
                 value: $value
