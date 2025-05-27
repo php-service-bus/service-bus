@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Stepan Zolotarev
  */
