@@ -17,7 +17,6 @@ use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Level;
-use Monolog\Logger;
 use Monolog\LogRecord;
 
 /**

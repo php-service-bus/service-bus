@@ -84,7 +84,7 @@ final class SimpleRetryStrategy implements RetryStrategy
                         );
 
                         $context->logger()->info(
-                            'Resending an `{messageClass}` message to the queue wit delay `{delay}`',
+                            'Resending an `{messageClass}` message to the queue with delay `{delay}`',
                             [
                                 'messageClass'   => \get_class($message),
                                 'delay'          => $delay,

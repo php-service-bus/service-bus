@@ -14,7 +14,6 @@ namespace ServiceBus\Infrastructure\Logger\Handlers\Graylog;
 
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Level;
-use Monolog\Logger;
 use Monolog\LogRecord;
 
 /**

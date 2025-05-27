@@ -33,34 +33,30 @@ use function ServiceBus\Common\uuid;
  */
 final class TestContext implements ServiceBusContext
 {
-    /**
-     * @var object
-     */
-    private $incomeMessage;
+    private object $incomeMessage;
+
+    private ReceivedMessageMetadata $receivedMessageMetadata;
 
     /**
-     * @var object[]
+     * @var array<string, object>
      */
-    public $messages = [];
+    public array $messages = [];
 
     /**
-     * @var TestHandler
+     * @var array<string, OutcomeMessageMetadata>
      */
-    public $testLogHandler;
+    public array $withMetadata = [];
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    public TestHandler $testLogHandler;
 
-    /**
-     * @var ValidationViolations|null
-     */
-    private $violations;
+    private LoggerInterface $logger;
+
+    private ?ValidationViolations $violations = null;
 
     public function __construct(object $incomeMessage)
     {
         $this->incomeMessage  = $incomeMessage;
+        $this->receivedMessageMetadata = new ReceivedMessageMetadata(uuid(), uuid(), []);
         $this->testLogHandler = new TestHandler();
         $this->logger         = new Logger(
             __CLASS__,
@@ -79,8 +75,13 @@ final class TestContext implements ServiceBusContext
         ?OutcomeMessageMetadata $withMetadata = null
     ): Promise {
         return call(
-            function () use ($message) {
-                $this->messages[] = $message;
+            function () use ($message, $withMetadata) {
+                $id = \spl_object_hash($message);
+
+                $this->messages[$id] = $message;
+                if ($withMetadata !== null) {
+                    $this->withMetadata[$id] = $withMetadata;
+                }
             }
         );
     }
@@ -91,9 +92,14 @@ final class TestContext implements ServiceBusContext
         ?OutcomeMessageMetadata $withMetadata = null
     ): Promise {
         return call(
-            function () use ($messages) {
+            function () use ($messages, $withMetadata) {
                 foreach ($messages as $message) {
-                    $this->messages[] = $message;
+                    $id = \spl_object_hash($message);
+
+                    $this->messages[$id] = $message;
+                    if ($withMetadata !== null) {
+                        $this->withMetadata[$id] = $withMetadata;
+                    }
                 }
             }
         );
@@ -111,7 +117,7 @@ final class TestContext implements ServiceBusContext
 
     public function metadata(): IncomingMessageMetadata
     {
-        return new ReceivedMessageMetadata(uuid(), uuid(), []);
+        return $this->receivedMessageMetadata;
     }
 
     /**
